@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Database;
+using ClawRPG.Scripts.UI;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -290,9 +291,11 @@ namespace ClawRPG.Scripts.Characters {
         
         private void ShowDamageNumber(int damage, bool isCrit)
         {
-            var popup = new DamagePopup();
-            popup.Initialize(damage, isCrit, GlobalPosition);
-            GetTree().CurrentScene.AddChild(popup);
+            if (DamageNumberSystem.Instance != null)
+            {
+                var type = isCrit ? DamageNumberSystem.DamageType.Critical : DamageNumberSystem.DamageType.Normal;
+                DamageNumberSystem.Instance.ShowDamageOnEntity2D(this, damage, type);
+            }
         }
         
         private void FlashDamage()

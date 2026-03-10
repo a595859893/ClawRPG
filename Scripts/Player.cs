@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.UI;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -442,12 +443,21 @@ namespace ClawRPG.Scripts.Characters {
                 {
                     finalDamage = 0;
                     TriggerPerfectBlock();
-                    // Counter attack could trigger here
+                    // Show perfect block text
+                    if (DamageNumberSystem.Instance != null)
+                    {
+                        DamageNumberSystem.Instance.ShowTextEffect2D(GetViewport().GetCamera2D().GetScreenCenterPosition(), "PERFECT!", DamageNumberSystem.DamageType.Blocked);
+                    }
                     GD.Print("Perfect block! No damage taken!");
                 }
                 else
                 {
                     finalDamage *= (1 - BlockDamageReduction);
+                    // Show blocked text
+                    if (DamageNumberSystem.Instance != null)
+                    {
+                        DamageNumberSystem.Instance.ShowTextEffect2D(GetViewport().GetCamera2D().GetScreenCenterPosition(), "BLOCKED", DamageNumberSystem.DamageType.Blocked);
+                    }
                     GD.Print("Blocked! Damage reduced to: " + finalDamage);
                 }
             }
@@ -471,8 +481,11 @@ namespace ClawRPG.Scripts.Characters {
                 Velocity = -fromDirection * 100f;
             }
             
-            // Visual feedback
-            ShowDamageNumber((int)finalDamage, isCrit);
+            // Visual feedback - show damage number
+            if (finalDamage > 0)
+            {
+                ShowDamageNumber((int)finalDamage, isCrit);
+            }
             
             GD.Print("Player took " + finalDamage + " damage. HP: " + CurrentHealth + "/" + MaxHealth);
         }
@@ -482,6 +495,11 @@ namespace ClawRPG.Scripts.Characters {
             CurrentHealth = Mathf.Min(MaxHealth, CurrentHealth + amount);
             // Track statistics
             StatisticsManager.Instance.RecordHealing(amount);
+            // Show heal number
+            if (DamageNumberSystem.Instance != null)
+            {
+                DamageNumberSystem.Instance.ShowDamageOnEntity2D(this, amount, DamageNumberSystem.DamageType.Heal);
+            }
             GD.Print("Healed " + amount + " HP. HP: " + CurrentHealth + "/" + MaxHealth);
         }
         
@@ -736,9 +754,11 @@ namespace ClawRPG.Scripts.Characters {
         
         private void ShowDamageNumber(int damage, bool isCrit)
         {
-            var popup = new DamagePopup();
-            popup.Initialize(damage, isCrit, GlobalPosition);
-            GetTree().CurrentScene.AddChild(popup);
+            if (DamageNumberSystem.Instance != null)
+            {
+                var type = isCrit ? DamageNumberSystem.DamageType.Critical : DamageNumberSystem.DamageType.Normal;
+                DamageNumberSystem.Instance.ShowDamageOnEntity2D(this, damage, type);
+            }
         }
     }
     
