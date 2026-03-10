@@ -601,6 +601,94 @@ namespace ClawRPG.Scripts.Characters {
             return IsPerfectBlock ? 1.0f : BlockDamageReduction;
         }
         
+        /// <summary>
+        /// 重置玩家数据 - 用于新游戏开始
+        /// </summary>
+        public void ResetPlayer()
+        {
+            // 重置基础属性
+            CurrentHealth = MaxHealth;
+            CurrentMana = MaxMana;
+            CurrentStamina = MaxStamina;
+            Level = 1;
+            Experience = 0;
+            Gold = 0;
+            
+            // 重置战斗状态
+            IsAttacking = false;
+            IsBlocking = false;
+            IsDodging = false;
+            IsInvincible = false;
+            IsPerfectBlock = false;
+            
+            // 重置技能
+            SkillPoints = 0;
+            LearnedSkillIds.Clear();
+            SkillLevels.Clear();
+            
+            // 重置状态效果
+            _statusEffects.Clear();
+            
+            // 重置世界事件倍率
+            EventXPMultiplier = 1.0f;
+            EventDropMultiplier = 1.0f;
+            EventGoldMultiplier = 1.0f;
+            
+            // 重置位置
+            GlobalPosition = new Vector2(640, 360);
+            
+            GD.Print("Player reset for new game");
+        }
+        
+        /// <summary>
+        /// 加载玩家数据 - 用于存档读取
+        /// </summary>
+        public void LoadPlayerData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            
+            // 加载基础属性
+            if (data.TryGetValue("Level", out var level)) Level = Convert.ToInt32(level);
+            if (data.TryGetValue("Experience", out var exp)) Experience = Convert.ToInt32(exp);
+            if (data.TryGetValue("Gold", out var gold)) Gold = Convert.ToInt32(gold);
+            if (data.TryGetValue("CurrentHealth", out var health)) CurrentHealth = Convert.ToInt32(health);
+            if (data.TryGetValue("CurrentMana", out var mana)) CurrentMana = Convert.ToInt32(mana);
+            
+            // 加载技能点
+            if (data.TryGetValue("SkillPoints", out var skillPoints)) 
+                SkillPoints = Convert.ToInt32(skillPoints);
+            
+            // 加载已学习技能
+            if (data.TryGetValue("LearnedSkillIds", out var skillIds))
+            {
+                LearnedSkillIds.Clear();
+                var ids = skillIds as System.Collections.IEnumerable;
+                if (ids != null)
+                {
+                    foreach (var id in ids)
+                    {
+                        LearnedSkillIds.Add(Convert.ToInt32(id));
+                    }
+                }
+            }
+            
+            // 加载技能等级
+            if (data.TryGetValue("SkillLevels", out var skillLevels))
+            {
+                SkillLevels.Clear();
+                var levels = skillLevels as Dictionary<object, object>;
+                if (levels != null)
+                {
+                    foreach (var kvp in levels)
+                    {
+                        SkillLevels[Convert.ToInt32(kvp.Key)] = Convert.ToInt32(kvp.Value);
+                    }
+                }
+            }
+            
+            GD.Print("Player data loaded: Level " + Level + ", Gold " + Gold);
+        }
+        
         private void ShowDamageNumber(int damage, bool isCrit)
         {
             var popup = new DamagePopup();

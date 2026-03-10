@@ -17,8 +17,26 @@ namespace ClawRPG.Scripts {
         private Node2D _items;
         
         // Game state
+        public enum GameState
+        {
+            TitleScreen,
+            Playing,
+            Paused,
+            GameOver
+        }
+        
+        private GameState _currentGameState = GameState.Playing;
+        
         public static bool IsPaused { get; private set; }
         public static int CurrentDay { get; private set; } = 1;
+        
+        public void SetGameState(GameState state)
+        {
+            _currentGameState = state;
+            GD.Print("Game state changed to: " + state);
+        }
+        
+        public GameState GetGameState() => _currentGameState;
         
         public override void _Ready()
         {
@@ -307,6 +325,134 @@ namespace ClawRPG.Scripts {
         public WorldEventManager GetWorldEventManager()
         {
             return WorldEventManager.Instance;
+        }
+        
+        /// <summary>
+        /// 开始新游戏
+        /// </summary>
+        public void StartNewGame()
+        {
+            GD.Print("Starting new game...");
+            
+            // 重置玩家数据
+            if (_player != null)
+            {
+                _player.ResetPlayer();
+            }
+            
+            // 重置游戏状态
+            CurrentDay = 1;
+            IsPaused = false;
+            SetGameState(GameState.Playing);
+            
+            // 显示游戏UI
+            ShowGameUI();
+            
+            GD.Print("New game started!");
+        }
+        
+        /// <summary>
+        /// 加载游戏存档
+        /// </summary>
+        public void LoadGame(int saveSlot)
+        {
+            GD.Print("Loading game from slot: " + saveSlot);
+            
+            var saveSystem = new SaveSystem();
+            var saveData = saveSystem.LoadGame(saveSlot);
+            
+            if (saveData != null)
+            {
+                // 加载玩家数据
+                if (_player != null && saveData.PlayerData != null)
+                {
+                    _player.LoadPlayerData(saveData.PlayerData);
+                }
+                
+                // 加载统计
+                var statsData = new Dictionary<string, object>
+                {
+                    ["TotalKills"] = saveData.TotalKills,
+                    ["TotalDeaths"] = saveData.TotalDeaths,
+                    ["TotalDamageDealt"] = saveData.TotalDamageDealt,
+                    ["TotalDamageTaken"] = saveData.TotalDamageTaken,
+                    ["TotalHealing"] = saveData.TotalHealing,
+                    ["CriticalHits"] = saveData.CriticalHits,
+                    ["PerfectBlocks"] = saveData.PerfectBlocks,
+                    ["Dodges"] = saveData.Dodges,
+                    ["GoldEarned"] = saveData.GoldEarned,
+                    ["GoldSpent"] = saveData.GoldSpent,
+                    ["ExperienceGained"] = saveData.ExperienceGained,
+                    ["ItemsCollected"] = saveData.ItemsCollected,
+                    ["ItemsCrafted"] = saveData.ItemsCrafted,
+                    ["QuestsCompleted"] = saveData.QuestsCompleted,
+                    ["SkillsLearned"] = saveData.SkillsLearned,
+                    ["SkillsUsed"] = saveData.SkillsUsed,
+                    ["RegionsDiscovered"] = saveData.RegionsDiscovered,
+                    ["EnemiesEncountered"] = saveData.EnemiesEncountered,
+                    ["BossesDefeated"] = saveData.BossesDefeated,
+                    ["TotalPlayTime"] = saveData.TotalPlayTime,
+                    ["HighestLevel"] = saveData.HighestLevel,
+                    ["HighestCombo"] = saveData.HighestCombo,
+                    ["AchievementsUnlocked"] = saveData.AchievementsUnlocked
+                };
+                StatisticsManager.Instance.LoadStatistics(statsData);
+                
+                CurrentDay = saveData.CurrentDay;
+                SetGameState(GameState.Playing);
+                
+                ShowGameUI();
+                
+                GD.Print("Game loaded successfully!");
+            }
+            else
+            {
+                GD.PrintErr("Failed to load save file!");
+            }
+        }
+        
+        /// <summary>
+        /// 显示游戏UI
+        /// </summary>
+        private void ShowGameUI()
+        {
+            // 显示所有游戏UI元素
+            var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+            if (canvasLayer != null)
+            {
+                foreach (var child in canvasLayer.GetChildren())
+                {
+                    if (child is Control control)
+                    {
+                        control.Visible = true;
+                    }
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 切换设置界面
+        /// </summary>
+        public void ToggleSettings()
+        {
+            var settingsUI = GetNodeOrNull<Control>("CanvasLayer/SettingsUI");
+            if (settingsUI != null)
+            {
+                settingsUI.Visible = !settingsUI.Visible;
+                
+                if (settingsUI.Visible)
+                {
+                    GD.Print("Settings opened");
+                }
+                else
+                {
+                    GD.Print("Settings closed");
+                }
+            }
+            else
+            {
+                GD.Print("Settings UI not found in scene");
+            }
         }
     }
 }
