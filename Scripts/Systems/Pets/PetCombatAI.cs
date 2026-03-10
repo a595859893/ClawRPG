@@ -5,7 +5,12 @@ using System.Collections.Generic;
 namespace ClawRPG.Scripts.Systems.Pets
 {
     /// <summary>
-    /// 宠物战斗AI - 宠物在战斗中自动攻击敌人
+    /// 宠物战斗AI - 增强版
+    /// - 战术行为：包围、侧翼、环绕
+    /// - 智能目标选择：低血量、脆皮优先
+    /// - 宠物性格系统：基于宠物类型的行为差异
+    /// - 主动buff：主动为玩家提供增益
+    /// - 队形跟随：更好的跟随位置
     /// </summary>
     public class PetCombatAI : Node
     {
@@ -17,16 +22,22 @@ namespace ClawRPG.Scripts.Systems.Pets
         private Pet _activePet;
         private CharacterBody2D _player;
         
-        // AI配置
-        private float _followDistance = 80f;      // 跟随距离
-        private float _attackRange = 100f;       // 攻击范围
-        private float _followSpeed = 150f;       // 跟随速度
-        private float _attackCooldown = 1.5f;    // 攻击冷却
+        // AI配置 - 可根据宠物类型调整
+        private float _followDistance = 80f;
+        private float _attackRange = 100f;
+        private float _followSpeed = 180f;
+        private float _attackCooldown = 1.5f;
         private float _lastAttackTime = 0f;
         
-        // 状态
-        private enum PetAIState { Idle, Following, Attacking, Returning }
+        // 战术配置
+        private float _tacticalDistance = 150f;    // 战术距离
+        private float _flankAngle = 45f;           // 侧翼角度
+        private float _circlespeed = 2f;           // 环绕速度
+        
+        // 状态机
+        private enum PetAIState { Idle, Following, Engaging, Attacking, Retreating, Supporting }
         private PetAIState _currentState = PetAIState.Idle;
+        private PetAIState _previousState = PetAIState.Idle;
         
         // 敌人检测
         private Area2D _detectionArea;
@@ -39,7 +50,16 @@ namespace ClawRPG.Scripts.Systems.Pets
         // 信号
         public Action OnPetAttack;
         public Action<string> OnPetSpecialAbility;
-
+        
+        // 战术数据
+        private Node2D _currentTarget;
+        private Vector2 _tacticalPosition;
+        private float _stateTimer = 0f;
+        private float _supportCooldown = 0f;
+        
+        // 宠物性格参数
+        private PetPersonality _personality = PetPersonality.Balanced;
+        
         public bool IsEnabled { get; set; } = true;
         public bool IsVisible { get; set; } = true;
 
@@ -53,33 +73,61 @@ namespace ClawRPG.Scripts.Systems.Pets
                 CreatePetVisuals();
             }
             
-            GD.Print("宠物战斗AI已初始化");
+            GD.Print("宠物战斗AI已初始化 (增强版)");
         }
 
-        /// <summary>
-        /// 设置激活的宠物
-        /// </summary>
         public void SetActivePet(Pet pet)
         {
             _activePet = pet;
-            if (pet != null && _petNameLabel != null)
+            if (pet != null)
             {
-                _petNameLabel.Text = pet.PetName;
+                if (_petNameLabel != null)
+                {
+                    _petNameLabel.Text = pet.PetName;
+                }
+                // 根据宠物类型设置性格
+                UpdatePersonality(pet.Type);
+            }
+        }
+        
+        private void UpdatePersonality(PetType type)
+        {
+            switch (type)
+            {
+                case PetType.Companion:
+                    _personality = PetPersonality.Aggressive;
+                    _attackCooldown = 1.2f;
+                    _tacticalDistance = 120f;
+                    break;
+                case PetType.Collector:
+                    _personality = PetPersonality.Cautious;
+                    _attackCooldown = 2.0f;
+                    _tacticalDistance = 200f;
+                    _followDistance = 120f;
+                    break;
+                case PetType.Guardian:
+                    _personality = PetPersonality.Defensive;
+                    _attackCooldown = 1.8f;
+                    _tacticalDistance = 80f;
+                    _followDistance = 50f;
+                    break;
+                case PetType.Explorer:
+                    _personality = PetPersonality.Balanced;
+                    _attackCooldown = 1.5f;
+                    _tacticalDistance = 150f;
+                    break;
             }
         }
 
         private void CreatePetVisuals()
         {
-            // 创建宠物精灵
             _petSprite = new Sprite2D();
             _petSprite.Name = "PetSprite";
             _petSprite.Visible = IsVisible;
             
-            // 使用占位纹理
             var placeholderTexture = CreatePlaceholderTexture();
             _petSprite.Texture = placeholderTexture;
             
-            // 创建名称标签
             _petNameLabel = new Label();
             _petNameLabel.Name = "PetName";
             _petNameLabel.HorizontalAlignment = HorizontalAlignment.Center;
@@ -91,11 +139,10 @@ namespace ClawRPG.Scripts.Systems.Pets
                 _petNameLabel.Text = _activePet.PetName;
             }
             
-            // 创建检测区域
             _detectionArea = new Area2D();
             _detectionArea.Name = "DetectionArea";
             var detectionShape = new CollisionShape2D();
-            detectionShape.Shape = new CircleShape2D { Radius = 200f };
+            detectionShape.Shape = new CircleShape2D { Radius = 250f };
             _detectionArea.AddChild(detectionShape);
             
             _attackArea = new Area2D();
@@ -104,242 +151,450 @@ namespace ClawRPG.Scripts.Systems.Pets
             attackShape.Shape = new CircleShape2D { Radius = 30f };
             _attackArea.AddChild(attackShape);
             
-            // 添加节点
             AddChild(_petSprite);
             AddChild(_petNameLabel);
             AddChild(_detectionArea);
             AddChild(_attackArea);
             
-            // 连接敌人检测信号
             _detectionArea.AreaEntered += OnEnemyDetected;
         }
 
         private Texture2D CreatePlaceholderTexture()
         {
-            // 创建简单占位纹理
             var image = new Image(32, 32, Image.Format.Rgba8);
-            image.Fill(new Color(0.3f, 0.7f, 0.3f, 1f)); // 绿色宠物
+            Color petColor = _activePet?.Rarity switch
+            {
+                PetRarity.Common => new Color(0.7f, 0.7f, 0.7f, 1f),
+                PetRarity.Uncommon => new Color(0.3f, 0.8f, 0.3f, 1f),
+                PetRarity.Rare => new Color(0.3f, 0.5f, 0.9f, 1f),
+                PetRarity.Epic => new Color(0.6f, 0.3f, 0.8f, 1f),
+                PetRarity.Legendary => new Color(1f, 0.6f, 0f, 1f),
+                _ => new Color(0.3f, 0.7f, 0.3f, 1f)
+            };
+            image.Fill(petColor);
             return ImageTexture.CreateFromImage(image);
         }
 
-        private void OnEnemyDetected(Area2D area)
-        {
-            // 检测到敌人
-        }
+        private void OnEnemyDetected(Area2D area) { }
 
         public override void _PhysicsProcess(float delta)
         {
             if (!IsEnabled || _activePet == null || _player == null) return;
 
-            // 更新宠物位置跟随玩家
-            var playerPos = _player.GlobalPosition;
+            _stateTimer += delta;
             
-            // 查找最近的敌人
-            var nearestEnemy = FindNearestEnemy();
+            // 智能目标选择
+            var newTarget = SelectSmartTarget();
             
-            if (nearestEnemy != null)
-            {
-                float distanceToEnemy = playerPos.DistanceTo(nearestEnemy.GlobalPosition);
-                
-                if (distanceToEnemy <= _attackRange)
-                {
-                    // 在攻击范围内，攻击敌人
-                    AttackEnemy(nearestEnemy, delta);
-                }
-                else if (distanceToEnemy <= 300f)
-                {
-                    // 在检测范围内，靠近敌人
-                    MoveTowards(nearestEnemy.GlobalPosition, delta);
-                }
-                else
-                {
-                    // 跟随玩家
-                    FollowPlayer(delta);
-                }
-            }
-            else
-            {
-                // 没有敌人，跟随玩家
-                FollowPlayer(delta);
-            }
+            // 状态转换
+            UpdateStateMachine(newTarget, delta);
             
-            // 应用特殊能力
-            ProcessSpecialAbility(delta);
+            // 状态行为
+            ExecuteStateBehavior(newTarget, delta);
+            
+            // 特殊能力处理
+            ProcessSpecialAbility(newTarget, delta);
+            
+            // 更新视觉
+            UpdateVisuals();
+            
+            _currentTarget = newTarget;
         }
-
+        
+        private Node2D SelectSmartTarget()
+        {
+            if (_detectionArea == null) return null;
+            
+            var bodies = _detectionArea.GetOverlappingAreas();
+            if (bodies.Count == 0) return null;
+            
+            Node2D bestTarget = null;
+            float bestScore = float.MaxValue;
+            
+            foreach (var body in bodies)
+            {
+                var enemy = body?.GetParent();
+                if (enemy == null || !enemy.IsInGroup("enemy")) continue;
+                
+                float score = CalculateTargetScore(enemy);
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    bestTarget = enemy as Node2D;
+                }
+            }
+            
+            return bestTarget;
+        }
+        
+        /// <summary>
+        /// 计算目标评分（越低越好）
+        /// 考虑因素：距离、血量、威胁等级
+        /// </summary>
+        private float CalculateTargetScore(Node2D enemy)
+        {
+            float score = 0f;
+            
+            // 距离权重 (越近越好)
+            float dist = GlobalPosition.DistanceTo(enemy.GlobalPosition);
+            score += dist * 0.5f;
+            
+            // 血量权重 (低血量优先) - 需要从敌人获取HP
+            if (enemy.HasMethod("GetCurrentHealth"))
+            {
+                int currentHp = (int)enemy.Call("GetCurrentHealth");
+                int maxHp = (int)enemy.Call("GetMaxHealth");
+                float hpPercent = maxHp > 0 ? (float)currentHp / maxHp : 1f;
+                score += hpPercent * 500f; // 低血量降低分数
+            }
+            
+            // 性格影响
+            switch (_personality)
+            {
+                case PetPersonality.Aggressive:
+                    // 优先攻击玩家正在攻击的敌人
+                    break;
+                case PetPersonality.Cautious:
+                    score += dist * 0.3f; // 更偏好远程
+                    break;
+                case PetPersonality.Defensive:
+                    // 优先攻击靠近玩家的敌人
+                    if (_player != null)
+                    {
+                        float enemyToPlayer = enemy.GlobalPosition.DistanceTo(_player.GlobalPosition);
+                        score -= enemyToPlayer * 0.2f; // 靠近玩家的敌人分数更低
+                    }
+                    break;
+            }
+            
+            return score;
+        }
+        
+        private void UpdateStateMachine(Node2D target, float delta)
+        {
+            _previousState = _currentState;
+            
+            if (target == null)
+            {
+                _currentState = PetAIState.Following;
+                return;
+            }
+            
+            float distToEnemy = GlobalPosition.DistanceTo(target.GlobalPosition);
+            float distToPlayer = _player != null ? GlobalPosition.DistanceTo(_player.GlobalPosition) : float.MaxValue;
+            
+            // 玩家血量检查
+            bool playerLowHealth = false;
+            if (_player != null && _player.HasMethod("GetCurrentHealth"))
+            {
+                int playerHp = (int)_player.Call("GetCurrentHealth");
+                int playerMaxHp = (int)_player.Call("GetMaxHealth");
+                playerLowHealth = playerMaxHp > 0 && (float)playerHp / playerMaxHp < 0.3f;
+            }
+            
+            switch (_personality)
+            {
+                case PetPersonality.Defensive:
+                    // 守护型：玩家血量低时进入支援状态
+                    if (playerLowHealth && _activePet.SpecialAbility != "")
+                    {
+                        _currentState = PetAIState.Supporting;
+                        return;
+                    }
+                    break;
+                    
+                case PetPersonality.Aggressive:
+                    // 攻击型：保持战斗
+                    if (distToEnemy <= _attackRange)
+                        _currentState = PetAIState.Attacking;
+                    else if (distToEnemy <= _tacticalDistance)
+                        _currentState = PetAIState.Engaging;
+                    else
+                        _currentState = PetAIState.Engaging;
+                    return;
+                    
+                case PetPersonality.Cautious:
+                    // 谨慎型：保持距离
+                    if (distToEnemy < 80f)
+                        _currentState = PetAIState.Retreating;
+                    else if (distToEnemy <= _attackRange)
+                        _currentState = PetAIState.Attacking;
+                    else if (distToEnemy <= _tacticalDistance + 50f)
+                        _currentState = PetAIState.Engaging;
+                    else
+                        _currentState = PetAIState.Following;
+                    return;
+                    
+                default: // Balanced
+                    if (distToEnemy <= _attackRange)
+                        _currentState = PetAIState.Attacking;
+                    else if (distToEnemy <= _tacticalDistance)
+                        _currentState = PetAIState.Engaging;
+                    else
+                        _currentState = PetAIState.Engaging;
+                    return;
+            }
+        }
+        
+        private void ExecuteStateBehavior(Node2D target, float delta)
+        {
+            switch (_currentState)
+            {
+                case PetAIState.Following:
+                    FollowPlayer(delta);
+                    break;
+                    
+                case PetAIState.Engaging:
+                    if (target != null)
+                        TacticalApproach(target, delta);
+                    break;
+                    
+                case PetAIState.Attacking:
+                    if (target != null)
+                        AttackEnemy(target, delta);
+                    break;
+                    
+                case PetAIState.Retreating:
+                    if (target != null)
+                        MaintainDistance(target, delta, retreat: true);
+                    break;
+                    
+                case PetAIState.Supporting:
+                    SupportPlayer(delta);
+                    break;
+            }
+        }
+        
         private void FollowPlayer(float delta)
         {
             if (_player == null) return;
             
-            var playerPos = _player.GlobalPosition;
-            var followPos = playerPos + new Vector2(0, -_followDistance);
+            // 根据宠物类型选择跟随位置
+            Vector2 offset = _activePet?.Type switch
+            {
+                PetType.Guardian => new Vector2(GD.Randf() * 60f - 30f, -30f),
+                PetType.Collector => new Vector2(GD.Randf() * 80f - 40f, -60f),
+                _ => new Vector2(GD.Randf() * 40f - 20f, -_followDistance)
+            };
             
-            MoveTowards(followPos, delta);
+            // 平滑移动到目标位置
+            var targetPos = _player.GlobalPosition + offset;
+            MoveTowardsSmooth(targetPos, delta, _followSpeed * 0.8f);
         }
-
-        private void MoveTowards(Vector2 targetPos, float delta)
+        
+        /// <summary>
+        /// 战术接近 - 使用侧翼或包围策略
+        /// </summary>
+        private void TacticalApproach(Node2D target, float delta)
+        {
+            if (_player == null) return;
+            
+            // 计算最佳战术位置
+            Vector2 playerPos = _player.GlobalPosition;
+            Vector2 enemyPos = target.GlobalPosition;
+            
+            // 获取玩家朝向
+            int playerFacing = 1; // 默认朝右
+            if (_player is CharacterBody2D cb && cb.Velocity.x != 0)
+                playerFacing = cb.Velocity.x > 0 ? 1 : -1;
+            
+            // 侧翼位置：敌人侧后方
+            Vector2 enemyDir = (enemyPos - playerPos).Normalized();
+            Vector2 flankDir = new Vector2(-enemyDir.y, enemyDir.x);
+            
+            // 目标位置：在敌人侧翼，保持战术距离
+            Vector2 tacticalTarget = enemyPos - enemyDir * _tacticalDistance * 0.5f + flankDir * playerFacing * _tacticalDistance * 0.3f;
+            
+            MoveTowardsSmooth(tacticalTarget, delta, _followSpeed);
+        }
+        
+        /// <summary>
+        /// 保持距离 - 攻击型保持近身，谨慎型保持距离
+        /// </summary>
+        private void MaintainDistance(Node2D target, float delta, bool retreat = false)
+        {
+            float currentDist = GlobalPosition.DistanceTo(target.GlobalPosition);
+            float idealDist = _personality == PetPersonality.Cautious ? 150f : 80f;
+            
+            Vector2 direction;
+            if (retreat && currentDist < idealDist)
+                direction = (GlobalPosition - target.GlobalPosition).Normalized();
+            else if (currentDist > idealDist + 20f)
+                direction = (target.GlobalPosition - GlobalPosition).Normalized();
+            else
+                return; // 距离合适
+            
+            GlobalPosition += direction * _followSpeed * delta;
+            
+            if (_petSprite != null)
+                _petSprite.FlipH = direction.x < 0;
+        }
+        
+        /// <summary>
+        /// 平滑移动到目标位置
+        /// </summary>
+        private void MoveTowardsSmooth(Vector2 targetPos, float delta, float speed)
         {
             var currentPos = GlobalPosition;
             var direction = (targetPos - currentPos).Normalized();
             var distance = currentPos.DistanceTo(targetPos);
             
-            if (distance > 10f)
+            if (distance > 15f)
             {
-                GlobalPosition += direction * _followSpeed * delta;
+                GlobalPosition += direction * speed * delta;
                 
-                // 翻转精灵方向
                 if (_petSprite != null)
-                {
                     _petSprite.FlipH = direction.x < 0;
-                }
             }
         }
-
-        private Node2D FindNearestEnemy()
+        
+        private void MoveTowards(Vector2 targetPos, float delta)
         {
-            if (_detectionArea == null) return null;
-            
-            var bodies = _detectionArea.GetOverlappingAreas();
-            Node2D nearest = null;
-            float nearestDist = float.MaxValue;
-            
-            foreach (var body in bodies)
-            {
-                if (body is Area2D area)
-                {
-                    var enemies = area.GetParent();
-                    if (enemies != null && enemies.IsInGroup("enemy"))
-                    {
-                        float dist = GlobalPosition.DistanceTo(enemies.GlobalPosition);
-                        if (dist < nearestDist)
-                        {
-                            nearestDist = dist;
-                            nearest = enemies as Node2D;
-                        }
-                    }
-                }
-            }
-            
-            return nearest;
+            MoveTowardsSmooth(targetPos, delta, _followSpeed);
         }
 
         private void AttackEnemy(Node2D enemy, float delta)
         {
             if (enemy == null) return;
             
-            // 转向敌人
             var direction = (enemy.GlobalPosition - GlobalPosition).Normalized();
             if (_petSprite != null)
-            {
                 _petSprite.FlipH = direction.x < 0;
-            }
             
-            // 检查攻击冷却
             float currentTime = (float)Time.GetTicksMsec() / 1000f;
             if (currentTime - _lastAttackTime >= _attackCooldown)
             {
                 _lastAttackTime = currentTime;
                 
-                // 计算宠物攻击力
                 int petAttack = _activePet != null ? _activePet.GetTotalAttackBonus() : 0;
                 float damageMultiplier = 0.5f + (_activePet?.Level ?? 1) * 0.1f;
+                
+                // 暴击计算
+                bool isCrit = GD.Randf() * 100f < (_activePet?.GetTotalCriticalBonus() ?? 5);
+                if (isCrit) damageMultiplier *= 1.5f;
+                
                 int finalDamage = (int)(petAttack * damageMultiplier);
                 
-                // 对敌人造成伤害
                 var enemyChar = enemy as CharacterBody2D;
                 if (enemyChar != null)
                 {
-                    // 尝试调用敌人的受伤方法
                     enemyChar.CallDeferred("TakeDamage", finalDamage);
                     
-                    // 击退效果
+                    // 击退
                     var knockbackDir = (enemy.GlobalPosition - GlobalPosition).Normalized();
-                    enemyChar.Velocity = knockbackDir * 100f;
+                    enemyChar.Velocity = knockbackDir * 120f;
+                    
+                    // 经验获取
+                    if (_activePet != null)
+                        _activePet.AddExperience(finalDamage / 10);
                 }
                 
-                // 播放攻击特效
-                ShowAttackEffect(enemy.GlobalPosition);
-                
+                ShowAttackEffect(enemy.GlobalPosition, isCrit);
                 OnPetAttack?.Invoke();
                 
-                GD.Print($"宠物 {_activePet?.PetName ?? "Unknown"} 攻击敌人造成 {finalDamage} 伤害");
+                string critText = isCrit ? " 暴击!" : "";
+                GD.Print($"宠物 {_activePet?.PetName ?? "Unknown"} 攻击敌人造成 {finalDamage}{critText}");
             }
         }
 
-        private void ShowAttackEffect(Vector2 targetPos)
+        private void ShowAttackEffect(Vector2 targetPos, bool isCrit)
         {
-            // 创建简单的攻击特效
             var effect = new Sprite2D();
             effect.Position = targetPos - GlobalPosition;
             
-            var tex = CreateAttackTexture();
+            var tex = CreateAttackTexture(isCrit);
             effect.Texture = tex;
             
             AddChild(effect);
             
-            // 0.3秒后移除
+            float duration = isCrit ? 0.5f : 0.3f;
             var timer = new Timer();
-            timer.WaitTime = 0.3f;
+            timer.WaitTime = duration;
             timer.OneShot = true;
             timer.Autostart = true;
             timer.Timeout += () => effect.QueueFree();
             AddChild(timer);
         }
 
-        private Texture2D CreateAttackTexture()
+        private Texture2D CreateAttackTexture(bool isCrit)
         {
             var image = new Image(16, 16, Image.Format.Rgba8);
-            image.Fill(new Color(1f, 1f, 0f, 0.8f)); // 黄色闪光
+            Color color = isCrit ? new Color(1f, 0.8f, 0f, 1f) : new Color(1f, 1f, 0f, 0.8f);
+            image.Fill(color);
             return ImageTexture.CreateFromImage(image);
         }
-
-        private void ProcessSpecialAbility(float delta)
+        
+        /// <summary>
+        /// 支援玩家 - 使用特殊能力
+        /// </summary>
+        private void SupportPlayer(float delta)
         {
-            if (_activePet == null) return;
+            if (_player == null || _activePet == null) return;
             
-            // 处理特殊能力
+            _supportCooldown += delta;
+            if (_supportCooldown < 3f) return;
+            _supportCooldown = 0f;
+            
+            // 根据特殊能力提供支援
             switch (_activePet.SpecialAbility)
             {
-                case "auto_pickup":
-                    // 自动拾取已在物品系统中实现
-                    break;
-                    
-                case "exp_boost":
-                    // 经验加成 - 在Player获取经验时应用
-                    break;
-                    
-                case "drop_boost":
-                    // 掉落加成 - 在敌人死亡时应用
-                    break;
-                    
-                case "damage_reduction":
-                    // 伤害减免 - 玩家受伤时应用
+                case "heal":
+                    // 治疗玩家
+                    if (_player.HasMethod("Heal"))
+                    {
+                        int healAmount = _activePet.GetTotalAttackBonus();
+                        _player.CallDeferred("Heal", healAmount);
+                        OnPetSpecialAbility?.Invoke("heal");
+                    }
                     break;
                     
                 case "shield":
-                    // 护盾 - 周期性给玩家添加护盾
+                    // 护盾
+                    if (_player.HasMethod("ApplyStatusEffect"))
+                    {
+                        int shieldAmount = _activePet.GetTotalHealthBonus() / 2;
+                        _player.CallDeferred("ApplyStatusEffect", "shield", shieldAmount, 5f);
+                        OnPetSpecialAbility?.Invoke("shield");
+                    }
                     break;
                     
+                case "damage_reduction":
+                    // 伤害减免
+                    if (_player.HasMethod("ApplyStatusEffect"))
+                    {
+                        _player.CallDeferred("ApplyStatusEffect", "damage_reduction", 20, 10f);
+                        OnPetSpecialAbility?.Invoke("damage_reduction");
+                    }
+                    break;
+            }
+            
+            // 跟随玩家
+            FollowPlayer(delta);
+        }
+
+        private void ProcessSpecialAbility(Node2D target, float delta)
+        {
+            if (_activePet == null) return;
+            
+            // 非守护型宠物的特殊能力
+            if (_personality == PetPersonality.Defensive)
+            {
+                // 守护型特殊能力在SupportPlayer中处理
+                return;
+            }
+            
+            switch (_activePet.SpecialAbility)
+            {
                 case "fire_breath":
-                    // 火焰吐息 - 范围攻击
                     PerformFireBreath();
                     break;
                     
-                case "resurrect":
-                    // 复活 - 玩家死亡时触发
-                    break;
-                    
-                case "all_stats":
-                    // 全属性加成 - 已通过属性系统实现
-                    break;
-                    
                 case "holy_protection":
-                    // 神圣保护 - 周期性圣光护盾
                     PerformHolyProtection(delta);
                     break;
                     
-                case "lucky":
-                    // 幸运 - 暴击率加成
+                case "resurrect":
+                    // 在玩家死亡时处理
                     break;
             }
         }
@@ -354,32 +609,26 @@ namespace ClawRPG.Scripts.Systems.Pets
             
             _fireBreathCooldown = currentTime;
             
-            // 对范围内敌人造成火焰伤害
-            if (_detectionArea != null)
+            if (_detectionArea == null) return;
+            
+            var bodies = _detectionArea.GetOverlappingAreas();
+            foreach (var body in bodies)
             {
-                var bodies = _detectionArea.GetOverlappingAreas();
-                foreach (var body in bodies)
+                var enemies = body?.GetParent();
+                if (enemies?.IsInGroup("enemy") == true)
                 {
-                    var enemies = body?.GetParent();
-                    if (enemies?.IsInGroup("enemy") == true)
+                    var enemyChar = enemies as CharacterBody2D;
+                    if (enemyChar != null)
                     {
-                        var enemyChar = enemies as CharacterBody2D;
-                        if (enemyChar != null)
-                        {
-                            int fireDamage = (_activePet?.GetTotalAttackBonus() ?? 10) * 2;
-                            enemyChar.CallDeferred("TakeDamage", fireDamage);
-                            
-                            // 施加燃烧效果
-                            enemyChar.CallDeferred("ApplyStatusEffect", "burning", fireDamage, 3f);
-                        }
+                        int fireDamage = (_activePet?.GetTotalAttackBonus() ?? 10) * 2;
+                        enemyChar.CallDeferred("TakeDamage", fireDamage);
+                        enemyChar.CallDeferred("ApplyStatusEffect", "burning", fireDamage, 3f);
                     }
                 }
-                
-                // 特效
-                CreateFireBreathEffect();
-                
-                OnPetSpecialAbility?.Invoke("fire_breath");
             }
+            
+            CreateFireBreathEffect();
+            OnPetSpecialAbility?.Invoke("fire_breath");
         }
 
         private void CreateFireBreathEffect()
@@ -398,11 +647,8 @@ namespace ClawRPG.Scripts.Systems.Pets
             particles.ProcessMaterial = processMat;
             particles.Position = Vector2.Zero;
             
-            // 翻转方向
             if (_petSprite?.FlipH == true)
-            {
                 particles.Rotation = Mathf.Pi;
-            }
             
             AddChild(particles);
             
@@ -425,48 +671,57 @@ namespace ClawRPG.Scripts.Systems.Pets
             {
                 _holyProtectionTimer = 0f;
                 
-                if (_player != null)
+                if (_player != null && _player.HasMethod("ApplyStatusEffect"))
                 {
-                    // 给玩家添加神圣护盾
-                    _player.CallDeferred("ApplyStatusEffect", "shield", 
-                        (_activePet?.GetTotalHealthBonus() ?? 50) / 2, 5f);
-                    
+                    int shieldAmount = (_activePet?.GetTotalHealthBonus() ?? 50) / 2;
+                    _player.CallDeferred("ApplyStatusEffect", "shield", shieldAmount, 5f);
                     OnPetSpecialAbility?.Invoke("holy_protection");
                 }
             }
         }
+        
+        private void UpdateVisuals()
+        {
+            if (_petSprite == null) return;
+            
+            // 根据状态改变颜色/效果
+            switch (_currentState)
+            {
+                case PetAIState.Attacking:
+                    // 攻击时稍微放大
+                    _petSprite.Scale = new Vector2(1.2f, 1.2f);
+                    break;
+                case PetAIState.Retreating:
+                    // 后退时缩小
+                    _petSprite.Scale = new Vector2(0.9f, 0.9f);
+                    break;
+                case PetAIState.Supporting:
+                    // 支援时发光效果（通过颜色变化模拟）
+                    _petSprite.Modulate = new Color(1f, 1f, 0.8f, 1f);
+                    break;
+                default:
+                    _petSprite.Scale = Vector2.One;
+                    _petSprite.Modulate = Colors.White;
+                    break;
+            }
+        }
 
-        /// <summary>
-        /// 玩家受伤时宠物响应
-        /// </summary>
         public void OnPlayerDamaged(int damage)
         {
             if (_activePet == null) return;
             
-            // 忠诚度影响宠物反应
             if (_activePet.Loyalty >= 70)
             {
-                // 高忠诚度：宠物攻击敌人
-                var enemy = FindNearestEnemy();
+                var enemy = SelectSmartTarget();
                 if (enemy != null)
-                {
                     AttackEnemy(enemy, 0.016f);
-                }
-            }
-            else if (_activePet.Loyalty < 30)
-            {
-                // 低忠诚度：宠物可能会逃跑（这里简单处理为不响应）
             }
         }
 
-        /// <summary>
-        /// 玩家死亡时宠物响应
-        /// </summary>
         public void OnPlayerDeath()
         {
             if (_activePet?.SpecialAbility == "resurrect")
             {
-                // 尝试复活玩家
                 if (_player != null && _activePet.Loyalty >= 50)
                 {
                     float resChance = 0.3f + (_activePet.Loyalty - 50) * 0.01f;
@@ -482,9 +737,6 @@ namespace ClawRPG.Scripts.Systems.Pets
             }
         }
 
-        /// <summary>
-        /// 设置宠物可见性
-        /// </summary>
         public void SetPetVisible(bool visible)
         {
             IsVisible = visible;
@@ -492,12 +744,17 @@ namespace ClawRPG.Scripts.Systems.Pets
             if (_petNameLabel != null) _petNameLabel.Visible = visible;
         }
 
-        /// <summary>
-        /// 获取宠物位置
-        /// </summary>
-        public Vector2 GetPetPosition()
-        {
-            return GlobalPosition;
-        }
+        public Vector2 GetPetPosition() => GlobalPosition;
+    }
+    
+    /// <summary>
+    /// 宠物性格 - 决定AI行为模式
+    /// </summary>
+    public enum PetPersonality
+    {
+        Balanced,      // 平衡 - 标准战斗行为
+        Aggressive,    // 攻击性 - 积极进攻，保持战斗
+        Defensive,     // 防御性 - 保护玩家，优先支援
+        Cautious       // 谨慎 - 保持距离，避免近身
     }
 }
