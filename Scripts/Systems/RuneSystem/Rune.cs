@@ -45,6 +45,23 @@ namespace ClawRPG.Scripts.Systems {
     }
 
     /// <summary>
+    /// 符文集合类型
+    /// </summary>
+    public enum RuneSet {
+        None,
+        Attack,         // 攻击套装
+        Defense,        // 防御套装
+        Life,           // 生命套装
+        Magic,          // 魔法套装
+        Speed,          // 速度套装
+        Critical,       // 暴击套装
+        Balance,        // 均衡套装
+        Dragon,         // 龙之套装
+        Phoenix,        // 凤凰套装
+        Shadow          // 暗影套装
+    }
+
+    /// <summary>
     /// 符文数据类
     /// </summary>
     public class Rune {
@@ -53,6 +70,7 @@ namespace ClawRPG.Scripts.Systems {
         public string Description { get; set; }
         public RuneType Type { get; set; }
         public RuneRarity Rarity { get; set; }
+        public RuneSet Set { get; set; }  // 符文所属套装
         public Dictionary<RuneAttribute, float> Attributes { get; set; }
         public int LevelRequired { get; set; }
         public int Price { get; set; }
@@ -65,6 +83,7 @@ namespace ClawRPG.Scripts.Systems {
 
         public Rune() {
             Attributes = new Dictionary<RuneAttribute, float>();
+            Set = RuneSet.None;
         }
 
         /// <summary>

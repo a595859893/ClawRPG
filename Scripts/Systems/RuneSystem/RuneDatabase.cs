@@ -32,6 +32,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "增加基础攻击力",
                 Type = RuneType.Attack,
                 Rarity = RuneRarity.Common,
+                Set = RuneSet.Attack,
                 LevelRequired = 1,
                 Price = 100,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -45,6 +46,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "提升力量属性",
                 Type = RuneType.Attack,
                 Rarity = RuneRarity.Uncommon,
+                Set = RuneSet.Attack,
                 LevelRequired = 5,
                 Price = 300,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -58,6 +60,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "增加暴击率和暴击伤害",
                 Type = RuneType.Attack,
                 Rarity = RuneRarity.Rare,
+                Set = RuneSet.Attack,
                 LevelRequired = 10,
                 Price = 800,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -72,6 +75,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "致命攻击符文",
                 Type = RuneType.Attack,
                 Rarity = RuneRarity.Epic,
+                Set = RuneSet.Attack,
                 LevelRequired = 20,
                 Price = 2500,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -87,6 +91,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "传说级攻击符文",
                 Type = RuneType.Attack,
                 Rarity = RuneRarity.Legendary,
+                Set = RuneSet.Dragon,
                 LevelRequired = 30,
                 Price = 10000,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -104,6 +109,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "增加基础防御",
                 Type = RuneType.Defense,
                 Rarity = RuneRarity.Common,
+                Set = RuneSet.Defense,
                 LevelRequired = 1,
                 Price = 100,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -117,6 +123,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "提升生命值和防御",
                 Type = RuneType.Defense,
                 Rarity = RuneRarity.Uncommon,
+                Set = RuneSet.Defense,
                 LevelRequired = 5,
                 Price = 300,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -131,6 +138,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "大幅提升生命值",
                 Type = RuneType.Defense,
                 Rarity = RuneRarity.Rare,
+                Set = RuneSet.Defense,
                 LevelRequired = 10,
                 Price = 800,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -145,6 +153,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "生命恢复和抗性",
                 Type = RuneType.Defense,
                 Rarity = RuneRarity.Epic,
+                Set = RuneSet.Defense,
                 LevelRequired = 20,
                 Price = 2500,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -161,6 +170,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "传说级防御符文",
                 Type = RuneType.Defense,
                 Rarity = RuneRarity.Legendary,
+                Set = RuneSet.Phoenix,
                 LevelRequired = 30,
                 Price = 10000,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -181,6 +191,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "增加法力上限",
                 Type = RuneType.Magic,
                 Rarity = RuneRarity.Common,
+                Set = RuneSet.Magic,
                 LevelRequired = 1,
                 Price = 100,
                 Attributes = new Dictionary<RuneAttribute, float> {
@@ -194,6 +205,7 @@ namespace ClawRPG.Scripts.Systems {
                 Description = "提升法力恢复",
                 Type = RuneType.Magic,
                 Rarity = RuneRarity.Uncommon,
+                Set = RuneSet.Magic,
                 LevelRequired = 5,
                 Price = 300,
                 Attributes = new Dictionary<RuneAttribute, float> {
