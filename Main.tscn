@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=40 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_main"]
 [ext_resource type="Script" path="res://Scripts/UI/PlayerHUD.cs" id="2_hud"]
@@ -52,6 +52,7 @@
 [ext_resource type="Script" path="res://Scripts/Systems/TitleSystem.cs" id="49_title_system"]
 [ext_resource type="Script" path="res://Scripts/Systems/Pets/PetCombatAI.cs" id="50_pet_combat_ai"]
 [ext_resource type="Script" path="res://Scripts/Systems/BossAbilityVisualizer.cs" id="51_boss_visualizer"]
+[ext_resource type="Script" path="res://Scripts/UI/BossHealthBarUI.cs" id="52_boss_health_bar"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -449,3 +450,13 @@ script = ExtResource("48_title_notify")
 
 [node name="PetCombatAI" type="Node" parent="."]
 script = ExtResource("50_pet_combat_ai")
+
+[node name="BossHealthBarUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("52_boss_health_bar")

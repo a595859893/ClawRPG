@@ -315,6 +315,11 @@ namespace ClawRPG.Scripts {
             counterAttackUI.Name = "CounterAttackUI";
             ui.AddChild(counterAttackUI);
             
+            // Boss Health Bar UI
+            var bossHealthBarUI = new UI.BossHealthBarUI();
+            bossHealthBarUI.Name = "BossHealthBarUI";
+            ui.AddChild(bossHealthBarUI);
+            
             GD.Print("UI initialized");
         }
         
