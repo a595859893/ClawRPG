@@ -2,6 +2,305 @@
 
 自我提升需要重点关注的方向（由开发循环更新）
 
+## 2026-03-10 16:50 🎮 NPC对话系统 - add_quest_system 增强 ✅
+
+**实现状态**: NPC对话系统已完成
+
+**实现功能**:
+1. **DialogueData.cs** (1.8KB)
+   - DialogueOption: 对话选项数据结构（条件、奖励、事件）
+   - DialogueNode: 对话节点（说话者、文本、选项）
+   - Dialogue: 对话数据（NPC ID、节点列表）
+
+2. **DialogueDatabase.cs** (16.5KB)
+   - 铁匠对话：武器打造/修理服务
+   - 商人对话：买卖物品功能
+   - 贤者对话：试炼指引/建议
+   - 任务发布者对话：森林/洞穴任务
+   - 支持条件对话（任务状态、等级要求）
+   - 支持对话奖励（金币、物品、任务）
+
+3. **DialogueManager.cs** (12KB)
+   - 对话流程管理
+   - 信号系统：DialogueStarted/DialogueEnded/NodeChanged/OptionSelected/RewardGranted
+   - 节点解锁条件检查
+   - 对话奖励发放
+   - 事件触发系统
+
+4. **DialogueUI.cs** (10.7KB)
+   - 底部对话面板
+   - 说话者名字显示（金色）
+   - 对话内容显示（RichTextLabel）
+   - 选项按钮（悬停效果）
+   - 继续按钮（无选项时）
+   - Enter/Escape 键继续/跳过
+
+5. **Main.cs 集成**
+   - DialogueManager 初始化
+   - DialogueUI 添加到 CanvasLayer
+   - Quests 命名空间导入
+
+**设计模式**:
+- 单例模式：DialogueManager.Instance, DialogueDatabase.Instance
+- 信号系统：事件驱动对话流程
+- 数据驱动：对话内容与逻辑分离
+- 条件系统：任务状态/等级检查
+
+**下一步**: 可添加NPC交互触发器、对话动画、更多NPC对话内容
+
+**学习收获**:
+- 从 insights.md 学习到的数据驱动设计模式
+- 信号系统实现对话事件驱动
+- UI动态创建和样式应用
+
+---
+
+## 2026-03-10 16:40 🎨 相机特效增强系统 - polish_ui 增强 ✅
+
+**实现状态**: 相机特效增强系统已完成
+
+**实现功能**:
+1. **CameraEffectSystem.cs** (7KB)
+   - 动态FOV系统：玩家移动速度影响FOV (75°-90°)
+   - 镜头震动系统：轻/中/强/剧烈四种强度
+   - 渐晕效果系统：战斗/低血量触发
+   - 预设方法：TriggerLightShake/TriggerMediumShake/TriggerHeavyShake/TriggerViolentShake
+   - 平滑过渡动画
+
+2. **CameraEffectUI.cs** (8KB)
+   - 动态FOV开关和强度滑块
+   - 镜头震动开关和强度滑块
+   - 渐晕效果开关和强度滑块
+   - 设置存档支持
+
+3. **系统集成**
+   - Main.cs: CameraEffectSystem 初始化
+
+**设计模式**: 单例模式、平滑过渡动画
+
+**下一步**: 可添加更多相机效果、相机预设配置
+
+**实现状态**: 连击系统和动态屏幕效果已完成
+
+**实现功能**:
+1. **ComboSystem.cs** (5KB)
+   - 连击系统核心 (0-100连击)
+   - 3秒衰减时间
+   - 连击加成倍率 (每级+10%伤害)
+   - 里程碑奖励 (10/25/50/75/100 连击)
+   - 金币/经验奖励发放
+   - 信号系统: OnComboChanged/OnComboMilestone/OnComboBroken
+   - 存档支持: Serialize/Deserialize
+
+2. **ComboDisplayUI.cs** (8KB)
+   - 连击显示 UI (屏幕左侧)
+   - 数字显示 + 伤害倍率
+   - 连击等级颜色区分 (金/绿/蓝/紫/红)
+   - 里程碑庆祝动画
+   - 进度条显示衰减时间
+   - 淡入淡出动画效果
+
+3. **DynamicScreenEffect.cs** (8KB)
+   - 动态屏幕效果系统
+   - 血量低时渐晕效果 (vignette)
+   - 伤害类型颜色叠加 (火/冰/雷/毒/暗/圣)
+   - 连击脉冲效果
+   - 屏幕闪烁功能
+   - Tween动画平滑过渡
+
+4. **系统集成**
+   - Player.cs: 攻击时触发 RegisterHit()
+   - Main.cs: 初始化 ComboSystem 和 UI
+   - SaveSystem.cs: ComboData 存档支持
+
+**应用学习收获**:
+- Tween动画系统 (从EnhancementEffect学习)
+- 屏幕效果模式 (从ScreenFlashEffect学习)
+- 数据驱动设计 (连击里程碑配置)
+- 信号系统 (事件驱动UI更新)
+
+**下一步**: 可添加连击音效、更多视觉效果
+
+## 2026-03-10 16:25 🎨 自动收藏点系统 - polish_ui 增强 ✅
+
+**实现状态**: 自动收藏点系统已完成
+
+**实现功能**:
+1. **AutoBookmarkSystem.cs** (10KB)
+   - 自动标记 Boss 位置 (boss_defeat 事件触发)
+   - 自动标记商店位置 (shop_discovered 事件触发)
+   - 自动标记任务目标 (quest_updated 事件触发)
+   - 自动标记传送点 (waypoint_discovered 事件触发)
+   - 已发现位置去重机制 (HashSet)
+   - 存档支持: Serialize/Deserialize
+
+2. **AutoBookmarkUI.cs** (9KB)
+   - Shift+N 打开设置界面
+   - 可开关各类自动标记 (Boss/商店/任务/传送点)
+   - 清除已发现记录功能
+   - ESC 键关闭界面
+
+3. **系统集成**
+   - Main.cs: AutoBookmarkSystem 初始化和快捷键处理
+   - SaveSystem.cs: AutoBookmarkData 存档支持
+   - project.godot: auto_bookmark 输入绑定 (Shift+N)
+   - HotkeyHelpUI.cs: Shift+N 快捷键提示
+   - Main.tscn: AutoBookmarkUI 节点
+
+**设计模式**: 事件驱动设计，单例模式，信号系统
+
+**下一步**: 可添加更多自动触发事件（区域进入、敌人击杀等）
+
+---
+
+## 2026-03-10 16:00 🎯 赏金任务系统 - 内容扩展 ✅
+
+**实现状态**: 赏金任务系统已完成
+
+**实现功能**:
+1. **BountySystem.cs** (20KB)
+   - BountyDatabase: 25+赏金任务模板
+   - BountyManager: 赏金任务管理
+   - 5种赏金类型: 击杀敌人/收集物品/Boss挑战/生存挑战/连击挑战
+   - 5种难度等级: 简单/普通/困难/精英/传奇
+   - 24小时刷新机制
+   - 最多3个活跃赏金
+   - 信号系统: OnBountyAccepted/OnBountyProgressUpdated/OnBountyCompleted/OnBountyClaimed
+   - 存档支持: Serialize/Deserialize
+
+2. **BountyUI.cs** (13KB)
+   - B键打开赏金面板
+   - 筛选功能: 全部/击杀/收集/Boss/生存/连击
+   - 进度条显示
+   - 难度颜色区分
+   - 奖励显示和领取按钮
+
+3. **系统集成**
+   - Main.cs: BountyManager初始化和快捷键处理
+   - SaveSystem.cs: 赏金数据存档支持
+   - Enemy.cs: 击杀追踪 UpdateKillProgress()
+   - Boss.cs: Boss击杀追踪 UpdateBossKillProgress()
+   - project.godot: bounty输入绑定 (B键)
+   - HotkeyHelpUI.cs: B键快捷键提示
+   - Main.tscn: BountyUI节点
+
+**设计模式**: 数据驱动设计，单例模式，信号系统
+
+**下一步**: 可添加赏金刷新功能、赏金商店、更多赏金类型
+
+---
+
+## 2026-03-10 15:40 🎨 附魔卷轴掉落系统 - polish_ui 增强 ✅
+
+**实现状态**: 附魔卷轴掉落系统已完成
+
+**实现功能**:
+1. **附魔卷轴物品** (ItemSystem.cs)
+   - 23种附魔卷轴物品 (ID 501-523)
+   - 攻击型卷轴: 锋利/锐利/嗜血/致命/闪电 (ID 501-505)
+   - 防御型卷轴: 坚固/铁壁/生命/重生/恢复 (ID 506-510)
+   - 魔法型卷轴: 魔法/奥术/智慧/冰霜/火焰抗性 (ID 511-515)
+   - 辅助型卷轴: 敏捷/疾风/全抗性/雷电/毒液抗性 (ID 516-520)
+   - 传奇型卷轴: 传奇力量/守护/攻击 (ID 521-523)
+
+2. **敌人掉落集成** (EnemyDatabase.cs)
+   - Boss掉落: 传奇卷轴30-50%掉率
+   - 精英怪掉落: 稀有卷轴10-20%掉率
+   - 普通怪掉落: 普通卷轴5%掉率
+   - 覆盖哥布林/狼/骷髅/岩石傀儡/火焰元素/青年龙等
+
+3. **掉落系统** (Enemy.cs)
+   - EnemyTypeId属性用于掉落查找
+   - DropLoot()使用数据库DropTable
+   - 掉落直接进入玩家背包
+
+4. **敌人生成器** (EnemySpawner.cs)
+   - ConfigureEnemyFromDatabase设置EnemyTypeId
+   - 自动传递敌人类型ID给生成的敌人
+
+**下一步**: 可添加附魔卷轴商店购买、附魔石合成功能
+
+---
+
+## 2026-03-10 15:30 🎨 附魔系统 - polish_ui 增强 ✅
+
+**实现状态**: 附魔系统已完成
+
+**实现功能**:
+1. **EnchantmentDatabase.cs** (16KB)
+   - 20种附魔模板
+   - 5种附魔类型：攻击/防御/魔法/辅助/传奇
+   - 5种稀有度：普通/优秀/稀有/史诗/传说
+   - 13种附魔属性：伤害/防御/生命/法力/暴击率/暴击伤害/攻击速度/移动速度/各种抗性/全属性
+   - 成功率设置（30%-80%）
+   - 玩家等级要求（1-35级）
+   - 材料消耗配置
+
+2. **EnchantmentSystem.cs** (15KB)
+   - 附魔背包管理
+   - 附魔执行（成功率判定）
+   - 装备附魔映射（最多3个附魔/装备）
+   - 附魔属性加成计算
+   - 附魔耐久度系统
+   - 存档支持：Serialize/Deserialize
+   - 信号系统：OnEnchantmentAdded/OnEnchantmentRemoved/OnEnchantmentResult
+
+3. **EnchantmentUI.cs** (16KB)
+   - E键打开/关闭附魔界面
+   - 5个标签页：攻击/防御/魔法/辅助/传奇
+   - 附魔列表显示（名称/描述/属性/成功率/等级要求/花费）
+   - 附魔卷轴背包显示
+   - 附魔执行按钮
+   - 金币显示
+
+**系统集成**:
+- Main.tscn: 添加 EnchantmentDatabase/EnchantmentSystem/EnchantmentUI 节点
+- Main.cs: 初始化附魔系统，添加 E键打开附魔界面
+- SaveSystem.cs: 添加 EnchantmentData 存档支持
+- project.godot: 添加 enchantment 输入绑定 (E键)
+- HotkeyHelpUI.cs: 添加 E键 快捷键提示
+
+**设计模式**:
+- 数据驱动设计：附魔数据与逻辑分离
+- 单例模式：EnchantmentDatabase.Instance, EnchantmentSystem.Instance
+- 信号系统：附魔事件驱动 UI 更新
+- 存档系统：完整的序列化/反序列化支持
+
+**下一步**: 可添加附魔掉落来源、附魔石合成、更多附魔类型
+
+---
+
+## 2026-03-10 15:15 🎨 强化特效动画 - polish_ui 增强 ✅
+
+**实现状态**: 强化特效动画系统已完成
+
+**实现功能**:
+1. **EnhancementEffect.cs** (15KB)
+   - 成功特效：金色粒子、屏幕震动、成功闪光
+   - 失败特效：灰色粒子、屏幕震动、失败闪光、文字摇晃
+   - 最大等级特效：紫色光环、星星粒子
+   - 进行中动画：闪烁文字、旋转效果
+   - 粒子系统：20+金色粒子向上散开、15个灰色粒子向下飘散
+   - 屏幕震动：通过相机位置偏移实现
+
+2. **EnhancementUI.cs 更新**
+   - 集成 EnhancementEffect 引用
+   - 强化进行中延迟1秒播放动画
+   - 成功/失败/最大等级时播放对应特效
+
+3. **Main.tscn 更新**
+   - 添加 EnhancementEffect 节点 (id 30)
+   - CanvasLayer 中添加 EnhancementEffect 子节点
+
+**设计模式**:
+- Tween动画系统：平滑的粒子运动和颜色过渡
+- 粒子系统：程序化生成的粒子效果
+- 事件驱动：特效与强化结果联动
+
+**下一步**: 可添加强化石掉落来源、更多特效音效
+
+---
+
 ## 2026-03-10 14:45 🎨 装备强化系统 - polish_ui 增强 ✅
 
 **实现状态**: 装备强化系统已完成
@@ -322,6 +621,38 @@
 - 核心RPG系统全部实现
 - 29个UI组件已集成到Main.tscn
 - 项目进入内容扩展和优化阶段
+
+## 2026-03-10 15:25 🎨 自动使用药水系统 - polish_ui 增强 ✅
+
+**实现状态**: 自动使用药水系统已完成
+
+**实现功能**:
+1. **AutoPotionSystem.cs** (11KB)
+   - 自动使用生命/魔法/增益药水
+   - 可配置阈值 (默认30%)
+   - 2秒/30秒冷却时间
+   - 存档支持 Serialize/Deserialize
+
+2. **AutoPotionUI.cs** (8KB)
+   - Shift+X 打开设置
+   - 开关自动使用选项 (生命/魔法/增益药水)
+   - 滑动条调整阈值 (5%-95%)
+   - 实时显示当前设置值
+
+3. **系统集成**
+   - Main.cs: 初始化自动药水系统
+   - SaveSystem.cs: AutoPotionData 存档支持
+   - project.godot: auto_potion 输入绑定 (Shift+X)
+   - HotkeyHelpUI.cs: 快捷键提示
+
+**设计模式**:
+- 单例模式：AutoPotionSystem.Instance
+- 事件驱动：信号系统 (AutoPotionUsed, AutoPotionSettingsChanged)
+- 数据驱动：药水数据与逻辑分离
+
+**下一步**: 可添加音效、更多自动触发条件
+
+---
 
 ## 2026-03-10 14:50 🎉 ClawRPG 开发循环完成
 
@@ -1224,6 +1555,38 @@
 - 单例模式：BookmarkSystem.Instance
 
 **下一步**: 可添加收藏点自动标记（ Boss 位置、商店等）、收藏点图标显示
+
+---
+
+## 2026-03-10 16:15 🎨 天气系统 - polish_ui 增强 ✅
+
+**实现状态**: 天气系统已完成
+
+**实现功能**:
+1. **WeatherSystem.cs** (17KB)
+   - WeatherType 枚举: 晴朗/多云/小雨/大雨/暴风雨/小雪/大雪/雾/沙尘暴/夜晚 (10种)
+   - WeatherIntensity 枚举: 轻微/普通/强烈 (3种)
+   - WeatherDatabase: 天气模板数据库
+   - 天气效果: 伤害/防御/经验/掉落/视野倍率
+   - 自动天气切换和手动切换
+   - 存档支持
+
+2. **WeatherUI.cs** (11KB)
+   - V键打开天气面板
+   - 显示天气图标和名称
+   - 持续时间进度条
+   - 天气效果显示 (颜色区分)
+   - 手动切换天气按钮
+   - 自动切换开关
+
+3. **系统集成**
+   - Main.tscn/Main.cs/SaveSystem.cs/HotkeyHelpUI.cs/project.godot
+
+**设计模式**: 单例模式，数据驱动设计，信号系统
+
+**下一步**: 可添加天气粒子特效、天气相关任务
+
+---
 
 **下一步方向**:
 1. 宠物战斗AI集成
