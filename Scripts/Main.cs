@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Mounts;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -228,6 +229,12 @@ namespace ClawRPG.Scripts {
                 ToggleWeaponMasteryUI();
             }
             
+            // Handle mount UI toggle (O key)
+            if (Input.IsActionJustPressed("mounts"))
+            {
+                ToggleMountUI();
+            }
+            
             // Handle title UI toggle (Y key)
             if (Input.IsActionJustPressed("titles"))
             {
@@ -294,6 +301,15 @@ namespace ClawRPG.Scripts {
             if (weaponMasteryUI != null)
             {
                 weaponMasteryUI.Toggle();
+            }
+        }
+        
+        private void ToggleMountUI()
+        {
+            var mountUI = GetNodeOrNull<UI.MountUI>("CanvasLayer/MountUI");
+            if (mountUI != null)
+            {
+                mountUI.ToggleUI();
             }
         }
         
@@ -539,6 +555,12 @@ namespace ClawRPG.Scripts {
                             QuickSlotSystem.Instance.SetSlot(i, saveData.QuickSlotItemIds[i], saveData.QuickSlotQuantities[i]);
                         }
                     }
+                }
+                
+                // 加载坐骑数据
+                if (saveData.MountData != null && MountManager.Instance != null)
+                {
+                    MountManager.Instance.Deserialize(saveData.MountData);
                 }
                 
                 CurrentDay = saveData.CurrentDay;

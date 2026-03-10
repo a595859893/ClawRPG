@@ -71,7 +71,12 @@ namespace ClawRPG.Scripts.Characters {
         public float TotalCritChance => BaseCritChance + GetRuneBonus(RuneAttribute.CritChance) / 100f;
         public float TotalCritDamage => BaseCritDamage + GetRuneBonus(RuneAttribute.CritDamage) / 100f;
         public float TotalAttackSpeed => BaseAttackSpeed;
-        public float TotalMoveSpeed => BaseMoveSpeed + GetRuneBonus(RuneAttribute.MoveSpeed);
+        
+        // Mount system bonuses (applied on top of base + runes)
+        public int MountSpeedBonus { get; set; }
+        public int MountCarryCapacityBonus { get; set; }
+        
+        public float TotalMoveSpeed => BaseMoveSpeed + GetRuneBonus(RuneAttribute.MoveSpeed) + MountSpeedBonus;
         
         // Resistance bonuses from runes
         public float FireResistance { get; private set; }

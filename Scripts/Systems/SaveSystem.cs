@@ -105,6 +105,9 @@ namespace ClawRPG.Scripts.Systems {
             public string[] QuickSlotItemIds { get; set; } = new string[9];
             public int[] QuickSlotQuantities { get; set; } = new int[9];
             
+            // Mount system data
+            public Dictionary<string, Dictionary<string, object>> MountData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -445,6 +448,12 @@ namespace ClawRPG.Scripts.Systems {
                         data.QuickSlotQuantities[i] = quickSlotData.ContainsKey($"slot_{i}_qty") ? (int)quickSlotData[$"slot_{i}_qty"] : 0;
                     }
                 }
+            }
+            
+            // Save mount data
+            if (MountManager.Instance != null)
+            {
+                data.MountData = MountManager.Instance.Serialize();
             }
             
             return data;
