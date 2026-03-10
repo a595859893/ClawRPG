@@ -174,6 +174,11 @@ namespace ClawRPG.Scripts {
             bossAbilityVisualizer.Name = "BossAbilityVisualizer";
             AddChild(bossAbilityVisualizer);
             
+            // Initialize boss ability warning UI system
+            var bossAbilityWarningUI = new UI.BossAbilityWarningUI();
+            bossAbilityWarningUI.Name = "BossAbilityWarningUI";
+            AddChild(bossAbilityWarningUI);
+            
             // Initialize counter attack VFX system
             var counterAttackVFX = new Combat.CounterAttackVFX();
             counterAttackVFX.Name = "CounterAttackVFX";

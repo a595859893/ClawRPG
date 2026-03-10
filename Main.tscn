@@ -54,6 +54,7 @@
 [ext_resource type="Script" path="res://Scripts/Systems/BossAbilityVisualizer.cs" id="51_boss_visualizer"]
 [ext_resource type="Script" path="res://Scripts/UI/BossHealthBarUI.cs" id="52_boss_health_bar"]
 [ext_resource type="Script" path="res://Scripts/UI/DamageNumberSystem.cs" id="53_damage_number"]
+[ext_resource type="Script" path="res://Scripts/UI/BossAbilityWarningUI.cs" id="54_boss_warning_ui"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -464,3 +465,13 @@ script = ExtResource("52_boss_health_bar")
 
 [node name="DamageNumberSystem" type="CanvasLayer" parent="."]
 script = ExtResource("53_damage_number")
+
+[node name="BossAbilityWarningUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("54_boss_warning_ui")

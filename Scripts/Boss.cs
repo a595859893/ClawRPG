@@ -98,6 +98,7 @@ namespace ClawRPG.Scripts.Characters {
         public event Action<int> OnPhaseChange;
         public event Action OnEnrage;
         public event Action<string> OnSpecialAbility;
+        public event Action<string> OnAbilityWarmingUp; // 技能预警信号
         public event Action<BossAIState> OnAIStateChanged;
         
         public override void _Ready()
@@ -122,7 +123,48 @@ namespace ClawRPG.Scripts.Characters {
             // Reset boss damage tracking for no-hit achievement
             AchievementManager.Instance?.ResetBossDamageTaken();
             
+            // Connect ability warning signal to UI
+            ConnectAbilityWarningToUI();
+            
             GD.Print($"Boss {BossTitle} spawned! Phase: {_currentPhase}, Enrage: {EnrageTime}s");
+        }
+        
+        /// <summary>
+        /// 连接技能预警信号到UI系统
+        /// </summary>
+        private void ConnectAbilityWarningToUI()
+        {
+            // 延迟连接，确保UI已初始化
+            CallDeferred(nameof(_ConnectAbilityWarningSignal));
+        }
+        
+        private void _ConnectAbilityWarningSignal()
+        {
+            var warningUI = GetTree().GetCurrentScene().GetNodeOrNull<UI.BossAbilityWarningUI>("BossAbilityWarningUI");
+            if (warningUI != null)
+            {
+                OnAbilityWarmingUp += (abilityId) => {
+                    var target = GetTarget();
+                    Vector2 targetPos = target != null ? target.GlobalPosition : GlobalPosition;
+                    
+                    // 获取技能信息
+                    bool isAoE = false;
+                    float aoeRadius = 0f;
+                    if (_abilityDatabase.TryGetValue(abilityId, out var ability))
+                    {
+                        isAoE = ability.IsAoE;
+                        aoeRadius = ability.AoERadius;
+                    }
+                    
+                    warningUI.ShowAbilityWarning(abilityId, targetPos, 2f, isAoE, aoeRadius);
+                };
+                
+                GD.Print($"Boss {BossTitle} connected ability warning to UI");
+            }
+            else
+            {
+                GD.PrintErr($"BossAbilityWarningUI not found for boss {BossTitle}");
+            }
         }
         
         private void InitializeAbilityDatabase()
@@ -517,6 +559,9 @@ namespace ClawRPG.Scripts.Characters {
             string ability = readyAbilities[GD.Randi() % readyAbilities.Count];
             
             GD.Print($"{BossTitle} uses special ability: {ability}");
+            
+            // Fire warming up event for UI warning (before actual ability use)
+            OnAbilityWarmingUp?.Invoke(ability);
             
             // Set cooldown
             if (_abilityDatabase.ContainsKey(ability))
