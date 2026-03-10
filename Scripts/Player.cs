@@ -323,6 +323,8 @@ namespace ClawRPG.Scripts.Characters {
             // Track perfect block for titles
             PerfectBlockCount++;
             TitleSystem.Instance.CheckAndUnlockTitle("Combat", PerfectBlockCount);
+            // Track perfect block achievements
+            AchievementManager.Instance?.TrackPerfectBlock(1);
             // Trigger counter attack system
             Systems.CounterAttackSystem.Instance?.OnPerfectBlock();
             GD.Print("PERFECT BLOCK!");
@@ -454,6 +456,9 @@ namespace ClawRPG.Scripts.Characters {
             
             // Track statistics
             StatisticsManager.Instance.RecordDamageTaken((int)finalDamage);
+            
+            // Track boss damage for no-hit boss achievement
+            AchievementManager.Instance?.TrackBossDamageTaken((int)finalDamage);
             
             if (CurrentHealth <= 0)
             {

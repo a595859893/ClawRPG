@@ -26,6 +26,11 @@ namespace ClawRPG.Scripts.Systems
         private int _regionsExplored;
         private int _skillsLearned;
         private float _totalSurvivalTime;
+        private int _enrageKills;
+        private int _perfectBlocks;
+        private int _counterAttacks;
+        private int _noHitBosses;
+        private int _totalBossDamageTaken;
         
         // Signals
         public Action<Achievement> OnAchievementUnlocked;
@@ -140,6 +145,52 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("skill_learn_15", _skillsLearned);
         }
         
+        public void TrackEnrageKill()
+        {
+            _enrageKills++;
+            UpdateAchievement("enrage_kill_1", _enrageKills);
+            UpdateAchievement("enrage_kill_5", _enrageKills);
+            UpdateAchievement("enrage_kill_10", _enrageKills);
+        }
+        
+        public void TrackPerfectBlock(int count = 1)
+        {
+            _perfectBlocks += count;
+            UpdateAchievement("perfect_block_10", _perfectBlocks);
+            UpdateAchievement("perfect_block_50", _perfectBlocks);
+            UpdateAchievement("perfect_block_100", _perfectBlocks);
+        }
+        
+        public void TrackCounterAttack(int count = 1)
+        {
+            _counterAttacks += count;
+            UpdateAchievement("counter_5", _counterAttacks);
+            UpdateAchievement("counter_25", _counterAttacks);
+            UpdateAchievement("counter_50", _counterAttacks);
+        }
+        
+        public void TrackNoHitBoss(bool success)
+        {
+            if (success)
+            {
+                _noHitBosses++;
+                UpdateAchievement("nohit_boss_1", _noHitBosses);
+                UpdateAchievement("nohit_boss_3", _noHitBosses);
+            }
+        }
+        
+        public void TrackBossDamageTaken(int damage)
+        {
+            _totalBossDamageTaken += damage;
+        }
+        
+        public int GetBossDamageTaken() => _totalBossDamageTaken;
+        
+        public void ResetBossDamageTaken()
+        {
+            _totalBossDamageTaken = 0;
+        }
+        
         private void UpdateAchievement(string id, int value)
         {
             if (_trackedAchievements.TryGetValue(id, out var achievement))
@@ -240,6 +291,10 @@ namespace ClawRPG.Scripts.Systems
                 { "regionsExplored", _regionsExplored },
                 { "skillsLearned", _skillsLearned },
                 { "totalSurvivalTime", (int)_totalSurvivalTime },
+                { "enrageKills", _enrageKills },
+                { "perfectBlocks", _perfectBlocks },
+                { "counterAttacks", _counterAttacks },
+                { "noHitBosses", _noHitBosses },
                 { "unlockedAchievements", _unlockedAchievements.Count },
                 { "totalAchievements", _trackedAchievements.Count }
             };

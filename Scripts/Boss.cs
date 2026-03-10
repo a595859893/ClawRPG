@@ -119,6 +119,9 @@ namespace ClawRPG.Scripts.Characters {
                 _availableAbilities.AddRange(SpecialAbilities);
             }
             
+            // Reset boss damage tracking for no-hit achievement
+            AchievementManager.Instance?.ResetBossDamageTaken();
+            
             GD.Print($"Boss {BossTitle} spawned! Phase: {_currentPhase}, Enrage: {EnrageTime}s");
         }
         
@@ -968,6 +971,31 @@ namespace ClawRPG.Scripts.Characters {
             
             // Track boss bounty progress
             BountyManager.Instance?.UpdateBossKillProgress(BossId);
+            
+            // Track boss kill achievements
+            AchievementManager.Instance?.TrackBossKill();
+            
+            // Track enrage kill achievements - if boss was enraged when killed
+            if (_isEnraged)
+            {
+                AchievementManager.Instance?.TrackEnrageKill();
+                GD.Print($"*** ENRAGE KILL! {_isEnraged} ***");
+            }
+            
+            // Track no-hit boss achievement
+            var player = GetTarget();
+            if (player != null)
+            {
+                var stats = AchievementManager.Instance?.GetStatistics();
+                if (stats != null && stats.ContainsKey("bossDamageTaken"))
+                {
+                    int bossDamageTaken = AchievementManager.Instance.GetBossDamageTaken();
+                    if (bossDamageTaken <= 0)
+                    {
+                        AchievementManager.Instance?.TrackNoHitBoss(true);
+                    }
+                }
+            }
             
             base.Die();
         }

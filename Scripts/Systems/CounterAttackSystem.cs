@@ -240,6 +240,9 @@ namespace ClawRPG.Scripts.Systems
             EmitSignal(SignalName.CounterAttackPerformed, CurrentCounterType, damage);
             EmitSignal(SignalName.CounterAttack窗口, false);
             
+            // Track counter attack achievements
+            AchievementManager.Instance?.TrackCounterAttack(1);
+            
             return true;
         }
         

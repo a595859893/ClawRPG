@@ -425,6 +425,142 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 2000,
                 RewardExp = 5000
             });
+            
+            // Enrage kill achievements - Boss狂暴击杀成就
+            AddAchievement(new Achievement
+            {
+                Id = "enrage_kill_1",
+                Name = "狂暴杀手",
+                Description = "在Boss狂暴状态下击杀1个Boss",
+                Type = AchievementType.EnrageKill,
+                Difficulty = AchievementDifficulty.Normal,
+                RequiredValue = 1,
+                RewardGold = 1000,
+                RewardExp = 2000
+            });
+            
+            AddAchievement(new Achievement
+            {
+                Id = "enrage_kill_5",
+                Name = "狂暴猎手",
+                Description = "在Boss狂暴状态下击杀5个Boss",
+                Type = AchievementType.EnrageKill,
+                Difficulty = AchievementDifficulty.Hard,
+                RequiredValue = 5,
+                RewardGold = 3000,
+                RewardExp = 5000
+            });
+            
+            AddAchievement(new Achievement
+            {
+                Id = "enrage_kill_10",
+                Name = "狂暴终结者",
+                Description = "在Boss狂暴状态下击杀10个Boss",
+                Type = AchievementType.EnrageKill,
+                Difficulty = AchievementDifficulty.Epic,
+                RequiredValue = 10,
+                RewardGold = 8000,
+                RewardExp = 15000
+            });
+            
+            // Perfect block achievements - 完美格挡成就
+            AddAchievement(new Achievement
+            {
+                Id = "perfect_block_10",
+                Name = "格挡新手",
+                Description = "完成10次完美格挡",
+                Type = AchievementType.PerfectBlock,
+                Difficulty = AchievementDifficulty.Easy,
+                RequiredValue = 10,
+                RewardGold = 200,
+                RewardExp = 500
+            });
+            
+            AddAchievement(new Achievement
+            {
+                Id = "perfect_block_50",
+                Name = "格挡大师",
+                Description = "完成50次完美格挡",
+                Type = AchievementType.PerfectBlock,
+                Difficulty = AchievementDifficulty.Normal,
+                RequiredValue = 50,
+                RewardGold = 800,
+                RewardExp = 1500
+            });
+            
+            AddAchievement(new Achievement
+            {
+                Id = "perfect_block_100",
+                Name = "铁壁防御者",
+                Description = "完成100次完美格挡",
+                Type = AchievementType.PerfectBlock,
+                Difficulty = AchievementDifficulty.Hard,
+                RequiredValue = 100,
+                RewardGold = 2000,
+                RewardExp = 3000
+            });
+            
+            // Counter attack achievements - 反击成就
+            AddAchievement(new Achievement
+            {
+                Id = "counter_5",
+                Name = "反击新手",
+                Description = "成功完成5次反击",
+                Type = AchievementType.CounterAttack,
+                Difficulty = AchievementDifficulty.Easy,
+                RequiredValue = 5,
+                RewardGold = 300,
+                RewardExp = 500
+            });
+            
+            AddAchievement(new Achievement
+            {
+                Id = "counter_25",
+                Name = "反击达人",
+                Description = "成功完成25次反击",
+                Type = AchievementType.CounterAttack,
+                Difficulty = AchievementDifficulty.Normal,
+                RequiredValue = 25,
+                RewardGold = 1000,
+                RewardExp = 2000
+            });
+            
+            AddAchievement(new Achievement
+            {
+                Id = "counter_50",
+                Name = "反击大师",
+                Description = "成功完成50次反击",
+                Type = AchievementType.CounterAttack,
+                Difficulty = AchievementDifficulty.Hard,
+                RequiredValue = 50,
+                RewardGold = 2500,
+                RewardExp = 5000
+            });
+            
+            // No-hit boss achievements - 无伤Boss成就
+            AddAchievement(new Achievement
+            {
+                Id = "nohit_boss_1",
+                Name = "无伤初战",
+                Description = "无伤击败1个Boss",
+                Type = AchievementType.NoHitBoss,
+                Difficulty = AchievementDifficulty.Hard,
+                RequiredValue = 1,
+                RewardGold = 2000,
+                RewardExp = 3000
+            });
+            
+            AddAchievement(new Achievement
+            {
+                Id = "nohit_boss_3",
+                Name = "无伤猎手",
+                Description = "无伤击败3个Boss",
+                Type = AchievementType.NoHitBoss,
+                Difficulty = AchievementDifficulty.Epic,
+                RequiredValue = 3,
+                RewardGold = 5000,
+                RewardExp = 8000
+            });
         }
         
         private void AddAchievement(Achievement achievement)

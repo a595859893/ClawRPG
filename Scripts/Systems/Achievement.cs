@@ -59,7 +59,11 @@ namespace ClawRPG.Scripts.Systems
         Survival,
         Combo,
         Damage,
-        Gold
+        Gold,
+        EnrageKill,
+        PerfectBlock,
+        CounterAttack,
+        NoHitBoss
     }
     
     public enum AchievementDifficulty
