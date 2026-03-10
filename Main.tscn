@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=34 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_main"]
 [ext_resource type="Script" path="res://Scripts/UI/PlayerHUD.cs" id="2_hud"]
@@ -33,6 +33,8 @@
 [ext_resource type="Script" path="res://Scripts/Systems/Enchantment/EnchantmentDatabase.cs" id="31_enchant_db"]
 [ext_resource type="Script" path="res://Scripts/Systems/Enchantment/EnchantmentSystem.cs" id="32_enchant_system"]
 [ext_resource type="Script" path="res://Scripts/UI/EnchantmentUI.cs" id="33_enchant_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/EquipmentVisuals.cs" id="34_equip_visuals"]
+[ext_resource type="Script" path="res://Scripts/UI/EquipmentVisualsUI.cs" id="35_equip_visuals_ui"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -306,3 +308,16 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("33_enchant_ui")
+
+[node name="EquipmentVisuals" type="Node" parent="."]
+script = ExtResource("34_equip_visuals")
+
+[node name="EquipmentVisualsUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("35_equip_visuals_ui")

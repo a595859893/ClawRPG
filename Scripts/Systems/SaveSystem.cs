@@ -120,6 +120,9 @@ namespace ClawRPG.Scripts.Systems {
             // Enchantment system data
             public Dictionary<string, object> EnchantmentData { get; set; } = new();
             
+            // Equipment visuals data
+            public Dictionary<string, string> EquipmentVisualsData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -490,6 +493,13 @@ namespace ClawRPG.Scripts.Systems {
             
             // Save enchantment data
             data.EnchantmentData = ClawRPG.Scripts.Systems.Enchantment.EnchantmentSystem.Instance.Serialize();
+            
+            // Save equipment visuals data
+            var equipVisuals = GetNodeOrNull<UI.EquipmentVisuals>("EquipmentVisuals");
+            if (equipVisuals != null)
+            {
+                data.EquipmentVisualsData = equipVisuals.Serialize();
+            }
             
             return data;
         }

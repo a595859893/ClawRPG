@@ -317,6 +317,12 @@ namespace ClawRPG.Scripts {
                 ToggleEnchantmentUI();
             }
             
+            // Handle equipment visuals UI toggle (V key)
+            if (Input.IsActionJustPressed("equip_visuals"))
+            {
+                ToggleEquipmentVisualsUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -445,6 +451,15 @@ namespace ClawRPG.Scripts {
             if (enchantmentUI != null)
             {
                 enchantmentUI.Toggle();
+            }
+        }
+        
+        private void ToggleEquipmentVisualsUI()
+        {
+            var equipVisualsUI = GetNodeOrNull<UI.EquipmentVisualsUI>("CanvasLayer/EquipmentVisualsUI");
+            if (equipVisualsUI != null)
+            {
+                equipVisualsUI.Toggle();
             }
         }
         
@@ -712,6 +727,13 @@ namespace ClawRPG.Scripts {
                 if (saveData.EnchantmentData != null)
                 {
                     ClawRPG.Scripts.Systems.Enchantment.EnchantmentSystem.Instance.Deserialize(saveData.EnchantmentData);
+                }
+                
+                // 加载装备外观数据
+                var equipVisuals = GetNodeOrNull<UI.EquipmentVisuals>("EquipmentVisuals");
+                if (equipVisuals != null && saveData.EquipmentVisualsData != null)
+                {
+                    equipVisuals.Deserialize(saveData.EquipmentVisualsData);
                 }
                 
                 CurrentDay = saveData.CurrentDay;
