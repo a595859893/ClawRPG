@@ -120,10 +120,25 @@ namespace ClawRPG.Scripts {
             // Update UI
             UpdatePlayerUI();
             
+            // Handle runes UI toggle (U key)
+            if (Input.IsActionJustPressed("runes"))
+            {
+                ToggleRunesUI();
+            }
+            
             // Handle pause
             if (Input.IsActionJustPressed("ui_cancel"))
             {
                 TogglePause();
+            }
+        }
+        
+        private void ToggleRunesUI()
+        {
+            var runeUI = GetNodeOrNull<UI.RuneUI>("CanvasLayer/RuneUI");
+            if (runeUI != null)
+            {
+                runeUI.Toggle();
             }
         }
         

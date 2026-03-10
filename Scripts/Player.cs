@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -39,6 +40,34 @@ namespace ClawRPG.Scripts.Characters {
         public float CurrentStamina { get; private set; }
         public int Level { get; private set; } = 1;
         public int Experience { get; private set; }
+        
+        // Currency
+        public int Gold { get; set; }
+        
+        // Rune system - base attributes (before runes)
+        public float BaseAttackDamage { get; private set; } = 15f;
+        public float BaseDefense { get; private set; } = 5f;
+        public float BaseMaxHealth { get; private set; } = 100f;
+        public float BaseMaxMana { get; private set; } = 50f;
+        public float BaseCritChance { get; private set; } = 0.1f;
+        public float BaseCritDamage { get; private set; } = 1.5f;
+        public float BaseAttackSpeed { get; private set; } = 0.5f;
+        public float BaseMoveSpeed { get; private set; } = 200f;
+        
+        // Rune system - total attributes (after runes applied)
+        public float TotalAttackDamage => BaseAttackDamage + GetRuneBonus(RuneAttribute.Damage);
+        public float TotalDefense => BaseDefense + GetRuneBonus(RuneAttribute.Defense);
+        public float TotalMaxHealth => (int)(BaseMaxHealth + GetRuneBonus(RuneAttribute.MaxHealth));
+        public float TotalMaxMana => (int)(BaseMaxMana + GetRuneBonus(RuneAttribute.MaxMana));
+        public float TotalCritChance => BaseCritChance + GetRuneBonus(RuneAttribute.CritChance) / 100f;
+        public float TotalCritDamage => BaseCritDamage + GetRuneBonus(RuneAttribute.CritDamage) / 100f;
+        public float TotalAttackSpeed => BaseAttackSpeed;
+        public float TotalMoveSpeed => BaseMoveSpeed + GetRuneBonus(RuneAttribute.MoveSpeed);
+        
+        // Resistance bonuses from runes
+        public float FireResistance { get; private set; }
+        public float IceResistance { get; private set; }
+        public float DarkResistance { get; private set; }
         
         // Skill system
         public int SkillPoints { get; private set; }
@@ -279,6 +308,30 @@ namespace ClawRPG.Scripts.Characters {
                 }
             }
             return enemies;
+        }
+        
+        /// <summary>
+        /// 获取符文属性加成
+        /// </summary>
+        private float GetRuneBonus(RuneAttribute attribute) {
+            try {
+                var runeManager = Systems.RuneManager.Instance;
+                if (runeManager == null) return 0;
+                
+                var attributes = runeManager.CalculateTotalAttributes();
+                return attributes.TryGetValue(attribute, out float value) ? value : 0;
+            } catch {
+                return 0;
+            }
+        }
+        
+        /// <summary>
+        /// 刷新符文属性加成（从符文管理器更新抗性等）
+        /// </summary>
+        public void RefreshRuneAttributes() {
+            FireResistance = GetRuneBonus(RuneAttribute.FireResistance);
+            IceResistance = GetRuneBonus(RuneAttribute.IceResistance);
+            DarkResistance = GetRuneBonus(RuneAttribute.DarkResistance);
         }
         
         public void TakeDamage(int damage, bool isCrit = false, Vector2 fromDirection = default)
