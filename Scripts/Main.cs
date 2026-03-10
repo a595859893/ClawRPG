@@ -33,6 +33,7 @@ namespace ClawRPG.Scripts {
         }
         
         private GameState _currentGameState = GameState.Playing;
+        private bool _shiftEToggleCooldown = false;
         
         public static bool IsPaused { get; private set; }
         public static int CurrentDay { get; private set; } = 1;
@@ -132,6 +133,11 @@ namespace ClawRPG.Scripts {
             var soundEffectSystem = new SoundEffectSystem();
             soundEffectSystem.Name = "SoundEffectSystem";
             AddChild(soundEffectSystem);
+            
+            // Initialize equipment set system
+            var equipmentSetManager = new EquipmentSetManager();
+            equipmentSetManager.Name = "EquipmentSetManager";
+            AddChild(equipmentSetManager);
             
             // Connect sound effect signals
             ConnectSoundSignals();
@@ -265,6 +271,11 @@ namespace ClawRPG.Scripts {
             var storyUI = new UI.StoryUI();
             storyUI.Name = "StoryUI";
             ui.AddChild(storyUI);
+            
+            // Equipment Set UI
+            var equipmentSetUI = new UI.EquipmentSetUI();
+            equipmentSetUI.Name = "EquipmentSetUI";
+            ui.AddChild(equipmentSetUI);
             
             GD.Print("UI initialized");
         }
@@ -402,10 +413,24 @@ namespace ClawRPG.Scripts {
                 ToggleAutoBookmarkUI();
             }
             
-            // Handle enhancement UI toggle (X key)
+            // Handle equipment set UI toggle (Shift+S key)
             if (Input.IsActionJustPressed("enhancement"))
             {
                 ToggleEnhancementUI();
+            }
+            
+            // Handle equipment set UI toggle (Shift+E key)
+            if (Input.IsKeyPressed(KEY_SHIFT) && Input.IsKeyPressed(KEY_E))
+            {
+                if (!_shiftEToggleCooldown)
+                {
+                    ToggleEquipmentSetUI();
+                    _shiftEToggleCooldown = true;
+                }
+            }
+            else
+            {
+                _shiftEToggleCooldown = false;
             }
             
             // Handle auto potion UI toggle (Shift+X key)
@@ -618,6 +643,15 @@ namespace ClawRPG.Scripts {
                 {
                     storyUI.RefreshChapterList();
                 }
+            }
+        }
+        
+        private void ToggleEquipmentSetUI()
+        {
+            var setUI = GetNodeOrNull<UI.EquipmentSetUI>("CanvasLayer/EquipmentSetUI");
+            if (setUI != null)
+            {
+                setUI.ToggleSetUI();
             }
         }
         
