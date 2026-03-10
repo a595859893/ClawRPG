@@ -8,6 +8,7 @@ using ClawRPG.Scripts.Systems.Enhancement;
 using ClawRPG.Scripts.UI;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Quests;
+using ClawRPG.Scripts.Achievements;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -127,6 +128,14 @@ namespace ClawRPG.Scripts {
             storyManager.Name = "StoryManager";
             AddChild(storyManager);
             
+            // Initialize sound effect system
+            var soundEffectSystem = new SoundEffectSystem();
+            soundEffectSystem.Name = "SoundEffectSystem";
+            AddChild(soundEffectSystem);
+            
+            // Connect sound effect signals
+            ConnectSoundSignals();
+            
             // Spawn player
             SpawnPlayer();
             
@@ -137,6 +146,35 @@ namespace ClawRPG.Scripts {
             LoadGameData();
             
             GD.Print("Game initialized successfully!");
+        }
+        
+        private void ConnectSoundSignals()
+        {
+            // Connect achievement unlock sound
+            if (AchievementManager.Instance != null)
+            {
+                AchievementManager.Instance.OnAchievementUnlocked += (achievement) => {
+                    if (SoundEffectSystem.Instance != null)
+                        SoundEffectSystem.Instance.PlayAchievementUnlock();
+                };
+            }
+            
+            // Connect title unlock sound
+            if (TitleSystem.Instance != null)
+            {
+                TitleSystem.Instance.OnTitleUnlocked += (title) => {
+                    if (SoundEffectSystem.Instance != null)
+                        SoundEffectSystem.Instance.PlayTitleUnlock();
+                };
+            }
+            
+            // Connect quest complete sound
+            QuestSystem.OnQuestCompleted += (quest) => {
+                if (SoundEffectSystem.Instance != null)
+                    SoundEffectSystem.Instance.PlayQuestComplete();
+            };
+            
+            GD.Print("Sound effect signals connected");
         }
         
         private void SpawnPlayer()

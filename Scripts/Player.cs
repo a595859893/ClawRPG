@@ -176,6 +176,10 @@ namespace ClawRPG.Scripts.Characters {
             CurrentMana = MaxMana;
             SkillPoints += 1;
             
+            // Play level up sound
+            if (SoundEffectSystem.Instance != null)
+                SoundEffectSystem.Instance.PlayLevelUp();
+            
             // Track statistics
             StatisticsManager.Instance.UpdateHighestLevel(Level);
             
