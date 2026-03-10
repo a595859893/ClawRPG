@@ -111,6 +111,9 @@ namespace ClawRPG.Scripts.Systems {
             // Bookmark system data
             public Dictionary<string, object> BookmarkData { get; set; } = new();
             
+            // Auto bookmark system data
+            public Dictionary<string, object> AutoBookmarkData { get; set; } = new();
+            
             // Enhancement system data
             public Dictionary<string, object> EnhancementData { get; set; } = new();
             
@@ -481,6 +484,13 @@ namespace ClawRPG.Scripts.Systems {
             if (BookmarkSystem.Instance != null)
             {
                 data.BookmarkData = BookmarkSystem.Instance.Serialize();
+            }
+            
+            // Save auto bookmark data
+            var autoBookmarkSystem = GetNodeOrNull<Systems.AutoBookmarkSystem>("AutoBookmarkSystem");
+            if (autoBookmarkSystem != null)
+            {
+                data.AutoBookmarkData = autoBookmarkSystem.Serialize();
             }
             
             // Save enhancement data

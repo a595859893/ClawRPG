@@ -86,6 +86,11 @@ namespace ClawRPG.Scripts {
             var autoPotionSystem = new AutoPotionSystem();
             autoPotionSystem.Name = "AutoPotionSystem";
             AddChild(autoPotionSystem);
+
+            // Initialize auto bookmark system
+            var autoBookmarkSystem = new AutoBookmarkSystem();
+            autoBookmarkSystem.Name = "AutoBookmarkSystem";
+            AddChild(autoBookmarkSystem);
             
             // Initialize enchantment database
             var enchantmentDb = new ClawRPG.Scripts.Systems.Enchantment.EnchantmentDatabase();
@@ -302,6 +307,12 @@ namespace ClawRPG.Scripts {
                 ToggleBookmarkUI();
             }
             
+            // Handle auto bookmark settings toggle (Shift+N key)
+            if (Input.IsActionJustPressed("auto_bookmark"))
+            {
+                ToggleAutoBookmarkUI();
+            }
+            
             // Handle enhancement UI toggle (X key)
             if (Input.IsActionJustPressed("enhancement"))
             {
@@ -432,6 +443,15 @@ namespace ClawRPG.Scripts {
             if (bookmarkUI != null)
             {
                 bookmarkUI.ToggleVisibility();
+            }
+        }
+        
+        private void ToggleAutoBookmarkUI()
+        {
+            var autoBookmarkUI = GetNodeOrNull<UI.AutoBookmarkUI>("CanvasLayer/AutoBookmarkUI");
+            if (autoBookmarkUI != null)
+            {
+                autoBookmarkUI.Toggle();
             }
         }
         
@@ -725,6 +745,16 @@ namespace ClawRPG.Scripts {
                 if (saveData.BookmarkData != null && BookmarkSystem.Instance != null)
                 {
                     BookmarkSystem.Instance.Deserialize(saveData.BookmarkData);
+                }
+                
+                // 加载自动收藏点数据
+                if (saveData.AutoBookmarkData != null)
+                {
+                    var autoBookmarkSystem = GetNodeOrNull<Systems.AutoBookmarkSystem>("AutoBookmarkSystem");
+                    if (autoBookmarkSystem != null)
+                    {
+                        autoBookmarkSystem.Deserialize(saveData.AutoBookmarkData);
+                    }
                 }
                 
                 // 加载强化数据

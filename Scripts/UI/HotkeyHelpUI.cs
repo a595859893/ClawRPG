@@ -61,6 +61,7 @@ namespace ClawRPG.Scripts.UI {
             AddHotkey("坐骑", "O");
             AddHotkey("称号", "Y");
             AddHotkey("收藏点", "N");
+            AddHotkey("自动收藏点设置", "Shift+N");
             AddHotkey("称号系统", "Y");
             AddHotkey("坐骑系统", "O");
             AddHotkey("快速槽", "1-9");
