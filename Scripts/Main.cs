@@ -159,6 +159,11 @@ namespace ClawRPG.Scripts {
             soundEffectSystem.Name = "SoundEffectSystem";
             AddChild(soundEffectSystem);
             
+            // Initialize background music system
+            var backgroundMusicSystem = new BackgroundMusicSystem();
+            backgroundMusicSystem.Name = "BackgroundMusicSystem";
+            AddChild(backgroundMusicSystem);
+            
             // Initialize equipment set system
             var equipmentSetManager = new EquipmentSetManager();
             equipmentSetManager.Name = "EquipmentSetManager";
@@ -879,6 +884,11 @@ namespace ClawRPG.Scripts {
             enemy.GlobalPosition = position;
             _enemies.AddChild(enemy);
             
+            // Start battle music when enemy spawns (if not already in battle)
+            if (BackgroundMusicSystem.Instance != null && !BackgroundMusicSystem.Instance.IsInBattle()) {
+                BackgroundMusicSystem.Instance.StartBattleMusic(false);
+            }
+            
             GD.Print("Enemy spawned: " + enemyType);
         }
         
@@ -886,6 +896,16 @@ namespace ClawRPG.Scripts {
         {
             CurrentDay++;
             GD.Print("Day " + CurrentDay + " begins!");
+        }
+        
+        /// <summary>
+        /// Check if battle has ended (no enemies remaining)
+        /// </summary>
+        public void CheckBattleEnd() {
+            if (_enemies.GetChildCount() == 0 && BackgroundMusicSystem.Instance != null) {
+                BackgroundMusicSystem.Instance.StopBattleMusic();
+                BackgroundMusicSystem.Instance.PlayVictoryMusic();
+            }
         }
         
         /// <summary>
