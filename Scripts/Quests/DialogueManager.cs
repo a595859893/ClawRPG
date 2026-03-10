@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using ClawRPG.Scripts.Items;
 
 namespace ClawRPG.Scripts.Quests {
     /// <summary>
@@ -282,9 +283,26 @@ namespace ClawRPG.Scripts.Quests {
             }
         }
 
+        // 玩家引用（通过 Initialize 设置）
+        private Node _playerNode;
+        
+        /// <summary>
+        /// 初始化对话框管理器（由 Main 调用）
+        /// </summary>
+        public void Initialize(Node playerNode) {
+            _playerNode = playerNode;
+        }
+        
         // 获取玩家相关数据的接口方法
         private Node GetPlayer() {
-            return null; // TODO: 实现获取玩家节点
+            if (_playerNode != null) return _playerNode;
+            
+            // 尝试从场景树获取玩家节点
+            var tree = Engine.GetMainLoop();
+            if (tree is SceneTree sceneTree) {
+                return sceneTree.GetFirstNodeInGroup("player");
+            }
+            return null;
         }
 
         private int GetPlayerLevel() {
@@ -296,7 +314,7 @@ namespace ClawRPG.Scripts.Quests {
         }
 
         private string GetQuestState(string questId) {
-            var questSystem = GetQuestSystem();
+            var questSystem = QuestSystem.Instance;
             if (questSystem != null && questSystem.HasMethod("GetQuestState")) {
                 return (string)questSystem.Call("GetQuestState", questId);
             }
@@ -304,11 +322,11 @@ namespace ClawRPG.Scripts.Quests {
         }
 
         private Node GetQuestSystem() {
-            return null; // TODO: 实现获取任务系统
+            return QuestSystem.Instance;
         }
 
         private Node GetItemSystem() {
-            return null; // TODO: 实现获取物品系统
+            return InventoryManager.Instance;
         }
 
         /// <summary>

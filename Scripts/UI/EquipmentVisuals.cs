@@ -15,6 +15,13 @@ namespace ClawRPG.Scripts.UI {
         private string _armorVisualId = "default_armor";
         // 饰品外观
         private string _accessoryVisualId = "default_accessory";
+        
+        // 已解锁的外观（slot -> list of visualId）
+        private Dictionary<string, HashSet<string>> _unlockedVisuals = new Dictionary<string, HashSet<string>>() {
+            { "weapon", new HashSet<string>() { "default_sword" } },
+            { "armor", new HashSet<string>() { "default_armor" } },
+            { "accessory", new HashSet<string>() { "default_accessory" } }
+        };
 
         // 武器外观数据库
         private Dictionary<string, WeaponVisual> _weaponVisuals = new Dictionary<string, WeaponVisual>();
@@ -257,16 +264,21 @@ namespace ClawRPG.Scripts.UI {
                 return true;
             }
 
-            // TODO: 从玩家进度数据中检查解锁状态
-            // 这里简化为检查特定的解锁条件
-            return true;
+            // 从已解锁数据中检查
+            if (_unlockedVisuals.TryGetValue(slot, out var unlocked)) {
+                return unlocked.Contains(visualId);
+            }
+            return false;
         }
 
         /// <summary>
         /// 解锁外观
         /// </summary>
         public void UnlockVisual(string slot, string visualId) {
-            // TODO: 保存解锁状态到玩家数据
+            if (!_unlockedVisuals.ContainsKey(slot)) {
+                _unlockedVisuals[slot] = new HashSet<string>();
+            }
+            _unlockedVisuals[slot].Add(visualId);
             GD.Print($"外观已解锁: {slot} - {visualId}");
         }
 
@@ -295,6 +307,35 @@ namespace ClawRPG.Scripts.UI {
             }
             if (data.ContainsKey("accessoryVisualId")) {
                 _accessoryVisualId = data["accessoryVisualId"];
+            }
+        }
+        
+        /// <summary>
+        /// 获取已解锁外观数据（用于存档）
+        /// </summary>
+        public Dictionary<string, string[]> GetUnlockedVisualsData() {
+            var result = new Dictionary<string, string[]>();
+            foreach (var kvp in _unlockedVisuals) {
+                result[kvp.Key] = new List<string>(kvp.Value).ToArray();
+            }
+            return result;
+        }
+        
+        /// <summary>
+        /// 加载已解锁外观数据（从存档）
+        /// </summary>
+        public void LoadUnlockedVisualsData(Dictionary<string, string[]> data) {
+            if (data == null) return;
+            
+            foreach (var kvp in data) {
+                if (_unlockedVisuals.ContainsKey(kvp.Key)) {
+                    _unlockedVisuals[kvp.Key].Clear();
+                    foreach (var visualId in kvp.Value) {
+                        _unlockedVisuals[kvp.Key].Add(visualId);
+                    }
+                } else {
+                    _unlockedVisuals[kvp.Key] = new HashSet<string>(kvp.Value);
+                }
             }
         }
     }

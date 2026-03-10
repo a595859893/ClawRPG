@@ -123,6 +123,9 @@ namespace ClawRPG.Scripts.Systems {
             // Auto potion system data
             public Dictionary<string, object> AutoPotionData { get; set; } = new();
             
+            // Equipment visuals data (unlocked appearances)
+            public Dictionary<string, string[]> UnlockedVisuals { get; set; } = new();
+            
             // Enchantment system data
             public Dictionary<string, object> EnchantmentData { get; set; } = new();
             
@@ -531,6 +534,7 @@ namespace ClawRPG.Scripts.Systems {
             if (equipVisuals != null)
             {
                 data.EquipmentVisualsData = equipVisuals.Serialize();
+                data.UnlockedVisuals = equipVisuals.GetUnlockedVisualsData();
             }
             
             // Save combo system data

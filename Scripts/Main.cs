@@ -1162,6 +1162,12 @@ namespace ClawRPG.Scripts {
                     equipVisuals.Deserialize(saveData.EquipmentVisualsData);
                 }
                 
+                // 加载已解锁外观数据
+                if (equipVisuals != null && saveData.UnlockedVisuals != null)
+                {
+                    equipVisuals.LoadUnlockedVisualsData(saveData.UnlockedVisuals);
+                }
+                
                 // 加载按键绑定数据
                 var keybindingSystem = GetNodeOrNull<Systems.KeybindingSystem>("KeybindingSystem");
                 if (keybindingSystem != null && saveData.KeybindingData != null)
