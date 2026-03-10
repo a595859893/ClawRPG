@@ -49,6 +49,9 @@ namespace ClawRPG.Scripts.Characters {
         
         public override void _Ready()
         {
+            // Initialize from database if EnemyTypeId is set (Flyweight Pattern)
+            InitializeFromDatabase();
+            
             CurrentHealth = MaxHealth;
             
             _sprite = GetNode<Sprite2D>("Sprite2D");
@@ -62,6 +65,37 @@ namespace ClawRPG.Scripts.Characters {
             ChangeState(new EnemyStateIdle(this));
             
             GD.Print("Enemy spawned: " + EnemyName + " HP: " + CurrentHealth);
+        }
+        
+        /// <summary>
+        /// Initialize enemy properties from database using Flyweight Pattern
+        /// Multiple enemy instances can share the same EnemyType data from cache
+        /// </summary>
+        private void InitializeFromDatabase()
+        {
+            if (string.IsNullOrEmpty(EnemyTypeId)) return;
+            
+            var enemyType = EnemyDatabase.Instance.GetEnemyType(EnemyTypeId);
+            if (enemyType == null)
+            {
+                GD.PrintErr("Enemy type not found in database: " + EnemyTypeId);
+                return;
+            }
+            
+            // Apply database values (shared intrinsic state)
+            EnemyName = enemyType.Name;
+            MaxHealth = enemyType.MaxHealth;
+            MoveSpeed = enemyType.MoveSpeed;
+            AttackDamage = enemyType.AttackDamage;
+            AttackRange = enemyType.AttackRange;
+            AttackCooldown = enemyType.AttackCooldown;
+            ChaseRange = enemyType.ChaseRange;
+            DetectionRange = enemyType.DetectionRange;
+            CriticalChance = enemyType.CriticalChance;
+            CriticalDamage = enemyType.CriticalDamage;
+            ExperienceReward = enemyType.ExperienceReward;
+            
+            GD.Print("Enemy initialized from database: " + EnemyTypeId);
         }
         
         public override void _PhysicsProcess(double delta)

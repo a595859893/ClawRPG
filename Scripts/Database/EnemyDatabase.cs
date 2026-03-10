@@ -1025,5 +1025,17 @@ namespace ClawRPG.Scripts.Database {
         public int GetEnemyCount() {
             return _enemies.Count;
         }
+        
+        /// <summary>
+        /// Get enemy type by ID (Flyweight Factory)
+        /// Returns cached EnemyType for memory efficiency
+        /// </summary>
+        public EnemyType GetEnemyType(string id) {
+            if (_enemies.TryGetValue(id, out var enemyType))
+            {
+                return enemyType;
+            }
+            return null;
+        }
     }
 }
