@@ -122,6 +122,11 @@ namespace ClawRPG.Scripts {
             dialogueManager.Name = "DialogueManager";
             AddChild(dialogueManager);
             
+            // Initialize story system
+            var storyManager = new StorySystem.StoryManager();
+            storyManager.Name = "StoryManager";
+            AddChild(storyManager);
+            
             // Spawn player
             SpawnPlayer();
             
@@ -217,6 +222,11 @@ namespace ClawRPG.Scripts {
             var dialogueUI = new UI.DialogueUI();
             dialogueUI.Name = "DialogueUI";
             ui.AddChild(dialogueUI);
+
+            // Story UI
+            var storyUI = new UI.StoryUI();
+            storyUI.Name = "StoryUI";
+            ui.AddChild(storyUI);
             
             GD.Print("UI initialized");
         }
@@ -390,6 +400,12 @@ namespace ClawRPG.Scripts {
                 ToggleEquipmentVisualsUI();
             }
             
+            // Handle story UI toggle (K key)
+            if (Input.IsActionJustPressed("story"))
+            {
+                ToggleStoryUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -545,6 +561,19 @@ namespace ClawRPG.Scripts {
             if (equipVisualsUI != null)
             {
                 equipVisualsUI.Toggle();
+            }
+        }
+        
+        private void ToggleStoryUI()
+        {
+            var storyUI = GetNodeOrNull<UI.StoryUI>("CanvasLayer/StoryUI");
+            if (storyUI != null)
+            {
+                storyUI.Visible = !storyUI.Visible;
+                if (storyUI.Visible)
+                {
+                    storyUI.RefreshChapterList();
+                }
             }
         }
 
