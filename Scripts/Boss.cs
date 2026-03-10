@@ -97,6 +97,9 @@ namespace ClawRPG.Scripts.Characters {
         private bool _isEnraged;
         private bool _phaseTransitioning;
         
+        // Rage shader effect
+        private ShaderMaterial _rageMaterial;
+        
         // Events
         public event Action<int> OnPhaseChange;
         public event Action OnEnrage;
@@ -107,6 +110,9 @@ namespace ClawRPG.Scripts.Characters {
         public override void _Ready()
         {
             base._Ready();
+            
+            // Initialize rage shader material
+            InitializeRageShader();
             
             InitializeAbilityDatabase();
             
@@ -1105,11 +1111,53 @@ namespace ClawRPG.Scripts.Characters {
         
         private void ShowEnrageEffect()
         {
+            // Apply rage shader effect
+            if (_rageMaterial != null && _sprite != null)
+            {
+                _sprite.Material = _rageMaterial;
+                AnimateRageShader();
+            }
+            
+            // Also keep the original modulate effect for compatibility
             var tween = CreateTween();
             _sprite.Modulate = new Color(1f, 0.3f, 0f);
             tween.SetLoops();
             tween.TweenProperty(_sprite, "modulate", new Color(1f, 0f, 0f), 0.5f);
             tween.TweenProperty(_sprite, "modulate", new Color(1f, 0.3f, 0f), 0.5f);
+        }
+        
+        private void InitializeRageShader()
+        {
+            var shader = GD.Load<Shader>("res://Shaders/boss_rage.gdshader");
+            if (shader != null)
+            {
+                _rageMaterial = new ShaderMaterial();
+                _rageMaterial.Shader = shader;
+                _rageMaterial.SetShaderParameter("rage_amount", 0.0f);
+                GD.Print($"Boss {BossTitle} initialized rage shader");
+            }
+            else
+            {
+                GD.PrintErr($"Failed to load boss_rage.gdshader for {BossTitle}");
+            }
+        }
+        
+        private void AnimateRageShader()
+        {
+            if (_rageMaterial == null) return;
+            
+            var tween = CreateTween();
+            tween.SetLoops();
+            
+            // Animate rage_amount from 0.5 to 1.0
+            tween.TweenCallback(Callable.From(() => {
+                _rageMaterial.SetShaderParameter("rage_amount", 0.5f);
+            }));
+            tween.TweenInterval(0.5f);
+            tween.TweenCallback(Callable.From(() => {
+                _rageMaterial.SetShaderParameter("rage_amount", 1.0f);
+            }));
+            tween.TweenInterval(0.5f);
         }
         
         // Public methods
