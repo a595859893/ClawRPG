@@ -123,6 +123,9 @@ namespace ClawRPG.Scripts.Systems {
             // Bounty system data
             public Dictionary<string, object> BountyData { get; set; } = new();
             
+            // Weather system data
+            public Dictionary<string, object> WeatherData { get; set; } = new();
+            
             // Equipment visuals data
             public Dictionary<string, string> EquipmentVisualsData { get; set; } = new();
             
@@ -499,6 +502,13 @@ namespace ClawRPG.Scripts.Systems {
             
             // Save bounty data
             data.BountyData = BountyManager.Instance.Serialize();
+            
+            // Save weather data
+            var weatherSystem = GetNodeOrNull<WeatherSystem>("WeatherSystem");
+            if (weatherSystem != null)
+            {
+                data.WeatherData = weatherSystem.Serialize();
+            }
             
             // Save equipment visuals data
             var equipVisuals = GetNodeOrNull<UI.EquipmentVisuals>("EquipmentVisuals");

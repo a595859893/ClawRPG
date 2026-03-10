@@ -96,6 +96,11 @@ namespace ClawRPG.Scripts {
             var bountyManager = BountyManager.Instance;
             bountyManager.Initialize();
             
+            // Initialize weather system
+            var weatherSystem = new WeatherSystem();
+            weatherSystem.Name = "WeatherSystem";
+            AddChild(weatherSystem);
+            
             // Spawn player
             SpawnPlayer();
             
@@ -752,6 +757,13 @@ namespace ClawRPG.Scripts {
                 if (saveData.BountyData != null)
                 {
                     BountyManager.Instance.Deserialize(saveData.BountyData);
+                }
+                
+                // 加载天气数据
+                var weatherSystem = GetNodeOrNull<WeatherSystem>("WeatherSystem");
+                if (weatherSystem != null && saveData.WeatherData != null)
+                {
+                    weatherSystem.Deserialize(saveData.WeatherData);
                 }
                 
                 // 加载装备外观数据

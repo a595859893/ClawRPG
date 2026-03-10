@@ -71,6 +71,7 @@ namespace ClawRPG.Scripts.UI {
             AddHotkey("附魔系统", "E");
             AddHotkey("赏金任务", "B");
             AddHotkey("装备外观", "V");
+            AddHotkey("天气系统", "V");
             AddHotkey("暂停", "ESC");
             
             // Toggle hint

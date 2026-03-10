@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=37 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_main"]
 [ext_resource type="Script" path="res://Scripts/UI/PlayerHUD.cs" id="2_hud"]
@@ -36,6 +36,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/EquipmentVisuals.cs" id="34_equip_visuals"]
 [ext_resource type="Script" path="res://Scripts/UI/EquipmentVisualsUI.cs" id="35_equip_visuals_ui"]
 [ext_resource type="Script" path="res://Scripts/UI/BountyUI.cs" id="36_bounty_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/WeatherUI.cs" id="37_weather_ui"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -319,6 +320,16 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("36_bounty_ui")
+
+[node name="WeatherUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("37_weather_ui")
 
 [node name="EquipmentVisuals" type="Node" parent="."]
 script = ExtResource("34_equip_visuals")
