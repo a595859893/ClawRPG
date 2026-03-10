@@ -34,7 +34,20 @@ namespace ClawRPG.Scripts.Systems {
         BossEncounter,   // 遇到Boss
         RegionEnter,     // 进入区域
         ItemCollected,   // 收集物品
-        SkillUnlocked    // 技能解锁
+        SkillUnlocked,   // 技能解锁
+        FirstPotion,     // 首次使用药水
+        FirstEnhance,    // 首次强化装备
+        FirstRune,       // 首次镶嵌符文
+        FirstPetCombat,  // 首次宠物战斗
+        FirstMountRide,  // 首次骑乘坐骑
+        FirstCombo,      // 首次连击
+        FirstCounter,    // 首次反击
+        FirstDodge,      // 首次闪避成功
+        FirstBlock,      // 首次格挡
+        FirstCrit,       // 首次暴击
+        FirstSkillUse,   // 首次使用技能
+        FirstTitle,      // 首次获得称号
+        FirstAchievement // 首次获得成就
     }
 
     public enum TutorialTargetType {
@@ -299,6 +312,133 @@ namespace ClawRPG.Scripts.Systems {
                 Duration = 0f,
                 CanSkip = true
             });
+
+            // 药水系统
+            steps.Add(new TutorialStep {
+                StepId = "potion",
+                Title = "药水系统",
+                Description = "按 H 键使用背包中的药水恢复生命值。合理使用药水是战斗的关键！",
+                Trigger = TutorialTrigger.FirstPotion,
+                TargetType = TutorialTargetType.Key,
+                TargetAction = "H",
+                Duration = 0f,
+                CanSkip = false
+            });
+
+            // 强化系统
+            steps.Add(new TutorialStep {
+                StepId = "enhancement",
+                Title = "强化系统",
+                Description = "按 Ctrl+E 打开强化界面，消耗材料提升装备属性！",
+                Trigger = TutorialTrigger.FirstEnhance,
+                TargetType = TutorialTargetType.Key,
+                TargetAction = "Ctrl+E",
+                Duration = 0f,
+                CanSkip = false
+            });
+
+            // 符文系统
+            steps.Add(new TutorialStep {
+                StepId = "rune",
+                Title = "符文镶嵌",
+                Description = "在装备上镶嵌符文可以获得额外属性加成。高品质符文带来更强效果！",
+                Trigger = TutorialTrigger.FirstRune,
+                TargetType = TutorialTargetType.UIButton,
+                TargetAction = "Rune",
+                Duration = 0f,
+                CanSkip = true
+            });
+
+            // 宠物战斗
+            steps.Add(new TutorialStep {
+                StepId = "pet_combat",
+                Title = "宠物战斗",
+                Description = "宠物会在战斗中自动协助你作战。升级宠物提升其能力！",
+                Trigger = TutorialTrigger.FirstPetCombat,
+                TargetType = TutorialTargetType.None,
+                Duration = 5f,
+                CanSkip = true
+            });
+
+            // 骑乘坐骑
+            steps.Add(new TutorialStep {
+                StepId = "mount_ride",
+                Title = "骑乘出行",
+                Description = "骑乘坐骑可以大幅提升移动速度。某些坐骑还能在战斗中提供帮助！",
+                Trigger = TutorialTrigger.FirstMountRide,
+                TargetType = TutorialTargetType.Key,
+                TargetAction = "M",
+                Duration = 0f,
+                CanSkip = true
+            });
+
+            // 连击系统
+            steps.Add(new TutorialStep {
+                StepId = "combo",
+                Title = "连击系统",
+                Description = "连续攻击敌人会积累连击数！高连击数获得额外伤害加成！",
+                Trigger = TutorialTrigger.FirstCombo,
+                TargetType = TutorialTargetType.None,
+                Duration = 5f,
+                CanSkip = true
+            });
+
+            // 暴击系统
+            steps.Add(new TutorialStep {
+                StepId = "critical",
+                Title = "暴击机制",
+                Description = "攻击时有几率触发暴击，造成双倍伤害！提升暴击率属性成为致命杀手！",
+                Trigger = TutorialTrigger.FirstCrit,
+                TargetType = TutorialTargetType.None,
+                Duration = 5f,
+                CanSkip = true
+            });
+
+            // 技能使用
+            steps.Add(new TutorialStep {
+                StepId = "skill_use",
+                Title = "技能释放",
+                Description = "点击技能栏或按数字键1-4释放技能。合理搭配技能形成强力连招！",
+                Trigger = TutorialTrigger.FirstSkillUse,
+                TargetType = TutorialTargetType.Key,
+                TargetAction = "1-4",
+                Duration = 0f,
+                CanSkip = false
+            });
+
+            // 称号系统
+            steps.Add(new TutorialStep {
+                StepId = "title",
+                Title = "称号系统",
+                Description = "完成特定成就可获得炫酷称号！称号会显示在角色头顶彰显你的荣耀！",
+                Trigger = TutorialTrigger.FirstTitle,
+                TargetType = TutorialTargetType.None,
+                Duration = 5f,
+                CanSkip = true
+            });
+
+            // 成就系统
+            steps.Add(new TutorialStep {
+                StepId = "achievement",
+                Title = "成就系统",
+                Description = "完成各种挑战目标解锁成就！成就不仅有奖励还能展示你的实力！",
+                Trigger = TutorialTrigger.FirstAchievement,
+                TargetType = TutorialTargetType.Key,
+                TargetAction = "L",
+                Duration = 0f,
+                CanSkip = false
+            });
+
+            // 快捷栏
+            steps.Add(new TutorialStep {
+                StepId = "quickslot",
+                Title = "快捷栏",
+                Description = "将物品或技能拖放到快捷栏，按数字键快速使用！战斗中使用更便捷！",
+                Trigger = TutorialTrigger.Manual,
+                TargetType = TutorialTargetType.None,
+                Duration = 5f,
+                CanSkip = true
+            });
         }
         
         public List<TutorialStep> GetAllSteps() => steps;
@@ -313,6 +453,30 @@ namespace ClawRPG.Scripts.Systems {
         
         public List<TutorialStep> GetIncompleteSteps() {
             return steps.FindAll(s => !s.IsCompleted);
+        }
+        
+        /// <summary>
+        /// 便捷方法：触发指定类型的教程
+        /// </summary>
+        public static void Trigger(TutorialTrigger trigger) {
+            if (Instance != null) {
+                var ui = TutorialUI.Instance;
+                if (ui != null) {
+                    ui.TriggerTutorial(trigger);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 便捷方法：通过ID开始教程
+        /// </summary>
+        public static void TriggerById(string stepId) {
+            if (Instance != null) {
+                var ui = TutorialUI.Instance;
+                if (ui != null) {
+                    ui.StartTutorialById(stepId);
+                }
+            }
         }
     }
 }

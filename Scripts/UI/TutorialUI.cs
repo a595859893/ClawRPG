@@ -32,12 +32,18 @@ namespace ClawRPG.Scripts.UI {
         private ColorRect _highlightOverlay;
         private ColorRect _highlightCircle;
         private Label _actionLabel;
+        private Label _stepCounter;  // 教程步骤计数器
 
         // 当前教程
         private TutorialStep _currentStep;
         private float _remainingTime;
         private bool _isActive;
         private List<TutorialStep> _pendingSteps = new List<TutorialStep>();
+        private int _completedSteps = 0;
+        private int _totalSteps = 0;
+        
+        // 动画
+        private Tween _pulseTween;
         
         // 样式
         private Color _panelBgColor = new Color(0.1f, 0.1f, 0.15f, 0.95f);
@@ -45,6 +51,7 @@ namespace ClawRPG.Scripts.UI {
         private Color _descriptionColor = new Color(0.9f, 0.9f, 0.9f, 1f);
         private Color _targetColor = new Color(0.4f, 0.8f, 1f, 1f);
         private Color _highlightColor = new Color(1f, 0.9f, 0.3f, 0.4f);
+        private Color _successColor = new Color(0.3f, 0.9f, 0.5f, 1f);
         
         public bool IsActive => _isActive;
         public TutorialStep CurrentStep => _currentStep;
@@ -169,8 +176,21 @@ namespace ClawRPG.Scripts.UI {
             _actionLabel.Visible = false;
             AddChild(_actionLabel);
             
+            // 步骤计数器
+            _stepCounter = new Label();
+            _stepCounter.Text = "1/1";
+            _stepCounter.HorizontalAlignment = HorizontalAlignment.Right;
+            _stepCounter.AddThemeColorOverride("font_color", _targetColor);
+            _stepCounter.AddThemeFontSizeOverride("font_size", 12);
+            _stepCounter.Position = new Vector2(420, 15);
+            _stepCounter.Visible = false;
+            _panel.AddChild(_stepCounter);
+            
             // 初始隐藏
             Visible = false;
+            
+            // 计算总步骤数
+            _totalSteps = TutorialDatabase.Instance.GetAllSteps().Count;
         }
 
         private void ConnectSignals() {
@@ -195,6 +215,14 @@ namespace ClawRPG.Scripts.UI {
             // 更新UI
             _titleLabel.Text = step.Title;
             _descriptionLabel.Text = step.Description;
+            
+            // 更新步骤计数器
+            _completedSteps = 0;
+            foreach (var s in TutorialDatabase.Instance.GetAllSteps()) {
+                if (s.IsCompleted) _completedSteps++;
+            }
+            _stepCounter.Text = $"{_completedSteps + 1}/{_totalSteps}";
+            _stepCounter.Visible = true;
             
             // 目标操作
             if (step.TargetType != TutorialTargetType.None && !string.IsNullOrEmpty(step.TargetAction)) {
@@ -229,11 +257,14 @@ namespace ClawRPG.Scripts.UI {
             // 显示
             Visible = true;
             
-            // 淡入动画
+            // 淡入动画 + 缩放效果
             var tween = CreateTween();
+            _panel.Scale = new Vector2(0.8f, 0.8f);
+            tween.SetParallel(true);
             tween.TweenProperty(_panel, "modulate:a", 1f, 0.3f);
+            tween.TweenProperty(_panel, "scale", new Vector2(1f, 1f), 0.3f).SetTrans(Tween.TransitionType.Back);
             
-            GD.Print($"[TutorialUI] Started tutorial: {step.StepId}");
+            GD.Print($"[TutorialUI] Started tutorial: {step.StepId} ({_completedSteps + 1}/{_totalSteps})");
         }
 
         private void ShowHighlight(TutorialStep step) {
@@ -270,14 +301,23 @@ namespace ClawRPG.Scripts.UI {
                 _currentStep.IsCompleted = true;
             }
             
-            // 淡出动画
+            // 淡出动画 + 缩放效果
             var tween = CreateTween();
+            tween.SetParallel(true);
             tween.TweenProperty(_panel, "modulate:a", 0f, 0.3f);
+            tween.TweenProperty(_panel, "scale", new Vector2(1.1f, 1.1f), 0.3f);
             tween.TweenCallback(Callable.From(() => {
                 Visible = false;
+                _panel.Scale = new Vector2(1f, 1f);
                 _highlightOverlay.Visible = false;
                 _highlightCircle.Visible = false;
                 _actionLabel.Visible = false;
+                _stepCounter.Visible = false;
+                
+                // 检查是否全部完成
+                if (IsAllTutorialsCompleted()) {
+                    ShowCompletionMessage();
+                }
             }));
             
             // 检查下一个教程
@@ -288,6 +328,21 @@ namespace ClawRPG.Scripts.UI {
             }
             
             GD.Print($"[TutorialUI] Ended tutorial: {_currentStep?.StepId}");
+        }
+        
+        /// <summary>
+        /// 显示完成消息
+        /// </summary>
+        private void ShowCompletionMessage() {
+            var completionStep = new TutorialStep {
+                StepId = "completion",
+                Title = "🎉 恭喜完成所有教程！",
+                Description = "你已经掌握了游戏的基础操作。祝你冒险愉快！",
+                Duration = 5f,
+                CanSkip = true
+            };
+            
+            CallDeferred("StartTutorial", completionStep);
         }
 
         /// <summary>
