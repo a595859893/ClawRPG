@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Skills {
     /// <summary>
@@ -410,6 +411,9 @@ namespace ClawRPG.Scripts.Skills {
         {
             _learnedSkills.Add(skillId);
             GD.Print("Learned skill: " + SkillDatabase.Instance.GetSkill(skillId)?.Name);
+            
+            // Track achievement progress
+            AchievementManager.Instance.TrackSkillLearn(_learnedSkills.Count);
         }
         
         public bool HasLearned(int skillId)

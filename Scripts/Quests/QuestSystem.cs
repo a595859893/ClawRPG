@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Quests {
     /// <summary>
@@ -360,6 +361,13 @@ namespace ClawRPG.Scripts.Quests {
             // Give rewards
             player.GainExperience(quest.ExperienceReward);
             // Give gold
+            if (player is Player p)
+            {
+                p.AddGold(quest.GoldReward);
+            }
+            
+            // Track achievement progress
+            AchievementManager.Instance.TrackQuestComplete();
             
             _questStatus[questId] = QuestStatus.TurnedIn;
             GD.Print("Quest completed: " + quest.Name + "! Rewards: " + quest.ExperienceReward + " XP, " + quest.GoldReward + " Gold");

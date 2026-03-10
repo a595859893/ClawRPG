@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Crafting {
     /// <summary>
@@ -376,6 +377,9 @@ namespace ClawRPG.Scripts.Crafting {
             
             // Add result item
             inventory.AddItem(recipe.ResultItemId, recipe.ResultQuantity);
+            
+            // Track achievement progress
+            AchievementManager.Instance.TrackCraft();
             
             // Trigger success event
             OnCraftingSuccess?.Invoke(recipe, recipe.ResultQuantity);

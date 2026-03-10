@@ -121,11 +121,13 @@ namespace ClawRPG.Scripts.Characters {
         }
         
         /// <summary>
-        /// Add gold to player and track for daily challenges
+        /// Add gold to player and track for daily challenges and achievements
         /// </summary>
         public void AddGold(int amount) {
             Gold += amount;
             DailyChallengeManager.Instance.OnGoldEarned(amount);
+            // Track achievement progress
+            AchievementManager.Instance.TrackGoldEarned(amount);
         }
         
         /// <summary>
@@ -540,6 +542,9 @@ namespace ClawRPG.Scripts.Characters {
             CurrentMana = MaxMana;
             
             GD.Print("LEVEL UP! Now level " + Level + "! +1 Skill Point!");
+            
+            // Track achievement progress
+            AchievementManager.Instance.TrackLevel(Level);
             
             // Level up effect
             var effect = new LevelUpEffect();
