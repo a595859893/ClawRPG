@@ -40,6 +40,11 @@ namespace ClawRPG.Scripts.Characters {
         public int Level { get; private set; } = 1;
         public int Experience { get; private set; }
         
+        // Skill system
+        public int SkillPoints { get; private set; }
+        public List<int> LearnedSkillIds { get; private set; } = new();
+        public Dictionary<int, int> SkillLevels { get; private set; } = new();
+        
         // Combat state
         public bool IsAttacking { get; private set; }
         public bool IsBlocking { get; private set; }
@@ -329,6 +334,85 @@ namespace ClawRPG.Scripts.Characters {
             CurrentMana = Mathf.Max(0, CurrentMana - amount);
         }
         
+        // Skill system methods
+        public bool CanLearnSkill(Skill skill)
+        {
+            if (SkillPoints < 1) return false;
+            if (LearnedSkillIds.Contains(skill.Id)) return false;
+            if (Level < skill.LevelRequired) return false;
+            return true;
+        }
+        
+        public bool CanUpgradeSkill(Skill skill)
+        {
+            if (!LearnedSkillIds.Contains(skill.Id)) return false;
+            if (SkillPoints < 1) return false;
+            int currentLevel = SkillLevels.GetValueOrDefault(skill.Id, 1);
+            if (currentLevel >= skill.MaxLevel) return false;
+            return true;
+        }
+        
+        public bool LearnSkill(Skill skill)
+        {
+            if (!CanLearnSkill(skill)) return false;
+            
+            SkillPoints--;
+            LearnedSkillIds.Add(skill.Id);
+            SkillLevels[skill.Id] = 1;
+            
+            GD.Print("Learned skill: " + skill.Name);
+            
+            // Apply passive skill bonuses
+            ApplySkillBonuses(skill);
+            
+            return true;
+        }
+        
+        public bool UpgradeSkill(Skill skill)
+        {
+            if (!CanUpgradeSkill(skill)) return false;
+            
+            SkillPoints--;
+            SkillLevels[skill.Id]++;
+            
+            int newLevel = SkillLevels[skill.Id];
+            GD.Print("Upgraded skill: " + skill.Name + " to level " + newLevel);
+            
+            // Reapply skill bonuses
+            ApplySkillBonuses(skill);
+            
+            return true;
+        }
+        
+        private void ApplySkillBonuses(Skill skill)
+        {
+            int skillLevel = SkillLevels.GetValueOrDefault(skill.Id, 1);
+            
+            // Apply passive bonuses based on skill
+            if (skill.PassiveAttackBonus > 0)
+            {
+                AttackDamage += skill.PassiveAttackBonus * skillLevel;
+            }
+            if (skill.PassiveDefenseBonus > 0)
+            {
+                // Would need to add defense stat
+            }
+            if (skill.PassiveHealthBonus > 0)
+            {
+                MaxHealth += skill.PassiveHealthBonus * skillLevel;
+                CurrentHealth = Mathf.Min(CurrentHealth + skill.PassiveHealthBonus * skillLevel, MaxHealth);
+            }
+            if (skill.PassiveManaBonus > 0)
+            {
+                MaxMana += skill.PassiveManaBonus * skillLevel;
+                CurrentMana = Mathf.Min(CurrentMana + skill.PassiveManaBonus * skillLevel, MaxMana);
+            }
+            if (skill.PassiveCritBonus > 0)
+            {
+                CriticalChance = Mathf.Min(1.0f, CriticalChance + skill.PassiveCritBonus * skillLevel);
+            }
+        }
+        
         public void GainExperience(int amount)
         {
             Experience += amount;
@@ -346,6 +430,7 @@ namespace ClawRPG.Scripts.Characters {
         {
             Level++;
             Experience -= Level * 100;
+            SkillPoints += 1; // 1 skill point per level
             
             // Increase stats
             MaxHealth += 20;
@@ -354,7 +439,7 @@ namespace ClawRPG.Scripts.Characters {
             CurrentHealth = MaxHealth;
             CurrentMana = MaxMana;
             
-            GD.Print("LEVEL UP! Now level " + Level);
+            GD.Print("LEVEL UP! Now level " + Level + "! +1 Skill Point!");
             
             // Level up effect
             var effect = new LevelUpEffect();
