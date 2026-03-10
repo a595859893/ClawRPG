@@ -51,6 +51,11 @@ namespace ClawRPG.Scripts {
             _items.Name = "Items";
             AddChild(_items);
             
+            // Initialize weapon mastery system
+            var weaponMasterySystem = new WeaponMasterySystem();
+            weaponMasterySystem.Name = "WeaponMasterySystem";
+            AddChild(weaponMasterySystem);
+            
             // Spawn player
             SpawnPlayer();
             
@@ -212,6 +217,23 @@ namespace ClawRPG.Scripts {
                 ToggleMultiplayerUI();
             }
             
+            // Handle weapon mastery UI toggle (W key)
+            if (Input.IsActionJustPressed("weapon_mastery"))
+            {
+                ToggleWeaponMasteryUI();
+            }
+            
+            // Handle special attacks
+            if (Input.IsActionJustPressed("spin_attack"))
+            {
+                TrySpinAttack();
+            }
+            
+            if (Input.IsActionJustPressed("charge_attack"))
+            {
+                TryChargeAttack();
+            }
+            
             // Handle pause
             if (Input.IsActionJustPressed("ui_cancel"))
             {
@@ -252,6 +274,43 @@ namespace ClawRPG.Scripts {
             if (multiplayerUI != null)
             {
                 multiplayerUI.Toggle();
+            }
+        }
+        
+        private void ToggleWeaponMasteryUI()
+        {
+            var weaponMasteryUI = GetNodeOrNull<UI.WeaponMasteryUI>("CanvasLayer/WeaponMasteryUI");
+            if (weaponMasteryUI != null)
+            {
+                weaponMasteryUI.Toggle();
+            }
+        }
+        
+        private void TrySpinAttack()
+        {
+            if (WeaponMasterySystem.Instance != null)
+            {
+                bool success = WeaponMasterySystem.Instance.TrySpinAttack();
+                if (success)
+                {
+                    GD.Print("Spin attack executed!");
+                }
+            }
+        }
+        
+        private void TryChargeAttack()
+        {
+            if (WeaponMasterySystem.Instance != null && _player != null)
+            {
+                Vector2 inputDir = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+                if (inputDir.Length() > 0.1f)
+                {
+                    bool success = WeaponMasterySystem.Instance.TryChargeAttack(inputDir);
+                    if (success)
+                    {
+                        GD.Print("Charge attack executed!");
+                    }
+                }
             }
         }
         
