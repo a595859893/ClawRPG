@@ -19,9 +19,75 @@ namespace ClawRPG.Scripts.Mounts {
         [Signal] public delegate void OnMountDeactivated();
         [Signal] public delegate void OnMountLevelUp(string mountId, int newLevel);
         [Signal] public delegate void OnMountExperienceGained(string mountId, int exp);
+        [Signal] public delegate void OnMountEffectTriggered(string mountId, Vector2 position);
+
+        // Shader material for mount trail effect
+        private ShaderMaterial _mountTrailMaterial;
 
         public override void _Ready() {
             Instance = this;
+            InitializeMountTrailEffect();
+        }
+
+        /// <summary>
+        /// 初始化坐骑拖尾特效
+        /// </summary>
+        private void InitializeMountTrailEffect() {
+            var shader = GD.Load<Shader>("res://Shaders/mount_trail.gdshader");
+            if (shader != null) {
+                _mountTrailMaterial = new ShaderMaterial();
+                _mountTrailMaterial.Shader = shader;
+                // Set default values
+                _mountTrailMaterial.SetShaderParameter("trail_intensity", 0.5f);
+                _mountTrailMaterial.SetShaderParameter("pulse_speed", 2.0f);
+                _mountTrailMaterial.SetShaderParameter("trail_color", new Color(0.3f, 0.7f, 1.0f, 0.8f));
+                GD.Print("[MountManager] Trail shader initialized");
+            } else {
+                GD.Warning("[MountManager] Failed to load mount_trail.gdshader");
+            }
+        }
+
+        /// <summary>
+        /// 获取坐骑拖尾特效材质
+        /// </summary>
+        public ShaderMaterial GetMountTrailMaterial() {
+            return _mountTrailMaterial;
+        }
+
+        /// <summary>
+        /// 触发坐骑特效
+        /// </summary>
+        public void TriggerMountEffect(Vector2 position) {
+            if (_activeMountId != null && _mountTrailMaterial != null) {
+                EmitSignal(nameof(OnMountEffectTriggered), _activeMountId, position);
+            }
+        }
+
+        /// <summary>
+        /// 设置拖尾强度
+        /// </summary>
+        public void SetTrailIntensity(float intensity) {
+            if (_mountTrailMaterial != null) {
+                _mountTrailMaterial.SetShaderParameter("trail_intensity", Mathf.Clamp(intensity, 0.0f, 1.0f));
+            }
+        }
+
+        /// <summary>
+        /// 设置拖尾颜色
+        /// </summary>
+        public void SetTrailColor(Color color) {
+            if (_mountTrailMaterial != null) {
+                _mountTrailMaterial.SetShaderParameter("trail_color", color);
+            }
+        }
+
+        /// <summary>
+        /// 设置脉冲速度
+        /// </summary>
+        public void SetPulseSpeed(float speed) {
+            if (_mountTrailMaterial != null) {
+                _mountTrailMaterial.SetShaderParameter("pulse_speed", Mathf.Clamp(speed, 0.1f, 5.0f));
+            }
         }
 
         public override void _Process(float delta) {
@@ -107,6 +173,12 @@ namespace ClawRPG.Scripts.Mounts {
 
             // 应用坐骑属性加成
             ApplyMountBonuses(mountId, true);
+
+            // 触发坐骑特效
+            var player = GetTree().CurrentScene.GetNodeOrNull<Player>("../Player");
+            if (player != null) {
+                TriggerMountEffect(player.GlobalPosition);
+            }
 
             GD.Print($"坐骑已激活: {mountId}");
             EmitSignal(nameof(OnMountActivated), mountId);
