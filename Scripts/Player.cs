@@ -114,6 +114,7 @@ namespace ClawRPG.Scripts.Characters {
         // Components
         private AnimationPlayer _animationPlayer;
         private Sprite2D _sprite;
+        private ShaderMaterial _hitFlashMaterial;
         private Area2D _attackArea;
         private CollisionShape2D _hitbox;
         
@@ -129,6 +130,18 @@ namespace ClawRPG.Scripts.Characters {
             
             _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
             _sprite = GetNode<Sprite2D>("Sprite2D");
+            
+            // Initialize hit flash shader material
+            var shader = GD.Load<Shader>("res://Shaders/player_hit_flash.gdshader");
+            if (shader != null)
+            {
+                _hitFlashMaterial = new ShaderMaterial();
+                _hitFlashMaterial.Shader = shader;
+                _hitFlashMaterial.SetShaderParameter("flash_amount", 0.0f);
+                _hitFlashMaterial.SetShaderParameter("flash_color", new Color(1f, 0.3f, 0.3f));
+                _sprite.Material = _hitFlashMaterial;
+            }
+            
             _attackArea = GetNode<Area2D>("AttackArea");
             _hitbox = GetNode<CollisionShape2D>("Hitbox/CollisionShape2D");
             
@@ -514,6 +527,8 @@ namespace ClawRPG.Scripts.Characters {
             if (finalDamage > 0)
             {
                 ShowDamageNumber((int)finalDamage, isCrit);
+                // Trigger hit flash effect
+                TriggerHitFlash();
             }
             
             GD.Print("Player took " + finalDamage + " damage. HP: " + CurrentHealth + "/" + MaxHealth);
@@ -788,6 +803,25 @@ namespace ClawRPG.Scripts.Characters {
                 var type = isCrit ? DamageNumberSystem.DamageType.Critical : DamageNumberSystem.DamageType.Normal;
                 DamageNumberSystem.Instance.ShowDamageOnEntity2D(this, damage, type);
             }
+        }
+        
+        /// <summary>
+        /// Trigger hit flash effect using shader
+        /// </summary>
+        private void TriggerHitFlash()
+        {
+            if (_hitFlashMaterial == null || _sprite == null) return;
+            
+            var tween = CreateTween();
+            // Flash to full intensity quickly
+            tween.TweenCallback(Callable.From(() => {
+                _hitFlashMaterial.SetShaderParameter("flash_amount", 0.6f);
+            }));
+            // Fade out
+            tween.TweenInterval(0.05f);
+            tween.TweenCallback(Callable.From(() => {
+                _hitFlashMaterial.SetShaderParameter("flash_amount", 0.0f);
+            }));
         }
     }
     
