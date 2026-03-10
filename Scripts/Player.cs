@@ -115,6 +115,7 @@ namespace ClawRPG.Scripts.Characters {
         private AnimationPlayer _animationPlayer;
         private Sprite2D _sprite;
         private ShaderMaterial _hitFlashMaterial;
+        private ShaderMaterial _skillGlowMaterial;
         private Area2D _attackArea;
         private CollisionShape2D _hitbox;
         
@@ -140,6 +141,21 @@ namespace ClawRPG.Scripts.Characters {
                 _hitFlashMaterial.SetShaderParameter("flash_amount", 0.0f);
                 _hitFlashMaterial.SetShaderParameter("flash_color", new Color(1f, 0.3f, 0.3f));
                 _sprite.Material = _hitFlashMaterial;
+            }
+            
+            // Initialize skill glow shader material
+            var skillGlowShader = GD.Load<Shader>("res://Shaders/skill_glow.gdshader");
+            if (skillGlowShader != null)
+            {
+                _skillGlowMaterial = new ShaderMaterial();
+                _skillGlowMaterial.Shader = skillGlowShader;
+                _skillGlowMaterial.SetShaderParameter("glow_amount", 0.0f);
+                _skillGlowMaterial.SetShaderParameter("glow_color", new Color(0.3f, 0.6f, 1.0f, 1.0f));
+                _skillGlowMaterial.SetShaderParameter("enable_pulse", true);
+                _skillGlowMaterial.SetShaderParameter("pulse_speed", 3.0f);
+                _skillGlowMaterial.SetShaderParameter("pulse_min", 0.3f);
+                _skillGlowMaterial.SetShaderParameter("pulse_max", 0.7f);
+                _skillGlowMaterial.SetShaderParameter("enable_edge_glow", true);
             }
             
             _attackArea = GetNode<Area2D>("AttackArea");
@@ -821,6 +837,46 @@ namespace ClawRPG.Scripts.Characters {
             tween.TweenInterval(0.05f);
             tween.TweenCallback(Callable.From(() => {
                 _hitFlashMaterial.SetShaderParameter("flash_amount", 0.0f);
+            }));
+        }
+        
+        /// <summary>
+        /// Trigger skill glow effect using shader - for magic/buff effects
+        /// </summary>
+        public void TriggerSkillGlow(Color? glowColor = null, float duration = 0.5f)
+        {
+            if (_skillGlowMaterial == null || _sprite == null) return;
+            
+            // Set custom glow color if provided
+            if (glowColor.HasValue)
+            {
+                _skillGlowMaterial.SetShaderParameter("glow_color", glowColor.Value);
+            }
+            
+            // Apply material if not already applied
+            if (_sprite.Material != _skillGlowMaterial && _sprite.Material != _hitFlashMaterial)
+            {
+                _sprite.Material = _skillGlowMaterial;
+            }
+            
+            var tween = CreateTween();
+            // Fade in glow
+            tween.TweenCallback(Callable.From(() => {
+                _skillGlowMaterial.SetShaderParameter("glow_amount", 0.8f);
+            }));
+            // Hold
+            tween.TweenInterval(duration * 0.5f);
+            // Fade out
+            tween.TweenCallback(Callable.From(() => {
+                _skillGlowMaterial.SetShaderParameter("glow_amount", 0.0f);
+            }));
+            // Restore original material after effect ends
+            tween.TweenInterval(duration * 0.5f);
+            tween.TweenCallback(Callable.From(() => {
+                if (_hitFlashMaterial != null)
+                {
+                    _sprite.Material = _hitFlashMaterial;
+                }
             }));
         }
     }
