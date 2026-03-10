@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=8 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_main"]
+[ext_resource type="Script" path="res://Scripts/UI/PlayerHUD.cs" id="2_hud"]
+[ext_resource type="Script" path="res://Scripts/UI/HotkeyHelpUI.cs" id="3_hotkey"]
+[ext_resource type="Script" path="res://Scripts/UI/InventoryUI.cs" id="4_inventory"]
+[ext_resource type="Script" path="res://Scripts/UI/CraftingUI.cs" id="5_crafting"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -15,3 +19,41 @@ position = Vector2(640, 360)
 current = true
 
 [node name="World" type="Node2D" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="PlayerHUD" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_hud")
+
+[node name="HotkeyHelpUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_hotkey")
+
+[node name="InventoryUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_inventory")
+
+[node name="CraftingUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_crafting")
