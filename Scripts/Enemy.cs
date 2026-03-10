@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -123,6 +124,15 @@ namespace ClawRPG.Scripts.Characters {
             IsDead = true;
             
             GD.Print(EnemyName + " defeated!");
+            
+            // Track kill achievement
+            AchievementManager.Instance.TrackKill();
+            
+            // Check if this is a boss
+            if (this is Boss)
+            {
+                AchievementManager.Instance.TrackBossKill();
+            }
             
             // Give experience to player
             if (_target != null)
