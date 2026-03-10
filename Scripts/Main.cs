@@ -206,6 +206,12 @@ namespace ClawRPG.Scripts {
                 ToggleQuestGuide();
             }
             
+            // Handle multiplayer UI toggle (M key)
+            if (Input.IsActionJustPressed("multiplayer"))
+            {
+                ToggleMultiplayerUI();
+            }
+            
             // Handle pause
             if (Input.IsActionJustPressed("ui_cancel"))
             {
@@ -237,6 +243,15 @@ namespace ClawRPG.Scripts {
             if (questGuide != null)
             {
                 questGuide.Toggle();
+            }
+        }
+        
+        private void ToggleMultiplayerUI()
+        {
+            var multiplayerUI = GetNodeOrNull<UI.MultiplayerUI>("CanvasLayer/MultiplayerUI");
+            if (multiplayerUI != null)
+            {
+                multiplayerUI.Toggle();
             }
         }
         

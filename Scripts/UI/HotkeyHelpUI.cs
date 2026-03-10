@@ -53,9 +53,10 @@ namespace ClawRPG.Scripts.UI {
             AddHotkey("宠物", "P");
             AddHotkey("成就", "L");
             AddHotkey("合成", "C");
-            AddHotkey("世界地图", "M");
+            AddHotkey("世界地图", "R");
             AddHotkey("统计", "Z");
             AddHotkey("任务指引", "G");
+            AddHotkey("多人游戏", "M");
             AddHotkey("暂停", "ESC");
             
             // Toggle hint
