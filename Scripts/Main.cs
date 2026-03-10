@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Systems;
 using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Enhancement;
@@ -218,6 +219,16 @@ namespace ClawRPG.Scripts {
             var teamSkillSystem = new TeamSkillSystem();
             teamSkillSystem.Name = "TeamSkillSystem";
             AddChild(teamSkillSystem);
+            
+            // Initialize elemental reaction system
+            var elementalReactionManager = new Systems.ElementalReactionManager();
+            elementalReactionManager.Name = "ElementalReactionManager";
+            AddChild(elementalReactionManager);
+            
+            // Initialize elemental damage manager
+            var elementalDamageManager = new Systems.ElementalDamageManager();
+            elementalDamageManager.Name = "ElementalDamageManager";
+            AddChild(elementalDamageManager);
             
             // Initialize shop system
             var shopSystem = new ShopSystem();
