@@ -7,6 +7,7 @@ using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Enhancement;
 using ClawRPG.Scripts.UI;
 using ClawRPG.Scripts.Items;
+using ClawRPG.Scripts.Quests;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -115,6 +116,11 @@ namespace ClawRPG.Scripts {
             var comboSystem = new ComboSystem();
             comboSystem.Name = "ComboSystem";
             AddChild(comboSystem);
+
+            // Initialize dialogue system
+            var dialogueManager = Quests.DialogueManager.Instance;
+            dialogueManager.Name = "DialogueManager";
+            AddChild(dialogueManager);
             
             // Spawn player
             SpawnPlayer();
@@ -206,6 +212,11 @@ namespace ClawRPG.Scripts {
             comboDisplayUI.Name = "ComboDisplayUI";
             comboDisplayUI.AddToGroup("ComboDisplay");
             ui.AddChild(comboDisplayUI);
+
+            // Dialogue UI
+            var dialogueUI = new UI.DialogueUI();
+            dialogueUI.Name = "DialogueUI";
+            ui.AddChild(dialogueUI);
             
             GD.Print("UI initialized");
         }
@@ -534,6 +545,18 @@ namespace ClawRPG.Scripts {
             if (equipVisualsUI != null)
             {
                 equipVisualsUI.Toggle();
+            }
+        }
+
+        private void ToggleDialogueUI(string npcId)
+        {
+            if (Quests.DialogueManager.Instance.IsInDialogue)
+            {
+                Quests.DialogueManager.Instance.EndDialogue();
+            }
+            else
+            {
+                Quests.DialogueManager.Instance.StartDialogue(npcId);
             }
         }
         
