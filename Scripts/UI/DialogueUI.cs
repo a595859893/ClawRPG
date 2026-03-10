@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using System.Text;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 对话框UI - 显示NPC对话内容
+    /// 增强功能: 打字机效果、对话历史记录、NPC表情变化
     /// </summary>
     public class DialogueUI : Control {
         // UI组件引用
@@ -14,6 +16,26 @@ namespace ClawRPG.Scripts.UI {
         private TextureRect _portrait;
         private TextureButton _continueButton;
         private PanelContainer _mainPanel;
+        
+        // 增强: 对话历史记录
+        private VBoxContainer _historyContainer;
+        private ScrollContainer _historyScroll;
+        private PanelContainer _historyPanel;
+        
+        // 增强: 打字机效果
+        private string _fullText = "";
+        private string _displayedText = "";
+        private float _typeTimer = 0f;
+        private float _typeSpeed = 0.03f;
+        private bool _isTyping = false;
+        private bool _skipTypewriter = false;
+        
+        // 增强: NPC表情
+        private Dictionary<string, Color> _emotionColors = new Dictionary<string, Color>();
+        
+        // 历史记录
+        private List<string> _dialogueHistory = new List<string>();
+        private int _maxHistoryItems = 10;
 
         // 预设
         private Color _speakerNameColor = new Color(1f, 0.84f, 0f); // 金色
@@ -26,6 +48,9 @@ namespace ClawRPG.Scripts.UI {
         public override void _Ready() {
             base._Ready();
             
+            // 初始化表情颜色
+            InitializeEmotionColors();
+            
             SetupUI();
             Visible = false;
             
@@ -33,6 +58,15 @@ namespace ClawRPG.Scripts.UI {
             Quests.DialogueManager.Instance.DialogueStarted.Connect(OnDialogueStarted);
             Quests.DialogueManager.Instance.DialogueEnded.Connect(OnDialogueEnded);
             Quests.DialogueManager.Instance.NodeChanged.Connect(OnNodeChanged);
+        }
+        
+        private void InitializeEmotionColors() {
+            _emotionColors["normal"] = new Color(0.5f, 0.5f, 0.5f);    // 灰色
+            _emotionColors["happy"] = new Color(1f, 0.8f, 0.2f);       // 黄色
+            _emotionColors["angry"] = new Color(1f, 0.3f, 0.3f);       // 红色
+            _emotionColors["sad"] = new Color(0.4f, 0.6f, 1f);         // 蓝色
+            _emotionColors["surprised"] = new Color(0.8f, 0.5f, 1f);   // 紫色
+            _emotionColors["scared"] = new Color(0.6f, 0.8f, 0.6f);     // 淡绿
         }
 
         private void SetupUI() {
@@ -119,22 +153,76 @@ namespace ClawRPG.Scripts.UI {
             
             mainVBox.AddChild(_continueButton);
 
+            // 增强: 创建历史记录面板
+            SetupHistoryPanel();
+            
             // 创建选项按钮场景
             CreateOptionButtonScene();
+        }
+        
+        private void SetupHistoryPanel() {
+            // 历史记录面板 (在主对话框上方显示)
+            _historyPanel = new PanelContainer();
+            _historyPanel.SetAnchorsPreset(Control.LayoutPreset.BottomWide);
+            _historyPanel.MarginBottom = -260;
+            _historyPanel.MarginLeft = 60;
+            _historyPanel.MarginRight = -60;
+            _historyPanel.CustomMinimumSize = new Vector2(0, 60);
+            _historyPanel.Visible = false;
+            AddChild(_historyPanel);
+            
+            var historyStyle = new StyleBoxFlat();
+            historyStyle.BgColor = new Color(0f, 0f, 0f, 0.6f);
+            historyStyle.CornerRadiusTopLeft = 8;
+            historyStyle.CornerRadiusTopRight = 8;
+            _historyPanel.AddThemeStyleboxOverride("panel", historyStyle);
+            
+            _historyScroll = new ScrollContainer();
+            _historyScroll.HScrollEnabled = false;
+            _historyScroll.VScrollEnabled = true;
+            _historyPanel.AddChild(_historyScroll);
+            
+            _historyContainer = new VBoxContainer();
+            _historyContainer.AddThemeConstantOverride("separation", 4);
+            _historyScroll.AddChild(_historyContainer);
         }
 
         private void CreateOptionButtonScene() {
             // 动态创建选项按钮
         }
+        
+        public override void _Process(float delta) {
+            base._Process(delta);
+            
+            // 打字机效果
+            if (_isTyping && !_skipTypewriter) {
+                _typeTimer += delta;
+                if (_typeTimer >= _typeSpeed) {
+                    _typeTimer = 0f;
+                    if (_displayedText.Length < _fullText.Length) {
+                        _displayedText = _fullText.Substring(0, _displayedText.Length + 1);
+                        _dialogueText.Text = _displayedText;
+                    } else {
+                        _isTyping = false;
+                        ShowOptions();
+                    }
+                }
+            }
+        }
 
         private void OnDialogueStarted() {
             Visible = true;
+            _dialogueHistory.Clear();
+            _historyPanel.Visible = false;
             UpdateDialogueDisplay();
         }
 
         private void OnDialogueEnded() {
             Visible = false;
             ClearOptions();
+            _isTyping = false;
+            _fullText = "";
+            _displayedText = "";
         }
 
         private void OnNodeChanged(string nodeId) {
@@ -149,15 +237,71 @@ namespace ClawRPG.Scripts.UI {
 
             // 更新说话者名字
             _speakerNameLabel.Text = currentNode.SpeakerName ?? "";
+            
+            // 增强: 设置打字机速度
+            _typeSpeed = currentNode.TextRevealSpeed > 0 ? currentNode.TextRevealSpeed : 0.03f;
+            
+            // 更新对话内容 (打字机效果)
+            _fullText = currentNode.Text ?? "";
+            _displayedText = "";
+            _isTyping = true;
+            _skipTypewriter = false;
+            
+            // 添加到历史记录
+            AddToHistory(currentNode.SpeakerName, currentNode.Text);
 
-            // 更新对话内容
-            _dialogueText.Text = currentNode.Text ?? "";
+            // 更新头像和表情
+            UpdatePortraitWithEmotion(currentNode.SpeakerPortrait, currentNode.Emotion);
+            
+            // 应用节点动画
+            ApplyNodeAnimation(currentNode.Animation);
 
-            // 更新头像（如果需要）
-            UpdatePortrait(currentNode.SpeakerPortrait);
-
-            // 显示选项或继续按钮
+            // 清空选项,打字机完成后再显示
             ClearOptions();
+        }
+        
+        private void AddToHistory(string speaker, string text) {
+            if (string.IsNullOrEmpty(text)) return;
+            
+            string historyEntry = $"[b]{speaker}:[/b] {text}";
+            _dialogueHistory.Add(historyEntry);
+            
+            // 限制历史记录数量
+            while (_dialogueHistory.Count > _maxHistoryItems) {
+                _dialogueHistory.RemoveAt(0);
+            }
+            
+            // 更新历史记录显示
+            UpdateHistoryDisplay();
+        }
+        
+        private void UpdateHistoryDisplay() {
+            // 清除旧的历史记录
+            foreach (var child in _historyContainer.GetChildren()) {
+                child.QueueFree();
+            }
+            
+            // 显示最近的几条记录
+            int startIndex = Math.Max(0, _dialogueHistory.Count - 3);
+            for (int i = startIndex; i < _dialogueHistory.Count; i++) {
+                var label = new RichTextLabel();
+                label.BbcodeEnabled = true;
+                label.Text = _dialogueHistory[i];
+                label.FitContent = true;
+                label.AddThemeColorOverride("default_color", new Color(0.8f, 0.8f, 0.8f, 0.7f));
+                label.AddThemeFontSizeOverride("normal_font_size", 12);
+                _historyContainer.AddChild(label);
+            }
+            
+            // 显示历史记录面板
+            _historyPanel.Visible = _dialogueHistory.Count > 0;
+        }
+        
+        private void ShowOptions() {
+            var manager = Quests.DialogueManager.Instance;
+            var currentNode = manager.CurrentNode;
+
+            if (currentNode == null) return;
 
             var availableOptions = manager.GetAvailableOptions();
             
@@ -178,17 +322,56 @@ namespace ClawRPG.Scripts.UI {
             }
         }
 
-        private void UpdatePortrait(string portraitPath) {
-            // TODO: 加载头像纹理
-            // 目前使用占位颜色
+        private void UpdatePortraitWithEmotion(string portraitPath, string emotion) {
+            // 增强: 根据表情显示不同颜色的头像边框
             if (_portrait != null) {
+                var borderColor = _emotionColors.ContainsKey(emotion) 
+                    ? _emotionColors[emotion] 
+                    : _emotionColors["normal"];
+                
                 var placeholderStyle = new StyleBoxFlat();
                 placeholderStyle.BgColor = new Color(0.3f, 0.3f, 0.3f);
+                placeholderStyle.BorderWidthLeft = 4;
+                placeholderStyle.BorderWidthRight = 4;
+                placeholderStyle.BorderWidthTop = 4;
+                placeholderStyle.BorderWidthBottom = 4;
+                placeholderStyle.BorderColor = borderColor;
                 placeholderStyle.CornerRadiusTopLeft = 40;
                 placeholderStyle.CornerRadiusTopRight = 40;
                 placeholderStyle.CornerRadiusBottomLeft = 40;
                 placeholderStyle.CornerRadiusBottomRight = 40;
                 _portrait.AddThemeStyleboxOverride("normal", placeholderStyle);
+                
+                GD.Print($"[DialogueUI] Emotion changed: {emotion}, border color: {borderColor}");
+            }
+        }
+        
+        private void ApplyNodeAnimation(string animation) {
+            if (string.IsNullOrEmpty(animation) || animation == "none") return;
+            
+            switch (animation) {
+                case "fade_in":
+                    // 淡入效果
+                    var tween = CreateTween();
+                    _mainPanel.Modulate = new Color(1, 1, 1, 0);
+                    tween.TweenProperty(_mainPanel, "modulate:a", 1f, 0.3f);
+                    break;
+                    
+                case "bounce":
+                    // 弹跳效果
+                    var bounceTween = CreateTween();
+                    var originalPos = _mainPanel.Position;
+                    bounceTween.TweenProperty(_mainPanel, "position:y", originalPos.y - 20, 0.15f);
+                    bounceTween.TweenProperty(_mainPanel, "position:y", originalPos.y, 0.15f);
+                    break;
+                    
+                case "pulse":
+                    // 脉冲效果
+                    var pulseTween = CreateTween();
+                    pulseTween.SetLoops();
+                    pulseTween.TweenProperty(_mainPanel, "scale", new Vector2(1.02f, 1.02f), 0.3f);
+                    pulseTween.TweenProperty(_mainPanel, "scale", new Vector2(1f, 1f), 0.3f);
+                    break;
             }
         }
 
@@ -239,11 +422,26 @@ namespace ClawRPG.Scripts.UI {
         }
 
         private void OnOptionSelected(Quests.DialogueOption option) {
+            // 玩家选择选项时,停止打字机效果并立即显示完整文本
+            _skipTypewriter = true;
+            _isTyping = false;
+            _displayedText = _fullText;
+            _dialogueText.Text = _fullText;
+            
             Quests.DialogueManager.Instance.SelectOption(option);
         }
 
         private void OnContinuePressed() {
-            Quests.DialogueManager.Instance.Continue();
+            // 点击继续时,如果正在打字,跳过打字机效果
+            if (_isTyping) {
+                _skipTypewriter = true;
+                _isTyping = false;
+                _displayedText = _fullText;
+                _dialogueText.Text = _fullText;
+                ShowOptions();
+            } else {
+                Quests.DialogueManager.Instance.Continue();
+            }
         }
 
         private void ClearOptions() {
@@ -256,8 +454,19 @@ namespace ClawRPG.Scripts.UI {
         public override void _Input(InputEvent @event) {
             if (!Visible) return;
             
-            if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_cancel")) {
-                // 按Enter或Escape跳过/继续
+            // 增强: 按Space键跳过打字机效果
+            if (@event.IsActionPressed("ui_accept")) {
+                if (_isTyping && !_skipTypewriter) {
+                    // 跳过打字机效果
+                    _skipTypewriter = true;
+                    _isTyping = false;
+                    _displayedText = _fullText;
+                    _dialogueText.Text = _fullText;
+                    ShowOptions();
+                    return;
+                }
+                
+                // 继续对话
                 if (Quests.DialogueManager.Instance.IsInDialogue) {
                     var currentNode = Quests.DialogueManager.Instance.CurrentNode;
                     if (currentNode != null && currentNode.IsEndNode) {
@@ -265,6 +474,13 @@ namespace ClawRPG.Scripts.UI {
                     } else if (currentNode != null && (currentNode.Options.Count == 0 || Quests.DialogueManager.Instance.GetAvailableOptions().Count == 0)) {
                         Quests.DialogueManager.Instance.Continue();
                     }
+                }
+            }
+            
+            if (@event.IsActionPressed("ui_cancel")) {
+                // 按Escape结束对话
+                if (Quests.DialogueManager.Instance.IsInDialogue) {
+                    Quests.DialogueManager.Instance.EndDialogue();
                 }
             }
         }

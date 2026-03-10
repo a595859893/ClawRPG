@@ -33,9 +33,16 @@ namespace ClawRPG.Scripts.Quests {
         public string RequiredQuestId { get; set; }
         public string RequiredQuestState { get; set; }
         public int RequiredLevel { get; set; }
+        // 增强: 表情和动画
+        public string Emotion { get; set; } // normal/happy/angry/sad/surprised
+        public string Animation { get; set; } // none/fade_in/bounce/pulse
+        public float TextRevealSpeed { get; set; } = 0.05f; // 打字机速度(秒/字符)
 
         public DialogueNode() {
             Options = new List<DialogueOption>();
+            Emotion = "normal";
+            Animation = "none";
+            TextRevealSpeed = 0.05f;
         }
     }
 
