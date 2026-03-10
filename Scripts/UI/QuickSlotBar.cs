@@ -11,6 +11,9 @@ namespace ClawRPG.Scripts.UI {
         private QuickSlotItem[] _slotItems = new QuickSlotItem[QuickSlotSystem.SlotCount];
         
         public override void _Ready() {
+            // Add to QuickSlotBar group for drag-drop detection
+            AddToGroup("QuickSlotBar");
+            
             // Create main container
             var mainContainer = new VBoxContainer();
             mainContainer.SetAnchorsPreset(Control.LayoutPreset.BottomWide);

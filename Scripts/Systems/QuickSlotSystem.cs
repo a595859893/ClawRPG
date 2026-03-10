@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Items;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
@@ -22,6 +23,34 @@ namespace ClawRPG.Scripts.UI {
         
         public override void _Ready() {
             Instance = this;
+            
+            // Listen for drag drop events
+            if (DragDropHelper.Instance != null) {
+                DragDropHelper.Instance.OnItemDroppedOnQuickSlot += HandleItemDrop;
+            }
+        }
+        
+        /// <summary>
+        /// Handle item dropped from inventory to quick slot
+        /// </summary>
+        private void HandleItemDrop(string itemId, int slotIndex) {
+            if (slotIndex < 0 || slotIndex >= SlotCount) return;
+            if (string.IsNullOrEmpty(itemId)) return;
+            
+            var item = ItemDatabase.Instance.GetItem(itemId);
+            if (item == null || item.Type != ItemType.Consumable) return;
+            
+            // Get quantity from inventory
+            var invSlot = InventoryManager.Instance?.GetItemSlot(itemId);
+            int qty = invSlot?.Quantity ?? 1;
+            
+            // Set the slot
+            SetSlot(slotIndex, itemId, qty);
+            
+            // Show feedback
+            if (ScreenFlashEffect.Instance != null) {
+                ScreenFlashEffect.Instance.Flash(new Color(0.3f, 0.6f, 1f), 0.15f);
+            }
         }
         
         public override void _Input(InputEvent @event) {

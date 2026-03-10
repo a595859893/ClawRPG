@@ -330,7 +330,45 @@ namespace ClawRPG.Scripts.UI
             slot.SetMeta("slot_index", index);
             slot.Pressed += () => OnSlotPressed(slot);
             
+            // Add drag support using GUI input event
+            slot.GuiInput += (evt) => OnSlotGuiInput(slot, evt);
+            
             return slot;
+        }
+        
+        private void OnSlotGuiInput(Button slot, InputEvent evt) {
+            if (evt is InputEventMouseButton btn && btn.ButtonIndex == MouseButton.Left) {
+                if (btn.Pressed) {
+                    // Start drag after a short delay
+                    _dragStartTimer = 0.1f;
+                    _dragSlot = slot;
+                } else {
+                    // Release - normal click
+                    _dragStartTimer = 0;
+                    _dragSlot = null;
+                }
+            }
+        }
+        
+        private float _dragStartTimer = 0;
+        private Button _dragSlot = null;
+        
+        public override void _Process(float delta) {
+            if (_dragStartTimer > 0 && _dragSlot != null) {
+                _dragStartTimer -= delta;
+                if (_dragStartTimer <= 0) {
+                    // Start dragging
+                    var itemId = _dragSlot.GetMeta("item_id") as string;
+                    var qty = (int)_dragSlot.GetMeta("quantity");
+                    
+                    if (!string.IsNullOrEmpty(itemId) && qty > 0) {
+                        var item = ItemDatabase.Instance.GetItem(itemId);
+                        if (item != null && DragDropHelper.Instance != null) {
+                            DragDropHelper.Instance.StartDrag(itemId, qty, item.Type);
+                        }
+                    }
+                }
+            }
         }
         
         private void OnInventoryUpdated()
