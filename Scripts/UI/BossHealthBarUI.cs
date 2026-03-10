@@ -16,11 +16,17 @@ namespace ClawRPG.Scripts.UI {
         private Label _phaseLabel;
         private TextureRect _bossIcon;
         
+        // Enrage UI Components
+        private ProgressBar _enrageBar;
+        private Label _enrageLabel;
+        private Label _enrageWarningLabel;
+        
         // State
         private Node2D _currentBoss;
         private bool _isVisible = false;
         private float _displayTimer = 0f;
         private float _fadeTimer = 0f;
+        private bool _wasEnraged = false;
         private const float AutoHideTime = 3f;
         private const float FadeTime = 0.5f;
         
@@ -28,6 +34,8 @@ namespace ClawRPG.Scripts.UI {
         private Color _healthColorNormal = new Color(0.2f, 0.8f, 0.2f);
         private Color _healthColorWarning = new Color(0.9f, 0.7f, 0.1f);
         private Color _healthColorCritical = new Color(0.9f, 0.2f, 0.2f);
+        private Color _enrageColorWarning = new Color(1f, 0.3f, 0f, 0.8f);
+        private Color _enrageColorActive = new Color(1f, 0f, 0f, 1f);
         
         public override void _Ready()
         {
@@ -124,6 +132,50 @@ namespace ClawRPG.Scripts.UI {
             _phaseLabel.AddThemeFontSizeOverride("font_size", 12);
             _phaseLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.8f, 1f));
             vbox.AddChild(_phaseLabel);
+            
+            // Enrage warning label (shows when boss is about to enrage)
+            _enrageWarningLabel = new Label();
+            _enrageWarningLabel.Text = "";
+            _enrageWarningLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _enrageWarningLabel.AddThemeFontSizeOverride("font_size", 11);
+            _enrageWarningLabel.AddThemeColorOverride("font_color", new Color(1f, 0.4f, 0f));
+            vbox.AddChild(_enrageWarningLabel);
+            
+            // Enrage progress bar
+            _enrageBar = new ProgressBar();
+            _enrageBar.CustomMinimumSize = new Vector2(360, 8);
+            _enrageBar.MinValue = 0;
+            _enrageBar.MaxValue = 100;
+            _enrageBar.Value = 0;
+            _enrageBar.ShowPercentage = false;
+            _enrageBar.Visible = false;
+            
+            var enrageBg = new StyleBoxFlat();
+            enrageBg.BgColor = new Color(0.15f, 0.15f, 0.15f, 1f);
+            enrageBg.CornerRadiusTopLeft = 3;
+            enrageBg.CornerRadiusTopRight = 3;
+            enrageBg.CornerRadiusBottomLeft = 3;
+            enrageBg.CornerRadiusBottomRight = 3;
+            _enrageBar.AddThemeStyleboxOverride("background", enrageBg);
+            
+            var enrageFill = new StyleBoxFlat();
+            enrageFill.BgColor = _enrageColorWarning;
+            enrageFill.CornerRadiusTopLeft = 3;
+            enrageFill.CornerRadiusTopRight = 3;
+            enrageFill.CornerRadiusBottomLeft = 3;
+            enrageFill.CornerRadiusBottomRight = 3;
+            _enrageBar.AddThemeStyleboxOverride("fill", enrageFill);
+            
+            vbox.AddChild(_enrageBar);
+            
+            // Enrage label
+            _enrageLabel = new Label();
+            _enrageLabel.Text = "";
+            _enrageLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _enrageLabel.AddThemeFontSizeOverride("font_size", 11);
+            _enrageLabel.AddThemeColorOverride("font_color", new Color(1f, 0.3f, 0f));
+            _enrageLabel.Visible = false;
+            vbox.AddChild(_enrageLabel);
         }
         
         public override void _Process(float delta)
@@ -205,6 +257,106 @@ namespace ClawRPG.Scripts.UI {
             {
                 _phaseLabel.Text = "";
             }
+            
+            // Update enrage display
+            UpdateEnrageDisplay(boss);
+        }
+        
+        private void UpdateEnrageDisplay(Scripts.Boss boss)
+        {
+            bool isEnraged = boss.IsEnraged();
+            float enrageTimeRemaining = boss.GetEnrageTimeRemaining();
+            float enrageTime = boss.EnrageTime;
+            
+            // Check if enrage state changed
+            if (isEnraged != _wasEnraged)
+            {
+                _wasEnraged = isEnraged;
+                if (isEnraged)
+                {
+                    // Boss just became enraged - trigger visual effect
+                    OnBossEnraged();
+                }
+            }
+            
+            if (isEnraged)
+            {
+                // Boss is enraged - show enrage active state
+                _enrageBar.Visible = true;
+                _enrageLabel.Visible = true;
+                _enrageBar.Value = 100;
+                _enrageLabel.Text = "⚠️ ENRAGED! ⚠️";
+                _enrageLabel.AddThemeColorOverride("font_color", _enrageColorActive);
+                _enrageWarningLabel.Text = "";
+                
+                // Pulsing effect for enrage
+                float pulse = Mathf.Sin(Time.GetTicksMsec() * 0.01f) * 0.3f + 0.7f;
+                _enrageBar.Modulate = new Color(1f, pulse * 0.3f, pulse * 0.3f, 1f);
+            }
+            else if (enrageTimeRemaining > 0 && enrageTime > 0)
+            {
+                // Show enrage countdown when boss health is low (< 30%) or enrage is imminent (< 30s)
+                float healthPercent = boss.CurrentHealth / boss.MaxHealth;
+                float enragePercentRemaining = (enrageTimeRemaining / enrageTime) * 100f;
+                
+                if (healthPercent < 0.3f || enrageTimeRemaining < 30f)
+                {
+                    _enrageBar.Visible = true;
+                    _enrageBar.Value = enragePercentRemaining;
+                    
+                    // Warning color when enrage is close
+                    StyleBoxFlat enrageFill = _enrageBar.GetThemeStylebox("fill") as StyleBoxFlat;
+                    if (enrageFill != null)
+                    {
+                        if (enrageTimeRemaining < 10f)
+                        {
+                            enrageFill.BgColor = _enrageColorActive;
+                        }
+                        else
+                        {
+                            enrageFill.BgColor = _enrageColorWarning;
+                        }
+                    }
+                    
+                    // Show warning text
+                    if (enrageTimeRemaining < 10f)
+                    {
+                        _enrageWarningLabel.Text = "⚡ ENRAGE IMMINENT! ⚡";
+                        _enrageLabel.Text = $"Enrage: {(int)enrageTimeRemaining}s";
+                    }
+                    else
+                    {
+                        _enrageWarningLabel.Text = "";
+                        _enrageLabel.Text = $"Enrage: {(int)enrageTimeRemaining}s";
+                    }
+                    
+                    _enrageLabel.Visible = true;
+                    _enrageBar.Modulate = new Color(1f, 1f, 1f, 1f);
+                }
+                else
+                {
+                    // Hide enrage display
+                    _enrageBar.Visible = false;
+                    _enrageLabel.Visible = false;
+                    _enrageWarningLabel.Text = "";
+                }
+            }
+            else
+            {
+                // No enrage system or already enraged
+                _enrageBar.Visible = false;
+                _enrageLabel.Visible = false;
+                _enrageWarningLabel.Text = "";
+            }
+        }
+        
+        private void OnBossEnraged()
+        {
+            // Visual feedback when boss becomes enraged
+            GD.Print("Boss has become ENRAGED!");
+            
+            // Could add screen shake, flash effect, etc. here
+            // For now, the UI will show the enrage state
         }
         
         /// <summary>
