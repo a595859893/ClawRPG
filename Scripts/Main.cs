@@ -199,6 +199,11 @@ namespace ClawRPG.Scripts {
             teamSkillSystem.Name = "TeamSkillSystem";
             AddChild(teamSkillSystem);
             
+            // Initialize game settings system
+            var gameSettings = new GameSettings();
+            gameSettings.Name = "GameSettings";
+            AddChild(gameSettings);
+            
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
             
@@ -616,6 +621,12 @@ namespace ClawRPG.Scripts {
                 ToggleKeybindingUI();
             }
             
+            // Handle settings UI toggle (F11 key)
+            if (Input.IsActionJustPressed("balance"))
+            {
+                OpenSettingsUI();
+            }
+            
             // Handle tutorial UI toggle (F9 key) - 查看快捷键教程
             if (Input.IsActionJustPressed("tutorial"))
             {
@@ -866,6 +877,21 @@ namespace ClawRPG.Scripts {
             {
                 keybindingUI.ToggleKeybindingUI();
             }
+        }
+        
+        private void OpenSettingsUI()
+        {
+            // Check if any modal UI is open
+            var existingSettings = GetNodeOrNull<UI.SettingsUI>("CanvasLayer/SettingsUI");
+            if (existingSettings != null)
+            {
+                existingSettings.QueueFree();
+                return;
+            }
+            
+            var settingsUI = new UI.SettingsUI();
+            settingsUI.Name = "SettingsUI";
+            GetNode("CanvasLayer").AddChild(settingsUI);
         }
         
         private void ToggleReputationUI()
