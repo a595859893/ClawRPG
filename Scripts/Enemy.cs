@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -98,6 +99,13 @@ namespace ClawRPG.Scripts.Characters {
             
             CurrentHealth -= damage;
             
+            // Track statistics
+            StatisticsManager.Instance.RecordDamageDealt(damage);
+            if (isCrit)
+            {
+                StatisticsManager.Instance.RecordCriticalHit();
+            }
+            
             // Show damage popup
             ShowDamageNumber(damage, isCrit);
             
@@ -123,6 +131,19 @@ namespace ClawRPG.Scripts.Characters {
             IsDead = true;
             
             GD.Print(EnemyName + " defeated!");
+            
+            // Track kill achievement
+            AchievementManager.Instance.TrackKill();
+            
+            // Track statistics
+            StatisticsManager.Instance.RecordKill();
+            
+            // Check if this is a boss
+            if (this is Boss)
+            {
+                AchievementManager.Instance.TrackBossKill();
+                StatisticsManager.Instance.RecordBossDefeated();
+            }
             
             // Give experience to player
             if (_target != null)

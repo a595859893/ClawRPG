@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Quests {
     /// <summary>
@@ -275,6 +276,12 @@ namespace ClawRPG.Scripts.Quests {
     {
         private Dictionary<int, QuestStatus> _questStatus = new();
         
+        // Signals for UI updates
+        public static event Action<Quest> OnQuestAccepted;
+        public static event Action<Quest> OnQuestCompleted;
+        public static event Action<Quest, QuestObjective> OnQuestObjectiveUpdated;
+        public static event Action<Quest> OnQuestTurnedIn;
+        
         public QuestStatus GetQuestStatus(int questId)
         {
             return _questStatus.ContainsKey(questId) ? _questStatus[questId] : QuestStatus.NotStarted;
@@ -297,6 +304,9 @@ namespace ClawRPG.Scripts.Quests {
             
             _questStatus[questId] = QuestStatus.Active;
             GD.Print("Started quest: " + quest.Name);
+            
+            // Trigger signal
+            OnQuestAccepted?.Invoke(quest);
         }
         
         public void UpdateObjective(string targetId, int amount = 1)
@@ -312,6 +322,9 @@ namespace ClawRPG.Scripts.Quests {
                     {
                         obj.CurrentAmount += amount;
                         GD.Print("Objective progress: " + obj.Description + " (" + obj.CurrentAmount + "/" + obj.RequiredAmount + ")");
+                        
+                        // Trigger signal
+                        OnQuestObjectiveUpdated?.Invoke(quest, obj);
                         
                         if (obj.IsComplete)
                         {
@@ -360,9 +373,20 @@ namespace ClawRPG.Scripts.Quests {
             // Give rewards
             player.GainExperience(quest.ExperienceReward);
             // Give gold
+            if (player is Player p)
+            {
+                p.AddGold(quest.GoldReward);
+            }
+            
+            // Track achievement progress
+            AchievementManager.Instance.TrackQuestComplete();
             
             _questStatus[questId] = QuestStatus.TurnedIn;
             GD.Print("Quest completed: " + quest.Name + "! Rewards: " + quest.ExperienceReward + " XP, " + quest.GoldReward + " Gold");
+            
+            // Trigger signals
+            OnQuestCompleted?.Invoke(quest);
+            OnQuestTurnedIn?.Invoke(quest);
         }
         
         public List<Quest> GetActiveQuests()
@@ -376,6 +400,25 @@ namespace ClawRPG.Scripts.Quests {
                 }
             }
             return result;
+        }
+        
+        /// <summary>
+        /// 获取当前主线任务
+        /// </summary>
+        public Quest GetCurrentMainQuest()
+        {
+            foreach (var kvp in _questStatus)
+            {
+                if (kvp.Value == QuestStatus.Active)
+                {
+                    var quest = QuestDatabase.Instance.GetQuest(kvp.Key);
+                    if (quest != null && quest.QuestType == QuestType.Main)
+                    {
+                        return quest;
+                    }
+                }
+            }
+            return null;
         }
     }
 }

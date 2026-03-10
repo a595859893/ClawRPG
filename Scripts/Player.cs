@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -40,6 +41,53 @@ namespace ClawRPG.Scripts.Characters {
         public int Level { get; private set; } = 1;
         public int Experience { get; private set; }
         
+        // Currency
+        public int Gold { get; set; }
+        
+        // Combat statistics for titles
+        public int PerfectBlockCount { get; private set; }
+        public int DodgeCount { get; private set; }
+        
+        // World Event multipliers
+        public float EventXPMultiplier { get; set; } = 1.0f;
+        public float EventDropMultiplier { get; set; } = 1.0f;
+        public float EventGoldMultiplier { get; set; } = 1.0f;
+        
+        // Rune system - base attributes (before runes)
+        public float BaseAttackDamage { get; private set; } = 15f;
+        public float BaseDefense { get; private set; } = 5f;
+        public float BaseMaxHealth { get; private set; } = 100f;
+        public float BaseMaxMana { get; private set; } = 50f;
+        public float BaseCritChance { get; private set; } = 0.1f;
+        public float BaseCritDamage { get; private set; } = 1.5f;
+        public float BaseAttackSpeed { get; private set; } = 0.5f;
+        public float BaseMoveSpeed { get; private set; } = 200f;
+        
+        // Rune system - total attributes (after runes applied)
+        public float TotalAttackDamage => BaseAttackDamage + GetRuneBonus(RuneAttribute.Damage);
+        public float TotalDefense => BaseDefense + GetRuneBonus(RuneAttribute.Defense);
+        public float TotalMaxHealth => (int)(BaseMaxHealth + GetRuneBonus(RuneAttribute.MaxHealth));
+        public float TotalMaxMana => (int)(BaseMaxMana + GetRuneBonus(RuneAttribute.MaxMana));
+        public float TotalCritChance => BaseCritChance + GetRuneBonus(RuneAttribute.CritChance) / 100f;
+        public float TotalCritDamage => BaseCritDamage + GetRuneBonus(RuneAttribute.CritDamage) / 100f;
+        public float TotalAttackSpeed => BaseAttackSpeed;
+        
+        // Mount system bonuses (applied on top of base + runes)
+        public int MountSpeedBonus { get; set; }
+        public int MountCarryCapacityBonus { get; set; }
+        
+        public float TotalMoveSpeed => BaseMoveSpeed + GetRuneBonus(RuneAttribute.MoveSpeed) + MountSpeedBonus;
+        
+        // Resistance bonuses from runes
+        public float FireResistance { get; private set; }
+        public float IceResistance { get; private set; }
+        public float DarkResistance { get; private set; }
+        
+        // Skill system
+        public int SkillPoints { get; private set; }
+        public List<int> LearnedSkillIds { get; private set; } = new();
+        public Dictionary<int, int> SkillLevels { get; private set; } = new();
+        
         // Combat state
         public bool IsAttacking { get; private set; }
         public bool IsBlocking { get; private set; }
@@ -63,18 +111,78 @@ namespace ClawRPG.Scripts.Characters {
         private Area2D _attackArea;
         private CollisionShape2D _hitbox;
         
+        // Inventory reference
+        public Inventory Inventory { get; private set; }
+        
         public override void _Ready()
         {
             CurrentHealth = MaxHealth;
             CurrentMana = MaxMana;
             CurrentStamina = MaxStamina;
+            Inventory = new Inventory();
             
             _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
             _sprite = GetNode<Sprite2D>("Sprite2D");
             _attackArea = GetNode<Area2D>("AttackArea");
             _hitbox = GetNode<CollisionShape2D>("Hitbox/CollisionShape2D");
             
+            // 添加头顶称号显示
+            AddChild(new UI.PlayerTitleDisplay());
+            
             GD.Print("Player initialized - HP: " + CurrentHealth + "/" + MaxHealth);
+        }
+        
+        /// <summary>
+        /// Add gold to player and track for daily challenges and achievements
+        /// </summary>
+        public void AddGold(int amount) {
+            Gold += amount;
+            DailyChallengeManager.Instance.OnGoldEarned(amount);
+            // Track achievement progress
+            AchievementManager.Instance.TrackGoldEarned(amount);
+            // Track statistics
+            StatisticsManager.Instance.RecordGoldEarned(amount);
+            // Check title progress
+            TitleSystem.Instance.CheckAndUnlockTitle("Collection", Gold);
+        }
+        
+        /// <summary>
+        /// Add experience to player and handle level up
+        /// </summary>
+        public void AddExperience(int amount) {
+            Experience += amount;
+            
+            // Track statistics
+            StatisticsManager.Instance.RecordExperience(amount);
+            
+            // Check for level up
+            int expNeeded = GetExperienceForNextLevel();
+            while (Experience >= expNeeded) {
+                Experience -= expNeeded;
+                Level++;
+                LevelUp();
+                expNeeded = GetExperienceForNextLevel();
+            }
+        }
+        
+        private int GetExperienceForNextLevel() {
+            return Level * 100 + 50;
+        }
+        
+        private void LevelUp() {
+            MaxHealth += 10;
+            MaxMana += 5;
+            CurrentHealth = MaxHealth;
+            CurrentMana = MaxMana;
+            SkillPoints += 1;
+            
+            // Track statistics
+            StatisticsManager.Instance.UpdateHighestLevel(Level);
+            
+            // Check level titles
+            TitleSystem.Instance.CheckAndUnlockTitle("Level", Level);
+            
+            GD.Print($"Player leveled up! Level: {Level}");
         }
         
         public override void _PhysicsProcess(double delta)
@@ -206,6 +314,11 @@ namespace ClawRPG.Scripts.Characters {
         {
             IsPerfectBlock = true;
             _perfectBlockTimer = PerfectBlockWindow;
+            // Track statistics
+            StatisticsManager.Instance.RecordPerfectBlock();
+            // Track perfect block for titles
+            PerfectBlockCount++;
+            TitleSystem.Instance.CheckAndUnlockTitle("Combat", PerfectBlockCount);
             GD.Print("PERFECT BLOCK!");
         }
         
@@ -240,6 +353,10 @@ namespace ClawRPG.Scripts.Characters {
             IsInvincible = true;
             CurrentStamina -= 20f;
             _dodgeCooldownTimer = DodgeCooldown;
+            
+            // Track dodge for titles
+            DodgeCount++;
+            TitleSystem.Instance.CheckAndUnlockTitle("Combat", DodgeCount);
             
             Vector2 dodgeDir = AttackDirection;
             if (Input.GetVector("move_left", "move_right", "move_up", "move_down") != Vector2.Zero)
@@ -276,6 +393,30 @@ namespace ClawRPG.Scripts.Characters {
             return enemies;
         }
         
+        /// <summary>
+        /// 获取符文属性加成
+        /// </summary>
+        private float GetRuneBonus(RuneAttribute attribute) {
+            try {
+                var runeManager = Systems.RuneManager.Instance;
+                if (runeManager == null) return 0;
+                
+                var attributes = runeManager.CalculateTotalAttributes();
+                return attributes.TryGetValue(attribute, out float value) ? value : 0;
+            } catch {
+                return 0;
+            }
+        }
+        
+        /// <summary>
+        /// 刷新符文属性加成（从符文管理器更新抗性等）
+        /// </summary>
+        public void RefreshRuneAttributes() {
+            FireResistance = GetRuneBonus(RuneAttribute.FireResistance);
+            IceResistance = GetRuneBonus(RuneAttribute.IceResistance);
+            DarkResistance = GetRuneBonus(RuneAttribute.DarkResistance);
+        }
+        
         public void TakeDamage(int damage, bool isCrit = false, Vector2 fromDirection = default)
         {
             if (IsInvincible) return;
@@ -301,6 +442,9 @@ namespace ClawRPG.Scripts.Characters {
             
             CurrentHealth -= (int)finalDamage;
             
+            // Track statistics
+            StatisticsManager.Instance.RecordDamageTaken((int)finalDamage);
+            
             if (CurrentHealth <= 0)
             {
                 Die();
@@ -321,6 +465,8 @@ namespace ClawRPG.Scripts.Characters {
         public void Heal(int amount)
         {
             CurrentHealth = Mathf.Min(MaxHealth, CurrentHealth + amount);
+            // Track statistics
+            StatisticsManager.Instance.RecordHealing(amount);
             GD.Print("Healed " + amount + " HP. HP: " + CurrentHealth + "/" + MaxHealth);
         }
         
@@ -329,10 +475,83 @@ namespace ClawRPG.Scripts.Characters {
             CurrentMana = Mathf.Max(0, CurrentMana - amount);
         }
         
-        public void RestoreMana(int amount)
+        // Skill system methods
+        public bool CanLearnSkill(Skill skill)
         {
-            CurrentMana = Mathf.Min(MaxMana, CurrentMana + amount);
-            GD.Print("Restored " + amount + " Mana. Mana: " + CurrentMana + "/" + MaxMana);
+            if (SkillPoints < 1) return false;
+            if (LearnedSkillIds.Contains(skill.Id)) return false;
+            if (Level < skill.LevelRequired) return false;
+            return true;
+        }
+        
+        public bool CanUpgradeSkill(Skill skill)
+        {
+            if (!LearnedSkillIds.Contains(skill.Id)) return false;
+            if (SkillPoints < 1) return false;
+            int currentLevel = SkillLevels.GetValueOrDefault(skill.Id, 1);
+            if (currentLevel >= skill.MaxLevel) return false;
+            return true;
+        }
+        
+        public bool LearnSkill(Skill skill)
+        {
+            if (!CanLearnSkill(skill)) return false;
+            
+            SkillPoints--;
+            LearnedSkillIds.Add(skill.Id);
+            SkillLevels[skill.Id] = 1;
+            
+            GD.Print("Learned skill: " + skill.Name);
+            
+            // Apply passive skill bonuses
+            ApplySkillBonuses(skill);
+            
+            return true;
+        }
+        
+        public bool UpgradeSkill(Skill skill)
+        {
+            if (!CanUpgradeSkill(skill)) return false;
+            
+            SkillPoints--;
+            SkillLevels[skill.Id]++;
+            
+            int newLevel = SkillLevels[skill.Id];
+            GD.Print("Upgraded skill: " + skill.Name + " to level " + newLevel);
+            
+            // Reapply skill bonuses
+            ApplySkillBonuses(skill);
+            
+            return true;
+        }
+        
+        private void ApplySkillBonuses(Skill skill)
+        {
+            int skillLevel = SkillLevels.GetValueOrDefault(skill.Id, 1);
+            
+            // Apply passive bonuses based on skill
+            if (skill.PassiveAttackBonus > 0)
+            {
+                AttackDamage += skill.PassiveAttackBonus * skillLevel;
+            }
+            if (skill.PassiveDefenseBonus > 0)
+            {
+                // Would need to add defense stat
+            }
+            if (skill.PassiveHealthBonus > 0)
+            {
+                MaxHealth += skill.PassiveHealthBonus * skillLevel;
+                CurrentHealth = Mathf.Min(CurrentHealth + skill.PassiveHealthBonus * skillLevel, MaxHealth);
+            }
+            if (skill.PassiveManaBonus > 0)
+            {
+                MaxMana += skill.PassiveManaBonus * skillLevel;
+                CurrentMana = Mathf.Min(CurrentMana + skill.PassiveManaBonus * skillLevel, MaxMana);
+            }
+            if (skill.PassiveCritBonus > 0)
+            {
+                CriticalChance = Mathf.Min(1.0f, CriticalChance + skill.PassiveCritBonus * skillLevel);
+            }
         }
         
         public void GainExperience(int amount)
@@ -352,6 +571,7 @@ namespace ClawRPG.Scripts.Characters {
         {
             Level++;
             Experience -= Level * 100;
+            SkillPoints += 1; // 1 skill point per level
             
             // Increase stats
             MaxHealth += 20;
@@ -360,7 +580,10 @@ namespace ClawRPG.Scripts.Characters {
             CurrentHealth = MaxHealth;
             CurrentMana = MaxMana;
             
-            GD.Print("LEVEL UP! Now level " + Level);
+            GD.Print("LEVEL UP! Now level " + Level + "! +1 Skill Point!");
+            
+            // Track achievement progress
+            AchievementManager.Instance.TrackLevel(Level);
             
             // Level up effect
             var effect = new LevelUpEffect();
@@ -371,6 +594,8 @@ namespace ClawRPG.Scripts.Characters {
         private void Die()
         {
             GD.Print("Player died!");
+            // Track statistics
+            StatisticsManager.Instance.RecordDeath();
             // Handle death (game over, respawn, etc.)
             QueueFree();
         }
@@ -398,6 +623,94 @@ namespace ClawRPG.Scripts.Characters {
         public float GetBlockDamageReduction()
         {
             return IsPerfectBlock ? 1.0f : BlockDamageReduction;
+        }
+        
+        /// <summary>
+        /// 重置玩家数据 - 用于新游戏开始
+        /// </summary>
+        public void ResetPlayer()
+        {
+            // 重置基础属性
+            CurrentHealth = MaxHealth;
+            CurrentMana = MaxMana;
+            CurrentStamina = MaxStamina;
+            Level = 1;
+            Experience = 0;
+            Gold = 0;
+            
+            // 重置战斗状态
+            IsAttacking = false;
+            IsBlocking = false;
+            IsDodging = false;
+            IsInvincible = false;
+            IsPerfectBlock = false;
+            
+            // 重置技能
+            SkillPoints = 0;
+            LearnedSkillIds.Clear();
+            SkillLevels.Clear();
+            
+            // 重置状态效果
+            _statusEffects.Clear();
+            
+            // 重置世界事件倍率
+            EventXPMultiplier = 1.0f;
+            EventDropMultiplier = 1.0f;
+            EventGoldMultiplier = 1.0f;
+            
+            // 重置位置
+            GlobalPosition = new Vector2(640, 360);
+            
+            GD.Print("Player reset for new game");
+        }
+        
+        /// <summary>
+        /// 加载玩家数据 - 用于存档读取
+        /// </summary>
+        public void LoadPlayerData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            
+            // 加载基础属性
+            if (data.TryGetValue("Level", out var level)) Level = Convert.ToInt32(level);
+            if (data.TryGetValue("Experience", out var exp)) Experience = Convert.ToInt32(exp);
+            if (data.TryGetValue("Gold", out var gold)) Gold = Convert.ToInt32(gold);
+            if (data.TryGetValue("CurrentHealth", out var health)) CurrentHealth = Convert.ToInt32(health);
+            if (data.TryGetValue("CurrentMana", out var mana)) CurrentMana = Convert.ToInt32(mana);
+            
+            // 加载技能点
+            if (data.TryGetValue("SkillPoints", out var skillPoints)) 
+                SkillPoints = Convert.ToInt32(skillPoints);
+            
+            // 加载已学习技能
+            if (data.TryGetValue("LearnedSkillIds", out var skillIds))
+            {
+                LearnedSkillIds.Clear();
+                var ids = skillIds as System.Collections.IEnumerable;
+                if (ids != null)
+                {
+                    foreach (var id in ids)
+                    {
+                        LearnedSkillIds.Add(Convert.ToInt32(id));
+                    }
+                }
+            }
+            
+            // 加载技能等级
+            if (data.TryGetValue("SkillLevels", out var skillLevels))
+            {
+                SkillLevels.Clear();
+                var levels = skillLevels as Dictionary<object, object>;
+                if (levels != null)
+                {
+                    foreach (var kvp in levels)
+                    {
+                        SkillLevels[Convert.ToInt32(kvp.Key)] = Convert.ToInt32(kvp.Value);
+                    }
+                }
+            }
+            
+            GD.Print("Player data loaded: Level " + Level + ", Gold " + Gold);
         }
         
         private void ShowDamageNumber(int damage, bool isCrit)

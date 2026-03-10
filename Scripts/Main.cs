@@ -1,8 +1,10 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.UI;
-using ClawRPG.Scripts.Items;
+using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Mounts;
+using ClawRPG.Scripts.Systems.Pets;
+using ClawRPG.Scripts.Systems.Enhancement;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -18,8 +20,26 @@ namespace ClawRPG.Scripts {
         private Node2D _items;
         
         // Game state
+        public enum GameState
+        {
+            TitleScreen,
+            Playing,
+            Paused,
+            GameOver
+        }
+        
+        private GameState _currentGameState = GameState.Playing;
+        
         public static bool IsPaused { get; private set; }
         public static int CurrentDay { get; private set; } = 1;
+        
+        public void SetGameState(GameState state)
+        {
+            _currentGameState = state;
+            GD.Print("Game state changed to: " + state);
+        }
+        
+        public GameState GetGameState() => _currentGameState;
         
         public override void _Ready()
         {
@@ -33,6 +53,32 @@ namespace ClawRPG.Scripts {
             _items = new Node2D();
             _items.Name = "Items";
             AddChild(_items);
+            
+            // Initialize weapon mastery system
+            var weaponMasterySystem = new WeaponMasterySystem();
+            weaponMasterySystem.Name = "WeaponMasterySystem";
+            AddChild(weaponMasterySystem);
+            
+            // Initialize title system
+            var titleSystem = new TitleSystem();
+            titleSystem.Name = "TitleSystem";
+            AddChild(titleSystem);
+            
+            // Initialize pet combat AI
+            var petCombatAI = new PetCombatAI();
+            petCombatAI.Name = "PetCombatAI";
+            AddChild(petCombatAI);
+            petCombatAI.Initialize();
+            
+            // Initialize enhancement system
+            var enhancementSystem = new EnhancementSystem();
+            enhancementSystem.Name = "EnhancementSystem";
+            AddChild(enhancementSystem);
+            
+            // Initialize enhancement database
+            var enhancementDb = new EnhancementDatabase();
+            enhancementDb.Name = "EnhancementDatabase";
+            AddChild(enhancementDb);
             
             // Spawn player
             SpawnPlayer();
@@ -103,11 +149,6 @@ namespace ClawRPG.Scripts {
             expBar.MaxValue = 100;
             ui.AddChild(expBar);
             
-            // Potion UI
-            var potionUI = new PotionUI();
-            potionUI.Name = "PotionUI";
-            ui.AddChild(potionUI);
-            
             GD.Print("UI initialized");
         }
         
@@ -118,19 +159,127 @@ namespace ClawRPG.Scripts {
             if (saveSystem.HasSave(0))
             {
                 GD.Print("Found save file, loading...");
-                // Would load game state here
+                var data = saveSystem.LoadGame(0);
+                if (data != null)
+                {
+                    // Load statistics
+                    var statsData = new Dictionary<string, object>
+                    {
+                        ["TotalKills"] = data.TotalKills,
+                        ["TotalDeaths"] = data.TotalDeaths,
+                        ["TotalDamageDealt"] = data.TotalDamageDealt,
+                        ["TotalDamageTaken"] = data.TotalDamageTaken,
+                        ["TotalHealing"] = data.TotalHealing,
+                        ["CriticalHits"] = data.CriticalHits,
+                        ["PerfectBlocks"] = data.PerfectBlocks,
+                        ["Dodges"] = data.Dodges,
+                        ["GoldEarned"] = data.GoldEarned,
+                        ["GoldSpent"] = data.GoldSpent,
+                        ["ExperienceGained"] = data.ExperienceGained,
+                        ["ItemsCollected"] = data.ItemsCollected,
+                        ["ItemsCrafted"] = data.ItemsCrafted,
+                        ["QuestsCompleted"] = data.QuestsCompleted,
+                        ["SkillsLearned"] = data.SkillsLearned,
+                        ["SkillsUsed"] = data.SkillsUsed,
+                        ["RegionsDiscovered"] = data.RegionsDiscovered,
+                        ["EnemiesEncountered"] = data.EnemiesEncountered,
+                        ["BossesDefeated"] = data.BossesDefeated,
+                        ["TotalPlayTime"] = data.TotalPlayTime,
+                        ["HighestLevel"] = data.HighestLevel,
+                        ["HighestCombo"] = data.HighestCombo,
+                        ["AchievementsUnlocked"] = data.AchievementsUnlocked
+                    };
+                    StatisticsManager.Instance.LoadStatistics(statsData);
+                    GD.Print("Statistics loaded successfully!");
+                }
             }
         }
         
+        private float _autoSaveTimer = 0f;
+        private const float AutoSaveInterval = 300f; // 5 minutes
+        
         public override void _Process(double delta)
         {
+            float dt = (float)delta;
+            
+            // Update play time
+            StatisticsManager.Instance.AddPlayTime(dt);
+            
+            // Auto save every 5 minutes
+            _autoSaveTimer += dt;
+            if (_autoSaveTimer >= AutoSaveInterval)
+            {
+                _autoSaveTimer = 0f;
+                // Auto save logic would go here
+                GD.Print("Auto save triggered...");
+            }
+            
             // Update UI
             UpdatePlayerUI();
             
-            // Update potion effects
-            if (_player != null)
+            // Handle runes UI toggle (U key)
+            if (Input.IsActionJustPressed("runes"))
             {
-                PotionManager.Instance.UpdatePotionEffects((float)delta, _player);
+                ToggleRunesUI();
+            }
+            
+            // Handle quest tracker toggle (T key)
+            if (Input.IsActionJustPressed("quest_tracker"))
+            {
+                ToggleQuestTracker();
+            }
+            
+            // Handle quest guide toggle (G key)
+            if (Input.IsActionJustPressed("quest_guide"))
+            {
+                ToggleQuestGuide();
+            }
+            
+            // Handle multiplayer UI toggle (M key)
+            if (Input.IsActionJustPressed("multiplayer"))
+            {
+                ToggleMultiplayerUI();
+            }
+            
+            // Handle weapon mastery UI toggle (W key)
+            if (Input.IsActionJustPressed("weapon_mastery"))
+            {
+                ToggleWeaponMasteryUI();
+            }
+            
+            // Handle mount UI toggle (O key)
+            if (Input.IsActionJustPressed("mounts"))
+            {
+                ToggleMountUI();
+            }
+            
+            // Handle title UI toggle (Y key)
+            if (Input.IsActionJustPressed("titles"))
+            {
+                ToggleTitleUI();
+            }
+            
+            // Handle bookmarks UI toggle (N key)
+            if (Input.IsActionJustPressed("bookmarks"))
+            {
+                ToggleBookmarkUI();
+            }
+            
+            // Handle enhancement UI toggle (X key)
+            if (Input.IsActionJustPressed("enhancement"))
+            {
+                ToggleEnhancementUI();
+            }
+            
+            // Handle special attacks
+            if (Input.IsActionJustPressed("spin_attack"))
+            {
+                TrySpinAttack();
+            }
+            
+            if (Input.IsActionJustPressed("charge_attack"))
+            {
+                TryChargeAttack();
             }
             
             // Handle pause
@@ -138,14 +287,127 @@ namespace ClawRPG.Scripts {
             {
                 TogglePause();
             }
-            
-            // Toggle Potion UI with P key
-            if (Input.IsActionJustPressed("potion"))
+        }
+        
+        private void ToggleRunesUI()
+        {
+            var runeUI = GetNodeOrNull<UI.RuneUI>("CanvasLayer/RuneUI");
+            if (runeUI != null)
             {
-                var potionUI = GetNodeOrNull<PotionUI>("UI/PotionUI");
-                if (potionUI != null)
+                runeUI.Toggle();
+            }
+        }
+        
+        private void ToggleQuestTracker()
+        {
+            var questTracker = GetNodeOrNull<UI.QuestTrackerUI>("CanvasLayer/QuestTrackerUI");
+            if (questTracker != null)
+            {
+                questTracker.Toggle();
+            }
+        }
+        
+        private void ToggleQuestGuide()
+        {
+            var questGuide = GetNodeOrNull<UI.QuestGuideArrow>("CanvasLayer/QuestGuideArrow");
+            if (questGuide != null)
+            {
+                questGuide.Toggle();
+            }
+        }
+        
+        private void ToggleMultiplayerUI()
+        {
+            var multiplayerUI = GetNodeOrNull<UI.MultiplayerUI>("CanvasLayer/MultiplayerUI");
+            if (multiplayerUI != null)
+            {
+                multiplayerUI.Toggle();
+            }
+        }
+        
+        private void ToggleWeaponMasteryUI()
+        {
+            var weaponMasteryUI = GetNodeOrNull<UI.WeaponMasteryUI>("CanvasLayer/WeaponMasteryUI");
+            if (weaponMasteryUI != null)
+            {
+                weaponMasteryUI.Toggle();
+            }
+        }
+        
+        private void ToggleMountUI()
+        {
+            var mountUI = GetNodeOrNull<UI.MountUI>("CanvasLayer/MountUI");
+            if (mountUI != null)
+            {
+                mountUI.ToggleUI();
+            }
+        }
+        
+        private void ToggleTitleUI()
+        {
+            var titleUI = GetNodeOrNull<UI.TitleUI>("CanvasLayer/TitleUI");
+            if (titleUI != null)
+            {
+                if (titleUI.Visible)
                 {
-                    potionUI.ToggleUI();
+                    titleUI.Hide();
+                }
+                else
+                {
+                    titleUI.Show();
+                }
+            }
+        }
+        
+        private void ToggleBookmarkUI()
+        {
+            var bookmarkUI = GetNodeOrNull<UI.BookmarkUI>("CanvasLayer/BookmarkUI");
+            if (bookmarkUI != null)
+            {
+                bookmarkUI.ToggleVisibility();
+            }
+        }
+        
+        private void ToggleEnhancementUI()
+        {
+            var enhancementUI = GetNodeOrNull<UI.EnhancementUI>("CanvasLayer/EnhancementUI");
+            if (enhancementUI != null)
+            {
+                if (enhancementUI.Visible)
+                {
+                    enhancementUI.Hide();
+                }
+                else
+                {
+                    enhancementUI.Show();
+                }
+            }
+        }
+        
+        private void TrySpinAttack()
+        {
+            if (WeaponMasterySystem.Instance != null)
+            {
+                bool success = WeaponMasterySystem.Instance.TrySpinAttack();
+                if (success)
+                {
+                    GD.Print("Spin attack executed!");
+                }
+            }
+        }
+        
+        private void TryChargeAttack()
+        {
+            if (WeaponMasterySystem.Instance != null && _player != null)
+            {
+                Vector2 inputDir = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+                if (inputDir.Length() > 0.1f)
+                {
+                    bool success = WeaponMasterySystem.Instance.TryChargeAttack(inputDir);
+                    if (success)
+                    {
+                        GD.Print("Charge attack executed!");
+                    }
                 }
             }
         }
@@ -239,6 +501,194 @@ namespace ClawRPG.Scripts {
         {
             CurrentDay++;
             GD.Print("Day " + CurrentDay + " begins!");
+        }
+        
+        /// <summary>
+        /// 显示通知消息
+        /// </summary>
+        public void ShowNotification(string message, string detail = "")
+        {
+            // 尝试找到通知UI系统
+            var notificationUI = GetNodeOrNull("CanvasLayer/NotificationUI");
+            if (notificationUI != null)
+            {
+                // 调用通知UI的方法
+                GD.Print($"通知: {message} - {detail}");
+            }
+            else
+            {
+                GD.Print($"通知: {message} - {detail}");
+            }
+        }
+        
+        /// <summary>
+        /// 获取世界事件管理器实例
+        /// </summary>
+        public WorldEventManager GetWorldEventManager()
+        {
+            return WorldEventManager.Instance;
+        }
+        
+        /// <summary>
+        /// 开始新游戏
+        /// </summary>
+        public void StartNewGame()
+        {
+            GD.Print("Starting new game...");
+            
+            // 重置玩家数据
+            if (_player != null)
+            {
+                _player.ResetPlayer();
+            }
+            
+            // 重置游戏状态
+            CurrentDay = 1;
+            IsPaused = false;
+            SetGameState(GameState.Playing);
+            
+            // 显示游戏UI
+            ShowGameUI();
+            
+            GD.Print("New game started!");
+        }
+        
+        /// <summary>
+        /// 加载游戏存档
+        /// </summary>
+        public void LoadGame(int saveSlot)
+        {
+            GD.Print("Loading game from slot: " + saveSlot);
+            
+            var saveSystem = new SaveSystem();
+            var saveData = saveSystem.LoadGame(saveSlot);
+            
+            if (saveData != null)
+            {
+                // 加载玩家数据
+                if (_player != null && saveData.PlayerData != null)
+                {
+                    _player.LoadPlayerData(saveData.PlayerData);
+                }
+                
+                // 加载统计
+                var statsData = new Dictionary<string, object>
+                {
+                    ["TotalKills"] = saveData.TotalKills,
+                    ["TotalDeaths"] = saveData.TotalDeaths,
+                    ["TotalDamageDealt"] = saveData.TotalDamageDealt,
+                    ["TotalDamageTaken"] = saveData.TotalDamageTaken,
+                    ["TotalHealing"] = saveData.TotalHealing,
+                    ["CriticalHits"] = saveData.CriticalHits,
+                    ["PerfectBlocks"] = saveData.PerfectBlocks,
+                    ["Dodges"] = saveData.Dodges,
+                    ["GoldEarned"] = saveData.GoldEarned,
+                    ["GoldSpent"] = saveData.GoldSpent,
+                    ["ExperienceGained"] = saveData.ExperienceGained,
+                    ["ItemsCollected"] = saveData.ItemsCollected,
+                    ["ItemsCrafted"] = saveData.ItemsCrafted,
+                    ["QuestsCompleted"] = saveData.QuestsCompleted,
+                    ["SkillsLearned"] = saveData.SkillsLearned,
+                    ["SkillsUsed"] = saveData.SkillsUsed,
+                    ["RegionsDiscovered"] = saveData.RegionsDiscovered,
+                    ["EnemiesEncountered"] = saveData.EnemiesEncountered,
+                    ["BossesDefeated"] = saveData.BossesDefeated,
+                    ["TotalPlayTime"] = saveData.TotalPlayTime,
+                    ["HighestLevel"] = saveData.HighestLevel,
+                    ["HighestCombo"] = saveData.HighestCombo,
+                    ["AchievementsUnlocked"] = saveData.AchievementsUnlocked
+                };
+                StatisticsManager.Instance.LoadStatistics(statsData);
+                
+                // 加载快速槽数据
+                if (saveData.QuickSlotItemIds != null && saveData.QuickSlotQuantities != null)
+                {
+                    for (int i = 0; i < Mathf.Min(saveData.QuickSlotItemIds.Length, 9); i++)
+                    {
+                        if (QuickSlotSystem.Instance != null && i < 9)
+                        {
+                            QuickSlotSystem.Instance.SetSlot(i, saveData.QuickSlotItemIds[i], saveData.QuickSlotQuantities[i]);
+                        }
+                    }
+                }
+                
+                // 加载坐骑数据
+                if (saveData.MountData != null && MountManager.Instance != null)
+                {
+                    MountManager.Instance.Deserialize(saveData.MountData);
+                }
+                
+                // 加载收藏点数据
+                if (saveData.BookmarkData != null && BookmarkSystem.Instance != null)
+                {
+                    BookmarkSystem.Instance.Deserialize(saveData.BookmarkData);
+                }
+                
+                // 加载强化数据
+                if (saveData.EnhancementData != null)
+                {
+                    var enhancementSystem = GetNodeOrNull<Systems.Enhancement.EnhancementSystem>("EnhancementSystem");
+                    if (enhancementSystem != null)
+                    {
+                        enhancementSystem.Deserialize(saveData.EnhancementData);
+                    }
+                }
+                
+                CurrentDay = saveData.CurrentDay;
+                SetGameState(GameState.Playing);
+                
+                ShowGameUI();
+                
+                GD.Print("Game loaded successfully!");
+            }
+            else
+            {
+                GD.PrintErr("Failed to load save file!");
+            }
+        }
+        
+        /// <summary>
+        /// 显示游戏UI
+        /// </summary>
+        private void ShowGameUI()
+        {
+            // 显示所有游戏UI元素
+            var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+            if (canvasLayer != null)
+            {
+                foreach (var child in canvasLayer.GetChildren())
+                {
+                    if (child is Control control)
+                    {
+                        control.Visible = true;
+                    }
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 切换设置界面
+        /// </summary>
+        public void ToggleSettings()
+        {
+            var settingsUI = GetNodeOrNull<Control>("CanvasLayer/SettingsUI");
+            if (settingsUI != null)
+            {
+                settingsUI.Visible = !settingsUI.Visible;
+                
+                if (settingsUI.Visible)
+                {
+                    GD.Print("Settings opened");
+                }
+                else
+                {
+                    GD.Print("Settings closed");
+                }
+            }
+            else
+            {
+                GD.Print("Settings UI not found in scene");
+            }
         }
     }
 }
