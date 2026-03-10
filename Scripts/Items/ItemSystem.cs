@@ -208,6 +208,36 @@ namespace ClawRPG.Scripts.Items {
             AddItem(new Item { Id = 337, Name = "恶魔之冠", Description = "恶魔领主的冠冕", Value = 500, Type = Item.ItemType.Material });
             AddItem(new Item { Id = 338, Name = "恶魔之心", Description = "恶魔领主的核心", Value = 500, Type = Item.ItemType.Material });
             AddItem(new Item { Id = 339, Name = "自然精华", Description = "自然能量精华", Value = 25, Type = Item.ItemType.Material });
+            
+            // === New materials for Dragon's Lair ===
+            AddItem(new Item { Id = 340, Name = "龙鳞", Description = "巨龙的鳞片", Value = 100, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 341, Name = "龙血结晶", Description = "龙血凝固形成的结晶", Value = 150, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 342, Name = "龙晶", Description = "巨龙的生命晶核", Value = 200, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 343, Name = "老龙鳞", Description = "远古巨龙的鳞片", Value = 300, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 344, Name = "老龙血", Description = "远古巨龙的血液精华", Value = 400, Type = Item.ItemType.Material });
+            
+            // === New materials for Holy Temple ===
+            AddItem(new Item { Id = 345, Name = "神圣羽毛", Description = "神圣护卫的羽毛", Value = 80, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 346, Name = "天使羽毛", Description = "堕落天使的羽毛", Value = 120, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 347, Name = "天堂水晶", Description = "天堂能量的结晶", Value = 100, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 348, Name = "神光精华", Description = "神圣光芒的精华", Value = 150, Type = Item.ItemType.Material });
+            
+            // === New materials for Swamp ===
+            AddItem(new Item { Id = 349, Name = "腐肉", Description = "沼泽僵尸的腐肉", Value = 5, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 350, Name = "鳄鱼鳞片", Description = "鳄鱼坚硬鳞片", Value = 25, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 351, Name = "蚊刺", Description = "蚊群的刺针", Value = 3, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 352, Name = "女巫之帽", Description = "沼泽女巫的魔法帽子", Value = 60, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 353, Name = "毒素精华", Description = "剧毒精华", Value = 30, Type = Item.ItemType.Material });
+            
+            // === New materials for Abyss ===
+            AddItem(new Item { Id = 354, Name = "虚空碎片", Description = "来自虚空维度的碎片", Value = 100, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 355, Name = "深渊精华", Description = "深渊恶魔的能量精华", Value = 80, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 356, Name = "暗能核心", Description = "暗影能量的核心", Value = 90, Type = Item.ItemType.Material });
+            
+            // === New materials for Mini-bosses ===
+            AddItem(new Item { Id = 357, Name = "哥布林首领之牙", Description = "哥布林首领的獠牙", Value = 40, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 358, Name = "骷髅头骨", Description = "骷髅领主的头骨", Value = 50, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 359, Name = "女巫扫帚", Description = "女巫的魔法扫帚", Value = 45, Type = Item.ItemType.Material });
         }
         
         private void AddItem(Item item)

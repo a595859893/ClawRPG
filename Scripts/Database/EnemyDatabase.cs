@@ -690,6 +690,277 @@ namespace ClawRPG.Scripts.Database {
                 SpriteModulate = new Color(0.6f, 0.1f, 0.1f)
             };
             
+            // === DRAGON'S LAIR ENEMIES ===
+            _enemies["young_dragon"] = new EnemyType("young_dragon", "Young Dragon", 800, 85f, 45f) {
+                Description = "A juvenile dragon still growing in power",
+                AttackRange = 90f,
+                AttackCooldown = 2.5f,
+                ChaseRange = 220f,
+                DetectionRange = 400f,
+                ExperienceReward = 300,
+                GoldReward = 150,
+                DropTable = new Dictionary<string, float> {
+                    { "dragon_scale", 0.6f },
+                    { "dragon_blood", 0.4f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "ice", 1.3f }
+                },
+                SpriteModulate = new Color(0.7f, 0.3f, 0.2f)
+            };
+            
+            _enemies["dragon_whelp"] = new EnemyType("dragon_whelp", "Dragon Whelp", 400, 100f, 30f) {
+                Description = "A baby dragon with developing breath weapon",
+                AttackRange = 60f,
+                AttackCooldown = 2.0f,
+                ChaseRange = 180f,
+                DetectionRange = 320f,
+                ExperienceReward = 180,
+                GoldReward = 80,
+                DropTable = new Dictionary<string, float> {
+                    { "dragon_scale", 0.4f },
+                    { "fire_essence", 0.3f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "ice", 1.2f }
+                },
+                SpriteModulate = new Color(0.8f, 0.4f, 0.25f)
+            };
+            
+            _enemies["dragon_knight"] = new EnemyType("dragon_knight", "Dragon Knight", 120, 95f, 28f) {
+                Description = "A knight bonded with a dragon",
+                AttackRange = 65f,
+                AttackCooldown = 1.2f,
+                ChaseRange = 200f,
+                DetectionRange = 350f,
+                ExperienceReward = 60,
+                GoldReward = 40,
+                DropTable = new Dictionary<string, float> {
+                    { "dragon_scale", 0.3f },
+                    { "holy_crystal", 0.2f }
+                },
+                SpriteModulate = new Color(0.6f, 0.5f, 0.7f)
+            };
+            
+            // === HOLY TEMPLE ENEMIES ===
+            _enemies["holy_guardian"] = new EnemyType("holy_guardian", "Holy Guardian", 200, 70f, 35f) {
+                Description = "A sacred knight protecting the temple",
+                AttackRange = 60f,
+                AttackCooldown = 1.6f,
+                ChaseRange = 160f,
+                DetectionRange = 280f,
+                ExperienceReward = 80,
+                GoldReward = 50,
+                DropTable = new Dictionary<string, float> {
+                    { "holy_crystal", 0.4f },
+                    { "holy_feather", 0.3f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "shadow", 1.5f },
+                    { "dark", 1.5f }
+                },
+                SpriteModulate = new Color(0.95f, 0.9f, 0.7f)
+            };
+            
+            _enemies["fallen_angel"] = new EnemyType("fallen_angel", "Fallen Angel", 90, 130f, 25f) {
+                Description = "A corrupted celestial being",
+                AttackRange = 50f,
+                AttackCooldown = 0.9f,
+                ChaseRange = 200f,
+                DetectionRange = 350f,
+                ExperienceReward = 55,
+                GoldReward = 35,
+                DropTable = new Dictionary<string, float> {
+                    { "holy_feather", 0.35f },
+                    { "shadow_essence", 0.25f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "holy", 1.8f },
+                    { "fire", 1.3f }
+                },
+                SpriteModulate = new Color(0.4f, 0.4f, 0.5f)
+            };
+            
+            _enemies["celestial_essence"] = new EnemyType("celestial_essence", "Celestial Essence", 40, 145f, 15f) {
+                Description = "Pure celestial energy manifested",
+                AttackRange = 35f,
+                AttackCooldown = 0.6f,
+                ChaseRange = 170f,
+                DetectionRange = 300f,
+                ExperienceReward = 30,
+                GoldReward = 20,
+                DropTable = new Dictionary<string, float> {
+                    { "holy_crystal", 0.5f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "dark", 1.5f }
+                },
+                SpriteModulate = new Color(1f, 0.95f, 0.6f)
+            };
+            
+            // === SWAMP ENEMIES ===
+            _enemies["swamp_zombie"] = new EnemyType("swamp_zombie", "Swamp Zombie", 65, 45f, 16f) {
+                Description = "An undead risen from the murky waters",
+                AttackRange = 40f,
+                AttackCooldown = 1.8f,
+                ChaseRange = 100f,
+                DetectionRange = 180f,
+                ExperienceReward = 18,
+                GoldReward = 10,
+                DropTable = new Dictionary<string, float> {
+                    { "rotten_flesh", 0.4f },
+                    { "poison_essence", 0.15f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "fire", 1.4f },
+                    { "holy", 1.6f }
+                },
+                SpriteModulate = new Color(0.3f, 0.5f, 0.3f)
+            };
+            
+            _enemies["crocodile"] = new EnemyType("crocodile", "Swamp Crocodile", 100, 85f, 24f) {
+                Description = "A deadly predator lurking in the waters",
+                AttackRange = 55f,
+                AttackCooldown = 1.5f,
+                ChaseRange = 140f,
+                DetectionRange = 240f,
+                ExperienceReward = 35,
+                GoldReward = 22,
+                DropTable = new Dictionary<string, float> {
+                    { "crocodile_scale", 0.5f },
+                    { "monster_essence", 0.2f }
+                },
+                SpriteModulate = new Color(0.35f, 0.45f, 0.3f)
+            };
+            
+            _enemies["mosquito_swarm"] = new EnemyType("mosquito_swarm", "Mosquito Swarm", 30, 160f, 8f) {
+                Description = "A deadly swarm of bloodsuckers",
+                AttackRange = 25f,
+                AttackCooldown = 0.3f,
+                ChaseRange = 200f,
+                DetectionRange = 350f,
+                ExperienceReward = 15,
+                GoldReward = 8,
+                DropTable = new Dictionary<string, float> {
+                    { "mosquito_sting", 0.3f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "fire", 1.2f }
+                },
+                SpriteModulate = new Color(0.2f, 0.15f, 0.1f)
+            };
+            
+            // === ABYSS ENEMIES (Endgame) ===
+            _enemies["void_creature"] = new EnemyType("void_creature", "Void Creature", 250, 110f, 32f) {
+                Description = "An entity from the void between dimensions",
+                AttackRange = 55f,
+                AttackCooldown = 1.1f,
+                ChaseRange = 190f,
+                DetectionRange = 340f,
+                ExperienceReward = 120,
+                GoldReward = 75,
+                DropTable = new Dictionary<string, float> {
+                    { "void_shard", 0.4f },
+                    { "dark_crystal", 0.3f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "holy", 1.7f },
+                    { "fire", 1.3f }
+                },
+                SpriteModulate = new Color(0.15f, 0.05f, 0.2f)
+            };
+            
+            _enemies["abyss_demon"] = new EnemyType("abyss_demon", "Abyss Demon", 180, 100f, 30f) {
+                Description = "A demon from the deepest abyss",
+                AttackRange = 50f,
+                AttackCooldown = 1.0f,
+                ChaseRange = 180f,
+                DetectionRange = 320f,
+                ExperienceReward = 90,
+                GoldReward = 55,
+                DropTable = new Dictionary<string, float> {
+                    { "demon_heart", 0.3f },
+                    { "shadow_essence", 0.25f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "holy", 1.6f },
+                    { "fire", 0.8f }
+                },
+                SpriteModulate = new Color(0.5f, 0.1f, 0.15f)
+            };
+            
+            _enemies["elder_dragon"] = new EnemyType("elder_dragon", "Elder Dragon", 2500, 75f, 60f) {
+                Description = "An ancient dragon of immense power",
+                AttackRange = 100f,
+                AttackCooldown = 3.0f,
+                ChaseRange = 250f,
+                DetectionRange = 450f,
+                ExperienceReward = 800,
+                GoldReward = 400,
+                DropTable = new Dictionary<string, float> {
+                    { "elder_dragon_scale", 1.0f },
+                    { "elder_dragon_blood", 1.0f },
+                    { "dragon_blood", 1.0f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "ice", 1.2f }
+                },
+                SpriteModulate = new Color(0.5f, 0.2f, 0.5f)
+            };
+            
+            // === SPECIAL MINI-BOSSES ===
+            _enemies["goblin_chief"] = new EnemyType("goblin_chief", "Goblin Chief", 150, 95f, 20f) {
+                Description = "The leader of the goblin band",
+                AttackRange = 45f,
+                AttackCooldown = 1.0f,
+                ChaseRange = 180f,
+                DetectionRange = 300f,
+                ExperienceReward = 50,
+                GoldReward = 35,
+                DropTable = new Dictionary<string, float> {
+                    { "goblin_ear", 1.0f },
+                    { "ancient_coin", 0.5f }
+                },
+                SpriteModulate = new Color(0.5f, 0.7f, 0.4f)
+            };
+            
+            _enemies["skeleton_lord"] = new EnemyType("skeleton_lord", "Skeleton Lord", 200, 75f, 28f) {
+                Description = "An undead commander of the bone army",
+                AttackRange = 55f,
+                AttackCooldown = 1.4f,
+                ChaseRange = 160f,
+                DetectionRange = 280f,
+                ExperienceReward = 75,
+                GoldReward = 45,
+                DropTable = new Dictionary<string, float> {
+                    { "skeleton_bone", 1.0f },
+                    { "skull", 0.5f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "holy", 1.7f },
+                    { "fire", 1.3f }
+                },
+                SpriteModulate = new Color(0.85f, 0.85f, 0.8f)
+            };
+            
+            _enemies["witch"] = new EnemyType("witch", "Swamp Witch", 120, 90f, 22f) {
+                Description = "A mysterious sorceress of the swamp",
+                AttackRange = 120f,
+                AttackCooldown = 1.8f,
+                ChaseRange = 140f,
+                DetectionRange = 300f,
+                ExperienceReward = 55,
+                GoldReward = 40,
+                DropTable = new Dictionary<string, float> {
+                    { "witch_hat", 0.5f },
+                    { "poison_essence", 0.4f }
+                },
+                StatusEffectVulnerability = new Dictionary<string, float> {
+                    { "fire", 1.4f }
+                },
+                SpriteModulate = new Color(0.4f, 0.3f, 0.5f)
+            };
+            
             GD.Print($"[EnemyDatabase] Loaded {_enemies.Count} enemy types");
         }
         
