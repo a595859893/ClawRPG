@@ -117,6 +117,9 @@ namespace ClawRPG.Scripts.Systems {
             // Auto potion system data
             public Dictionary<string, object> AutoPotionData { get; set; } = new();
             
+            // Enchantment system data
+            public Dictionary<string, object> EnchantmentData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -484,6 +487,9 @@ namespace ClawRPG.Scripts.Systems {
             {
                 data.AutoPotionData = autoPotionSystem.Serialize();
             }
+            
+            // Save enchantment data
+            data.EnchantmentData = ClawRPG.Scripts.Systems.Enchantment.EnchantmentSystem.Instance.Serialize();
             
             return data;
         }

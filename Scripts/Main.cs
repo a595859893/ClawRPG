@@ -87,6 +87,11 @@ namespace ClawRPG.Scripts {
             autoPotionSystem.Name = "AutoPotionSystem";
             AddChild(autoPotionSystem);
             
+            // Initialize enchantment database
+            var enchantmentDb = new ClawRPG.Scripts.Systems.Enchantment.EnchantmentDatabase();
+            enchantmentDb.Name = "EnchantmentDatabase";
+            AddChild(enchantmentDb);
+            
             // Spawn player
             SpawnPlayer();
             
@@ -160,6 +165,11 @@ namespace ClawRPG.Scripts {
             var potionUI = new PotionUI();
             potionUI.Name = "PotionUI";
             ui.AddChild(potionUI);
+            
+            // Enchantment UI
+            var enchantmentUI = new EnchantmentUI();
+            enchantmentUI.Name = "EnchantmentUI";
+            ui.AddChild(enchantmentUI);
             
             GD.Print("UI initialized");
         }
@@ -301,6 +311,12 @@ namespace ClawRPG.Scripts {
                 TogglePotionUI();
             }
             
+            // Handle enchantment UI toggle (E key - secondary action)
+            if (Input.IsActionJustPressed("enchantment"))
+            {
+                ToggleEnchantmentUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -420,6 +436,15 @@ namespace ClawRPG.Scripts {
             if (autoPotionUI != null)
             {
                 autoPotionUI.ToggleVisibility();
+            }
+        }
+        
+        private void ToggleEnchantmentUI()
+        {
+            var enchantmentUI = GetNodeOrNull<UI.EnchantmentUI>("CanvasLayer/EnchantmentUI");
+            if (enchantmentUI != null)
+            {
+                enchantmentUI.Toggle();
             }
         }
         
@@ -681,6 +706,12 @@ namespace ClawRPG.Scripts {
                     {
                         autoPotionSystem.Deserialize(saveData.AutoPotionData);
                     }
+                }
+                
+                // 加载附魔数据
+                if (saveData.EnchantmentData != null)
+                {
+                    ClawRPG.Scripts.Systems.Enchantment.EnchantmentSystem.Instance.Deserialize(saveData.EnchantmentData);
                 }
                 
                 CurrentDay = saveData.CurrentDay;
