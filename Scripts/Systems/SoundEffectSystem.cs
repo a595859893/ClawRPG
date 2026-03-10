@@ -211,19 +211,93 @@ namespace ClawRPG.Scripts.Systems {
         public void PlayBossAbilitySummonMinions() {
             PlayCombatSound("boss_summon_minions");
         }
-        
+
         #endregion
-        
+
+        #region Counter Attack Sounds
+
+        public void PlayCounterAttackWindow() {
+            PlayCombatSound("counter_window");
+        }
+
+        public void PlayCounterAttackReady() {
+            PlayCombatSound("counter_ready");
+        }
+
+        public void PlayCounterAttackPerformed(CounterAttackSystem.CounterType type) {
+            string soundName = type switch {
+                CounterAttackSystem.CounterType.Riposte => "counter_riposte",
+                CounterAttackSystem.CounterType.ShieldBash => "counter_shield_bash",
+                CounterAttackSystem.CounterType.BladeDance => "counter_blade_dance",
+                CounterAttackSystem.CounterType.IronWill => "counter_iron_will",
+                CounterAttackSystem.CounterType.BloodRevenge => "counter_blood_revenge",
+                CounterAttackSystem.CounterType.MagicCounter => "counter_magic_counter",
+                _ => "counter_attack"
+            };
+            PlayCombatSound(soundName);
+        }
+
+        public void PlayPerfectCounter() {
+            PlayCombatSound("perfect_counter");
+        }
+
+        #endregion
+
+        #region Region & Exploration Sounds
+
+        public void PlayRegionEnter() {
+            PlayAmbientSound("region_enter");
+        }
+
+        public void PlayRegionExit() {
+            PlayAmbientSound("region_exit");
+        }
+
+        public void PlayDiscovery() {
+            PlayAmbientSound("discovery");
+        }
+
+        public void PlayTeleport() {
+            PlayAmbientSound("teleport");
+        }
+
+        public void PlayFastTravel() {
+            PlayAmbientSound("fast_travel");
+        }
+
+        #endregion
+
+        #region Weather Sounds
+
+        public void PlayWeatherChange(WeatherType weather) {
+            string soundName = weather switch {
+                WeatherType.Clear => "weather_clear",
+                WeatherType.Rain => "weather_rain",
+                WeatherType.Storm => "weather_storm",
+                WeatherType.Snow => "weather_snow",
+                WeatherType.Fog => "weather_fog",
+                WeatherType.Sandstorm => "weather_sandstorm",
+                _ => "weather_change"
+            };
+            PlayAmbientSound(soundName);
+        }
+
+        #endregion
+
         #region Private Methods
-        
+
         private void PlayUISound(string soundName) {
             // In a full implementation, this would play actual audio files
             // For now, we just log the sound being played
             GD.Print($"[SFX] UI Sound: {soundName}");
         }
-        
+
         private void PlayCombatSound(string soundName) {
             GD.Print($"[SFX] Combat Sound: {soundName}");
+        }
+
+        private void PlayAmbientSound(string soundName) {
+            GD.Print($"[SFX] Ambient Sound: {soundName}");
         }
         
         /// <summary>

@@ -103,6 +103,14 @@ namespace ClawRPG.Scripts {
             counterAttackSystem.Name = "CounterAttackSystem";
             AddChild(counterAttackSystem);
             
+            // Connect counter attack system signals to sound effects
+            counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttackPerformed, 
+                this, nameof(_OnCounterAttackPerformed));
+            counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttack窗口, 
+                this, nameof(_OnCounterAttackWindow));
+            counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttackReady, 
+                this, nameof(_OnCounterAttackReady));
+            
             // Initialize enchantment database
             var enchantmentDb = new ClawRPG.Scripts.Systems.Enchantment.EnchantmentDatabase();
             enchantmentDb.Name = "EnchantmentDatabase";
@@ -116,6 +124,10 @@ namespace ClawRPG.Scripts {
             var weatherSystem = new WeatherSystem();
             weatherSystem.Name = "WeatherSystem";
             AddChild(weatherSystem);
+            
+            // Connect weather system signals to sound effects
+            weatherSystem.Connect(WeatherSystem.SignalName.WeatherChanged, 
+                this, nameof(_OnWeatherChanged));
             
             // Initialize camera effect system
             var cameraEffectSystem = new CameraEffectSystem();
@@ -1116,5 +1128,60 @@ namespace ClawRPG.Scripts {
                 GD.Print("Settings UI not found in scene");
             }
         }
+        
+        #region Counter Attack Sound Handlers
+        
+        /// <summary>
+        /// Handle counter attack performed signal
+        /// </summary>
+        private void _OnCounterAttackPerformed(CounterAttackSystem.CounterType type, float damage)
+        {
+            if (SoundEffectSystem.Instance != null)
+            {
+                SoundEffectSystem.Instance.PlayCounterAttackPerformed(type);
+            }
+        }
+        
+        /// <summary>
+        /// Handle counter attack window signal
+        /// </summary>
+        private void _OnCounterAttackWindow(bool isActive)
+        {
+            if (SoundEffectSystem.Instance != null)
+            {
+                if (isActive)
+                {
+                    SoundEffectSystem.Instance.PlayCounterAttackWindow();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Handle counter attack ready signal
+        /// </summary>
+        private void _OnCounterAttackReady()
+        {
+            if (SoundEffectSystem.Instance != null)
+            {
+                SoundEffectSystem.Instance.PlayCounterAttackReady();
+            }
+        }
+        
+        #endregion
+        
+        #region Weather Sound Handlers
+        
+        /// <summary>
+        /// Handle weather changed signal
+        /// </summary>
+        private void _OnWeatherChanged(WeatherData newWeather, WeatherData oldWeather)
+        {
+            if (SoundEffectSystem.Instance != null && newWeather != null)
+            {
+                SoundEffectSystem.Instance.PlayWeatherChange(newWeather.Type);
+            }
+        }
+        
+        #endregion
     }
 }
