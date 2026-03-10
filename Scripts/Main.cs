@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.Mounts;
+using ClawRPG.Scripts.Systems.Pets;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -61,6 +62,12 @@ namespace ClawRPG.Scripts {
             var titleSystem = new TitleSystem();
             titleSystem.Name = "TitleSystem";
             AddChild(titleSystem);
+            
+            // Initialize pet combat AI
+            var petCombatAI = new PetCombatAI();
+            petCombatAI.Name = "PetCombatAI";
+            AddChild(petCombatAI);
+            petCombatAI.Initialize();
             
             // Spawn player
             SpawnPlayer();
