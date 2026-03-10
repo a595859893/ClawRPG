@@ -77,6 +77,7 @@ namespace ClawRPG.Scripts.UI {
             AddHotkey("装备外观", "V");
             AddHotkey("天气系统", "V");
             AddHotkey("故事章节", "K");
+            AddHotkey("按键绑定", "F10");
             AddHotkey("暂停", "ESC");
             
             // Toggle hint

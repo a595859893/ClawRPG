@@ -135,6 +135,9 @@ namespace ClawRPG.Scripts.Systems {
             // Equipment visuals data
             public Dictionary<string, string> EquipmentVisualsData { get; set; } = new();
             
+            // Keybinding data
+            public Dictionary<string, int> KeybindingData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -535,6 +538,13 @@ namespace ClawRPG.Scripts.Systems {
             if (comboSystem != null)
             {
                 data.ComboData = comboSystem.Serialize();
+            }
+            
+            // Save keybinding data
+            var keybindingSystem = GetNodeOrNull<Systems.KeybindingSystem>("KeybindingSystem");
+            if (keybindingSystem != null)
+            {
+                data.KeybindingData = keybindingSystem.Serialize();
             }
             
             return data;

@@ -150,6 +150,11 @@ namespace ClawRPG.Scripts {
             bossAbilityVisualizer.Name = "BossAbilityVisualizer";
             AddChild(bossAbilityVisualizer);
             
+            // Initialize keybinding system
+            var keybindingSystem = new Systems.KeybindingSystem();
+            keybindingSystem.Name = "KeybindingSystem";
+            AddChild(keybindingSystem);
+            
             // Connect sound effect signals
             ConnectSoundSignals();
             
@@ -288,6 +293,11 @@ namespace ClawRPG.Scripts {
             equipmentSetUI.Name = "EquipmentSetUI";
             ui.AddChild(equipmentSetUI);
             
+            // Keybinding UI
+            var keybindingUI = new UI.KeybindingUI();
+            keybindingUI.Name = "KeybindingUI";
+            ui.AddChild(keybindingUI);
+            
             GD.Print("UI initialized");
         }
         
@@ -337,6 +347,14 @@ namespace ClawRPG.Scripts {
                     {
                         comboSystem.Deserialize(data.ComboData);
                         GD.Print("Combo data loaded successfully!");
+                    }
+                    
+                    // Load keybinding data
+                    var keybindingSystem = GetNodeOrNull<Systems.KeybindingSystem>("KeybindingSystem");
+                    if (keybindingSystem != null && data.KeybindingData != null)
+                    {
+                        keybindingSystem.Deserialize(data.KeybindingData);
+                        GD.Print("Keybinding data loaded successfully!");
                     }
                 }
             }
@@ -484,6 +502,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("player_profile"))
             {
                 TogglePlayerProfileUI();
+            }
+            
+            // Handle keybinding UI toggle (F10 key)
+            if (Input.IsActionJustPressed("keybinding"))
+            {
+                ToggleKeybindingUI();
             }
             
             // Handle special attacks
@@ -672,6 +696,15 @@ namespace ClawRPG.Scripts {
             if (profileUI != null)
             {
                 profileUI.Toggle();
+            }
+        }
+        
+        private void ToggleKeybindingUI()
+        {
+            var keybindingUI = GetNodeOrNull<UI.KeybindingUI>("CanvasLayer/KeybindingUI");
+            if (keybindingUI != null)
+            {
+                keybindingUI.ToggleKeybindingUI();
             }
         }
 
@@ -981,6 +1014,13 @@ namespace ClawRPG.Scripts {
                 if (equipVisuals != null && saveData.EquipmentVisualsData != null)
                 {
                     equipVisuals.Deserialize(saveData.EquipmentVisualsData);
+                }
+                
+                // 加载按键绑定数据
+                var keybindingSystem = GetNodeOrNull<Systems.KeybindingSystem>("KeybindingSystem");
+                if (keybindingSystem != null && saveData.KeybindingData != null)
+                {
+                    keybindingSystem.Deserialize(saveData.KeybindingData);
                 }
                 
                 CurrentDay = saveData.CurrentDay;
