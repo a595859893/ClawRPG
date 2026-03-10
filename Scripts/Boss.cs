@@ -87,6 +87,9 @@ namespace ClawRPG.Scripts.Characters {
         // Visual effects
         private BossAbilityVisualizer _visualizer;
         
+        // AI Decision Maker (Behavior Tree)
+        private BossDecisionMaker _decisionMaker;
+        
         // State
         private int _currentPhase = 1;
         private float _abilityTimer;
@@ -125,6 +128,9 @@ namespace ClawRPG.Scripts.Characters {
             
             // Connect ability warning signal to UI
             ConnectAbilityWarningToUI();
+            
+            // Initialize AI Decision Maker (Behavior Tree)
+            _decisionMaker = new BossDecisionMaker(this);
             
             GD.Print($"Boss {BossTitle} spawned! Phase: {_currentPhase}, Enrage: {EnrageTime}s");
         }
@@ -283,7 +289,8 @@ namespace ClawRPG.Scripts.Characters {
             _abilityTimer -= dt;
             if (_abilityTimer <= 0)
             {
-                TryUseSpecialAbility();
+                // Use Behavior Tree decision maker instead of random selection
+                TryUseDecisionMaker();
                 _abilityTimer = AbilityCooldown;
             }
             
@@ -615,6 +622,121 @@ namespace ClawRPG.Scripts.Characters {
             }
             
             OnSpecialAbility?.Invoke(ability);
+        }
+        
+        /// <summary>
+        /// Use Behavior Tree decision maker for intelligent ability selection
+        /// </summary>
+        private void TryUseDecisionMaker()
+        {
+            if (_decisionMaker == null) {
+                // Fallback to random selection
+                TryUseSpecialAbility();
+                return;
+            }
+            
+            var target = GetTarget();
+            if (target == null) {
+                TryUseSpecialAbility();
+                return;
+            }
+            
+            // Make decision using Behavior Tree
+            _decisionMaker.MakeDecision(target, 0f);
+        }
+        
+        /// <summary>
+        /// Force set AI state (for decision maker)
+        /// </summary>
+        public void ForceSetState(BossAIState newState)
+        {
+            if (_aiState == newState) return;
+            
+            _aiState = newState;
+            _stateTimer = GetStateDuration(newState);
+            OnAIStateChanged?.Invoke(newState);
+            
+            GD.Print($"{BossTitle} state changed to {newState} via Decision Maker");
+        }
+        
+        /// <summary>
+        /// Try to use a specific ability (called by decision maker)
+        /// </summary>
+        public void TryUseAbility(string abilityId)
+        {
+            if (string.IsNullOrEmpty(abilityId)) {
+                // Default attack
+                TryAttack();
+                return;
+            }
+            
+            // Check cooldown
+            if (_abilityCurrentCooldowns.ContainsKey(abilityId) && _abilityCurrentCooldowns[abilityId] > 0) {
+                return;
+            }
+            
+            // Check if ability is available
+            if (_availableAbilities != null && !_availableAbilities.Contains(abilityId)) {
+                return;
+            }
+            
+            GD.Print($"{BossTitle} uses ability via Decision Maker: {abilityId}");
+            
+            // Fire warning event for UI
+            OnAbilityWarmingUp?.Invoke(abilityId);
+            
+            // Set cooldown
+            if (_abilityDatabase.ContainsKey(abilityId)) {
+                _abilityCurrentCooldowns[abilityId] = _abilityDatabase[abilityId].Cooldown;
+            }
+            
+            SetAIState(BossAIState.UsingAbility);
+            
+            // Execute ability
+            switch (abilityId)
+            {
+                case "fire_breath":
+                    UseFireBreath();
+                    break;
+                case "lightning_chain":
+                    UseLightningChain();
+                    break;
+                case "poison_cloud":
+                    UsePoisonCloud();
+                    break;
+                case "ice_lance":
+                    UseIceLance();
+                    break;
+                case "dark_bolt":
+                    UseDarkBolt();
+                    break;
+                case "ground_slam":
+                    UseGroundSlam();
+                    break;
+                case "fear_shout":
+                    UseFearShout();
+                    break;
+                case "bleed_wave":
+                    UseBleedWave();
+                    break;
+                case "magic_missile":
+                    UseMagicMissile();
+                    break;
+                case "heal":
+                    UseBossHeal();
+                    break;
+                case "teleport":
+                    UseTeleport();
+                    break;
+                case "summon_minions":
+                    UseSummonMinions();
+                    break;
+                default:
+                    UseAreaAttack();
+                    break;
+            }
+            
+            OnSpecialAbility?.Invoke(abilityId);
         }
         
         // Enhanced ability implementations
