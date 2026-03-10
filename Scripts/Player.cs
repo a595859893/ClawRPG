@@ -128,6 +128,8 @@ namespace ClawRPG.Scripts.Characters {
             DailyChallengeManager.Instance.OnGoldEarned(amount);
             // Track achievement progress
             AchievementManager.Instance.TrackGoldEarned(amount);
+            // Track statistics
+            StatisticsManager.Instance.RecordGoldEarned(amount);
         }
         
         /// <summary>
@@ -135,6 +137,9 @@ namespace ClawRPG.Scripts.Characters {
         /// </summary>
         public void AddExperience(int amount) {
             Experience += amount;
+            
+            // Track statistics
+            StatisticsManager.Instance.RecordExperience(amount);
             
             // Check for level up
             int expNeeded = GetExperienceForNextLevel();
@@ -156,6 +161,9 @@ namespace ClawRPG.Scripts.Characters {
             CurrentHealth = MaxHealth;
             CurrentMana = MaxMana;
             SkillPoints += 1;
+            
+            // Track statistics
+            StatisticsManager.Instance.UpdateHighestLevel(Level);
             
             GD.Print($"Player leveled up! Level: {Level}");
         }
@@ -289,6 +297,8 @@ namespace ClawRPG.Scripts.Characters {
         {
             IsPerfectBlock = true;
             _perfectBlockTimer = PerfectBlockWindow;
+            // Track statistics
+            StatisticsManager.Instance.RecordPerfectBlock();
             GD.Print("PERFECT BLOCK!");
         }
         
@@ -408,6 +418,9 @@ namespace ClawRPG.Scripts.Characters {
             
             CurrentHealth -= (int)finalDamage;
             
+            // Track statistics
+            StatisticsManager.Instance.RecordDamageTaken((int)finalDamage);
+            
             if (CurrentHealth <= 0)
             {
                 Die();
@@ -428,6 +441,8 @@ namespace ClawRPG.Scripts.Characters {
         public void Heal(int amount)
         {
             CurrentHealth = Mathf.Min(MaxHealth, CurrentHealth + amount);
+            // Track statistics
+            StatisticsManager.Instance.RecordHealing(amount);
             GD.Print("Healed " + amount + " HP. HP: " + CurrentHealth + "/" + MaxHealth);
         }
         
@@ -555,6 +570,8 @@ namespace ClawRPG.Scripts.Characters {
         private void Die()
         {
             GD.Print("Player died!");
+            // Track statistics
+            StatisticsManager.Instance.RecordDeath();
             // Handle death (game over, respawn, etc.)
             QueueFree();
         }

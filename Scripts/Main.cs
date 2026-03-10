@@ -112,12 +112,61 @@ namespace ClawRPG.Scripts {
             if (saveSystem.HasSave(0))
             {
                 GD.Print("Found save file, loading...");
-                // Would load game state here
+                var data = saveSystem.LoadGame(0);
+                if (data != null)
+                {
+                    // Load statistics
+                    var statsData = new Dictionary<string, object>
+                    {
+                        ["TotalKills"] = data.TotalKills,
+                        ["TotalDeaths"] = data.TotalDeaths,
+                        ["TotalDamageDealt"] = data.TotalDamageDealt,
+                        ["TotalDamageTaken"] = data.TotalDamageTaken,
+                        ["TotalHealing"] = data.TotalHealing,
+                        ["CriticalHits"] = data.CriticalHits,
+                        ["PerfectBlocks"] = data.PerfectBlocks,
+                        ["Dodges"] = data.Dodges,
+                        ["GoldEarned"] = data.GoldEarned,
+                        ["GoldSpent"] = data.GoldSpent,
+                        ["ExperienceGained"] = data.ExperienceGained,
+                        ["ItemsCollected"] = data.ItemsCollected,
+                        ["ItemsCrafted"] = data.ItemsCrafted,
+                        ["QuestsCompleted"] = data.QuestsCompleted,
+                        ["SkillsLearned"] = data.SkillsLearned,
+                        ["SkillsUsed"] = data.SkillsUsed,
+                        ["RegionsDiscovered"] = data.RegionsDiscovered,
+                        ["EnemiesEncountered"] = data.EnemiesEncountered,
+                        ["BossesDefeated"] = data.BossesDefeated,
+                        ["TotalPlayTime"] = data.TotalPlayTime,
+                        ["HighestLevel"] = data.HighestLevel,
+                        ["HighestCombo"] = data.HighestCombo,
+                        ["AchievementsUnlocked"] = data.AchievementsUnlocked
+                    };
+                    StatisticsManager.Instance.LoadStatistics(statsData);
+                    GD.Print("Statistics loaded successfully!");
+                }
             }
         }
         
+        private float _autoSaveTimer = 0f;
+        private const float AutoSaveInterval = 300f; // 5 minutes
+        
         public override void _Process(double delta)
         {
+            float dt = (float)delta;
+            
+            // Update play time
+            StatisticsManager.Instance.AddPlayTime(dt);
+            
+            // Auto save every 5 minutes
+            _autoSaveTimer += dt;
+            if (_autoSaveTimer >= AutoSaveInterval)
+            {
+                _autoSaveTimer = 0f;
+                // Auto save logic would go here
+                GD.Print("Auto save triggered...");
+            }
+            
             // Update UI
             UpdatePlayerUI();
             

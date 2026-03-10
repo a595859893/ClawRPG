@@ -75,6 +75,27 @@ namespace ClawRPG.Scripts.Systems {
             public int TotalDeaths { get; set; }
             public int TotalDamageDealt { get; set; }
             public int TotalDamageTaken { get; set; }
+            
+            // Extended game stats
+            public int TotalHealing { get; set; }
+            public int CriticalHits { get; set; }
+            public int PerfectBlocks { get; set; }
+            public int Dodges { get; set; }
+            public int GoldEarned { get; set; }
+            public int GoldSpent { get; set; }
+            public int ExperienceGained { get; set; }
+            public int ItemsCollected { get; set; }
+            public int ItemsCrafted { get; set; }
+            public int QuestsCompleted { get; set; }
+            public int SkillsLearned { get; set; }
+            public int SkillsUsed { get; set; }
+            public int RegionsDiscovered { get; set; }
+            public int EnemiesEncountered { get; set; }
+            public int BossesDefeated { get; set; }
+            public float TotalPlayTime { get; set; }
+            public int HighestLevel { get; set; }
+            public int HighestCombo { get; set; }
+            public int AchievementsUnlocked { get; set; }
         }
         
         // Save slot metadata (stored separately for quick loading)
