@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/AchievementUI.cs" id="11_achievement"]
 [ext_resource type="Script" path="res://Scripts/UI/StatisticsUI.cs" id="12_statistics"]
 [ext_resource type="Script" path="res://Scripts/UI/TitleScreenUI.cs" id="13_title"]
+[ext_resource type="Script" path="res://Scripts/UI/BulletinBoardUI.cs" id="14_bulletin"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -137,3 +138,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("13_title")
+
+[node name="BulletinBoardUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("14_bulletin")
