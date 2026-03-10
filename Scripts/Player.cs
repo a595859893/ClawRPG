@@ -44,6 +44,10 @@ namespace ClawRPG.Scripts.Characters {
         // Currency
         public int Gold { get; set; }
         
+        // Combat statistics for titles
+        public int PerfectBlockCount { get; private set; }
+        public int DodgeCount { get; private set; }
+        
         // World Event multipliers
         public float EventXPMultiplier { get; set; } = 1.0f;
         public float EventDropMultiplier { get; set; } = 1.0f;
@@ -130,6 +134,8 @@ namespace ClawRPG.Scripts.Characters {
             AchievementManager.Instance.TrackGoldEarned(amount);
             // Track statistics
             StatisticsManager.Instance.RecordGoldEarned(amount);
+            // Check title progress
+            TitleSystem.Instance.CheckAndUnlockTitle("Collection", Gold);
         }
         
         /// <summary>
@@ -164,6 +170,9 @@ namespace ClawRPG.Scripts.Characters {
             
             // Track statistics
             StatisticsManager.Instance.UpdateHighestLevel(Level);
+            
+            // Check level titles
+            TitleSystem.Instance.CheckAndUnlockTitle("Level", Level);
             
             GD.Print($"Player leveled up! Level: {Level}");
         }
@@ -299,6 +308,9 @@ namespace ClawRPG.Scripts.Characters {
             _perfectBlockTimer = PerfectBlockWindow;
             // Track statistics
             StatisticsManager.Instance.RecordPerfectBlock();
+            // Track perfect block for titles
+            PerfectBlockCount++;
+            TitleSystem.Instance.CheckAndUnlockTitle("Combat", PerfectBlockCount);
             GD.Print("PERFECT BLOCK!");
         }
         
@@ -333,6 +345,10 @@ namespace ClawRPG.Scripts.Characters {
             IsInvincible = true;
             CurrentStamina -= 20f;
             _dodgeCooldownTimer = DodgeCooldown;
+            
+            // Track dodge for titles
+            DodgeCount++;
+            TitleSystem.Instance.CheckAndUnlockTitle("Combat", DodgeCount);
             
             Vector2 dodgeDir = AttackDirection;
             if (Input.GetVector("move_left", "move_right", "move_up", "move_down") != Vector2.Zero)

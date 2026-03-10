@@ -56,6 +56,11 @@ namespace ClawRPG.Scripts {
             weaponMasterySystem.Name = "WeaponMasterySystem";
             AddChild(weaponMasterySystem);
             
+            // Initialize title system
+            var titleSystem = new TitleSystem();
+            titleSystem.Name = "TitleSystem";
+            AddChild(titleSystem);
+            
             // Spawn player
             SpawnPlayer();
             
@@ -223,6 +228,12 @@ namespace ClawRPG.Scripts {
                 ToggleWeaponMasteryUI();
             }
             
+            // Handle title UI toggle (Y key)
+            if (Input.IsActionJustPressed("titles"))
+            {
+                ToggleTitleUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -283,6 +294,22 @@ namespace ClawRPG.Scripts {
             if (weaponMasteryUI != null)
             {
                 weaponMasteryUI.Toggle();
+            }
+        }
+        
+        private void ToggleTitleUI()
+        {
+            var titleUI = GetNodeOrNull<UI.TitleUI>("CanvasLayer/TitleUI");
+            if (titleUI != null)
+            {
+                if (titleUI.Visible)
+                {
+                    titleUI.Hide();
+                }
+                else
+                {
+                    titleUI.Show();
+                }
             }
         }
         

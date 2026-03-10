@@ -96,6 +96,10 @@ namespace ClawRPG.Scripts.Systems {
             public int HighestLevel { get; set; }
             public int HighestCombo { get; set; }
             public int AchievementsUnlocked { get; set; }
+            
+            // Title system data
+            public string CurrentTitleId { get; set; } = "";
+            public string[] UnlockedTitleIds { get; set; } = new string[0];
         }
         
         // Save slot metadata (stored separately for quick loading)
