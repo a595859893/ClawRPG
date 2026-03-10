@@ -9,6 +9,7 @@ using ClawRPG.Scripts.UI;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Quests;
 using ClawRPG.Scripts.Achievements;
+using ClawRPG.Scripts.Combat;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -143,6 +144,11 @@ namespace ClawRPG.Scripts {
             var equipmentSetManager = new EquipmentSetManager();
             equipmentSetManager.Name = "EquipmentSetManager";
             AddChild(equipmentSetManager);
+            
+            // Initialize boss ability visualizer
+            var bossAbilityVisualizer = new Combat.BossAbilityVisualizer();
+            bossAbilityVisualizer.Name = "BossAbilityVisualizer";
+            AddChild(bossAbilityVisualizer);
             
             // Connect sound effect signals
             ConnectSoundSignals();

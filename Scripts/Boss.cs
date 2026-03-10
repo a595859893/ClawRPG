@@ -83,6 +83,9 @@ namespace ClawRPG.Scripts.Characters {
         private float _chaseRange = 400f;
         private float _predictTargetTime = 0.2f;
         
+        // Visual effects
+        private BossAbilityVisualizer _visualizer;
+        
         // State
         private int _currentPhase = 1;
         private float _abilityTimer;
@@ -101,6 +104,9 @@ namespace ClawRPG.Scripts.Characters {
             base._Ready();
             
             InitializeAbilityDatabase();
+            
+            // Initialize visualizer
+            _visualizer = BossAbilityVisualizer.Instance;
             
             _abilityTimer = 5f;
             _enrageTimer = EnrageTime;
@@ -566,7 +572,15 @@ namespace ClawRPG.Scripts.Characters {
         private void UseFireBreath()
         {
             var ability = _abilityDatabase["fire_breath"];
-            Vector2 direction = (GetTarget().GlobalPosition - GlobalPosition).Normalized();
+            Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition + new Vector2(100, 0);
+            Vector2 direction = (targetPos - GlobalPosition).Normalized();
+            float facingAngle = Mathf.Atan2(direction.Y, direction.X);
+            
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("fire_breath", GlobalPosition, targetPos, facingAngle);
+            }
             
             // Create area effect
             if (ability.IsAoE)
@@ -586,6 +600,14 @@ namespace ClawRPG.Scripts.Characters {
         private void UseLightningChain()
         {
             var ability = _abilityDatabase["lightning_chain"];
+            Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition + new Vector2(100, 0);
+            
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("lightning_chain", GlobalPosition, targetPos);
+            }
+            
             ApplyAoEDamage(ability);
             GD.Print("Lightning chain attack!");
         }
@@ -593,6 +615,14 @@ namespace ClawRPG.Scripts.Characters {
         private void UsePoisonCloud()
         {
             var ability = _abilityDatabase["poison_cloud"];
+            Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition;
+            
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("poison_cloud", GlobalPosition, targetPos);
+            }
+            
             ApplyAoEDamage(ability);
             
             if (GetTarget() != null && ApplyStatusEffect(ability))
@@ -605,6 +635,16 @@ namespace ClawRPG.Scripts.Characters {
         private void UseIceLance()
         {
             var ability = _abilityDatabase["ice_lance"];
+            Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition + new Vector2(100, 0);
+            Vector2 direction = (targetPos - GlobalPosition).Normalized();
+            float facingAngle = Mathf.Atan2(direction.Y, direction.X);
+            
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("ice_lance", GlobalPosition, targetPos, facingAngle);
+            }
+            
             if (GetTarget() != null)
             {
                 float dist = GlobalPosition.DistanceTo(GetTarget().GlobalPosition);
@@ -625,6 +665,14 @@ namespace ClawRPG.Scripts.Characters {
         private void UseDarkBolt()
         {
             var ability = _abilityDatabase["dark_bolt"];
+            Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition + new Vector2(100, 0);
+            
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("shadow_bolt", GlobalPosition, targetPos);
+            }
+            
             if (GetTarget() != null)
             {
                 float dist = GlobalPosition.DistanceTo(GetTarget().GlobalPosition);
@@ -645,6 +693,14 @@ namespace ClawRPG.Scripts.Characters {
         private void UseGroundSlam()
         {
             var ability = _abilityDatabase["ground_slam"];
+            Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition;
+            
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("ground_slam", GlobalPosition, targetPos);
+            }
+            
             ApplyAoEDamage(ability);
             
             // Add stun effect
@@ -667,6 +723,13 @@ namespace ClawRPG.Scripts.Characters {
         private void UseFearShout()
         {
             var ability = _abilityDatabase["fear_shout"];
+            
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("fear_roar", GlobalPosition, GlobalPosition);
+            }
+            
             ApplyAoEDamage(ability);
             GD.Print("Fear shout! Enemies terrified.");
         }
@@ -674,6 +737,13 @@ namespace ClawRPG.Scripts.Characters {
         private void UseBleedWave()
         {
             var ability = _abilityDatabase["bleed_wave"];
+            
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("blood_ripple", GlobalPosition, GlobalPosition);
+            }
+            
             ApplyAoEDamage(ability);
             
             if (ApplyStatusEffect(ability) && GetTarget() != null)
@@ -686,6 +756,14 @@ namespace ClawRPG.Scripts.Characters {
         private void UseMagicMissile()
         {
             var ability = _abilityDatabase["magic_missile"];
+            Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition + new Vector2(100, 0);
+            
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("arcane_missile", GlobalPosition, targetPos);
+            }
+            
             if (GetTarget() != null)
             {
                 float dist = GlobalPosition.DistanceTo(GetTarget().GlobalPosition);
@@ -700,6 +778,12 @@ namespace ClawRPG.Scripts.Characters {
         
         private void UseBossHeal()
         {
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("self_heal", GlobalPosition, GlobalPosition);
+            }
+            
             Heal(MaxHealth / 4);
             // Visual feedback
             var tween = CreateTween();
@@ -710,13 +794,27 @@ namespace ClawRPG.Scripts.Characters {
         
         private void UseTeleport()
         {
+            // Trigger visual effect at current position first
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("teleport", GlobalPosition, GlobalPosition);
+            }
+            
             if (GetTarget() != null)
             {
                 // Teleport to random position around player
                 float angle = (float)GD.RandRange(0, Mathf.PI * 2);
                 float distance = (float)GD.RandRange(100, 200);
                 Vector2 offset = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance;
-                GlobalPosition = GetTarget().GlobalPosition + offset;
+                Vector2 newPos = GetTarget().GlobalPosition + offset;
+                
+                // Trigger visual effect at new position
+                if (_visualizer != null)
+                {
+                    _visualizer.TriggerAbilityVisual("teleport", newPos, newPos);
+                }
+                
+                GlobalPosition = newPos;
                 
                 // Visual effect
                 var tween = CreateTween();
@@ -728,6 +826,12 @@ namespace ClawRPG.Scripts.Characters {
         
         private void UseSummonMinions()
         {
+            // Trigger visual effect
+            if (_visualizer != null)
+            {
+                _visualizer.TriggerAbilityVisual("summon_minions", GlobalPosition, GlobalPosition);
+            }
+            
             // Spawn 3 minions around boss
             for (int i = 0; i < 3; i++)
             {
