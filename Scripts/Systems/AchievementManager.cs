@@ -15,6 +15,9 @@ namespace ClawRPG.Scripts.Systems
         private List<Achievement> _unlockedAchievements;
         private Dictionary<string, Achievement> _trackedAchievements;
         
+        // Tutorial tracking
+        private bool _hasTriggeredFirstAchievement = false;
+        
         // Statistics tracking
         private int _totalKills;
         private int _totalBossesKilled;
@@ -205,6 +208,13 @@ namespace ClawRPG.Scripts.Systems
                     {
                         _unlockedAchievements.Add(achievement);
                         OnAchievementUnlocked?.Invoke(achievement);
+                        
+                        // Trigger tutorial for first achievement
+                        if (!_hasTriggeredFirstAchievement)
+                        {
+                            _hasTriggeredFirstAchievement = true;
+                            TutorialSystem.Trigger(TutorialTrigger.FirstAchievement);
+                        }
                         
                         // Grant rewards
                         GrantRewards(achievement);

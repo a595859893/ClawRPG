@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Items
 {
@@ -20,6 +21,9 @@ namespace ClawRPG.Scripts.Items
         
         // 药水冷却
         private Dictionary<int, float> _cooldowns = new Dictionary<int, float>();
+        
+        // Tutorial tracking
+        private bool _hasTriggeredFirstPotion = false;
 
         // 信号系统
         public Action<PotionInstance> OnPotionAdded;
@@ -142,6 +146,13 @@ namespace ClawRPG.Scripts.Items
             // 消耗药水
             RemovePotion(potionId, 1);
             OnPotionUsed?.Invoke(potion);
+            
+            // Trigger tutorial for first potion use
+            if (!_hasTriggeredFirstPotion)
+            {
+                _hasTriggeredFirstPotion = true;
+                TutorialSystem.Trigger(TutorialTrigger.FirstPotion);
+            }
 
             return true;
         }

@@ -60,6 +60,9 @@ namespace ClawRPG.Scripts.Systems {
         // 称号数据库
         private Dictionary<string, Title> titleDatabase = new Dictionary<string, Title>();
         
+        // Tutorial tracking
+        private bool _hasTriggeredFirstTitle = false;
+        
         public TitleSystem() {
             Instance = this;
             InitializeDatabase();
@@ -149,6 +152,14 @@ namespace ClawRPG.Scripts.Systems {
                     
                     // 触发称号解锁事件
                     OnTitleUnlocked?.Invoke(title);
+                    
+                    // Trigger tutorial for first title
+                    if (!_hasTriggeredFirstTitle)
+                    {
+                        _hasTriggeredFirstTitle = true;
+                        TutorialSystem.Trigger(TutorialTrigger.FirstTitle);
+                    }
+                    
                     return true;
                 }
             }

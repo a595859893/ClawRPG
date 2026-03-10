@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
@@ -47,6 +48,9 @@ namespace ClawRPG.Scripts.Systems {
         
         // 符文背包容量
         private const int MAX_RUNE_INVENTORY = 50;
+        
+        // Tutorial tracking
+        private bool _hasTriggeredFirstRune = false;
 
         // 信号
         public delegate void RuneEvent();
@@ -170,6 +174,14 @@ namespace ClawRPG.Scripts.Systems {
 
             _equipmentSlots[slotIndex].EquippedRune = rune;
             OnRuneEquipped?.Invoke();
+            
+            // Trigger tutorial for first rune equip
+            if (!_hasTriggeredFirstRune)
+            {
+                _hasTriggeredFirstRune = true;
+                TutorialSystem.Trigger(TutorialTrigger.FirstRune);
+            }
+            
             return true;
         }
 

@@ -45,6 +45,9 @@ namespace ClawRPG.Scripts.Systems
         // Counter attack database
         private Dictionary<CounterType, CounterAttackData> _counterAttacks;
         
+        // Tutorial tracking
+        private bool _hasTriggeredFirstCounter = false;
+        
         // Signals
         [Signal]
         public delegate void CounterAttackPerformedEventHandler(CounterType type, float damage);
@@ -242,6 +245,13 @@ namespace ClawRPG.Scripts.Systems
             
             // Track counter attack achievements
             AchievementManager.Instance?.TrackCounterAttack(1);
+            
+            // Trigger tutorial for first counter attack
+            if (!_hasTriggeredFirstCounter)
+            {
+                _hasTriggeredFirstCounter = true;
+                TutorialSystem.Trigger(TutorialTrigger.FirstCounter);
+            }
             
             return true;
         }

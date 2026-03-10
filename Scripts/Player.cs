@@ -49,6 +49,11 @@ namespace ClawRPG.Scripts.Characters {
         public int PerfectBlockCount { get; private set; }
         public int DodgeCount { get; private set; }
         
+        // Tutorial tracking
+        private bool _hasTriggeredFirstCrit = false;
+        private bool _hasTriggeredFirstBlock = false;
+        private bool _hasTriggeredFirstDodge = false;
+        
         // World Event multipliers
         public float EventXPMultiplier { get; set; } = 1.0f;
         public float EventDropMultiplier { get; set; } = 1.0f;
@@ -328,6 +333,14 @@ namespace ClawRPG.Scripts.Characters {
             AchievementManager.Instance?.TrackPerfectBlock(1);
             // Trigger counter attack system
             Systems.CounterAttackSystem.Instance?.OnPerfectBlock();
+            
+            // Trigger tutorial for first block
+            if (!_hasTriggeredFirstBlock)
+            {
+                _hasTriggeredFirstBlock = true;
+                TutorialSystem.Trigger(TutorialTrigger.FirstBlock);
+            }
+            
             GD.Print("PERFECT BLOCK!");
         }
         
@@ -339,7 +352,16 @@ namespace ClawRPG.Scripts.Characters {
             // Calculate damage with critical
             float damage = AttackDamage;
             bool isCrit = GD.Randf() < CriticalChance;
-            if (isCrit) damage *= CriticalDamage;
+            if (isCrit)
+            {
+                damage *= CriticalDamage;
+                // Trigger tutorial for first critical hit
+                if (!_hasTriggeredFirstCrit)
+                {
+                    _hasTriggeredFirstCrit = true;
+                    TutorialSystem.Trigger(TutorialTrigger.FirstCrit);
+                }
+            }
             
             // Deal damage to enemies in range
             var enemies = GetEnemiesInAttackRange();
@@ -370,6 +392,13 @@ namespace ClawRPG.Scripts.Characters {
             // Track dodge for titles
             DodgeCount++;
             TitleSystem.Instance.CheckAndUnlockTitle("Combat", DodgeCount);
+            
+            // Trigger tutorial for first dodge
+            if (!_hasTriggeredFirstDodge)
+            {
+                _hasTriggeredFirstDodge = true;
+                TutorialSystem.Trigger(TutorialTrigger.FirstDodge);
+            }
             
             Vector2 dodgeDir = AttackDirection;
             if (Input.GetVector("move_left", "move_right", "move_up", "move_down") != Vector2.Zero)

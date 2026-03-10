@@ -1,6 +1,7 @@
 using Godot;
 using Godot.Collections;
 using System;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Systems.Enhancement {
     /// <summary>
@@ -78,6 +79,9 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         // 玩家数据
         private Dictionary<string, EnhancementData> _enhancedItems = new();
         private Player _player;
+        
+        // Tutorial tracking
+        private bool _hasTriggeredFirstEnhance = false;
         
         public override void _Ready() {
             Instance = this;
@@ -214,6 +218,13 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
             _player.SetInventory(inventory);
             
             EmitSignal(SignalName.OnEnhancementComplete, itemId, newLevel, result);
+            
+            // Trigger tutorial for first enhancement
+            if (!_hasTriggeredFirstEnhance && result == EnhancementResult.Success)
+            {
+                _hasTriggeredFirstEnhance = true;
+                TutorialSystem.Trigger(TutorialTrigger.FirstEnhance);
+            }
             
             return result;
         }

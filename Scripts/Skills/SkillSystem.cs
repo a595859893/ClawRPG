@@ -407,6 +407,9 @@ namespace ClawRPG.Scripts.Skills {
         private Dictionary<int, float> _cooldowns = new();
         private HashSet<int> _learnedSkills = new();
         
+        // Tutorial tracking
+        private bool _hasTriggeredFirstSkillUse = false;
+        
         public void LearnSkill(int skillId)
         {
             _learnedSkills.Add(skillId);
@@ -460,6 +463,13 @@ namespace ClawRPG.Scripts.Skills {
             
             // Start cooldown
             _cooldowns[skillId] = skill.Cooldown;
+            
+            // Trigger tutorial for first skill use
+            if (!_hasTriggeredFirstSkillUse)
+            {
+                _hasTriggeredFirstSkillUse = true;
+                TutorialSystem.Trigger(TutorialTrigger.FirstSkillUse);
+            }
             
             GD.Print("Used skill: " + skill.Name);
         }

@@ -19,6 +19,7 @@ namespace ClawRPG.Scripts.Systems {
         private float _comboTimer = 0f;
         private int _totalComboHits = 0;
         private int _highestCombo = 0;
+        private bool _hasTriggeredFirstCombo = false;
         
         // Combo milestone rewards
         private Dictionary<int, (int gold, int exp)> _milestoneRewards = new()
@@ -81,6 +82,13 @@ namespace ClawRPG.Scripts.Systems {
             
             // Trigger visual effect
             TriggerComboEffect();
+            
+            // Trigger tutorial for first combo
+            if (!_hasTriggeredFirstCombo && _currentCombo >= 3)
+            {
+                _hasTriggeredFirstCombo = true;
+                TutorialSystem.Trigger(TutorialTrigger.FirstCombo);
+            }
         }
         
         /// <summary>
