@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=30 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_main"]
 [ext_resource type="Script" path="res://Scripts/UI/PlayerHUD.cs" id="2_hud"]
@@ -29,6 +29,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/BookmarkUI.cs" id="27_bookmarkui"]
 [ext_resource type="Script" path="res://Scripts/UI/EnhancementUI.cs" id="28_enhancement"]
 [ext_resource type="Script" path="res://Scripts/Systems/Enhancement/EquipmentEnhancement.cs" id="29_enhancement_system"]
+[ext_resource type="Script" path="res://Scripts/UI/EnhancementEffect.cs" id="30_enhancement_effect"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -273,6 +274,16 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("28_enhancement")
+
+[node name="EnhancementEffect" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("30_enhancement_effect")
 
 [node name="EnhancementSystem" type="Node" parent="."]
 script = ExtResource("29_enhancement_system")
