@@ -529,6 +529,18 @@ namespace ClawRPG.Scripts {
                 };
                 StatisticsManager.Instance.LoadStatistics(statsData);
                 
+                // 加载快速槽数据
+                if (saveData.QuickSlotItemIds != null && saveData.QuickSlotQuantities != null)
+                {
+                    for (int i = 0; i < Mathf.Min(saveData.QuickSlotItemIds.Length, 9); i++)
+                    {
+                        if (QuickSlotSystem.Instance != null && i < 9)
+                        {
+                            QuickSlotSystem.Instance.SetSlot(i, saveData.QuickSlotItemIds[i], saveData.QuickSlotQuantities[i]);
+                        }
+                    }
+                }
+                
                 CurrentDay = saveData.CurrentDay;
                 SetGameState(GameState.Playing);
                 

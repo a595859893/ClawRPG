@@ -100,6 +100,13 @@ namespace ClawRPG.Scripts.Systems {
             // Title system data
             public string CurrentTitleId { get; set; } = "";
             public string[] UnlockedTitleIds { get; set; } = new string[0];
+            
+            // Quick slot data
+            public string[] QuickSlotItemIds { get; set; } = new string[9];
+            public int[] QuickSlotQuantities { get; set; } = new int[9];
+            
+            // Player data (legacy support)
+            public object PlayerData { get; set; }
         }
         
         // Save slot metadata (stored separately for quick loading)
@@ -425,6 +432,20 @@ namespace ClawRPG.Scripts.Systems {
             data.X = player?.Position.X ?? 0;
             data.Y = player?.Position.Y ?? 0;
             data.CurrentArea = "forest";
+            
+            // Save quick slot data
+            if (QuickSlotSystem.Instance != null)
+            {
+                var quickSlotData = QuickSlotSystem.Instance.Serialize();
+                if (quickSlotData != null)
+                {
+                    for (int i = 0; i < 9; i++)
+                    {
+                        data.QuickSlotItemIds[i] = quickSlotData.ContainsKey($"slot_{i}_item") ? (string)quickSlotData[$"slot_{i}_item"] : "";
+                        data.QuickSlotQuantities[i] = quickSlotData.ContainsKey($"slot_{i}_qty") ? (int)quickSlotData[$"slot_{i}_qty"] : 0;
+                    }
+                }
+            }
             
             return data;
         }
