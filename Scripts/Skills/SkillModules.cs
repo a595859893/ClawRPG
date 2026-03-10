@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Systems;
 
 namespace ClawRPG.Scripts.Skills {
     /// <summary>
@@ -21,6 +22,9 @@ namespace ClawRPG.Scripts.Skills {
         public int MaxLevel { get; set; } = 5;
         public int RequiredSkillId { get; set; }
         public string IconPath { get; set; } = "";
+        
+        // Elemental type - for elemental reactions
+        public ElementType Element { get; set; } = ElementType.None;
         
         // Dynamic effects list (the core of modular design)
         public List<SkillEffectData> Effects { get; set; } = new();

@@ -230,6 +230,10 @@ namespace ClawRPG.Scripts {
             elementalDamageManager.Name = "ElementalDamageManager";
             AddChild(elementalDamageManager);
             
+            // Initialize elemental skill manager
+            var elementalSkillManager = new Systems.ElementalSkillManager();
+            elementalSkillManager.Initialize();
+            
             // Initialize shop system
             var shopSystem = new ShopSystem();
             shopSystem.Name = "ShopSystem";

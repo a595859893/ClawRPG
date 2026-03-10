@@ -22,7 +22,7 @@ namespace ClawRPG.Scripts.Systems {
         private void Initialize()
         {
             // ===== OFFENSIVE SKILL TREE =====
-            // Lightning Arrow
+            // Lightning Arrow - Thunder element
             AddSkill(new SkillData
             {
                 Id = 1,
@@ -33,13 +33,14 @@ namespace ClawRPG.Scripts.Systems {
                 ManaCost = 10,
                 Cooldown = 3f,
                 LevelRequired = 1,
+                Element = ElementType.Thunder,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Damage, Value = 30 }
                 }
             });
             
-            // Meteor
+            // Meteor - Fire element
             AddSkill(new SkillData
             {
                 Id = 2,
@@ -51,13 +52,14 @@ namespace ClawRPG.Scripts.Systems {
                 Cooldown = 10f,
                 LevelRequired = 3,
                 RequiredSkillId = 1,
+                Element = ElementType.Fire,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Damage, Value = 80, IsAOE = true, AOERadius = 100 }
                 }
             });
             
-            // Holy Strike
+            // Holy Strike - Light element
             AddSkill(new SkillData
             {
                 Id = 3,
@@ -69,6 +71,7 @@ namespace ClawRPG.Scripts.Systems {
                 Cooldown = 4f,
                 LevelRequired = 2,
                 RequiredSkillId = 1,
+                Element = ElementType.Light,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Damage, Value = 40 },
@@ -76,7 +79,7 @@ namespace ClawRPG.Scripts.Systems {
                 }
             });
             
-            // Shadow Arrow
+            // Shadow Arrow - Dark element
             AddSkill(new SkillData
             {
                 Id = 4,
@@ -87,6 +90,7 @@ namespace ClawRPG.Scripts.Systems {
                 ManaCost = 12,
                 Cooldown = 3f,
                 LevelRequired = 2,
+                Element = ElementType.Dark,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Damage, Value = 35 },
@@ -112,7 +116,7 @@ namespace ClawRPG.Scripts.Systems {
                 }
             });
             
-            // Poison Arrow
+            // Poison Arrow - Earth element (poison)
             AddSkill(new SkillData
             {
                 Id = 6,
@@ -123,6 +127,7 @@ namespace ClawRPG.Scripts.Systems {
                 ManaCost = 8,
                 Cooldown = 2f,
                 LevelRequired = 1,
+                Element = ElementType.Earth,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Damage, Value = 15 },
@@ -130,7 +135,7 @@ namespace ClawRPG.Scripts.Systems {
                 }
             });
             
-            // Fire Bomb
+            // Fire Bomb - Fire element
             AddSkill(new SkillData
             {
                 Id = 7,
@@ -142,6 +147,7 @@ namespace ClawRPG.Scripts.Systems {
                 Cooldown = 5f,
                 LevelRequired = 2,
                 RequiredSkillId = 6,
+                Element = ElementType.Fire,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Damage, Value = 30, IsAOE = true, AOERadius = 60 },
@@ -149,7 +155,7 @@ namespace ClawRPG.Scripts.Systems {
                 }
             });
             
-            // Frost Nova
+            // Frost Nova - Ice element
             AddSkill(new SkillData
             {
                 Id = 8,
@@ -161,6 +167,7 @@ namespace ClawRPG.Scripts.Systems {
                 Cooldown = 8f,
                 LevelRequired = 3,
                 RequiredSkillId = 7,
+                Element = ElementType.Ice,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Damage, Value = 25, IsAOE = true, AOERadius = 120 },
@@ -168,7 +175,7 @@ namespace ClawRPG.Scripts.Systems {
                 }
             });
             
-            // Shadow Spike
+            // Shadow Spike - Dark element
             AddSkill(new SkillData
             {
                 Id = 9,
@@ -179,6 +186,7 @@ namespace ClawRPG.Scripts.Systems {
                 ManaCost = 18,
                 Cooldown = 5f,
                 LevelRequired = 3,
+                Element = ElementType.Dark,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Damage, Value = 45 },
@@ -186,7 +194,7 @@ namespace ClawRPG.Scripts.Systems {
                 }
             });
             
-            // Chain Lightning
+            // Chain Lightning - Thunder element
             AddSkill(new SkillData
             {
                 Id = 10,
@@ -198,6 +206,7 @@ namespace ClawRPG.Scripts.Systems {
                 Cooldown = 7f,
                 LevelRequired = 4,
                 RequiredSkillId = 9,
+                Element = ElementType.Thunder,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Damage, Value = 35, IsAOE = true, AOERadius = 150 },
@@ -206,7 +215,7 @@ namespace ClawRPG.Scripts.Systems {
             });
             
             // ===== MAGIC SKILL TREE - HEALING =====
-            // Heal
+            // Heal - Light element (holy magic)
             AddSkill(new SkillData
             {
                 Id = 101,
@@ -217,6 +226,7 @@ namespace ClawRPG.Scripts.Systems {
                 ManaCost = 15,
                 Cooldown = 5f,
                 LevelRequired = 1,
+                Element = ElementType.Light,
                 Effects = new List<SkillEffectData>
                 {
                     new SkillEffectData { EffectType = SkillEffectType.Heal, Value = 40 }
