@@ -40,6 +40,17 @@
 [ext_resource type="Script" path="res://Scripts/UI/WeatherUI.cs" id="37_weather_ui"]
 [ext_resource type="Script" path="res://Scripts/UI/AutoBookmarkUI.cs" id="38_auto_bookmark_ui"]
 [ext_resource type="Script" path="res://Scripts/UI/PlayerProfileUI.cs" id="39_profile_ui"]
+[ext_resource type="Script" path="res://Scripts/Systems/SoundEffectSystem.cs" id="40_sound_effect"]
+[ext_resource type="Script" path="res://Scripts/UI/StoryUI.cs" id="41_story_ui"]
+[ext_resource type="Script" path="res://Scripts/Systems/StorySystem.cs" id="42_story_system"]
+[ext_resource type="Script" path="res://Scripts/UI/EquipmentSetUI.cs" id="43_equipment_set_ui"]
+[ext_resource type="Script" path="res://Scripts/Items/EquipmentSetManager.cs" id="44_equipment_set_mgr"]
+[ext_resource type="Script" path="res://Scripts/UI/PotionUI.cs" id="45_potion_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/RegionUI.cs" id="46_region_ui"]
+[ext_resource type="Script" path="res://Scripts/Systems/RegionManager.cs" id="47_region_mgr"]
+[ext_resource type="Script" path="res://Scripts/UI/TitleNotification.cs" id="48_title_notify"]
+[ext_resource type="Script" path="res://Scripts/Systems/TitleSystem.cs" id="49_title_system"]
+[ext_resource type="Script" path="res://Scripts/Systems/Pets/PetCombatAI.cs" id="50_pet_combat_ai"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -366,3 +377,71 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("39_profile_ui")
+
+[node name="SoundEffectSystem" type="Node" parent="."]
+script = ExtResource("40_sound_effect")
+
+[node name="StorySystem" type="Node" parent="."]
+script = ExtResource("42_story_system")
+
+[node name="StoryUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("41_story_ui")
+
+[node name="EquipmentSetManager" type="Node" parent="."]
+script = ExtResource("44_equipment_set_mgr")
+
+[node name="EquipmentSetUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("43_equipment_set_ui")
+
+[node name="PotionUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("45_potion_ui")
+
+[node name="RegionManager" type="Node" parent="."]
+script = ExtResource("47_region_mgr")
+
+[node name="RegionUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("46_region_ui")
+
+[node name="TitleSystem" type="Node" parent="."]
+script = ExtResource("49_title_system")
+
+[node name="TitleNotification" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("48_title_notify")
+
+[node name="PetCombatAI" type="Node" parent="."]
+script = ExtResource("50_pet_combat_ai")
