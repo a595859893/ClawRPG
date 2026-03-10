@@ -200,6 +200,12 @@ namespace ClawRPG.Scripts {
                 ToggleQuestTracker();
             }
             
+            // Handle quest guide toggle (G key)
+            if (Input.IsActionJustPressed("quest_guide"))
+            {
+                ToggleQuestGuide();
+            }
+            
             // Handle pause
             if (Input.IsActionJustPressed("ui_cancel"))
             {
@@ -222,6 +228,15 @@ namespace ClawRPG.Scripts {
             if (questTracker != null)
             {
                 questTracker.Toggle();
+            }
+        }
+        
+        private void ToggleQuestGuide()
+        {
+            var questGuide = GetNodeOrNull<UI.QuestGuideArrow>("CanvasLayer/QuestGuideArrow");
+            if (questGuide != null)
+            {
+                questGuide.Toggle();
             }
         }
         

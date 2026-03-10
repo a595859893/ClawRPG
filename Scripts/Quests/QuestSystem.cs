@@ -401,5 +401,24 @@ namespace ClawRPG.Scripts.Quests {
             }
             return result;
         }
+        
+        /// <summary>
+        /// 获取当前主线任务
+        /// </summary>
+        public Quest GetCurrentMainQuest()
+        {
+            foreach (var kvp in _questStatus)
+            {
+                if (kvp.Value == QuestStatus.Active)
+                {
+                    var quest = QuestDatabase.Instance.GetQuest(kvp.Key);
+                    if (quest != null && quest.QuestType == QuestType.Main)
+                    {
+                        return quest;
+                    }
+                }
+            }
+            return null;
+        }
     }
 }

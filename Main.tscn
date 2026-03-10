@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=17 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_main"]
 [ext_resource type="Script" path="res://Scripts/UI/PlayerHUD.cs" id="2_hud"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/TitleScreenUI.cs" id="13_title"]
 [ext_resource type="Script" path="res://Scripts/UI/BulletinBoardUI.cs" id="14_bulletin"]
 [ext_resource type="Script" path="res://Scripts/UI/QuestTrackerUI.cs" id="15_questtracker"]
+[ext_resource type="Script" path="res://Scripts/UI/QuestGuideArrow.cs" id="16_questguide"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -158,3 +159,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("15_questtracker")
+
+[node name="QuestGuideArrow" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("16_questguide")
