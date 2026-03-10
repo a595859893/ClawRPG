@@ -47,6 +47,8 @@ namespace ClawRPG.Scripts {
         
         public GameState GetGameState() => _currentGameState;
         
+        public Player GetPlayer() => _player;
+        
         public override void _Ready()
         {
             GD.Print("=== ClawRPG Starting ===");
@@ -154,6 +156,11 @@ namespace ClawRPG.Scripts {
             var bossAbilityVisualizer = new Combat.BossAbilityVisualizer();
             bossAbilityVisualizer.Name = "BossAbilityVisualizer";
             AddChild(bossAbilityVisualizer);
+            
+            // Initialize counter attack VFX system
+            var counterAttackVFX = new Combat.CounterAttackVFX();
+            counterAttackVFX.Name = "CounterAttackVFX";
+            AddChild(counterAttackVFX);
             
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();

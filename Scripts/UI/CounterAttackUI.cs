@@ -209,6 +209,18 @@ namespace ClawRPG.Scripts.UI
         {
             _statusLabel.Text = $"反击成功! 造成 {(int)damage} 伤害";
             _statusLabel.Modulate = new Color(0f, 1f, 0f);
+            
+            // Trigger VFX
+            if (Combat.CounterAttackVFX.Instance != null)
+            {
+                var main = GetTree().Root.GetNode<Main>("Main");
+                if (main != null && main.GetPlayer() != null)
+                {
+                    var player = main.GetPlayer();
+                    var vfxType = Combat.CounterAttackVFX.Instance.GetVFXForCounterType(type);
+                    Combat.CounterAttackVFX.Instance.TriggerCounterVFX(vfxType, player.GlobalPosition, true, player.Rotation);
+                }
+            }
         }
         
         public override void _Process(double delta)
