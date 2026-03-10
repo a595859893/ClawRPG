@@ -63,7 +63,20 @@ public class MultiplayerManager : Node
     private float _syncInterval = 0.05f;  // 20Hz 同步频率
     private float _syncTimer = 0f;
 
+    // 踢人功能
+    private HashSet<int> _kickedPlayers = new HashSet<int>();
+
+    // 准备状态系统
+    private bool _isReady = false;
+    private Dictionary<int, bool> _playerReadyStates = new Dictionary<int, bool>();
+
+    // 房间密码
+    private string _roomPassword = "";
+    private bool _needsPassword = false;
+
     public bool IsInRoom => !string.IsNullOrEmpty(_currentRoomId);
+    public bool IsReady => _isReady;
+    public bool NeedsPassword => _needsPassword;
     public bool IsHost => _isHost;
     public int LocalPlayerId => _localPlayerId;
     public string PlayerName
@@ -200,6 +213,137 @@ public class MultiplayerManager : Node
     }
 
     /// <summary>
+    /// 踢出玩家（仅房主可用）
+    /// </summary>
+    public void KickPlayer(int playerId)
+    {
+        if (!_isHost || !IsInRoom) return;
+
+        var message = new Dictionary<string, object>
+        {
+            { "type", "kick_player" },
+            { "room_id", _currentRoomId },
+            { "target_player_id", playerId },
+            { "kicker_id", _localPlayerId }
+        };
+        
+        NetworkClient.Instance.SendJson(message);
+        _kickedPlayers.Add(playerId);
+    }
+
+    /// <summary>
+    /// 设置准备状态
+    /// </summary>
+    public void SetReady(bool ready)
+    {
+        if (!IsInRoom) return;
+
+        _isReady = ready;
+        _playerReadyStates[_localPlayerId] = ready;
+
+        var message = new Dictionary<string, object>
+        {
+            { "type", "player_ready" },
+            { "room_id", _currentRoomId },
+            { "player_id", _localPlayerId },
+            { "ready", ready }
+        };
+        
+        NetworkClient.Instance.SendJson(message);
+    }
+
+    /// <summary>
+    /// 切换准备状态
+    /// </summary>
+    public void ToggleReady()
+    {
+        SetReady(!_isReady);
+    }
+
+    /// <summary>
+    /// 创建密码房间
+    /// </summary>
+    public void CreateRoomWithPassword(string roomName, string password, int maxPlayers = 4)
+    {
+        if (!NetworkClient.Instance.IsConnected)
+        {
+            OnConnectionFailed?.Invoke("Not connected to server");
+            return;
+        }
+
+        _isHost = true;
+        _roomPassword = password;
+        var message = new Dictionary<string, object>
+        {
+            { "type", "create_room" },
+            { "room_name", roomName },
+            { "password", password },
+            { "max_players", maxPlayers },
+            { "player_name", _playerName }
+        };
+        
+        NetworkClient.Instance.SendJson(message);
+    }
+
+    /// <summary>
+    /// 加入密码房间
+    /// </summary>
+    public void JoinRoomWithPassword(string roomId, string password)
+    {
+        if (!NetworkClient.Instance.IsConnected)
+        {
+            OnConnectionFailed?.Invoke("Not connected to server");
+            return;
+        }
+
+        _isHost = false;
+        _roomPassword = password;
+        var message = new Dictionary<string, object>
+        {
+            { "type", "join_room" },
+            { "room_id", roomId },
+            { "password", password },
+            { "player_name", _playerName }
+        };
+        
+        NetworkClient.Instance.SendJson(message);
+    }
+
+    /// <summary>
+    /// 检查是否所有玩家都准备好（房主用）
+    /// </summary>
+    public bool AreAllPlayersReady()
+    {
+        if (_networkPlayers.Count == 0) return _isReady;
+        
+        lock (_playersLock)
+        {
+            foreach (var kvp in _playerReadyStates)
+            {
+                if (!kvp.Value) return false;
+            }
+            return _isReady;
+        }
+    }
+
+    /// <summary>
+    /// 获取房间信息
+    /// </summary>
+    public RoomInfo GetRoomInfo()
+    {
+        if (!IsInRoom) return null;
+
+        return new RoomInfo
+        {
+            RoomId = _currentRoomId,
+            RoomName = "", // 需要服务器返回
+            MaxPlayers = 4,
+            CurrentPlayers = _networkPlayers.Count + 1,
+            IsStarted = false
+        };
+    }
+
+    /// <summary>
     /// 同步本地玩家状态
     /// </summary>
     private void SyncLocalPlayerState()
@@ -282,6 +426,15 @@ public class MultiplayerManager : Node
                     break;
                 case "error":
                     HandleError(data);
+                    break;
+                case "player_kicked":
+                    HandlePlayerKicked(data);
+                    break;
+                case "player_ready_update":
+                    HandlePlayerReadyUpdate(data);
+                    break;
+                case "room_locked":
+                    HandleRoomLocked(data);
                     break;
             }
         }
@@ -406,6 +559,54 @@ public class MultiplayerManager : Node
         string error = data.ContainsKey("message") ? data["message"].ToString() : "Unknown error";
         GD.PrintErr($"[MultiplayerManager] Server error: {error}");
         OnConnectionFailed?.Invoke(error);
+    }
+
+    private void HandlePlayerKicked(Dictionary<string, object> data)
+    {
+        int kickedId = data.ContainsKey("player_id") ? Convert.ToInt32(data["player_id"]) : -1;
+        
+        if (kickedId == _localPlayerId)
+        {
+            // 被踢出房间
+            GD.Print("[MultiplayerManager] You were kicked from the room");
+            _currentRoomId = "";
+            _isHost = false;
+            _localPlayerId = -1;
+            lock (_playersLock)
+            {
+                _networkPlayers.Clear();
+            }
+            OnRoomLeft?.Invoke();
+        }
+        else
+        {
+            // 其他玩家被踢
+            lock (_playersLock)
+            {
+                _networkPlayers.Remove(kickedId);
+            }
+            OnPlayerLeft?.Invoke(kickedId);
+            GD.Print($"[MultiplayerManager] Player {kickedId} was kicked");
+        }
+    }
+
+    private void HandlePlayerReadyUpdate(Dictionary<string, object> data)
+    {
+        int playerId = data.ContainsKey("player_id") ? Convert.ToInt32(data["player_id"]) : -1;
+        bool isReady = data.ContainsKey("ready") && Convert.ToBoolean(data["ready"]);
+        
+        if (playerId > 0)
+        {
+            _playerReadyStates[playerId] = isReady;
+            GD.Print($"[MultiplayerManager] Player {playerId} ready: {isReady}");
+        }
+    }
+
+    private void HandleRoomLocked(Dictionary<string, object> data)
+    {
+        string reason = data.ContainsKey("reason") ? data["reason"].ToString() : "Unknown reason";
+        GD.Print($"[MultiplayerManager] Room locked: {reason}");
+        OnConnectionFailed?.Invoke(reason);
     }
 
     private void OnError(string error)
