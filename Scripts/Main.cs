@@ -92,6 +92,10 @@ namespace ClawRPG.Scripts {
             enchantmentDb.Name = "EnchantmentDatabase";
             AddChild(enchantmentDb);
             
+            // Initialize bounty system
+            var bountyManager = BountyManager.Instance;
+            bountyManager.Initialize();
+            
             // Spawn player
             SpawnPlayer();
             
@@ -317,6 +321,12 @@ namespace ClawRPG.Scripts {
                 ToggleEnchantmentUI();
             }
             
+            // Handle bounty UI toggle (B key)
+            if (Input.IsActionJustPressed("bounty"))
+            {
+                ToggleBountyUI();
+            }
+            
             // Handle equipment visuals UI toggle (V key)
             if (Input.IsActionJustPressed("equip_visuals"))
             {
@@ -451,6 +461,15 @@ namespace ClawRPG.Scripts {
             if (enchantmentUI != null)
             {
                 enchantmentUI.Toggle();
+            }
+        }
+        
+        private void ToggleBountyUI()
+        {
+            var bountyUI = GetNodeOrNull<UI.BountyUI>("CanvasLayer/BountyUI");
+            if (bountyUI != null)
+            {
+                bountyUI.Toggle();
             }
         }
         
@@ -727,6 +746,12 @@ namespace ClawRPG.Scripts {
                 if (saveData.EnchantmentData != null)
                 {
                     ClawRPG.Scripts.Systems.Enchantment.EnchantmentSystem.Instance.Deserialize(saveData.EnchantmentData);
+                }
+                
+                // 加载赏金数据
+                if (saveData.BountyData != null)
+                {
+                    BountyManager.Instance.Deserialize(saveData.BountyData);
                 }
                 
                 // 加载装备外观数据

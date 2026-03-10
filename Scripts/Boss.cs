@@ -242,6 +242,9 @@ namespace ClawRPG.Scripts.Characters {
             OnEnrage = null;
             OnSpecialAbility = null;
             
+            // Track boss bounty progress
+            BountyManager.Instance.UpdateBossKillProgress(BossId);
+            
             base.Die();
         }
     }

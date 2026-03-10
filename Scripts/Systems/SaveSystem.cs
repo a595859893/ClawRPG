@@ -120,6 +120,9 @@ namespace ClawRPG.Scripts.Systems {
             // Enchantment system data
             public Dictionary<string, object> EnchantmentData { get; set; } = new();
             
+            // Bounty system data
+            public Dictionary<string, object> BountyData { get; set; } = new();
+            
             // Equipment visuals data
             public Dictionary<string, string> EquipmentVisualsData { get; set; } = new();
             
@@ -493,6 +496,9 @@ namespace ClawRPG.Scripts.Systems {
             
             // Save enchantment data
             data.EnchantmentData = ClawRPG.Scripts.Systems.Enchantment.EnchantmentSystem.Instance.Serialize();
+            
+            // Save bounty data
+            data.BountyData = BountyManager.Instance.Serialize();
             
             // Save equipment visuals data
             var equipVisuals = GetNodeOrNull<UI.EquipmentVisuals>("EquipmentVisuals");

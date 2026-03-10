@@ -138,6 +138,9 @@ namespace ClawRPG.Scripts.Characters {
             // Track kill achievement
             AchievementManager.Instance.TrackKill();
             
+            // Track bounty progress
+            BountyManager.Instance.UpdateKillProgress(EnemyTypeId);
+            
             // Track statistics
             StatisticsManager.Instance.RecordKill();
             
