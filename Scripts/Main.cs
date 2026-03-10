@@ -154,6 +154,11 @@ namespace ClawRPG.Scripts {
             aoeIndicatorManager.Name = "AOEIndicatorManager";
             AddChild(aoeIndicatorManager);
 
+            // Initialize animation effect system
+            var animationEffectManager = new Systems.AnimationEffectManager();
+            animationEffectManager.Name = "AnimationEffectManager";
+            AddChild(animationEffectManager);
+
             // Initialize dialogue system
             var dialogueManager = Quests.DialogueManager.Instance;
             dialogueManager.Name = "DialogueManager";

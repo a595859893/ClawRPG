@@ -132,6 +132,13 @@ namespace ClawRPG.Scripts.Characters {
             _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
             _sprite = GetNode<Sprite2D>("Sprite2D");
             
+            // Initialize AnimationEffectManager for attack/hit effects
+            if (GetTree().CurrentScene != null)
+            {
+                var effectManager = new AnimationEffectManager();
+                GetTree().CurrentScene.AddChild(effectManager);
+            }
+            
             // Initialize hit flash shader material
             var shader = GD.Load<Shader>("res://Shaders/player_hit_flash.gdshader");
             if (shader != null)
@@ -378,6 +385,9 @@ namespace ClawRPG.Scripts.Characters {
             IsAttacking = true;
             _attackTimer = AttackSpeed;
             
+            // Play attack animation effect
+            AnimationEffectManager.Instance?.PlayAttackAnimation(GlobalPosition, 0.3f);
+            
             // Calculate damage with critical
             float damage = AttackDamage;
             bool isCrit = GD.Randf() < CriticalChance;
@@ -397,6 +407,9 @@ namespace ClawRPG.Scripts.Characters {
             foreach (var enemy in enemies)
             {
                 enemy.TakeDamage((int)damage, isCrit, AttackDirection);
+                
+                // Play hit effect for each enemy hit
+                AnimationEffectManager.Instance?.PlayHitEffect(enemy.GlobalPosition, isCrit, 1.0f);
             }
             
             // Register combo hit
@@ -545,6 +558,8 @@ namespace ClawRPG.Scripts.Characters {
                 ShowDamageNumber((int)finalDamage, isCrit);
                 // Trigger hit flash effect
                 TriggerHitFlash();
+                // Play hit animation effect
+                AnimationEffectManager.Instance?.PlayHitAnimation(fromDirection);
             }
             
             GD.Print("Player took " + finalDamage + " damage. HP: " + CurrentHealth + "/" + MaxHealth);
