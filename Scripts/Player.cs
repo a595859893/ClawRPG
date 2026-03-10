@@ -126,6 +126,9 @@ namespace ClawRPG.Scripts.Characters {
             _attackArea = GetNode<Area2D>("AttackArea");
             _hitbox = GetNode<CollisionShape2D>("Hitbox/CollisionShape2D");
             
+            // 添加头顶称号显示
+            AddChild(new UI.PlayerTitleDisplay());
+            
             GD.Print("Player initialized - HP: " + CurrentHealth + "/" + MaxHealth);
         }
         

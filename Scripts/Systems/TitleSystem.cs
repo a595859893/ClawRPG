@@ -161,6 +161,7 @@ namespace ClawRPG.Scripts.Systems {
         public void SetCurrentTitle(string titleId) {
             if (titleDatabase.ContainsKey(titleId) && titleDatabase[titleId].IsUnlocked) {
                 CurrentTitleId = titleId;
+                OnCurrentTitleChanged?.Invoke(titleId);
             }
         }
         
@@ -244,6 +245,19 @@ namespace ClawRPG.Scripts.Systems {
         
         // 称号解锁事件
         public event Action<Title> OnTitleUnlocked;
+        
+        // 当前称号变更事件
+        public event Action<string> OnCurrentTitleChanged;
+        
+        /// <summary>
+        /// 获取当前显示的称号对象
+        /// </summary>
+        public Title GetCurrentTitle() {
+            if (!string.IsNullOrEmpty(CurrentTitleId) && titleDatabase.TryGetValue(CurrentTitleId, out var title)) {
+                return title;
+            }
+            return null;
+        }
         
         /// <summary>
         /// 序列化存档数据
