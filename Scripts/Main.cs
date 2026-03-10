@@ -129,6 +129,11 @@ namespace ClawRPG.Scripts {
             storyManager.Name = "StoryManager";
             AddChild(storyManager);
             
+            // Initialize region manager
+            var regionManager = new RegionManager();
+            regionManager.Name = "RegionManager";
+            AddChild(regionManager);
+            
             // Initialize sound effect system
             var soundEffectSystem = new SoundEffectSystem();
             soundEffectSystem.Name = "SoundEffectSystem";

@@ -70,6 +70,8 @@ namespace ClawRPG.Scripts.UI {
             AddHotkey("冲锋", "E");
             AddHotkey("装备强化", "X");
             AddHotkey("自动药水设置", "Shift+X");
+            AddHotkey("药水管理", "P");
+            AddHotkey("装备套装", "Shift+E");
             AddHotkey("附魔系统", "E");
             AddHotkey("赏金任务", "B");
             AddHotkey("装备外观", "V");
