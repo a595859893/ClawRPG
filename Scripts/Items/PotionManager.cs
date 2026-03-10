@@ -157,7 +157,7 @@ namespace ClawRPG.Scripts.Items
                 var playerScript = player as Characters.Player;
                 if (playerScript != null)
                 {
-                    playerScript.Heal(potion.HealthRestore);
+                    playerScript.Heal((int)potion.HealthRestore);
                 }
             }
 
@@ -166,7 +166,7 @@ namespace ClawRPG.Scripts.Items
                 var playerScript = player as Characters.Player;
                 if (playerScript != null)
                 {
-                    playerScript.RestoreMana(potion.ManaRestore);
+                    playerScript.RestoreMana((int)potion.ManaRestore);
                 }
             }
 
@@ -245,12 +245,12 @@ namespace ClawRPG.Scripts.Items
 
             if (potion.HealthRegen > 0)
             {
-                playerScript.Heal(potion.HealthRegen * delta);
+                playerScript.Heal((int)(potion.HealthRegen * delta));
             }
 
             if (potion.ManaRegen > 0)
             {
-                playerScript.RestoreMana(potion.ManaRegen * delta);
+                playerScript.RestoreMana((int)(potion.ManaRegen * delta));
             }
         }
 

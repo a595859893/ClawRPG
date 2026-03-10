@@ -5,6 +5,8 @@ using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Enhancement;
+using ClawRPG.Scripts.UI;
+using ClawRPG.Scripts.Items;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -149,6 +151,11 @@ namespace ClawRPG.Scripts {
             expBar.MaxValue = 100;
             ui.AddChild(expBar);
             
+            // Potion UI
+            var potionUI = new PotionUI();
+            potionUI.Name = "PotionUI";
+            ui.AddChild(potionUI);
+            
             GD.Print("UI initialized");
         }
         
@@ -217,6 +224,12 @@ namespace ClawRPG.Scripts {
             // Update UI
             UpdatePlayerUI();
             
+            // Update potion effects
+            if (_player != null)
+            {
+                PotionManager.Instance.UpdatePotionEffects(dt, _player);
+            }
+            
             // Handle runes UI toggle (U key)
             if (Input.IsActionJustPressed("runes"))
             {
@@ -269,6 +282,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("enhancement"))
             {
                 ToggleEnhancementUI();
+            }
+            
+            // Handle potion UI toggle (P key)
+            if (Input.IsActionJustPressed("potion"))
+            {
+                TogglePotionUI();
             }
             
             // Handle special attacks

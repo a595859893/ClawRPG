@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace ClawRPG.Scripts.UI
 {
     /// <summary>
-    /// 药水UI界面
+    /// 药水UI界面 - P键打开
     /// </summary>
     public partial class PotionUI : Control
     {
@@ -17,16 +17,12 @@ namespace ClawRPG.Scripts.UI
         
         // 筛选按钮
         private HBoxContainer _filterButtons;
-        private Button _btnAll;
-        private Button _btnHealth;
-        private Button _btnMana;
-        private Button _btnBuffs;
         
         // 当前筛选类型
         private string _currentFilter = "all";
         
         // 当前选中的药水
-        private Potion _selectedPotion;
+        private Items.Potion _selectedPotion;
         private Label _selectedPotionName;
         private Label _selectedPotionDesc;
         private Label _selectedPotionEffect;
@@ -36,7 +32,7 @@ namespace ClawRPG.Scripts.UI
         // 玩家引用
         private Node _player;
         
-        // 资源
+        // 资源颜色
         private Color _commonColor = new Color(0.7f, 0.7f, 0.7f);
         private Color _uncommonColor = new Color(0.2f, 0.8f, 0.2f);
         private Color _rareColor = new Color(0.2f, 0.5f, 1.0f);
@@ -49,9 +45,9 @@ namespace ClawRPG.Scripts.UI
             Visible = false;
             
             // 连接信号
-            PotionManager.Instance.OnPotionAdded += OnPotionUpdated;
-            PotionManager.Instance.OnPotionRemoved += OnPotionUpdated;
-            PotionManager.Instance.OnPotionUsed += OnPotionUsed;
+            Items.PotionManager.Instance.OnPotionAdded += OnPotionUpdated;
+            Items.PotionManager.Instance.OnPotionRemoved += OnPotionUpdated;
+            Items.PotionManager.Instance.OnPotionUsed += OnPotionUsed;
         }
 
         private void SetupUI()
@@ -90,10 +86,10 @@ namespace ClawRPG.Scripts.UI
             _filterButtons.Spacing = 10;
             _container.AddChild(_filterButtons);
             
-            _btnAll = CreateFilterButton("全部", "all");
-            _btnHealth = CreateFilterButton("生命", "health");
-            _btnMana = CreateFilterButton("法力", "mana");
-            _btnBuffs = CreateFilterButton("增益", "buffs");
+            CreateFilterButton("全部", "all");
+            CreateFilterButton("生命", "health");
+            CreateFilterButton("法力", "mana");
+            CreateFilterButton("增益", "buffs");
             
             // 药水列表
             var scrollContainer = new ScrollContainer();
@@ -165,14 +161,13 @@ namespace ClawRPG.Scripts.UI
             RefreshPotionList();
         }
 
-        private Button CreateFilterButton(string text, string filter)
+        private void CreateFilterButton(string text, string filter)
         {
             var btn = new Button();
             btn.Text = text;
             btn.Size = new Vector2(60, 30);
             btn.Pressed += () => OnFilterChanged(filter);
             _filterButtons.AddChild(btn);
-            return btn;
         }
 
         private void OnFilterChanged(string filter)
@@ -189,20 +184,20 @@ namespace ClawRPG.Scripts.UI
                 child.QueueFree();
             }
 
-            List<PotionInstance> filteredPotions = new List<PotionInstance>();
+            List<Items.PotionInstance> filteredPotions = new List<Items.PotionInstance>();
             
             // 根据筛选类型过滤
-            foreach (var potionInstance in PotionManager.Instance.OwnedPotions)
+            foreach (var potionInstance in Items.PotionManager.Instance.OwnedPotions)
             {
                 if (potionInstance.Quantity <= 0) continue;
                 
-                var potion = PotionDatabase.Instance.GetPotion(potionInstance.PotionId);
+                var potion = Items.PotionDatabase.Instance.GetPotion(potionInstance.PotionId);
                 if (potion == null) continue;
                 
                 bool shouldAdd = _currentFilter switch
                 {
-                    "health" => potion.Type == PotionType.Health,
-                    "mana" => potion.Type == PotionType.Mana || potion.Type == PotionType.Stamina,
+                    "health" => potion.Type == Items.PotionType.Health,
+                    "mana" => potion.Type == Items.PotionType.Mana || potion.Type == Items.PotionType.Stamina,
                     "buffs" => potion.Duration > 0,
                     _ => true
                 };
@@ -214,7 +209,7 @@ namespace ClawRPG.Scripts.UI
             // 显示药水
             foreach (var potionInstance in filteredPotions)
             {
-                var potion = PotionDatabase.Instance.GetPotion(potionInstance.PotionId);
+                var potion = Items.PotionDatabase.Instance.GetPotion(potionInstance.PotionId);
                 if (potion == null) continue;
 
                 var itemContainer = new HBoxContainer();
@@ -226,11 +221,11 @@ namespace ClawRPG.Scripts.UI
                 
                 Color iconColor = potion.Rarity switch
                 {
-                    PotionRarity.Common => _commonColor,
-                    PotionRarity.Uncommon => _uncommonColor,
-                    PotionRarity.Rare => _rareColor,
-                    PotionRarity.Epic => _epicColor,
-                    PotionRarity.Legendary => _legendaryColor,
+                    Items.PotionRarity.Common => _commonColor,
+                    Items.PotionRarity.Uncommon => _uncommonColor,
+                    Items.PotionRarity.Rare => _rareColor,
+                    Items.PotionRarity.Epic => _epicColor,
+                    Items.PotionRarity.Legendary => _legendaryColor,
                     _ => Colors.White
                 };
                 icon.Color = iconColor;
@@ -263,7 +258,7 @@ namespace ClawRPG.Scripts.UI
             }
         }
 
-        private void SelectPotion(Potion potion)
+        private void SelectPotion(Items.Potion potion)
         {
             _selectedPotion = potion;
             
@@ -289,37 +284,37 @@ namespace ClawRPG.Scripts.UI
             _selectedPotionEffect.Text = effects;
             
             // 检查是否有药水可用
-            _useButton.Disabled = !PotionManager.Instance.HasPotion(potion.Id);
+            _useButton.Disabled = !Items.PotionManager.Instance.HasPotion(potion.Id);
             
             // 更新自动使用状态
-            _autoUseCheck.ButtonPressed = PotionManager.Instance.GetPotionQuantity(potion.Id) > 0 && 
-                PotionManager.Instance.OwnedPotions.Exists(p => p.PotionId == potion.Id && p.IsAutoUse);
+            _autoUseCheck.ButtonPressed = Items.PotionManager.Instance.GetPotionQuantity(potion.Id) > 0 && 
+                Items.PotionManager.Instance.OwnedPotions.Exists(p => p.PotionId == potion.Id && p.IsAutoUse);
         }
 
         private void OnUseButtonPressed()
         {
             if (_selectedPotion == null || _player == null) return;
             
-            if (PotionManager.Instance.UsePotion(_selectedPotion.Id, _player))
+            if (Items.PotionManager.Instance.UsePotion(_selectedPotion.Id, _player))
             {
                 RefreshPotionList();
-                SelectPotion(_selectedPotion); // 刷新状态
+                SelectPotion(_selectedPotion);
             }
         }
 
         private void OnAutoUseToggled(bool toggled)
         {
             if (_selectedPotion == null) return;
-            PotionManager.Instance.SetAutoUse(_selectedPotion.Id, toggled);
+            Items.PotionManager.Instance.SetAutoUse(_selectedPotion.Id, toggled);
         }
 
-        private void OnPotionUpdated(PotionInstance potion)
+        private void OnPotionUpdated(Items.PotionInstance potion)
         {
             RefreshPotionList();
             UpdateActiveEffects();
         }
 
-        private void OnPotionUsed(Potion potion)
+        private void OnPotionUsed(Items.Potion potion)
         {
             RefreshPotionList();
             UpdateActiveEffects();
@@ -327,7 +322,7 @@ namespace ClawRPG.Scripts.UI
 
         private void UpdateActiveEffects()
         {
-            var activeBuffs = PotionManager.Instance.GetActiveBuffs();
+            var activeBuffs = Items.PotionManager.Instance.GetActiveBuffs();
             if (activeBuffs.Count == 0)
             {
                 _infoLabel.Text = "无激活效果";
@@ -337,7 +332,7 @@ namespace ClawRPG.Scripts.UI
             string text = "";
             foreach (var buff in activeBuffs)
             {
-                float remaining = PotionManager.Instance.GetBuffRemainingTime(buff.Id);
+                float remaining = Items.PotionManager.Instance.GetBuffRemainingTime(buff.Id);
                 text += $"{buff.Name}: {remaining:F1}秒 | ";
             }
             _infoLabel.Text = text;
@@ -354,7 +349,7 @@ namespace ClawRPG.Scripts.UI
                 // 获取玩家节点
                 if (_player == null)
                 {
-                    _player = GetTree().GetFirstNodeInGroup("Player");
+                    _player = GetTree().GetFirstNodeInGroup("player");
                 }
             }
         }
@@ -364,18 +359,6 @@ namespace ClawRPG.Scripts.UI
             if (Visible)
             {
                 UpdateActiveEffects();
-            }
-        }
-
-        public override void _Input(InputEvent evt)
-        {
-            if (evt is InputEventKey key && key.Pressed)
-            {
-                // 按P键打开药水UI
-                if (key.Keycode == Key.P)
-                {
-                    ToggleUI();
-                }
             }
         }
     }

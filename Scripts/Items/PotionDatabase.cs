@@ -378,29 +378,5 @@ namespace ClawRPG.Scripts.Items
             }
             return result;
         }
-
-        public List<Potion> GetConsumablePotions()
-        {
-            List<Potion> result = new List<Potion>();
-            foreach (var potion in _potions.Values)
-            {
-                // 直接恢复的的药水
-                if (potion.HealthRestore > 0 || potion.ManaRestore > 0 || potion.Duration == 0)
-                    result.Add(potion);
-            }
-            return result;
-        }
-
-        public List<Potion> GetBuffPotions()
-        {
-            List<Potion> result = new List<Potion>();
-            foreach (var potion in _potions.Values)
-            {
-                // 有持续效果的药水
-                if (potion.Duration > 0)
-                    result.Add(potion);
-            }
-            return result;
-        }
     }
 }
