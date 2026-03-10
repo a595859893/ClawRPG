@@ -194,6 +194,12 @@ namespace ClawRPG.Scripts {
                 ToggleRunesUI();
             }
             
+            // Handle quest tracker toggle (T key)
+            if (Input.IsActionJustPressed("quest_tracker"))
+            {
+                ToggleQuestTracker();
+            }
+            
             // Handle pause
             if (Input.IsActionJustPressed("ui_cancel"))
             {
@@ -207,6 +213,15 @@ namespace ClawRPG.Scripts {
             if (runeUI != null)
             {
                 runeUI.Toggle();
+            }
+        }
+        
+        private void ToggleQuestTracker()
+        {
+            var questTracker = GetNodeOrNull<UI.QuestTrackerUI>("CanvasLayer/QuestTrackerUI");
+            if (questTracker != null)
+            {
+                questTracker.Toggle();
             }
         }
         

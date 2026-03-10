@@ -276,6 +276,12 @@ namespace ClawRPG.Scripts.Quests {
     {
         private Dictionary<int, QuestStatus> _questStatus = new();
         
+        // Signals for UI updates
+        public static event Action<Quest> OnQuestAccepted;
+        public static event Action<Quest> OnQuestCompleted;
+        public static event Action<Quest, QuestObjective> OnQuestObjectiveUpdated;
+        public static event Action<Quest> OnQuestTurnedIn;
+        
         public QuestStatus GetQuestStatus(int questId)
         {
             return _questStatus.ContainsKey(questId) ? _questStatus[questId] : QuestStatus.NotStarted;
@@ -298,6 +304,9 @@ namespace ClawRPG.Scripts.Quests {
             
             _questStatus[questId] = QuestStatus.Active;
             GD.Print("Started quest: " + quest.Name);
+            
+            // Trigger signal
+            OnQuestAccepted?.Invoke(quest);
         }
         
         public void UpdateObjective(string targetId, int amount = 1)
@@ -313,6 +322,9 @@ namespace ClawRPG.Scripts.Quests {
                     {
                         obj.CurrentAmount += amount;
                         GD.Print("Objective progress: " + obj.Description + " (" + obj.CurrentAmount + "/" + obj.RequiredAmount + ")");
+                        
+                        // Trigger signal
+                        OnQuestObjectiveUpdated?.Invoke(quest, obj);
                         
                         if (obj.IsComplete)
                         {
@@ -371,6 +383,10 @@ namespace ClawRPG.Scripts.Quests {
             
             _questStatus[questId] = QuestStatus.TurnedIn;
             GD.Print("Quest completed: " + quest.Name + "! Rewards: " + quest.ExperienceReward + " XP, " + quest.GoldReward + " Gold");
+            
+            // Trigger signals
+            OnQuestCompleted?.Invoke(quest);
+            OnQuestTurnedIn?.Invoke(quest);
         }
         
         public List<Quest> GetActiveQuests()
