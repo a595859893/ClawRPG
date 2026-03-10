@@ -1,6 +1,8 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.UI;
+using ClawRPG.Scripts.Items;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -101,6 +103,11 @@ namespace ClawRPG.Scripts {
             expBar.MaxValue = 100;
             ui.AddChild(expBar);
             
+            // Potion UI
+            var potionUI = new PotionUI();
+            potionUI.Name = "PotionUI";
+            ui.AddChild(potionUI);
+            
             GD.Print("UI initialized");
         }
         
@@ -120,10 +127,26 @@ namespace ClawRPG.Scripts {
             // Update UI
             UpdatePlayerUI();
             
+            // Update potion effects
+            if (_player != null)
+            {
+                PotionManager.Instance.UpdatePotionEffects((float)delta, _player);
+            }
+            
             // Handle pause
             if (Input.IsActionJustPressed("ui_cancel"))
             {
                 TogglePause();
+            }
+            
+            // Toggle Potion UI with P key
+            if (Input.IsActionJustPressed("potion"))
+            {
+                var potionUI = GetNodeOrNull<PotionUI>("UI/PotionUI");
+                if (potionUI != null)
+                {
+                    potionUI.ToggleUI();
+                }
             }
         }
         

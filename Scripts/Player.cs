@@ -329,6 +329,12 @@ namespace ClawRPG.Scripts.Characters {
             CurrentMana = Mathf.Max(0, CurrentMana - amount);
         }
         
+        public void RestoreMana(int amount)
+        {
+            CurrentMana = Mathf.Min(MaxMana, CurrentMana + amount);
+            GD.Print("Restored " + amount + " Mana. Mana: " + CurrentMana + "/" + MaxMana);
+        }
+        
         public void GainExperience(int amount)
         {
             Experience += amount;
