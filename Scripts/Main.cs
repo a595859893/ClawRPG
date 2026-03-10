@@ -321,6 +321,12 @@ namespace ClawRPG.Scripts {
             comboDisplayUI.AddToGroup("ComboDisplay");
             ui.AddChild(comboDisplayUI);
 
+            // Combat Stats Panel
+            var combatStatsPanel = new UI.CombatStatsPanel();
+            combatStatsPanel.Name = "CombatStatsPanel";
+            combatStatsPanel.AddToGroup("CombatStatsPanel");
+            ui.AddChild(combatStatsPanel);
+
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
             dialogueUI.Name = "DialogueUI";
@@ -593,6 +599,16 @@ namespace ClawRPG.Scripts {
                 if (tutorialUI != null)
                 {
                     tutorialUI.StartTutorialById("hotkeys");
+                }
+            }
+            
+            // Handle combat stats panel toggle (F12 key)
+            if (Input.IsActionJustPressed("combat_stats"))
+            {
+                var combatStatsPanel = GetNodeOrNull<UI.CombatStatsPanel>("CanvasLayer/CombatStatsPanel");
+                if (combatStatsPanel != null)
+                {
+                    combatStatsPanel.Toggle();
                 }
             }
             
@@ -930,6 +946,12 @@ namespace ClawRPG.Scripts {
                 BackgroundMusicSystem.Instance.StartBattleMusic(false);
             }
             
+            // Start combat stats
+            var combatStatsPanel = GetNodeOrNull<UI.CombatStatsPanel>("CanvasLayer/CombatStatsPanel");
+            if (combatStatsPanel != null) {
+                combatStatsPanel.StartCombat();
+            }
+            
             // Trigger first combat tutorial
             var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
             if (tutorialUI != null && tutorialUI.IsActive == false) {
@@ -952,6 +974,14 @@ namespace ClawRPG.Scripts {
             if (_enemies.GetChildCount() == 0 && BackgroundMusicSystem.Instance != null) {
                 BackgroundMusicSystem.Instance.StopBattleMusic();
                 BackgroundMusicSystem.Instance.PlayVictoryMusic();
+            }
+            
+            // End combat stats if no enemies
+            if (_enemies.GetChildCount() == 0) {
+                var combatStatsPanel = GetNodeOrNull<UI.CombatStatsPanel>("CanvasLayer/CombatStatsPanel");
+                if (combatStatsPanel != null) {
+                    combatStatsPanel.EndCombat();
+                }
             }
         }
         
