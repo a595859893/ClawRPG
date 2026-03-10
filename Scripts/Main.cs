@@ -106,6 +106,11 @@ namespace ClawRPG.Scripts {
             weatherSystem.Name = "WeatherSystem";
             AddChild(weatherSystem);
             
+            // Initialize camera effect system
+            var cameraEffectSystem = new CameraEffectSystem();
+            cameraEffectSystem.Name = "CameraEffectSystem";
+            AddChild(cameraEffectSystem);
+            
             // Initialize combo system
             var comboSystem = new ComboSystem();
             comboSystem.Name = "ComboSystem";
