@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Items;
+using ClawRPG.Scripts.Database;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -42,6 +44,7 @@ namespace ClawRPG.Scripts.Characters {
         // Loot
         [Export] public int ExperienceReward = 20;
         [Export] public string[] DropItems;
+        [Export] public string EnemyTypeId = "";  // Database enemy type ID for drop table lookup
         
         public override void _Ready()
         {
@@ -166,6 +169,46 @@ namespace ClawRPG.Scripts.Characters {
         
         private void DropLoot()
         {
+            // First, try to use database drop table
+            if (!string.IsNullOrEmpty(EnemyTypeId))
+            {
+                var enemyType = Database.EnemyDatabase.Instance.GetEnemy(EnemyTypeId);
+                if (enemyType != null && enemyType.DropTable != null && enemyType.DropTable.Count > 0)
+                {
+                    foreach (var dropEntry in enemyType.DropTable)
+                    {
+                        string itemId = dropEntry.Key;
+                        float dropChance = dropEntry.Value;
+                        
+                        if (GD.Randf() < dropChance)
+                        {
+                            // Try to parse as integer ID first
+                            if (int.TryParse(itemId, out int itemIdInt))
+                            {
+                                // Add to player's inventory using InventoryManager
+                                var inventoryManager = Items.InventoryManager.Instance;
+                                if (inventoryManager != null)
+                                {
+                                    if (inventoryManager.AddItem(itemIdInt, 1))
+                                    {
+                                        var itemData = Items.ItemDatabase.Instance.GetItem(itemIdInt);
+                                        string itemName = itemData?.Name ?? $"Item {itemIdInt}";
+                                        GD.Print($"[Loot] Player received: {itemName}");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // It's a string key, spawn as item drop in world
+                                GD.Print("Dropped item: " + itemId);
+                            }
+                        }
+                    }
+                    return;  // Use database drops, skip editor DropItems
+                }
+            }
+            
+            // Fallback to editor-configured DropItems
             if (DropItems == null || DropItems.Length == 0) return;
             
             foreach (var itemId in DropItems)

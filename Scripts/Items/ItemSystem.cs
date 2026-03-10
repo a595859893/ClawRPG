@@ -245,6 +245,39 @@ namespace ClawRPG.Scripts.Items {
             AddItem(new Item { Id = 403, Name = "稀有强化石", Description = "稀有强化材料，可提高10%强化成功率", Value = 2000, Type = Item.ItemType.Material });
             AddItem(new Item { Id = 404, Name = "史诗强化石", Description = "史诗级强化材料，可提高15%强化成功率", Value = 10000, Type = Item.ItemType.Material });
             AddItem(new Item { Id = 405, Name = "传说强化石", Description = "传说级强化材料，可提高25%强化成功率", Value = 50000, Type = Item.ItemType.Material });
+
+            // === Enchantment Scrolls - Attack Type ===
+            AddItem(new Item { Id = 501, Name = "锋利卷轴", Description = "附魔攻击+5", Value = 100, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 502, Name = "锐利卷轴", Description = "附魔攻击+10", Value = 300, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 503, Name = "嗜血卷轴", Description = "附魔暴击率+5%", Value = 500, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 504, Name = "致命卷轴", Description = "附魔暴击伤害+15%", Value = 800, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 505, Name = "闪电卷轴", Description = "附魔攻击速度+10%", Value = 600, Type = Item.ItemType.Material });
+
+            // === Enchantment Scrolls - Defense Type ===
+            AddItem(new Item { Id = 506, Name = "坚固卷轴", Description = "附魔防御+5", Value = 100, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 507, Name = "铁壁卷轴", Description = "附魔防御+10", Value = 300, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 508, Name = "生命卷轴", Description = "附魔生命+50", Value = 400, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 509, Name = "重生卷轴", Description = "附魔生命+100", Value = 700, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 510, Name = "恢复卷轴", Description = "附魔生命+200", Value = 1200, Type = Item.ItemType.Material });
+
+            // === Enchantment Scrolls - Magic Type ===
+            AddItem(new Item { Id = 511, Name = "魔法卷轴", Description = "附魔法力+30", Value = 150, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 512, Name = "奥术卷轴", Description = "附魔法力+60", Value = 400, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 513, Name = "智慧卷轴", Description = "附魔法力+100", Value = 800, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 514, Name = "冰霜抗性卷轴", Description = "附魔冰霜抗性+10%", Value = 250, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 515, Name = "火焰抗性卷轴", Description = "附魔火焰抗性+10%", Value = 250, Type = Item.ItemType.Material });
+
+            // === Enchantment Scrolls - Utility Type ===
+            AddItem(new Item { Id = 516, Name = "敏捷卷轴", Description = "附魔移动速度+5%", Value = 200, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 517, Name = "疾风卷轴", Description = "附魔移动速度+10%", Value = 500, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 518, Name = "全抗性卷轴", Description = "附魔所有抗性+5%", Value = 600, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 519, Name = "雷电抗性卷轴", Description = "附魔雷电抗性+10%", Value = 250, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 520, Name = "毒液抗性卷轴", Description = "附魔毒抗性+10%", Value = 250, Type = Item.ItemType.Material });
+
+            // === Enchantment Scrolls - Legendary Type ===
+            AddItem(new Item { Id = 521, Name = "传奇力量卷轴", Description = "附魔全属性+5%", Value = 5000, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 522, Name = "传奇守护卷轴", Description = "附魔防御+30生命+200", Value = 8000, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 523, Name = "传奇攻击卷轴", Description = "附魔攻击+20暴击率+10%", Value = 10000, Type = Item.ItemType.Material });
         }
         
         private void AddItem(Item item)

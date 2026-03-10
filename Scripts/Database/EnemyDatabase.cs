@@ -88,7 +88,9 @@ namespace ClawRPG.Scripts.Database {
                 GoldReward = 5,
                 DropTable = new Dictionary<string, float> {
                     { "goblin_ear", 0.3f },
-                    { "monster_essence", 0.1f }
+                    { "monster_essence", 0.1f },
+                    { "501", 0.05f },  // 锋利卷轴
+                    { "506", 0.05f }   // 坚固卷轴
                 },
                 SpriteModulate = new Color(0.4f, 0.6f, 0.3f)
             };
@@ -103,7 +105,9 @@ namespace ClawRPG.Scripts.Database {
                 GoldReward = 8,
                 DropTable = new Dictionary<string, float> {
                     { "monster_essence", 0.2f },
-                    { "wolf_pelt", 0.4f }
+                    { "wolf_pelt", 0.4f },
+                    { "502", 0.05f },  // 锐利卷轴
+                    { "508", 0.05f }   // 生命卷轴
                 },
                 SpriteModulate = new Color(0.5f, 0.5f, 0.5f)
             };
@@ -169,7 +173,9 @@ namespace ClawRPG.Scripts.Database {
                 GoldReward = 12,
                 DropTable = new Dictionary<string, float> {
                     { "skeleton_bone", 0.5f },
-                    { "ancient_coin", 0.2f }
+                    { "ancient_coin", 0.2f },
+                    { "503", 0.08f },  // 嗜血卷轴
+                    { "511", 0.08f }   // 魔法卷轴
                 },
                 StatusEffectVulnerability = new Dictionary<string, float> {
                     { "holy", 1.5f },
@@ -206,7 +212,9 @@ namespace ClawRPG.Scripts.Database {
                 GoldReward = 20,
                 DropTable = new Dictionary<string, float> {
                     { "golem_core", 0.3f },
-                    { "ancient_coin", 0.1f }
+                    { "ancient_coin", 0.1f },
+                    { "507", 0.15f },  // 铁壁卷轴
+                    { "510", 0.1f }    // 恢复卷轴
                 },
                 StatusEffectVulnerability = new Dictionary<string, float> {
                     { "ice", 1.3f },
@@ -226,7 +234,9 @@ namespace ClawRPG.Scripts.Database {
                 GoldReward = 15,
                 DropTable = new Dictionary<string, float> {
                     { "fire_essence", 0.4f },
-                    { "phoenix_feather", 0.2f }
+                    { "phoenix_feather", 0.2f },
+                    { "515", 0.2f },   // 火焰抗性卷轴
+                    { "504", 0.1f }    // 致命卷轴
                 },
                 StatusEffectVulnerability = new Dictionary<string, float> {
                     { "ice", 2.0f },
@@ -669,7 +679,11 @@ namespace ClawRPG.Scripts.Database {
                 GoldReward = 200,
                 DropTable = new Dictionary<string, float> {
                     { "treant_heart", 1.0f },
-                    { "ancient_coin", 0.5f }
+                    { "ancient_coin", 0.5f },
+                    { "521", 0.3f },  // 传奇力量卷轴
+                    { "522", 0.2f },  // 传奇守护卷轴
+                    { "508", 0.5f },  // 生命卷轴
+                    { "518", 0.4f }   // 全抗性卷轴
                 },
                 SpriteModulate = new Color(0.2f, 0.5f, 0.2f)
             };
@@ -685,7 +699,12 @@ namespace ClawRPG.Scripts.Database {
                 DropTable = new Dictionary<string, float> {
                     { "demon_crown", 1.0f },
                     { "demon_heart", 1.0f },
-                    { "ancient_coin", 1.0f }
+                    { "ancient_coin", 1.0f },
+                    { "521", 0.5f },  // 传奇力量卷轴
+                    { "522", 0.4f },  // 传奇守护卷轴
+                    { "523", 0.3f },  // 传奇攻击卷轴
+                    { "519", 0.6f },  // 雷电抗性卷轴
+                    { "520", 0.6f }   // 毒液抗性卷轴
                 },
                 SpriteModulate = new Color(0.6f, 0.1f, 0.1f)
             };
@@ -701,7 +720,10 @@ namespace ClawRPG.Scripts.Database {
                 GoldReward = 150,
                 DropTable = new Dictionary<string, float> {
                     { "dragon_scale", 0.6f },
-                    { "dragon_blood", 0.4f }
+                    { "dragon_blood", 0.4f },
+                    { "523", 0.15f },  // 传奇攻击卷轴
+                    { "505", 0.3f },   // 闪电卷轴
+                    { "515", 0.3f }    // 火焰抗性卷轴
                 },
                 StatusEffectVulnerability = new Dictionary<string, float> {
                     { "ice", 1.3f }
@@ -719,7 +741,9 @@ namespace ClawRPG.Scripts.Database {
                 GoldReward = 80,
                 DropTable = new Dictionary<string, float> {
                     { "dragon_scale", 0.4f },
-                    { "fire_essence", 0.3f }
+                    { "fire_essence", 0.3f },
+                    { "505", 0.2f },   // 闪电卷轴
+                    { "509", 0.2f }    // 重生卷轴
                 },
                 StatusEffectVulnerability = new Dictionary<string, float> {
                     { "ice", 1.2f }
@@ -737,7 +761,9 @@ namespace ClawRPG.Scripts.Database {
                 GoldReward = 40,
                 DropTable = new Dictionary<string, float> {
                     { "dragon_scale", 0.3f },
-                    { "holy_crystal", 0.2f }
+                    { "holy_crystal", 0.2f },
+                    { "503", 0.15f },  // 嗜血卷轴
+                    { "514", 0.15f }   // 冰霜抗性卷轴
                 },
                 SpriteModulate = new Color(0.6f, 0.5f, 0.7f)
             };

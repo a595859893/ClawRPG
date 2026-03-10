@@ -1,6 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Characters;
+using ClawRPG.Scripts.Items;
+using ClawRPG.Scripts.Database;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
@@ -184,6 +187,12 @@ namespace ClawRPG.Scripts.Systems {
         {
             // Use reflection or direct property access to set enemy properties
             // Since the properties are [Export], we can set them directly
+            
+            // Set the enemy type ID for drop table lookup
+            enemy.EnemyTypeId = enemyType.Id;
+            
+            // Set other properties from database
+            enemy.ExperienceReward = enemyType.ExperienceReward;
             
             // Note: In Godot 4.x with C#, we'd use the properties directly
             // This is a simplified approach
