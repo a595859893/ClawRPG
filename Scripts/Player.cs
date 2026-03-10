@@ -44,6 +44,11 @@ namespace ClawRPG.Scripts.Characters {
         // Currency
         public int Gold { get; set; }
         
+        // World Event multipliers
+        public float EventXPMultiplier { get; set; } = 1.0f;
+        public float EventDropMultiplier { get; set; } = 1.0f;
+        public float EventGoldMultiplier { get; set; } = 1.0f;
+        
         // Rune system - base attributes (before runes)
         public float BaseAttackDamage { get; private set; } = 15f;
         public float BaseDefense { get; private set; } = 5f;

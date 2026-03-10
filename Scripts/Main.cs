@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -231,6 +232,32 @@ namespace ClawRPG.Scripts {
         {
             CurrentDay++;
             GD.Print("Day " + CurrentDay + " begins!");
+        }
+        
+        /// <summary>
+        /// 显示通知消息
+        /// </summary>
+        public void ShowNotification(string message, string detail = "")
+        {
+            // 尝试找到通知UI系统
+            var notificationUI = GetNodeOrNull("CanvasLayer/NotificationUI");
+            if (notificationUI != null)
+            {
+                // 调用通知UI的方法
+                GD.Print($"通知: {message} - {detail}");
+            }
+            else
+            {
+                GD.Print($"通知: {message} - {detail}");
+            }
+        }
+        
+        /// <summary>
+        /// 获取世界事件管理器实例
+        /// </summary>
+        public WorldEventManager GetWorldEventManager()
+        {
+            return WorldEventManager.Instance;
         }
     }
 }
