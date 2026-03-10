@@ -162,6 +162,58 @@ namespace ClawRPG.Scripts.Systems {
         
         #endregion
         
+        #region Boss Ability Sounds
+        
+        public void PlayBossAbilityFireBreath() {
+            PlayCombatSound("boss_fire_breath");
+        }
+        
+        public void PlayBossAbilityLightningChain() {
+            PlayCombatSound("boss_lightning_chain");
+        }
+        
+        public void PlayBossAbilityPoisonCloud() {
+            PlayCombatSound("boss_poison_cloud");
+        }
+        
+        public void PlayBossAbilityIceLance() {
+            PlayCombatSound("boss_ice_lance");
+        }
+        
+        public void PlayBossAbilityShadowBolt() {
+            PlayCombatSound("boss_shadow_bolt");
+        }
+        
+        public void PlayBossAbilityGroundSlam() {
+            PlayCombatSound("boss_ground_slam");
+        }
+        
+        public void PlayBossAbilityFearRoar() {
+            PlayCombatSound("boss_fear_roar");
+        }
+        
+        public void PlayBossAbilityBloodRipple() {
+            PlayCombatSound("boss_blood_ripple");
+        }
+        
+        public void PlayBossAbilityArcaneMissile() {
+            PlayCombatSound("boss_arcane_missile");
+        }
+        
+        public void PlayBossAbilitySelfHeal() {
+            PlayCombatSound("boss_self_heal");
+        }
+        
+        public void PlayBossAbilityTeleport() {
+            PlayCombatSound("boss_teleport");
+        }
+        
+        public void PlayBossAbilitySummonMinions() {
+            PlayCombatSound("boss_summon_minions");
+        }
+        
+        #endregion
+        
         #region Private Methods
         
         private void PlayUISound(string soundName) {

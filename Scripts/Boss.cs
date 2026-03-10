@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -576,6 +577,9 @@ namespace ClawRPG.Scripts.Characters {
             Vector2 direction = (targetPos - GlobalPosition).Normalized();
             float facingAngle = Mathf.Atan2(direction.Y, direction.X);
             
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityFireBreath();
+            
             // Trigger visual effect
             if (_visualizer != null)
             {
@@ -602,6 +606,9 @@ namespace ClawRPG.Scripts.Characters {
             var ability = _abilityDatabase["lightning_chain"];
             Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition + new Vector2(100, 0);
             
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityLightningChain();
+            
             // Trigger visual effect
             if (_visualizer != null)
             {
@@ -616,6 +623,9 @@ namespace ClawRPG.Scripts.Characters {
         {
             var ability = _abilityDatabase["poison_cloud"];
             Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition;
+            
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityPoisonCloud();
             
             // Trigger visual effect
             if (_visualizer != null)
@@ -638,6 +648,9 @@ namespace ClawRPG.Scripts.Characters {
             Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition + new Vector2(100, 0);
             Vector2 direction = (targetPos - GlobalPosition).Normalized();
             float facingAngle = Mathf.Atan2(direction.Y, direction.X);
+            
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityIceLance();
             
             // Trigger visual effect
             if (_visualizer != null)
@@ -667,6 +680,9 @@ namespace ClawRPG.Scripts.Characters {
             var ability = _abilityDatabase["dark_bolt"];
             Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition + new Vector2(100, 0);
             
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityShadowBolt();
+            
             // Trigger visual effect
             if (_visualizer != null)
             {
@@ -694,6 +710,9 @@ namespace ClawRPG.Scripts.Characters {
         {
             var ability = _abilityDatabase["ground_slam"];
             Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition;
+            
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityGroundSlam();
             
             // Trigger visual effect
             if (_visualizer != null)
@@ -724,6 +743,9 @@ namespace ClawRPG.Scripts.Characters {
         {
             var ability = _abilityDatabase["fear_shout"];
             
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityFearRoar();
+            
             // Trigger visual effect
             if (_visualizer != null)
             {
@@ -737,6 +759,9 @@ namespace ClawRPG.Scripts.Characters {
         private void UseBleedWave()
         {
             var ability = _abilityDatabase["bleed_wave"];
+            
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityBloodRipple();
             
             // Trigger visual effect
             if (_visualizer != null)
@@ -758,6 +783,9 @@ namespace ClawRPG.Scripts.Characters {
             var ability = _abilityDatabase["magic_missile"];
             Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition + new Vector2(100, 0);
             
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityArcaneMissile();
+            
             // Trigger visual effect
             if (_visualizer != null)
             {
@@ -778,6 +806,9 @@ namespace ClawRPG.Scripts.Characters {
         
         private void UseBossHeal()
         {
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilitySelfHeal();
+            
             // Trigger visual effect
             if (_visualizer != null)
             {
@@ -794,6 +825,9 @@ namespace ClawRPG.Scripts.Characters {
         
         private void UseTeleport()
         {
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilityTeleport();
+            
             // Trigger visual effect at current position first
             if (_visualizer != null)
             {
@@ -826,6 +860,9 @@ namespace ClawRPG.Scripts.Characters {
         
         private void UseSummonMinions()
         {
+            // Play ability sound
+            SoundEffectSystem.Instance?.PlayBossAbilitySummonMinions();
+            
             // Trigger visual effect
             if (_visualizer != null)
             {
