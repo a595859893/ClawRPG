@@ -192,6 +192,10 @@ namespace ClawRPG.Scripts {
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
             
+            // Initialize reputation system
+            var reputationSystem = ReputationSystem.Instance;
+            reputationSystem.Initialize();
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -366,6 +370,11 @@ namespace ClawRPG.Scripts {
             var balanceUI = new UI.BalanceUI();
             balanceUI.Name = "BalanceUI";
             ui.AddChild(balanceUI);
+            
+            // Reputation UI
+            var reputationUI = new UI.ReputationUI();
+            reputationUI.Name = "ReputationUI";
+            ui.AddChild(reputationUI);
             
             GD.Print("UI initialized");
             
@@ -612,6 +621,12 @@ namespace ClawRPG.Scripts {
                 }
             }
             
+            // Handle reputation UI toggle (R key)
+            if (Input.IsActionJustPressed("ui_reputation"))
+            {
+                ToggleReputationUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -816,6 +831,15 @@ namespace ClawRPG.Scripts {
             if (keybindingUI != null)
             {
                 keybindingUI.ToggleKeybindingUI();
+            }
+        }
+        
+        private void ToggleReputationUI()
+        {
+            var reputationUI = GetNodeOrNull<UI.ReputationUI>("CanvasLayer/ReputationUI");
+            if (reputationUI != null)
+            {
+                reputationUI.Toggle();
             }
         }
 
