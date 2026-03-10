@@ -191,6 +191,10 @@ namespace ClawRPG.Scripts {
             
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
+            
+            // Tutorial System
+            var tutorialDb = new TutorialDatabase();
+            GD.Print("Tutorial database initialized");
             keybindingSystem.Name = "KeybindingSystem";
             AddChild(keybindingSystem);
             
@@ -347,7 +351,19 @@ namespace ClawRPG.Scripts {
             bossHealthBarUI.Name = "BossHealthBarUI";
             ui.AddChild(bossHealthBarUI);
             
+            // Tutorial UI
+            var tutorialUI = new UI.TutorialUI();
+            tutorialUI.Name = "TutorialUI";
+            ui.AddChild(tutorialUI);
+            
             GD.Print("UI initialized");
+            
+            // Trigger welcome tutorial
+            var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
+            if (tutorialUI != null)
+            {
+                tutorialUI.TriggerTutorial(TutorialTrigger.GameStart);
+            }
         }
         
         private void LoadGameData()
@@ -563,6 +579,16 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("keybinding"))
             {
                 ToggleKeybindingUI();
+            }
+            
+            // Handle tutorial UI toggle (F9 key) - 查看快捷键教程
+            if (Input.IsActionJustPressed("tutorial"))
+            {
+                var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
+                if (tutorialUI != null)
+                {
+                    tutorialUI.StartTutorialById("hotkeys");
+                }
             }
             
             // Handle special attacks
@@ -897,6 +923,12 @@ namespace ClawRPG.Scripts {
             // Start battle music when enemy spawns (if not already in battle)
             if (BackgroundMusicSystem.Instance != null && !BackgroundMusicSystem.Instance.IsInBattle()) {
                 BackgroundMusicSystem.Instance.StartBattleMusic(false);
+            }
+            
+            // Trigger first combat tutorial
+            var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
+            if (tutorialUI != null && tutorialUI.IsActive == false) {
+                tutorialUI.TriggerTutorial(TutorialTrigger.FirstCombat);
             }
             
             GD.Print("Enemy spawned: " + enemyType);
