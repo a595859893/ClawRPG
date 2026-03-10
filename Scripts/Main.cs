@@ -356,6 +356,11 @@ namespace ClawRPG.Scripts {
             tutorialUI.Name = "TutorialUI";
             ui.AddChild(tutorialUI);
             
+            // Balance UI
+            var balanceUI = new UI.BalanceUI();
+            balanceUI.Name = "BalanceUI";
+            ui.AddChild(balanceUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
