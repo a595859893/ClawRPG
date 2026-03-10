@@ -97,11 +97,15 @@ namespace ClawRPG.Scripts.Characters {
         private Area2D _attackArea;
         private CollisionShape2D _hitbox;
         
+        // Inventory reference
+        public Inventory Inventory { get; private set; }
+        
         public override void _Ready()
         {
             CurrentHealth = MaxHealth;
             CurrentMana = MaxMana;
             CurrentStamina = MaxStamina;
+            Inventory = new Inventory();
             
             _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
             _sprite = GetNode<Sprite2D>("Sprite2D");
@@ -109,6 +113,44 @@ namespace ClawRPG.Scripts.Characters {
             _hitbox = GetNode<CollisionShape2D>("Hitbox/CollisionShape2D");
             
             GD.Print("Player initialized - HP: " + CurrentHealth + "/" + MaxHealth);
+        }
+        
+        /// <summary>
+        /// Add gold to player and track for daily challenges
+        /// </summary>
+        public void AddGold(int amount) {
+            Gold += amount;
+            DailyChallengeManager.Instance.OnGoldEarned(amount);
+        }
+        
+        /// <summary>
+        /// Add experience to player and handle level up
+        /// </summary>
+        public void AddExperience(int amount) {
+            Experience += amount;
+            
+            // Check for level up
+            int expNeeded = GetExperienceForNextLevel();
+            while (Experience >= expNeeded) {
+                Experience -= expNeeded;
+                Level++;
+                LevelUp();
+                expNeeded = GetExperienceForNextLevel();
+            }
+        }
+        
+        private int GetExperienceForNextLevel() {
+            return Level * 100 + 50;
+        }
+        
+        private void LevelUp() {
+            MaxHealth += 10;
+            MaxMana += 5;
+            CurrentHealth = MaxHealth;
+            CurrentMana = MaxMana;
+            SkillPoints += 1;
+            
+            GD.Print($"Player leveled up! Level: {Level}");
         }
         
         public override void _PhysicsProcess(double delta)
