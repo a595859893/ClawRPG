@@ -339,6 +339,10 @@ namespace ClawRPG.Scripts.Characters {
                 enemy.TakeDamage((int)damage, isCrit, AttackDirection);
             }
             
+            // Register combo hit
+            var comboSystem = GetTree().GetFirstNodeInGroup("ComboSystem") as ComboSystem;
+            comboSystem?.RegisterHit((int)damage);
+            
             GD.Print("Attack! Damage: " + damage + (isCrit ? " CRITICAL!" : ""));
             
             // Attack animation/sound would go here

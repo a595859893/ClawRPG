@@ -97,6 +97,9 @@ namespace ClawRPG.Scripts.Systems {
             public int HighestCombo { get; set; }
             public int AchievementsUnlocked { get; set; }
             
+            // Combo system data
+            public Dictionary<string, Variant> ComboData { get; set; }
+            
             // Title system data
             public string CurrentTitleId { get; set; } = "";
             public string[] UnlockedTitleIds { get; set; } = new string[0];
@@ -525,6 +528,13 @@ namespace ClawRPG.Scripts.Systems {
             if (equipVisuals != null)
             {
                 data.EquipmentVisualsData = equipVisuals.Serialize();
+            }
+            
+            // Save combo system data
+            var comboSystem = GetNodeOrNull<Systems.ComboSystem>("ComboSystem");
+            if (comboSystem != null)
+            {
+                data.ComboData = comboSystem.Serialize();
             }
             
             return data;

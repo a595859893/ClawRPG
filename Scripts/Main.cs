@@ -106,6 +106,11 @@ namespace ClawRPG.Scripts {
             weatherSystem.Name = "WeatherSystem";
             AddChild(weatherSystem);
             
+            // Initialize combo system
+            var comboSystem = new ComboSystem();
+            comboSystem.Name = "ComboSystem";
+            AddChild(comboSystem);
+            
             // Spawn player
             SpawnPlayer();
             
@@ -185,6 +190,18 @@ namespace ClawRPG.Scripts {
             enchantmentUI.Name = "EnchantmentUI";
             ui.AddChild(enchantmentUI);
             
+            // Dynamic screen effect (for vignette, damage overlays, combo pulses)
+            var dynamicScreenEffect = new DynamicScreenEffect();
+            dynamicScreenEffect.Name = "DynamicScreenEffect";
+            dynamicScreenEffect.AddToGroup("DynamicScreenEffect");
+            ui.AddChild(dynamicScreenEffect);
+            
+            // Combo display UI
+            var comboDisplayUI = new ComboDisplayUI();
+            comboDisplayUI.Name = "ComboDisplayUI";
+            comboDisplayUI.AddToGroup("ComboDisplay");
+            ui.AddChild(comboDisplayUI);
+            
             GD.Print("UI initialized");
         }
         
@@ -227,6 +244,14 @@ namespace ClawRPG.Scripts {
                     };
                     StatisticsManager.Instance.LoadStatistics(statsData);
                     GD.Print("Statistics loaded successfully!");
+                    
+                    // Load combo system data
+                    var comboSystem = GetNodeOrNull<ComboSystem>("ComboSystem");
+                    if (comboSystem != null && data.ComboData != null)
+                    {
+                        comboSystem.Deserialize(data.ComboData);
+                        GD.Print("Combo data loaded successfully!");
+                    }
                 }
             }
         }
