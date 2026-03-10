@@ -111,6 +111,9 @@ namespace ClawRPG.Scripts.Systems {
             // Bookmark system data
             public Dictionary<string, object> BookmarkData { get; set; } = new();
             
+            // Enhancement system data
+            public Dictionary<string, object> EnhancementData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -463,6 +466,13 @@ namespace ClawRPG.Scripts.Systems {
             if (BookmarkSystem.Instance != null)
             {
                 data.BookmarkData = BookmarkSystem.Instance.Serialize();
+            }
+            
+            // Save enhancement data
+            var enhancementSystem = GetNodeOrNull<Systems.Enhancement.EnhancementSystem>("EnhancementSystem");
+            if (enhancementSystem != null)
+            {
+                data.EnhancementData = enhancementSystem.Serialize();
             }
             
             return data;

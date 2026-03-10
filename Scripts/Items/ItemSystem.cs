@@ -238,6 +238,13 @@ namespace ClawRPG.Scripts.Items {
             AddItem(new Item { Id = 357, Name = "哥布林首领之牙", Description = "哥布林首领的獠牙", Value = 40, Type = Item.ItemType.Material });
             AddItem(new Item { Id = 358, Name = "骷髅头骨", Description = "骷髅领主的头骨", Value = 50, Type = Item.ItemType.Material });
             AddItem(new Item { Id = 359, Name = "女巫扫帚", Description = "女巫的魔法扫帚", Value = 45, Type = Item.ItemType.Material });
+            
+            // Enhancement stones
+            AddItem(new Item { Id = 401, Name = "普通强化石", Description = "用于装备强化的基础材料", Value = 100, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 402, Name = "优秀强化石", Description = "高品质强化材料，可提高5%强化成功率", Value = 500, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 403, Name = "稀有强化石", Description = "稀有强化材料，可提高10%强化成功率", Value = 2000, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 404, Name = "史诗强化石", Description = "史诗级强化材料，可提高15%强化成功率", Value = 10000, Type = Item.ItemType.Material });
+            AddItem(new Item { Id = 405, Name = "传说强化石", Description = "传说级强化材料，可提高25%强化成功率", Value = 50000, Type = Item.ItemType.Material });
         }
         
         private void AddItem(Item item)

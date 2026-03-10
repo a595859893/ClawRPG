@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.Systems.Pets;
+using ClawRPG.Scripts.Systems.Enhancement;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -68,6 +69,16 @@ namespace ClawRPG.Scripts {
             petCombatAI.Name = "PetCombatAI";
             AddChild(petCombatAI);
             petCombatAI.Initialize();
+            
+            // Initialize enhancement system
+            var enhancementSystem = new EnhancementSystem();
+            enhancementSystem.Name = "EnhancementSystem";
+            AddChild(enhancementSystem);
+            
+            // Initialize enhancement database
+            var enhancementDb = new EnhancementDatabase();
+            enhancementDb.Name = "EnhancementDatabase";
+            AddChild(enhancementDb);
             
             // Spawn player
             SpawnPlayer();
@@ -254,6 +265,12 @@ namespace ClawRPG.Scripts {
                 ToggleBookmarkUI();
             }
             
+            // Handle enhancement UI toggle (X key)
+            if (Input.IsActionJustPressed("enhancement"))
+            {
+                ToggleEnhancementUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -348,6 +365,22 @@ namespace ClawRPG.Scripts {
             if (bookmarkUI != null)
             {
                 bookmarkUI.ToggleVisibility();
+            }
+        }
+        
+        private void ToggleEnhancementUI()
+        {
+            var enhancementUI = GetNodeOrNull<UI.EnhancementUI>("CanvasLayer/EnhancementUI");
+            if (enhancementUI != null)
+            {
+                if (enhancementUI.Visible)
+                {
+                    enhancementUI.Hide();
+                }
+                else
+                {
+                    enhancementUI.Show();
+                }
             }
         }
         
@@ -589,6 +622,16 @@ namespace ClawRPG.Scripts {
                 if (saveData.BookmarkData != null && BookmarkSystem.Instance != null)
                 {
                     BookmarkSystem.Instance.Deserialize(saveData.BookmarkData);
+                }
+                
+                // 加载强化数据
+                if (saveData.EnhancementData != null)
+                {
+                    var enhancementSystem = GetNodeOrNull<Systems.Enhancement.EnhancementSystem>("EnhancementSystem");
+                    if (enhancementSystem != null)
+                    {
+                        enhancementSystem.Deserialize(saveData.EnhancementData);
+                    }
                 }
                 
                 CurrentDay = saveData.CurrentDay;
