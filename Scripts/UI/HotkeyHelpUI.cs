@@ -67,6 +67,7 @@ namespace ClawRPG.Scripts.UI {
             AddHotkey("旋风斩", "Q");
             AddHotkey("冲锋", "E");
             AddHotkey("装备强化", "X");
+            AddHotkey("自动药水设置", "Shift+X");
             AddHotkey("暂停", "ESC");
             
             // Toggle hint

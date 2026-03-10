@@ -80,6 +80,11 @@ namespace ClawRPG.Scripts {
             enhancementDb.Name = "EnhancementDatabase";
             AddChild(enhancementDb);
             
+            // Initialize auto potion system
+            var autoPotionSystem = new AutoPotionSystem();
+            autoPotionSystem.Name = "AutoPotionSystem";
+            AddChild(autoPotionSystem);
+            
             // Spawn player
             SpawnPlayer();
             
@@ -271,6 +276,12 @@ namespace ClawRPG.Scripts {
                 ToggleEnhancementUI();
             }
             
+            // Handle auto potion UI toggle (Shift+X key)
+            if (Input.IsActionJustPressed("auto_potion"))
+            {
+                ToggleAutoPotionUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -381,6 +392,15 @@ namespace ClawRPG.Scripts {
                 {
                     enhancementUI.Show();
                 }
+            }
+        }
+        
+        private void ToggleAutoPotionUI()
+        {
+            var autoPotionUI = GetNodeOrNull<UI.AutoPotionUI>("CanvasLayer/AutoPotionUI");
+            if (autoPotionUI != null)
+            {
+                autoPotionUI.ToggleVisibility();
             }
         }
         
@@ -631,6 +651,16 @@ namespace ClawRPG.Scripts {
                     if (enhancementSystem != null)
                     {
                         enhancementSystem.Deserialize(saveData.EnhancementData);
+                    }
+                }
+                
+                // 加载自动药水数据
+                if (saveData.AutoPotionData != null)
+                {
+                    var autoPotionSystem = GetNodeOrNull<Systems.AutoPotionSystem>("AutoPotionSystem");
+                    if (autoPotionSystem != null)
+                    {
+                        autoPotionSystem.Deserialize(saveData.AutoPotionData);
                     }
                 }
                 

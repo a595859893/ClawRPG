@@ -114,6 +114,9 @@ namespace ClawRPG.Scripts.Systems {
             // Enhancement system data
             public Dictionary<string, object> EnhancementData { get; set; } = new();
             
+            // Auto potion system data
+            public Dictionary<string, object> AutoPotionData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -473,6 +476,13 @@ namespace ClawRPG.Scripts.Systems {
             if (enhancementSystem != null)
             {
                 data.EnhancementData = enhancementSystem.Serialize();
+            }
+            
+            // Save auto potion data
+            var autoPotionSystem = GetNodeOrNull<Systems.AutoPotionSystem>("AutoPotionSystem");
+            if (autoPotionSystem != null)
+            {
+                data.AutoPotionData = autoPotionSystem.Serialize();
             }
             
             return data;
