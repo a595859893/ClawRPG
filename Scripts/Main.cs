@@ -199,6 +199,11 @@ namespace ClawRPG.Scripts {
             balanceManager.Name = "BalanceManager";
             AddChild(balanceManager);
             
+            // Initialize screen effect system (post-processing)
+            var screenEffectManager = new ScreenEffectManager();
+            screenEffectManager.Name = "ScreenEffectManager";
+            AddChild(screenEffectManager);
+            
             // Initialize team skill system
             var teamSkillSystem = new TeamSkillSystem();
             teamSkillSystem.Name = "TeamSkillSystem";

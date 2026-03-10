@@ -890,6 +890,9 @@ namespace ClawRPG.Scripts.Characters {
             // Play ability sound
             SoundEffectSystem.Instance?.PlayBossAbilityGroundSlam();
             
+            // Trigger screen shockwave effect
+            ScreenEffectManager.Instance?.TriggerShockwave(0.6f, 1.2f, 0.03f);
+            
             // Trigger visual effect
             if (_visualizer != null)
             {
@@ -921,6 +924,9 @@ namespace ClawRPG.Scripts.Characters {
             
             // Play ability sound
             SoundEffectSystem.Instance?.PlayBossAbilityFearRoar();
+            
+            // Trigger screen shockwave effect
+            ScreenEffectManager.Instance?.TriggerShockwave(0.4f, 1.0f, 0.02f);
             
             // Trigger visual effect
             if (_visualizer != null)
