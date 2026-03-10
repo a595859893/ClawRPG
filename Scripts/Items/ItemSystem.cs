@@ -4,6 +4,18 @@ using System.Collections.Generic;
 
 namespace ClawRPG.Scripts.Items {
     /// <summary>
+    /// Item quality levels
+    /// </summary>
+    public enum ItemQuality
+    {
+        Common = 0,      // Gray
+        Uncommon = 1,    // Green
+        Rare = 2,        // Blue
+        Epic = 3,        // Purple
+        Legendary = 4    // Orange
+    }
+
+    /// <summary>
     /// Base Item class
     /// </summary>
     public class Item
@@ -12,6 +24,7 @@ namespace ClawRPG.Scripts.Items {
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
         public ItemType Type { get; set; }
+        public ItemQuality Quality { get; set; } = ItemQuality.Common;
         public int Value { get; set; }
         public int MaxStack { get; set; } = 99;
         public string IconPath { get; set; }
