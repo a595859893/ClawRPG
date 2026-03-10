@@ -189,6 +189,11 @@ namespace ClawRPG.Scripts {
             balanceManager.Name = "BalanceManager";
             AddChild(balanceManager);
             
+            // Initialize team skill system
+            var teamSkillSystem = new TeamSkillSystem();
+            teamSkillSystem.Name = "TeamSkillSystem";
+            AddChild(teamSkillSystem);
+            
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
             
@@ -375,6 +380,11 @@ namespace ClawRPG.Scripts {
             var reputationUI = new UI.ReputationUI();
             reputationUI.Name = "ReputationUI";
             ui.AddChild(reputationUI);
+            
+            // Team Skill UI
+            var teamSkillUI = new UI.TeamSkillUI();
+            teamSkillUI.Name = "TeamSkillUI";
+            ui.AddChild(teamSkillUI);
             
             GD.Print("UI initialized");
             
@@ -611,6 +621,19 @@ namespace ClawRPG.Scripts {
                 }
             }
             
+            // Handle team skill UI toggle (T key)
+            if (Input.IsActionJustPressed("team_skill"))
+            {
+                var teamSkillUI = GetNodeOrNull<UI.TeamSkillUI>("CanvasLayer/TeamSkillUI");
+                if (teamSkillUI != null)
+                {
+                    teamSkillUI.Toggle();
+                }
+            }
+            
+            // Handle team skill hotkeys (1-9, 0, -, =, ])
+            HandleTeamSkillInput();
+            
             // Handle combat stats panel toggle (F12 key)
             if (Input.IsActionJustPressed("combat_stats"))
             {
@@ -841,6 +864,36 @@ namespace ClawRPG.Scripts {
             {
                 reputationUI.Toggle();
             }
+        }
+        
+        /// <summary>
+        /// 处理队伍技能快捷键输入
+        /// </summary>
+        private void HandleTeamSkillInput()
+        {
+            if (TeamSkillSystem.Instance == null) return;
+            
+            // 数字键 1-9 使用对应技能
+            if (Input.IsActionJustPressed("team_skill_1"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.HealingRain);
+            else if (Input.IsActionJustPressed("team_skill_2"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.ShieldWall);
+            else if (Input.IsActionJustPressed("team_skill_3"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.DamageAura);
+            else if (Input.IsActionJustPressed("team_skill_4"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.DefenseAura);
+            else if (Input.IsActionJustPressed("team_skill_5"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.SpeedAura);
+            else if (Input.IsActionJustPressed("team_skill_6"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.ManaRegen);
+            else if (Input.IsActionJustPressed("team_skill_7"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.CritAura);
+            else if (Input.IsActionJustPressed("team_skill_8"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.LifeSteal);
+            else if (Input.IsActionJustPressed("team_skill_9"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.Invincibility);
+            else if (Input.IsActionJustPressed("team_skill_0"))
+                TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.Resurrection);
         }
 
         private void ToggleDialogueUI(string npcId)
