@@ -179,6 +179,11 @@ namespace ClawRPG.Scripts {
             counterAttackVFX.Name = "CounterAttackVFX";
             AddChild(counterAttackVFX);
             
+            // Initialize balance manager system
+            var balanceManager = new BalanceManager();
+            balanceManager.Name = "BalanceManager";
+            AddChild(balanceManager);
+            
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
             keybindingSystem.Name = "KeybindingSystem";
