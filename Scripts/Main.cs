@@ -248,6 +248,12 @@ namespace ClawRPG.Scripts {
                 ToggleTitleUI();
             }
             
+            // Handle bookmarks UI toggle (N key)
+            if (Input.IsActionJustPressed("bookmarks"))
+            {
+                ToggleBookmarkUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -333,6 +339,15 @@ namespace ClawRPG.Scripts {
                 {
                     titleUI.Show();
                 }
+            }
+        }
+        
+        private void ToggleBookmarkUI()
+        {
+            var bookmarkUI = GetNodeOrNull<UI.BookmarkUI>("CanvasLayer/BookmarkUI");
+            if (bookmarkUI != null)
+            {
+                bookmarkUI.ToggleVisibility();
             }
         }
         
@@ -568,6 +583,12 @@ namespace ClawRPG.Scripts {
                 if (saveData.MountData != null && MountManager.Instance != null)
                 {
                     MountManager.Instance.Deserialize(saveData.MountData);
+                }
+                
+                // 加载收藏点数据
+                if (saveData.BookmarkData != null && BookmarkSystem.Instance != null)
+                {
+                    BookmarkSystem.Instance.Deserialize(saveData.BookmarkData);
                 }
                 
                 CurrentDay = saveData.CurrentDay;

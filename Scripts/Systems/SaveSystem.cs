@@ -108,6 +108,9 @@ namespace ClawRPG.Scripts.Systems {
             // Mount system data
             public Dictionary<string, Dictionary<string, object>> MountData { get; set; } = new();
             
+            // Bookmark system data
+            public Dictionary<string, object> BookmarkData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -454,6 +457,12 @@ namespace ClawRPG.Scripts.Systems {
             if (MountManager.Instance != null)
             {
                 data.MountData = MountManager.Instance.Serialize();
+            }
+            
+            // Save bookmark data
+            if (BookmarkSystem.Instance != null)
+            {
+                data.BookmarkData = BookmarkSystem.Instance.Serialize();
             }
             
             return data;

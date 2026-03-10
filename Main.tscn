@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=28 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_main"]
 [ext_resource type="Script" path="res://Scripts/UI/PlayerHUD.cs" id="2_hud"]
@@ -25,6 +25,8 @@
 [ext_resource type="Script" path="res://Scripts/MountManager.cs" id="23_mountmgr"]
 [ext_resource type="Script" path="res://Scripts/UI/MountUI.cs" id="24_mountui"]
 [ext_resource type="Script" path="res://Scripts/UI/DragDropHelper.cs" id="25_dragdrop"]
+[ext_resource type="Script" path="res://Scripts/Systems/BookmarkSystem.cs" id="26_bookmark"]
+[ext_resource type="Script" path="res://Scripts/UI/BookmarkUI.cs" id="27_bookmarkui"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -246,3 +248,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("25_dragdrop")
+
+[node name="BookmarkSystem" type="Node" parent="."]
+script = ExtResource("26_bookmark")
+
+[node name="BookmarkUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("27_bookmarkui")
