@@ -323,6 +323,8 @@ namespace ClawRPG.Scripts.Characters {
             // Track perfect block for titles
             PerfectBlockCount++;
             TitleSystem.Instance.CheckAndUnlockTitle("Combat", PerfectBlockCount);
+            // Trigger counter attack system
+            Systems.CounterAttackSystem.Instance?.OnPerfectBlock();
             GD.Print("PERFECT BLOCK!");
         }
         

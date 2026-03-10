@@ -59,6 +59,7 @@ namespace ClawRPG.Scripts.UI {
             AddHotkey("任务指引", "G");
             AddHotkey("多人游戏", "M");
             AddHotkey("武器熟练度", "W");
+            AddHotkey("反击系统", "Shift+C");
             AddHotkey("坐骑", "O");
             AddHotkey("称号", "Y");
             AddHotkey("收藏点", "N");

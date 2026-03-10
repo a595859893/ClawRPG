@@ -96,6 +96,11 @@ namespace ClawRPG.Scripts {
             autoBookmarkSystem.Name = "AutoBookmarkSystem";
             AddChild(autoBookmarkSystem);
             
+            // Initialize counter attack system
+            var counterAttackSystem = new CounterAttackSystem();
+            counterAttackSystem.Name = "CounterAttackSystem";
+            AddChild(counterAttackSystem);
+            
             // Initialize enchantment database
             var enchantmentDb = new ClawRPG.Scripts.Systems.Enchantment.EnchantmentDatabase();
             enchantmentDb.Name = "EnchantmentDatabase";
@@ -298,6 +303,11 @@ namespace ClawRPG.Scripts {
             keybindingUI.Name = "KeybindingUI";
             ui.AddChild(keybindingUI);
             
+            // Counter Attack UI
+            var counterAttackUI = new UI.CounterAttackUI();
+            counterAttackUI.Name = "CounterAttackUI";
+            ui.AddChild(counterAttackUI);
+            
             GD.Print("UI initialized");
         }
         
@@ -416,6 +426,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("weapon_mastery"))
             {
                 ToggleWeaponMasteryUI();
+            }
+            
+            // Handle counter attack UI toggle (Shift+C key)
+            if (Input.IsActionJustPressed("counter_attack"))
+            {
+                ToggleCounterAttackUI();
             }
             
             // Handle mount UI toggle (O key)
@@ -570,6 +586,15 @@ namespace ClawRPG.Scripts {
             if (weaponMasteryUI != null)
             {
                 weaponMasteryUI.Toggle();
+            }
+        }
+        
+        private void ToggleCounterAttackUI()
+        {
+            var counterAttackUI = GetNodeOrNull<UI.CounterAttackUI>("CanvasLayer/CounterAttackUI");
+            if (counterAttackUI != null)
+            {
+                counterAttackUI.Toggle();
             }
         }
         
