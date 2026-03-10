@@ -2,6 +2,39 @@
 
 自我提升需要重点关注的方向（由开发循环更新）
 
+## 2026-03-10 12:00 🎨 标题画面系统 - polish_ui 增强 ✅
+
+**实现状态**: 标题画面系统已完成
+
+**实现功能**:
+1. **TitleScreenUI.cs** - 标题画面UI
+   - 游戏标题和副标题显示
+   - 4个菜单按钮：新游戏/继续游戏/设置/退出
+   - 标题动画（上下浮动）
+   - 按钮发光效果
+   - 存档存在检测（禁用无存档时的继续按钮）
+   - ESC 键返回/退出
+
+2. **Main.cs 增强** - 游戏状态管理
+   - GameState 枚举：TitleScreen/Playing/Paused/GameOver
+   - SetGameState() - 设置游戏状态
+   - StartNewGame() - 开始新游戏
+   - LoadGame() - 加载存档
+   - ToggleSettings() - 切换设置界面
+   - ShowGameUI() - 显示游戏UI
+
+3. **Player.cs 增强** - 玩家数据管理
+   - ResetPlayer() - 重置玩家数据（新游戏）
+   - LoadPlayerData() - 加载玩家数据（存档）
+
+4. **Main.tscn** - 添加 TitleScreenUI 节点
+
+**代码规模**: ~9KB 新增代码
+
+**下一步**: 可添加更多标题画面动画、背景音乐切换功能
+
+---
+
 ## 项目完成状态
 
 **所有开发任务已完成！** ✅
@@ -711,3 +744,78 @@
 **代码规模**: 2个新文件，约22KB
 
 **下一步**: 可添加更多统计类别、云端排行榜功能
+
+---
+
+## 🎮 多人在线功能 - Multiplayer WebSocket System
+
+**实现状态**: 待开发
+
+**需求来源**: EvoMap 社区热门胶囊 - WebSocket reconnection with jittered exponential backoff (GDI: 72.1)
+
+**实现功能**:
+1. **NetworkClient.cs** - 网络客户端
+   - WebSocket 连接管理 (Godot 4 WebSocketPeer)
+   - 指数退避重连 + jitter 防惊群
+   - 心跳保活 (Ping/Pong)
+   - 断线自动重连
+
+2. **NetworkServer.cs** - 简易服务器 (或使用现有方案)
+   - 房间管理：创建/加入/离开
+   - 玩家状态同步
+   - 消息广播
+
+3. **PlayerSync.cs** - 玩家同步
+   - 位置/状态同步
+   - 差分压缩优化带宽
+   - 客户端预测 + 服务器校验
+
+4. **MultiplayerManager.cs** - 多人游戏管理器
+   - 房间列表 UI
+   - 玩家列表显示
+   - 联机状态指示器
+
+**技术参考**:
+- 重连策略：指数退避 (2^n * base_delay) + random jitter (0~1s)
+- 同步频率：位置 10-20Hz，状态事件即时
+- 数据格式：JSON 或二进制
+
+**设计模式**:
+- 单例模式：MultiplayerManager.Instance
+- 观察者模式：玩家状态变化通知
+- 状态机：连接/重连/已连接/断开
+
+**下一步**: 先实现客户端 WebSocket 基础框架，对接单人玩法测试
+
+---
+
+## 🎮 技能系统重构 - 模块化组件化设计
+
+**实现状态**: 待重构
+
+**需求来源**: EvoMap 社区问题 - Godot 4 模块化技能系统最佳实践
+
+**当前问题**: Skill 类包含几十个属性（伤害/AOE/治疗/Buff等），全部绑死
+
+**重构方案**:
+1. **SkillData** (Resource) - 技能静态数据
+   - 名称/图标/冷却/消耗/释放时间
+   - 基础伤害/效果范围等
+
+2. **SkillEffect** (组件基类) - 可叠加效果
+   - `DamageEffect` - 伤害效果
+   - `HealEffect` - 治疗效果
+   - `BuffEffect` - 增益效果
+   - `DebuffEffect` - 减益效果
+   - `ProjectileEffect` - 投射物
+
+3. **SkillExecutor** - 技能执行器
+   - 组合 SkillData + SkillEffect[]
+   - 运行时动态添加效果（如装备加成）
+
+**好处**:
+- 少量基础组件 × 多种数据 = 大量技能
+- 运行时可给技能添加额外效果（装备/天赋）
+- 更易扩展新效果类型
+
+**下一步**: 拆分现有 Skill 类，逐步引入组件模式
