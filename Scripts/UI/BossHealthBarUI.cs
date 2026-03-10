@@ -27,6 +27,7 @@ namespace ClawRPG.Scripts.UI {
         private float _displayTimer = 0f;
         private float _fadeTimer = 0f;
         private bool _wasEnraged = false;
+        private int _lastEnrageSecond = -1;
         private const float AutoHideTime = 3f;
         private const float FadeTime = 0.5f;
         
@@ -259,10 +260,10 @@ namespace ClawRPG.Scripts.UI {
             }
             
             // Update enrage display
-            UpdateEnrageDisplay(boss);
+            UpdateEnrageDisplay(boss, delta);
         }
         
-        private void UpdateEnrageDisplay(Scripts.Boss boss)
+        private void UpdateEnrageDisplay(Scripts.Boss boss, float delta)
         {
             bool isEnraged = boss.IsEnraged();
             float enrageTimeRemaining = boss.GetEnrageTimeRemaining();
@@ -323,11 +324,24 @@ namespace ClawRPG.Scripts.UI {
                     {
                         _enrageWarningLabel.Text = "⚡ ENRAGE IMMINENT! ⚡";
                         _enrageLabel.Text = $"Enrage: {(int)enrageTimeRemaining}s";
+                        
+                        // Warning effect when enrage is imminent - light shake every second
+                        int currentSecond = (int)enrageTimeRemaining;
+                        if (currentSecond != _lastEnrageSecond)
+                        {
+                            _lastEnrageSecond = currentSecond;
+                            var cameraEffect = GetNodeOrNull<CameraEffectSystem>("/root/Main/CameraEffectSystem");
+                            if (cameraEffect != null)
+                            {
+                                cameraEffect.TriggerLightShake();
+                            }
+                        }
                     }
                     else
                     {
                         _enrageWarningLabel.Text = "";
                         _enrageLabel.Text = $"Enrage: {(int)enrageTimeRemaining}s";
+                        _lastEnrageSecond = -1; // Reset when not in warning zone
                     }
                     
                     _enrageLabel.Visible = true;
@@ -355,8 +369,33 @@ namespace ClawRPG.Scripts.UI {
             // Visual feedback when boss becomes enraged
             GD.Print("Boss has become ENRAGED!");
             
-            // Could add screen shake, flash effect, etc. here
-            // For now, the UI will show the enrage state
+            // Trigger screen shake effect - violent shake for enrage
+            var cameraEffect = GetNodeOrNull<CameraEffectSystem>("/root/Main/CameraEffectSystem");
+            if (cameraEffect != null)
+            {
+                cameraEffect.TriggerViolentShake();
+            }
+            
+            // Trigger screen flash effect - red flash for danger
+            var screenFlash = GetNodeOrNull<ScreenFlashEffect>("/root/Main/ScreenFlashEffect");
+            if (screenFlash != null)
+            {
+                screenFlash.FlashCustomColor(new Color(1f, 0.2f, 0f, 0.6f), 0.5f);
+            }
+            
+            // Trigger vignette effect for dramatic impact
+            if (cameraEffect != null)
+            {
+                cameraEffect.SetVignette(0.5f);
+                // Create a timer to fade out vignette
+                var timer = GetTree().CreateTimer(2.0f);
+                timer.Connect("timeout", () => {
+                    if (cameraEffect != null)
+                    {
+                        cameraEffect.SetVignette(0f);
+                    }
+                });
+            }
         }
         
         /// <summary>
