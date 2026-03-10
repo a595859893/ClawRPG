@@ -125,6 +125,11 @@ namespace ClawRPG.Scripts {
             var bountyManager = BountyManager.Instance;
             bountyManager.Initialize();
             
+            // Initialize mail system
+            var mailManager = new MailManager();
+            mailManager.Name = "MailManager";
+            AddChild(mailManager);
+            
             // Initialize weather system
             var weatherSystem = new WeatherSystem();
             weatherSystem.Name = "WeatherSystem";
@@ -672,6 +677,12 @@ namespace ClawRPG.Scripts {
                 ToggleBadgeUI();
             }
             
+            // Handle mail UI toggle (M key)
+            if (Input.IsActionJustPressed("ui_mail"))
+            {
+                ToggleMailUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -918,6 +929,30 @@ namespace ClawRPG.Scripts {
                 if (canvasLayer != null)
                 {
                     canvasLayer.AddChild(newBadgeUI);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 切换邮件界面
+        /// </summary>
+        private void ToggleMailUI()
+        {
+            var mailUI = GetNodeOrNull<UI.MailUI>("CanvasLayer/MailUI");
+            if (mailUI != null)
+            {
+                mailUI.QueueFree();
+            }
+            else
+            {
+                var newMailUI = new UI.MailUI();
+                newMailUI.Name = "MailUI";
+                var canvasLayer = GetNodeOrNull("CanvasLayer");
+                if (canvasLayer != null)
+                {
+                    canvasLayer.AddChild(newMailUI);
+                    // 传入玩家ID（单人模式用默认ID）
+                    newMailUI.Open(GetMultiplayer().GetUniqueId().ToString());
                 }
             }
         }
