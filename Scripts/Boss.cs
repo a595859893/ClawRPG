@@ -887,6 +887,13 @@ namespace ClawRPG.Scripts.Characters {
             var ability = _abilityDatabase["ground_slam"];
             Vector2 targetPos = GetTarget()?.GlobalPosition ?? GlobalPosition;
             
+            // Show AOE indicator before damage
+            if (Systems.AOEIndicatorManager.Instance != null)
+            {
+                var worldPos = new Vector3(GlobalPosition.X, GlobalPosition.Y, 0);
+                Systems.AOEIndicatorManager.Instance.ShowAtWorldPosition(worldPos, ability.AoERadius, true, 1.5f);
+            }
+            
             // Play ability sound
             SoundEffectSystem.Instance?.PlayBossAbilityGroundSlam();
             
@@ -921,6 +928,13 @@ namespace ClawRPG.Scripts.Characters {
         private void UseFearShout()
         {
             var ability = _abilityDatabase["fear_shout"];
+            
+            // Show AOE indicator before damage
+            if (Systems.AOEIndicatorManager.Instance != null)
+            {
+                var worldPos = new Vector3(GlobalPosition.X, GlobalPosition.Y, 0);
+                Systems.AOEIndicatorManager.Instance.ShowAtWorldPosition(worldPos, ability.AoERadius, true, 1.2f);
+            }
             
             // Play ability sound
             SoundEffectSystem.Instance?.PlayBossAbilityFearRoar();

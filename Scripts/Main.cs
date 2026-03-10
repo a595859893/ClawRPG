@@ -149,6 +149,11 @@ namespace ClawRPG.Scripts {
             comboSystem.Name = "ComboSystem";
             AddChild(comboSystem);
 
+            // Initialize AOE indicator system
+            var aoeIndicatorManager = new Systems.AOEIndicatorManager();
+            aoeIndicatorManager.Name = "AOEIndicatorManager";
+            AddChild(aoeIndicatorManager);
+
             // Initialize dialogue system
             var dialogueManager = Quests.DialogueManager.Instance;
             dialogueManager.Name = "DialogueManager";
