@@ -98,6 +98,11 @@ namespace ClawRPG.Scripts {
             autoBookmarkSystem.Name = "AutoBookmarkSystem";
             AddChild(autoBookmarkSystem);
             
+            // Initialize achievement badge system
+            var badgeSystem = new AchievementBadgeSystem();
+            badgeSystem.Name = "AchievementBadgeSystem";
+            AddChild(badgeSystem);
+            
             // Initialize counter attack system
             var counterAttackSystem = new CounterAttackSystem();
             counterAttackSystem.Name = "CounterAttackSystem";
@@ -650,6 +655,12 @@ namespace ClawRPG.Scripts {
                 ToggleReputationUI();
             }
             
+            // Handle achievement badge UI toggle (B key)
+            if (Input.IsActionJustPressed("ui_badges"))
+            {
+                ToggleBadgeUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -863,6 +874,25 @@ namespace ClawRPG.Scripts {
             if (reputationUI != null)
             {
                 reputationUI.Toggle();
+            }
+        }
+        
+        private void ToggleBadgeUI()
+        {
+            var badgeUI = GetNodeOrNull<UI.AchievementBadgeUI>("CanvasLayer/AchievementBadgeUI");
+            if (badgeUI != null)
+            {
+                badgeUI.QueueFree();
+            }
+            else
+            {
+                var newBadgeUI = new UI.AchievementBadgeUI();
+                newBadgeUI.Name = "AchievementBadgeUI";
+                var canvasLayer = GetNodeOrNull("CanvasLayer");
+                if (canvasLayer != null)
+                {
+                    canvasLayer.AddChild(newBadgeUI);
+                }
             }
         }
         
