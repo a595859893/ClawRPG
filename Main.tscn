@@ -51,6 +51,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/TitleNotification.cs" id="48_title_notify"]
 [ext_resource type="Script" path="res://Scripts/Systems/TitleSystem.cs" id="49_title_system"]
 [ext_resource type="Script" path="res://Scripts/Systems/Pets/PetCombatAI.cs" id="50_pet_combat_ai"]
+[ext_resource type="Script" path="res://Scripts/Systems/BossAbilityVisualizer.cs" id="51_boss_visualizer"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -380,6 +381,9 @@ script = ExtResource("39_profile_ui")
 
 [node name="SoundEffectSystem" type="Node" parent="."]
 script = ExtResource("40_sound_effect")
+
+[node name="BossAbilityVisualizer" type="Node" parent="."]
+script = ExtResource("51_boss_visualizer")
 
 [node name="StorySystem" type="Node" parent="."]
 script = ExtResource("42_story_system")
