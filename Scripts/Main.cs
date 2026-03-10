@@ -204,6 +204,11 @@ namespace ClawRPG.Scripts {
             teamSkillSystem.Name = "TeamSkillSystem";
             AddChild(teamSkillSystem);
             
+            // Initialize shop system
+            var shopSystem = new ShopSystem();
+            shopSystem.Name = "ShopSystem";
+            AddChild(shopSystem);
+            
             // Initialize game settings system
             var gameSettings = new GameSettings();
             gameSettings.Name = "GameSettings";
@@ -400,6 +405,11 @@ namespace ClawRPG.Scripts {
             var teamSkillUI = new UI.TeamSkillUI();
             teamSkillUI.Name = "TeamSkillUI";
             ui.AddChild(teamSkillUI);
+            
+            // Shop UI
+            var shopUI = new UI.ShopUI();
+            shopUI.Name = "ShopUI";
+            ui.AddChild(shopUI);
             
             GD.Print("UI initialized");
             
@@ -683,6 +693,12 @@ namespace ClawRPG.Scripts {
                 ToggleMailUI();
             }
             
+            // Handle shop UI toggle (H key)
+            if (Input.IsActionJustPressed("ui_shop"))
+            {
+                ToggleShopUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -953,6 +969,31 @@ namespace ClawRPG.Scripts {
                     canvasLayer.AddChild(newMailUI);
                     // 传入玩家ID（单人模式用默认ID）
                     newMailUI.Open(GetMultiplayer().GetUniqueId().ToString());
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 切换商店界面
+        /// </summary>
+        private void ToggleShopUI()
+        {
+            var shopUI = GetNodeOrNull<UI.ShopUI>("CanvasLayer/ShopUI");
+            if (shopUI != null && shopUI.Visible)
+            {
+                shopUI.Hide();
+            }
+            else
+            {
+                // ShopUI 是直接添加到 ui 容器的
+                var ui = GetNodeOrNull<Control>("UI");
+                if (ui != null)
+                {
+                    var existingShopUI = ui.GetNodeOrNull<UI.ShopUI>("ShopUI");
+                    if (existingShopUI != null)
+                    {
+                        existingShopUI.Toggle();
+                    }
                 }
             }
         }
