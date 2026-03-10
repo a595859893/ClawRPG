@@ -406,6 +406,12 @@ namespace ClawRPG.Scripts {
                 ToggleStoryUI();
             }
             
+            // Handle player profile UI toggle (F key)
+            if (Input.IsActionJustPressed("player_profile"))
+            {
+                TogglePlayerProfileUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -574,6 +580,15 @@ namespace ClawRPG.Scripts {
                 {
                     storyUI.RefreshChapterList();
                 }
+            }
+        }
+        
+        private void TogglePlayerProfileUI()
+        {
+            var profileUI = GetNodeOrNull<UI.PlayerProfileUI>("CanvasLayer/PlayerProfileUI");
+            if (profileUI != null)
+            {
+                profileUI.Toggle();
             }
         }
 

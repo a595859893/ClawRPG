@@ -39,6 +39,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/BountyUI.cs" id="36_bounty_ui"]
 [ext_resource type="Script" path="res://Scripts/UI/WeatherUI.cs" id="37_weather_ui"]
 [ext_resource type="Script" path="res://Scripts/UI/AutoBookmarkUI.cs" id="38_auto_bookmark_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/PlayerProfileUI.cs" id="39_profile_ui"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -355,3 +356,13 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("35_equip_visuals_ui")
+
+[node name="PlayerProfileUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("39_profile_ui")
