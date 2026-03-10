@@ -32,6 +32,7 @@ namespace ClawRPG.Scripts.UI {
         // 引用
         private Player _player;
         private EnhancementSystem _enhancementSystem;
+        private EnhancementEffect _enhancementEffect;
         
         // 颜色
         private Color ColorCommon = new Color(0.7f, 0.7f, 0.7f);
@@ -46,6 +47,7 @@ namespace ClawRPG.Scripts.UI {
             
             _enhancementSystem = EquipmentEnhancement.Instance;
             _player = GetNodeOrNull<Player>("/root/Main/Player");
+            _enhancementEffect = GetNodeOrNull<EnhancementEffect>("../EnhancementEffect");
             
             if (_enhancementSystem != null) {
                 _enhancementSystem.OnEnhancementComplete += OnEnhancementComplete;
@@ -470,13 +472,20 @@ namespace ClawRPG.Scripts.UI {
             
             int currentLevel = _enhancementSystem.GetEnhancementLevel(_selectedItemId);
             
-            var result = _enhancementSystem.EnhanceItem(_selectedItemId, currentLevel, type, selectedStone);
+            // 播放强化进行中特效
+            _enhancementEffect?.PlayEnhancingAnimation();
             
-            // 播放音效或显示消息
-            ShowEnhancementResult(result, currentLevel);
-            
-            UpdateDetailPanel();
-            RefreshEquipmentList();
+            // 延迟执行强化（模拟强化过程）
+            var timer = GetTree().CreateTimer(1.0f);
+            timer.Timeout += () => {
+                var result = _enhancementSystem.EnhanceItem(_selectedItemId, currentLevel, type, selectedStone);
+                
+                // 根据结果播放不同特效
+                ShowEnhancementResult(result, currentLevel);
+                
+                UpdateDetailPanel();
+                RefreshEquipmentList();
+            };
         }
         
         private void ShowEnhancementResult(EnhancementResult result, int oldLevel) {
@@ -485,12 +494,15 @@ namespace ClawRPG.Scripts.UI {
             switch (result) {
                 case EnhancementResult.Success:
                     msgSystem?.ShowPositive("强化成功! 装备强化+" + (oldLevel + 1));
+                    _enhancementEffect?.PlaySuccessEffect(oldLevel + 1);
                     break;
                 case EnhancementResult.Failed:
                     msgSystem?.ShowWarning("强化失败... 装备降级至+" + Math.Max(0, oldLevel - 1));
+                    _enhancementEffect?.PlayFailEffect(Math.Max(0, oldLevel - 1));
                     break;
                 case EnhancementResult.MaxLevel:
                     msgSystem?.ShowWarning("装备已达到最大强化等级!");
+                    _enhancementEffect?.PlayMaxLevelEffect();
                     break;
             }
         }
