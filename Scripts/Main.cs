@@ -165,6 +165,11 @@ namespace ClawRPG.Scripts {
             weatherSystem.Connect(WeatherSystem.SignalName.WeatherChanged,
                 this, nameof(_OnWeatherChanged));
 
+            // Initialize companion interaction system (pet/mount bonding)
+            var companionInteractionSystem = new CompanionInteractionSystem();
+            companionInteractionSystem.Name = "CompanionInteractionSystem";
+            AddChild(companionInteractionSystem);
+
             // Initialize camera effect system
             var cameraEffectSystem = new CameraEffectSystem();
             cameraEffectSystem.Name = "CameraEffectSystem";
