@@ -295,6 +295,11 @@ namespace ClawRPG.Scripts {
             guildSystem.Name = "GuildSystem";
             AddChild(guildSystem);
             
+            // Initialize trade system
+            var tradeSystem = new TradeSystem();
+            tradeSystem.Name = "TradeSystem";
+            AddChild(tradeSystem);
+            
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
             
@@ -545,6 +550,11 @@ namespace ClawRPG.Scripts {
             var guildUI = new GuildUI();
             guildUI.Name = "GuildUI";
             ui.AddChild(guildUI);
+            
+            // Trade UI
+            var tradeUI = new UI.TradeUI();
+            tradeUI.Name = "TradeUI";
+            ui.AddChild(tradeUI);
             
             // Daily Login Reward UI
             var dailyLoginRewardUI = new DailyLoginRewardUI();
@@ -843,6 +853,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_guild"))
             {
                 ToggleGuildUI();
+            }
+            
+            // Handle trade UI toggle (T key)
+            if (Input.IsActionJustPressed("ui_trade"))
+            {
+                ToggleTradeUI();
             }
             
             // Handle daily login reward UI toggle (L key - using existing binding, different from Alchemy)
@@ -1325,6 +1341,14 @@ namespace ClawRPG.Scripts {
                 guildUI.Show();
                 guildUI.Toggle();
             }
+        }
+        
+        /// <summary>
+        /// 切换交易界面
+        /// </summary>
+        private void ToggleTradeUI()
+        {
+            TradeUI.ToggleTrade();
         }
         
         /// <summary>
