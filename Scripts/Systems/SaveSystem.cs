@@ -145,6 +145,9 @@ namespace ClawRPG.Scripts.Systems {
             // Pet story system data
             public Dictionary<string, object> PetStoryData { get; set; } = new();
             
+            // Pet egg system data
+            public Dictionary<string, object> PetEggData { get; set; } = new();
+            
             // Emote system data
             public Dictionary<string, object> EmoteData { get; set; } = new();
             
