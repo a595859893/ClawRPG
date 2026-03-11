@@ -1,626 +1,417 @@
-using System;
-using System.Collections.Generic;
-using Godot;
-using Godot.Collections;
-using ClawRPG.Scripts.Systems;
-
-public class RuneUI : Control
+namespace ClawRPG.Scripts.UI
 {
-    private PanelContainer mainPanel;
-    private VBoxContainer mainVBox;
-    private TabContainer tabContainer;
-    
-    // Inventory tab
-    private GridContainer inventoryGrid;
-    private Label inventoryLabel;
-    
-    // Equipment tab
-    private GridContainer equipmentGrid;
-    private Label equipmentLabel;
-    
-    // Sets tab
-    private VBoxContainer setsVBox;
-    private Label setsLabel;
-    
-    // Selected rune info
-    private PanelContainer infoPanel;
-    private Label runeNameLabel;
-    private Label runeTypeLabel;
-    private Label runeRarityLabel;
-    private Label runeDescriptionLabel;
-    private Label runeAttributesLabel;
-    private Label runeSetLabel;
-    private Button equipButton;
-    private Button unequipButton;
-    private Button sellButton;
-    
-    private Rune selectedRune;
-    private int selectedSlotIndex = -1;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using ClawRPG.Scripts.Data;
+    using ClawRPG.Scripts.Database;
+    using ClawRPG.Scripts.Systems;
 
-    public override void _Ready()
+    /// <summary>
+    /// 符文界面
+    /// </summary>
+    public partial class RuneUI : Control
     {
-        Visible = false; 
-        SetupUI();
-        
-        // Connect signals
-        if (RuneManager.Instance != null)
+        private RuneSystem _runeSystem;
+        private bool _isVisible = false;
+
+        // UI 组件
+        private Label _titleLabel;
+        private HBoxContainer _runeSlotsContainer;
+        private VBoxContainer _inventoryContainer;
+        private VBoxContainer _statsContainer;
+        private Label _setBonusLabel;
+        private Button _closeButton;
+        private Button _addRuneButton;
+
+        // 符文槽位
+        private RuneSlot[] _runeSlots = new RuneSlot[6];
+
+        public override void _Ready()
         {
-            RuneManager.Instance.OnRunesUpdated += RefreshInventory;
-            RuneManager.Instance.OnRuneEquipped += RefreshEquipment;
-        }
-        
-        RefreshAll();
-    }
-
-    private void SetupUI()
-    {
-        // Main Panel
-        mainPanel = new PanelContainer();
-        mainPanel.AnchorRight = 1f;
-        mainPanel.AnchorBottom = 1f;
-        mainPanel.SetAnchorsPreserveMargin(true);
-        mainPanel.Modulate = new Color(1, 1, 1, 0.95f);
-        AddChild(mainPanel);
-
-        // Main VBox
-        mainVBox = new VBoxContainer();
-        mainVBox.SetAnchorsPreserveMargin(true);
-        mainVBox.AnchorRight = 1f;
-        mainVBox.AnchorBottom = 1f;
-        mainVBox.AddThemeConstantOverride("separation", 10);
-        mainPanel.AddChild(mainVBox);
-
-        // Title
-        var titleLabel = new Label();
-        titleLabel.Text = "🔮 Rune System";
-        titleLabel.Align = Label.AlignEnum.Center;
-        titleLabel.AddThemeFontSizeOverride("font_size", 24);
-        mainVBox.AddChild(titleLabel);
-
-        // Tab Container
-        tabContainer = new TabContainer();
-        tabContainer.SetAnchorsPreserveMargin(true);
-        tabContainer.AnchorRight = 1f;
-        tabContainer.AnchorBottom = 0.85f;
-        mainVBox.AddChild(tabContainer);
-
-        // Inventory Tab
-        SetupInventoryTab();
-
-        // Equipment Tab
-        SetupEquipmentTab();
-
-        // Sets Tab
-        SetupSetsTab();
-
-        // Info Panel
-        SetupInfoPanel();
-
-        // Close button
-        var closeButton = new Button();
-        closeButton.Text = "Close (R)";
-        closeButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        closeButton.Pressed += () => ToggleUI();
-        mainVBox.AddChild(closeButton);
-    }
-
-    private void SetupInventoryTab()
-    {
-        var inventoryTab = new Control();
-        inventoryTab.Name = "Inventory";
-        tabContainer.AddChild(inventoryTab);
-
-        var vbox = new VBoxContainer();
-        vbox.SetAnchorsPreserveMargin(true);
-        vbox.AnchorRight = 1f;
-        vbox.AnchorBottom = 1f;
-        vbox.AddThemeConstantOverride("separation", 10);
-        inventoryTab.AddChild(vbox);
-
-        inventoryLabel = new Label();
-        inventoryLabel.Text = "Your Runes";
-        inventoryLabel.AddThemeFontSizeOverride("font_size", 18);
-        vbox.AddChild(inventoryLabel);
-
-        var scrollContainer = new ScrollContainer();
-        scrollContainer.SetAnchorsPreserveMargin(true);
-        scrollContainer.AnchorRight = 1f;
-        scrollContainer.AnchorBottom = 1f;
-        scrollContainer.VscrollEnabled = true;
-        vbox.AddChild(scrollContainer);
-
-        inventoryGrid = new GridContainer();
-        inventoryGrid.Columns = 5;
-        inventoryGrid.AddThemeConstantOverride("h_separation", 10);
-        inventoryGrid.AddThemeConstantOverride("v_separation", 10);
-        inventoryGrid.SetAnchorsPreserveMargin(true);
-        inventoryGrid.AnchorRight = 1f;
-        scrollContainer.AddChild(inventoryGrid);
-    }
-
-    private void SetupEquipmentTab()
-    {
-        var equipmentTab = new Control();
-        equipmentTab.Name = "Equipment";
-        tabContainer.AddChild(equipmentTab);
-
-        var vbox = new VBoxContainer();
-        vbox.SetAnchorsPreserveMargin(true);
-        vbox.AnchorRight = 1f;
-        vbox.AnchorBottom = 1f;
-        vbox.AddThemeConstantOverride("separation", 10);
-        equipmentTab.AddChild(vbox);
-
-        equipmentLabel = new Label();
-        equipmentLabel.Text = "Equipped Runes";
-        equipmentLabel.AddThemeFontSizeOverride("font_size", 18);
-        vbox.AddChild(equipmentLabel);
-
-        var scrollContainer = new ScrollContainer();
-        scrollContainer.SetAnchorsPreserveMargin(true);
-        scrollContainer.AnchorRight = 1f;
-        scrollContainer.AnchorBottom = 1f;
-        scrollContainer.VscrollEnabled = true;
-        vbox.AddChild(scrollContainer);
-
-        equipmentGrid = new GridContainer();
-        equipmentGrid.Columns = 2;
-        equipmentGrid.AddThemeConstantOverride("h_separation", 10);
-        equipmentGrid.AddThemeConstantOverride("v_separation", 10);
-        equipmentGrid.SetAnchorsPreserveMargin(true);
-        equipmentGrid.AnchorRight = 1f;
-        scrollContainer.AddChild(equipmentGrid);
-    }
-
-    private void SetupSetsTab()
-    {
-        var setsTab = new Control();
-        setsTab.Name = "Sets";
-        tabContainer.AddChild(setsTab);
-
-        var scrollContainer = new ScrollContainer();
-        scrollContainer.SetAnchorsPreserveMargin(true);
-        scrollContainer.AnchorRight = 1f;
-        scrollContainer.AnchorBottom = 1f;
-        scrollContainer.VscrollEnabled = true;
-        setsTab.AddChild(scrollContainer);
-
-        setsVBox = new VBoxContainer();
-        setsVBox.SetAnchorsPreserveMargin(true);
-        setsVBox.AnchorRight = 1f;
-        setsVBox.AnchorBottom = 1f;
-        setsVBox.AddThemeConstantOverride("separation", 10);
-        scrollContainer.AddChild(setsVBox);
-
-        setsLabel = new Label();
-        setsLabel.Text = "Active Set Bonuses";
-        setsLabel.AddThemeFontSizeOverride("font_size", 18);
-        setsVBox.AddChild(setsLabel);
-    }
-
-    private void SetupInfoPanel()
-    {
-        var infoTab = new Control();
-        infoTab.Name = "Info";
-        tabContainer.AddChild(infoTab);
-
-        var vbox = new VBoxContainer();
-        vbox.SetAnchorsPreserveMargin(true);
-        vbox.AnchorRight = 1f;
-        vbox.AnchorBottom = 1f;
-        vbox.AddThemeConstantOverride("separation", 10);
-        vbox.MarginLeft = 20;
-        vbox.MarginTop = 20;
-        vbox.MarginRight = -20;
-        vbox.MarginBottom = -20;
-        infoTab.AddChild(vbox);
-
-        infoPanel = new PanelContainer();
-        infoPanel.SetAnchorsPreserveMargin(true);
-        infoPanel.AnchorRight = 1f;
-        infoPanel.AnchorBottom = 1f;
-        vbox.AddChild(infoPanel);
-
-        var infoVBox = new VBoxContainer();
-        infoVBox.AddThemeConstantOverride("separation", 10);
-        infoPanel.AddChild(infoVBox);
-
-        runeNameLabel = new Label();
-        runeNameLabel.Text = "Select a rune";
-        runeNameLabel.AddThemeFontSizeOverride("font_size", 20);
-        infoVBox.AddChild(runeNameLabel);
-
-        runeTypeLabel = new Label();
-        runeTypeLabel.Text = "";
-        infoVBox.AddChild(runeTypeLabel);
-
-        runeRarityLabel = new Label();
-        runeRarityLabel.Text = "";
-        infoVBox.AddChild(runeRarityLabel);
-
-        runeDescriptionLabel = new Label();
-        runeDescriptionLabel.Text = "";
-        runeDescriptionLabel.AutowrapMode = TextServer.AutowrapMode.Word;
-        infoVBox.AddChild(runeDescriptionLabel);
-
-        runeAttributesLabel = new Label();
-        runeAttributesLabel.Text = "";
-        infoVBox.AddChild(runeAttributesLabel);
-
-        runeSetLabel = new Label();
-        runeSetLabel.Text = "";
-        infoVBox.AddChild(runeSetLabel);
-
-        // Buttons
-        var buttonHBox = new HBoxContainer();
-        buttonHBox.AddThemeConstantOverride("separation", 10);
-        infoVBox.AddChild(buttonHBox);
-
-        equipButton = new Button();
-        equipButton.Text = "Equip";
-        equipButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        equipButton.Pressed += OnEquipPressed;
-        buttonHBox.AddChild(equipButton);
-
-        unequipButton = new Button();
-        unequipButton.Text = "Unequip";
-        unequipButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        unequipButton.Pressed += OnUnequipPressed;
-        buttonHBox.AddChild(unequipButton);
-
-        sellButton = new Button();
-        sellButton.Text = "Sell";
-        sellButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        sellButton.Pressed += OnSellPressed;
-        buttonHBox.AddChild(sellButton);
-
-        UpdateInfoPanel(null);
-    }
-
-    public void ToggleUI()
-    {
-        Visible = !Visible;
-        if (Visible)
-        {
-            RefreshAll();
-            InputManager.AddActionListener("ui_cancel", OnClosePressed);
-            InputManager.AddActionListener("ui_rune", OnClosePressed);
-        }
-        else
-        {
-            InputManager.RemoveActionListener("ui_cancel", OnClosePressed);
-            InputManager.RemoveActionListener("ui_rune", OnClosePressed);
-        }
-    }
-
-    private void OnClosePressed()
-    {
-        ToggleUI();
-    }
-
-    private void RefreshAll()
-    {
-        RefreshInventory();
-        RefreshEquipment();
-        RefreshSets();
-    }
-
-    private void RefreshInventory()
-    {
-        // Clear existing children
-        foreach (var child in inventoryGrid.GetChildren())
-            child.QueueFree();
-
-        var runes = RuneManager.Instance.GetOwnedRunes();
-        foreach (var rune in runes)
-        {
-            var button = CreateRuneButton(rune);
-            inventoryGrid.AddChild(button);
-        }
-
-        inventoryLabel.Text = $"Your Runes ({runes.Count})";
-    }
-
-    private void RefreshEquipment()
-    {
-        // Clear existing children
-        foreach (var child in equipmentGrid.GetChildren())
-            child.QueueFree();
-
-        for (int i = 0; i < 5; i++)
-        {
-            var slotPanel = new VBoxContainer();
-            
-            var slotLabel = new Label();
-            slotLabel.Text = $"Slot {i + 1}";
-            if (RuneManager.Instance.IsSlotUnlocked(i))
+            _runeSystem = RuneSystem.Instance;
+            if (_runeSystem == null)
             {
-                slotLabel.Text += " ✓";
-            }
-            else
-            {
-                slotLabel.Text += $" (Cost: {RuneManager.Instance.GetSlotUnlockCost(i)}g)";
-                slotLabel.Modulate = new Color(0.5f, 0.5f, 0.5f);
-            }
-            slotLabel.Align = Label.AlignEnum.Center;
-            slotPanel.AddChild(slotLabel);
-
-            var equippedRune = RuneManager.Instance.GetEquippedRune(i);
-            if (equippedRune != null)
-            {
-                var button = CreateRuneButton(equippedRune, i);
-                slotPanel.AddChild(button);
-            }
-            else
-            {
-                var emptyLabel = new Label();
-                emptyLabel.Text = "[Empty]";
-                emptyLabel.Modulate = new Color(0.5f, 0.5f, 0.5f);
-                slotPanel.AddChild(emptyLabel);
-
-                // Add click to equip
-                var selectButton = new Button();
-                selectButton.Text = "Select";
-                selectButton.Pressed += () => OnSlotSelected(i);
-                slotPanel.AddChild(selectButton);
+                _runeSystem = new RuneSystem();
+                _runeSystem.Initialize();
             }
 
-            // Add unlock button if not unlocked
-            if (!RuneManager.Instance.IsSlotUnlocked(i))
-            {
-                var unlockButton = new Button();
-                unlockButton.Text = "Unlock";
-                unlockButton.Pressed += () => OnUnlockSlot(i);
-                slotPanel.AddChild(unlockButton);
-            }
-
-            equipmentGrid.AddChild(slotPanel);
+            SetupUI();
+            Visible = false;
         }
 
-        var equipped = RuneManager.Instance.GetAllEquippedRunes();
-        equipmentLabel.Text = $"Equipped Runes ({equipped.Count}/5)";
-    }
-
-    private void RefreshSets()
-    {
-        // Clear existing children (except label)
-        foreach (var child in setsVBox.GetChildren())
+        private void SetupUI()
         {
-            if (child != setsLabel)
+            // 主容器
+            var mainContainer = new VBoxContainer();
+            mainContainer.SetAnchorPreset(ControlPreset.CenterAll);
+            mainContainer.CustomMinimumSize = new Vector2(800, 600);
+            mainContainer.Modulate = new Color(1, 1, 1, 0.95f);
+            AddChild(mainContainer);
+
+            // 标题
+            _titleLabel = new Label();
+            _titleLabel.Text = "符文系统";
+            _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _titleLabel.AddThemeFontSizeOverride("font_size", 24);
+            mainContainer.AddChild(_titleLabel);
+
+            // 内容区域
+            var contentContainer = new HBoxContainer();
+            contentContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            contentContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+            mainContainer.AddChild(contentContainer);
+
+            // 符文槽位区域
+            var slotsPanel = new VBoxContainer;
+            slotsPanel.CustomMinimumSize = new Vector2(300, 0);
+            contentContainer.AddChild(slotsPanel);
+
+            var slotsLabel = new Label();
+            slotsLabel.Text = "已装备符文";
+            slotsLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            slotsPanel.AddChild(slotsLabel);
+
+            _runeSlotsContainer = new HBoxContainer();
+            _runeSlotsContainer.Alignment = BoxContainer.Alignment.Center;
+            slotsPanel.AddChild(_runeSlotsContainer);
+
+            // 创建6个符文槽位
+            for (int i = 0; i < 6; i++)
+            {
+                var slot = CreateRuneSlot(i);
+                _runeSlots[i] = slot;
+                _runeSlotsContainer.AddChild(slot.Container);
+            }
+
+            // 背包区域
+            var inventoryPanel = new VBoxContainer();
+            inventoryPanel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            contentContainer.AddChild(inventoryPanel);
+
+            var inventoryLabel = new Label();
+            inventoryLabel.Text = "符文背包";
+            inventoryLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            inventoryPanel.AddChild(inventoryLabel);
+
+            var scrollContainer = new ScrollContainer;
+            scrollContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+            inventoryPanel.AddChild(scrollContainer);
+
+            _inventoryContainer = new VBoxContainer();
+            scrollContainer.AddChild(_inventoryContainer);
+
+            // 按钮区域
+            var buttonContainer = new HBoxContainer();
+            buttonContainer.Alignment = BoxContainer.Alignment.Center;
+            mainContainer.AddChild(buttonContainer);
+
+            _addRuneButton = new Button();
+            _addRuneButton.Text = "添加随机符文";
+            _addRuneButton.Pressed += OnAddRunePressed;
+            buttonContainer.AddChild(_addRuneButton);
+
+            _closeButton = new Button();
+            _closeButton.Text = "关闭";
+            _closeButton.Pressed += OnClosePressed;
+            buttonContainer.AddChild(_closeButton);
+
+            // 统计和套装加成区域
+            var statsPanel = new VBoxContainer();
+            statsPanel.CustomMinimumSize = new Vector2(200, 0);
+            contentContainer.AddChild(statsPanel);
+
+            var statsLabel = new Label();
+            statsLabel.Text = "属性加成";
+            statsLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            statsPanel.AddChild(statsLabel);
+
+            _statsContainer = new VBoxContainer();
+            statsPanel.AddChild(_statsContainer);
+
+            var setLabel = new Label();
+            setLabel.Text = "套装效果";
+            setLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            statsPanel.AddChild(setLabel);
+
+            _setBonusLabel = new Label();
+            _setBonusLabel.Text = "无";
+            statsPanel.AddChild(_setBonusLabel);
+        }
+
+        private RuneSlot CreateRuneSlot(int index)
+        {
+            var slot = new RuneSlot();
+
+            slot.Container = new PanelContainer;
+            slot.Container.CustomMinimumSize = new Vector2(60, 60);
+            slot.Container.Modulate = new Color(0.3f, 0.3f, 0.3f);
+
+            slot.Icon = new TextureRect;
+            slot.Icon.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+            slot.Icon.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+            slot.Container.AddChild(slot.Icon);
+
+            slot.IndexLabel = new Label;
+            slot.IndexLabel.Text = (index + 1).ToString();
+            slot.IndexLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            slot.IndexLabel.VerticalAlignment = VerticalAlignment.Center;
+            slot.Container.AddChild(slot.IndexLabel);
+
+            slot.Index = index;
+            slot.Container.GuiInput += (InputEvent) => OnSlotInput(slot, InputEvent);
+
+            return slot;
+        }
+
+        private void OnSlotInput(RuneSlot slot, InputEvent evt)
+        {
+            if (evt is InputEventMouseButton mouse && mouse.Pressed && mouse.ButtonIndex == MouseButton.Left)
+            {
+                var equipped = _runeSystem.GetEquippedRunes();
+                var slotRune = equipped.FirstOrDefault(r =>
+                {
+                    var instance = _runeSystem.GetAllOwnedRunes().FirstOrDefault(x => x.Id == r.Id);
+                    return instance != null && _runeSystem.GetRuneInstance(instance.Id)?.SlotIndex == slot.Index;
+                });
+
+                if (slotRune != null)
+                {
+                    // 卸下符文
+                    var instance = _runeSystem.GetAllOwnedRunes().FirstOrDefault(x => x.Id == slotRune.Id);
+                    if (instance != null)
+                    {
+                        var inst = _runeSystem.GetRuneInstance(instance.Id);
+                        if (inst != null)
+                        {
+                            _runeSystem.UnequipRune(inst.UniqueId);
+                        }
+                    }
+                }
+
+                UpdateUI();
+            }
+        }
+
+        public override void _Process(double delta)
+        {
+            // 实时更新
+        }
+
+        private void UpdateUI()
+        {
+            // 清空背包
+            foreach (var child in _inventoryContainer.GetChildren())
+            {
                 child.QueueFree();
-        }
-
-        var equipped = RuneManager.Instance.GetAllEquippedRunes();
-        
-        // Count set pieces
-        var setCounts = new Dictionary<RuneSet, int>();
-        foreach (var rune in equipped)
-        {
-            if (rune.Set != RuneSet.None)
-            {
-                if (!setCounts.ContainsKey(rune.Set))
-                    setCounts[rune.Set] = 0;
-                setCounts[rune.Set]++;
             }
-        }
-        
-        if (setCounts.Count == 0)
-        {
-            var noSetsLabel = new Label();
-            noSetsLabel.Text = "No set bonuses active";
-            noSetsLabel.Modulate = new Color(0.7f, 0.7f, 0.7f);
-            setsVBox.AddChild(noSetsLabel);
-            return;
-        }
 
-        foreach (var setCount in setCounts)
-        {
-            var setName = setCount.Key.ToString();
-            var count = setCount.Value;
-            
-            var setPanel = new PanelContainer();
-            setPanel.CustomMinimumSize = new Vector2(0, 60);
-            setsVBox.AddChild(setPanel);
-
-            var hbox = new HBoxContainer();
-            hbox.AddThemeConstantOverride("separation", 20);
-            setPanel.AddChild(hbox);
-
-            var nameLabel = new Label();
-            nameLabel.Text = setName + " Set";
-            nameLabel.AddThemeFontSizeOverride("font_size", 16);
-            hbox.AddChild(nameLabel);
-
-            var countLabel = new Label();
-            countLabel.Text = $"{count} pieces";
-            countLabel.Modulate = new Color(0, 1, 0);
-            hbox.AddChild(countLabel);
-        }
-    }
-
-    private Button CreateRuneButton(Rune rune, int slotIndex = -1)
-    {
-        var button = new Button();
-        button.Text = rune.Name;
-        button.CustomMinimumSize = new Vector2(100, 40);
-        
-        // Color based on rarity
-        var color = GetRarityColor(rune.Rarity);
-        button.Modulate = color;
-        
-        button.Pressed += () => OnRuneSelected(rune, slotIndex);
-        
-        return button;
-    }
-
-    private Color GetRarityColor(RuneRarity rarity)
-    {
-        switch (rarity)
-        {
-            case RuneRarity.Common: return new Color(1, 1, 1);
-            case RuneRarity.Uncommon: return new Color(0.1f, 1, 0);
-            case RuneRarity.Rare: return new Color(0, 0.44f, 1);
-            case RuneRarity.Epic: return new Color(0.64f, 0.21f, 0.93f);
-            case RuneRarity.Legendary: return new Color(1, 0.5f, 0);
-            default: return new Color(1, 1, 1);
-        }
-    }
-
-    private void OnRuneSelected(Rune rune, int slotIndex)
-    {
-        selectedRune = rune;
-        selectedSlotIndex = slotIndex;
-        UpdateInfoPanel(rune);
-    }
-
-    private void OnSlotSelected(int slotIndex)
-    {
-        selectedSlotIndex = slotIndex;
-        // Show inventory to select a rune for this slot
-        tabContainer.CurrentTab = 0; // Switch to inventory tab
-    }
-
-    private void OnUnlockSlot(int slotIndex)
-    {
-        var player = GameManager.GetPlayer();
-        if (player == null) return;
-
-        int cost = RuneManager.Instance.GetSlotUnlockCost(slotIndex);
-        if (player.Gold >= cost)
-        {
-            if (RuneManager.Instance.UnlockSlot(slotIndex, player.Gold))
+            // 显示符文背包
+            var runes = _runeSystem.GetAllOwnedRunes();
+            foreach (var rune in runes)
             {
-                player.AddGold(-cost);
-                RefreshEquipment();
+                var item = CreateRuneItem(rune);
+                _inventoryContainer.AddChild(item);
             }
-        }
-        else
-        {
-            GD.Print("Not enough gold to unlock slot!");
-        }
-    }
 
-    private void UpdateInfoPanel(Rune rune)
-    {
-        if (rune == null)
-        {
-            runeNameLabel.Text = "Select a rune";
-            runeTypeLabel.Text = "";
-            runeRarityLabel.Text = "";
-            runeDescriptionLabel.Text = "";
-            runeAttributesLabel.Text = "";
-            runeSetLabel.Text = "";
-            equipButton.Disabled = true;
-            unequipButton.Disabled = true;
-            sellButton.Disabled = true;
-            return;
-        }
-
-        runeNameLabel.Text = rune.Name;
-        runeNameLabel.Modulate = GetRarityColor(rune.Rarity);
-        
-        runeTypeLabel.Text = $"Type: {rune.Type}";
-        runeRarityLabel.Text = $"Rarity: {rune.Rarity}";
-        runeDescriptionLabel.Text = rune.Description;
-
-        var attrs = new System.Text.StringBuilder();
-        attrs.Append("Attributes:\n");
-        foreach (var attr in rune.Attributes)
-        {
-            attrs.Append($"  {attr.Key}: +{attr.Value}\n");
-        }
-        runeAttributesLabel.Text = attrs.ToString();
-
-        runeSetLabel.Text = rune.Set != RuneSet.None ? $"Set: {rune.Set}" : "No set";
-
-        // Check if rune is equipped
-        bool isEquipped = false; 
-        for (int i = 0; i < 5; i++)
-        {
-            var equipped = RuneManager.Instance.GetEquippedRune(i);
-            if (equipped != null && equipped.Id == rune.Id)
+            // 更新槽位显示
+            var equipped = _runeSystem.GetEquippedRunes();
+            foreach (var slot in _runeSlots)
             {
-                isEquipped = true;
-                break;
+                var runeInSlot = equipped.FirstOrDefault(r =>
+                {
+                    var instance = _runeSystem.GetAllOwnedRunes().FirstOrDefault(x => x.Id == r.Id);
+                    return instance != null && _runeSystem.GetRuneInstance(instance.Id)?.SlotIndex == slot.Index;
+                });
+
+                if (runeInSlot != null)
+                {
+                    slot.Container.Modulate = RuneDatabase.RarityColors[runeInSlot.Rarity];
+                    slot.IndexLabel.Text = runeInSlot.Name.Substring(0, 1);
+                }
+                else
+                {
+                    slot.Container.Modulate = new Color(0.3f, 0.3f, 0.3f);
+                    slot.IndexLabel.Text = (slot.Index + 1).ToString();
+                }
+            }
+
+            // 更新属性加成
+            UpdateStats();
+
+            // 更新套装加成
+            var (setName, level, bonus) = _runeSystem.GetActiveSetBonus();
+            if (level > 0)
+            {
+                _setBonusLabel.Text = $"{setName}\n{level}件效果\n+{bonus}%全属性";
+            }
+            else
+            {
+                _setBonusLabel.Text = "无";
             }
         }
 
-        equipButton.Disabled = selectedSlotIndex < 0 || isEquipped;
-        unequipButton.Disabled = !isEquipped;
-        sellButton.Disabled = isEquipped;
-    }
-
-    private void OnEquipPressed()
-    {
-        if (selectedRune == null || selectedSlotIndex < 0)
-            return;
-
-        RuneManager.Instance.EquipRune(selectedSlotIndex, selectedRune);
-        RefreshAll();
-    }
-
-    private void OnUnequipPressed()
-    {
-        if (selectedRune == null)
-            return;
-
-        // Find the slot and unequip
-        for (int i = 0; i < 5; i++)
+        private Control CreateRuneItem(Rune rune)
         {
-            var equipped = RuneManager.Instance.GetEquippedRune(i);
-            if (equipped != null && equipped.Id == selectedRune.Id)
+            var container = new PanelContainer;
+            container.CustomMinimumSize = new Vector2(0, 50);
+
+            var hbox = new HBoxContainer;
+            container.AddChild(hbox);
+
+            var colorBox = new ColorRect;
+            colorBox.CustomMinimumSize = new Vector2(40, 40);
+            colorBox.Color = RuneDatabase.RarityColors[rune.Rarity];
+            hbox.AddChild(colorBox);
+
+            var info = new VBoxContainer;
+            info.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            hbox.AddChild(info);
+
+            var nameLabel = new Label;
+            nameLabel.Text = $"{rune.Name} Lv.{rune.Level}";
+            nameLabel.AddThemeFontSizeOverride("font_size", 14);
+            info.AddChild(nameLabel);
+
+            var typeLabel = new Label;
+            typeLabel.Text = $"{RuneDatabase.GetRuneTypeName(rune.Type)} +{rune.AttributeValue}";
+            typeLabel.AddThemeFontSizeOverride("font_size", 12);
+            info.AddChild(typeLabel);
+
+            var equipButton = new Button;
+            equipButton.Text = rune.IsEquipped ? "卸下" : "装备";
+            equipButton.Pressed += () =>
             {
-                RuneManager.Instance.UnequipRune(i);
-                break;
+                var instance = _runeSystem.GetAllOwnedRunes().FirstOrDefault(x => x.Id == rune.Id);
+                if (instance != null)
+                {
+                    var inst = _runeSystem.GetRuneInstance(instance.Id);
+                    if (inst != null)
+                    {
+                        if (rune.IsEquipped)
+                        {
+                            _runeSystem.UnequipRune(inst.UniqueId);
+                        }
+                        else
+                        {
+                            // 找到第一个空槽位
+                            var equipped = _runeSystem.GetEquippedRunes();
+                            int slot = -1;
+                            for (int i = 0; i < 6; i++)
+                            {
+                                if (!equipped.Any(e =>
+                                {
+                                    var inst2 = _runeSystem.GetAllOwnedRunes().FirstOrDefault(x => x.Id == e.Id);
+                                    return inst2 != null && _runeSystem.GetRuneInstance(inst2.Id)?.SlotIndex == i;
+                                }))
+                                {
+                                    slot = i;
+                                    break;
+                                }
+                            }
+                            if (slot >= 0)
+                            {
+                                _runeSystem.EquipRune(inst.UniqueId, slot);
+                            }
+                        }
+                    }
+                }
+                UpdateUI();
+            };
+            hbox.AddChild(equipButton);
+
+            var deleteButton = new Button;
+            deleteButton.Text = "删除";
+            deleteButton.Pressed += () =>
+            {
+                var instance = _runeSystem.GetAllOwnedRunes().FirstOrDefault(x => x.Id == rune.Id);
+                if (instance != null)
+                {
+                    var inst = _runeSystem.GetRuneInstance(instance.Id);
+                    if (inst != null)
+                    {
+                        _runeSystem.RemoveRune(inst.UniqueId);
+                    }
+                }
+                UpdateUI();
+            };
+            hbox.AddChild(deleteButton);
+
+            return container;
+        }
+
+        private void UpdateStats()
+        {
+            foreach (var child in _statsContainer.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            var bonuses = _runeSystem.GetAttributeBonuses();
+
+            AddStatLine("攻击", bonuses[RuneType.Attack]);
+            AddStatLine("防御", bonuses[RuneType.Defense]);
+            AddStatLine("生命", bonuses[RuneType.Health]);
+            AddStatLine("速度", bonuses[RuneType.Speed]);
+            AddStatLine("暴击", bonuses[RuneType.Critical]);
+            AddStatLine("魔法", bonuses[RuneType.Magic]);
+            AddStatLine("生命偷取", bonuses[RuneType.LifeSteal]);
+            AddStatLine("闪避", bonuses[RuneType.Dodge]);
+        }
+
+        private void AddStatLine(string name, float value)
+        {
+            var label = new Label;
+            label.Text = $"{name}: +{value:F1}";
+            label.AddThemeFontSizeOverride("font_size", 12);
+            _statsContainer.AddChild(label);
+        }
+
+        private void OnAddRunePressed()
+        {
+            _runeSystem.AddRandomRune();
+            UpdateUI();
+        }
+
+        private void OnClosePressed()
+        {
+            ToggleUI();
+        }
+
+        public void ToggleUI()
+        {
+            _isVisible = !_isVisible;
+            Visible = _isVisible;
+
+            if (_isVisible)
+            {
+                UpdateUI();
             }
         }
-        RefreshAll();
-    }
 
-    private void OnSellPressed()
-    {
-        if (selectedRune == null)
-            return;
-
-        var player = GameManager.GetPlayer();
-        if (player == null) return;
-
-        // Check if rune is equipped
-        bool isEquipped = false; 
-        for (int i = 0; i < 5; i++)
+        public override void _Input(InputEvent evt)
         {
-            var equipped = RuneManager.Instance.GetEquippedRune(i);
-            if (equipped != null && equipped.Id == selectedRune.Id)
+            if (evt is InputEventKey key && key.Pressed)
             {
-                isEquipped = true;
-                break;
+                // R 键切换显示
+                if (key.Keycode == Key.R)
+                {
+                    ToggleUI();
+                }
+                // ESC 关闭
+                else if (key.Keycode == Key.Escape && _isVisible)
+                {
+                    ToggleUI();
+                }
             }
         }
 
-        if (isEquipped)
+        private class RuneSlot
         {
-            GD.Print("[RuneUI] Cannot sell equipped rune");
-            return;
-        }
-
-        // Sell the rune
-        if (RuneManager.Instance.RemoveRune(selectedRune))
-        {
-            player.AddGold(selectedRune.Price);
-            GD.Print($"[RuneUI] Sold {selectedRune.Name} for {selectedRune.Price} gold");
-            RefreshAll();
-        }
-    }
-
-    public override void _Input(InputEvent @event)
-    {
-        if (@event.IsActionPressed("ui_rune") || @event.IsActionPressed("ui_cancel"))
-        {
-            if (Visible)
-            {
-                ToggleUI();
-                GetTree().SetInputAsHandled();
-            }
+            public PanelContainer Container;
+            public TextureRect Icon;
+            public Label IndexLabel;
+            public int Index;
         }
     }
 }
