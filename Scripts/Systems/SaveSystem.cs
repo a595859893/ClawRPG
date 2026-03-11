@@ -141,6 +141,9 @@ namespace ClawRPG.Scripts.Systems {
             // Keybinding data
             public Dictionary<string, int> KeybindingData { get; set; } = new();
             
+            // Pet story system data
+            public Dictionary<string, object> PetStoryData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -549,6 +552,13 @@ namespace ClawRPG.Scripts.Systems {
             if (keybindingSystem != null)
             {
                 data.KeybindingData = keybindingSystem.Serialize();
+            }
+            
+            // Save pet story data
+            var petStorySystem = GetNodeOrNull<PetStorySystem>("PetStorySystem");
+            if (petStorySystem != null)
+            {
+                data.PetStoryData = petStorySystem.Serialize();
             }
             
             return data;

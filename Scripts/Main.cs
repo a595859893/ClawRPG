@@ -482,6 +482,17 @@ namespace ClawRPG.Scripts {
             petTrainingUI.Name = "PetTrainingUI";
             AddChild(petTrainingUI);
 
+            // Initialize pet story system
+            var petStorySystem = new PetStorySystem();
+            petStorySystem.Name = "PetStorySystem";
+            AddChild(petStorySystem);
+
+            // Initialize pet story UI
+            var petStoryUI = new PetStoryUI();
+            petStoryUI.Name = "PetStoryUI";
+            petStoryUI.Visible = false;
+            ui.AddChild(petStoryUI);
+
             // Initialize pet morph system
             var petMorphSystem = PetMorphSystem.Instance;
             petMorphSystem.Initialize();
@@ -1162,6 +1173,14 @@ namespace ClawRPG.Scripts {
                         keybindingSystem.Deserialize(data.KeybindingData);
                         GD.Print("Keybinding data loaded successfully!");
                     }
+                    
+                    // Load pet story data
+                    var petStorySystem = GetNodeOrNull<PetStorySystem>("PetStorySystem");
+                    if (petStorySystem != null && data.PetStoryData != null)
+                    {
+                        petStorySystem.Deserialize(data.PetStoryData);
+                        GD.Print("Pet story data loaded successfully!");
+                    }
                 }
             }
         }
@@ -1644,6 +1663,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_pet_expedition"))
             {
                 TogglePetExpeditionUI();
+            }
+
+            // Handle pet story UI toggle (Ctrl+Shift+P)
+            if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.P))
+            {
+                TogglePetStoryUI();
             }
 
             // Handle pet equipment enhancement UI toggle (Ctrl+Shift+E)
@@ -2217,6 +2242,48 @@ namespace ClawRPG.Scripts {
                 if (petExpeditionUI.Visible)
                 {
                     petExpeditionUI.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet story UI
+        /// </summary>
+        private void TogglePetStoryUI()
+        {
+            var petStoryUI = GetNodeOrNull<PetStoryUI>("UI/PetStoryUI");
+            if (petStoryUI != null)
+            {
+                // Get player and their first pet (or selected pet)
+                var player = GetPlayer();
+                if (player != null && player.Pets != null && player.Pets.Count > 0)
+                {
+                    // Show stories for the first pet for now
+                    var pet = player.Pets[0];
+                    if (pet != null)
+                    {
+                        // Get pet type from pet data
+                        int petTypeId = 1; // Default to wolf
+                        if (pet.Has("PetTypeId"))
+                        {
+                            petTypeId = (int)pet.Get("PetTypeId");
+                        }
+                        else if (pet.Has("pet_type"))
+                        {
+                            petTypeId = (int)pet.Get("pet_type");
+                        }
+                        
+                        string petName = "宠物";
+                        if (pet.Has("name"))
+                        {
+                            petName = (string)pet.Get("name");
+                        }
+                        
+                        string[] petTypes = { "", "狼", "熊", "鹰", "狐狸", "龙", "马" };
+                        string petTypeStr = petTypeId < petTypes.Length ? petTypes[petTypeId] : "未知";
+                        
+                        PetStoryUI.Toggle(0, petTypeId, petName, petTypeStr);
+                    }
                 }
             }
         }
@@ -3242,6 +3309,13 @@ namespace ClawRPG.Scripts {
                 if (keybindingSystem != null && saveData.KeybindingData != null)
                 {
                     keybindingSystem.Deserialize(saveData.KeybindingData);
+                }
+
+                // 加载宠物故事数据
+                var petStorySystem = GetNodeOrNull<PetStorySystem>("PetStorySystem");
+                if (petStorySystem != null && saveData.PetStoryData != null)
+                {
+                    petStorySystem.Deserialize(saveData.PetStoryData);
                 }
 
                 CurrentDay = saveData.CurrentDay;
