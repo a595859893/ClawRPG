@@ -114,6 +114,11 @@ namespace ClawRPG.Scripts {
             playerProfileSystem.Name = "PlayerProfileSystem";
             AddChild(playerProfileSystem);
 
+            // Initialize artifact system
+            var artifactSystem = new ArtifactSystem();
+            artifactSystem.Name = "ArtifactSystem";
+            AddChild(artifactSystem);
+
             // Initialize counter attack system
             var counterAttackSystem = new CounterAttackSystem();
             counterAttackSystem.Name = "CounterAttackSystem";
@@ -717,6 +722,11 @@ namespace ClawRPG.Scripts {
             playerProfileUI.Name = "PlayerProfileUI";
             ui.AddChild(playerProfileUI);
 
+            // Artifact UI
+            var artifactUI = new ArtifactUI();
+            artifactUI.Name = "ArtifactUI";
+            ui.AddChild(artifactUI);
+
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
             dialogueUI.Name = "DialogueUI";
@@ -1239,6 +1249,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.C))
             {
                 ToggleChoiceEventUI();
+            }
+
+            // Handle artifact UI toggle (K key - when not in combat)
+            if (Input.IsKeyPressed(Key.K))
+            {
+                ToggleArtifactUI();
             }
 
             // Handle title UI toggle (Y key)
@@ -2376,6 +2392,15 @@ namespace ClawRPG.Scripts {
             if (profileUI != null)
             {
                 profileUI.Toggle();
+            }
+        }
+
+        private void ToggleArtifactUI()
+        {
+            var artifactUI = GetNodeOrNull<ArtifactUI>("UI/ArtifactUI");
+            if (artifactUI != null)
+            {
+                artifactUI.ToggleVisible();
             }
         }
 
