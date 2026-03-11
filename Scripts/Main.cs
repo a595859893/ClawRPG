@@ -231,6 +231,11 @@ namespace ClawRPG.Scripts {
             teamSkillSystem.Name = "TeamSkillSystem";
             AddChild(teamSkillSystem);
             
+            // Initialize mystery treasure system
+            var mysteryTreasureSystem = new MysteryTreasureSystem();
+            mysteryTreasureSystem.Name = "MysteryTreasureSystem";
+            AddChild(mysteryTreasureSystem);
+            
             // Initialize elemental reaction system
             var elementalReactionManager = new Systems.ElementalReactionManager();
             elementalReactionManager.Name = "ElementalReactionManager";
@@ -623,6 +628,12 @@ namespace ClawRPG.Scripts {
             petEvolutionUI.Visible = false;
             ui.AddChild(petEvolutionUI);
             
+            // Mystery Treasure UI
+            var mysteryTreasureUI = new MysteryTreasureUI();
+            mysteryTreasureUI.Name = "MysteryTreasureUI";
+            mysteryTreasureUI.Visible = false;
+            ui.AddChild(mysteryTreasureUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -1013,6 +1024,12 @@ namespace ClawRPG.Scripts {
                 TogglePetEvolutionUI();
             }
             
+            // Handle mystery treasure UI toggle (T key)
+            if (Input.IsActionJustPressed("ui_mystery_treasure"))
+            {
+                ToggleMysteryTreasureUI();
+            }
+            
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -1317,6 +1334,18 @@ namespace ClawRPG.Scripts {
                 {
                     petEvolutionUI.ShowUI();
                 }
+            }
+        }
+        
+        /// <summary>
+        /// Toggle mystery treasure UI
+        /// </summary>
+        private void ToggleMysteryTreasureUI()
+        {
+            var mysteryTreasureUI = GetNodeOrNull<MysteryTreasureUI>("UI/MysteryTreasureUI");
+            if (mysteryTreasureUI != null)
+            {
+                mysteryTreasureUI.Toggle();
             }
         }
         
