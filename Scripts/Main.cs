@@ -250,6 +250,11 @@ namespace ClawRPG.Scripts {
             shopSystem.Name = "ShopSystem";
             AddChild(shopSystem);
             
+            // Initialize mount combat system
+            var mountCombatSystem = new Mounts.MountCombatSystem();
+            mountCombatSystem.Name = "MountCombatSystem";
+            AddChild(mountCombatSystem);
+            
             // Initialize game settings system
             var gameSettings = new GameSettings();
             gameSettings.Name = "GameSettings";
@@ -470,6 +475,11 @@ namespace ClawRPG.Scripts {
             var alchemyUI = new Systems.AlchemyUI();
             alchemyUI.Name = "AlchemyUI";
             ui.AddChild(alchemyUI);
+            
+            // Mount Combat UI
+            var mountCombatUI = new UI.MountCombatUI();
+            mountCombatUI.Name = "MountCombatUI";
+            ui.AddChild(mountCombatUI);
             
             GD.Print("UI initialized");
             
@@ -777,6 +787,12 @@ namespace ClawRPG.Scripts {
                 ToggleAlchemyUI();
             }
             
+            // Handle mount combat UI toggle (V key)
+            if (Input.IsActionJustPressed("ui_mount_combat"))
+            {
+                ToggleMountCombatUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -954,6 +970,18 @@ namespace ClawRPG.Scripts {
             if (alchemyUI != null)
             {
                 alchemyUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle mount combat UI
+        /// </summary>
+        private void ToggleMountCombatUI()
+        {
+            var mountCombatUI = GetNodeOrNull<UI.MountCombatUI>("UI/MountCombatUI");
+            if (mountCombatUI != null)
+            {
+                mountCombatUI.Toggle();
             }
         }
         
