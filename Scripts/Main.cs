@@ -20,11 +20,11 @@ namespace ClawRPG.Scripts {
     {
         [Export] public PackedScene PlayerScene;
         [Export] public PackedScene EnemyScene;
-        
+
         private Player _player;
         private Node2D _enemies;
         private Node2D _items;
-        
+
         // Game state
         public enum GameState
         {
@@ -33,62 +33,62 @@ namespace ClawRPG.Scripts {
             Paused,
             GameOver
         }
-        
+
         private GameState _currentGameState = GameState.Playing;
         private bool _shiftEToggleCooldown = false;
-        
+
         public static bool IsPaused { get; private set; }
         public static int CurrentDay { get; private set; } = 1;
-        
+
         public void SetGameState(GameState state)
         {
             _currentGameState = state;
             GD.Print("Game state changed to: " + state);
         }
-        
+
         public GameState GetGameState() => _currentGameState;
-        
+
         public Player GetPlayer() => _player;
-        
+
         public override void _Ready()
         {
             GD.Print("=== ClawRPG Starting ===");
-            
+
             // Create node structure
             _enemies = new Node2D();
             _enemies.Name = "Enemies";
             AddChild(_enemies);
-            
+
             _items = new Node2D();
             _items.Name = "Items";
             AddChild(_items);
-            
+
             // Initialize weapon mastery system
             var weaponMasterySystem = new WeaponMasterySystem();
             weaponMasterySystem.Name = "WeaponMasterySystem";
             AddChild(weaponMasterySystem);
-            
+
             // Initialize title system
             var titleSystem = new TitleSystem();
             titleSystem.Name = "TitleSystem";
             AddChild(titleSystem);
-            
+
             // Initialize pet combat AI
             var petCombatAI = new PetCombatAI();
             petCombatAI.Name = "PetCombatAI";
             AddChild(petCombatAI);
             petCombatAI.Initialize();
-            
+
             // Initialize enhancement system
             var enhancementSystem = new EnhancementSystem();
             enhancementSystem.Name = "EnhancementSystem";
             AddChild(enhancementSystem);
-            
+
             // Initialize enhancement database
             var enhancementDb = new EnhancementDatabase();
             enhancementDb.Name = "EnhancementDatabase";
             AddChild(enhancementDb);
-            
+
             // Initialize auto potion system
             var autoPotionSystem = new AutoPotionSystem();
             autoPotionSystem.Name = "AutoPotionSystem";
@@ -98,68 +98,68 @@ namespace ClawRPG.Scripts {
             var autoBookmarkSystem = new AutoBookmarkSystem();
             autoBookmarkSystem.Name = "AutoBookmarkSystem";
             AddChild(autoBookmarkSystem);
-            
+
             // Initialize achievement badge system
             var badgeSystem = new AchievementBadgeSystem();
             badgeSystem.Name = "AchievementBadgeSystem";
             AddChild(badgeSystem);
-            
+
             // Initialize secret achievement system
             var secretAchievementSystem = new SecretAchievementSystem();
             secretAchievementSystem.Name = "SecretAchievementSystem";
             AddChild(secretAchievementSystem);
-            
+
             // Initialize counter attack system
             var counterAttackSystem = new CounterAttackSystem();
             counterAttackSystem.Name = "CounterAttackSystem";
             AddChild(counterAttackSystem);
-            
+
             // Initialize enchantment database
             var enchantmentDb = new EnchantmentDatabase();
             enchantmentDb.Name = "EnchantmentDatabase";
             AddChild(enchantmentDb);
-            
+
             // Connect counter attack system signals to sound effects
-            counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttackPerformed, 
+            counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttackPerformed,
                 this, nameof(_OnCounterAttackPerformed));
-            counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttack窗口, 
+            counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttack窗口,
                 this, nameof(_OnCounterAttackWindow));
-            counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttackReady, 
+            counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttackReady,
                 this, nameof(_OnCounterAttackReady));
-            
+
             // Initialize enchantment database
             var enchantmentDb = new ClawRPG.Scripts.Systems.Enchantment.EnchantmentDatabase();
             enchantmentDb.Name = "EnchantmentDatabase";
             AddChild(enchantmentDb);
-            
+
             // Initialize bounty system
             var bountyManager = BountyManager.Instance;
             bountyManager.Initialize();
-            
+
             // Initialize mail system
             var mailManager = new MailManager();
             mailManager.Name = "MailManager";
             AddChild(mailManager);
-            
+
             // Initialize daily login reward system
             var dailyLoginRewardSystem = new DailyLoginRewardSystem();
             dailyLoginRewardSystem.Name = "DailyLoginRewardSystem";
             AddChild(dailyLoginRewardSystem);
-            
+
             // Initialize weather system
             var weatherSystem = new WeatherSystem();
             weatherSystem.Name = "WeatherSystem";
             AddChild(weatherSystem);
-            
+
             // Connect weather system signals to sound effects
-            weatherSystem.Connect(WeatherSystem.SignalName.WeatherChanged, 
+            weatherSystem.Connect(WeatherSystem.SignalName.WeatherChanged,
                 this, nameof(_OnWeatherChanged));
-            
+
             // Initialize camera effect system
             var cameraEffectSystem = new CameraEffectSystem();
             cameraEffectSystem.Name = "CameraEffectSystem";
             AddChild(cameraEffectSystem);
-            
+
             // Initialize combo system
             var comboSystem = new ComboSystem();
             comboSystem.Name = "ComboSystem";
@@ -179,242 +179,245 @@ namespace ClawRPG.Scripts {
             var dialogueManager = Quests.DialogueManager.Instance;
             dialogueManager.Name = "DialogueManager";
             AddChild(dialogueManager);
-            
+
             // Initialize story system
             var storyManager = new StorySystem.StoryManager();
             storyManager.Name = "StoryManager";
             AddChild(storyManager);
-            
+
             // Initialize region manager
             var regionManager = new RegionManager();
             regionManager.Name = "RegionManager";
             AddChild(regionManager);
-            
+
             // Initialize sound effect system
             var soundEffectSystem = new SoundEffectSystem();
             soundEffectSystem.Name = "SoundEffectSystem";
             soundEffectSystem.AddToGroup("SoundEffectSystem");
             AddChild(soundEffectSystem);
-            
+
             // Initialize background music system
             var backgroundMusicSystem = new BackgroundMusicSystem();
             backgroundMusicSystem.Name = "BackgroundMusicSystem";
             AddChild(backgroundMusicSystem);
-            
+
             // Initialize equipment set system
             var equipmentSetManager = new EquipmentSetManager();
             equipmentSetManager.Name = "EquipmentSetManager";
             AddChild(equipmentSetManager);
-            
+
             // Initialize procedural equipment system (affix generation)
             var proceduralEquipmentSystem = ProceduralEquipmentSystem.Instance;
-            
+
             // Initialize boss ability visualizer
             var bossAbilityVisualizer = new Combat.BossAbilityVisualizer();
             bossAbilityVisualizer.Name = "BossAbilityVisualizer";
             AddChild(bossAbilityVisualizer);
-            
+
             // Initialize boss ability warning UI system
             var bossAbilityWarningUI = new UI.BossAbilityWarningUI();
             bossAbilityWarningUI.Name = "BossAbilityWarningUI";
             AddChild(bossAbilityWarningUI);
-            
+
             // Initialize counter attack VFX system
             var counterAttackVFX = new Combat.CounterAttackVFX();
             counterAttackVFX.Name = "CounterAttackVFX";
             AddChild(counterAttackVFX);
-            
+
             // Initialize balance manager system
             var balanceManager = new BalanceManager();
             balanceManager.Name = "BalanceManager";
             AddChild(balanceManager);
-            
+
             // Initialize screen effect system (post-processing)
             var screenEffectManager = new ScreenEffectManager();
             screenEffectManager.Name = "ScreenEffectManager";
             AddChild(screenEffectManager);
-            
+
             // Initialize team skill system
             var teamSkillSystem = new TeamSkillSystem();
             teamSkillSystem.Name = "TeamSkillSystem";
             AddChild(teamSkillSystem);
-            
+
             // Initialize loot drop system
             LootDropSystem.Instance.Initialize();
-            
+
             // Initialize mystery treasure system
             var mysteryTreasureSystem = new MysteryTreasureSystem();
             mysteryTreasureSystem.Name = "MysteryTreasureSystem";
             AddChild(mysteryTreasureSystem);
-            
+
             // Initialize elemental reaction system
             var elementalReactionManager = new Systems.ElementalReactionManager();
             elementalReactionManager.Name = "ElementalReactionManager";
             AddChild(elementalReactionManager);
-            
+
             // Initialize elemental damage manager
             var elementalDamageManager = new Systems.ElementalDamageManager();
             elementalDamageManager.Name = "ElementalDamageManager";
             AddChild(elementalDamageManager);
-            
+
             // Initialize elemental skill manager
             var elementalSkillManager = new Systems.ElementalSkillManager();
             elementalSkillManager.Initialize();
-            
+
             // Initialize particle effect system
             var particleEffectManager = new Systems.ParticleEffectManager();
             particleEffectManager.Name = "ParticleEffectManager";
             AddChild(particleEffectManager);
-            
+
             // Initialize shop system
             var shopSystem = new ShopSystem();
             shopSystem.Name = "ShopSystem";
             AddChild(shopSystem);
-            
+
             // Initialize auction house system
             var auctionHouseSystem = new AuctionHouseSystem();
             auctionHouseSystem.Name = "AuctionHouseSystem";
             AddChild(auctionHouseSystem);
             auctionHouseSystem.Initialize(_player);
-            
+
             // Initialize mount combat system
             var mountCombatSystem = new Mounts.MountCombatSystem();
             mountCombatSystem.Name = "MountCombatSystem";
             AddChild(mountCombatSystem);
-            
+
             // Initialize mount equipment system
             var mountEquipmentSystem = new Systems.MountEquipmentSystem();
             mountEquipmentSystem.Name = "MountEquipmentSystem";
             AddChild(mountEquipmentSystem);
-            
+
             // Initialize mount evolution system
             var mountEvolutionSystem = MountEvolutionSystem.Instance;
             mountEvolutionSystem.Initialize();
-            
+
             // Initialize random world event system
             var worldEventSystem = new Systems.RandomWorldEventSystem();
             worldEventSystem.Name = "RandomWorldEventSystem";
             AddChild(worldEventSystem);
-            
+
             // Initialize game settings system
             var gameSettings = new GameSettings();
             gameSettings.Name = "GameSettings";
             AddChild(gameSettings);
-            
+
             // Initialize quick slot system
             var quickSlotSystem = new QuickSlotSystem();
             quickSlotSystem.Name = "QuickSlotSystem";
             AddChild(quickSlotSystem);
-            
+
             // Initialize guild system
             var guildSystem = new GuildSystem();
             guildSystem.Name = "GuildSystem";
             AddChild(guildSystem);
-            
+
+            // Initialize collectible system
+            CollectibleSystem.Instance.Initialize();
+
             // Initialize pet equipment system
             var petEquipmentSystem = new Systems.Pets.PetEquipmentSystem();
             petEquipmentSystem.Name = "PetEquipmentSystem";
             AddChild(petEquipmentSystem);
-            
+
             // Initialize trade system
             var tradeSystem = new TradeSystem();
             tradeSystem.Name = "TradeSystem";
             AddChild(tradeSystem);
-            
+
             // Initialize gem system
             var gemSystem = GemSystem.Instance;
-            
+
             // Initialize gem fusion system
             var gemFusionSystem = new Systems.GemSystem.GemFusionSystem();
             gemFusionSystem.Name = "GemFusionSystem";
             AddChild(gemFusionSystem);
-            
+
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
-            
+
             // Initialize reputation system
             var reputationSystem = ReputationSystem.Instance;
             reputationSystem.Initialize();
-            
+
             // Initialize NPC schedule system
             var npcScheduleSystem = new NPCScheduleSystem();
             npcScheduleSystem.Name = "NPCScheduleSystem";
             AddChild(npcScheduleSystem);
-            
+
             // Initialize relic system
             var relicSystem = new Systems.RelicSystem();
             relicSystem.Name = "RelicSystem";
             AddChild(relicSystem);
-            
+
             // Initialize pet evolution system
             var petEvolutionSystem = new Systems.PetEvolution.PetEvolutionSystem();
             petEvolutionSystem.Name = "PetEvolutionSystem";
             AddChild(petEvolutionSystem);
-            
+
             // Initialize pet talent system
             var petTalentSystem = new Systems.PetTalentSystem();
             petTalentSystem.Name = "PetTalentSystem";
             AddChild(petTalentSystem);
-            
+
             // Initialize pet affection system
             var petAffectionSystem = new Systems.PetAffectionSystem();
             petAffectionSystem.Name = "PetAffectionSystem";
             AddChild(petAffectionSystem);
             petAffectionSystem.Initialize();
-            
+
             // Initialize elemental trial system
             var elementalTrialSystem = new Systems.ElementalTrialSystem();
             elementalTrialSystem.Name = "ElementalTrialSystem";
             AddChild(elementalTrialSystem);
             elementalTrialSystem.Initialize();
-            
+
             // Initialize pet battle arena system
             var petBattleArenaSystem = new Systems.PetBattleArena.PetBattleArenaSystem();
             petBattleArenaSystem.Name = "PetBattleArenaSystem";
             AddChild(petBattleArenaSystem);
-            
+
             // Initialize daily dungeon system
             var dailyDungeonSystem = new Systems.DailyDungeon.DailyDungeonSystem();
             dailyDungeonSystem.Name = "DailyDungeonSystem";
             AddChild(dailyDungeonSystem);
-            
+
             // Initialize random boon system
             var randomBoonSystem = new Systems.RandomBoon.RandomBoonSystem();
             randomBoonSystem.Name = "RandomBoonSystem";
             AddChild(randomBoonSystem);
-            
+
             // Initialize daily quest system
             var dailyQuestSystem = new Systems.DailyQuest.DailyQuestSystem();
             dailyQuestSystem.Name = "DailyQuestSystem";
             AddChild(dailyQuestSystem);
             dailyQuestSystem.Initialize();
-            
+
             // Initialize procedural challenge system
             var proceduralChallengeSystem = new Systems.ProceduralChallengeSystem();
             proceduralChallengeSystem.Name = "ProceduralChallengeSystem";
             AddChild(proceduralChallengeSystem);
-            
+
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
             keybindingSystem.Name = "KeybindingSystem";
             AddChild(keybindingSystem);
-            
+
             // Connect sound effect signals
             ConnectSoundSignals();
-            
+
             // Spawn player
             SpawnPlayer();
-            
+
             // Initialize UI
             InitializeUI();
-            
+
             // Load game data
             LoadGameData();
-            
+
             GD.Print("Game initialized successfully!");
         }
-        
+
         private void ConnectSoundSignals()
         {
             // Connect achievement unlock sound
@@ -425,7 +428,7 @@ namespace ClawRPG.Scripts {
                         SoundEffectSystem.Instance.PlayAchievementUnlock();
                 };
             }
-            
+
             // Connect title unlock sound
             if (TitleSystem.Instance != null)
             {
@@ -434,16 +437,16 @@ namespace ClawRPG.Scripts {
                         SoundEffectSystem.Instance.PlayTitleUnlock();
                 };
             }
-            
+
             // Connect quest complete sound
             QuestSystem.OnQuestCompleted += (quest) => {
                 if (SoundEffectSystem.Instance != null)
                     SoundEffectSystem.Instance.PlayQuestComplete();
             };
-            
+
             GD.Print("Sound effect signals connected");
         }
-        
+
         private void SpawnPlayer()
         {
             if (PlayerScene == null)
@@ -451,22 +454,22 @@ namespace ClawRPG.Scripts {
                 GD.PrintErr("PlayerScene not set!");
                 return;
             }
-            
+
             _player = PlayerScene.Instantiate<Player>();
             _player.AddToGroup("player");
             _player.GlobalPosition = new Vector2(640, 360); // Center of screen
             AddChild(_player);
-            
+
             GD.Print("Player spawned");
         }
-        
+
         private void InitializeUI()
         {
             // Create UI layer
             var ui = new CanvasLayer();
             ui.Name = "UI";
             AddChild(ui);
-            
+
             // Health bar
             var healthBar = new ProgressBar();
             healthBar.Name = "HealthBar";
@@ -475,7 +478,7 @@ namespace ClawRPG.Scripts {
             healthBar.Value = 100;
             healthBar.MaxValue = 100;
             ui.AddChild(healthBar);
-            
+
             // Mana bar
             var manaBar = new ProgressBar();
             manaBar.Name = "ManaBar";
@@ -484,14 +487,14 @@ namespace ClawRPG.Scripts {
             manaBar.Value = 50;
             manaBar.MaxValue = 50;
             ui.AddChild(manaBar);
-            
+
             // Level display
             var levelLabel = new Label();
             levelLabel.Name = "LevelLabel";
             levelLabel.Position = new Vector2(230, 20);
             levelLabel.Text = "Lv.1";
             ui.AddChild(levelLabel);
-            
+
             // Experience bar
             var expBar = new ProgressBar();
             expBar.Name = "ExpBar";
@@ -500,23 +503,23 @@ namespace ClawRPG.Scripts {
             expBar.Value = 0;
             expBar.MaxValue = 100;
             ui.AddChild(expBar);
-            
+
             // Potion UI
             var potionUI = new PotionUI();
             potionUI.Name = "PotionUI";
             ui.AddChild(potionUI);
-            
+
             // Enchantment UI
             var enchantmentUI = new EnchantmentUI();
             enchantmentUI.Name = "EnchantmentUI";
             ui.AddChild(enchantmentUI);
-            
+
             // Dynamic screen effect (for vignette, damage overlays, combo pulses)
             var dynamicScreenEffect = new DynamicScreenEffect();
             dynamicScreenEffect.Name = "DynamicScreenEffect";
             dynamicScreenEffect.AddToGroup("DynamicScreenEffect");
             ui.AddChild(dynamicScreenEffect);
-            
+
             // Combo display UI
             var comboDisplayUI = new ComboDisplayUI();
             comboDisplayUI.Name = "ComboDisplayUI";
@@ -528,7 +531,7 @@ namespace ClawRPG.Scripts {
             combatStatsPanel.Name = "CombatStatsPanel";
             combatStatsPanel.AddToGroup("CombatStatsPanel");
             ui.AddChild(combatStatsPanel);
-            
+
             // Quick Slot UI
             var quickSlotUI = new UI.QuickSlotUI();
             quickSlotUI.Name = "QuickSlotUI";
@@ -543,228 +546,228 @@ namespace ClawRPG.Scripts {
             var storyUI = new UI.StoryUI();
             storyUI.Name = "StoryUI";
             ui.AddChild(storyUI);
-            
+
             // Equipment Set UI
             var equipmentSetUI = new UI.EquipmentSetUI();
             equipmentSetUI.Name = "EquipmentSetUI";
             ui.AddChild(equipmentSetUI);
-            
+
             // Keybinding UI
             var keybindingUI = new UI.KeybindingUI();
             keybindingUI.Name = "KeybindingUI";
             ui.AddChild(keybindingUI);
-            
+
             // Counter Attack UI
             var counterAttackUI = new UI.CounterAttackUI();
             counterAttackUI.Name = "CounterAttackUI";
             ui.AddChild(counterAttackUI);
-            
+
             // Boss Health Bar UI
             var bossHealthBarUI = new UI.BossHealthBarUI();
             bossHealthBarUI.Name = "BossHealthBarUI";
             ui.AddChild(bossHealthBarUI);
-            
+
             // Tutorial UI
             var tutorialUI = new UI.TutorialUI();
             tutorialUI.Name = "TutorialUI";
             ui.AddChild(tutorialUI);
-            
+
             // Balance UI
             var balanceUI = new UI.BalanceUI();
             balanceUI.Name = "BalanceUI";
             ui.AddChild(balanceUI);
-            
+
             // Reputation UI
             var reputationUI = new UI.ReputationUI();
             reputationUI.Name = "ReputationUI";
             ui.AddChild(reputationUI);
-            
+
             // Team Skill UI
             var teamSkillUI = new UI.TeamSkillUI();
             teamSkillUI.Name = "TeamSkillUI";
             ui.AddChild(teamSkillUI);
-            
+
             // Shop UI
             var shopUI = new UI.ShopUI();
             shopUI.Name = "ShopUI";
             ui.AddChild(shopUI);
-            
+
             // Fishing System
             var fishingSystem = new Crafting.FishingSystem();
             fishingSystem.Name = "FishingSystem";
             AddChild(fishingSystem);
-            
+
             // Fishing UI
             var fishingUI = new UI.FishingUI();
             fishingUI.Name = "FishingUI";
             ui.AddChild(fishingUI);
-            
+
             // Alchemy System
             var alchemySystem = Systems.AlchemySystem.Instance;
             alchemySystem.Initialize();
-            
+
             // Alchemy UI
             var alchemyUI = new Systems.AlchemyUI();
             alchemyUI.Name = "AlchemyUI";
             ui.AddChild(alchemyUI);
-            
+
             // Mount Combat UI
             var mountCombatUI = new UI.MountCombatUI();
             mountCombatUI.Name = "MountCombatUI";
             ui.AddChild(mountCombatUI);
-            
+
             // Mount Evolution UI
             var mountEvolutionUI = new UI.MountEvolutionUI();
             mountEvolutionUI.Name = "MountEvolutionUI";
             ui.AddChild(mountEvolutionUI);
-            
+
             // Mount Equipment UI
             var mountEquipmentUI = new Systems.MountEquipmentUI();
             mountEquipmentUI.Name = "MountEquipmentUI";
             ui.AddChild(mountEquipmentUI);
-            
+
             // Random World Event UI
             var worldEventUI = new Systems.RandomWorldEventUI();
             worldEventUI.Name = "WorldEventUI";
             ui.AddChild(worldEventUI);
-            
+
             // Title UI
             var titleUI = new Systems.TitleUI();
             titleUI.Name = "TitleUI";
             ui.AddChild(titleUI);
-            
+
             // Guild UI
             var guildUI = new GuildUI();
             guildUI.Name = "GuildUI";
             ui.AddChild(guildUI);
-            
+
             // Trade UI
             var tradeUI = new UI.TradeUI();
             tradeUI.Name = "TradeUI";
             ui.AddChild(tradeUI);
-            
+
             // Daily Login Reward UI
             var dailyLoginRewardUI = new DailyLoginRewardUI();
             dailyLoginRewardUI.Name = "DailyLoginRewardUI";
             ui.AddChild(dailyLoginRewardUI);
-            
+
             // Gem UI
             var gemUI = new Systems.GemSystem.GemUI();
             gemUI.Name = "GemUI";
             ui.AddChild(gemUI);
-            
+
             // Gem Fusion UI
             var gemFusionUI = new Systems.GemSystem.GemFusionUI();
             gemFusionUI.Name = "GemFusionUI";
             gemFusionUI.Visible = false;
             ui.AddChild(gemFusionUI);
-            
+
             // Costume UI
             var costumeUI = new UI.CostumeUI();
             costumeUI.Name = "CostumeUI";
             ui.AddChild(costumeUI);
-            
+
             // Relic UI
             var relicUI = new Systems.RelicUI();
             relicUI.Name = "RelicUI";
             relicUI.Visible = false;
             ui.AddChild(relicUI);
-            
+
             // Equipment Enhancement System
             var enhancementSystem = Systems.EquipmentEnhancementSystem.Instance;
             enhancementSystem.Initialize();
-            
+
             // Equipment Enhancement UI
             var enhancementUI = new Systems.EquipmentEnhancementUI();
             enhancementUI.Name = "EquipmentEnhancementUI";
             enhancementUI.Visible = false;
             ui.AddChild(enhancementUI);
-            
+
             // Pet Equipment UI
             var petEquipmentUI = new Systems.Pets.PetEquipmentUI();
             petEquipmentUI.Name = "PetEquipmentUI";
             petEquipmentUI.Visible = false;
             ui.AddChild(petEquipmentUI);
-            
+
             // Pet Evolution UI
             var petEvolutionUI = new Systems.PetEvolution.PetEvolutionUI();
             petEvolutionUI.Name = "PetEvolutionUI";
             petEvolutionUI.Visible = false;
             ui.AddChild(petEvolutionUI);
-            
+
             // Pet Talent UI
             var petTalentUI = new Systems.PetTalentUI();
             petTalentUI.Name = "PetTalentUI";
             petTalentUI.Visible = false;
             ui.AddChild(petTalentUI);
-            
+
             // Pet Affection UI
             var petAffectionUI = new Systems.PetAffectionUI();
             petAffectionUI.Name = "PetAffectionUI";
             petAffectionUI.Visible = false;
             ui.AddChild(petAffectionUI);
-            
+
             // Mystery Treasure UI
             var mysteryTreasureUI = new MysteryTreasureUI();
             mysteryTreasureUI.Name = "MysteryTreasureUI";
             mysteryTreasureUI.Visible = false;
             ui.AddChild(mysteryTreasureUI);
-            
+
             // Elemental Trial UI
             var elementalTrialUI = new Systems.ElementalTrialUI();
             elementalTrialUI.Name = "ElementalTrialUI";
             elementalTrialUI.Visible = false;
             ui.AddChild(elementalTrialUI);
-            
+
             // Pet Battle Arena UI
             var petBattleArenaUI = new Systems.PetBattleArena.PetBattleArenaUI();
             petBattleArenaUI.Name = "PetBattleArenaUI";
             petBattleArenaUI.Visible = false;
             ui.AddChild(petBattleArenaUI);
-            
+
             // Daily Dungeon UI
             var dailyDungeonUI = new Systems.DailyDungeon.DailyDungeonUI();
             dailyDungeonUI.Name = "DailyDungeonUI";
             dailyDungeonUI.Visible = false;
             ui.AddChild(dailyDungeonUI);
-            
+
             // Random Boon UI
             var randomBoonUI = new UI.RandomBoonUI();
             randomBoonUI.Name = "RandomBoonUI";
             randomBoonUI.Visible = false;
             ui.AddChild(randomBoonUI);
-            
+
             // Daily Quest UI
             var dailyQuestUI = new Systems.DailyQuest.DailyQuestUI();
             dailyQuestUI.Name = "DailyQuestUI";
             dailyQuestUI.Visible = false;
             ui.AddChild(dailyQuestUI);
-            
+
             // Procedural Challenge UI
             var proceduralChallengeUI = new Systems.ProceduralChallengeUI();
             proceduralChallengeUI.Name = "ProceduralChallengeUI";
             proceduralChallengeUI.Visible = false;
             ui.AddChild(proceduralChallengeUI);
-            
+
             // Loot Drop UI
             var lootDropUI = new Systems.LootDropUI();
             lootDropUI.Name = "LootDropUI";
             lootDropUI.Visible = false;
             ui.AddChild(lootDropUI);
-            
+
             // Equipment Durability System
             var durabilitySystem = new Systems.EquipmentDurability.EquipmentDurabilitySystem();
             durabilitySystem.Name = "EquipmentDurabilitySystem";
             AddChild(durabilitySystem);
-            
+
             // Equipment Durability UI
             var durabilityUI = new Systems.EquipmentDurability.EquipmentDurabilityUI();
             durabilityUI.Name = "EquipmentDurabilityUI";
             durabilityUI.Visible = false;
             ui.AddChild(durabilityUI);
-            
+
             GD.Print("UI initialized");
-            
+
             // Trigger welcome tutorial
             var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
             if (tutorialUI != null)
@@ -772,7 +775,7 @@ namespace ClawRPG.Scripts {
                 tutorialUI.TriggerTutorial(TutorialTrigger.GameStart);
             }
         }
-        
+
         private void LoadGameData()
         {
             // Load player data if exists
@@ -812,7 +815,7 @@ namespace ClawRPG.Scripts {
                     };
                     StatisticsManager.Instance.LoadStatistics(statsData);
                     GD.Print("Statistics loaded successfully!");
-                    
+
                     // Load combo system data
                     var comboSystem = GetNodeOrNull<ComboSystem>("ComboSystem");
                     if (comboSystem != null && data.ComboData != null)
@@ -820,7 +823,7 @@ namespace ClawRPG.Scripts {
                         comboSystem.Deserialize(data.ComboData);
                         GD.Print("Combo data loaded successfully!");
                     }
-                    
+
                     // Load keybinding data
                     var keybindingSystem = GetNodeOrNull<Systems.KeybindingSystem>("KeybindingSystem");
                     if (keybindingSystem != null && data.KeybindingData != null)
@@ -831,17 +834,17 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         private float _autoSaveTimer = 0f;
         private const float AutoSaveInterval = 300f; // 5 minutes
-        
+
         public override void _Process(double delta)
         {
             float dt = (float)delta;
-            
+
             // Update play time
             StatisticsManager.Instance.AddPlayTime(dt);
-            
+
             // Auto save every 5 minutes
             _autoSaveTimer += dt;
             if (_autoSaveTimer >= AutoSaveInterval)
@@ -850,82 +853,82 @@ namespace ClawRPG.Scripts {
                 // Auto save logic would go here
                 GD.Print("Auto save triggered...");
             }
-            
+
             // Update UI
             UpdatePlayerUI();
-            
+
             // Update potion effects
             if (_player != null)
             {
                 PotionManager.Instance.UpdatePotionEffects(dt, _player);
             }
-            
+
             // Handle runes UI toggle (U key)
             if (Input.IsActionJustPressed("runes"))
             {
                 ToggleRunesUI();
             }
-            
+
             // Handle quest tracker toggle (T key)
             if (Input.IsActionJustPressed("quest_tracker"))
             {
                 ToggleQuestTracker();
             }
-            
+
             // Handle quest guide toggle (G key)
             if (Input.IsActionJustPressed("quest_guide"))
             {
                 ToggleQuestGuide();
             }
-            
+
             // Handle multiplayer UI toggle (M key)
             if (Input.IsActionJustPressed("multiplayer"))
             {
                 ToggleMultiplayerUI();
             }
-            
+
             // Handle weapon mastery UI toggle (W key)
             if (Input.IsActionJustPressed("weapon_mastery"))
             {
                 ToggleWeaponMasteryUI();
             }
-            
+
             // Handle counter attack UI toggle (Shift+C key)
             if (Input.IsActionJustPressed("counter_attack"))
             {
                 ToggleCounterAttackUI();
             }
-            
+
             // Handle mount UI toggle (O key)
             if (Input.IsActionJustPressed("mounts"))
             {
                 ToggleMountUI();
             }
-            
+
             // Handle title UI toggle (Y key)
             if (Input.IsActionJustPressed("titles"))
             {
                 ToggleTitleUI();
             }
-            
+
             // Handle bookmarks UI toggle (N key)
             if (Input.IsActionJustPressed("bookmarks"))
             {
                 ToggleBookmarkUI();
             }
-            
+
             // Handle auto bookmark settings toggle (Shift+N key)
             if (Input.IsActionJustPressed("auto_bookmark"))
             {
                 ToggleAutoBookmarkUI();
             }
-            
+
             // Handle equipment set UI toggle (Shift+S key)
             if (Input.IsActionJustPressed("enhancement"))
             {
                 ToggleEnhancementUI();
             }
-            
+
             // Handle equipment set UI toggle (Shift+E key)
             if (Input.IsKeyPressed(KEY_SHIFT) && Input.IsKeyPressed(KEY_E))
             {
@@ -939,61 +942,61 @@ namespace ClawRPG.Scripts {
             {
                 _shiftEToggleCooldown = false;
             }
-            
+
             // Handle auto potion UI toggle (Shift+X key)
             if (Input.IsActionJustPressed("auto_potion"))
             {
                 ToggleAutoPotionUI();
             }
-            
+
             // Handle potion UI toggle (P key)
             if (Input.IsActionJustPressed("potion"))
             {
                 TogglePotionUI();
             }
-            
+
             // Handle enchantment UI toggle (E key - secondary action)
             if (Input.IsActionJustPressed("enchantment"))
             {
                 ToggleEnchantmentUI();
             }
-            
+
             // Handle bounty UI toggle (B key)
             if (Input.IsActionJustPressed("bounty"))
             {
                 ToggleBountyUI();
             }
-            
+
             // Handle equipment visuals UI toggle (V key)
             if (Input.IsActionJustPressed("equip_visuals"))
             {
                 ToggleEquipmentVisualsUI();
             }
-            
+
             // Handle story UI toggle (K key)
             if (Input.IsActionJustPressed("story"))
             {
                 ToggleStoryUI();
             }
-            
+
             // Handle player profile UI toggle (F key)
             if (Input.IsActionJustPressed("player_profile"))
             {
                 TogglePlayerProfileUI();
             }
-            
+
             // Handle keybinding UI toggle (F10 key)
             if (Input.IsActionJustPressed("keybinding"))
             {
                 ToggleKeybindingUI();
             }
-            
+
             // Handle settings UI toggle (F11 key)
             if (Input.IsActionJustPressed("balance"))
             {
                 OpenSettingsUI();
             }
-            
+
             // Handle tutorial UI toggle (F9 key) - 查看快捷键教程
             if (Input.IsActionJustPressed("tutorial"))
             {
@@ -1003,7 +1006,7 @@ namespace ClawRPG.Scripts {
                     tutorialUI.StartTutorialById("hotkeys");
                 }
             }
-            
+
             // Handle team skill UI toggle (T key)
             if (Input.IsActionJustPressed("team_skill"))
             {
@@ -1013,10 +1016,10 @@ namespace ClawRPG.Scripts {
                     teamSkillUI.Toggle();
                 }
             }
-            
+
             // Handle team skill hotkeys (1-9, 0, -, =, ])
             HandleTeamSkillInput();
-            
+
             // Handle combat stats panel toggle (F12 key)
             if (Input.IsActionJustPressed("combat_stats"))
             {
@@ -1026,235 +1029,241 @@ namespace ClawRPG.Scripts {
                     combatStatsPanel.Toggle();
                 }
             }
-            
+
             // Handle reputation UI toggle (R key)
             if (Input.IsActionJustPressed("ui_reputation"))
             {
                 ToggleReputationUI();
             }
-            
+
             // Handle achievement badge UI toggle (B key)
             if (Input.IsActionJustPressed("ui_badges"))
             {
                 ToggleBadgeUI();
             }
-            
+
             // Handle secret achievement UI toggle (Ctrl+S key)
             if (Input.IsActionJustPressed("ui_secret_achievements"))
             {
                 ToggleSecretAchievementUI();
             }
-            
+
+            // Handle collectible UI toggle (K key)
+            if (Input.IsActionJustPressed("ui_collectible"))
+            {
+                ToggleCollectibleUI();
+            }
+
             // Handle mail UI toggle (M key)
             if (Input.IsActionJustPressed("ui_mail"))
             {
                 ToggleMailUI();
             }
-            
+
             // Handle shop UI toggle (H key)
             if (Input.IsActionJustPressed("ui_shop"))
             {
                 ToggleShopUI();
             }
-            
+
             // Handle guild UI toggle (G key)
             if (Input.IsActionJustPressed("ui_guild"))
             {
                 ToggleGuildUI();
             }
-            
+
             // Handle trade UI toggle (T key)
             if (Input.IsActionJustPressed("ui_trade"))
             {
                 ToggleTradeUI();
             }
-            
+
             // Handle daily login reward UI toggle (L key - using existing binding, different from Alchemy)
             if (Input.IsActionJustPressed("ui_daily_login"))
             {
                 ToggleDailyLoginRewardUI();
             }
-            
+
             // Handle random boon UI toggle (B key)
             if (Input.IsActionJustPressed("ui_boon"))
             {
                 ToggleRandomBoonUI();
             }
-            
+
             // Handle daily quest UI toggle (Q key)
             if (Input.IsActionJustPressed("ui_daily_quest"))
             {
                 ToggleDailyQuestUI();
             }
-            
+
             // Handle procedural challenge UI toggle (P key - using Shift+P for challenge)
             if (Input.IsActionJustPressed("ui_challenge"))
             {
                 ToggleProceduralChallengeUI();
             }
-            
+
             // Handle loot drop UI toggle (L key)
             if (Input.IsActionJustPressed("ui_loot"))
             {
                 ToggleLootDropUI();
             }
-            
+
             // Handle equipment durability UI toggle (U key - using Shift+U)
             if (Input.IsKeyPressed(KEY_SHIFT) && Input.IsKeyPressed(KEY_U))
             {
                 ToggleEquipmentDurabilityUI();
             }
-            
+
             // Handle auction house UI toggle (Y key)
             if (Input.IsActionJustPressed("ui_auction"))
             {
                 ToggleAuctionHouseUI();
             }
-            
+
             // Handle enchantment UI toggle (E key)
             if (Input.IsActionJustPressed("ui_enchant"))
             {
                 ToggleEnchantmentUI();
             }
-            
+
             // Handle fishing UI toggle (P key)
             if (Input.IsActionJustPressed("ui_fishing"))
             {
                 ToggleFishingUI();
             }
-            
+
             // Handle alchemy UI toggle (L key)
             if (Input.IsActionJustPressed("ui_alchemy"))
             {
                 ToggleAlchemyUI();
             }
-            
+
             // Handle mount combat UI toggle (V key)
             if (Input.IsActionJustPressed("ui_mount_combat"))
             {
                 ToggleMountCombatUI();
             }
-            
+
             // Handle mount evolution UI toggle (J key)
             if (Input.IsActionJustPressed("ui_mount_evolution"))
             {
                 ToggleMountEvolutionUI();
             }
-            
+
             // Handle mount equipment UI toggle (K key)
             if (Input.IsActionJustPressed("ui_mount_equipment"))
             {
                 ToggleMountEquipmentUI();
             }
-            
+
             // Handle world event UI toggle (O key)
             if (Input.IsActionJustPressed("ui_world_event"))
             {
                 ToggleWorldEventUI();
             }
-            
+
             // Handle gem UI toggle (Z key)
             if (Input.IsActionJustPressed("ui_gem"))
             {
                 ToggleGemUI();
             }
-            
+
             // Handle gem fusion UI toggle (F key)
             if (Input.IsActionJustPressed("ui_gem_fusion"))
             {
                 ToggleGemFusionUI();
             }
-            
+
             // Handle costume UI toggle (C key)
             if (Input.IsActionJustPressed("ui_costume"))
             {
                 ToggleCostumeUI();
             }
-            
+
             // Handle pet equipment UI toggle (Shift+P key)
             if (Input.IsActionJustPressed("ui_pet") && Input.IsKeyPressed(Key.Shift))
             {
                 TogglePetEquipmentUI();
             }
-            
+
             // Handle relic UI toggle (R key)
             if (Input.IsActionJustPressed("ui_relic"))
             {
                 ToggleRelicUI();
             }
-            
+
             // Handle equipment enhancement UI toggle (E key - separate from enchantment)
             if (Input.IsActionJustPressed("ui_enhancement"))
             {
                 ToggleEquipmentEnhancementUI();
             }
-            
+
             // Handle pet evolution UI toggle (P key - separate from pet equipment)
             if (Input.IsActionJustPressed("ui_pet_evolution"))
             {
                 TogglePetEvolutionUI();
             }
-            
+
             // Handle pet talent UI toggle
             if (Input.IsActionJustPressed("ui_pet_talent"))
             {
                 TogglePetTalentUI();
             }
-            
+
             // Handle pet affection UI toggle (Shift+P)
             if (Input.IsActionJustPressed("ui_pet_affection"))
             {
                 TogglePetAffectionUI();
             }
-            
+
             // Handle mystery treasure UI toggle (T key)
             if (Input.IsActionJustPressed("ui_mystery_treasure"))
             {
                 ToggleMysteryTreasureUI();
             }
-            
+
             // Handle elemental trial UI toggle (E key - separate from enchantment)
             if (Input.IsActionJustPressed("ui_elemental_trial"))
             {
                 ToggleElementalTrialUI();
             }
-            
+
             // Handle pet battle arena UI toggle (P key - separate from pet evolution)
             if (Input.IsActionJustPressed("ui_pet_battle_arena"))
             {
                 TogglePetBattleArenaUI();
             }
-            
+
             // Handle daily dungeon UI toggle (D key)
             if (Input.IsActionJustPressed("ui_daily_dungeon"))
             {
                 ToggleDailyDungeonUI();
             }
-            
+
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
                 ToggleTitleUI();
             }
-            
+
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
                 TrySpinAttack();
             }
-            
+
             if (Input.IsActionJustPressed("charge_attack"))
             {
                 TryChargeAttack();
             }
-            
+
             // Handle pause
             if (Input.IsActionJustPressed("ui_cancel"))
             {
                 TogglePause();
             }
         }
-        
+
         private void ToggleRunesUI()
         {
             var runeUI = GetNodeOrNull<UI.RuneUI>("CanvasLayer/RuneUI");
@@ -1263,7 +1272,7 @@ namespace ClawRPG.Scripts {
                 runeUI.Toggle();
             }
         }
-        
+
         private void ToggleQuestTracker()
         {
             var questTracker = GetNodeOrNull<UI.QuestTrackerUI>("CanvasLayer/QuestTrackerUI");
@@ -1272,7 +1281,7 @@ namespace ClawRPG.Scripts {
                 questTracker.Toggle();
             }
         }
-        
+
         private void ToggleQuestGuide()
         {
             var questGuide = GetNodeOrNull<UI.QuestGuideArrow>("CanvasLayer/QuestGuideArrow");
@@ -1281,7 +1290,7 @@ namespace ClawRPG.Scripts {
                 questGuide.Toggle();
             }
         }
-        
+
         private void ToggleMultiplayerUI()
         {
             var multiplayerUI = GetNodeOrNull<UI.MultiplayerUI>("CanvasLayer/MultiplayerUI");
@@ -1290,7 +1299,7 @@ namespace ClawRPG.Scripts {
                 multiplayerUI.Toggle();
             }
         }
-        
+
         private void ToggleWeaponMasteryUI()
         {
             var weaponMasteryUI = GetNodeOrNull<UI.WeaponMasteryUI>("CanvasLayer/WeaponMasteryUI");
@@ -1299,7 +1308,7 @@ namespace ClawRPG.Scripts {
                 weaponMasteryUI.Toggle();
             }
         }
-        
+
         private void ToggleCounterAttackUI()
         {
             var counterAttackUI = GetNodeOrNull<UI.CounterAttackUI>("CanvasLayer/CounterAttackUI");
@@ -1308,7 +1317,7 @@ namespace ClawRPG.Scripts {
                 counterAttackUI.Toggle();
             }
         }
-        
+
         private void ToggleMountUI()
         {
             var mountUI = GetNodeOrNull<UI.MountUI>("CanvasLayer/MountUI");
@@ -1317,7 +1326,7 @@ namespace ClawRPG.Scripts {
                 mountUI.ToggleUI();
             }
         }
-        
+
         private void ToggleTitleUI()
         {
             var titleUI = GetNodeOrNull<Systems.TitleUI>("CanvasLayer/TitleUI");
@@ -1326,7 +1335,7 @@ namespace ClawRPG.Scripts {
                 titleUI.ToggleUI();
             }
         }
-        
+
         private void ToggleBookmarkUI()
         {
             var bookmarkUI = GetNodeOrNull<UI.BookmarkUI>("CanvasLayer/BookmarkUI");
@@ -1335,7 +1344,7 @@ namespace ClawRPG.Scripts {
                 bookmarkUI.ToggleVisibility();
             }
         }
-        
+
         private void ToggleAutoBookmarkUI()
         {
             var autoBookmarkUI = GetNodeOrNull<UI.AutoBookmarkUI>("CanvasLayer/AutoBookmarkUI");
@@ -1344,7 +1353,7 @@ namespace ClawRPG.Scripts {
                 autoBookmarkUI.Toggle();
             }
         }
-        
+
         private void ToggleEnhancementUI()
         {
             var enhancementUI = GetNodeOrNull<UI.EnhancementUI>("CanvasLayer/EnhancementUI");
@@ -1360,7 +1369,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         private void ToggleAutoPotionUI()
         {
             var autoPotionUI = GetNodeOrNull<UI.AutoPotionUI>("CanvasLayer/AutoPotionUI");
@@ -1369,7 +1378,7 @@ namespace ClawRPG.Scripts {
                 autoPotionUI.ToggleVisibility();
             }
         }
-        
+
         private void ToggleEnchantmentUI()
         {
             var enchantmentUI = GetNodeOrNull<UI.EnchantmentUI>("CanvasLayer/EnchantmentUI");
@@ -1378,7 +1387,7 @@ namespace ClawRPG.Scripts {
                 enchantmentUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// 切换钓鱼界面
         /// </summary>
@@ -1397,7 +1406,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// 切换炼金界面
         /// </summary>
@@ -1409,7 +1418,7 @@ namespace ClawRPG.Scripts {
                 alchemyUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// Toggle mount combat UI
         /// </summary>
@@ -1421,7 +1430,7 @@ namespace ClawRPG.Scripts {
                 mountCombatUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// Toggle mount evolution UI
         /// </summary>
@@ -1433,7 +1442,7 @@ namespace ClawRPG.Scripts {
                 mountEvolutionUI.ToggleUI();
             }
         }
-        
+
         /// <summary>
         /// Toggle mount equipment UI
         /// </summary>
@@ -1445,7 +1454,7 @@ namespace ClawRPG.Scripts {
                 mountEquipmentUI.ToggleUI();
             }
         }
-        
+
         private void ToggleWorldEventUI()
         {
             var worldEventUI = GetNodeOrNull<Systems.RandomWorldEventUI>("UI/WorldEventUI");
@@ -1454,7 +1463,7 @@ namespace ClawRPG.Scripts {
                 worldEventUI.ToggleVisibility();
             }
         }
-        
+
         /// <summary>
         /// Toggle gem UI
         /// </summary>
@@ -1470,7 +1479,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// Toggle gem fusion UI
         /// </summary>
@@ -1482,7 +1491,25 @@ namespace ClawRPG.Scripts {
                 gemFusionUI.Toggle();
             }
         }
-        
+
+        /// <summary>
+        /// Toggle collectible UI
+        /// </summary>
+        private void ToggleCollectibleUI()
+        {
+            var collectibleUI = GetNodeOrNull<Systems.CollectibleUI>("UI/CollectibleUI");
+            if (collectibleUI != null)
+            {
+                collectibleUI.QueueFree();
+            }
+            else
+            {
+                var newUI = new Systems.CollectibleUI();
+                newUI.Name = "CollectibleUI";
+                GetNode("UI").AddChild(newUI);
+            }
+        }
+
         /// <summary>
         /// Toggle costume UI
         /// </summary>
@@ -1494,7 +1521,7 @@ namespace ClawRPG.Scripts {
                 costumeUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// Toggle pet equipment UI
         /// </summary>
@@ -1506,7 +1533,7 @@ namespace ClawRPG.Scripts {
                 petEquipmentUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// Toggle relic UI
         /// </summary>
@@ -1518,7 +1545,7 @@ namespace ClawRPG.Scripts {
                 relicUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// Toggle equipment enhancement UI
         /// </summary>
@@ -1530,7 +1557,7 @@ namespace ClawRPG.Scripts {
                 enhancementUI.ToggleUI();
             }
         }
-        
+
         /// <summary>
         /// Toggle pet evolution UI
         /// </summary>
@@ -1549,7 +1576,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// Toggle pet talent UI
         /// </summary>
@@ -1561,7 +1588,7 @@ namespace ClawRPG.Scripts {
                 petTalentUI.ToggleUI();
             }
         }
-        
+
         /// <summary>
         /// Toggle pet affection UI
         /// </summary>
@@ -1573,7 +1600,7 @@ namespace ClawRPG.Scripts {
                 petAffectionUI.ToggleUI();
             }
         }
-        
+
         /// <summary>
         /// Toggle mystery treasure UI
         /// </summary>
@@ -1597,7 +1624,7 @@ namespace ClawRPG.Scripts {
                 elementalTrialUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// Toggle pet battle arena UI
         /// </summary>
@@ -1609,7 +1636,7 @@ namespace ClawRPG.Scripts {
                 petBattleArenaUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// Toggle daily dungeon UI
         /// </summary>
@@ -1630,7 +1657,7 @@ namespace ClawRPG.Scripts {
                 bountyUI.Toggle();
             }
         }
-        
+
         private void ToggleEquipmentVisualsUI()
         {
             var equipVisualsUI = GetNodeOrNull<UI.EquipmentVisualsUI>("CanvasLayer/EquipmentVisualsUI");
@@ -1639,7 +1666,7 @@ namespace ClawRPG.Scripts {
                 equipVisualsUI.Toggle();
             }
         }
-        
+
         private void ToggleStoryUI()
         {
             var storyUI = GetNodeOrNull<UI.StoryUI>("CanvasLayer/StoryUI");
@@ -1652,7 +1679,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         private void ToggleEquipmentSetUI()
         {
             var setUI = GetNodeOrNull<UI.EquipmentSetUI>("CanvasLayer/EquipmentSetUI");
@@ -1661,7 +1688,7 @@ namespace ClawRPG.Scripts {
                 setUI.ToggleSetUI();
             }
         }
-        
+
         private void TogglePlayerProfileUI()
         {
             var profileUI = GetNodeOrNull<UI.PlayerProfileUI>("CanvasLayer/PlayerProfileUI");
@@ -1670,7 +1697,7 @@ namespace ClawRPG.Scripts {
                 profileUI.Toggle();
             }
         }
-        
+
         private void ToggleKeybindingUI()
         {
             var keybindingUI = GetNodeOrNull<UI.KeybindingUI>("CanvasLayer/KeybindingUI");
@@ -1679,7 +1706,7 @@ namespace ClawRPG.Scripts {
                 keybindingUI.ToggleKeybindingUI();
             }
         }
-        
+
         private void OpenSettingsUI()
         {
             // Check if any modal UI is open
@@ -1689,12 +1716,12 @@ namespace ClawRPG.Scripts {
                 existingSettings.QueueFree();
                 return;
             }
-            
+
             var settingsUI = new UI.SettingsUI();
             settingsUI.Name = "SettingsUI";
             GetNode("CanvasLayer").AddChild(settingsUI);
         }
-        
+
         private void ToggleReputationUI()
         {
             var reputationUI = GetNodeOrNull<UI.ReputationUI>("CanvasLayer/ReputationUI");
@@ -1703,7 +1730,7 @@ namespace ClawRPG.Scripts {
                 reputationUI.Toggle();
             }
         }
-        
+
         private void ToggleBadgeUI()
         {
             var badgeUI = GetNodeOrNull<UI.AchievementBadgeUI>("CanvasLayer/AchievementBadgeUI");
@@ -1722,7 +1749,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         private void ToggleSecretAchievementUI()
         {
             var secretUI = GetNodeOrNull<Systems.SecretAchievementUI>("CanvasLayer/SecretAchievementUI");
@@ -1741,7 +1768,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// 切换邮件界面
         /// </summary>
@@ -1765,7 +1792,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// 切换商店界面
         /// </summary>
@@ -1790,7 +1817,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// 切换拍卖行界面
         /// </summary>
@@ -1818,7 +1845,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// 切换公会界面
         /// </summary>
@@ -1826,7 +1853,7 @@ namespace ClawRPG.Scripts {
         {
             var ui = GetNodeOrNull<Control>("UI");
             if (ui == null) return;
-            
+
             var guildUI = ui.GetNodeOrNull<GuildUI>("GuildUI");
             if (guildUI != null && guildUI.Visible)
             {
@@ -1844,7 +1871,7 @@ namespace ClawRPG.Scripts {
                 guildUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// 切换交易界面
         /// </summary>
@@ -1852,7 +1879,7 @@ namespace ClawRPG.Scripts {
         {
             TradeUI.ToggleTrade();
         }
-        
+
         /// <summary>
         /// 切换每日登录奖励界面
         /// </summary>
@@ -1860,7 +1887,7 @@ namespace ClawRPG.Scripts {
         {
             var ui = GetNodeOrNull<Control>("UI");
             if (ui == null) return;
-            
+
             var dailyLoginRewardUI = ui.GetNodeOrNull<DailyLoginRewardUI>("DailyLoginRewardUI");
             if (dailyLoginRewardUI != null && dailyLoginRewardUI.Visible)
             {
@@ -1877,7 +1904,7 @@ namespace ClawRPG.Scripts {
                 dailyLoginRewardUI.Show();
             }
         }
-        
+
         /// <summary>
         /// 切换随机祝福界面
         /// </summary>
@@ -1885,7 +1912,7 @@ namespace ClawRPG.Scripts {
         {
             var ui = GetNodeOrNull<Control>("UI");
             if (ui == null) return;
-            
+
             var randomBoonUI = ui.GetNodeOrNull<UI.RandomBoonUI>("RandomBoonUI");
             if (randomBoonUI != null && randomBoonUI.Visible)
             {
@@ -1902,7 +1929,7 @@ namespace ClawRPG.Scripts {
                 randomBoonUI.Show();
             }
         }
-        
+
         /// <summary>
         /// 切换每日任务界面
         /// </summary>
@@ -1910,7 +1937,7 @@ namespace ClawRPG.Scripts {
         {
             var ui = GetNodeOrNull<Control>("UI");
             if (ui == null) return;
-            
+
             var dailyQuestUI = ui.GetNodeOrNull<Systems.DailyQuest.DailyQuestUI>("DailyQuestUI");
             if (dailyQuestUI != null && dailyQuestUI.Visible)
             {
@@ -1927,7 +1954,7 @@ namespace ClawRPG.Scripts {
                 dailyQuestUI.Show();
             }
         }
-        
+
         /// <summary>
         /// 切换程序化挑战界面
         /// </summary>
@@ -1935,7 +1962,7 @@ namespace ClawRPG.Scripts {
         {
             var ui = GetNodeOrNull<Control>("UI");
             if (ui == null) return;
-            
+
             var challengeUI = ui.GetNodeOrNull<Systems.ProceduralChallengeUI>("ProceduralChallengeUI");
             if (challengeUI != null && challengeUI.Visible)
             {
@@ -1952,7 +1979,7 @@ namespace ClawRPG.Scripts {
                 challengeUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// 切换战利品掉落统计界面
         /// </summary>
@@ -1960,7 +1987,7 @@ namespace ClawRPG.Scripts {
         {
             var ui = GetNodeOrNull<Control>("UI");
             if (ui == null) return;
-            
+
             var lootUI = ui.GetNodeOrNull<Systems.LootDropUI>("LootDropUI");
             if (lootUI != null && lootUI.Visible)
             {
@@ -1977,7 +2004,7 @@ namespace ClawRPG.Scripts {
                 lootUI.Toggle();
             }
         }
-        
+
         /// <summary>
         /// 切换装备耐久度界面
         /// </summary>
@@ -1985,7 +2012,7 @@ namespace ClawRPG.Scripts {
         {
             var ui = GetNodeOrNull<Control>("UI");
             if (ui == null) return;
-            
+
             var durabilityUI = ui.GetNodeOrNull<Systems.EquipmentDurability.EquipmentDurabilityUI>("EquipmentDurabilityUI");
             if (durabilityUI != null && durabilityUI.Visible)
             {
@@ -2002,7 +2029,7 @@ namespace ClawRPG.Scripts {
                 durabilityUI.ToggleUI();
             }
         }
-        
+
         /// <summary>
         /// 切换附魔界面
         /// </summary>
@@ -2010,7 +2037,7 @@ namespace ClawRPG.Scripts {
         {
             var ui = GetNodeOrNull<Control>("UI");
             if (ui == null) return;
-            
+
             var enchantUI = ui.GetNodeOrNull<Systems.EnchantmentUI>("EnchantmentUI");
             if (enchantUI != null && enchantUI.Visible)
             {
@@ -2027,14 +2054,14 @@ namespace ClawRPG.Scripts {
                 enchantUI.Show();
             }
         }
-        
+
         /// <summary>
         /// 处理队伍技能快捷键输入
         /// </summary>
         private void HandleTeamSkillInput()
         {
             if (TeamSkillSystem.Instance == null) return;
-            
+
             // 数字键 1-9 使用对应技能
             if (Input.IsActionJustPressed("team_skill_1"))
                 TeamSkillSystem.Instance.UseSkill(TeamSkillSystem.TeamSkillType.HealingRain);
@@ -2069,7 +2096,7 @@ namespace ClawRPG.Scripts {
                 Quests.DialogueManager.Instance.StartDialogue(npcId);
             }
         }
-        
+
         private void TrySpinAttack()
         {
             if (WeaponMasterySystem.Instance != null)
@@ -2081,7 +2108,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         private void TryChargeAttack()
         {
             if (WeaponMasterySystem.Instance != null && _player != null)
@@ -2097,45 +2124,45 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         private void UpdatePlayerUI()
         {
             if (_player == null) return;
-            
+
             var healthBar = GetNodeOrNull<ProgressBar>("UI/HealthBar");
             var manaBar = GetNodeOrNull<ProgressBar>("UI/ManaBar");
             var levelLabel = GetNodeOrNull<Label>("UI/LevelLabel");
             var expBar = GetNodeOrNull<ProgressBar>("UI/ExpBar");
-            
+
             if (healthBar != null)
             {
                 healthBar.MaxValue = _player.MaxHealth;
                 healthBar.Value = _player.CurrentHealth;
             }
-            
+
             if (manaBar != null)
             {
                 manaBar.MaxValue = _player.MaxMana;
                 manaBar.Value = _player.CurrentMana;
             }
-            
+
             if (levelLabel != null)
             {
                 levelLabel.Text = "Lv." + _player.Level;
             }
-            
+
             if (expBar != null)
             {
                 expBar.MaxValue = _player.Level * 100;
                 expBar.Value = _player.Experience;
             }
         }
-        
+
         private void TogglePause()
         {
             IsPaused = !IsPaused;
             GetTree().Paused = IsPaused;
-            
+
             if (IsPaused)
             {
                 ShowPauseMenu();
@@ -2144,25 +2171,25 @@ namespace ClawRPG.Scripts {
             {
                 HidePauseMenu();
             }
-            
+
             GD.Print("Game " + (IsPaused ? "PAUSED" : "RESUMED"));
         }
-        
+
         private void ShowPauseMenu()
         {
             // Create pause menu
             var pauseMenu = new Control();
             pauseMenu.Name = "PauseMenu";
             pauseMenu.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            
+
             var panel = new Panel();
             panel.SetAnchorsPreset(Control.LayoutPreset.Center);
             panel.Size = new Vector2(300, 200);
             pauseMenu.AddChild(panel);
-            
+
             AddChild(pauseMenu);
         }
-        
+
         private void HidePauseMenu()
         {
             var pauseMenu = GetNodeOrNull("PauseMenu");
@@ -2171,41 +2198,41 @@ namespace ClawRPG.Scripts {
                 pauseMenu.QueueFree();
             }
         }
-        
+
         public void SpawnEnemy(Vector2 position, string enemyType = "goblin")
         {
             if (EnemyScene == null) return;
-            
+
             var enemy = EnemyScene.Instantiate<Enemy>();
             enemy.GlobalPosition = position;
             _enemies.AddChild(enemy);
-            
+
             // Start battle music when enemy spawns (if not already in battle)
             if (BackgroundMusicSystem.Instance != null && !BackgroundMusicSystem.Instance.IsInBattle()) {
                 BackgroundMusicSystem.Instance.StartBattleMusic(false);
             }
-            
+
             // Start combat stats
             var combatStatsPanel = GetNodeOrNull<UI.CombatStatsPanel>("CanvasLayer/CombatStatsPanel");
             if (combatStatsPanel != null) {
                 combatStatsPanel.StartCombat();
             }
-            
+
             // Trigger first combat tutorial
             var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
             if (tutorialUI != null && tutorialUI.IsActive == false) {
                 tutorialUI.TriggerTutorial(TutorialTrigger.FirstCombat);
             }
-            
+
             GD.Print("Enemy spawned: " + enemyType);
         }
-        
+
         public void AdvanceDay()
         {
             CurrentDay++;
             GD.Print("Day " + CurrentDay + " begins!");
         }
-        
+
         /// <summary>
         /// Check if battle has ended (no enemies remaining)
         /// </summary>
@@ -2214,7 +2241,7 @@ namespace ClawRPG.Scripts {
                 BackgroundMusicSystem.Instance.StopBattleMusic();
                 BackgroundMusicSystem.Instance.PlayVictoryMusic();
             }
-            
+
             // End combat stats if no enemies
             if (_enemies.GetChildCount() == 0) {
                 var combatStatsPanel = GetNodeOrNull<UI.CombatStatsPanel>("CanvasLayer/CombatStatsPanel");
@@ -2223,7 +2250,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// 显示通知消息
         /// </summary>
@@ -2241,7 +2268,7 @@ namespace ClawRPG.Scripts {
                 GD.Print($"通知: {message} - {detail}");
             }
         }
-        
+
         /// <summary>
         /// 获取世界事件管理器实例
         /// </summary>
@@ -2249,41 +2276,41 @@ namespace ClawRPG.Scripts {
         {
             return WorldEventManager.Instance;
         }
-        
+
         /// <summary>
         /// 开始新游戏
         /// </summary>
         public void StartNewGame()
         {
             GD.Print("Starting new game...");
-            
+
             // 重置玩家数据
             if (_player != null)
             {
                 _player.ResetPlayer();
             }
-            
+
             // 重置游戏状态
             CurrentDay = 1;
             IsPaused = false;
             SetGameState(GameState.Playing);
-            
+
             // 显示游戏UI
             ShowGameUI();
-            
+
             GD.Print("New game started!");
         }
-        
+
         /// <summary>
         /// 加载游戏存档
         /// </summary>
         public void LoadGame(int saveSlot)
         {
             GD.Print("Loading game from slot: " + saveSlot);
-            
+
             var saveSystem = new SaveSystem();
             var saveData = saveSystem.LoadGame(saveSlot);
-            
+
             if (saveData != null)
             {
                 // 加载玩家数据
@@ -2291,7 +2318,7 @@ namespace ClawRPG.Scripts {
                 {
                     _player.LoadPlayerData(saveData.PlayerData);
                 }
-                
+
                 // 加载统计
                 var statsData = new Dictionary<string, object>
                 {
@@ -2320,7 +2347,7 @@ namespace ClawRPG.Scripts {
                     ["AchievementsUnlocked"] = saveData.AchievementsUnlocked
                 };
                 StatisticsManager.Instance.LoadStatistics(statsData);
-                
+
                 // 加载快速槽数据
                 if (saveData.QuickSlotItemIds != null && saveData.QuickSlotQuantities != null)
                 {
@@ -2332,19 +2359,19 @@ namespace ClawRPG.Scripts {
                         }
                     }
                 }
-                
+
                 // 加载坐骑数据
                 if (saveData.MountData != null && MountManager.Instance != null)
                 {
                     MountManager.Instance.Deserialize(saveData.MountData);
                 }
-                
+
                 // 加载收藏点数据
                 if (saveData.BookmarkData != null && BookmarkSystem.Instance != null)
                 {
                     BookmarkSystem.Instance.Deserialize(saveData.BookmarkData);
                 }
-                
+
                 // 加载自动收藏点数据
                 if (saveData.AutoBookmarkData != null)
                 {
@@ -2354,7 +2381,7 @@ namespace ClawRPG.Scripts {
                         autoBookmarkSystem.Deserialize(saveData.AutoBookmarkData);
                     }
                 }
-                
+
                 // 加载强化数据
                 if (saveData.EnhancementData != null)
                 {
@@ -2364,7 +2391,7 @@ namespace ClawRPG.Scripts {
                         enhancementSystem.Deserialize(saveData.EnhancementData);
                     }
                 }
-                
+
                 // 加载自动药水数据
                 if (saveData.AutoPotionData != null)
                 {
@@ -2374,51 +2401,51 @@ namespace ClawRPG.Scripts {
                         autoPotionSystem.Deserialize(saveData.AutoPotionData);
                     }
                 }
-                
+
                 // 加载附魔数据
                 if (saveData.EnchantmentData != null)
                 {
                     ClawRPG.Scripts.Systems.Enchantment.EnchantmentSystem.Instance.Deserialize(saveData.EnchantmentData);
                 }
-                
+
                 // 加载赏金数据
                 if (saveData.BountyData != null)
                 {
                     BountyManager.Instance.Deserialize(saveData.BountyData);
                 }
-                
+
                 // 加载天气数据
                 var weatherSystem = GetNodeOrNull<WeatherSystem>("WeatherSystem");
                 if (weatherSystem != null && saveData.WeatherData != null)
                 {
                     weatherSystem.Deserialize(saveData.WeatherData);
                 }
-                
+
                 // 加载装备外观数据
                 var equipVisuals = GetNodeOrNull<UI.EquipmentVisuals>("EquipmentVisuals");
                 if (equipVisuals != null && saveData.EquipmentVisualsData != null)
                 {
                     equipVisuals.Deserialize(saveData.EquipmentVisualsData);
                 }
-                
+
                 // 加载已解锁外观数据
                 if (equipVisuals != null && saveData.UnlockedVisuals != null)
                 {
                     equipVisuals.LoadUnlockedVisualsData(saveData.UnlockedVisuals);
                 }
-                
+
                 // 加载按键绑定数据
                 var keybindingSystem = GetNodeOrNull<Systems.KeybindingSystem>("KeybindingSystem");
                 if (keybindingSystem != null && saveData.KeybindingData != null)
                 {
                     keybindingSystem.Deserialize(saveData.KeybindingData);
                 }
-                
+
                 CurrentDay = saveData.CurrentDay;
                 SetGameState(GameState.Playing);
-                
+
                 ShowGameUI();
-                
+
                 GD.Print("Game loaded successfully!");
             }
             else
@@ -2426,7 +2453,7 @@ namespace ClawRPG.Scripts {
                 GD.PrintErr("Failed to load save file!");
             }
         }
-        
+
         /// <summary>
         /// 显示游戏UI
         /// </summary>
@@ -2445,7 +2472,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// 切换设置界面
         /// </summary>
@@ -2455,7 +2482,7 @@ namespace ClawRPG.Scripts {
             if (settingsUI != null)
             {
                 settingsUI.Visible = !settingsUI.Visible;
-                
+
                 if (settingsUI.Visible)
                 {
                     GD.Print("Settings opened");
@@ -2470,9 +2497,9 @@ namespace ClawRPG.Scripts {
                 GD.Print("Settings UI not found in scene");
             }
         }
-        
+
         #region Counter Attack Sound Handlers
-        
+
         /// <summary>
         /// Handle counter attack performed signal
         /// </summary>
@@ -2483,7 +2510,7 @@ namespace ClawRPG.Scripts {
                 SoundEffectSystem.Instance.PlayCounterAttackPerformed(type);
             }
         }
-        
+
         /// <summary>
         /// Handle counter attack window signal
         /// </summary>
@@ -2497,7 +2524,7 @@ namespace ClawRPG.Scripts {
                 }
             }
         }
-        
+
         /// <summary>
         /// Handle counter attack ready signal
         /// </summary>
@@ -2508,11 +2535,11 @@ namespace ClawRPG.Scripts {
                 SoundEffectSystem.Instance.PlayCounterAttackReady();
             }
         }
-        
+
         #endregion
-        
+
         #region Weather Sound Handlers
-        
+
         /// <summary>
         /// Handle weather changed signal
         /// </summary>
@@ -2523,7 +2550,7 @@ namespace ClawRPG.Scripts {
                 SoundEffectSystem.Instance.PlayWeatherChange(newWeather.Type);
             }
         }
-        
+
         #endregion
     }
 }

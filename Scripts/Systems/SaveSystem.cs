@@ -791,5 +791,43 @@ namespace ClawRPG.Scripts.Systems {
             }
             return new Dictionary<string, object>();
         }
+
+        // ===== Collectible System Save/Load =====
+
+        public void SaveCollectibleData(Dictionary<string, object> data)
+        {
+            try
+            {
+                string path = "user://collectible_data.json";
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(data, options);
+                File.WriteAllText(path, json);
+                GD.Print("[SaveSystem] Collectible data saved");
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to save collectible data: " + e.Message);
+            }
+        }
+
+        public Dictionary<string, object> LoadCollectibleData()
+        {
+            try
+            {
+                string path = "user://collectible_data.json";
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    GD.Print("[SaveSystem] Collectible data loaded");
+                    return data;
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to load collectible data: " + e.Message);
+            }
+            return new Dictionary<string, object>();
+        }
     }
 }
