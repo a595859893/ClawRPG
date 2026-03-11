@@ -306,6 +306,11 @@ namespace ClawRPG.Scripts {
             worldEventSystem.Name = "RandomWorldEventSystem";
             AddChild(worldEventSystem);
 
+            // Initialize world boss system
+            var worldBossSystem = new Systems.WorldBoss.WorldBossSystem();
+            worldBossSystem.Name = "WorldBossSystem";
+            AddChild(worldBossSystem);
+
             // Initialize game settings system
             var gameSettings = new GameSettings();
             gameSettings.Name = "GameSettings";
@@ -810,6 +815,12 @@ namespace ClawRPG.Scripts {
             dynamicDifficultyUI.Name = "DynamicDifficultyUI";
             dynamicDifficultyUI.Visible = false;
             ui.AddChild(dynamicDifficultyUI);
+
+            // World Boss UI
+            var worldBossUI = new Systems.WorldBoss.WorldBossUI();
+            worldBossUI.Name = "WorldBossUI";
+            worldBossUI.Visible = false;
+            ui.AddChild(worldBossUI);
 
             // Elemental Trial UI
             var elementalTrialUI = new Systems.ElementalTrialUI();
@@ -1435,6 +1446,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_cancel"))
             {
                 TogglePause();
+            }
+
+            // Handle world boss UI toggle (W key)
+            if (Input.IsActionJustPressed("ui_world_boss"))
+            {
+                ToggleWorldBossUI();
             }
         }
 
@@ -2357,6 +2374,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(enchantUI);
                 }
                 enchantUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换世界首领界面
+        /// </summary>
+        private void ToggleWorldBossUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var worldBossUI = ui.GetNodeOrNull<Systems.WorldBoss.WorldBossUI>("WorldBossUI");
+            if (worldBossUI != null && worldBossUI.Visible)
+            {
+                worldBossUI.Hide();
+            }
+            else
+            {
+                if (worldBossUI == null)
+                {
+                    worldBossUI = new Systems.WorldBoss.WorldBossUI();
+                    worldBossUI.Name = "WorldBossUI";
+                    ui.AddChild(worldBossUI);
+                }
+                worldBossUI.Show();
             }
         }
 
