@@ -340,6 +340,12 @@ namespace ClawRPG.Scripts {
             petEvolutionSystem.Name = "PetEvolutionSystem";
             AddChild(petEvolutionSystem);
             
+            // Initialize elemental trial system
+            var elementalTrialSystem = new Systems.ElementalTrialSystem();
+            elementalTrialSystem.Name = "ElementalTrialSystem";
+            AddChild(elementalTrialSystem);
+            elementalTrialSystem.Initialize();
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -633,6 +639,12 @@ namespace ClawRPG.Scripts {
             mysteryTreasureUI.Name = "MysteryTreasureUI";
             mysteryTreasureUI.Visible = false;
             ui.AddChild(mysteryTreasureUI);
+            
+            // Elemental Trial UI
+            var elementalTrialUI = new Systems.ElementalTrialUI();
+            elementalTrialUI.Name = "ElementalTrialUI";
+            elementalTrialUI.Visible = false;
+            ui.AddChild(elementalTrialUI);
             
             GD.Print("UI initialized");
             
@@ -1030,6 +1042,12 @@ namespace ClawRPG.Scripts {
                 ToggleMysteryTreasureUI();
             }
             
+            // Handle elemental trial UI toggle (E key - separate from enchantment)
+            if (Input.IsActionJustPressed("ui_elemental_trial"))
+            {
+                ToggleElementalTrialUI();
+            }
+            
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -1348,7 +1366,19 @@ namespace ClawRPG.Scripts {
                 mysteryTreasureUI.Toggle();
             }
         }
-        
+
+        /// <summary>
+        /// Toggle elemental trial UI
+        /// </summary>
+        private void ToggleElementalTrialUI()
+        {
+            var elementalTrialUI = GetNodeOrNull<Systems.ElementalTrialUI>("UI/ElementalTrialUI");
+            if (elementalTrialUI != null)
+            {
+                elementalTrialUI.Toggle();
+            }
+        }
+
         private void ToggleBountyUI()
         {
             var bountyUI = GetNodeOrNull<UI.BountyUI>("CanvasLayer/BountyUI");
