@@ -144,6 +144,9 @@ namespace ClawRPG.Scripts.Systems {
             // Pet story system data
             public Dictionary<string, object> PetStoryData { get; set; } = new();
             
+            // Emote system data
+            public Dictionary<string, object> EmoteData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -559,6 +562,15 @@ namespace ClawRPG.Scripts.Systems {
             if (petStorySystem != null)
             {
                 data.PetStoryData = petStorySystem.Serialize();
+            }
+            
+            // Save emote data
+            var emoteSystem = GetNodeOrNull<Systems.Emote.EmoteSystem>("EmoteSystem");
+            if (emoteSystem != null)
+            {
+                var emoteData = new Dictionary<string, object>();
+                emoteSystem.SaveData(emoteData);
+                data.EmoteData = emoteData;
             }
             
             return data;

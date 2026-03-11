@@ -1120,6 +1120,17 @@ namespace ClawRPG.Scripts {
             partyUI.Visible = false;
             ui.AddChild(partyUI);
 
+            // Emote System
+            var emoteSystem = new Systems.Emote.EmoteSystem();
+            emoteSystem.Name = "EmoteSystem";
+            AddChild(emoteSystem);
+
+            // Emote UI
+            var emoteUI = new Systems.Emote.EmoteUI();
+            emoteUI.Name = "EmoteUI";
+            emoteUI.Visible = false;
+            ui.AddChild(emoteUI);
+
             // Trigger welcome tutorial
             var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
             if (tutorialUI != null)
@@ -1764,6 +1775,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_seasonal_event"))
             {
                 ToggleSeasonalEventUI();
+            }
+
+            // Handle emote UI toggle (E key)
+            if (Input.IsKeyPressed(Key.E))
+            {
+                ToggleEmoteUI();
             }
 
             // Handle title UI toggle (N key)
@@ -2911,6 +2928,28 @@ namespace ClawRPG.Scripts {
         }
 
         /// <summary>
+        /// 切换表情动作界面
+        /// </summary>
+        private void ToggleEmoteUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var emoteUI = ui.GetNodeOrNull<Systems.Emote.EmoteUI>("EmoteUI");
+            if (emoteUI != null)
+            {
+                emoteUI.Toggle();
+            }
+            else
+            {
+                emoteUI = new Systems.Emote.EmoteUI();
+                emoteUI.Name = "EmoteUI";
+                ui.AddChild(emoteUI);
+                emoteUI.Toggle();
+            }
+        }
+
+        /// <summary>
         /// 切换附魔界面
         /// </summary>
         private void ToggleEnchantmentUI()
@@ -3351,6 +3390,13 @@ namespace ClawRPG.Scripts {
                 if (petStorySystem != null && saveData.PetStoryData != null)
                 {
                     petStorySystem.Deserialize(saveData.PetStoryData);
+                }
+
+                // 加载表情动作数据
+                var emoteSystem = GetNodeOrNull<Systems.Emote.EmoteSystem>("EmoteSystem");
+                if (emoteSystem != null && saveData.EmoteData != null)
+                {
+                    emoteSystem.LoadData(saveData.EmoteData);
                 }
 
                 CurrentDay = saveData.CurrentDay;
