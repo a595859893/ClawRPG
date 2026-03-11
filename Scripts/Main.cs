@@ -497,6 +497,18 @@ namespace ClawRPG.Scripts {
             var petMorphSystem = PetMorphSystem.Instance;
             petMorphSystem.Initialize();
 
+            // Initialize pet habitat system
+            var petHabitatSystem = new PetHabitatSystem();
+            petHabitatSystem.Name = "PetHabitatSystem";
+            AddChild(petHabitatSystem);
+            petHabitatSystem.Initialize();
+
+            // Initialize pet habitat UI
+            var petHabitatUI = new PetHabitatUI();
+            petHabitatUI.Name = "PetHabitatUI";
+            petHabitatUI.Visible = false;
+            ui.AddChild(petHabitatUI);
+
             // Initialize mount expedition system
             var mountExpeditionSystem = new Systems.MountExpeditionSystem();
             mountExpeditionSystem.Name = "MountExpeditionSystem";
@@ -1753,6 +1765,12 @@ namespace ClawRPG.Scripts {
                 TogglePetMorphUI();
             }
 
+            // Handle pet habitat UI toggle (Ctrl+H key)
+            if (Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.H))
+            {
+                TogglePetHabitatUI();
+            }
+
             // Handle daily dungeon UI toggle (D key)
             if (Input.IsActionJustPressed("ui_daily_dungeon"))
             {
@@ -2427,6 +2445,25 @@ namespace ClawRPG.Scripts {
                 else
                 {
                     petMorphUI.ShowUI();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet habitat UI
+        /// </summary>
+        private void TogglePetHabitatUI()
+        {
+            var petHabitatUI = GetNodeOrNull<PetHabitatUI>("UI/PetHabitatUI");
+            if (petHabitatUI != null)
+            {
+                if (petHabitatUI.Visible)
+                {
+                    petHabitatUI.Hide();
+                }
+                else
+                {
+                    petHabitatUI.Show();
                 }
             }
         }

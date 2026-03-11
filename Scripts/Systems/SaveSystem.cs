@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.IO;
 using System.Text.Json;
+using GameSystems;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
@@ -1069,6 +1070,106 @@ namespace ClawRPG.Scripts.Systems {
                 GD.PrintErr("[SaveSystem] Failed to load pet training data: " + e.Message);
             }
             return new Dictionary<string, Variant>();
+        }
+
+        public void SavePetHabitatData(PlayerHabitatData data)
+        {
+            try
+            {
+                string path = "user://pet_habitat_data.json";
+                var dict = new Dictionary<string, object>();
+                
+                dict["current_habitat_id"] = data.CurrentHabitatId;
+                dict["total_comfort"] = data.TotalComfort;
+                dict["total_attraction"] = data.TotalAttraction;
+                dict["decorations_purchased"] = data.DecorationsPurchased;
+                dict["gold_spent_on_decorations"] = data.GoldSpentOnDecorations;
+                dict["habitat_visits"] = data.HabitatVisits;
+                dict["pets_attracted"] = data.PetsAttracted;
+                
+                // Serialize placed decorations
+                var placedList = new List<Dictionary<string, object>>();
+                foreach (var dec in data.PlacedDecorations)
+                {
+                    placedList.Add(new Dictionary<string, object>
+                    {
+                        ["decoration_id"] = dec.DecorationId,
+                        ["slot"] = dec.Slot,
+                        ["placed_at"] = dec.PlacedAt.ToString("o")
+                    });
+                }
+                dict["placed_decorations"] = placedList;
+                
+                // Serialize decoration counts
+                dict["decoration_counts"] = data.DecorationCounts;
+                
+                string json = JsonSerializer.Serialize(dict);
+                File.WriteAllText(path, json);
+                GD.Print("[SaveSystem] Pet habitat data saved");
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to save pet habitat data: " + e.Message);
+            }
+        }
+
+        public PlayerHabitatData LoadPetHabitatData()
+        {
+            try
+            {
+                string path = "user://pet_habitat_data.json";
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    if (dict != null)
+                    {
+                        var data = new PlayerHabitatData();
+                        
+                        data.CurrentHabitatId = dict.ContainsKey("current_habitat_id") ? (string)dict["current_habitat_id"] : "meadow";
+                        data.TotalComfort = dict.ContainsKey("total_comfort") ? Convert.ToInt32(dict["total_comfort"]) : 0;
+                        data.TotalAttraction = dict.ContainsKey("total_attraction") ? Convert.ToInt32(dict["total_attraction"]) : 0;
+                        data.DecorationsPurchased = dict.ContainsKey("decorations_purchased") ? Convert.ToInt32(dict["decorations_purchased"]) : 0;
+                        data.GoldSpentOnDecorations = dict.ContainsKey("gold_spent_on_decorations") ? Convert.ToInt32(dict["gold_spent_on_decorations"]) : 0;
+                        data.HabitatVisits = dict.ContainsKey("habitat_visits") ? Convert.ToInt32(dict["habitat_visits"]) : 0;
+                        data.PetsAttracted = dict.ContainsKey("pets_attracted") ? Convert.ToInt32(dict["pets_attracted"]) : 0;
+                        
+                        // Deserialize placed decorations
+                        if (dict.ContainsKey("placed_decorations") && dict["placed_decorations"] != null)
+                        {
+                            var placedList = (System.Text.Json.JsonElement)dict["placed_decorations"];
+                            foreach (var item in placedList.EnumerateArray())
+                            {
+                                var dec = new PlacedDecoration
+                                {
+                                    DecorationId = item.GetProperty("decoration_id").GetString(),
+                                    Slot = item.GetProperty("slot").GetInt32(),
+                                    PlacedAt = DateTime.Parse(item.GetProperty("placed_at").GetString())
+                                };
+                                data.PlacedDecorations.Add(dec);
+                            }
+                        }
+                        
+                        // Deserialize decoration counts
+                        if (dict.ContainsKey("decoration_counts") && dict["decoration_counts"] != null)
+                        {
+                            var counts = (System.Text.Json.JsonElement)dict["decoration_counts"];
+                            foreach (var item in counts.EnumerateObject())
+                            {
+                                data.DecorationCounts[item.Name] = item.Value.GetInt32();
+                            }
+                        }
+                        
+                        GD.Print("[SaveSystem] Pet habitat data loaded");
+                        return data;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to load pet habitat data: " + e.Message);
+            }
+            return new PlayerHabitatData();
         }
 
         public void SaveMountExpeditionData(Dictionary<string, object> data)
