@@ -766,6 +766,17 @@ namespace ClawRPG.Scripts {
             durabilityUI.Visible = false;
             ui.AddChild(durabilityUI);
 
+            // Buff System
+            var buffSystem = new Systems.BuffSystem.BuffSystem();
+            buffSystem.Name = "BuffSystem";
+            AddChild(buffSystem);
+
+            // Buff UI
+            var buffUI = new Systems.BuffSystem.BuffUI();
+            buffUI.Name = "BuffUI";
+            buffUI.Visible = false;
+            ui.AddChild(buffUI);
+
             GD.Print("UI initialized");
 
             // Trigger welcome tutorial
@@ -1238,6 +1249,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_daily_dungeon"))
             {
                 ToggleDailyDungeonUI();
+            }
+
+            // Handle buff UI toggle (V key)
+            if (Input.IsActionJustPressed("ui_buff"))
+            {
+                ToggleBuffUI();
             }
 
             // Handle title UI toggle (N key)
@@ -2027,6 +2044,18 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(durabilityUI);
                 }
                 durabilityUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// 切换状态效果界面
+        /// </summary>
+        private void ToggleBuffUI()
+        {
+            var buffUI = GetNodeOrNull<Systems.BuffSystem.BuffUI>("UI/BuffUI");
+            if (buffUI != null)
+            {
+                buffUI.ToggleBuffUI();
             }
         }
 
