@@ -375,6 +375,11 @@ namespace ClawRPG.Scripts {
             AddChild(dailyQuestSystem);
             dailyQuestSystem.Initialize();
             
+            // Initialize procedural challenge system
+            var proceduralChallengeSystem = new Systems.ProceduralChallengeSystem();
+            proceduralChallengeSystem.Name = "ProceduralChallengeSystem";
+            AddChild(proceduralChallengeSystem);
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -705,6 +710,12 @@ namespace ClawRPG.Scripts {
             dailyQuestUI.Visible = false;
             ui.AddChild(dailyQuestUI);
             
+            // Procedural Challenge UI
+            var proceduralChallengeUI = new Systems.ProceduralChallengeUI();
+            proceduralChallengeUI.Name = "ProceduralChallengeUI";
+            proceduralChallengeUI.Visible = false;
+            ui.AddChild(proceduralChallengeUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -1021,6 +1032,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_daily_quest"))
             {
                 ToggleDailyQuestUI();
+            }
+            
+            // Handle procedural challenge UI toggle (P key - using Shift+P for challenge)
+            if (Input.IsActionJustPressed("ui_challenge"))
+            {
+                ToggleProceduralChallengeUI();
             }
             
             // Handle auction house UI toggle (Y key)
@@ -1788,6 +1805,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(dailyQuestUI);
                 }
                 dailyQuestUI.Show();
+            }
+        }
+        
+        /// <summary>
+        /// 切换程序化挑战界面
+        /// </summary>
+        private void ToggleProceduralChallengeUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+            
+            var challengeUI = ui.GetNodeOrNull<Systems.ProceduralChallengeUI>("ProceduralChallengeUI");
+            if (challengeUI != null && challengeUI.Visible)
+            {
+                challengeUI.Hide();
+            }
+            else
+            {
+                if (challengeUI == null)
+                {
+                    challengeUI = new Systems.ProceduralChallengeUI();
+                    challengeUI.Name = "ProceduralChallengeUI";
+                    ui.AddChild(challengeUI);
+                }
+                challengeUI.Toggle();
             }
         }
         
