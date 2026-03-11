@@ -325,6 +325,11 @@ namespace ClawRPG.Scripts {
             npcScheduleSystem.Name = "NPCScheduleSystem";
             AddChild(npcScheduleSystem);
             
+            // Initialize relic system
+            var relicSystem = new Systems.RelicSystem();
+            relicSystem.Name = "RelicSystem";
+            AddChild(relicSystem);
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -594,6 +599,12 @@ namespace ClawRPG.Scripts {
             var costumeUI = new UI.CostumeUI();
             costumeUI.Name = "CostumeUI";
             ui.AddChild(costumeUI);
+            
+            // Relic UI
+            var relicUI = new Systems.RelicUI();
+            relicUI.Name = "RelicUI";
+            relicUI.Visible = false;
+            ui.AddChild(relicUI);
             
             // Pet Equipment UI
             var petEquipmentUI = new Systems.Pets.PetEquipmentUI();
@@ -979,6 +990,12 @@ namespace ClawRPG.Scripts {
                 TogglePetEquipmentUI();
             }
             
+            // Handle relic UI toggle (R key)
+            if (Input.IsActionJustPressed("ui_relic"))
+            {
+                ToggleRelicUI();
+            }
+            
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -1252,6 +1269,18 @@ namespace ClawRPG.Scripts {
             if (petEquipmentUI != null)
             {
                 petEquipmentUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle relic UI
+        /// </summary>
+        private void ToggleRelicUI()
+        {
+            var relicUI = GetNodeOrNull<Systems.RelicUI>("UI/RelicUI");
+            if (relicUI != null)
+            {
+                relicUI.Toggle();
             }
         }
         

@@ -71,19 +71,29 @@ namespace ClawRPG.Scripts.Characters {
         public float BaseMoveSpeed { get; private set; } = 200f;
         
         // Rune system - total attributes (after runes applied)
-        public float TotalAttackDamage => BaseAttackDamage + GetRuneBonus(RuneAttribute.Damage);
-        public float TotalDefense => BaseDefense + GetRuneBonus(RuneAttribute.Defense);
-        public float TotalMaxHealth => (int)(BaseMaxHealth + GetRuneBonus(RuneAttribute.MaxHealth));
+        public float TotalAttackDamage => BaseAttackDamage + GetRuneBonus(RuneAttribute.Damage) + RelicAttackBonus;
+        public float TotalDefense => BaseDefense + GetRuneBonus(RuneAttribute.Defense) + RelicDefenseBonus;
+        public float TotalMaxHealth => (int)(BaseMaxHealth + GetRuneBonus(RuneAttribute.MaxHealth) + RelicHealthBonus);
         public float TotalMaxMana => (int)(BaseMaxMana + GetRuneBonus(RuneAttribute.MaxMana));
-        public float TotalCritChance => BaseCritChance + GetRuneBonus(RuneAttribute.CritChance) / 100f;
-        public float TotalCritDamage => BaseCritDamage + GetRuneBonus(RuneAttribute.CritDamage) / 100f;
+        public float TotalCritChance => BaseCritChance + GetRuneBonus(RuneAttribute.CritChance) / 100f + RelicCritRateBonus;
+        public float TotalCritDamage => BaseCritDamage + GetRuneBonus(RuneAttribute.CritDamage) / 100f + RelicCritDamageBonus;
         public float TotalAttackSpeed => BaseAttackSpeed;
         
         // Mount system bonuses (applied on top of base + runes)
         public int MountSpeedBonus { get; set; }
         public int MountCarryCapacityBonus { get; set; }
         
-        public float TotalMoveSpeed => BaseMoveSpeed + GetRuneBonus(RuneAttribute.MoveSpeed) + MountSpeedBonus;
+        // Relic system bonuses (applied on top of base + runes + mount)
+        public float RelicAttackBonus { get; set; }
+        public float RelicDefenseBonus { get; set; }
+        public float RelicHealthBonus { get; set; }
+        public float RelicSpeedBonus { get; set; }
+        public float RelicCritRateBonus { get; set; }
+        public float RelicCritDamageBonus { get; set; }
+        public float RelicLifestealBonus { get; set; }
+        public float RelicDodgeBonus { get; set; }
+        
+        public float TotalMoveSpeed => BaseMoveSpeed + GetRuneBonus(RuneAttribute.MoveSpeed) + MountSpeedBonus + RelicSpeedBonus;
         
         // Resistance bonuses from runes
         public float FireResistance { get; private set; }
