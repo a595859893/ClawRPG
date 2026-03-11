@@ -913,6 +913,12 @@ namespace ClawRPG.Scripts {
             bossMechanicsUI.Visible = false;
             ui.AddChild(bossMechanicsUI);
 
+            // Rune UI
+            var runeUI = new UI.RuneUI();
+            runeUI.Name = "RuneUI";
+            runeUI.Visible = false;
+            ui.AddChild(runeUI);
+
             GD.Print("UI initialized");
 
             // Trigger welcome tutorial
