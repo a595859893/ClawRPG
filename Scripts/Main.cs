@@ -407,6 +407,11 @@ namespace ClawRPG.Scripts {
             playerTalentSystem.Name = "PlayerTalentSystem";
             AddChild(playerTalentSystem);
 
+            // Initialize mount race system
+            var mountRaceSystem = new MountRaceSystem();
+            mountRaceSystem.Name = "MountRaceSystem";
+            AddChild(mountRaceSystem);
+
             // Initialize daily quest system
             var dailyQuestSystem = new Systems.DailyQuest.DailyQuestSystem();
             dailyQuestSystem.Name = "DailyQuestSystem";
@@ -661,6 +666,11 @@ namespace ClawRPG.Scripts {
             var playerTalentUI = new Systems.PlayerTalent.PlayerTalentUI();
             playerTalentUI.Name = "PlayerTalentUI";
             ui.AddChild(playerTalentUI);
+
+            // Mount Race UI
+            var mountRaceUI = new MountRaceUI();
+            mountRaceUI.Name = "MountRaceUI";
+            ui.AddChild(mountRaceUI);
 
             // Guild UI
             var guildUI = new GuildUI();
@@ -976,6 +986,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_talent"))
             {
                 TogglePlayerTalentUI();
+            }
+
+            // Handle mount race UI toggle (Shift+R key)
+            if (Input.IsActionJustPressed("ui_mount_race"))
+            {
+                ToggleMountRaceUI();
             }
 
             // Handle auto potion UI toggle (Shift+X key)
@@ -1742,6 +1758,15 @@ namespace ClawRPG.Scripts {
             if (talentUI != null)
             {
                 talentUI.Toggle();
+            }
+        }
+
+        private void ToggleMountRaceUI()
+        {
+            var raceUI = GetNodeOrNull<MountRaceUI>("CanvasLayer/MountRaceUI");
+            if (raceUI != null)
+            {
+                raceUI.Toggle();
             }
         }
 
