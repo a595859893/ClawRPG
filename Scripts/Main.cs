@@ -354,6 +354,11 @@ namespace ClawRPG.Scripts {
             tradeSystem.Name = "TradeSystem";
             AddChild(tradeSystem);
 
+            // Initialize arena tournament system
+            var arenaTournamentSystem = new ArenaTournamentSystem();
+            arenaTournamentSystem.Name = "ArenaTournamentSystem";
+            AddChild(arenaTournamentSystem);
+
             // Initialize gem system
             var gemSystem = GemSystem.Instance;
 
@@ -1371,6 +1376,12 @@ namespace ClawRPG.Scripts {
                 ToggleRelicUI();
             }
 
+            // Handle arena tournament UI toggle (Shift+T key)
+            if (Input.IsActionJustPressed("ui_tournament") && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleArenaTournamentUI();
+            }
+
             // Handle equipment enhancement UI toggle (E key - separate from enchantment)
             if (Input.IsActionJustPressed("ui_enhancement"))
             {
@@ -1776,6 +1787,24 @@ namespace ClawRPG.Scripts {
             if (relicUI != null)
             {
                 relicUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// Toggle arena tournament UI
+        /// </summary>
+        private void ToggleArenaTournamentUI()
+        {
+            var arenaTournamentUI = GetNodeOrNull<UI.ArenaTournamentUI>("UI/ArenaTournamentUI");
+            if (arenaTournamentUI != null)
+            {
+                arenaTournamentUI.QueueFree();
+            }
+            else
+            {
+                var newUI = new UI.ArenaTournamentUI();
+                newUI.Name = "ArenaTournamentUI";
+                GetNode("UI").AddChild(newUI);
             }
         }
 
