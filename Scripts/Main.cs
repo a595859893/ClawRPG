@@ -308,6 +308,11 @@ namespace ClawRPG.Scripts {
             // Initialize gem system
             var gemSystem = GemSystem.Instance;
             
+            // Initialize gem fusion system
+            var gemFusionSystem = new Systems.GemSystem.GemFusionSystem();
+            gemFusionSystem.Name = "GemFusionSystem";
+            AddChild(gemFusionSystem);
+            
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
             
@@ -573,6 +578,12 @@ namespace ClawRPG.Scripts {
             var gemUI = new Systems.GemSystem.GemUI();
             gemUI.Name = "GemUI";
             ui.AddChild(gemUI);
+            
+            // Gem Fusion UI
+            var gemFusionUI = new Systems.GemSystem.GemFusionUI();
+            gemFusionUI.Name = "GemFusionUI";
+            gemFusionUI.Visible = false;
+            ui.AddChild(gemFusionUI);
             
             // Costume UI
             var costumeUI = new UI.CostumeUI();
@@ -945,6 +956,12 @@ namespace ClawRPG.Scripts {
                 ToggleGemUI();
             }
             
+            // Handle gem fusion UI toggle (F key)
+            if (Input.IsActionJustPressed("ui_gem_fusion"))
+            {
+                ToggleGemFusionUI();
+            }
+            
             // Handle costume UI toggle (C key)
             if (Input.IsActionJustPressed("ui_costume"))
             {
@@ -1194,6 +1211,18 @@ namespace ClawRPG.Scripts {
                 {
                     gemUI.RefreshUI();
                 }
+            }
+        }
+        
+        /// <summary>
+        /// Toggle gem fusion UI
+        /// </summary>
+        private void ToggleGemFusionUI()
+        {
+            var gemFusionUI = GetNodeOrNull<Systems.GemSystem.GemFusionUI>("UI/GemFusionUI");
+            if (gemFusionUI != null)
+            {
+                gemFusionUI.Toggle();
             }
         }
         
