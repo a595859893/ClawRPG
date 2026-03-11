@@ -678,5 +678,43 @@ namespace ClawRPG.Scripts.Systems {
                 return true;
             }
         }
+
+        // ===== Pet Talent System Save/Load =====
+        
+        public void SavePetTalentData(PlayerPetTalentData data)
+        {
+            try
+            {
+                string path = "user://pet_talent_data.json";
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(data, options);
+                File.WriteAllText(path, json);
+                GD.Print("[SaveSystem] Pet talent data saved");
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to save pet talent data: " + e.Message);
+            }
+        }
+
+        public PlayerPetTalentData LoadPetTalentData()
+        {
+            try
+            {
+                string path = "user://pet_talent_data.json";
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var data = JsonSerializer.Deserialize<PlayerPetTalentData>(json);
+                    GD.Print("[SaveSystem] Pet talent data loaded");
+                    return data;
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to load pet talent data: " + e.Message);
+            }
+            return new PlayerPetTalentData();
+        }
     }
 }

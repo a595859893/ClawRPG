@@ -61,6 +61,13 @@ namespace ClawRPG.Scripts.Systems.Pets
             }
 
             _ownedPets.Add(pet);
+            
+            // 为新宠物生成随机天赋
+            if (PetTalentSystem.Instance != null)
+            {
+                PetTalentSystem.Instance.GenerateRandomTalentsForPet(pet.Id, 3);
+            }
+            
             OnPetAdded?.Invoke(pet);
             
             // 如果没有激活宠物，自动激活

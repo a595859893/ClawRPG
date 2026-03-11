@@ -343,6 +343,11 @@ namespace ClawRPG.Scripts {
             petEvolutionSystem.Name = "PetEvolutionSystem";
             AddChild(petEvolutionSystem);
             
+            // Initialize pet talent system
+            var petTalentSystem = new Systems.PetTalentSystem();
+            petTalentSystem.Name = "PetTalentSystem";
+            AddChild(petTalentSystem);
+            
             // Initialize elemental trial system
             var elementalTrialSystem = new Systems.ElementalTrialSystem();
             elementalTrialSystem.Name = "ElementalTrialSystem";
@@ -657,6 +662,12 @@ namespace ClawRPG.Scripts {
             petEvolutionUI.Name = "PetEvolutionUI";
             petEvolutionUI.Visible = false;
             ui.AddChild(petEvolutionUI);
+            
+            // Pet Talent UI
+            var petTalentUI = new Systems.PetTalentUI();
+            petTalentUI.Name = "PetTalentUI";
+            petTalentUI.Visible = false;
+            ui.AddChild(petTalentUI);
             
             // Mystery Treasure UI
             var mysteryTreasureUI = new MysteryTreasureUI();
@@ -1096,6 +1107,12 @@ namespace ClawRPG.Scripts {
                 TogglePetEvolutionUI();
             }
             
+            // Handle pet talent UI toggle
+            if (Input.IsActionJustPressed("ui_pet_talent"))
+            {
+                TogglePetTalentUI();
+            }
+            
             // Handle mystery treasure UI toggle (T key)
             if (Input.IsActionJustPressed("ui_mystery_treasure"))
             {
@@ -1424,6 +1441,18 @@ namespace ClawRPG.Scripts {
                 {
                     petEvolutionUI.ShowUI();
                 }
+            }
+        }
+        
+        /// <summary>
+        /// Toggle pet talent UI
+        /// </summary>
+        private void TogglePetTalentUI()
+        {
+            var petTalentUI = GetNodeOrNull<Systems.PetTalentUI>("UI/PetTalentUI");
+            if (petTalentUI != null)
+            {
+                petTalentUI.ToggleUI();
             }
         }
         
