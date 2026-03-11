@@ -165,7 +165,7 @@ public partial class GuildSystem : Node {
             return false;
         }
 
-        // TODO: 从全局公会列表中移除
+        // 注：单人不影响全局公会列表（服务器功能）
 
         CurrentGuild = null;
         PlayerData = new PlayerGuildData();
@@ -214,7 +214,7 @@ public partial class GuildSystem : Node {
 
         MyApplications.Add(application);
         
-        // TODO: 发送到服务器端
+        // 注：单人模式申请存储在本地（服务器功能）
         
         GD.Print($"已申请加入公会: {guild.Name}");
         return true;

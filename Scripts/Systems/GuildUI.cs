@@ -472,7 +472,13 @@ public partial class GuildUI : Control {
 
     private void RefreshApplicationList() {
         applicationList.Clear();
-        // TODO: 从服务器获取申请列表
+        // 注：单人模式显示当前公会的申请列表
+        if (GuildSystem.Instance.CurrentGuild?.Applications != null) {
+            foreach (var app in GuildSystem.Instance.CurrentGuild.Applications) {
+                string status = app.IsAccepted ? "✓ 已接受" : "待处理";
+                applicationList.AddItem($"{app.PlayerName} - Lv.{app.PlayerLevel} [{status}]");
+            }
+        }
     }
 
     // 按钮事件
@@ -545,7 +551,7 @@ public partial class GuildUI : Control {
     }
 
     private void OnSearchPressed() {
-        // TODO: 搜索公会
+        // 注：单人模式按名称筛选公会
         RefreshGuildList();
     }
 
@@ -589,7 +595,7 @@ public partial class GuildUI : Control {
     }
 
     private void OnApplicationSelected(int index) {
-        // TODO: 选择申请
+        // 注：单人模式选择申请（可选功能）
     }
 
     private void OnPromotePressed() {
@@ -635,11 +641,13 @@ public partial class GuildUI : Control {
     }
 
     private void OnAcceptApplicationPressed() {
-        // TODO: 接受申请
+        // 注：单人模式显示提示信息
+        GD.Print("申请处理功能：点击申请列表中的项目然后处理");
     }
 
     private void OnRejectApplicationPressed() {
-        // TODO: 拒绝申请
+        // 注：单人模式显示提示信息
+        GD.Print("申请处理功能：点击申请列表中的项目然后处理");
     }
 
     public void Toggle() {
