@@ -71,12 +71,12 @@ namespace ClawRPG.Scripts.Characters {
         public float BaseMoveSpeed { get; private set; } = 200f;
         
         // Rune system - total attributes (after runes applied)
-        public float TotalAttackDamage => BaseAttackDamage + GetRuneBonus(RuneAttribute.Damage) + RelicAttackBonus + BoonAttackBonus;
-        public float TotalDefense => BaseDefense + GetRuneBonus(RuneAttribute.Defense) + RelicDefenseBonus + BoonDefenseBonus;
-        public float TotalMaxHealth => (int)(BaseMaxHealth + GetRuneBonus(RuneAttribute.MaxHealth) + RelicHealthBonus + BoonHealthBonus);
+        public float TotalAttackDamage => BaseAttackDamage + GetRuneBonus(RuneAttribute.Damage) + RelicAttackBonus + BoonAttackBonus + TalentAttackBonus;
+        public float TotalDefense => BaseDefense + GetRuneBonus(RuneAttribute.Defense) + RelicDefenseBonus + BoonDefenseBonus + TalentDefenseBonus;
+        public float TotalMaxHealth => (int)(BaseMaxHealth + GetRuneBonus(RuneAttribute.MaxHealth) + RelicHealthBonus + BoonHealthBonus + TalentHealthBonus);
         public float TotalMaxMana => (int)(BaseMaxMana + GetRuneBonus(RuneAttribute.MaxMana) + BoonMagicBonus);
-        public float TotalCritChance => BaseCritChance + GetRuneBonus(RuneAttribute.CritChance) / 100f + RelicCritRateBonus + BoonCritRateBonus;
-        public float TotalCritDamage => BaseCritDamage + GetRuneBonus(RuneAttribute.CritDamage) / 100f + RelicCritDamageBonus + BoonCritDamageBonus;
+        public float TotalCritChance => BaseCritChance + GetRuneBonus(RuneAttribute.CritChance) / 100f + RelicCritRateBonus + BoonCritRateBonus + TalentCritRate;
+        public float TotalCritDamage => BaseCritDamage + GetRuneBonus(RuneAttribute.CritDamage) / 100f + RelicCritDamageBonus + BoonCritDamageBonus + TalentCritDamage;
         public float TotalAttackSpeed => BaseAttackSpeed;
         
         // Mount system bonuses (applied on top of base + runes)
@@ -562,6 +562,14 @@ namespace ClawRPG.Scripts.Characters {
             BoonCritDamageBonus = RandomBoonSystem.Instance.GetCritDamageBonus();
             BoonLifestealBonus = RandomBoonSystem.Instance.GetLifestealBonus();
             BoonDodgeBonus = RandomBoonSystem.Instance.GetDodgeBonus();
+        }
+        
+        public void UpdateTotalAttributes()
+        {
+            // Recalculate all derived attributes after talent changes
+            // Most derived values are computed via properties, just trigger refresh
+            RefreshRuneAttributes();
+            ApplyBoonBonuses();
         }
         
         public void TakeDamage(int damage, bool isCrit = false, Vector2 fromDirection = default)

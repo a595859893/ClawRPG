@@ -402,6 +402,11 @@ namespace ClawRPG.Scripts {
             randomBoonSystem.Name = "RandomBoonSystem";
             AddChild(randomBoonSystem);
 
+            // Initialize player talent system
+            var playerTalentSystem = new Systems.PlayerTalent.PlayerTalentSystem();
+            playerTalentSystem.Name = "PlayerTalentSystem";
+            AddChild(playerTalentSystem);
+
             // Initialize daily quest system
             var dailyQuestSystem = new Systems.DailyQuest.DailyQuestSystem();
             dailyQuestSystem.Name = "DailyQuestSystem";
@@ -651,6 +656,11 @@ namespace ClawRPG.Scripts {
             var titleUI = new Systems.TitleUI();
             titleUI.Name = "TitleUI";
             ui.AddChild(titleUI);
+
+            // Player Talent UI
+            var playerTalentUI = new Systems.PlayerTalent.PlayerTalentUI();
+            playerTalentUI.Name = "PlayerTalentUI";
+            ui.AddChild(playerTalentUI);
 
             // Guild UI
             var guildUI = new GuildUI();
@@ -960,6 +970,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_equipment_set"))
             {
                 ToggleEquipmentSetUI();
+            }
+
+            // Handle player talent UI toggle (T key)
+            if (Input.IsActionJustPressed("ui_talent"))
+            {
+                TogglePlayerTalentUI();
             }
 
             // Handle auto potion UI toggle (Shift+X key)
@@ -1717,6 +1733,15 @@ namespace ClawRPG.Scripts {
             if (setUI != null)
             {
                 setUI.Toggle();
+            }
+        }
+
+        private void TogglePlayerTalentUI()
+        {
+            var talentUI = GetNodeOrNull<Systems.PlayerTalent.PlayerTalentUI>("CanvasLayer/PlayerTalentUI");
+            if (talentUI != null)
+            {
+                talentUI.Toggle();
             }
         }
 

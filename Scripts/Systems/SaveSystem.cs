@@ -867,5 +867,40 @@ namespace ClawRPG.Scripts.Systems {
             }
             return new Dictionary<string, object>();
         }
+
+        public void SavePlayerTalentData(Dictionary<string, object> data)
+        {
+            try
+            {
+                string path = "user://player_talent_data.json";
+                string json = JsonSerializer.Serialize(data);
+                File.WriteAllText(path, json);
+                GD.Print("[SaveSystem] Player talent data saved");
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to save player talent data: " + e.Message);
+            }
+        }
+
+        public Dictionary<string, object> LoadPlayerTalentData()
+        {
+            try
+            {
+                string path = "user://player_talent_data.json";
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    GD.Print("[SaveSystem] Player talent data loaded");
+                    return data;
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to load player talent data: " + e.Message);
+            }
+            return new Dictionary<string, object>();
+        }
     }
 }
