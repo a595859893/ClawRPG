@@ -1,6 +1,7 @@
-[gd_scene load_steps=40 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=41 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_main"]
+[ext_resource type="PackedScene" path="res://Player.tscn" id="1_player_scene"]
 [ext_resource type="Script" path="res://Scripts/UI/PlayerHUD.cs" id="2_hud"]
 [ext_resource type="Script" path="res://Scripts/UI/HotkeyHelpUI.cs" id="3_hotkey"]
 [ext_resource type="Script" path="res://Scripts/UI/InventoryUI.cs" id="4_inventory"]
@@ -58,6 +59,7 @@
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
+PlayerScene = ExtResource("1_player_scene")
 
 [node name="Background" type="ColorRect" parent="."]
 offset_right = 1280.0
