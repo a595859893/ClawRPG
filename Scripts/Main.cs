@@ -450,6 +450,11 @@ namespace ClawRPG.Scripts {
             proceduralChallengeSystem.Name = "ProceduralChallengeSystem";
             AddChild(proceduralChallengeSystem);
 
+            // Initialize boss mechanics system
+            var bossMechanicsSystem = new Systems.BossMechanics.BossMechanicsSystem();
+            bossMechanicsSystem.Name = "BossMechanicsSystem";
+            AddChild(bossMechanicsSystem);
+
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -870,6 +875,12 @@ namespace ClawRPG.Scripts {
             buffUI.Visible = false;
             ui.AddChild(buffUI);
 
+            // Boss Mechanics UI
+            var bossMechanicsUI = new Systems.BossMechanics.BossMechanicsUI();
+            bossMechanicsUI.Name = "BossMechanicsUI";
+            bossMechanicsUI.Visible = false;
+            ui.AddChild(bossMechanicsUI);
+
             GD.Print("UI initialized");
 
             // Trigger welcome tutorial
@@ -945,6 +956,13 @@ namespace ClawRPG.Scripts {
         public override void _Process(double delta)
         {
             float dt = (float)delta;
+
+            // Update boss mechanics system
+            var bossMechanicsSystem = GetNode<Systems.BossMechanics.BossMechanicsSystem>("BossMechanicsSystem");
+            if (bossMechanicsSystem != null)
+            {
+                bossMechanicsSystem._Process(dt);
+            }
 
             // Update play time
             StatisticsManager.Instance.AddPlayTime(dt);
@@ -1358,6 +1376,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_dynamic_difficulty"))
             {
                 ToggleDynamicDifficultyUI();
+            }
+
+            // Handle boss mechanics UI toggle (B key)
+            if (Input.IsActionJustPressed("boss_mechanics"))
+            {
+                ToggleBossMechanicsUI();
             }
 
             // Handle elemental trial UI toggle (E key - separate from enchantment)
@@ -1824,6 +1848,18 @@ namespace ClawRPG.Scripts {
             if (dynamicDifficultyUI != null)
             {
                 dynamicDifficultyUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// Toggle boss mechanics UI
+        /// </summary>
+        private void ToggleBossMechanicsUI()
+        {
+            var bossMechanicsUI = GetNodeOrNull<Systems.BossMechanics.BossMechanicsUI>("UI/BossMechanicsUI");
+            if (bossMechanicsUI != null)
+            {
+                bossMechanicsUI.Toggle();
             }
         }
 
