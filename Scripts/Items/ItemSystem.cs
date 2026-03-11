@@ -28,6 +28,8 @@ namespace ClawRPG.Scripts.Items {
         public int Value { get; set; }
         public int MaxStack { get; set; } = 99;
         public string IconPath { get; set; }
+        public int Level { get; set; } = 1;  // 物品等级
+        public List<Systems.EnchantmentData> Enchantments { get; set; }  // 附魔列表
         
         public enum ItemType { 
             Weapon, Armor, Accessory, 

@@ -109,6 +109,11 @@ namespace ClawRPG.Scripts {
             counterAttackSystem.Name = "CounterAttackSystem";
             AddChild(counterAttackSystem);
             
+            // Initialize enchantment database
+            var enchantmentDb = new EnchantmentDatabase();
+            enchantmentDb.Name = "EnchantmentDatabase";
+            AddChild(enchantmentDb);
+            
             // Connect counter attack system signals to sound effects
             counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttackPerformed, 
                 this, nameof(_OnCounterAttackPerformed));
@@ -729,6 +734,12 @@ namespace ClawRPG.Scripts {
                 ToggleShopUI();
             }
             
+            // Handle enchantment UI toggle (E key)
+            if (Input.IsActionJustPressed("ui_enchant"))
+            {
+                ToggleEnchantmentUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -1025,6 +1036,31 @@ namespace ClawRPG.Scripts {
                         existingShopUI.Toggle();
                     }
                 }
+            }
+        }
+        
+        /// <summary>
+        /// 切换附魔界面
+        /// </summary>
+        private void ToggleEnchantmentUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+            
+            var enchantUI = ui.GetNodeOrNull<Systems.EnchantmentUI>("EnchantmentUI");
+            if (enchantUI != null && enchantUI.Visible)
+            {
+                enchantUI.Hide();
+            }
+            else
+            {
+                if (enchantUI == null)
+                {
+                    enchantUI = new Systems.EnchantmentUI();
+                    enchantUI.Name = "EnchantmentUI";
+                    ui.AddChild(enchantUI);
+                }
+                enchantUI.Show();
             }
         }
         
