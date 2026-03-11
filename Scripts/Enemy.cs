@@ -179,6 +179,10 @@ namespace ClawRPG.Scripts.Characters {
             // Track statistics
             StatisticsManager.Instance.RecordKill();
             
+            // Track combat status - enemy killed
+            bool isBoss = this is Boss;
+            CombatStatusSystem.Instance.RecordEnemyKilled(isBoss);
+            
             // Check if this is a boss
             if (this is Boss)
             {

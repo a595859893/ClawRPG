@@ -464,6 +464,10 @@ namespace ClawRPG.Scripts.Characters {
             var comboSystem = GetTree().GetFirstNodeInGroup("ComboSystem") as ComboSystem;
             comboSystem?.RegisterHit((int)damage);
             
+            // Track combat stats
+            CombatStatusSystem.Instance.RecordDamageDealt(damage, isCrit, CombatStatusData.DamageBreakdown.DamageType.Physical);
+            CombatStatusSystem.Instance.IncrementCombo();
+            
             GD.Print("Attack! Damage: " + damage + (isCrit ? " CRITICAL!" : ""));
             
             // Attack animation/sound would go here
@@ -478,6 +482,9 @@ namespace ClawRPG.Scripts.Characters {
             IsInvincible = true;
             CurrentStamina -= 20f;
             _dodgeCooldownTimer = DodgeCooldown;
+            
+            // Track dodge for combat status
+            CombatStatusSystem.Instance.RecordDodge();
             
             // Track dodge for titles
             DodgeCount++;
@@ -598,6 +605,8 @@ namespace ClawRPG.Scripts.Characters {
                 else
                 {
                     finalDamage *= (1 - BlockDamageReduction);
+                    // Track block
+                    CombatStatusSystem.Instance.RecordBlock();
                     // Show blocked text
                     if (DamageNumberSystem.Instance != null)
                     {
@@ -611,6 +620,10 @@ namespace ClawRPG.Scripts.Characters {
             
             // Track statistics
             StatisticsManager.Instance.RecordDamageTaken((int)finalDamage);
+            
+            // Track combat status - damage taken
+            CombatStatusSystem.Instance.RecordDamageTaken(finalDamage, isCrit);
+            CombatStatusSystem.Instance.ResetCombo();
             
             // Track boss damage for no-hit boss achievement
             AchievementManager.Instance?.TrackBossDamageTaken((int)finalDamage);

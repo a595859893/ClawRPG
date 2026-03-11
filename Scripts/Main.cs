@@ -662,6 +662,12 @@ namespace ClawRPG.Scripts {
             skillCooldownUI.AddToGroup("CombatSkillCooldownUI");
             ui.AddChild(skillCooldownUI);
 
+            // Combat Status UI
+            var combatStatusUI = new UI.CombatStatusUI();
+            combatStatusUI.Name = "CombatStatusUI";
+            combatStatusUI.AddToGroup("CombatStatusUI");
+            ui.AddChild(combatStatusUI);
+
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
             dialogueUI.Name = "DialogueUI";
@@ -1065,6 +1071,9 @@ namespace ClawRPG.Scripts {
             {
                 bossMechanicsSystem._Process(dt);
             }
+
+            // Update combat status system
+            CombatStatusSystem.Instance._Process(dt);
 
             // Update play time
             StatisticsManager.Instance.AddPlayTime(dt);
