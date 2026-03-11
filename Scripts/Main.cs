@@ -442,6 +442,10 @@ namespace ClawRPG.Scripts {
             petTrainingUI.Name = "PetTrainingUI";
             AddChild(petTrainingUI);
 
+            // Initialize pet morph system
+            var petMorphSystem = PetMorphSystem.Instance;
+            petMorphSystem.Initialize();
+
             // Initialize mount expedition system
             var mountExpeditionSystem = new Systems.MountExpeditionSystem();
             mountExpeditionSystem.Name = "MountExpeditionSystem";
@@ -923,6 +927,12 @@ namespace ClawRPG.Scripts {
             petBattleArenaUI.Name = "PetBattleArenaUI";
             petBattleArenaUI.Visible = false; 
             ui.AddChild(petBattleArenaUI);
+
+            // Pet Morph UI
+            var petMorphUI = new Systems.PetMorph.PetMorphUI();
+            petMorphUI.Name = "PetMorphUI";
+            petMorphUI.Visible = false;
+            ui.AddChild(petMorphUI);
 
             // Daily Dungeon UI
             var dailyDungeonUI = new Systems.DailyDungeon.DailyDungeonUI();
@@ -1555,6 +1565,12 @@ namespace ClawRPG.Scripts {
                 TogglePetBattleArenaUI();
             }
 
+            // Handle pet morph UI toggle (O key)
+            if (Input.IsActionJustPressed("ui_pet_morph"))
+            {
+                TogglePetMorphUI();
+            }
+
             // Handle daily dungeon UI toggle (D key)
             if (Input.IsActionJustPressed("ui_daily_dungeon"))
             {
@@ -2110,6 +2126,25 @@ namespace ClawRPG.Scripts {
             if (petBattleArenaUI != null)
             {
                 petBattleArenaUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet morph UI
+        /// </summary>
+        private void TogglePetMorphUI()
+        {
+            var petMorphUI = GetNodeOrNull<Systems.PetMorph.PetMorphUI>("UI/PetMorphUI");
+            if (petMorphUI != null)
+            {
+                if (petMorphUI.Visible)
+                {
+                    petMorphUI.HideUI();
+                }
+                else
+                {
+                    petMorphUI.ShowUI();
+                }
             }
         }
 
