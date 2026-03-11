@@ -327,7 +327,7 @@ namespace ClawRPG.Scripts {
             AddChild(worldEventSystem);
 
             // Initialize choice event system (roguelike style)
-            var choiceEventSystem = new Systems.ChoiceEventSystem();
+            var choiceEventSystem = new Systems.ChoiceEvents.ChoiceEventSystem();
             choiceEventSystem.Name = "ChoiceEventSystem";
             AddChild(choiceEventSystem);
 
@@ -908,9 +908,8 @@ namespace ClawRPG.Scripts {
             ui.AddChild(worldBossUI);
 
             // Choice Event UI
-            var choiceEventUI = new Systems.ChoiceEventUI();
+            var choiceEventUI = new Systems.ChoiceEvents.ChoiceEventUI();
             choiceEventUI.Name = "ChoiceEventUI";
-            choiceEventUI.Initialize();
             ui.AddChild(choiceEventUI);
 
             // Elemental Trial UI
@@ -1161,6 +1160,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.K))
             {
                 ToggleSkillCooldownUI();
+            }
+
+            // Handle choice event UI toggle (C key)
+            if (Input.IsKeyPressed(Key.C))
+            {
+                ToggleChoiceEventUI();
             }
 
             // Handle title UI toggle (Y key)
@@ -1673,6 +1678,15 @@ namespace ClawRPG.Scripts {
             if (skillCooldownUI != null)
             {
                 skillCooldownUI.Toggle();
+            }
+        }
+
+        private void ToggleChoiceEventUI()
+        {
+            var choiceEventUI = GetNodeOrNull<Systems.ChoiceEvents.ChoiceEventUI>("CanvasLayer/ChoiceEventUI");
+            if (choiceEventUI != null)
+            {
+                choiceEventUI.ToggleVisibility();
             }
         }
 
