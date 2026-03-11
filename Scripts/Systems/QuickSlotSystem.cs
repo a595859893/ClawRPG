@@ -1,240 +1,365 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.Items;
 
-namespace ClawRPG.Scripts.UI {
+public class QuickSlotData
+{
+    public string ItemId { get; set; } = "";
+    public int ItemCount { get; set; } = 0;
+    public QuickSlotType SlotType { get; set; } = QuickSlotType.Item;
+    public int Hotkey { get; set; } = -1; // 1-8 for number keys
+    
+    public bool IsEmpty => string.IsNullOrEmpty(ItemId) || ItemCount <= 0;
+}
+
+public enum QuickSlotType
+{
+    Item,       // 消耗品
+    Scroll,     // 卷轴
+    Potion,     // 药水
+    Food,       // 食物
+    Mount       // 坐骑
+}
+
+public class QuickSlotSystem : Node
+{
+    public static QuickSlotSystem Instance { get; private set; }
+    
+    // 8 quick slots (1-8 keys)
+    private QuickSlotData[] _slots = new QuickSlotData[8];
+    
+    // Signals
+    public signal void SlotUpdated(int slotIndex, QuickSlotData data);
+    public signal void SlotUsed(int slotIndex, QuickSlotData data);
+    public signal void SlotEmpty(int slotIndex);
+    
+    public override void _Ready()
+    {
+        Instance = this;
+        
+        // Initialize slots
+        for (int i = 0; i < 8; i++)
+        {
+            _slots[i] = new QuickSlotData();
+            _slots[i].Hotkey = i + 1;
+        }
+        
+        LoadQuickSlots();
+    }
+    
+    #region Public Methods
+    
     /// <summary>
-    /// Quick slot system for fast item access using number keys
+    /// Add item to quick slot (first available or specific slot)
     /// </summary>
-    public class QuickSlotSystem : Node {
-        public static QuickSlotSystem Instance { get; private set; }
+    public bool AddToQuickSlot(string itemId, int count = 1, int targetSlot = -1)
+    {
+        var item = ItemDatabase.GetItem(itemId);
+        if (item == null) return false;
         
-        // 9 quick slots (1-9 keys)
-        public const int SlotCount = 9;
+        int slotIndex = targetSlot;
         
-        // Each slot holds an item ID and quantity
-        private string[] _slotItemIds = new string[SlotCount];
-        private int[] _slotQuantities = new int[SlotCount];
-        
-        // Signals
-        public Action<int, string, int> OnSlotUpdated;
-        public Action<int> OnSlotUsed;
-        
-        public override void _Ready() {
-            Instance = this;
-            
-            // Listen for drag drop events
-            if (DragDropHelper.Instance != null) {
-                DragDropHelper.Instance.OnItemDroppedOnQuickSlot += HandleItemDrop;
-            }
-        }
-        
-        /// <summary>
-        /// Handle item dropped from inventory to quick slot
-        /// </summary>
-        private void HandleItemDrop(string itemId, int slotIndex) {
-            if (slotIndex < 0 || slotIndex >= SlotCount) return;
-            if (string.IsNullOrEmpty(itemId)) return;
-            
-            var item = ItemDatabase.Instance.GetItem(itemId);
-            if (item == null || item.Type != ItemType.Consumable) return;
-            
-            // Get quantity from inventory
-            var invSlot = InventoryManager.Instance?.GetItemSlot(itemId);
-            int qty = invSlot?.Quantity ?? 1;
-            
-            // Set the slot
-            SetSlot(slotIndex, itemId, qty);
-            
-            // Show feedback
-            if (ScreenFlashEffect.Instance != null) {
-                ScreenFlashEffect.Instance.Flash(new Color(0.3f, 0.6f, 1f), 0.15f);
-            }
-        }
-        
-        public override void _Input(InputEvent @event) {
-            // Handle number keys 1-9 for quick slot usage
-            if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo) {
-                int slotIndex = -1;
-                
-                if (keyEvent.Scancode == Godot.KeyList.Key1) slotIndex = 0;
-                else if (keyEvent.Scancode == Godot.KeyList.Key2) slotIndex = 1;
-                else if (keyEvent.Scancode == Godot.KeyList.Key3) slotIndex = 2;
-                else if (keyEvent.Scancode == Godot.KeyList.Key4) slotIndex = 3;
-                else if (keyEvent.Scancode == Godot.KeyList.Key5) slotIndex = 4;
-                else if (keyEvent.Scancode == Godot.KeyList.Key6) slotIndex = 5;
-                else if (keyEvent.Scancode == Godot.KeyList.Key7) slotIndex = 6;
-                else if (keyEvent.Scancode == Godot.KeyList.Key8) slotIndex = 7;
-                else if (keyEvent.Scancode == Godot.KeyList.Key9) slotIndex = 8;
-                
-                if (slotIndex >= 0) {
-                    UseSlot(slotIndex);
-                }
-            }
-        }
-        
-        /// <summary>
-        /// Assign an item to a quick slot
-        /// </summary>
-        public void SetSlot(int slotIndex, string itemId, int quantity) {
-            if (slotIndex < 0 || slotIndex >= SlotCount) return;
-            
-            _slotItemIds[slotIndex] = itemId;
-            _slotQuantities[slotIndex] = quantity;
-            OnSlotUpdated?.Invoke(slotIndex, itemId, quantity);
-        }
-        
-        /// <summary>
-        /// Clear a quick slot
-        /// </summary>
-        public void ClearSlot(int slotIndex) {
-            if (slotIndex < 0 || slotIndex >= SlotCount) return;
-            
-            _slotItemIds[slotIndex] = "";
-            _slotQuantities[slotIndex] = 0;
-            OnSlotUpdated?.Invoke(slotIndex, "", 0);
-        }
-        
-        /// <summary>
-        /// Get the item ID in a slot
-        /// </summary>
-        public string GetSlotItemId(int slotIndex) {
-            if (slotIndex < 0 || slotIndex >= SlotCount) return "";
-            return _slotItemIds[slotIndex];
-        }
-        
-        /// <summary>
-        /// Get the quantity in a slot
-        /// </summary>
-        public int GetSlotQuantity(int slotIndex) {
-            if (slotIndex < 0 || slotIndex >= SlotCount) return 0;
-            return _slotQuantities[slotIndex];
-        }
-        
-        /// <summary>
-        /// Use an item in a quick slot
-        /// </summary>
-        public void UseSlot(int slotIndex) {
-            if (slotIndex < 0 || slotIndex >= SlotCount) return;
-            if (string.IsNullOrEmpty(_slotItemIds[slotIndex]) || _slotQuantities[slotIndex] <= 0) return;
-            
-            var item = ItemDatabase.Instance.GetItem(_slotItemIds[slotIndex]);
-            if (item == null) return;
-            
-            // Only consumables can be used from quick slots
-            if (item.Type != ItemType.Consumable) {
-                return;
-            }
-            
-            var player = GetTree().GetFirstNodeInGroup("Player") as Player;
-            if (player == null) return;
-            
-            // Apply item effect
-            bool used = false;
-            
-            switch (item.ConsumableType) {
-                case ConsumableType.HealthPotion:
-                    int healAmount = item.Value * 10; // Heal value based on item
-                    player.Heal(healAmount);
-                    used = true;
+        // If no specific slot, find first available
+        if (slotIndex < 0)
+        {
+            // Try to stack with existing
+            for (int i = 0; i < 8; i++)
+            {
+                if (_slots[i].ItemId == itemId && _slots[i].ItemCount < 99)
+                {
+                    slotIndex = i;
                     break;
-                    
-                case ConsumableType.ManaPotion:
-                    // Add mana restoration if Player has Mana property
-                    used = true;
-                    break;
-                    
-                case ConsumableType.StrengthPotion:
-                    player.ApplyStatusEffect(StatusEffectType.Buff, "strength_boost", 60f);
-                    used = true;
-                    break;
-                    
-                case ConsumableType.DefensePotion:
-                    player.ApplyStatusEffect(StatusEffectType.Buff, "defense_boost", 60f);
-                    used = true;
-                    break;
+                }
             }
             
-            if (used) {
-                _slotQuantities[slotIndex]--;
-                OnSlotUsed?.Invoke(slotIndex);
-                
-                // Remove item if quantity is 0
-                if (_slotQuantities[slotIndex] <= 0) {
-                    ClearSlot(slotIndex);
-                } else {
-                    OnSlotUpdated?.Invoke(slotIndex, _slotItemIds[slotIndex], _slotQuantities[slotIndex]);
-                }
-                
-                // Remove from inventory
-                if (InventoryManager.Instance != null) {
-                    InventoryManager.Instance.RemoveItem(_slotItemIds[slotIndex], 1);
-                }
-                
-                // Show feedback
-                if (ScreenFlashEffect.Instance != null) {
-                    ScreenFlashEffect.Instance.Flash(Color.Green, 0.2f);
-                }
-                
-                if (GameMessageSystem.Instance != null) {
-                    GameMessageSystem.Instance.ShowPositive($"使用 {item.Name}");
+            // Find empty slot
+            if (slotIndex < 0)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    if (_slots[i].IsEmpty)
+                    {
+                        slotIndex = i;
+                        break;
+                    }
                 }
             }
         }
         
-        /// <summary>
-        /// Auto-fill quick slots with consumables from inventory
-        /// </summary>
-        public void AutoFillSlots() {
-            if (InventoryManager.Instance == null) return;
-            
-            var consumables = InventoryManager.Instance.GetItemsByType(ItemType.Consumable);
-            int slotIndex = 0;
-            
-            foreach (var item in consumables) {
-                if (slotIndex >= SlotCount) break;
-                
-                SetSlot(slotIndex, item.Id, item.Quantity);
-                slotIndex++;
-            }
+        // No available slot
+        if (slotIndex < 0 || slotIndex >= 8) return false;
+        
+        // Add to slot
+        _slots[slotIndex].ItemId = itemId;
+        _slots[slotIndex].ItemCount += count;
+        _slots[slotIndex].SlotType = GetSlotType(item);
+        
+        SlotUpdated(slotIndex, _slots[slotIndex]);
+        SaveQuickSlots();
+        
+        return true;
+    }
+    
+    /// <summary>
+    /// Use item in quick slot
+    /// </summary>
+    public bool UseSlot(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= 8) return false;
+        
+        var slot = _slots[slotIndex];
+        if (slot.IsEmpty)
+        {
+            SlotEmpty(slotIndex);
+            return false;
         }
         
-        /// <summary>
-        /// Serialize quick slot data for saving
-        /// </summary>
-        public Dictionary<string, object> Serialize() {
-            var data = new Dictionary<string, object>();
+        // Use the item
+        bool success = UseItem(slot.ItemId);
+        
+        if (success)
+        {
+            slot.ItemCount--;
             
-            for (int i = 0; i < SlotCount; i++) {
-                data[$"slot_{i}_item"] = _slotItemIds[i] ?? "";
-                data[$"slot_{i}_qty"] = _slotQuantities[i];
+            if (slot.ItemCount <= 0)
+            {
+                slot.ItemId = "";
+                slot.ItemCount = 0;
             }
             
-            return data;
+            SlotUsed(slotIndex, slot);
+            SlotUpdated(slotIndex, slot);
+            SaveQuickSlots();
         }
         
-        /// <summary>
-        /// Deserialize and load quick slot data
-        /// </summary>
-        public void Deserialize(Dictionary<string, object> data) {
-            for (int i = 0; i < SlotCount; i++) {
-                string itemId = data.ContainsKey($"slot_{i}_item") ? (string)data[$"slot_{i}_item"] : "";
-                int qty = data.ContainsKey($"slot_{i}_qty") ? (int)data[$"slot_{i}_qty"] : 0;
-                
-                if (!string.IsNullOrEmpty(itemId) && qty > 0) {
-                    _slotItemIds[i] = itemId;
-                    _slotQuantities[i] = qty;
-                } else {
-                    _slotItemIds[i] = "";
-                    _slotQuantities[i] = 0;
+        return success;
+    }
+    
+    /// <summary>
+    /// Get slot data
+    /// </summary>
+    public QuickSlotData GetSlot(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= 8) return null;
+        return _slots[slotIndex];
+    }
+    
+    /// <summary>
+    /// Get all slots
+    /// </summary>
+    public QuickSlotData[] GetAllSlots() => _slots;
+    
+    /// <summary>
+    /// Clear a slot
+    /// </summary>
+    public void ClearSlot(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= 8) return;
+        
+        _slots[slotIndex] = new QuickSlotData();
+        _slots[slotIndex].Hotkey = slotIndex + 1;
+        
+        SlotUpdated(slotIndex, _slots[slotIndex]);
+        SaveQuickSlots();
+    }
+    
+    /// <summary>
+    /// Swap two slots
+    /// </summary>
+    public void SwapSlots(int fromSlot, int toSlot)
+    {
+        if (fromSlot < 0 || fromSlot >= 8 || toSlot < 0 || toSlot >= 8) return;
+        if (fromSlot == toSlot) return;
+        
+        var temp = _slots[fromSlot];
+        _slots[fromSlot] = _slots[toSlot];
+        _slots[toSlot] = temp;
+        
+        // Update hotkeys
+        _slots[fromSlot].Hotkey = fromSlot + 1;
+        _slots[toSlot].Hotkey = toSlot + 1;
+        
+        SlotUpdated(fromSlot, _slots[fromSlot]);
+        SlotUpdated(toSlot, _slots[toSlot]);
+        SaveQuickSlots();
+    }
+    
+    #endregion
+    
+    #region Private Methods
+    
+    private QuickSlotType GetSlotType(Item item)
+    {
+        if (item == null) return QuickSlotType.Item;
+        
+        // Determine slot type based on item properties
+        if (item is Potion || item.Name.Contains("药水") || item.Name.Contains("药水"))
+            return QuickSlotType.Potion;
+        if (item is Food || item.Name.Contains("食物") || item.Name.Contains("肉"))
+            return QuickSlotType.Food;
+        if (item.Name.Contains("卷轴") || item.Name.Contains("传送"))
+            return QuickSlotType.Scroll;
+        
+        return QuickSlotType.Item;
+    }
+    
+    private bool UseItem(string itemId)
+    {
+        var item = ItemDatabase.GetItem(itemId);
+        if (item == null) return false;
+        
+        var player = GetTree().CurrentScene?.GetNode("Player") as Node;
+        if (player == null) return false;
+        
+        // Use item based on type
+        bool used = false;
+        
+        switch (GetSlotType(item))
+        {
+            case QuickSlotType.Potion:
+                used = UsePotion(item);
+                break;
+            case QuickSlotType.Food:
+                used = UseFood(item);
+                break;
+            case QuickSlotType.Scroll:
+                used = UseScroll(item);
+                break;
+            default:
+                used = UseConsumable(item);
+                break;
+        }
+        
+        // Play use sound
+        if (used && SoundEffectSystem.Instance != null)
+        {
+            if (item is Potion || GetSlotType(item) == QuickSlotType.Potion)
+                SoundEffectSystem.Instance.PlayPotionUse();
+            else if (item is Food || GetSlotType(item) == QuickSlotType.Food)
+                SoundEffectSystem.Instance.PlayEat();
+            else
+                SoundEffectSystem.Instance.PlayItemPickup();
+        }
+        
+        return used;
+    }
+    
+    private bool UsePotion(Item item)
+    {
+        var playerEntity = GetTree().CurrentScene?.GetNode("Player") as Node;
+        if (playerEntity == null) return false;
+        
+        // Try to heal or restore mana based on item properties
+        int healAmount = 0;
+        if (item is Potion potion)
+        {
+            // Potion healing
+            healAmount = potion.HealAmount;
+        }
+        else if (item is Food food)
+        {
+            healAmount = food.HealthRestore;
+        }
+        
+        // Default healing if no specific value
+        if (healAmount <= 0) healAmount = 50;
+        
+        if (playerEntity.HasMethod("Heal"))
+            playerEntity.Call("Heal", healAmount);
+        
+        return true;
+    }
+    
+    private bool UseFood(Item item)
+    {
+        var playerEntity = GetTree().CurrentScene?.GetNode("Player") as Node;
+        if (playerEntity == null) return false;
+        
+        int healAmount = 0;
+        if (item is Food food)
+        {
+            healAmount = food.HealthRestore;
+        }
+        
+        if (healAmount <= 0) healAmount = 30;
+        
+        if (playerEntity.HasMethod("Heal"))
+            playerEntity.Call("Heal", healAmount);
+        
+        return true;
+    }
+    
+    private bool UseScroll(Item item)
+    {
+        var player = GetTree().CurrentScene?.GetNode("Player") as Node2D;
+        if (player == null) return false;
+        
+        // Handle different scroll types
+        if (item.Name.Contains("传送") || item.Name.Contains("home"))
+        {
+            // Teleport to home/waypoint
+            if (player.HasMethod("TeleportToHome"))
+                player.Call("TeleportToHome");
+        }
+        
+        return true;
+    }
+    
+    private bool UseConsumable(Item item)
+    {
+        var playerEntity = GetTree().CurrentScene?.GetNode("Player") as Node;
+        if (playerEntity == null) return false;
+        
+        // Generic consumable - just use it
+        if (item is Potion potion)
+        {
+            if (playerEntity.HasMethod("Heal"))
+                playerEntity.Call("Heal", potion.HealAmount > 0 ? potion.HealAmount : 50);
+        }
+        
+        return true;
+    }
+    
+    #endregion
+    
+    #region Save/Load
+    
+    private void SaveQuickSlots()
+    {
+        var saveData = new Godot.Collections.Dictionary();
+        
+        for (int i = 0; i < 8; i++)
+        {
+            var slotData = new Godot.Collections.Dictionary();
+            slotData["item_id"] = _slots[i].ItemId;
+            slotData["item_count"] = _slots[i].ItemCount;
+            slotData["slot_type"] = (int)_slots[i].SlotType;
+            saveData["slot_" + i] = slotData;
+        }
+        
+        SaveSystem.Save("quick_slots", saveData);
+    }
+    
+    private void LoadQuickSlots()
+    {
+        var saveData = SaveSystem.Load("quick_slots") as Godot.Collections.Dictionary;
+        if (saveData == null) return;
+        
+        for (int i = 0; i < 8; i++)
+        {
+            var key = "slot_" + i;
+            if (saveData.Contains(key))
+            {
+                var slotData = saveData[key] as Godot.Collections.Dictionary;
+                if (slotData != null)
+                {
+                    _slots[i].ItemId = slotData.Contains("item_id") ? (string)slotData["item_id"] : "";
+                    _slots[i].ItemCount = slotData.Contains("item_count") ? (int)slotData["item_count"] : 0;
+                    _slots[i].SlotType = slotData.Contains("slot_type") ? (QuickSlotType)(int)slotData["slot_type"] : QuickSlotType.Item;
                 }
-            }
-            
-            // Notify UI to update
-            for (int i = 0; i < SlotCount; i++) {
-                OnSlotUpdated?.Invoke(i, _slotItemIds[i], _slotQuantities[i]);
             }
         }
     }
+    
+    #endregion
 }

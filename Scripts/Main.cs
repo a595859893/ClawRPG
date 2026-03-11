@@ -269,6 +269,11 @@ namespace ClawRPG.Scripts {
             gameSettings.Name = "GameSettings";
             AddChild(gameSettings);
             
+            // Initialize quick slot system
+            var quickSlotSystem = new QuickSlotSystem();
+            quickSlotSystem.Name = "QuickSlotSystem";
+            AddChild(quickSlotSystem);
+            
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
             
@@ -410,6 +415,11 @@ namespace ClawRPG.Scripts {
             combatStatsPanel.Name = "CombatStatsPanel";
             combatStatsPanel.AddToGroup("CombatStatsPanel");
             ui.AddChild(combatStatsPanel);
+            
+            // Quick Slot UI
+            var quickSlotUI = new UI.QuickSlotUI();
+            quickSlotUI.Name = "QuickSlotUI";
+            ui.AddChild(quickSlotUI);
 
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
