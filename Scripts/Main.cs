@@ -446,6 +446,16 @@ namespace ClawRPG.Scripts {
             shopUI.Name = "ShopUI";
             ui.AddChild(shopUI);
             
+            // Fishing System
+            var fishingSystem = new Crafting.FishingSystem();
+            fishingSystem.Name = "FishingSystem";
+            AddChild(fishingSystem);
+            
+            // Fishing UI
+            var fishingUI = new UI.FishingUI();
+            fishingUI.Name = "FishingUI";
+            ui.AddChild(fishingUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -740,6 +750,12 @@ namespace ClawRPG.Scripts {
                 ToggleEnchantmentUI();
             }
             
+            // Handle fishing UI toggle (P key)
+            if (Input.IsActionJustPressed("ui_fishing"))
+            {
+                ToggleFishingUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -886,6 +902,25 @@ namespace ClawRPG.Scripts {
             if (enchantmentUI != null)
             {
                 enchantmentUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// 切换钓鱼界面
+        /// </summary>
+        private void ToggleFishingUI()
+        {
+            var fishingUI = GetNodeOrNull<UI.FishingUI>("UI/FishingUI");
+            if (fishingUI != null)
+            {
+                if (fishingUI.Visible)
+                {
+                    fishingUI.HideFishingUI();
+                }
+                else
+                {
+                    fishingUI.ShowFishingUI();
+                }
             }
         }
         
