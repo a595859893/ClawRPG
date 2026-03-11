@@ -526,6 +526,11 @@ namespace ClawRPG.Scripts {
             worldEventUI.Name = "WorldEventUI";
             ui.AddChild(worldEventUI);
             
+            // Title UI
+            var titleUI = new Systems.TitleUI();
+            titleUI.Name = "TitleUI";
+            ui.AddChild(titleUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -862,6 +867,12 @@ namespace ClawRPG.Scripts {
                 ToggleWorldEventUI();
             }
             
+            // Handle title UI toggle (N key)
+            if (Input.IsActionJustPressed("ui_title"))
+            {
+                ToggleTitleUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -945,17 +956,10 @@ namespace ClawRPG.Scripts {
         
         private void ToggleTitleUI()
         {
-            var titleUI = GetNodeOrNull<UI.TitleUI>("CanvasLayer/TitleUI");
+            var titleUI = GetNodeOrNull<Systems.TitleUI>("CanvasLayer/TitleUI");
             if (titleUI != null)
             {
-                if (titleUI.Visible)
-                {
-                    titleUI.Hide();
-                }
-                else
-                {
-                    titleUI.Show();
-                }
+                titleUI.ToggleUI();
             }
         }
         
