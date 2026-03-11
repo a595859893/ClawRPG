@@ -285,6 +285,11 @@ namespace ClawRPG.Scripts {
             quickSlotSystem.Name = "QuickSlotSystem";
             AddChild(quickSlotSystem);
             
+            // Initialize guild system
+            var guildSystem = new GuildSystem();
+            guildSystem.Name = "GuildSystem";
+            AddChild(guildSystem);
+            
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
             
@@ -530,6 +535,11 @@ namespace ClawRPG.Scripts {
             var titleUI = new Systems.TitleUI();
             titleUI.Name = "TitleUI";
             ui.AddChild(titleUI);
+            
+            // Guild UI
+            var guildUI = new GuildUI();
+            guildUI.Name = "GuildUI";
+            ui.AddChild(guildUI);
             
             GD.Print("UI initialized");
             
@@ -817,6 +827,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_shop"))
             {
                 ToggleShopUI();
+            }
+            
+            // Handle guild UI toggle (G key)
+            if (Input.IsActionJustPressed("ui_guild"))
+            {
+                ToggleGuildUI();
             }
             
             // Handle auction house UI toggle (Y key)
@@ -1266,6 +1282,32 @@ namespace ClawRPG.Scripts {
                     auctionUI.Show();
                     auctionUI.Open();
                 }
+            }
+        }
+        
+        /// <summary>
+        /// 切换公会界面
+        /// </summary>
+        private void ToggleGuildUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+            
+            var guildUI = ui.GetNodeOrNull<GuildUI>("GuildUI");
+            if (guildUI != null && guildUI.Visible)
+            {
+                guildUI.Hide();
+            }
+            else
+            {
+                if (guildUI == null)
+                {
+                    guildUI = new GuildUI();
+                    guildUI.Name = "GuildUI";
+                    ui.AddChild(guildUI);
+                }
+                guildUI.Show();
+                guildUI.Toggle();
             }
         }
         
