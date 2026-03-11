@@ -136,6 +136,11 @@ namespace ClawRPG.Scripts {
             mailManager.Name = "MailManager";
             AddChild(mailManager);
             
+            // Initialize daily login reward system
+            var dailyLoginRewardSystem = new DailyLoginRewardSystem();
+            dailyLoginRewardSystem.Name = "DailyLoginRewardSystem";
+            AddChild(dailyLoginRewardSystem);
+            
             // Initialize weather system
             var weatherSystem = new WeatherSystem();
             weatherSystem.Name = "WeatherSystem";
@@ -541,6 +546,11 @@ namespace ClawRPG.Scripts {
             guildUI.Name = "GuildUI";
             ui.AddChild(guildUI);
             
+            // Daily Login Reward UI
+            var dailyLoginRewardUI = new DailyLoginRewardUI();
+            dailyLoginRewardUI.Name = "DailyLoginRewardUI";
+            ui.AddChild(dailyLoginRewardUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -833,6 +843,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_guild"))
             {
                 ToggleGuildUI();
+            }
+            
+            // Handle daily login reward UI toggle (L key - using existing binding, different from Alchemy)
+            if (Input.IsActionJustPressed("ui_daily_login"))
+            {
+                ToggleDailyLoginRewardUI();
             }
             
             // Handle auction house UI toggle (Y key)
@@ -1308,6 +1324,31 @@ namespace ClawRPG.Scripts {
                 }
                 guildUI.Show();
                 guildUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// 切换每日登录奖励界面
+        /// </summary>
+        private void ToggleDailyLoginRewardUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+            
+            var dailyLoginRewardUI = ui.GetNodeOrNull<DailyLoginRewardUI>("DailyLoginRewardUI");
+            if (dailyLoginRewardUI != null && dailyLoginRewardUI.Visible)
+            {
+                dailyLoginRewardUI.Hide();
+            }
+            else
+            {
+                if (dailyLoginRewardUI == null)
+                {
+                    dailyLoginRewardUI = new DailyLoginRewardUI();
+                    dailyLoginRewardUI.Name = "DailyLoginRewardUI";
+                    ui.AddChild(dailyLoginRewardUI);
+                }
+                dailyLoginRewardUI.Show();
             }
         }
         
