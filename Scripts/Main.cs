@@ -269,6 +269,11 @@ namespace ClawRPG.Scripts {
             screenEffectManager.Name = "ScreenEffectManager";
             AddChild(screenEffectManager);
 
+            // Initialize combat VFX system
+            var combatVFXSystem = new Combat.CombatVFXSystem();
+            combatVFXSystem.Name = "CombatVFXSystem";
+            AddChild(combatVFXSystem);
+
             // Initialize team skill system
             var teamSkillSystem = new TeamSkillSystem();
             teamSkillSystem.Name = "TeamSkillSystem";
@@ -696,6 +701,11 @@ namespace ClawRPG.Scripts {
             combatStatusUI.Name = "CombatStatusUI";
             combatStatusUI.AddToGroup("CombatStatusUI");
             ui.AddChild(combatStatusUI);
+
+            // Combat VFX UI
+            var combatVFXUI = new UI.CombatVFXUI();
+            combatVFXUI.Name = "CombatVFXUI";
+            ui.AddChild(combatVFXUI);
 
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
@@ -1297,6 +1307,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("equip_visuals"))
             {
                 ToggleEquipmentVisualsUI();
+            }
+
+            // Handle combat VFX UI toggle (Shift+V key)
+            if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.V))
+            {
+                ToggleCombatVFXUI();
             }
 
             // Handle story UI toggle (K key)
@@ -2283,6 +2299,15 @@ namespace ClawRPG.Scripts {
             if (equipVisualsUI != null)
             {
                 equipVisualsUI.Toggle();
+            }
+        }
+
+        private void ToggleCombatVFXUI()
+        {
+            var combatVFXUI = GetNodeOrNull<UI.CombatVFXUI>("CanvasLayer/CombatVFXUI");
+            if (combatVFXUI != null)
+            {
+                combatVFXUI.Toggle();
             }
         }
 
