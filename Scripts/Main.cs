@@ -271,6 +271,11 @@ namespace ClawRPG.Scripts {
             monsterTamingSystem.Name = "MonsterTamingSystem";
             AddChild(monsterTamingSystem);
 
+            // Initialize prestige system
+            var prestigeSystem = new Systems.PrestigeSystem();
+            prestigeSystem.Name = "PrestigeSystem";
+            AddChild(prestigeSystem);
+
             // Initialize multiplayer leaderboard system
             var leaderboardSystem = new MultiplayerLeaderboard();
             leaderboardSystem.Name = "MultiplayerLeaderboard";
@@ -1198,6 +1203,12 @@ namespace ClawRPG.Scripts {
             monsterTamingUI.Visible = false;
             ui.AddChild(monsterTamingUI);
 
+            // Initialize Prestige UI
+            var prestigeUI = new PrestigeUI();
+            prestigeUI.Name = "PrestigeUI";
+            prestigeUI.Visible = false;
+            ui.AddChild(prestigeUI);
+
             GD.Print("UI initialized");
 
             // Survival Challenge System
@@ -1558,6 +1569,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.T))
             {
                 ToggleMonsterTamingUI();
+            }
+
+            // Handle prestige UI toggle (Ctrl+P key)
+            if (Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.P))
+            {
+                TogglePrestigeUI();
             }
 
             // Handle player profile UI toggle (F key)
@@ -2091,6 +2108,22 @@ namespace ClawRPG.Scripts {
             if (monsterTamingUI != null)
             {
                 monsterTamingUI.ToggleUI();
+            }
+        }
+
+        private void TogglePrestigeUI()
+        {
+            var prestigeUI = GetNodeOrNull<PrestigeUI>("CanvasLayer/PrestigeUI");
+            if (prestigeUI != null)
+            {
+                if (prestigeUI.Visible)
+                {
+                    prestigeUI.Hide();
+                }
+                else
+                {
+                    prestigeUI.Show();
+                }
             }
         }
 
@@ -3731,6 +3764,13 @@ namespace ClawRPG.Scripts {
                 if (sealedTowerManager != null && saveData.SealedTowerData != null)
                 {
                     sealedTowerManager.LoadData(saveData.SealedTowerData);
+                }
+
+                // 加载声望转生数据
+                var prestigeSystem = GetNodeOrNull<Systems.PrestigeSystem>("PrestigeSystem");
+                if (prestigeSystem != null && saveData.PrestigeData != null)
+                {
+                    prestigeSystem.LoadData(saveData.PrestigeData);
                 }
 
                 CurrentDay = saveData.CurrentDay;

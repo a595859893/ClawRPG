@@ -154,6 +154,9 @@ namespace ClawRPG.Scripts.Systems {
             // Sealed Tower system data (roguelike endless dungeon)
             public Dictionary<string, object> SealedTowerData { get; set; } = new();
 
+            // Prestige system data
+            public Dictionary<string, object> PrestigeData { get; set; } = new();
+
             // Guild Quest system data
             public Dictionary<string, object> GuildQuestData { get; set; } = new();
             
@@ -589,6 +592,14 @@ namespace ClawRPG.Scripts.Systems {
             {
                 var sealedTowerData = sealedTowerManager.SaveData();
                 data.SealedTowerData = sealedTowerData;
+            }
+            
+            // Save prestige data
+            var prestigeSystem = GetNodeOrNull<Systems.PrestigeSystem>("PrestigeSystem");
+            if (prestigeSystem != null)
+            {
+                var prestigeData = prestigeSystem.SaveData();
+                data.PrestigeData = prestigeData;
             }
             
             return data;
