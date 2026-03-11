@@ -109,6 +109,11 @@ namespace ClawRPG.Scripts {
             secretAchievementSystem.Name = "SecretAchievementSystem";
             AddChild(secretAchievementSystem);
 
+            // Initialize player profile system
+            var playerProfileSystem = new PlayerProfileSystem();
+            playerProfileSystem.Name = "PlayerProfileSystem";
+            AddChild(playerProfileSystem);
+
             // Initialize counter attack system
             var counterAttackSystem = new CounterAttackSystem();
             counterAttackSystem.Name = "CounterAttackSystem";
@@ -706,6 +711,11 @@ namespace ClawRPG.Scripts {
             var combatVFXUI = new UI.CombatVFXUI();
             combatVFXUI.Name = "CombatVFXUI";
             ui.AddChild(combatVFXUI);
+
+            // Player Profile UI
+            var playerProfileUI = new UI.PlayerProfileUI();
+            playerProfileUI.Name = "PlayerProfileUI";
+            ui.AddChild(playerProfileUI);
 
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
@@ -2362,7 +2372,7 @@ namespace ClawRPG.Scripts {
 
         private void TogglePlayerProfileUI()
         {
-            var profileUI = GetNodeOrNull<UI.PlayerProfileUI>("CanvasLayer/PlayerProfileUI");
+            var profileUI = GetNodeOrNull<UI.PlayerProfileUI>("UI/PlayerProfileUI");
             if (profileUI != null)
             {
                 profileUI.Toggle();
