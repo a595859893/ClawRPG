@@ -659,6 +659,16 @@ namespace ClawRPG.Scripts {
             relicUI.Visible = false;
             ui.AddChild(relicUI);
             
+            // Equipment Enhancement System
+            var enhancementSystem = Systems.EquipmentEnhancementSystem.Instance;
+            enhancementSystem.Initialize();
+            
+            // Equipment Enhancement UI
+            var enhancementUI = new Systems.EquipmentEnhancementUI();
+            enhancementUI.Name = "EquipmentEnhancementUI";
+            enhancementUI.Visible = false;
+            ui.AddChild(enhancementUI);
+            
             // Pet Equipment UI
             var petEquipmentUI = new Systems.Pets.PetEquipmentUI();
             petEquipmentUI.Name = "PetEquipmentUI";
@@ -1133,6 +1143,12 @@ namespace ClawRPG.Scripts {
                 ToggleRelicUI();
             }
             
+            // Handle equipment enhancement UI toggle (E key - separate from enchantment)
+            if (Input.IsActionJustPressed("ui_enhancement"))
+            {
+                ToggleEquipmentEnhancementUI();
+            }
+            
             // Handle pet evolution UI toggle (P key - separate from pet equipment)
             if (Input.IsActionJustPressed("ui_pet_evolution"))
             {
@@ -1454,6 +1470,18 @@ namespace ClawRPG.Scripts {
             if (relicUI != null)
             {
                 relicUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle equipment enhancement UI
+        /// </summary>
+        private void ToggleEquipmentEnhancementUI()
+        {
+            var enhancementUI = GetNodeOrNull<Systems.EquipmentEnhancementUI>("UI/EquipmentEnhancementUI");
+            if (enhancementUI != null)
+            {
+                enhancementUI.ToggleUI();
             }
         }
         
