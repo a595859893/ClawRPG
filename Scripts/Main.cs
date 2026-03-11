@@ -346,6 +346,11 @@ namespace ClawRPG.Scripts {
             AddChild(elementalTrialSystem);
             elementalTrialSystem.Initialize();
             
+            // Initialize pet battle arena system
+            var petBattleArenaSystem = new Systems.PetBattleArena.PetBattleArenaSystem();
+            petBattleArenaSystem.Name = "PetBattleArenaSystem";
+            AddChild(petBattleArenaSystem);
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -645,6 +650,12 @@ namespace ClawRPG.Scripts {
             elementalTrialUI.Name = "ElementalTrialUI";
             elementalTrialUI.Visible = false;
             ui.AddChild(elementalTrialUI);
+            
+            // Pet Battle Arena UI
+            var petBattleArenaUI = new Systems.PetBattleArena.PetBattleArenaUI();
+            petBattleArenaUI.Name = "PetBattleArenaUI";
+            petBattleArenaUI.Visible = false;
+            ui.AddChild(petBattleArenaUI);
             
             GD.Print("UI initialized");
             
@@ -1048,6 +1059,12 @@ namespace ClawRPG.Scripts {
                 ToggleElementalTrialUI();
             }
             
+            // Handle pet battle arena UI toggle (P key - separate from pet evolution)
+            if (Input.IsActionJustPressed("ui_pet_battle_arena"))
+            {
+                TogglePetBattleArenaUI();
+            }
+            
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -1376,6 +1393,18 @@ namespace ClawRPG.Scripts {
             if (elementalTrialUI != null)
             {
                 elementalTrialUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle pet battle arena UI
+        /// </summary>
+        private void TogglePetBattleArenaUI()
+        {
+            var petBattleArenaUI = GetNodeOrNull<Systems.PetBattleArena.PetBattleArenaUI>("UI/PetBattleArenaUI");
+            if (petBattleArenaUI != null)
+            {
+                petBattleArenaUI.Toggle();
             }
         }
 
