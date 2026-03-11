@@ -276,6 +276,11 @@ namespace ClawRPG.Scripts {
             prestigeSystem.Name = "PrestigeSystem";
             AddChild(prestigeSystem);
 
+            // Initialize dice master system
+            var diceMasterSystem = new DiceMasterSystem();
+            diceMasterSystem.Name = "DiceMasterSystem";
+            AddChild(diceMasterSystem);
+
             // Initialize multiplayer leaderboard system
             var leaderboardSystem = new MultiplayerLeaderboard();
             leaderboardSystem.Name = "MultiplayerLeaderboard";
@@ -1547,6 +1552,12 @@ namespace ClawRPG.Scripts {
                 ToggleTreasureHuntUI();
             }
 
+            // Handle dice master UI toggle (D key)
+            if (Input.IsKeyPressed(Key.D))
+            {
+                ToggleDiceMasterUI();
+            }
+
             // Handle ranked UI toggle (Shift+K key)
             if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.K))
             {
@@ -2795,6 +2806,30 @@ namespace ClawRPG.Scripts {
                     canvasLayer.AddChild(newUI);
                     newUI.Visible = true;
                 }
+            }
+        }
+
+        private void ToggleDiceMasterUI()
+        {
+            var diceMasterUI = GetNodeOrNull<DiceMasterUI>("CanvasLayer/DiceMasterUI");
+            if (diceMasterUI != null)
+            {
+                diceMasterUI.Toggle();
+            }
+            else
+            {
+                // Create UI if it doesn't exist
+                var diceMasterUI_new = new DiceMasterUI();
+                diceMasterUI_new.Name = "DiceMasterUI";
+                var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+                if (canvasLayer == null)
+                {
+                    canvasLayer = new CanvasLayer();
+                    canvasLayer.Name = "CanvasLayer";
+                    AddChild(canvasLayer);
+                }
+                canvasLayer.AddChild(diceMasterUI_new);
+                diceMasterUI_new.Show();
             }
         }
 
