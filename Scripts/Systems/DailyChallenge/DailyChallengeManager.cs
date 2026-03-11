@@ -31,6 +31,20 @@ namespace ClawRPG.Scripts.Systems {
         private HashSet<string> _exploredRegionIds = new();
         private int _survivalTimeSeconds;
         
+        // New challenge tracking
+        private int _totalFishCaught;
+        private int _totalAlchemyCrafted;
+        private int _totalMountKills;
+        private int _totalMountSkillsUsed;
+        private int _totalPetKills;
+        private int _totalItemsSold;
+        private int _totalItemsCrafted;
+        private int _totalReputationGained;
+        private int _totalBossesKilled;
+        private int _totalCriticalHits;
+        private int _totalDodges;
+        private int _totalHealed;
+        
         // Events
         public static string ChallengeCompletedSignal = "challenge_completed";
         public static string ChallengeUpdatedSignal = "challenge_updated";
@@ -155,6 +169,110 @@ namespace ClawRPG.Scripts.Systems {
             UpdateChallengeProgress(ChallengeType.CollectItems, 1);
         }
         
+        /// <summary>
+        /// Called when a fish is caught
+        /// </summary>
+        public void OnFishCaught() {
+            _totalFishCaught++;
+            UpdateChallengeProgress(ChallengeType.Fishing, _totalFishCaught);
+        }
+        
+        /// <summary>
+        /// Called when alchemy is crafted
+        /// </summary>
+        public void OnAlchemyCrafted() {
+            _totalAlchemyCrafted++;
+            UpdateChallengeProgress(ChallengeType.Alchemy, _totalAlchemyCrafted);
+        }
+        
+        /// <summary>
+        /// Called when enemy is killed while mounted
+        /// </summary>
+        public void OnMountKill() {
+            _totalMountKills++;
+            UpdateChallengeProgress(ChallengeType.MountCombat, _totalMountKills);
+        }
+        
+        /// <summary>
+        /// Called when a mount skill is used
+        /// </summary>
+        public void OnMountSkillUsed() {
+            _totalMountSkillsUsed++;
+            UpdateChallengeProgress(ChallengeType.MountCombat, _totalMountSkillsUsed);
+        }
+        
+        /// <summary>
+        /// Called when pet kills an enemy
+        /// </summary>
+        public void OnPetKill() {
+            _totalPetKills++;
+            UpdateChallengeProgress(ChallengeType.PetBattle, _totalPetKills);
+        }
+        
+        /// <summary>
+        /// Called when an item is sold
+        /// </summary>
+        public void OnItemSold() {
+            _totalItemsSold++;
+            UpdateChallengeProgress(ChallengeType.Trade, _totalItemsSold);
+        }
+        
+        /// <summary>
+        /// Called when an item is crafted
+        /// </summary>
+        public void OnItemCrafted() {
+            _totalItemsCrafted++;
+            UpdateChallengeProgress(ChallengeType.CraftItem, _totalItemsCrafted);
+        }
+        
+        /// <summary>
+        /// Called when reputation is gained
+        /// </summary>
+        public void OnReputationGained(int amount) {
+            _totalReputationGained += amount;
+            UpdateChallengeProgress(ChallengeType.Reputation, _totalReputationGained);
+        }
+        
+        /// <summary>
+        /// Called when a boss is killed
+        /// </summary>
+        public void OnBossKilled() {
+            _totalBossesKilled++;
+            UpdateChallengeProgress(ChallengeType.KillBoss, _totalBossesKilled);
+            UpdateChallengeProgress(ChallengeType.KillEnemies, _totalKills);
+        }
+        
+        /// <summary>
+        /// Called when a critical hit occurs
+        /// </summary>
+        public void OnCriticalHit() {
+            _totalCriticalHits++;
+            UpdateChallengeProgress(ChallengeType.CriticalHits, _totalCriticalHits);
+        }
+        
+        /// <summary>
+        /// Called when an attack is dodged
+        /// </summary>
+        public void OnDodge() {
+            _totalDodges++;
+            UpdateChallengeProgress(ChallengeType.Dodge, _totalDodges);
+        }
+        
+        /// <summary>
+        /// Called when player is healed
+        /// </summary>
+        public void OnHealed(int amount) {
+            _totalHealed += amount;
+            UpdateChallengeProgress(ChallengeType.Heal, _totalHealed);
+        }
+        
+        /// <summary>
+        /// Called when pet levels up
+        /// </summary>
+        public void OnPetLevelUp() {
+            UpdateChallengeProgress(ChallengeType.PetBattle, 1);
+        }
+        
         private void UpdateChallengeProgress(ChallengeType type, int newValue) {
             bool anyCompleted = false;
             
@@ -259,6 +377,20 @@ namespace ClawRPG.Scripts.Systems {
             _regionsExplored = 0;
             _exploredRegionIds.Clear();
             _survivalTimeSeconds = 0;
+            
+            // Reset new challenge tracking
+            _totalFishCaught = 0;
+            _totalAlchemyCrafted = 0;
+            _totalMountKills = 0;
+            _totalMountSkillsUsed = 0;
+            _totalPetKills = 0;
+            _totalItemsSold = 0;
+            _totalItemsCrafted = 0;
+            _totalReputationGained = 0;
+            _totalBossesKilled = 0;
+            _totalCriticalHits = 0;
+            _totalDodges = 0;
+            _totalHealed = 0;
         }
     }
 }
