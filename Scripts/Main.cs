@@ -281,6 +281,11 @@ namespace ClawRPG.Scripts {
             diceMasterSystem.Name = "DiceMasterSystem";
             AddChild(diceMasterSystem);
 
+            // Initialize identification system
+            var identificationSystem = new IdentificationSystem();
+            identificationSystem.Name = "IdentificationSystem";
+            AddChild(identificationSystem);
+
             // Initialize multiplayer leaderboard system
             var leaderboardSystem = new MultiplayerLeaderboard();
             leaderboardSystem.Name = "MultiplayerLeaderboard";
@@ -1214,6 +1219,12 @@ namespace ClawRPG.Scripts {
             prestigeUI.Visible = false;
             ui.AddChild(prestigeUI);
 
+            // Initialize Identification UI
+            var identificationUI = new IdentificationUI();
+            identificationUI.Name = "IdentificationUI";
+            identificationUI.Visible = false;
+            ui.AddChild(identificationUI);
+
             GD.Print("UI initialized");
 
             // Survival Challenge System
@@ -1586,6 +1597,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.P))
             {
                 TogglePrestigeUI();
+            }
+
+            // Handle identification UI toggle (I key)
+            if (Input.IsKeyPressed(Key.I))
+            {
+                ToggleIdentificationUI();
             }
 
             // Handle player profile UI toggle (F key)
@@ -2135,6 +2152,15 @@ namespace ClawRPG.Scripts {
                 {
                     prestigeUI.Show();
                 }
+            }
+        }
+
+        private void ToggleIdentificationUI()
+        {
+            var identificationUI = GetNodeOrNull<IdentificationUI>("CanvasLayer/IdentificationUI");
+            if (identificationUI != null)
+            {
+                identificationUI.ToggleUI();
             }
         }
 
