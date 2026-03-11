@@ -201,6 +201,9 @@ namespace ClawRPG.Scripts {
             equipmentSetManager.Name = "EquipmentSetManager";
             AddChild(equipmentSetManager);
             
+            // Initialize procedural equipment system (affix generation)
+            var proceduralEquipmentSystem = ProceduralEquipmentSystem.Instance;
+            
             // Initialize boss ability visualizer
             var bossAbilityVisualizer = new Combat.BossAbilityVisualizer();
             bossAbilityVisualizer.Name = "BossAbilityVisualizer";
