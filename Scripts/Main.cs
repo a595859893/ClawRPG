@@ -104,6 +104,11 @@ namespace ClawRPG.Scripts {
             badgeSystem.Name = "AchievementBadgeSystem";
             AddChild(badgeSystem);
             
+            // Initialize secret achievement system
+            var secretAchievementSystem = new SecretAchievementSystem();
+            secretAchievementSystem.Name = "SecretAchievementSystem";
+            AddChild(secretAchievementSystem);
+            
             // Initialize counter attack system
             var counterAttackSystem = new CounterAttackSystem();
             counterAttackSystem.Name = "CounterAttackSystem";
@@ -1023,6 +1028,12 @@ namespace ClawRPG.Scripts {
                 ToggleBadgeUI();
             }
             
+            // Handle secret achievement UI toggle (Ctrl+S key)
+            if (Input.IsActionJustPressed("ui_secret_achievements"))
+            {
+                ToggleSecretAchievementUI();
+            }
+            
             // Handle mail UI toggle (M key)
             if (Input.IsActionJustPressed("ui_mail"))
             {
@@ -1691,6 +1702,25 @@ namespace ClawRPG.Scripts {
                 if (canvasLayer != null)
                 {
                     canvasLayer.AddChild(newBadgeUI);
+                }
+            }
+        }
+        
+        private void ToggleSecretAchievementUI()
+        {
+            var secretUI = GetNodeOrNull<Systems.SecretAchievementUI>("CanvasLayer/SecretAchievementUI");
+            if (secretUI != null)
+            {
+                secretUI.QueueFree();
+            }
+            else
+            {
+                var newSecretUI = new Systems.SecretAchievementUI();
+                newSecretUI.Name = "SecretAchievementUI";
+                var canvasLayer = GetNodeOrNull("CanvasLayer");
+                if (canvasLayer != null)
+                {
+                    canvasLayer.AddChild(newSecretUI);
                 }
             }
         }
