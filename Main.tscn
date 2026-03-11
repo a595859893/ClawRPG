@@ -1,11 +1,65 @@
-[gd_scene load_steps=2 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=41 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_main"]
-[ext_resource type="PackedScene" path="res://Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://Player.tscn" id="1_player_scene"]
+[ext_resource type="Script" path="res://Scripts/UI/PlayerHUD.cs" id="2_hud"]
+[ext_resource type="Script" path="res://Scripts/UI/HotkeyHelpUI.cs" id="3_hotkey"]
+[ext_resource type="Script" path="res://Scripts/UI/InventoryUI.cs" id="4_inventory"]
+[ext_resource type="Script" path="res://Scripts/UI/CraftingUI.cs" id="5_crafting"]
+[ext_resource type="Script" path="res://Scripts/UI/TooltipSystem.cs" id="6_tooltip"]
+[ext_resource type="Script" path="res://Scripts/UI/ScreenFlashEffect.cs" id="7_flash"]
+[ext_resource type="Script" path="res://Scripts/UI/GameMessageSystem.cs" id="8_message"]
+[ext_resource type="Script" path="res://Scripts/UI/RuneUI.cs" id="9_rune"]
+[ext_resource type="Script" path="res://Scripts/UI/WorldEventUI.cs" id="10_worldevent"]
+[ext_resource type="Script" path="res://Scripts/UI/AchievementUI.cs" id="11_achievement"]
+[ext_resource type="Script" path="res://Scripts/UI/StatisticsUI.cs" id="12_statistics"]
+[ext_resource type="Script" path="res://Scripts/UI/TitleScreenUI.cs" id="13_title"]
+[ext_resource type="Script" path="res://Scripts/UI/BulletinBoardUI.cs" id="14_bulletin"]
+[ext_resource type="Script" path="res://Scripts/UI/QuestTrackerUI.cs" id="15_questtracker"]
+[ext_resource type="Script" path="res://Scripts/UI/QuestGuideArrow.cs" id="16_questguide"]
+[ext_resource type="Script" path="res://Scripts/UI/AchievementNotification.cs" id="17_notify"]
+[ext_resource type="Script" path="res://Scripts/UI/MultiplayerUI.cs" id="18_multiplayer"]
+[ext_resource type="Script" path="res://Scripts/UI/WeaponMasteryUI.cs" id="19_weaponmastery"]
+[ext_resource type="Script" path="res://Scripts/Systems/QuickSlotSystem.cs" id="20_quickslot"]
+[ext_resource type="Script" path="res://Scripts/UI/QuickSlotBar.cs" id="21_quickslotbar"]
+[ext_resource type="Script" path="res://Scripts/MountDatabase.cs" id="22_mountdb"]
+[ext_resource type="Script" path="res://Scripts/MountManager.cs" id="23_mountmgr"]
+[ext_resource type="Script" path="res://Scripts/UI/MountUI.cs" id="24_mountui"]
+[ext_resource type="Script" path="res://Scripts/UI/DragDropHelper.cs" id="25_dragdrop"]
+[ext_resource type="Script" path="res://Scripts/Systems/BookmarkSystem.cs" id="26_bookmark"]
+[ext_resource type="Script" path="res://Scripts/UI/BookmarkUI.cs" id="27_bookmarkui"]
+[ext_resource type="Script" path="res://Scripts/Systems/AutoBookmarkSystem.cs" id="27_autobookmark"]
+[ext_resource type="Script" path="res://Scripts/UI/EnhancementUI.cs" id="28_enhancement"]
+[ext_resource type="Script" path="res://Scripts/Systems/Enhancement/EquipmentEnhancement.cs" id="29_enhancement_system"]
+[ext_resource type="Script" path="res://Scripts/UI/EnhancementEffect.cs" id="30_enhancement_effect"]
+[ext_resource type="Script" path="res://Scripts/Systems/Enchantment/EnchantmentDatabase.cs" id="31_enchant_db"]
+[ext_resource type="Script" path="res://Scripts/Systems/Enchantment/EnchantmentSystem.cs" id="32_enchant_system"]
+[ext_resource type="Script" path="res://Scripts/UI/EnchantmentUI.cs" id="33_enchant_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/EquipmentVisuals.cs" id="34_equip_visuals"]
+[ext_resource type="Script" path="res://Scripts/UI/EquipmentVisualsUI.cs" id="35_equip_visuals_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/BountyUI.cs" id="36_bounty_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/WeatherUI.cs" id="37_weather_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/AutoBookmarkUI.cs" id="38_auto_bookmark_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/PlayerProfileUI.cs" id="39_profile_ui"]
+[ext_resource type="Script" path="res://Scripts/Systems/SoundEffectSystem.cs" id="40_sound_effect"]
+[ext_resource type="Script" path="res://Scripts/UI/StoryUI.cs" id="41_story_ui"]
+[ext_resource type="Script" path="res://Scripts/Systems/StorySystem.cs" id="42_story_system"]
+[ext_resource type="Script" path="res://Scripts/UI/EquipmentSetUI.cs" id="43_equipment_set_ui"]
+[ext_resource type="Script" path="res://Scripts/Items/EquipmentSetManager.cs" id="44_equipment_set_mgr"]
+[ext_resource type="Script" path="res://Scripts/UI/PotionUI.cs" id="45_potion_ui"]
+[ext_resource type="Script" path="res://Scripts/UI/RegionUI.cs" id="46_region_ui"]
+[ext_resource type="Script" path="res://Scripts/Systems/RegionManager.cs" id="47_region_mgr"]
+[ext_resource type="Script" path="res://Scripts/UI/TitleNotification.cs" id="48_title_notify"]
+[ext_resource type="Script" path="res://Scripts/Systems/TitleSystem.cs" id="49_title_system"]
+[ext_resource type="Script" path="res://Scripts/Systems/Pets/PetCombatAI.cs" id="50_pet_combat_ai"]
+[ext_resource type="Script" path="res://Scripts/Systems/BossAbilityVisualizer.cs" id="51_boss_visualizer"]
+[ext_resource type="Script" path="res://Scripts/UI/BossHealthBarUI.cs" id="52_boss_health_bar"]
+[ext_resource type="Script" path="res://Scripts/UI/DamageNumberSystem.cs" id="53_damage_number"]
+[ext_resource type="Script" path="res://Scripts/UI/BossAbilityWarningUI.cs" id="54_boss_warning_ui"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
-PlayerScene = ExtResource("2_player")
+PlayerScene = ExtResource("1_player_scene")
 
 [node name="Background" type="ColorRect" parent="."]
 offset_right = 1280.0
@@ -15,3 +69,411 @@ color = Color(0.2, 0.3, 0.2, 1)
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(640, 360)
 current = true
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="PlayerHUD" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_hud")
+
+[node name="HotkeyHelpUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_hotkey")
+
+[node name="InventoryUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_inventory")
+
+[node name="CraftingUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_crafting")
+
+[node name="TooltipSystem" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_tooltip")
+
+[node name="ScreenFlashEffect" type="CanvasLayer" parent="."]
+script = ExtResource("7_flash")
+
+[node name="GameMessageSystem" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("8_message")
+
+[node name="RuneUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("9_rune")
+
+[node name="WorldEventUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("10_worldevent")
+
+[node name="AchievementUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("11_achievement")
+
+[node name="StatisticsUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("12_statistics")
+
+[node name="TitleScreenUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("13_title")
+
+[node name="BulletinBoardUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("14_bulletin")
+
+[node name="QuestTrackerUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("15_questtracker")
+
+[node name="QuestGuideArrow" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("16_questguide")
+
+[node name="AchievementNotification" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("17_notify")
+
+[node name="MultiplayerUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("18_multiplayer")
+
+[node name="WeaponMasteryUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("19_weaponmastery")
+
+[node name="QuickSlotSystem" type="Node" parent="."]
+script = ExtResource("20_quickslot")
+
+[node name="QuickSlotBar" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("21_quickslotbar")
+
+[node name="MountDatabase" type="Node" parent="."]
+script = ExtResource("22_mountdb")
+
+[node name="MountManager" type="Node" parent="."]
+script = ExtResource("23_mountmgr")
+
+[node name="MountUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("24_mountui")
+
+[node name="DragDropHelper" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("25_dragdrop")
+
+[node name="BookmarkSystem" type="Node" parent="."]
+script = ExtResource("26_bookmark")
+
+[node name="BookmarkUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("27_bookmarkui")
+
+[node name="AutoBookmarkUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("38_auto_bookmark_ui")
+
+[node name="EnhancementUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("28_enhancement")
+
+[node name="EnhancementEffect" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("30_enhancement_effect")
+
+[node name="EnhancementSystem" type="Node" parent="."]
+script = ExtResource("29_enhancement_system")
+
+[node name="EnchantmentDatabase" type="Node" parent="."]
+script = ExtResource("31_enchant_db")
+
+[node name="EnchantmentSystem" type="Node" parent="."]
+script = ExtResource("32_enchant_system")
+
+[node name="EnchantmentUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("33_enchant_ui")
+
+[node name="BountyUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("36_bounty_ui")
+
+[node name="WeatherUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("37_weather_ui")
+
+[node name="EquipmentVisuals" type="Node" parent="."]
+script = ExtResource("34_equip_visuals")
+
+[node name="EquipmentVisualsUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("35_equip_visuals_ui")
+
+[node name="PlayerProfileUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("39_profile_ui")
+
+[node name="SoundEffectSystem" type="Node" parent="."]
+script = ExtResource("40_sound_effect")
+
+[node name="BossAbilityVisualizer" type="Node" parent="."]
+script = ExtResource("51_boss_visualizer")
+
+[node name="StorySystem" type="Node" parent="."]
+script = ExtResource("42_story_system")
+
+[node name="StoryUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("41_story_ui")
+
+[node name="EquipmentSetManager" type="Node" parent="."]
+script = ExtResource("44_equipment_set_mgr")
+
+[node name="EquipmentSetUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("43_equipment_set_ui")
+
+[node name="PotionUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("45_potion_ui")
+
+[node name="RegionManager" type="Node" parent="."]
+script = ExtResource("47_region_mgr")
+
+[node name="RegionUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("46_region_ui")
+
+[node name="TitleSystem" type="Node" parent="."]
+script = ExtResource("49_title_system")
+
+[node name="TitleNotification" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("48_title_notify")
+
+[node name="PetCombatAI" type="Node" parent="."]
+script = ExtResource("50_pet_combat_ai")
+
+[node name="BossHealthBarUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("52_boss_health_bar")
+
+[node name="DamageNumberSystem" type="CanvasLayer" parent="."]
+script = ExtResource("53_damage_number")
+
+[node name="BossAbilityWarningUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("54_boss_warning_ui")
