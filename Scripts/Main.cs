@@ -205,6 +205,11 @@ namespace ClawRPG.Scripts {
             skillComboSystem.Name = "SkillComboSystem";
             AddChild(skillComboSystem);
 
+            // Initialize skill tree system
+            var skillTreeSystem = new SkillTreeSystem();
+            skillTreeSystem.Name = "SkillTreeSystem";
+            AddChild(skillTreeSystem);
+
             // Initialize AOE indicator system
             var aoeIndicatorManager = new Systems.AOEIndicatorManager();
             aoeIndicatorManager.Name = "AOEIndicatorManager";
@@ -693,6 +698,11 @@ namespace ClawRPG.Scripts {
             var skillComboUI = new SkillComboUI();
             skillComboUI.Name = "SkillComboUI";
             ui.AddChild(skillComboUI);
+
+            // Skill Tree UI
+            var skillTreeUI = new SkillTreeUI();
+            skillTreeUI.Name = "SkillTreeUI";
+            ui.AddChild(skillTreeUI);
 
             // Quick Slot UI
             var quickSlotUI = new UI.QuickSlotUI();
