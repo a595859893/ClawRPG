@@ -656,6 +656,12 @@ namespace ClawRPG.Scripts {
             combatHUDUI.AddToGroup("CombatHUDEnhancementUI");
             ui.AddChild(combatHUDUI);
 
+            // Combat Skill Cooldown UI
+            var skillCooldownUI = new UI.CombatSkillCooldownUI();
+            skillCooldownUI.Name = "CombatSkillCooldownUI";
+            skillCooldownUI.AddToGroup("CombatSkillCooldownUI");
+            ui.AddChild(skillCooldownUI);
+
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
             dialogueUI.Name = "DialogueUI";
