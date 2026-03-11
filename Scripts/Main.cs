@@ -434,6 +434,11 @@ namespace ClawRPG.Scripts {
             mountRaceSystem.Name = "MountRaceSystem";
             AddChild(mountRaceSystem);
 
+            // Initialize dynamic difficulty system
+            var dynamicDifficultySystem = new DynamicDifficultySystem();
+            dynamicDifficultySystem.Name = "DynamicDifficultySystem";
+            AddChild(dynamicDifficultySystem);
+
             // Initialize daily quest system
             var dailyQuestSystem = new Systems.DailyQuest.DailyQuestSystem();
             dailyQuestSystem.Name = "DailyQuestSystem";
@@ -794,6 +799,12 @@ namespace ClawRPG.Scripts {
             mysteryTreasureUI.Name = "MysteryTreasureUI";
             mysteryTreasureUI.Visible = false;
             ui.AddChild(mysteryTreasureUI);
+
+            // Dynamic Difficulty UI
+            var dynamicDifficultyUI = new DynamicDifficultyUI();
+            dynamicDifficultyUI.Name = "DynamicDifficultyUI";
+            dynamicDifficultyUI.Visible = false;
+            ui.AddChild(dynamicDifficultyUI);
 
             // Elemental Trial UI
             var elementalTrialUI = new Systems.ElementalTrialUI();
@@ -1343,6 +1354,12 @@ namespace ClawRPG.Scripts {
                 ToggleMysteryTreasureUI();
             }
 
+            // Handle dynamic difficulty UI toggle (Shift+D key)
+            if (Input.IsActionJustPressed("ui_dynamic_difficulty"))
+            {
+                ToggleDynamicDifficultyUI();
+            }
+
             // Handle elemental trial UI toggle (E key - separate from enchantment)
             if (Input.IsActionJustPressed("ui_elemental_trial"))
             {
@@ -1795,6 +1812,18 @@ namespace ClawRPG.Scripts {
             if (mysteryTreasureUI != null)
             {
                 mysteryTreasureUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// Toggle dynamic difficulty UI
+        /// </summary>
+        private void ToggleDynamicDifficultyUI()
+        {
+            var dynamicDifficultyUI = GetNodeOrNull<DynamicDifficultyUI>("UI/DynamicDifficultyUI");
+            if (dynamicDifficultyUI != null)
+            {
+                dynamicDifficultyUI.ToggleUI();
             }
         }
 
