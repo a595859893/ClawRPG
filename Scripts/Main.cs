@@ -456,6 +456,15 @@ namespace ClawRPG.Scripts {
             fishingUI.Name = "FishingUI";
             ui.AddChild(fishingUI);
             
+            // Alchemy System
+            var alchemySystem = Systems.AlchemySystem.Instance;
+            alchemySystem.Initialize();
+            
+            // Alchemy UI
+            var alchemyUI = new Systems.AlchemyUI();
+            alchemyUI.Name = "AlchemyUI";
+            ui.AddChild(alchemyUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -756,6 +765,12 @@ namespace ClawRPG.Scripts {
                 ToggleFishingUI();
             }
             
+            // Handle alchemy UI toggle (L key)
+            if (Input.IsActionJustPressed("ui_alchemy"))
+            {
+                ToggleAlchemyUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -921,6 +936,18 @@ namespace ClawRPG.Scripts {
                 {
                     fishingUI.ShowFishingUI();
                 }
+            }
+        }
+        
+        /// <summary>
+        /// 切换炼金界面
+        /// </summary>
+        private void ToggleAlchemyUI()
+        {
+            var alchemyUI = GetNodeOrNull<Systems.AlchemyUI>("UI/AlchemyUI");
+            if (alchemyUI != null)
+            {
+                alchemyUI.Toggle();
             }
         }
         
