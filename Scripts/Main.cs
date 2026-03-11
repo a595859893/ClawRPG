@@ -259,6 +259,11 @@ namespace ClawRPG.Scripts {
             var mountEvolutionSystem = MountEvolutionSystem.Instance;
             mountEvolutionSystem.Initialize();
             
+            // Initialize random world event system
+            var worldEventSystem = new Systems.RandomWorldEventSystem();
+            worldEventSystem.Name = "RandomWorldEventSystem";
+            AddChild(worldEventSystem);
+            
             // Initialize game settings system
             var gameSettings = new GameSettings();
             gameSettings.Name = "GameSettings";
@@ -489,6 +494,11 @@ namespace ClawRPG.Scripts {
             var mountEvolutionUI = new UI.MountEvolutionUI();
             mountEvolutionUI.Name = "MountEvolutionUI";
             ui.AddChild(mountEvolutionUI);
+            
+            // Random World Event UI
+            var worldEventUI = new Systems.RandomWorldEventUI();
+            worldEventUI.Name = "WorldEventUI";
+            ui.AddChild(worldEventUI);
             
             GD.Print("UI initialized");
             
@@ -808,6 +818,12 @@ namespace ClawRPG.Scripts {
                 ToggleMountEvolutionUI();
             }
             
+            // Handle world event UI toggle (O key)
+            if (Input.IsActionJustPressed("ui_world_event"))
+            {
+                ToggleWorldEventUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -1009,6 +1025,15 @@ namespace ClawRPG.Scripts {
             if (mountEvolutionUI != null)
             {
                 mountEvolutionUI.ToggleUI();
+            }
+        }
+        
+        private void ToggleWorldEventUI()
+        {
+            var worldEventUI = GetNodeOrNull<Systems.RandomWorldEventUI>("UI/WorldEventUI");
+            if (worldEventUI != null)
+            {
+                worldEventUI.ToggleVisibility();
             }
         }
         
