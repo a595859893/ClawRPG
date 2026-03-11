@@ -832,6 +832,16 @@ namespace ClawRPG.Scripts {
             alchemyUI.Name = "AlchemyUI";
             ui.AddChild(alchemyUI);
 
+            // Cooking System
+            var cookingSystem = new Systems.Cooking.CookingSystem();
+            cookingSystem.Name = "CookingSystem";
+            AddChild(cookingSystem);
+
+            // Cooking UI
+            var cookingUI = new Systems.Cooking.CookingUI();
+            cookingUI.Name = "CookingUI";
+            ui.AddChild(cookingUI);
+
             // Mount Combat UI
             var mountCombatUI = new UI.MountCombatUI();
             mountCombatUI.Name = "MountCombatUI";
@@ -1202,6 +1212,13 @@ namespace ClawRPG.Scripts {
             // Update combat status system
             CombatStatusSystem.Instance._Process(dt);
 
+            // Update cooking system
+            var cookingSystem = GetNodeOrNull<Systems.Cooking.CookingSystem>("CookingSystem");
+            if (cookingSystem != null)
+            {
+                cookingSystem.UpdateCooking(dt);
+            }
+
             // Update survival challenge system
             var survivalChallengeSystem = GetNode<SurvivalChallengeSystem>("SurvivalChallengeSystem");
             if (survivalChallengeSystem != null)
@@ -1549,6 +1566,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_alchemy"))
             {
                 ToggleAlchemyUI();
+            }
+
+            // Handle cooking UI toggle (Shift+C key)
+            if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("ui_fishing"))
+            {
+                ToggleCookingUI();
             }
 
             // Handle mount combat UI toggle (V key)
@@ -1952,6 +1975,18 @@ namespace ClawRPG.Scripts {
             if (alchemyUI != null)
             {
                 alchemyUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// 切换烹饪界面
+        /// </summary>
+        private void ToggleCookingUI()
+        {
+            var cookingUI = GetNodeOrNull<Systems.Cooking.CookingUI>("UI/CookingUI");
+            if (cookingUI != null)
+            {
+                cookingUI.Toggle();
             }
         }
 
