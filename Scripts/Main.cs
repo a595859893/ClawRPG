@@ -230,6 +230,11 @@ namespace ClawRPG.Scripts {
             storyManager.Name = "StoryManager";
             AddChild(storyManager);
 
+            // Initialize sealed tower system (roguelike endless dungeon)
+            var sealedTowerManager = new Systems.SealedTowerManager();
+            sealedTowerManager.Name = "SealedTowerManager";
+            AddChild(sealedTowerManager);
+
             // Initialize region manager
             var regionManager = new RegionManager();
             regionManager.Name = "RegionManager";
@@ -795,6 +800,12 @@ namespace ClawRPG.Scripts {
             var storyUI = new UI.StoryUI();
             storyUI.Name = "StoryUI";
             ui.AddChild(storyUI);
+
+            // Sealed Tower UI (roguelike endless dungeon)
+            var sealedTowerUI = new UI.SealedTowerUI();
+            sealedTowerUI.Name = "SealedTowerUI";
+            sealedTowerUI.Visible = false;
+            ui.AddChild(sealedTowerUI);
 
             // Equipment Set UI
             var equipmentSetUI = new UI.EquipmentSetUI();
@@ -1452,6 +1463,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("story"))
             {
                 ToggleStoryUI();
+            }
+
+            // Handle sealed tower UI toggle (Ctrl+T key)
+            if (Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.T))
+            {
+                ToggleSealedTowerUI();
             }
 
             // Handle player profile UI toggle (F key)
@@ -2585,6 +2602,15 @@ namespace ClawRPG.Scripts {
             }
         }
 
+        private void ToggleSealedTowerUI()
+        {
+            var sealedTowerUI = GetNodeOrNull<UI.SealedTowerUI>("CanvasLayer/SealedTowerUI");
+            if (sealedTowerUI != null)
+            {
+                sealedTowerUI.Toggle();
+            }
+        }
+
         private void ToggleEquipmentSetUI()
         {
             var setUI = GetNodeOrNull<UI.EquipmentSetUI>("CanvasLayer/EquipmentSetUI");
@@ -3512,6 +3538,13 @@ namespace ClawRPG.Scripts {
                 if (emoteSystem != null && saveData.EmoteData != null)
                 {
                     emoteSystem.LoadData(saveData.EmoteData);
+                }
+
+                // 加载封印之塔数据
+                var sealedTowerManager = GetNodeOrNull<Systems.SealedTowerManager>("SealedTowerManager");
+                if (sealedTowerManager != null && saveData.SealedTowerData != null)
+                {
+                    sealedTowerManager.LoadData(saveData.SealedTowerData);
                 }
 
                 CurrentDay = saveData.CurrentDay;

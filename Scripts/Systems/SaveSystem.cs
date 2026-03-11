@@ -151,6 +151,9 @@ namespace ClawRPG.Scripts.Systems {
             // Emote system data
             public Dictionary<string, object> EmoteData { get; set; } = new();
             
+            // Sealed Tower system data (roguelike endless dungeon)
+            public Dictionary<string, object> SealedTowerData { get; set; } = new();
+            
             // Player data (legacy support)
             public object PlayerData { get; set; }
         }
@@ -575,6 +578,14 @@ namespace ClawRPG.Scripts.Systems {
                 var emoteData = new Dictionary<string, object>();
                 emoteSystem.SaveData(emoteData);
                 data.EmoteData = emoteData;
+            }
+            
+            // Save sealed tower data
+            var sealedTowerManager = GetNodeOrNull<Systems.SealedTowerManager>("SealedTowerManager");
+            if (sealedTowerManager != null)
+            {
+                var sealedTowerData = sealedTowerManager.SaveData();
+                data.SealedTowerData = sealedTowerData;
             }
             
             return data;
