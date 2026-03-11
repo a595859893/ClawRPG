@@ -319,6 +319,13 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         }
         
         /// <summary>
+        /// 获取所有已镶嵌宝石的装备ID列表
+        /// </summary>
+        public List<string> GetEquippedEquipmentIds() {
+            return _playerGemData.EquipmentSlots.Keys.ToList();
+        }
+        
+        /// <summary>
         /// 存档
         /// </summary>
         public Dictionary Save() {

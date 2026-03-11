@@ -332,25 +332,48 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         private void RefreshEquipmentList() {
             _equipmentList.Clear();
             
-            // TODO: 从玩家背包获取可镶嵌的装备
-            // 示例装备
-            _equipmentList.AddItem("武器 - 烈焰之剑", 0);
-            _equipmentList.SetItemMetadata(0, new Dictionary { { "id", "weapon_001" }, { "type", "weapon" } });
+            // 从 GemSystem 获取已装备的物品
+            var equippedIds = _gemSystem.GetEquippedEquipmentIds();
             
-            _equipmentList.AddItem("护甲 - 鳞甲", 1);
-            _equipmentList.SetItemMetadata(1, new Dictionary { { "id", "armor_001" }, { "type", "armor" } });
-            
-            _equipmentList.AddItem("头盔 - 铁盔", 2);
-            _equipmentList.SetItemMetadata(2, new Dictionary { { "id", "helmet_001" }, { "type", "helmet" } });
-            
-            _equipmentList.AddItem("靴子 - 轻靴", 3);
-            _equipmentList.SetItemMetadata(3, new Dictionary { { "id", "boots_001" }, { "type", "boots" } });
-            
-            _equipmentList.AddItem("手套 - 皮手套", 4);
-            _equipmentList.SetItemMetadata(4, new Dictionary { { "id", "gloves_001" }, { "type", "gloves" } });
-            
-            _equipmentList.AddItem("饰品 - 魔法戒指", 5);
-            _equipmentList.SetItemMetadata(5, new Dictionary { { "id", "accessory_001" }, { "type", "accessory" } });
+            if (equippedIds.Count > 0) {
+                // 显示已装备的物品
+                int index = 0;
+                foreach (var equipmentId in equippedIds) {
+                    // 从装备ID中提取类型
+                    string equipmentType = "weapon";
+                    if (equipmentId.Contains("armor")) equipmentType = "armor";
+                    else if (equipmentId.Contains("helmet")) equipmentType = "helmet";
+                    else if (equipmentId.Contains("boots")) equipmentType = "boots";
+                    else if (equipmentId.Contains("gloves")) equipmentType = "gloves";
+                    else if (equipmentId.Contains("accessory")) equipmentType = "accessory";
+                    
+                    string displayName = equipmentId.Replace("_", " ");
+                    displayName = char.ToUpper(displayName[0]) + displayName.Substring(1);
+                    
+                    _equipmentList.AddItem($"{displayName}", index);
+                    _equipmentList.SetItemMetadata(index, new Dictionary { { "id", equipmentId }, { "type", equipmentType } });
+                    index++;
+                }
+            } else {
+                // 如果没有已装备的物品，显示默认装备（首次使用）
+                _equipmentList.AddItem("武器 - 烈焰之剑", 0);
+                _equipmentList.SetItemMetadata(0, new Dictionary { { "id", "weapon_001" }, { "type", "weapon" } });
+                
+                _equipmentList.AddItem("护甲 - 鳞甲", 1);
+                _equipmentList.SetItemMetadata(1, new Dictionary { { "id", "armor_001" }, { "type", "armor" } });
+                
+                _equipmentList.AddItem("头盔 - 铁盔", 2);
+                _equipmentList.SetItemMetadata(2, new Dictionary { { "id", "helmet_001" }, { "type", "helmet" } });
+                
+                _equipmentList.AddItem("靴子 - 轻靴", 3);
+                _equipmentList.SetItemMetadata(3, new Dictionary { { "id", "boots_001" }, { "type", "boots" } });
+                
+                _equipmentList.AddItem("手套 - 皮手套", 4);
+                _equipmentList.SetItemMetadata(4, new Dictionary { { "id", "gloves_001" }, { "type", "gloves" } });
+                
+                _equipmentList.AddItem("饰品 - 魔法戒指", 5);
+                _equipmentList.SetItemMetadata(5, new Dictionary { { "id", "accessory_001" }, { "type", "accessory" } });
+            }
         }
         
         /// <summary>
