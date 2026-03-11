@@ -1129,6 +1129,12 @@ namespace ClawRPG.Scripts {
                 ToggleMountUI();
             }
 
+            // Handle skill cooldown UI toggle (K key)
+            if (Input.IsKeyPressed(Key.K))
+            {
+                ToggleSkillCooldownUI();
+            }
+
             // Handle title UI toggle (Y key)
             if (Input.IsActionJustPressed("titles"))
             {
@@ -1624,6 +1630,15 @@ namespace ClawRPG.Scripts {
             if (mountUI != null)
             {
                 mountUI.ToggleUI();
+            }
+        }
+
+        private void ToggleSkillCooldownUI()
+        {
+            var skillCooldownUI = GetNodeOrNull<UI.CombatSkillCooldownUI>("CanvasLayer/CombatSkillCooldownUI");
+            if (skillCooldownUI != null)
+            {
+                skillCooldownUI.Toggle();
             }
         }
 
