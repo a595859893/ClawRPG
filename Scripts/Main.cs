@@ -375,6 +375,11 @@ namespace ClawRPG.Scripts {
             AddChild(petAffectionSystem);
             petAffectionSystem.Initialize();
 
+            // Initialize pet foster system
+            var petFosterSystem = new Systems.PetFoster.PetFosterSystem();
+            petFosterSystem.Name = "PetFosterSystem";
+            AddChild(petFosterSystem);
+
             // Initialize pet skill system
             var petSkillSystem = new Systems.Pets.PetSkillSystem();
             petSkillSystem.Name = "PetSkillSystem";
@@ -748,6 +753,12 @@ namespace ClawRPG.Scripts {
             petAffectionUI.Name = "PetAffectionUI";
             petAffectionUI.Visible = false;
             ui.AddChild(petAffectionUI);
+
+            // Pet Foster UI
+            var petFosterUI = new Systems.PetFoster.PetFosterUI();
+            petFosterUI.Name = "PetFosterUI";
+            petFosterUI.Visible = false;
+            ui.AddChild(petFosterUI);
 
             // Pet Skill UI
             var petSkillUI = new PetSkillUI();
@@ -1279,6 +1290,12 @@ namespace ClawRPG.Scripts {
                 TogglePetAffectionUI();
             }
 
+            // Handle pet foster UI toggle (Alt+P)
+            if (Input.IsActionJustPressed("ui_pet_foster"))
+            {
+                TogglePetFosterUI();
+            }
+
             // Handle pet skill UI toggle (Ctrl+P)
             if (Input.IsActionJustPressed("ui_pet_skill"))
             {
@@ -1679,6 +1696,18 @@ namespace ClawRPG.Scripts {
             if (petAffectionUI != null)
             {
                 petAffectionUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet foster UI
+        /// </summary>
+        private void TogglePetFosterUI()
+        {
+            var petFosterUI = GetNodeOrNull<Systems.PetFoster.PetFosterUI>("UI/PetFosterUI");
+            if (petFosterUI != null)
+            {
+                petFosterUI.ToggleUI();
             }
         }
 
