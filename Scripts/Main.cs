@@ -374,6 +374,11 @@ namespace ClawRPG.Scripts {
             arenaTournamentSystem.Name = "ArenaTournamentSystem";
             AddChild(arenaTournamentSystem);
 
+            // Initialize arena colosseum system
+            var arenaColosseumSystem = new Systems.ArenaColosseumSystem();
+            arenaColosseumSystem.Name = "ArenaColosseumSystem";
+            AddChild(arenaColosseumSystem);
+
             // Initialize gem system
             var gemSystem = GemSystem.Instance;
 
@@ -1012,6 +1017,12 @@ namespace ClawRPG.Scripts {
             survivalChallengeUI.Visible = false;
             ui.AddChild(survivalChallengeUI);
 
+            // Arena Colosseum UI
+            var arenaColosseumUI = new Systems.ArenaColosseumSystem.ArenaColosseumUI();
+            arenaColosseumUI.Name = "ArenaColosseumUI";
+            arenaColosseumUI.Visible = false;
+            ui.AddChild(arenaColosseumUI);
+
             // Trigger welcome tutorial
             var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
             if (tutorialUI != null)
@@ -1479,6 +1490,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_tournament") && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleArenaTournamentUI();
+            }
+
+            // Handle arena colosseum UI toggle (Ctrl+A)
+            if (Input.IsActionJustPressed("ui_colosseum"))
+            {
+                ToggleArenaColosseumUI();
             }
 
             // Handle equipment enhancement UI toggle (E key - separate from enchantment)
@@ -1959,6 +1976,26 @@ namespace ClawRPG.Scripts {
                 var newUI = new UI.ArenaTournamentUI();
                 newUI.Name = "ArenaTournamentUI";
                 GetNode("UI").AddChild(newUI);
+            }
+        }
+
+        /// <summary>
+        /// Toggle arena colosseum UI
+        /// </summary>
+        private void ToggleArenaColosseumUI()
+        {
+            var arenaColosseumUI = GetNodeOrNull<Systems.ArenaColosseumSystem.ArenaColosseumUI>("CanvasLayer/ArenaColosseumUI");
+            if (arenaColosseumUI != null)
+            {
+                arenaColosseumUI.Visible = !arenaColosseumUI.Visible;
+            }
+            else
+            {
+                var newUI = GetNodeOrNull<Systems.ArenaColosseumSystem.ArenaColosseumUI>("CanvasLayer/ArenaColosseumUI");
+                if (newUI != null)
+                {
+                    newUI.Show();
+                }
             }
         }
 
