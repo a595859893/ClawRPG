@@ -193,7 +193,7 @@ namespace ClawRPG.Scripts.Systems {
                 var current = _database.GetCostume(currentId);
                 if (current != null)
                 {
-                    current.IsEquipped = false;
+                    current.IsEquipped = false; 
                     RemoveCostumeVisual(current);
                 }
             }

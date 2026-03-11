@@ -19,11 +19,11 @@ namespace ClawRPG.Scripts.UI
         private Label _levelReqLabel;
         private VBoxContainer _regionListContainer;
         private Player _player;
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
 
         public override void _Ready()
         {
-            Visible = false;
+            Visible = false; 
             SetupUI();
             
             // Get player reference
@@ -233,7 +233,7 @@ namespace ClawRPG.Scripts.UI
             else
             {
                 // Resume game if paused
-                GetTree().Paused = false;
+                GetTree().Paused = false; 
             }
         }
 

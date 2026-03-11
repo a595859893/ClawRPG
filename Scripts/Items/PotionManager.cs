@@ -23,7 +23,7 @@ namespace ClawRPG.Scripts.Items
         private Dictionary<int, float> _cooldowns = new Dictionary<int, float>();
         
         // Tutorial tracking
-        private bool _hasTriggeredFirstPotion = false;
+        private bool _hasTriggeredFirstPotion = false; 
 
         // 信号系统
         public Action<PotionInstance> OnPotionAdded;

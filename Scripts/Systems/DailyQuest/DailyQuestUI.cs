@@ -20,7 +20,7 @@ public class DailyQuestUI : Control
 	{
 		SetupUI();
 		RefreshQuestList();
-		Visible = false;
+		Visible = false; 
 
 		// Connect signals
 		if (DailyQuestSystem.Instance != null)
@@ -63,7 +63,7 @@ public class DailyQuestUI : Control
 		_closeButton = new Button();
 		_closeButton.Text = "X";
 		_closeButton.CustomMinimumSize = new Vector2(40, 40);
-		_closeButton.Pressed += () => Visible = false;
+		_closeButton.Pressed += () => Visible = false; 
 		titleBar.AddChild(_closeButton);
 
 		// Stats

@@ -24,8 +24,8 @@ public class NetworkClient : Node
     
     // 状态
     private int _reconnectAttempts = 0;
-    private bool _isConnected = false;
-    private bool _isConnecting = false;
+    private bool _isConnected = false; 
+    private bool _isConnecting = false; 
     
     // 心跳
     private Timer _heartbeatTimer;
@@ -61,7 +61,7 @@ public class NetworkClient : Node
     {
         _heartbeatTimer = new Timer();
         _heartbeatTimer.WaitTime = _heartbeatIntervalMs / 1000.0;
-        _heartbeatTimer.OneShot = false;
+        _heartbeatTimer.OneShot = false; 
         _heartbeatTimer.Timeout += OnHeartbeatTimeout;
         AddChild(_heartbeatTimer);
     }
@@ -102,7 +102,7 @@ public class NetworkClient : Node
     private void OnWsOpen(object sender, EventArgs e)
     {
         _isConnected = true;
-        _isConnecting = false;
+        _isConnecting = false; 
         _reconnectAttempts = 0;
         
         GD.Print("[NetworkClient] Connected to server");
@@ -118,8 +118,8 @@ public class NetworkClient : Node
 
     private void OnWsClose(object sender, CloseEventArgs e)
     {
-        _isConnected = false;
-        _isConnecting = false;
+        _isConnected = false; 
+        _isConnecting = false; 
         _heartbeatTimer.Stop();
         
         string reason = e.Reason ?? "Unknown";
@@ -225,8 +225,8 @@ public class NetworkClient : Node
             _ws.CloseAsync(1000, "Client disconnect");
         }
         
-        _isConnected = false;
-        _isConnecting = false;
+        _isConnected = false; 
+        _isConnecting = false; 
     }
 
     /// <summary>
@@ -267,7 +267,7 @@ public class NetworkClient : Node
 
     private void HandleConnectionFailed()
     {
-        _isConnecting = false;
+        _isConnecting = false; 
         ScheduleReconnect();
     }
 

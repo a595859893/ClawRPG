@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.UI {
         public static DragDropHelper Instance { get; private set; }
         
         private Control _dragPreview;
-        private bool _isDragging = false;
+        private bool _isDragging = false; 
         private string _draggedItemId = "";
         private int _draggedQuantity = 0;
         private ItemType _draggedItemType;
@@ -25,7 +25,7 @@ namespace ClawRPG.Scripts.UI {
             _dragPreview.CustomMinimumSize = new Vector2(50, 50);
             _dragPreview.SetAnchor(AnchorPresets.Center);
             _dragPreview.Modulate = new Color(1, 1, 1, 0.7f);
-            _dragPreview.Visible = false;
+            _dragPreview.Visible = false; 
             AddChild(_dragPreview);
             
             // Create preview background
@@ -101,10 +101,10 @@ namespace ClawRPG.Scripts.UI {
         /// End dragging
         /// </summary>
         public void EndDrag() {
-            _isDragging = false;
+            _isDragging = false; 
             _draggedItemId = "";
             _draggedQuantity = 0;
-            _dragPreview.Visible = false;
+            _dragPreview.Visible = false; 
         }
         
         /// <summary>

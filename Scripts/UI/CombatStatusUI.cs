@@ -28,7 +28,7 @@ namespace ClawRPG.Scripts.UI
         private HBoxContainer _buffContainer;
         
         // Toggle visibility
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         // Auto-hide timer
         private float _autoHideTimer = 0;
@@ -238,8 +238,8 @@ namespace ClawRPG.Scripts.UI
 
         private void Hide()
         {
-            _isVisible = false;
-            Visible = false;
+            _isVisible = false; 
+            Visible = false; 
         }
 
         private void UpdateStats()

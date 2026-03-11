@@ -31,7 +31,7 @@ namespace ClawRPG.Scripts.Characters {
             DamageMultiplier = dmgMult;
             Range = range;
             Duration = 0f;
-            IsAoE = false;
+            IsAoE = false; 
             AoERadius = 0f;
             StatusChance = 0f;
         }
@@ -160,7 +160,7 @@ namespace ClawRPG.Scripts.Characters {
                     Vector2 targetPos = target != null ? target.GlobalPosition : GlobalPosition;
                     
                     // 获取技能信息
-                    bool isAoE = false;
+                    bool isAoE = false; 
                     float aoeRadius = 0f;
                     if (_abilityDatabase.TryGetValue(abilityId, out var ability))
                     {
@@ -530,7 +530,7 @@ namespace ClawRPG.Scripts.Characters {
             
             OnPhaseChange?.Invoke(_currentPhase);
             
-            GetTree().CreateTimer(2f).Timeout += () => _phaseTransitioning = false;
+            GetTree().CreateTimer(2f).Timeout += () => _phaseTransitioning = false; 
         }
         
         private void TriggerEnrage()

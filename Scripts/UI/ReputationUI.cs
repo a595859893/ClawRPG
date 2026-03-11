@@ -26,7 +26,7 @@ namespace ClawRPG.Scripts.UI {
         
         public override void _Ready() {
             SetupUI();
-            Visible = false;
+            Visible = false; 
         }
         
         private void SetupUI() {
@@ -168,7 +168,7 @@ namespace ClawRPG.Scripts.UI {
                 CustomMinimumSize = new Vector2(0, 20),
                 SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
-            _reputationProgress.ShowPercentage = false;
+            _reputationProgress.ShowPercentage = false; 
             infoContainer.AddChild(_reputationProgress);
             
             _progressLabel = new Label {
@@ -246,7 +246,7 @@ namespace ClawRPG.Scripts.UI {
             _progressLabel.Text = $"{(int)(progress * 100)}%";
             
             // 检查是否有可领取的奖励
-            var hasReward = false;
+            var hasReward = false; 
             foreach (var reward in faction.Rewards) {
                 if (data.Tier >= reward.RequiredTier && !data.RewardClaimed) {
                     hasReward = true;
@@ -285,7 +285,7 @@ namespace ClawRPG.Scripts.UI {
         }
         
         public void Hide() {
-            Visible = false;
+            Visible = false; 
         }
         
         public void Toggle() {

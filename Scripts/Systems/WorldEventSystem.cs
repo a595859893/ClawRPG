@@ -430,7 +430,7 @@ namespace ClawRPG.Scripts.Systems {
             if (_currentEvent == null) return;
 
             var evt = _currentEvent;
-            _isEventActive = false;
+            _isEventActive = false; 
             _currentEvent = null;
             _nextEventCountdown = _globalCooldown * 60 + evt.Cooldown;
 

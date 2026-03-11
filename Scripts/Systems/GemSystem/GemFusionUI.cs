@@ -41,24 +41,24 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         private void _CreateUI() {
             // 主容器
             _mainContainer = new Control();
-            _mainContainer.SetAnchorsPreset(Control Preset.FullRect);
+            _mainContainer.SetAnchorsPreset(Control.Preset.FullRect);
             _mainContainer.MouseFilter = Control.MouseFilterEnum.Stop;
             AddChild(_mainContainer);
             
             // 背景
             var bg = new ColorRect();
             bg.Color = new Color(0, 0, 0, 0.7f);
-            bg.SetAnchorsPreset(Control Preset.FullRect);
+            bg.SetAnchorsPreset(Control.Preset.FullRect);
             _mainContainer.AddChild(bg);
             
             // 面板
             var panel = new PanelContainer();
-            panel.SetAnchorsPreset(Control Preset.Center);
+            panel.SetAnchorsPreset(Control.Preset.Center);
             panel.CustomMinimumSize = new Vector2(800, 600);
             _mainContainer.AddChild(panel);
             
             var panelMargin = new MarginContainer();
-            panelMargin.SetAnchorsPreset(Control Preset.FullRect);
+            panelMargin.SetAnchorsPreset(Control.Preset.FullRect);
             panelMargin.AddConstantOverride("margin_left", 20);
             panelMargin.AddConstantOverride("margin_right", 20);
             panelMargin.AddConstantOverride("margin_top", 20);
@@ -66,7 +66,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             panel.AddChild(panelMargin);
             
             var vbox = new VBoxContainer();
-            vbox.SetAnchorsPreset(Control Preset.FullRect);
+            vbox.SetAnchorsPreset(Control.Preset.FullRect);
             panelMargin.AddChild(vbox);
             
             // 标题栏

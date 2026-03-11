@@ -35,7 +35,7 @@ public partial class EnchantmentUI : Control
 
     public override void _Ready()
     {
-        Visible = false;
+        Visible = false; 
         CreateUI();
 
         // 监听附魔事件

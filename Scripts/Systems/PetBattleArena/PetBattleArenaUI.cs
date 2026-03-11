@@ -42,7 +42,7 @@ public class PetBattleArenaUI : Control
     private Label _totalDamageDealtLabel;
     private Label _totalDamageTakenLabel;
     
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
     
     public override void _Ready()
     {

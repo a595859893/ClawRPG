@@ -90,14 +90,14 @@ public partial class MountUI : Control
             _staminaBar.Value = mount.Stamina;
             _levelLabel.Text = "Level: " + mount.Level;
             _summonButton.Disabled = true;
-            _dismissButton.Disabled = false;
+            _dismissButton.Disabled = false; 
         }
         else
         {
             _mountNameLabel.Text = "No Mount";
             _staminaBar.Value = 0;
             _levelLabel.Text = "Level: -";
-            _summonButton.Disabled = false;
+            _summonButton.Disabled = false; 
             _dismissButton.Disabled = true;
         }
     }

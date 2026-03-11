@@ -17,12 +17,12 @@ namespace ClawRPG.Scripts.UI {
         private Button _closeButton;
         private Button _resetButton;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         public override void _Ready()
         {
             CreateUI();
-            Visible = false;
+            Visible = false; 
             
             // Subscribe to statistics updates
             StatisticsManager.Instance.OnStatisticsUpdated += UpdateDisplay;

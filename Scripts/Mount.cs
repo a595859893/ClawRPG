@@ -51,7 +51,7 @@ namespace ClawRPG.Scripts.Mounts {
         public MountInstance() {
             Level = 1;
             Experience = 0;
-            IsActive = false;
+            IsActive = false; 
             ObtainedAt = DateTime.Now;
         }
 

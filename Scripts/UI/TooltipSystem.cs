@@ -30,7 +30,7 @@ namespace ClawRPG.Scripts.UI
 
         private Item currentItem;
         private Skill currentSkill;
-        private bool isVisible = false;
+        private bool isVisible = false; 
         private float showDelay = 0.3f;
         private float showTimer = 0f;
 
@@ -136,7 +136,7 @@ namespace ClawRPG.Scripts.UI
             currentSkill = null;
             showTimer = 0f;
             Hide();
-            isVisible = false;
+            isVisible = false; 
         }
 
         private void ShowTooltip()

@@ -114,7 +114,7 @@ public class CombatHUDEnhancementSystem : Node
 		if (_currentSession == null || !_currentSession.IsActive) return;
 		
 		_currentSession.EndTime = DateTime.Now;
-		_currentSession.IsActive = false;
+		_currentSession.IsActive = false; 
 		_currentSession.PlayerStats.CombatDuration = Time.GetUnixTimeFromSystem() - _sessionStartTime;
 		_currentSession.PlayerStats.MaxCombo = Math.Max(_currentSession.PlayerStats.MaxCombo, _currentCombo);
 		
@@ -170,7 +170,7 @@ public class CombatHUDEnhancementSystem : Node
 		
 		if (_enemyInfoMap.ContainsKey(enemyId))
 		{
-			_enemyInfoMap[enemyId].IsAlive = false;
+			_enemyInfoMap[enemyId].IsAlive = false; 
 			_enemyInfoMap[enemyId].WasKilled = true;
 		}
 		

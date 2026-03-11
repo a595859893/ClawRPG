@@ -19,7 +19,7 @@ namespace ClawRPG.Scripts.Systems
         // Affixes by minimum quality
         private static Dictionary<ItemQuality, List<EquipmentAffix>> _affixesByQuality = new Dictionary<ItemQuality, List<EquipmentAffix>>();
         
-        public static bool IsInitialized { get; private set; } = false;
+        public static bool IsInitialized { get; private set; } = false; 
 
         /// <summary>
         /// Initialize all affixes
@@ -163,7 +163,7 @@ namespace ClawRPG.Scripts.Systems
             
             // Include affixes from Common up to the given quality
             ItemQuality[] qualities = { ItemQuality.Common, ItemQuality.Uncommon, ItemQuality.Rare, ItemQuality.Epic, ItemQuality.Legendary };
-            bool includeHigher = false;
+            bool includeHigher = false; 
             
             foreach (var q in qualities)
             {

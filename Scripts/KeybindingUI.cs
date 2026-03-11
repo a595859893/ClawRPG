@@ -41,7 +41,7 @@ namespace ClawRPG.UI {
 
         public override void _Ready()
         {
-            Visible = false;
+            Visible = false; 
             SetupUI();
             ConnectSignals();
             PopulateKeybindings();
@@ -242,7 +242,7 @@ namespace ClawRPG.UI {
                 {
                     _bindingItem.SetBinding(false);
                     _bindingItem.UpdateKey(newKey);
-                    _bindingPrompt.Visible = false;
+                    _bindingPrompt.Visible = false; 
                     _bindingItem = null;
                 }
                 
@@ -256,7 +256,7 @@ namespace ClawRPG.UI {
             {
                 _bindingItem.SetBinding(false);
                 _bindingItem = null;
-                _bindingPrompt.Visible = false;
+                _bindingPrompt.Visible = false; 
             }
         }
 
@@ -310,7 +310,7 @@ namespace ClawRPG.UI {
 
         public void HideKeybindingUI()
         {
-            Visible = false;
+            Visible = false; 
             CancelBinding();
         }
 
@@ -424,7 +424,7 @@ namespace ClawRPG.UI {
             else
             {
                 _bindButton.Text = "修改";
-                _bindButton.Disabled = false;
+                _bindButton.Disabled = false; 
             }
         }
     }

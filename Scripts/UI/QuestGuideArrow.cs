@@ -26,7 +26,7 @@ namespace ClawrRPG.Scripts.UI {
         private float timer = 0f;
         private Node2D currentTarget;            // 当前目标节点
         private Vector2 targetWorldPosition;       // 目标世界坐标
-        private bool hasTarget = false;
+        private bool hasTarget = false; 
         
         // 目标类型
         private enum TargetType
@@ -317,7 +317,7 @@ namespace ClawrRPG.Scripts.UI {
         {
             if (hasTarget)
             {
-                hasTarget = false;
+                hasTarget = false; 
                 currentTarget = null;
                 currentTargetType = TargetType.None;
                 Hide();

@@ -76,7 +76,7 @@ namespace ClawRPG.Scripts.Systems {
             if (_activeObjects.Contains(obj))
             {
                 _activeObjects.Remove(obj);
-                obj.Visible = false;
+                obj.Visible = false; 
                 _availableObjects.Enqueue(obj);
             }
         }
@@ -95,7 +95,7 @@ namespace ClawRPG.Scripts.Systems {
             var obj = PooledScene.Instantiate<Node2D>();
             if (obj != null)
             {
-                obj.Visible = false;
+                obj.Visible = false; 
                 _pooledObjectsParent.AddChild(obj);
                 _availableObjects.Enqueue(obj);
             }

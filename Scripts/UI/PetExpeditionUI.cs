@@ -23,7 +23,7 @@ public class PetExpeditionUI : Control
     {
         // 设置界面
         SetupUI();
-        Visible = false;
+        Visible = false; 
         
         // 连接到信号
         if (PetExpeditionSystem.Instance != null)
@@ -518,14 +518,14 @@ public class PetExpeditionUI : Control
     
     private void OnClosePressed()
     {
-        Visible = false;
+        Visible = false; 
     }
     
     public override void _Input(InputEvent @event)
     {
         if (@event is InputEventKey keyEvent && keyEvent.Pressed && keyEvent.Scancode == KeyList.Escape)
         {
-            Visible = false;
+            Visible = false; 
         }
     }
 }

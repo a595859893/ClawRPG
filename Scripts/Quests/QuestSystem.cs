@@ -344,7 +344,7 @@ namespace ClawRPG.Scripts.Quests {
             {
                 if (!obj.IsComplete)
                 {
-                    allComplete = false;
+                    allComplete = false; 
                     break;
                 }
             }

@@ -11,11 +11,11 @@ public class MountRaceUI : Control
 	private Button _closeButton;
 
 	private MountRaceData.MountRace _selectedRace;
-	private bool _isRacing = false;
+	private bool _isRacing = false; 
 
 	public override void _Ready()
 	{
-		Visible = false;
+		Visible = false; 
 	 SetupUI();
 	}
 
@@ -214,7 +214,7 @@ public class MountRaceUI : Control
 		_positionBar.CustomMinimumSize = new Vector2(560, 30);
 		_positionBar.MaxValue = 100;
 		_positionBar.Value = 0;
-		_positionBar.ShowPercentage = false;
+		_positionBar.ShowPercentage = false; 
 		vbox.AddChild(_positionBar);
 
 		var posLabel = new Label();
@@ -274,7 +274,7 @@ public class MountRaceUI : Control
 		if (!_isRacing)
 			return;
 
-		_isRacing = false;
+		_isRacing = false; 
 
 		var playerRacer = MountRaceSystem.Instance.GetPlayerRacer();
 		var race = MountRaceSystem.Instance.GetCurrentRace();
@@ -341,7 +341,7 @@ public class MountRaceUI : Control
 	private void OnExitRacePressed()
 	{
 		MountRaceSystem.Instance.CancelRace();
-		_isRacing = false;
+		_isRacing = false; 
 		
 		if (_raceUIPanel != null)
 			_raceUIPanel.QueueFree();
@@ -374,7 +374,7 @@ public class MountRaceUI : Control
 
 	public void Hide()
 	{
-		Visible = false;
+		Visible = false; 
 	}
 
 	public void Toggle()

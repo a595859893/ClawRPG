@@ -56,7 +56,7 @@ public partial class SettingsUI : Control
     {
         // 背景面板
         var bgPanel = new PanelContainer();
-        bgPanel.Set AnchorsPreset(Control.LayoutPreset.Center);
+        bgPanel.SetAnchorsPreset(Control.LayoutPreset.Center);
         bgPanel.CustomMinimumSize = new Vector2(600, 500);
         
         var bgStyle = new StyleBoxFlat();
@@ -75,7 +75,7 @@ public partial class SettingsUI : Control
         
         var vbox = new VBoxContainer();
         vbox.AddThemeConstantOverride("separation", 10);
-        vbox.Set AnchorsPreset(Control.LayoutPreset.Center);
+        vbox.SetAnchorsPreset(Control.LayoutPreset.Center);
         vbox.Position = new Vector2(-280, -230);
         bgPanel.AddChild(vbox);
         
@@ -130,7 +130,7 @@ public partial class SettingsUI : Control
         
         var vbox = new VBoxContainer();
         vbox.AddThemeConstantOverride("separation", 15);
-        vbox.Set AnchorsPreset(Control.LayoutPreset.FullRect);
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         vbox.Position = new Vector2(10, 10);
         vbox.Size = new Vector2(530, 330);
         audioPanel.AddChild(vbox);

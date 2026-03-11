@@ -21,7 +21,7 @@ namespace ClawRPG.Scripts.UI
         
         // 动画
         private float _animationTime = 0f;
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         // 设置界面引用
         private Control _settingsUI;
@@ -29,7 +29,7 @@ namespace ClawRPG.Scripts.UI
         public override void _Ready()
         {
             SetupUI();
-            Visible = false;
+            Visible = false; 
         }
         
         private void SetupUI()
@@ -203,9 +203,9 @@ namespace ClawRPG.Scripts.UI
         
         public void HideTitleScreen()
         {
-            _isVisible = false;
-            Visible = false;
-            GetTree().Paused = false;
+            _isVisible = false; 
+            Visible = false; 
+            GetTree().Paused = false; 
         }
         
         private void OnNewGamePressed()

@@ -110,7 +110,7 @@ namespace ClawRPG.Scripts.Bosses {
             
             _currentBossData = bossData;
             _isBossActive = true;
-            _bossDefeated = false;
+            _bossDefeated = false; 
             
             GD.Print($"Boss spawned: {bossData.Title}");
             
@@ -172,7 +172,7 @@ namespace ClawRPG.Scripts.Bosses {
             _currentBoss = bossNode;
             _currentBossData = bossData;
             _isBossActive = true;
-            _bossDefeated = false;
+            _bossDefeated = false; 
             
             GD.Print($"Boss spawned programmatically: {bossData.Title}");
             
@@ -210,7 +210,7 @@ namespace ClawRPG.Scripts.Bosses {
             if (!_isBossActive || _bossDefeated) return;
             
             _bossDefeated = true;
-            _isBossActive = false;
+            _isBossActive = false; 
             
             GD.Print($"Boss defeated: {_currentBossData.Title}");
             

@@ -89,7 +89,7 @@ namespace Game
             _CreateDetailPanel();
             
             // 默认隐藏
-            Visible = false;
+            Visible = false; 
         }
 
         private Button _CreateFilterButton(string text, SetType? filter)
@@ -105,7 +105,7 @@ namespace Game
         {
             _detailPanel = new Panel();
             _detailPanel.SetAnchorsPreset(Control.AnchorsPreset.FullRect);
-            _detailPanel.Visible = false;
+            _detailPanel.Visible = false; 
             AddChild(_detailPanel);
 
             var detailContainer = new VBoxContainer();
@@ -121,7 +121,7 @@ namespace Game
             var closeBtn = new Button();
             closeBtn.Text = "关闭";
             closeBtn.Align = Button.AlignMode.Center;
-            closeBtn.Pressed += () => _detailPanel.Visible = false;
+            closeBtn.Pressed += () => _detailPanel.Visible = false; 
             
             var headerContainer = new HBoxContainer();
             headerContainer.AddChild(closeBtn);

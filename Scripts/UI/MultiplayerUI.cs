@@ -22,7 +22,7 @@ public class MultiplayerUI : Control
     private VBoxContainer _menuContainer;
     
     // 状态
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
 
     public override void _Ready()
     {
@@ -119,12 +119,12 @@ public class MultiplayerUI : Control
         _roomInfoLabel = new Label();
         _roomInfoLabel.Text = "";
         _roomInfoLabel.HorizontalAlignment = HorizontalAlignment.Center;
-        _roomInfoLabel.Visible = false;
+        _roomInfoLabel.Visible = false; 
         mainVBox.AddChild(_roomInfoLabel);
         
         // 玩家列表
         _playerListContainer = new VBoxContainer();
-        _playerListContainer.Visible = false;
+        _playerListContainer.Visible = false; 
         mainVBox.AddChild(_playerListContainer);
         
         mainVBox.AddChild(new Control { CustomMinimumSize = new Vector2(0, 10) });
@@ -133,7 +133,7 @@ public class MultiplayerUI : Control
         _leaveRoomButton = new Button();
         _leaveRoomButton.Text = "离开房间";
         _leaveRoomButton.CustomMinimumSize = new Vector2(0, 40);
-        _leaveRoomButton.Visible = false;
+        _leaveRoomButton.Visible = false; 
         mainVBox.AddChild(_leaveRoomButton);
     }
 
@@ -201,16 +201,16 @@ public class MultiplayerUI : Control
     private void OnServerConnected()
     {
         _statusLabel.Text = "已连接到服务器";
-        _createRoomButton.Disabled = false;
+        _createRoomButton.Disabled = false; 
     }
 
     private void OnServerDisconnected(string reason)
     {
         _statusLabel.Text = $"断开连接: {reason}";
-        _connectButton.Disabled = false;
+        _connectButton.Disabled = false; 
         _createRoomButton.Disabled = true;
-        _roomInfoLabel.Visible = false;
-        _playerListContainer.Visible = false;
+        _roomInfoLabel.Visible = false; 
+        _playerListContainer.Visible = false; 
     }
 
     private void OnRoomCreated(string roomId)
@@ -239,10 +239,10 @@ public class MultiplayerUI : Control
     private void OnRoomLeft()
     {
         _roomInfoLabel.Text = "";
-        _roomInfoLabel.Visible = false;
-        _createRoomButton.Disabled = false;
-        _leaveRoomButton.Visible = false;
-        _playerListContainer.Visible = false;
+        _roomInfoLabel.Visible = false; 
+        _createRoomButton.Disabled = false; 
+        _leaveRoomButton.Visible = false; 
+        _playerListContainer.Visible = false; 
         
         // 清空玩家列表
         foreach (Node child in _playerListContainer.GetChildren())
@@ -289,7 +289,7 @@ public class MultiplayerUI : Control
     private void OnConnectionFailed(string reason)
     {
         _statusLabel.Text = $"连接失败: {reason}";
-        _connectButton.Disabled = false;
+        _connectButton.Disabled = false; 
     }
 
     public override void _Input(InputEvent e)
@@ -309,7 +309,7 @@ public class MultiplayerUI : Control
         if (_isVisible)
         {
             Hide();
-            _isVisible = false;
+            _isVisible = false; 
         }
         else
         {

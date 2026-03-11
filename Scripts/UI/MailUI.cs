@@ -26,7 +26,7 @@ namespace ClawRPG.UI {
 
         public override void _Ready() {
             SetupUI();
-            Visible = false;
+            Visible = false; 
         }
 
         private void SetupUI() {
@@ -276,7 +276,7 @@ namespace ClawRPG.UI {
             _goldLabel.Visible = !string.IsNullOrEmpty(attachments);
 
             _claimButton.Disabled = _selectedMail.Gold == 0 && _selectedMail.AttachedItems.Count == 0;
-            _deleteButton.Disabled = false;
+            _deleteButton.Disabled = false; 
         }
 
         private void OnClaimPressed() {
@@ -307,12 +307,12 @@ namespace ClawRPG.UI {
         }
 
         private void OnClosePressed() {
-            Visible = false;
+            Visible = false; 
         }
 
         public override void _Input(InputEvent e) {
             if (e is InputEventKey keyEvent && keyEvent.Pressed && keyEvent.Keycode == Key.Escape) {
-                Visible = false;
+                Visible = false; 
             }
         }
     }

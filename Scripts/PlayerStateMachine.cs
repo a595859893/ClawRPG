@@ -54,7 +54,7 @@ namespace ClawRPG.Scripts.Characters
             public bool CanBlock { get; set; } = true;
             public bool CanDodge { get; set; } = true;
             public bool CanCast { get; set; } = true;
-            public bool IsInvincible { get; set; } = false;
+            public bool IsInvincible { get; set; } = false; 
             public float AnimationBlend { get; set; } = 0f;
         }
 

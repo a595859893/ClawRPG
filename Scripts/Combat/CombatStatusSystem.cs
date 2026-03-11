@@ -73,7 +73,7 @@ namespace ClawRPG.Scripts.Combat
         {
             if (_currentCombat.IsInCombat)
             {
-                _currentCombat.IsInCombat = false;
+                _currentCombat.IsInCombat = false; 
                 double combatDuration = Time.GetUnixTimeFromSystem() - _currentCombat.CombatStartTime;
                 _sessionStats.TotalCombatTime += combatDuration;
                 

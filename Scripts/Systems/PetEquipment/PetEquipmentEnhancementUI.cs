@@ -359,7 +359,7 @@ public class PetEquipmentEnhancementUI : Control
 
     public void Hide()
     {
-        Visible = false;
+        Visible = false; 
     }
 
     public override void _Input(InputEvent @event)

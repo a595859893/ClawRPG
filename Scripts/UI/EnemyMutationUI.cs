@@ -24,13 +24,13 @@ namespace ClawRPG.Scripts.UI
         // 变异类型筛选
         private OptionButton _typeFilter;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         private List<EnemyMutationData.Mutation> _displayedMutations = new();
 
         public override void _Ready()
         {
             CreateUI();
-            Visible = false;
+            Visible = false; 
             GD.Print("敌人变异UI已创建 - 按 M 键切换");
         }
 
@@ -306,8 +306,8 @@ namespace ClawRPG.Scripts.UI
 
         public void Close()
         {
-            _isVisible = false;
-            Visible = false;
+            _isVisible = false; 
+            Visible = false; 
         }
     }
 }

@@ -85,7 +85,7 @@ namespace ClawRPG.Scripts.Items
         {
             PotionId = potionId;
             Quantity = quantity;
-            IsAutoUse = false;
+            IsAutoUse = false; 
         }
     }
 }

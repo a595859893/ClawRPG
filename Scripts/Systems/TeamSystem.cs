@@ -29,7 +29,7 @@ public class TeamSystem : Node
             PlayerId = playerId;
             PlayerName = playerName;
             IsHost = isHost;
-            IsReady = false;
+            IsReady = false; 
             Position = Vector2.Zero;
             Health = 100;
             MaxHealth = 100;
@@ -80,7 +80,7 @@ public class TeamSystem : Node
     // 状态
     private TeamInfo _currentTeam;
     private int _localPlayerId = -1;
-    private bool _isInTeam = false;
+    private bool _isInTeam = false; 
 
     public bool IsInTeam => _isInTeam;
     public TeamInfo CurrentTeam => _currentTeam;
@@ -153,7 +153,7 @@ public class TeamSystem : Node
         NetworkClient.Instance.SendJson(data);
 
         _currentTeam = null;
-        _isInTeam = false;
+        _isInTeam = false; 
 
         OnTeamLeft?.Invoke();
     }
@@ -333,7 +333,7 @@ public class TeamSystem : Node
         {
             // 被踢的是本地玩家
             _currentTeam = null;
-            _isInTeam = false;
+            _isInTeam = false; 
             OnTeamLeft?.Invoke();
         }
         else if (_currentTeam != null)

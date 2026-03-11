@@ -44,7 +44,7 @@ public class DynamicDifficultyUI : Control
 
     // 动画
     private Tween _tween;
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
 
     public override void _Ready()
     {
@@ -55,7 +55,7 @@ public class DynamicDifficultyUI : Control
         ConnectSignals();
         
         // 初始隐藏
-        Visible = false;
+        Visible = false; 
     }
 
     private void SetupUI()
@@ -82,7 +82,7 @@ public class DynamicDifficultyUI : Control
 
         // 主容器
         _mainVBox = new VBoxContainer();
-        _mainVBox.Set AnchorsPreset(Control.LayoutPreset.FullRect);
+        _mainVBox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         _mainPanel.AddChild(_mainVBox);
 
         // 标题

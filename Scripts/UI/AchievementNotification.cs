@@ -32,11 +32,11 @@ public partial class AchievementNotification : Control
 
     public override void _Ready()
     {
-        Visible = false;
+        Visible = false; 
         
         // 创建容器
         _container = new VBoxContainer();
-        _container.Set AnchorsPreset(Control.LayoutPreset.TopRight);
+        _container.SetAnchorsPreset(Control.LayoutPreset.TopRight);
         _container.Position = new Vector2(30, 30);
         _container.AddThemeConstantOverride("separation", 10);
         AddChild(_container);
@@ -83,8 +83,8 @@ public partial class AchievementNotification : Control
     {
         if (_popupQueue.Count == 0)
         {
-            _isShowing = false;
-            Visible = false;
+            _isShowing = false; 
+            Visible = false; 
             return;
         }
 

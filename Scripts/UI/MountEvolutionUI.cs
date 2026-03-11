@@ -33,12 +33,12 @@ public partial class MountEvolutionUI : Control {
     // 关闭按钮
     private Button _closeButton;
     
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
     
     public override void _Ready() {
         SetupUI();
         ConnectSignals();
-        Visible = false;
+        Visible = false; 
         GD.Print("[MountEvolutionUI] Initialized");
     }
     
@@ -122,7 +122,7 @@ public partial class MountEvolutionUI : Control {
         
         _evolutionProgress = new ProgressBar();
         _evolutionProgress.CustomMinimumSize = new Vector2(0, 20);
-        _evolutionProgress.ShowPercentage = false;
+        _evolutionProgress.ShowPercentage = false; 
         progressContainer.AddChild(_evolutionProgress);
         
         // 属性加成

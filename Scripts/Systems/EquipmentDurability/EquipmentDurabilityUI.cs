@@ -14,11 +14,11 @@ public class EquipmentDurabilityUI : Control
     private Label _totalCostLabel;
     private Button _repairAllButton;
 
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
 
     public override void _Ready()
     {
-        Visible = false;
+        Visible = false; 
         _mainPanel = new PanelContainer();
         _mainPanel.SetAnchorsPreset(Control.LayoutPreset.Center);
         _mainPanel.CustomMinimumSize = new Vector2(500, 400);

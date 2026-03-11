@@ -33,8 +33,8 @@ public class ElementalTrialUI : Control
 
     public override void _Ready()
     {
-        Visible = false;
-        _isInTrial = false;
+        Visible = false; 
+        _isInTrial = false; 
         
         CreateUI();
         ConnectSignals();
@@ -165,7 +165,7 @@ public class ElementalTrialUI : Control
         // This panel shows during active trial
         var activePanel = new PanelContainer();
         activePanel.SetName("战斗中");
-        activePanel.Visible = false;
+        activePanel.Visible = false; 
         _tabContainer.AddChild(activePanel);
         
         var activeContainer = new VBoxContainer();
@@ -248,7 +248,7 @@ public class ElementalTrialUI : Control
         
         if (ElementalTrialSystem.Instance.StartTrial(_selectedTrial.TrialId))
         {
-            Visible = false; // Hide during trial
+            Visible = false;  // Hide during trial
         }
     }
 
@@ -263,7 +263,7 @@ public class ElementalTrialUI : Control
 
     private void OnTrialCompleted(string trialId, int waves, int timeRemaining)
     {
-        _isInTrial = false;
+        _isInTrial = false; 
         RefreshTrialsList();
         
         var trial = ElementalTrialSystem.Instance.GetTrial(trialId);
@@ -275,7 +275,7 @@ public class ElementalTrialUI : Control
 
     private void OnTrialFailed(string trialId, int wave, string reason)
     {
-        _isInTrial = false;
+        _isInTrial = false; 
         GD.Print($"Trial failed: {trialId}, Wave: {wave}, Reason: {reason}");
     }
 
@@ -297,7 +297,7 @@ public class ElementalTrialUI : Control
 
     private void OnClosePressed()
     {
-        Visible = false;
+        Visible = false; 
     }
 
     public override void _Process(float delta)
@@ -383,7 +383,7 @@ public class ElementalTrialUI : Control
     {
         if (inputEvent.IsActionPressed("ui_cancel") && Visible)
         {
-            Visible = false;
+            Visible = false; 
         }
     }
 }

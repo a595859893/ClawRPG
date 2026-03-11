@@ -259,7 +259,7 @@ public class RandomBoonSystem : Node
     public void CancelOffer()
     {
         _currentOffer = null;
-        _isOffering = false;
+        _isOffering = false; 
     }
     
     // Get all owned boons

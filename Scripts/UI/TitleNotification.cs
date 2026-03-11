@@ -20,7 +20,7 @@ namespace ClawRPG.Scripts.UI {
         
         // 通知队列
         private Queue<TitleSystem.Title> _notificationQueue = new();
-        private bool _isShowing = false;
+        private bool _isShowing = false; 
         private const int MaxVisible = 3;
         
         // 通知节点列表
@@ -132,7 +132,7 @@ namespace ClawRPG.Scripts.UI {
                 if (panel != null) {
                     panel.QueueFree();
                     _activeNotifications.Remove(panel);
-                    _isShowing = false;
+                    _isShowing = false; 
                     // 重新调整其他通知的位置
                     RepositionNotifications();
                     // 处理队列中的下一个

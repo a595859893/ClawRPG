@@ -14,7 +14,7 @@ namespace ClawRPG.Scripts.Systems
         // 自动使用设置
         public bool AutoUseHealthPotion { get; set; } = true;
         public bool AutoUseManaPotion { get; set; } = true;
-        public bool AutoUseBuffPotions { get; set; } = false;
+        public bool AutoUseBuffPotions { get; set; } = false; 
 
         // 阈值设置 (0-100)
         public int HealthPotionThreshold { get; set; } = 30;  // 30%血量时自动使用

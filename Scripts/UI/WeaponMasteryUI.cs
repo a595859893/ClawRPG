@@ -18,14 +18,14 @@ namespace ClawRPG.Scripts.UI
         private Label _masteryLevelLabel;
         private Label _specialAttacksLabel;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         // Weapon buttons
         private Dictionary<WeaponType, Button> _weaponButtons = new();
         
         public override void _Ready()
         {
-            Visible = false;
+            Visible = false; 
             _CreateUI();
             
             // Connect to input

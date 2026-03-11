@@ -24,7 +24,7 @@ public class CombatSkillCooldownUI : Control
 	private Label _cooldownTimeLabel;
 	
 	// Toggle
-	private bool _isVisible = false;
+	private bool _isVisible = false; 
 	private KeyToggleHandler _toggleHandler;
 	
 	// Skill slot containers
@@ -171,7 +171,7 @@ public class CombatSkillCooldownUI : Control
 		// Progress bar
 		var progress = new ProgressBar();
 		progress.SetAnchor(AnchorPresets.FullRect);
-		progress.ShowPercentage = false;
+		progress.ShowPercentage = false; 
 		progress.MinValue = 0;
 		progress.MaxValue = maxCooldown;
 		progress.Value = currentCooldown;

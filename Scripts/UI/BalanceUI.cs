@@ -67,7 +67,7 @@ namespace ClawRPG.Scripts.UI {
         
         private Label _previewLabel;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         public override void _Ready() {
             SetupUI();
@@ -595,7 +595,7 @@ namespace ClawRPG.Scripts.UI {
         public void ToggleVisibility() {
             if (_isVisible) {
                 Hide();
-                _isVisible = false;
+                _isVisible = false; 
             } else {
                 Show();
                 LoadCurrentValues();

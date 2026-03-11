@@ -26,11 +26,11 @@ public class EquipmentEnhancementUI : Control
     private Label _resultLabel;
     private Label _detailLabel;
 
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
 
     public override void _Ready()
     {
-        Visible = false;
+        Visible = false; 
         _CreateUI();
         _ConnectSignals();
     }
@@ -249,7 +249,7 @@ public class EquipmentEnhancementUI : Control
         {
             if (Player.Instance != null)
             {
-                Player.Instance.FreezePlayer = false;
+                Player.Instance.FreezePlayer = false; 
             }
         }
     }

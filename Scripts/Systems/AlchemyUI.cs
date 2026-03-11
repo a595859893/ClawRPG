@@ -28,7 +28,7 @@ namespace ClawRPG.Scripts.Systems
         private Button _closeButton;
         private Label _messageLabel;
 
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         private AlchemyRecipe _selectedRecipe;
 
         public override void _Ready()
@@ -91,7 +91,7 @@ namespace ClawRPG.Scripts.Systems
             _messageLabel = GetNode<Label>("Panel/VBoxContainer/MessageLabel");
 
             // 初始隐藏
-            Visible = false;
+            Visible = false; 
         }
 
         private void ConnectSignals()
@@ -166,7 +166,7 @@ namespace ClawRPG.Scripts.Systems
 
             foreach (var recipe in allRecipes)
             {
-                bool shouldShow = false;
+                bool shouldShow = false; 
                 bool isUnlocked = AlchemySystem.Instance.IsRecipeUnlocked(recipe.Id);
                 bool canCraft = AlchemySystem.Instance.CanCraft(recipe.Id);
 

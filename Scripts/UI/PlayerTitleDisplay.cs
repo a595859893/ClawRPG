@@ -96,7 +96,7 @@ public class PlayerTitleDisplay : Node2D
         }
         else
         {
-            _titleLabel.Visible = false;
+            _titleLabel.Visible = false; 
         }
     }
     

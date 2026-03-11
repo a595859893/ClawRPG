@@ -34,7 +34,7 @@ namespace ClawRPG.Scripts.UI
 
         public override void _Ready()
         {
-            Visible = false;
+            Visible = false; 
             SetupUI();
             SetupSignals();
         }
@@ -216,7 +216,7 @@ namespace ClawRPG.Scripts.UI
             progressBar.CustomMinimumSize = new Vector2(200, 15);
             progressBar.Value = bounty.ProgressPercent * 100;
             progressBar.MaxValue = 100;
-            progressBar.ShowPercentage = false;
+            progressBar.ShowPercentage = false; 
             
             if (bounty.IsCompleted)
             {

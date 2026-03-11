@@ -33,7 +33,7 @@ namespace ClawRPG.Scripts.UI {
         private Button _addButton;
         private Label _countLabel;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         private BookmarkCategory? _currentFilter = null;
         
         // Signal for when player wants to travel to a bookmark
@@ -175,7 +175,7 @@ namespace ClawRPG.Scripts.UI {
         public void ToggleVisibility() {
             if (_isVisible) {
                 Hide();
-                _isVisible = false;
+                _isVisible = false; 
             } else {
                 Show();
                 _isVisible = true;

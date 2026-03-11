@@ -31,7 +31,7 @@ namespace ClawRPG.Scripts.Systems {
         private Player _player;
         
         // Wave system
-        [Export] public bool UseWaves = false;
+        [Export] public bool UseWaves = false; 
         [Export] public int EnemiesPerWave = 10;
         [Export] public float WaveDelay = 30f;
         private int _currentWave = 1;
@@ -69,7 +69,7 @@ namespace ClawRPG.Scripts.Systems {
             if (enemyScene == null)
             {
                 GD.Warning("[EnemySpawner] No Enemy.tscn found, object pool disabled");
-                UseObjectPool = false;
+                UseObjectPool = false; 
                 return;
             }
             

@@ -32,7 +32,7 @@ public partial class BossMechanicUI : Control
     private Label _damageLabel;
     private Label _ratingLabel;
     
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
     private float _battleTimer = 0;
 
     public override void _Ready()
@@ -50,7 +50,7 @@ public partial class BossMechanicUI : Control
         _container.SetAnchorsPreset(Control.LayoutPreset.Center);
         _container.CustomMinimumSize = new Vector2(800, 600);
         AddChild(_container);
-        _container.Visible = false;
+        _container.Visible = false; 
 
         // 背景面板
         Panel background = new Panel();
@@ -177,7 +177,7 @@ public partial class BossMechanicUI : Control
         _healthBar = new ProgressBar();
         _healthBar.CustomMinimumSize = new Vector2(0, 30);
         _healthBar.Value = 100;
-        _healthBar.ShowPercentage = false;
+        _healthBar.ShowPercentage = false; 
         
         var healthStyle = new StyleBoxFlat();
         healthStyle.BgColor = new Color(0.3f, 0.1f, 0.1f, 1f);

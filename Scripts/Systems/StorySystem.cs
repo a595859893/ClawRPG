@@ -391,7 +391,7 @@ namespace ClawRPG.Scripts.Systems {
             bool allComplete = true;
             foreach (var objective in currentChapter.Objectives) {
                 if (objective.CurrentCount < objective.TargetCount) {
-                    allComplete = false;
+                    allComplete = false; 
                     break;
                 }
             }

@@ -51,7 +51,7 @@ namespace GameSystems {
         public int WeeklyContribution { get; set; } = 0;
         public DateTime JoinDate { get; set; } = DateTime.Now;
         public DateTime LastActive { get; set; } = DateTime.Now;
-        public bool IsOnline { get; set; } = false;
+        public bool IsOnline { get; set; } = false; 
     }
 
     // 公会建筑数据
@@ -75,7 +75,7 @@ namespace GameSystems {
         public int MaxLevel { get; set; } = 5;
         public int CostPerLevel { get; set; } = 100; // 每次升级消耗贡献度
         public Dictionary<string, int> Bonuses { get; set; } = new Dictionary<string, int>();
-        public bool IsUnlocked { get; set; } = false;
+        public bool IsUnlocked { get; set; } = false; 
     }
 
     // 公会数据
@@ -123,6 +123,6 @@ namespace GameSystems {
         public int PlayerLevel { get; set; } = 1;
         public int PlayerContribution { get; set; } = 0;
         public DateTime ApplyTime { get; set; } = DateTime.Now;
-        public bool IsAccepted { get; set; } = false;
+        public bool IsAccepted { get; set; } = false; 
     }
 }

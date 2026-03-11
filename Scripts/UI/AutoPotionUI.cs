@@ -19,7 +19,7 @@ namespace ClawRPG.Scripts.UI
         private Label _healthDescLabel;
         private Label _manaDescLabel;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
 
         public override void _Ready()
         {
@@ -194,7 +194,7 @@ namespace ClawRPG.Scripts.UI
             if (_isVisible)
             {
                 Hide();
-                _isVisible = false;
+                _isVisible = false; 
             }
             else
             {

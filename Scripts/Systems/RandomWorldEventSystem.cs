@@ -384,7 +384,7 @@ namespace ClawRPG.Scripts.Systems {
 
             foreach (var kvp in _activeEvents) {
                 if (kvp.Value.IsActive && now >= kvp.Value.ExpireTime) {
-                    kvp.Value.IsActive = false;
+                    kvp.Value.IsActive = false; 
                     expiredEvents.Add(kvp.Key);
                     _playerData.ActiveEvents.Remove(kvp.Key);
                     EmitSignal(SignalName.EventExpired, kvp.Key);
@@ -442,7 +442,7 @@ namespace ClawRPG.Scripts.Systems {
             }
 
             // 标记为已领取
-            config.IsActive = false;
+            config.IsActive = false; 
             _playerData.ActiveEvents.Remove(eventId);
             
             EmitSignal(SignalName.EventRewardClaimed, eventId, eventData.GoldReward, eventData.ExpReward);

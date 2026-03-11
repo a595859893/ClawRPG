@@ -10,7 +10,7 @@ namespace ClawRPG.Systems;
 public static class RelicDatabase
 {
     private static readonly Dictionary<string, RelicData> _relics = new();
-    private static bool _initialized = false;
+    private static bool _initialized = false; 
     
     public static void Initialize()
     {

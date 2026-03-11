@@ -55,7 +55,7 @@ namespace ClawRPG.Scripts.Systems
             EnergyCost = 0;
             Duration = 1f;
             MinLevel = 1;
-            RequiresItem = false;
+            RequiresItem = false; 
             RequiredItemId = "";
         }
     }
@@ -78,7 +78,7 @@ namespace ClawRPG.Scripts.Systems
             Action = InteractionAction.Pet;
             StartTime = 0f;
             Duration = 1f;
-            Completed = false;
+            Completed = false; 
         }
     }
 

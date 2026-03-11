@@ -240,7 +240,7 @@ public class PetEvolutionSystem : Node
 		
 		if (!_petEvolutions.ContainsKey(petIndex))
 		{
-			stats["exists"] = false;
+			stats["exists"] = false; 
 			return stats;
 		}
 		

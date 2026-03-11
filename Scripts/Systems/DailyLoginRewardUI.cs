@@ -30,7 +30,7 @@ namespace 悬疑RPG
         {
             Instance = this;
             SetupUI();
-            Visible = false;
+            Visible = false; 
             
             // 连接信号
             DailyLoginRewardSystem.Instance.Connect(DailyLoginRewardSystem.SignalName.LoginDaysUpdated, Callable.From(OnLoginDaysUpdated));
@@ -235,7 +235,7 @@ namespace 悬疑RPG
                 }
                 else if (isCurrentDay)
                 {
-                    dayButtons[i].Disabled = false;
+                    dayButtons[i].Disabled = false; 
                     dayLabels[i].Modulate = new Color(1f, 0.8f, 0.2f); // 金色高亮
                 }
                 else
@@ -335,7 +335,7 @@ namespace 悬疑RPG
         /// </summary>
         public void Hide()
         {
-            Visible = false;
+            Visible = false; 
         }
 
         /// <summary>

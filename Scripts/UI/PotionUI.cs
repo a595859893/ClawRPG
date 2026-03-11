@@ -42,7 +42,7 @@ namespace ClawRPG.Scripts.UI
         public override void _Ready()
         {
             SetupUI();
-            Visible = false;
+            Visible = false; 
             
             // 连接信号
             Items.PotionManager.Instance.OnPotionAdded += OnPotionUpdated;

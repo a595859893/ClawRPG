@@ -46,7 +46,7 @@ namespace ClawRPG.Scripts.Systems
         private Dictionary<CounterType, CounterAttackData> _counterAttacks;
         
         // Tutorial tracking
-        private bool _hasTriggeredFirstCounter = false;
+        private bool _hasTriggeredFirstCounter = false; 
         
         // Signals
         [Signal]
@@ -169,7 +169,7 @@ namespace ClawRPG.Scripts.Systems
                 if (ExecutionWindowTimer <= 0)
                 {
                     ExecutionWindowTimer = 0;
-                    IsCounterAttacking = false;
+                    IsCounterAttacking = false; 
                     EmitSignal(SignalName.CounterAttack窗口, false);
                 }
             }
@@ -235,8 +235,8 @@ namespace ClawRPG.Scripts.Systems
             
             // Start cooldown
             CounterCooldownTimer = counterData.Cooldown;
-            CanCounter = false;
-            IsCounterAttacking = false;
+            CanCounter = false; 
+            IsCounterAttacking = false; 
             ExecutionWindowTimer = 0;
             
             // Emit signals
@@ -317,7 +317,7 @@ namespace ClawRPG.Scripts.Systems
         public void CancelCounterWindow()
         {
             ExecutionWindowTimer = 0;
-            IsCounterAttacking = false;
+            IsCounterAttacking = false; 
             EmitSignal(SignalName.CounterAttack窗口, false);
         }
     }

@@ -77,8 +77,8 @@ public partial class TradeSystem : Node {
         }
 
         // 重置接受状态
-        CurrentOffer.Player1Accepted = false;
-        CurrentOffer.Player2Accepted = false;
+        CurrentOffer.Player1Accepted = false; 
+        CurrentOffer.Player2Accepted = false; 
 
         EmitSignal(SignalName.OfferUpdated, CurrentOffer);
         return true;
@@ -92,8 +92,8 @@ public partial class TradeSystem : Node {
 
         var items = isPlayer1 ? CurrentOffer.Player1Items : CurrentOffer.Player2Items;
         if (items.Remove(item)) {
-            CurrentOffer.Player1Accepted = false;
-            CurrentOffer.Player2Accepted = false;
+            CurrentOffer.Player1Accepted = false; 
+            CurrentOffer.Player2Accepted = false; 
             EmitSignal(SignalName.OfferUpdated, CurrentOffer);
             return true;
         }
@@ -112,8 +112,8 @@ public partial class TradeSystem : Node {
             CurrentOffer.Player2Gold = gold;
         }
 
-        CurrentOffer.Player1Accepted = false;
-        CurrentOffer.Player2Accepted = false;
+        CurrentOffer.Player1Accepted = false; 
+        CurrentOffer.Player2Accepted = false; 
         EmitSignal(SignalName.OfferUpdated, CurrentOffer);
         return true;
     }

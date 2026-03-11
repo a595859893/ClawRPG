@@ -139,7 +139,7 @@ namespace ClawRPG.Systems
             SetupStatsTab(statsTab);
             
             // 初始隐藏
-            _mainContainer.Visible = false;
+            _mainContainer.Visible = false; 
         }
         
         private void SetupBreedingTab(Control tab)

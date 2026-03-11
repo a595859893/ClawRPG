@@ -37,14 +37,14 @@ namespace ClawRPG.Scripts.UI {
         private VBoxContainer _settingsTab;
         private CheckButton _showNotificationsCheck;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         private bool _showNotifications = true;
 
         public override void _Ready() {
             _instance = this;
             SetupUI();
             ConnectSignals();
-            Visible = false;
+            Visible = false; 
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace ClawRPG.Scripts.UI {
             _healthBar.CustomMinimumSize = new Vector2(500, 30);
             _healthBar.MaxValue = 100;
             _healthBar.Value = 100;
-            _healthBar.ShowPercentage = false;
+            _healthBar.ShowPercentage = false; 
             healthContainer.AddChild(_healthBar);
 
             _healthLabel = new Label();
@@ -231,7 +231,7 @@ namespace ClawRPG.Scripts.UI {
             
             // 显示第一个活跃战斗（或创建一个示例显示）
             var bossIds = new List<string> { "forest_boss", "fire_boss", "ice_boss", "shadow_boss", "holy_boss" };
-            bool hasActiveFight = false;
+            bool hasActiveFight = false; 
             
             foreach (var bossId in bossIds) {
                 var fight = system.GetBossFightStatus(bossId);

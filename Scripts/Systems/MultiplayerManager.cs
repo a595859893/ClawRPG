@@ -50,7 +50,7 @@ public class MultiplayerManager : Node
     public event ConnectionFailedEvent OnConnectionFailed;
 
     // 状态
-    private bool _isHost = false;
+    private bool _isHost = false; 
     private string _currentRoomId = "";
     private int _localPlayerId = -1;
     private string _playerName = "Player";
@@ -67,12 +67,12 @@ public class MultiplayerManager : Node
     private HashSet<int> _kickedPlayers = new HashSet<int>();
 
     // 准备状态系统
-    private bool _isReady = false;
+    private bool _isReady = false; 
     private Dictionary<int, bool> _playerReadyStates = new Dictionary<int, bool>();
 
     // 房间密码
     private string _roomPassword = "";
-    private bool _needsPassword = false;
+    private bool _needsPassword = false; 
 
     public bool IsInRoom => !string.IsNullOrEmpty(_currentRoomId);
     public bool IsReady => _isReady;
@@ -173,7 +173,7 @@ public class MultiplayerManager : Node
             return;
         }
 
-        _isHost = false;
+        _isHost = false; 
         var message = new Dictionary<string, object>
         {
             { "type", "join_room" },
@@ -201,7 +201,7 @@ public class MultiplayerManager : Node
         NetworkClient.Instance.SendJson(message);
         
         _currentRoomId = "";
-        _isHost = false;
+        _isHost = false; 
         _localPlayerId = -1;
         
         lock (_playersLock)
@@ -296,7 +296,7 @@ public class MultiplayerManager : Node
             return;
         }
 
-        _isHost = false;
+        _isHost = false; 
         _roomPassword = password;
         var message = new Dictionary<string, object>
         {
@@ -390,7 +390,7 @@ public class MultiplayerManager : Node
         if (IsInRoom)
         {
             _currentRoomId = "";
-            _isHost = false;
+            _isHost = false; 
             OnRoomLeft?.Invoke();
         }
     }
@@ -570,7 +570,7 @@ public class MultiplayerManager : Node
             // 被踢出房间
             GD.Print("[MultiplayerManager] You were kicked from the room");
             _currentRoomId = "";
-            _isHost = false;
+            _isHost = false; 
             _localPlayerId = -1;
             lock (_playersLock)
             {

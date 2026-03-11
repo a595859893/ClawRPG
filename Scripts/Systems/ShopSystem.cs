@@ -14,7 +14,7 @@ namespace GameSystems
         public int Stock { get; set; } // -1 = 无限
         public int DailyStock { get; set; } // 每日刷新数量
         public float Discount { get; set; } = 1.0f; // 折扣
-        public bool IsUnlocked { get; set; } = false;
+        public bool IsUnlocked { get; set; } = false; 
         public int UnlockRequirement { get; set; } = 0; // 声望等级需求
     }
 

@@ -37,7 +37,7 @@ public class MountRaceSystem : Node
 	private MountRaceData.PlayerRaceProgress _playerProgress;
 
 	private float _raceTimer = 0f;
-	private bool _isRacing = false;
+	private bool _isRacing = false; 
 
 	// Race configuration
 	private float _baseSpeed = 10f;
@@ -243,7 +243,7 @@ public class MountRaceSystem : Node
 		if (_currentRace == null)
 			return;
 
-		_isRacing = false;
+		_isRacing = false; 
 		_currentState = MountRaceData.RaceState.Finished;
 
 		// Sort racers by position
@@ -326,7 +326,7 @@ public class MountRaceSystem : Node
 
 	public void CancelRace()
 	{
-		_isRacing = false;
+		_isRacing = false; 
 		_currentState = MountRaceData.RaceState.Waiting;
 		_currentRace = null;
 		_racers.Clear();

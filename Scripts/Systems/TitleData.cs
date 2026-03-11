@@ -40,7 +40,7 @@ public class TitleDefinition
         Rarity = TitleRarity.Common;
         AttributeBonuses = new Dictionary<string, float>();
         IconName = "";
-        IsSecret = false;
+        IsSecret = false; 
     }
 }
 
@@ -56,8 +56,8 @@ public class PlayerTitleData
     public PlayerTitleData()
     {
         TitleId = "";
-        IsUnlocked = false;
-        IsActive = false;
+        IsUnlocked = false; 
+        IsActive = false; 
         UnlockTime = DateTime.MinValue;
         UnlockConditionProgress = 0;
     }

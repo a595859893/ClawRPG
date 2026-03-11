@@ -60,7 +60,7 @@ namespace ClawRPG.Scripts.Systems {
             FactionId = "";
             Reputation = 0;
             Tier = ReputationTier.Neutral;
-            RewardClaimed = false;
+            RewardClaimed = false; 
         }
     }
 
@@ -397,7 +397,7 @@ namespace ClawRPG.Scripts.Systems {
         /// </summary>
         public void Reset() {
             _playerFactions.Clear();
-            _isInitialized = false;
+            _isInitialized = false; 
         }
 
         /// <summary>

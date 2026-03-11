@@ -11,8 +11,8 @@ namespace ClawRPG.Systems {
         [Export] public string Description { get; set; }
         [Export] public Color BadgeColor { get; set; } = Colors.Gold;
         [Export] public string IconName { get; set; }
-        [Export] public int Tier { get; set; } = 1 // 1=铜, 2=银, 3=金, 4=钻石
-        [Export] public bool IsSecret { get; set; }= false;
+        [Export] public int Tier { get; set; } = 1; // 1=铜, 2=银, 3=金, 4=钻石
+        [Export] public bool IsSecret { get; set; }= false; 
         [Export] public Vector2 Position { get; set; } = Vector2.Zero;
     }
 

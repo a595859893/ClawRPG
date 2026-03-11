@@ -34,7 +34,7 @@ public class MysteryTreasureUI : Control
 
     private MysteryTreasureSystem _system;
     private MysteryTreasureDatabase _database;
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
 
     public override void _Ready()
     {
@@ -43,7 +43,7 @@ public class MysteryTreasureUI : Control
         _database = MysteryTreasureDatabase.Instance;
         
         SetupUI();
-        Visible = false;
+        Visible = false; 
     }
 
     private void SetupUI()

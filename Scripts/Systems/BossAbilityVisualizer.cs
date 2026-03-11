@@ -353,7 +353,7 @@ namespace ClawRPG.Scripts.UI {
             var timer = GetTree().CreateTimer(config.WarningDuration);
             timer.timeout += () => {
                 if (instance.RootNode != null && instance.RootNode.IsInsideTree()) {
-                    instance.IsWarning = false;
+                    instance.IsWarning = false; 
                     instance.CurrentTime = 0f;
                     instance.Duration = config.ActiveDuration;
                     instance.BaseColor = config.ActiveColor;

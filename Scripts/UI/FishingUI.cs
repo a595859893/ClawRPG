@@ -294,7 +294,7 @@ public class FishingUI : Control
         switch (state)
         {
             case FishingState.Idle:
-                _startButton.Disabled = false;
+                _startButton.Disabled = false; 
                 _reelButton.Disabled = true;
                 _cancelButton.Disabled = true;
                 _timerLabel.Text = "";
@@ -303,21 +303,21 @@ public class FishingUI : Control
             case FishingState.Casting:
                 _startButton.Disabled = true;
                 _reelButton.Disabled = true;
-                _cancelButton.Disabled = false;
+                _cancelButton.Disabled = false; 
                 _timerLabel.Text = "抛竿中...";
                 break;
                 
             case FishingState.Waiting:
                 _startButton.Disabled = true;
                 _reelButton.Disabled = true;
-                _cancelButton.Disabled = false;
+                _cancelButton.Disabled = false; 
                 _timerLabel.Text = "等待鱼咬钩...";
                 break;
                 
             case FishingState.Biting:
                 _startButton.Disabled = true;
-                _reelButton.Disabled = false;
-                _cancelButton.Disabled = false;
+                _reelButton.Disabled = false; 
+                _cancelButton.Disabled = false; 
                 _timerLabel.Text = "鱼咬钩了！快提竿！";
                 _timerLabel.Modulate = new Color(1, 0.3f, 0.3f);
                 break;
@@ -385,7 +385,7 @@ public class FishingUI : Control
     public void HideFishingUI()
     {
         Hide();
-        _isVisible = false;
+        _isVisible = false; 
     }
     
     public override void _Input(InputEvent e)

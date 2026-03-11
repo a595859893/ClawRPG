@@ -31,7 +31,7 @@ public class TitleUI : Control
     // 状态
     private TitleCategory _currentCategory = TitleCategory.Combat;
     private TitleDefinition _selectedTitle;
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
     
     // 颜色
     private Color _commonColor = new Color(1, 1, 1);
@@ -42,7 +42,7 @@ public class TitleUI : Control
     public override void _Ready()
     {
         _instance = this;
-        Visible = false;
+        Visible = false; 
         SetupUI();
     }
     
@@ -362,7 +362,7 @@ public class TitleUI : Control
         // 激活按钮
         if (isUnlocked)
         {
-            _activateButton.Disabled = false;
+            _activateButton.Disabled = false; 
             if (isActive)
             {
                 _activateButton.Text = "取消激活";

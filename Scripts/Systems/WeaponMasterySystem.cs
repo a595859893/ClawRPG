@@ -132,7 +132,7 @@ namespace ClawRPG.Scripts.Systems
                 SpinAttackDuration -= dt;
                 if (SpinAttackDuration <= 0)
                 {
-                    IsSpinAttacking = false;
+                    IsSpinAttacking = false; 
                     SpinAttackDuration = 0.5f;
                 }
             }
@@ -193,12 +193,12 @@ namespace ClawRPG.Scripts.Systems
         {
             if (IsChargingHeavyStrike && ChargeTime >= 0.3f)  // Minimum charge time
             {
-                IsChargingHeavyStrike = false;
+                IsChargingHeavyStrike = false; 
                 float multiplier = HeavyStrikeDamageMultiplier;
                 ChargeTime = 0f;
                 return SpecialAttackType.HeavyStrike;
             }
-            IsChargingHeavyStrike = false;
+            IsChargingHeavyStrike = false; 
             ChargeTime = 0f;
             return SpecialAttackType.None;
         }

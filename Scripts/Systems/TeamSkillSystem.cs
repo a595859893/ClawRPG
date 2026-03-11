@@ -53,7 +53,7 @@ public class TeamSkillSystem : Node
             RequiredMembers = members;
             Range = range;
             CurrentCooldown = 0;
-            IsActive = false;
+            IsActive = false; 
         }
     }
 

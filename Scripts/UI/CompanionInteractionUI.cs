@@ -42,7 +42,7 @@ namespace ClawRPG.Scripts.UI
             // 设置窗口属性
             RectMinSize = new Vector2(500, 600);
             _mainContainer = new VBoxContainer();
-            _mainContainer.Set AnchorsPreset = Control.LayoutPreset.FullRect;
+            _mainContainer.SetAnchorsPreset = Control.LayoutPreset.FullRect;
             _mainContainer.MarginLeft = 20;
             _mainContainer.MarginTop = 20;
             _mainContainer.MarginRight = -20;
@@ -132,13 +132,13 @@ namespace ClawRPG.Scripts.UI
             _progressBar.CustomMinimumSize = new Vector2(0, 30);
             _progressBar.Value = 0;
             _progressBar.MaxValue = 100;
-            _progressBar.Visible = false;
+            _progressBar.Visible = false; 
             _mainContainer.AddChild(_progressBar);
 
             _progressLabel = new Label();
             _progressLabel.Text = "";
             _progressLabel.Align = Label.AlignEnum.Center;
-            _progressLabel.Visible = false;
+            _progressLabel.Visible = false; 
             _mainContainer.AddChild(_progressLabel);
 
             // 开始按钮
@@ -324,9 +324,9 @@ namespace ClawRPG.Scripts.UI
 
         private void OnInteractionCompleted(string entityId, InteractionType entityType, InteractionAction action, int affectionGain, int happinessGain)
         {
-            _progressBar.Visible = false;
-            _progressLabel.Visible = false;
-            _startButton.Disabled = false;
+            _progressBar.Visible = false; 
+            _progressLabel.Visible = false; 
+            _startButton.Disabled = false; 
 
             UpdateStatistics();
 
@@ -336,7 +336,7 @@ namespace ClawRPG.Scripts.UI
 
             // 3秒后隐藏
             var timer = GetTree().CreateTimer(3f);
-            timer.Timeout += () => _progressLabel.Visible = false;
+            timer.Timeout += () => _progressLabel.Visible = false; 
         }
 
         private void OnInteractionFailed(string entityId, InteractionType entityType, InteractionAction action, string reason)
@@ -345,7 +345,7 @@ namespace ClawRPG.Scripts.UI
             _progressLabel.Visible = true;
 
             var timer = GetTree().CreateTimer(2f);
-            timer.Timeout += () => _progressLabel.Visible = false;
+            timer.Timeout += () => _progressLabel.Visible = false; 
         }
 
         private void UpdateStatistics()
@@ -360,7 +360,7 @@ namespace ClawRPG.Scripts.UI
 
         private void OnClosePressed()
         {
-            Visible = false;
+            Visible = false; 
             QueueFree();
         }
 

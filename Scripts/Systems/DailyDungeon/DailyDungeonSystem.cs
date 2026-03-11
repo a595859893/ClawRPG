@@ -114,7 +114,7 @@ public class DailyDungeonSystem : Node
             // New day, reset daily challenges
             _lastDailyReset = now;
             _dailyChallengeCount = 0;
-            _dailyCompleted = false;
+            _dailyCompleted = false; 
             SaveData();
         }
     }
@@ -182,7 +182,7 @@ public class DailyDungeonSystem : Node
         if (!_isInDungeon)
             return;
 
-        _isInDungeon = false;
+        _isInDungeon = false; 
         _currentDungeon = null;
         _currentFloor = 0;
         _enemiesDefeated = 0;
@@ -267,7 +267,7 @@ public class DailyDungeonSystem : Node
 
         SaveData();
 
-        _isInDungeon = false;
+        _isInDungeon = false; 
         DungeonCompleted?.Emit();
 
         GD.Print("Dungeon completed! Rewards: " + _currentDungeon.GoldReward + " gold, " + _currentDungeon.ExpReward + " exp");
@@ -294,7 +294,7 @@ public class DailyDungeonSystem : Node
 
         SaveData();
 
-        _isInDungeon = false;
+        _isInDungeon = false; 
         DungeonFailed?.Emit();
 
         GD.Print("Dungeon failed at floor: " + _currentFloor);

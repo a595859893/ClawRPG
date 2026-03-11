@@ -63,7 +63,7 @@ public class QuickSlotUI : Control
         _UpdateAllSlots();
         
         // Hide by default
-        Visible = false;
+        Visible = false; 
     }
     
     private void _CreateSlotVisual(QuickSlotItem slot, int index)
@@ -262,7 +262,7 @@ public class QuickSlotUI : Control
     }
     
     public void Show() => Visible = true;
-    public void Hide() => Visible = false;
+    public void Hide() => Visible = false; 
     public void Toggle() => Visible = !Visible;
 }
 

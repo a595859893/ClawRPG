@@ -248,7 +248,7 @@ public static class AuctionDatabase
                 {
                     // Item sold to highest bidder
                     auction.Status = AuctionItemStatus.Sold;
-                    auction.IsActive = false;
+                    auction.IsActive = false; 
                     
                     // Update seller data
                     var sellerData = GetPlayerData(auction.SellerName);
@@ -268,7 +268,7 @@ public static class AuctionDatabase
                 {
                     // No bids, auction expired
                     auction.Status = AuctionItemStatus.Expired;
-                    auction.IsActive = false;
+                    auction.IsActive = false; 
                 }
             }
         }

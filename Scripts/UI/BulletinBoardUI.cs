@@ -290,7 +290,7 @@ namespace ClawrRPG.Scripts.UI {
         
         public void HideBulletinBoard()
         {
-            Visible = false;
+            Visible = false; 
             OnBulletinBoardClosed?.Invoke();
         }
         

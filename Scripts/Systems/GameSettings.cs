@@ -19,10 +19,10 @@ public partial class GameSettings : Node
     [Export] private float _voiceVolume = 1.0f;
 
     // 画面设置
-    [Export] private bool _fullscreen = false;
+    [Export] private bool _fullscreen = false; 
     [Export] private bool _vsync = true;
     [Export] private int _qualityLevel = 2; // 0=低, 1=中, 2=高
-    [Export] private bool _showFps = false;
+    [Export] private bool _showFps = false; 
     [Export] private bool _showDamageNumbers = true;
 
     // 游戏设置
@@ -347,10 +347,10 @@ public partial class GameSettings : Node
         _sfxVolume = 1.0f;
         _voiceVolume = 1.0f;
         
-        _fullscreen = false;
+        _fullscreen = false; 
         _vsync = true;
         _qualityLevel = 2;
-        _showFps = false;
+        _showFps = false; 
         _showDamageNumbers = true;
         
         _difficulty = 1;

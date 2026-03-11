@@ -27,7 +27,7 @@ namespace ClawRPG.Scripts.UI
         // Inventory data
         private Player _player;
         private List<InventorySlot> _displaySlots = new();
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         // Grid settings
         private const int SlotsPerRow = 5;
@@ -596,8 +596,8 @@ namespace ClawRPG.Scripts.UI
         
         private void HideInventory()
         {
-            _isVisible = false;
-            _mainPanel.Visible = false;
+            _isVisible = false; 
+            _mainPanel.Visible = false; 
         }
     }
 }

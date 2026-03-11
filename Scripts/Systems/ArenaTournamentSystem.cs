@@ -298,7 +298,7 @@ public class ArenaTournamentSystem : Node
         {
             if (_matches.ContainsKey(activeMatchId) && _matches[activeMatchId].Round == match.Round)
             {
-                roundComplete = false;
+                roundComplete = false; 
                 break;
             }
         }

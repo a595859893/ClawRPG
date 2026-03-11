@@ -18,7 +18,7 @@ namespace ClawRPG.Scripts.UI {
         private ProgressBar _eventProgress;
         private TextureRect _iconDisplay;
         private ColorRect _background;
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
 
         public override void _Ready() {
             SetupUI();
@@ -172,7 +172,7 @@ namespace ClawRPG.Scripts.UI {
 
         private void HideAfterDelay() {
             Hide();
-            _isVisible = false;
+            _isVisible = false; 
         }
 
         private void OnEventUpdated(WorldEvent evt, int remainingTime) {
@@ -239,7 +239,7 @@ namespace ClawRPG.Scripts.UI {
             if (evt is InputEventKey keyEvent && keyEvent.Pressed && keyEvent.Keycode == Key.E) {
                 if (_isVisible) {
                     Hide();
-                    _isVisible = false;
+                    _isVisible = false; 
                 } else {
                     Show();
                     _isVisible = true;

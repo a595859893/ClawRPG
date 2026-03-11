@@ -17,7 +17,7 @@ namespace ClawRPG.Scripts.UI {
         
         private Tween _scaleTween;
         private Tween _fadeTween;
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         public override void _Ready()
         {
@@ -202,7 +202,7 @@ namespace ClawRPG.Scripts.UI {
             _fadeTween.TweenProperty(this, "modulate:a", 0f, 0.3f);
             _fadeTween.TweenCallback(Callable.From(() => {
                 Hide();
-                _isVisible = false;
+                _isVisible = false; 
             }));
         }
         

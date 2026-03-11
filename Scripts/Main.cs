@@ -35,7 +35,7 @@ namespace ClawRPG.Scripts {
         }
 
         private GameState _currentGameState = GameState.Playing;
-        private bool _shiftEToggleCooldown = false;
+        private bool _shiftEToggleCooldown = false; 
 
         public static bool IsPaused { get; private set; }
         public static int CurrentDay { get; private set; } = 1;
@@ -811,7 +811,7 @@ namespace ClawRPG.Scripts {
             // Gem Fusion UI
             var gemFusionUI = new Systems.GemSystem.GemFusionUI();
             gemFusionUI.Name = "GemFusionUI";
-            gemFusionUI.Visible = false;
+            gemFusionUI.Visible = false; 
             ui.AddChild(gemFusionUI);
 
             // Costume UI
@@ -822,7 +822,7 @@ namespace ClawRPG.Scripts {
             // Relic UI
             var relicUI = new Systems.RelicUI();
             relicUI.Name = "RelicUI";
-            relicUI.Visible = false;
+            relicUI.Visible = false; 
             ui.AddChild(relicUI);
 
             // Equipment Enhancement System
@@ -832,79 +832,79 @@ namespace ClawRPG.Scripts {
             // Equipment Enhancement UI
             var enhancementUI = new Systems.EquipmentEnhancementUI();
             enhancementUI.Name = "EquipmentEnhancementUI";
-            enhancementUI.Visible = false;
+            enhancementUI.Visible = false; 
             ui.AddChild(enhancementUI);
 
             // Pet Equipment UI
             var petEquipmentUI = new Systems.Pets.PetEquipmentUI();
             petEquipmentUI.Name = "PetEquipmentUI";
-            petEquipmentUI.Visible = false;
+            petEquipmentUI.Visible = false; 
             ui.AddChild(petEquipmentUI);
 
             // Pet Equipment Enhancement UI
             var petEquipmentEnhancementUI = new Systems.PetEquipment.PetEquipmentEnhancementUI();
             petEquipmentEnhancementUI.Name = "PetEquipmentEnhancementUI";
-            petEquipmentEnhancementUI.Visible = false;
+            petEquipmentEnhancementUI.Visible = false; 
             ui.AddChild(petEquipmentEnhancementUI);
 
             // Pet Evolution UI
             var petEvolutionUI = new Systems.PetEvolution.PetEvolutionUI();
             petEvolutionUI.Name = "PetEvolutionUI";
-            petEvolutionUI.Visible = false;
+            petEvolutionUI.Visible = false; 
             ui.AddChild(petEvolutionUI);
 
             // Pet Talent UI
             var petTalentUI = new Systems.PetTalentUI();
             petTalentUI.Name = "PetTalentUI";
-            petTalentUI.Visible = false;
+            petTalentUI.Visible = false; 
             ui.AddChild(petTalentUI);
 
             // Pet Affection UI
             var petAffectionUI = new Systems.PetAffectionUI();
             petAffectionUI.Name = "PetAffectionUI";
-            petAffectionUI.Visible = false;
+            petAffectionUI.Visible = false; 
             ui.AddChild(petAffectionUI);
 
             // Pet Foster UI
             var petFosterUI = new Systems.PetFoster.PetFosterUI();
             petFosterUI.Name = "PetFosterUI";
-            petFosterUI.Visible = false;
+            petFosterUI.Visible = false; 
             ui.AddChild(petFosterUI);
 
             // Pet Skill UI
             var petSkillUI = new PetSkillUI();
             petSkillUI.Name = "PetSkillUI";
-            petSkillUI.Visible = false;
+            petSkillUI.Visible = false; 
             ui.AddChild(petSkillUI);
 
             // Pet Expedition UI
             var petExpeditionUI = new PetExpeditionUI();
             petExpeditionUI.Name = "PetExpeditionUI";
-            petExpeditionUI.Visible = false;
+            petExpeditionUI.Visible = false; 
             ui.AddChild(petExpeditionUI);
 
             // Mount Expedition UI
             var mountExpeditionUI = new MountExpeditionUI();
             mountExpeditionUI.Name = "MountExpeditionUI";
-            mountExpeditionUI.Visible = false;
+            mountExpeditionUI.Visible = false; 
             ui.AddChild(mountExpeditionUI);
 
             // Mystery Treasure UI
             var mysteryTreasureUI = new MysteryTreasureUI();
             mysteryTreasureUI.Name = "MysteryTreasureUI";
-            mysteryTreasureUI.Visible = false;
+            mysteryTreasureUI.Visible = false; 
             ui.AddChild(mysteryTreasureUI);
 
             // Dynamic Difficulty UI
             var dynamicDifficultyUI = new DynamicDifficultyUI();
             dynamicDifficultyUI.Name = "DynamicDifficultyUI";
-            dynamicDifficultyUI.Visible = false;
+            dynamicDifficultyUI.Visible = false; 
             ui.AddChild(dynamicDifficultyUI);
 
             // World Boss UI
             var worldBossUI = new Systems.WorldBoss.WorldBossUI();
             worldBossUI.Name = "WorldBossUI";
-            worldBossUI.Visible = false;
+            worldBossUI.Visible = false; 
             ui.AddChild(worldBossUI);
 
             // Choice Event UI
@@ -916,43 +916,43 @@ namespace ClawRPG.Scripts {
             // Elemental Trial UI
             var elementalTrialUI = new Systems.ElementalTrialUI();
             elementalTrialUI.Name = "ElementalTrialUI";
-            elementalTrialUI.Visible = false;
+            elementalTrialUI.Visible = false; 
             ui.AddChild(elementalTrialUI);
 
             // Pet Battle Arena UI
             var petBattleArenaUI = new Systems.PetBattleArena.PetBattleArenaUI();
             petBattleArenaUI.Name = "PetBattleArenaUI";
-            petBattleArenaUI.Visible = false;
+            petBattleArenaUI.Visible = false; 
             ui.AddChild(petBattleArenaUI);
 
             // Daily Dungeon UI
             var dailyDungeonUI = new Systems.DailyDungeon.DailyDungeonUI();
             dailyDungeonUI.Name = "DailyDungeonUI";
-            dailyDungeonUI.Visible = false;
+            dailyDungeonUI.Visible = false; 
             ui.AddChild(dailyDungeonUI);
 
             // Random Boon UI
             var randomBoonUI = new UI.RandomBoonUI();
             randomBoonUI.Name = "RandomBoonUI";
-            randomBoonUI.Visible = false;
+            randomBoonUI.Visible = false; 
             ui.AddChild(randomBoonUI);
 
             // Daily Quest UI
             var dailyQuestUI = new Systems.DailyQuest.DailyQuestUI();
             dailyQuestUI.Name = "DailyQuestUI";
-            dailyQuestUI.Visible = false;
+            dailyQuestUI.Visible = false; 
             ui.AddChild(dailyQuestUI);
 
             // Procedural Challenge UI
             var proceduralChallengeUI = new Systems.ProceduralChallengeUI();
             proceduralChallengeUI.Name = "ProceduralChallengeUI";
-            proceduralChallengeUI.Visible = false;
+            proceduralChallengeUI.Visible = false; 
             ui.AddChild(proceduralChallengeUI);
 
             // Loot Drop UI
             var lootDropUI = new Systems.LootDropUI();
             lootDropUI.Name = "LootDropUI";
-            lootDropUI.Visible = false;
+            lootDropUI.Visible = false; 
             ui.AddChild(lootDropUI);
 
             // Equipment Durability System
@@ -963,7 +963,7 @@ namespace ClawRPG.Scripts {
             // Equipment Durability UI
             var durabilityUI = new Systems.EquipmentDurability.EquipmentDurabilityUI();
             durabilityUI.Name = "EquipmentDurabilityUI";
-            durabilityUI.Visible = false;
+            durabilityUI.Visible = false; 
             ui.AddChild(durabilityUI);
 
             // Buff System
@@ -974,19 +974,19 @@ namespace ClawRPG.Scripts {
             // Buff UI
             var buffUI = new Systems.BuffSystem.BuffUI();
             buffUI.Name = "BuffUI";
-            buffUI.Visible = false;
+            buffUI.Visible = false; 
             ui.AddChild(buffUI);
 
             // Boss Mechanics UI
             var bossMechanicsUI = new Systems.BossMechanics.BossMechanicsUI();
             bossMechanicsUI.Name = "BossMechanicsUI";
-            bossMechanicsUI.Visible = false;
+            bossMechanicsUI.Visible = false; 
             ui.AddChild(bossMechanicsUI);
 
             // Rune UI
             var runeUI = new UI.RuneUI();
             runeUI.Name = "RuneUI";
-            runeUI.Visible = false;
+            runeUI.Visible = false; 
             ui.AddChild(runeUI);
 
             GD.Print("UI initialized");
@@ -2818,7 +2818,7 @@ namespace ClawRPG.Scripts {
 
             // 重置游戏状态
             CurrentDay = 1;
-            IsPaused = false;
+            IsPaused = false; 
             SetGameState(GameState.Playing);
 
             // 显示游戏UI

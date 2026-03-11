@@ -193,7 +193,7 @@ namespace ClawRPG.Scripts.Mounts {
             ApplyMountBonuses(_activeMountId, false);
 
             var instance = _ownedMounts[_activeMountId];
-            instance.IsActive = false;
+            instance.IsActive = false; 
 
             GD.Print($"坐骑已取消: {_activeMountId}");
             EmitSignal(nameof(OnMountDeactivated));

@@ -28,7 +28,7 @@ namespace ClawRPG.Scripts.UI {
             SetupParticleContainer();
             SetupResultLabel();
             
-            Visible = false;
+            Visible = false; 
         }
         
         private void SetupEffectContainer() {
@@ -42,14 +42,14 @@ namespace ClawRPG.Scripts.UI {
             _successOverlay = new ColorRect();
             _successOverlay.Color = ColorSuccess;
             _successOverlay.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            _successOverlay.Visible = false;
+            _successOverlay.Visible = false; 
             _effectContainer.AddChild(_successOverlay);
             
             // 失败覆盖层
             _failOverlay = new ColorRect();
             _failOverlay.Color = ColorFail;
             _failOverlay.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            _failOverlay.Visible = false;
+            _failOverlay.Visible = false; 
             _effectContainer.AddChild(_failOverlay);
         }
         
@@ -67,7 +67,7 @@ namespace ClawRPG.Scripts.UI {
             _resultLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _resultLabel.AddThemeFontSizeOverride("font_size", 48);
             _resultLabel.Modulate = ColorGold;
-            _resultLabel.Visible = false;
+            _resultLabel.Visible = false; 
             _effectContainer.AddChild(_resultLabel);
         }
         
@@ -85,7 +85,7 @@ namespace ClawRPG.Scripts.UI {
             _mainTween.SetParallel(false);
             
             // 重置状态
-            _failOverlay.Visible = false;
+            _failOverlay.Visible = false; 
             _resultLabel.Visible = true;
             _resultLabel.Modulate = ColorGold;
             _resultLabel.Text = $"+{newLevel} 强化成功!";
@@ -110,7 +110,7 @@ namespace ClawRPG.Scripts.UI {
             // 延迟隐藏
             _mainTween.TweenInterval(1.5f);
             _mainTween.TweenCallback(() => {
-                Visible = false;
+                Visible = false; 
                 ClearParticles();
             });
         }
@@ -129,7 +129,7 @@ namespace ClawRPG.Scripts.UI {
             _mainTween.SetParallel(false);
             
             // 重置状态
-            _successOverlay.Visible = false;
+            _successOverlay.Visible = false; 
             _resultLabel.Visible = true;
             _resultLabel.Modulate = new Color(1.0f, 0.5f, 0.5f);
             _resultLabel.Text = $"+{newLevel} 强化失败...";
@@ -158,7 +158,7 @@ namespace ClawRPG.Scripts.UI {
             // 延迟隐藏
             _mainTween.TweenInterval(1.5f);
             _mainTween.TweenCallback(() => {
-                Visible = false;
+                Visible = false; 
                 ClearParticles();
             });
         }
@@ -177,8 +177,8 @@ namespace ClawRPG.Scripts.UI {
             _mainTween.SetParallel(false);
             
             // 重置状态
-            _successOverlay.Visible = false;
-            _failOverlay.Visible = false;
+            _successOverlay.Visible = false; 
+            _failOverlay.Visible = false; 
             _resultLabel.Visible = true;
             _resultLabel.Modulate = ColorPurple;
             _resultLabel.Text = "已达最大强化等级!";
@@ -189,7 +189,7 @@ namespace ClawRPG.Scripts.UI {
             // 延迟隐藏
             _mainTween.TweenInterval(2.0f);
             _mainTween.TweenCallback(() => {
-                Visible = false;
+                Visible = false; 
                 ClearParticles();
             });
         }
@@ -208,8 +208,8 @@ namespace ClawRPG.Scripts.UI {
             _mainTween.SetParallel(false);
             
             // 显示进行中
-            _successOverlay.Visible = false;
-            _failOverlay.Visible = false;
+            _successOverlay.Visible = false; 
+            _failOverlay.Visible = false; 
             _resultLabel.Visible = true;
             _resultLabel.Modulate = new Color(0.8f, 0.8f, 1.0f);
             _resultLabel.Text = "强化中...";

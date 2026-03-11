@@ -65,7 +65,7 @@ namespace ClawRPG.Scripts.UI {
             
             _healthBar = new ProgressBar();
             _healthBar.CustomMinimumSize = new Vector2(300, 25);
-            _healthBar.ShowPercentage = false;
+            _healthBar.ShowPercentage = false; 
             healthContainer.AddChild(_healthBar);
             
             // Apply health bar style
@@ -90,7 +90,7 @@ namespace ClawRPG.Scripts.UI {
             
             _manaBar = new ProgressBar();
             _manaBar.CustomMinimumSize = new Vector2(300, 20);
-            _manaBar.ShowPercentage = false;
+            _manaBar.ShowPercentage = false; 
             manaContainer.AddChild(_manaBar);
             
             // Apply mana bar style
@@ -115,7 +115,7 @@ namespace ClawRPG.Scripts.UI {
             
             _expBar = new ProgressBar();
             _expBar.CustomMinimumSize = new Vector2(400, 15);
-            _expBar.ShowPercentage = false;
+            _expBar.ShowPercentage = false; 
             expContainer.AddChild(_expBar);
             
             _expLabel = new Label();

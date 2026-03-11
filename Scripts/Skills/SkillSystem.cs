@@ -408,7 +408,7 @@ namespace ClawRPG.Scripts.Skills {
         private HashSet<int> _learnedSkills = new();
         
         // Tutorial tracking
-        private bool _hasTriggeredFirstSkillUse = false;
+        private bool _hasTriggeredFirstSkillUse = false; 
         
         public void LearnSkill(int skillId)
         {

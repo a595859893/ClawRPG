@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     public static class PetSkillDatabase
     {
         private static Dictionary<string, PetSkill> _skills = new Dictionary<string, PetSkill>();
-        private static bool _initialized = false;
+        private static bool _initialized = false; 
 
         public static void Initialize()
         {

@@ -105,7 +105,7 @@ namespace ClawRPG.Scripts.Systems {
         public bool IsUnlocked { get; set; }
 
         public EquipmentEnchantmentSlot() {
-            IsUnlocked = false;
+            IsUnlocked = false; 
         }
     }
 

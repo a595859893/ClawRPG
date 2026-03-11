@@ -15,9 +15,9 @@ namespace ClawRPG.Systems {
         public int Gold { get; set; } = 0;
         public List<string> AttachedItems { get; set; } = new List<string>();
         public DateTime SendTime { get; set; } = DateTime.Now;
-        public bool IsRead { get; set; } = false;
-        public bool IsSystemMail { get; set; } = false;
-        public bool IsDeleted { get; set; } = false;
+        public bool IsRead { get; set; } = false; 
+        public bool IsSystemMail { get; set; } = false; 
+        public bool IsDeleted { get; set; } = false; 
     }
 
     /// <summary>

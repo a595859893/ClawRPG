@@ -369,7 +369,7 @@ namespace ClawRPG.Scripts.Mounts {
             var instance = _mountCombatData[mountId];
             if (!instance.IsInCombat) return;
             
-            instance.IsInCombat = false;
+            instance.IsInCombat = false; 
             
             EmitSignal(nameof(OnMountCombatEnd), mountId, 
                 instance.CombatDamageDealt, 

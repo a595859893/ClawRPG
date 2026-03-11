@@ -20,7 +20,7 @@ namespace ClawRPG.Scripts.UI {
         private Color inProgressColor = new Color(0.3f, 0.6f, 1f); // Blue
         
         public override void _Ready() {
-            Visible = false;
+            Visible = false; 
             _InitializeUI();
             
             // Connect to story manager signals
@@ -243,7 +243,7 @@ namespace ClawRPG.Scripts.UI {
         }
         
         private void OnClosePressed() {
-            Visible = false;
+            Visible = false; 
         }
         
         private void OnChapterUnlocked(StoryChapter chapter) {
@@ -261,7 +261,7 @@ namespace ClawRPG.Scripts.UI {
         public override void _Input(InputEvent @event) {
             if (@event.IsActionPressed("ui_cancel")) {
                 if (Visible) {
-                    Visible = false;
+                    Visible = false; 
                     GetTree().SetInputAsHandled();
                 }
             }

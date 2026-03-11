@@ -8,7 +8,7 @@ public partial class ScreenEffectManager : Node
     [Export] private ShaderMaterial _shockwaveMaterial;
     private ColorRect _fullscreenRect;
     private double _time = 0.0;
-    private bool _isActive = false;
+    private bool _isActive = false; 
     private double _effectDuration = 0.0;
     private double _currentEffectTime = 0.0;
     
@@ -44,7 +44,7 @@ public partial class ScreenEffectManager : Node
         AddChild(canvasLayer);
         
         // Initially hidden
-        _fullscreenRect.Visible = false;
+        _fullscreenRect.Visible = false; 
         UpdateShockwaveUniforms();
     }
     
@@ -162,8 +162,8 @@ public partial class ScreenEffectManager : Node
     
     private void StopEffect()
     {
-        _isActive = false;
-        _fullscreenRect.Visible = false;
+        _isActive = false; 
+        _fullscreenRect.Visible = false; 
         _shockwaveStrength = 0.0f;
         _chromaticAmount = 0.0f;
     }

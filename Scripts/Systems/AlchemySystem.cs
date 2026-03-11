@@ -15,7 +15,7 @@ namespace ClawRPG.Scripts.Systems
         public static AlchemySystem Instance => _instance ??= new AlchemySystem();
 
         private PlayerAlchemyData _playerData = new PlayerAlchemyData();
-        private bool _isInitialized = false;
+        private bool _isInitialized = false; 
 
         // 信号系统
         public static event Action<AlchemyRecipe, bool> OnCraftAttempt; // 制作结果

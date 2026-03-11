@@ -16,13 +16,13 @@ public class BuffUI : Control
 	private Label _statsLabel;
 	private ScrollContainer _scrollContainer;
 	
-	private bool _isVisible = false;
+	private bool _isVisible = false; 
 	
 	public override void _Ready()
 	{
 		_instance = this;
 		SetupUI();
-		Visible = false;
+		Visible = false; 
 		
 		// 连接到BuffSystem信号
 		if (BuffSystem.Instance != null)

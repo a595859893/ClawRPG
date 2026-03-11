@@ -53,12 +53,12 @@ namespace ClawRPG.Scripts.UI {
         private TextureRect _accessorySlot;
         
         private Button _closeButton;
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         public override void _Ready()
         {
             SetupUI();
-            Visible = false;
+            Visible = false; 
             GetTree().Root.SizeChanged += OnWindowSizeChanged;
         }
         

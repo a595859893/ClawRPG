@@ -93,7 +93,7 @@ public class TitleSystem : Node
                 // 取消之前的激活状态
                 if (PlayerTitles.ActiveTitleId != "" && PlayerTitles.Titles.ContainsKey(PlayerTitles.ActiveTitleId))
                 {
-                    PlayerTitles.Titles[PlayerTitles.ActiveTitleId].IsActive = false;
+                    PlayerTitles.Titles[PlayerTitles.ActiveTitleId].IsActive = false; 
                 }
                 
                 titleData.IsActive = true;
@@ -116,7 +116,7 @@ public class TitleSystem : Node
     {
         if (PlayerTitles.Titles.ContainsKey(titleId))
         {
-            PlayerTitles.Titles[titleId].IsActive = false;
+            PlayerTitles.Titles[titleId].IsActive = false; 
             if (PlayerTitles.ActiveTitleId == titleId)
             {
                 PlayerTitles.ActiveTitleId = "";

@@ -26,11 +26,11 @@ public class BuffSystem : Node
 	private float _shieldValue = 0f;
 	
 	// 状态标志
-	private bool _isInvincible = false;
-	private bool _isFrozen = false;
-	private bool _isStunned = false;
-	private bool _isSilenced = false;
-	private bool _isRooted = false;
+	private bool _isInvincible = false; 
+	private bool _isFrozen = false; 
+	private bool _isStunned = false; 
+	private bool _isSilenced = false; 
+	private bool _isRooted = false; 
 	private float _slowMultiplier = 1f;
 	private float _weakMultiplier = 1f;
 	
@@ -345,11 +345,11 @@ public class BuffSystem : Node
 		_dodgeBonus = 0f;
 		_shieldValue = 0f;
 		
-		_isInvincible = false;
-		_isFrozen = false;
-		_isStunned = false;
-		_isSilenced = false;
-		_isRooted = false;
+		_isInvincible = false; 
+		_isFrozen = false; 
+		_isStunned = false; 
+		_isSilenced = false; 
+		_isRooted = false; 
 		_slowMultiplier = 1f;
 		_weakMultiplier = 1f;
 		

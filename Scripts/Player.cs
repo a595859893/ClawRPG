@@ -51,9 +51,9 @@ namespace ClawRPG.Scripts.Characters {
         public int DodgeCount { get; private set; }
         
         // Tutorial tracking
-        private bool _hasTriggeredFirstCrit = false;
-        private bool _hasTriggeredFirstBlock = false;
-        private bool _hasTriggeredFirstDodge = false;
+        private bool _hasTriggeredFirstCrit = false; 
+        private bool _hasTriggeredFirstBlock = false; 
+        private bool _hasTriggeredFirstDodge = false; 
         
         // World Event multipliers
         public float EventXPMultiplier { get; set; } = 1.0f;
@@ -283,7 +283,7 @@ namespace ClawRPG.Scripts.Characters {
             if (_dodgeCooldownTimer > 0) _dodgeCooldownTimer -= dt;
             if (_perfectBlockTimer > 0) _perfectBlockTimer -= dt;
             
-            if (_perfectBlockTimer <= 0) IsPerfectBlock = false;
+            if (_perfectBlockTimer <= 0) IsPerfectBlock = false; 
         }
         
         private void HandleMovement(float dt)
@@ -302,7 +302,7 @@ namespace ClawRPG.Scripts.Characters {
                 
                 // Flip sprite
                 if (inputDir.x < 0) _sprite.FlipH = true;
-                else if (inputDir.x > 0) _sprite.FlipH = false;
+                else if (inputDir.x > 0) _sprite.FlipH = false; 
             }
             else
             {
@@ -375,8 +375,8 @@ namespace ClawRPG.Scripts.Characters {
         
         private void EndBlock()
         {
-            IsBlocking = false;
-            IsPerfectBlock = false;
+            IsBlocking = false; 
+            IsPerfectBlock = false; 
             _perfectBlockTimer = 0;
             GD.Print("Block ended");
         }
@@ -473,7 +473,7 @@ namespace ClawRPG.Scripts.Characters {
             // Attack animation/sound would go here
             
             // Reset attack state after animation
-            GetTree().CreateTimer(0.3f).Timeout += () => IsAttacking = false;
+            GetTree().CreateTimer(0.3f).Timeout += () => IsAttacking = false; 
         }
         
         private void PerformDodge()
@@ -508,8 +508,8 @@ namespace ClawRPG.Scripts.Characters {
             tween.TweenProperty(this, "velocity", dodgeDir * DodgeSpeed, DodgeDuration);
             
             GetTree().CreateTimer(DodgeDuration).Timeout += () => {
-                IsDodging = false;
-                IsInvincible = false;
+                IsDodging = false; 
+                IsInvincible = false; 
                 Velocity = Vector2.Zero;
             };
             
@@ -850,11 +850,11 @@ namespace ClawRPG.Scripts.Characters {
             Gold = 0;
             
             // 重置战斗状态
-            IsAttacking = false;
-            IsBlocking = false;
-            IsDodging = false;
-            IsInvincible = false;
-            IsPerfectBlock = false;
+            IsAttacking = false; 
+            IsBlocking = false; 
+            IsDodging = false; 
+            IsInvincible = false; 
+            IsPerfectBlock = false; 
             
             // 重置技能
             SkillPoints = 0;

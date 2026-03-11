@@ -158,14 +158,14 @@ namespace ClawRPG.Scripts.UI {
             // 高亮覆盖层
             _highlightOverlay = new ColorRect();
             _highlightOverlay.Color = new Color(0f, 0f, 0f, 0.5f);
-            _highlightOverlay.Visible = false;
+            _highlightOverlay.Visible = false; 
             AddChild(_highlightOverlay);
             
             // 高亮圆圈
             _highlightCircle = new ColorRect();
             _highlightCircle.Color = _highlightColor;
             _highlightCircle.CustomMinimumSize = new Vector2(60, 60);
-            _highlightCircle.Visible = false;
+            _highlightCircle.Visible = false; 
             AddChild(_highlightCircle);
             
             // 操作提示
@@ -173,7 +173,7 @@ namespace ClawRPG.Scripts.UI {
             _actionLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _actionLabel.AddThemeColorOverride("font_color", Colors.White);
             _actionLabel.AddThemeFontSizeOverride("font_size", 18);
-            _actionLabel.Visible = false;
+            _actionLabel.Visible = false; 
             AddChild(_actionLabel);
             
             // 步骤计数器
@@ -183,11 +183,11 @@ namespace ClawRPG.Scripts.UI {
             _stepCounter.AddThemeColorOverride("font_color", _targetColor);
             _stepCounter.AddThemeFontSizeOverride("font_size", 12);
             _stepCounter.Position = new Vector2(420, 15);
-            _stepCounter.Visible = false;
+            _stepCounter.Visible = false; 
             _panel.AddChild(_stepCounter);
             
             // 初始隐藏
-            Visible = false;
+            Visible = false; 
             
             // 计算总步骤数
             _totalSteps = TutorialDatabase.Instance.GetAllSteps().Count;
@@ -229,7 +229,7 @@ namespace ClawRPG.Scripts.UI {
                 _targetLabel.Text = $"请按: {step.TargetAction}";
                 _targetLabel.Visible = true;
             } else {
-                _targetLabel.Visible = false;
+                _targetLabel.Visible = false; 
             }
             
             // 进度条
@@ -238,7 +238,7 @@ namespace ClawRPG.Scripts.UI {
                 _progressBar.MaxValue = step.Duration;
                 _progressBar.Value = step.Duration;
             } else {
-                _progressBar.Visible = false;
+                _progressBar.Visible = false; 
             }
             
             // 按钮
@@ -249,9 +249,9 @@ namespace ClawRPG.Scripts.UI {
             if (step.TargetType != TutorialTargetType.None) {
                 ShowHighlight(step);
             } else {
-                _highlightOverlay.Visible = false;
-                _highlightCircle.Visible = false;
-                _actionLabel.Visible = false;
+                _highlightOverlay.Visible = false; 
+                _highlightCircle.Visible = false; 
+                _actionLabel.Visible = false; 
             }
             
             // 显示
@@ -282,8 +282,8 @@ namespace ClawRPG.Scripts.UI {
                 tween.TweenProperty(_highlightCircle, "modulate:a", 0.8f, 0.5f);
                 tween.TweenProperty(_highlightCircle, "modulate:a", 0.4f, 0.5f);
             } else {
-                _highlightCircle.Visible = false;
-                _actionLabel.Visible = false;
+                _highlightCircle.Visible = false; 
+                _actionLabel.Visible = false; 
             }
             
             _highlightOverlay.Visible = true;
@@ -295,7 +295,7 @@ namespace ClawRPG.Scripts.UI {
         public void EndTutorial() {
             if (!_isActive) return;
             
-            _isActive = false;
+            _isActive = false; 
             
             if (_currentStep != null) {
                 _currentStep.IsCompleted = true;
@@ -307,12 +307,12 @@ namespace ClawRPG.Scripts.UI {
             tween.TweenProperty(_panel, "modulate:a", 0f, 0.3f);
             tween.TweenProperty(_panel, "scale", new Vector2(1.1f, 1.1f), 0.3f);
             tween.TweenCallback(Callable.From(() => {
-                Visible = false;
+                Visible = false; 
                 _panel.Scale = new Vector2(1f, 1f);
-                _highlightOverlay.Visible = false;
-                _highlightCircle.Visible = false;
-                _actionLabel.Visible = false;
-                _stepCounter.Visible = false;
+                _highlightOverlay.Visible = false; 
+                _highlightCircle.Visible = false; 
+                _actionLabel.Visible = false; 
+                _stepCounter.Visible = false; 
                 
                 // 检查是否全部完成
                 if (IsAllTutorialsCompleted()) {
@@ -381,7 +381,7 @@ namespace ClawRPG.Scripts.UI {
         /// </summary>
         public void ResetAllTutorials() {
             foreach (var step in TutorialDatabase.Instance.GetAllSteps()) {
-                step.IsCompleted = false;
+                step.IsCompleted = false; 
             }
             _pendingSteps.Clear();
             EndTutorial();
@@ -439,7 +439,7 @@ namespace ClawRPG.Scripts.UI {
             var timer = GetTree().CreateTimer(delay);
             timer.Timeout += () => {
                 if (_actionLabel != null) {
-                    _actionLabel.Visible = false;
+                    _actionLabel.Visible = false; 
                 }
             };
         }

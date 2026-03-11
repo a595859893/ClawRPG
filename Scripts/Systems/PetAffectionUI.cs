@@ -17,7 +17,7 @@ namespace ClawRPG.Systems {
         private Label _avgLevelLabel;
         private Button _closeButton;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         public override void _Ready() {
             _affectionSystem = PetAffectionSystem.Instance;
@@ -26,7 +26,7 @@ namespace ClawRPG.Systems {
             SetupUI();
             SetupSignals();
             
-            Visible = false;
+            Visible = false; 
         }
         
         private void SetupUI() {

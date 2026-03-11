@@ -53,7 +53,7 @@ namespace ClawRPG.Scripts.UI {
                 _enhancementSystem.OnEnhancementComplete += OnEnhancementComplete;
             }
             
-            Visible = false;
+            Visible = false; 
         }
         
         private void SetupUI() {
@@ -218,7 +218,7 @@ namespace ClawRPG.Scripts.UI {
         }
         
         public void Hide() {
-            Visible = false;
+            Visible = false; 
         }
         
         private void RefreshEquipmentList() {
@@ -414,7 +414,7 @@ namespace ClawRPG.Scripts.UI {
                     }
                     
                     bool has = playerCount >= mat.Value;
-                    if (!has) hasMaterials = false;
+                    if (!has) hasMaterials = false; 
                     
                     materialText += $"{matName}: {playerCount}/{mat.Value}";
                     if (!has) materialText += " ❌";
@@ -423,7 +423,7 @@ namespace ClawRPG.Scripts.UI {
                 
                 if (enhLevel >= 10) {
                     materialText = "已达到最大强化等级!";
-                    hasMaterials = false;
+                    hasMaterials = false; 
                 }
                 
                 _materialsLabel.Text = materialText;

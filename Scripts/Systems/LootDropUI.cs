@@ -12,12 +12,12 @@ public class LootDropUI : Control
     private HSlider _luckSlider;
     private Label _luckValueLabel;
     
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
 
     public override void _Ready()
     {
         SetupUI();
-        Visible = false;
+        Visible = false; 
     }
 
     private void SetupUI()

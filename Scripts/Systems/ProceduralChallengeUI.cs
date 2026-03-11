@@ -19,7 +19,7 @@ public class ProceduralChallengeUI : Control
 
     public override void _Ready()
     {
-        Visible = false;
+        Visible = false; 
         SetupUI();
         
         // Connect to challenge system signals
@@ -269,7 +269,7 @@ public class ProceduralChallengeUI : Control
 
     private void OnClosePressed()
     {
-        Visible = false;
+        Visible = false; 
     }
 
     private void OnChallengeStarted(string instanceId)

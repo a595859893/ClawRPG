@@ -13,7 +13,7 @@ namespace ClawRPG.Systems {
         // 时间系统 (0-24小时)
         private float _gameTime = 8.0f; // 从早上8点开始
         private float _timeScale = 1.0f; // 时间流逝速度
-        private bool _isPaused = false;
+        private bool _isPaused = false; 
 
         // NPC日程数据
         private Dictionary<string, NPCSchedule> _npcSchedules = new Dictionary<string, NPCSchedule>();

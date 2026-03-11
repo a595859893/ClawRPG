@@ -26,8 +26,8 @@ namespace ClawRPG.Scripts.UI
         
         public override void _Ready()
         {
-            Visible = false;
-            _isVisible = false;
+            Visible = false; 
+            _isVisible = false; 
             
             SetupUI();
             ConnectSignals();
@@ -215,7 +215,7 @@ namespace ClawRPG.Scripts.UI
             progressBar.Value = achievement.Progress * 100;
             progressBar.MaxValue = 100;
             progressBar.CustomMinimumSize = new Vector2(0, 8);
-            progressBar.ShowPercentage = false;
+            progressBar.ShowPercentage = false; 
             
             var progressStyle = new StyleBoxFlat();
             progressStyle.BgColor = new Color(0.2f, 0.2f, 0.25f, 1f);

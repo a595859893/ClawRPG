@@ -17,7 +17,7 @@ namespace ClawRPG.Scripts.UI {
         private Button _closeButton;
         private Button _clearButton;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         public override void _Ready() {
             SetupUI();

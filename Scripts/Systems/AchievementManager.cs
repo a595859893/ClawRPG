@@ -16,7 +16,7 @@ namespace ClawRPG.Scripts.Systems
         private Dictionary<string, Achievement> _trackedAchievements;
         
         // Tutorial tracking
-        private bool _hasTriggeredFirstAchievement = false;
+        private bool _hasTriggeredFirstAchievement = false; 
         
         // Statistics tracking
         private int _totalKills;

@@ -216,19 +216,19 @@ public class PetEquipmentUI : Control
         _buyButton = new Button();
         _buyButton.Text = "购买";
         _buyButton.Pressed += OnBuyPressed;
-        _buyButton.Visible = false;
+        _buyButton.Visible = false; 
         _detailPanel.AddChild(_buyButton);
         
         _equipButton = new Button();
         _equipButton.Text = "装备";
         _equipButton.Pressed += OnEquipPressed;
-        _equipButton.Visible = false;
+        _equipButton.Visible = false; 
         _detailPanel.AddChild(_equipButton);
         
         _unequipButton = new Button();
         _unequipButton.Text = "卸下";
         _unequipButton.Pressed += OnUnequipPressed;
-        _unequipButton.Visible = false;
+        _unequipButton.Visible = false; 
         _detailPanel.AddChild(_unequipButton);
     }
     
@@ -377,9 +377,9 @@ public class PetEquipmentUI : Control
             _detailNameLabel.Text = "未选择";
             _detailDescLabel.Text = "";
             _statsLabel.Text = "";
-            _buyButton.Visible = false;
-            _equipButton.Visible = false;
-            _unequipButton.Visible = false;
+            _buyButton.Visible = false; 
+            _equipButton.Visible = false; 
+            _unequipButton.Visible = false; 
             return;
         }
         

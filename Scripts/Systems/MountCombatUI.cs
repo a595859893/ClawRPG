@@ -15,7 +15,7 @@ namespace ClawRPG.Scripts.UI {
         private Label _combatStatsLabel;
         private HBoxContainer _skillButtonsContainer;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         private string _currentMountId = null;
         private List<MountCombatData.MountCombatSkill> _currentSkills = new List<MountCombatData.MountCombatSkill>();
         private List<TextureRect> _skillIcons = new List<TextureRect>();
@@ -24,7 +24,7 @@ namespace ClawRPG.Scripts.UI {
         public override void _Ready() {
             Instance = this;
             SetupUI();
-            Visible = false;
+            Visible = false; 
             
             // 连接到坐骑管理器信号
             if (MountManager.Instance != null) {
@@ -373,8 +373,8 @@ namespace ClawRPG.Scripts.UI {
         /// 坐骑取消激活回调
         /// </summary>
         private void _OnMountDeactivated() {
-            Visible = false;
-            _isVisible = false;
+            Visible = false; 
+            _isVisible = false; 
             _currentMountId = null;
             _currentSkills.Clear();
         }

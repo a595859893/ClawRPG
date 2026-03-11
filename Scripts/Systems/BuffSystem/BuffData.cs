@@ -58,8 +58,8 @@ public class BuffInfo
 	{
 		Duration = -1f;
 		TickInterval = 1f;
-		IsPermanent = false;
-		CanStack = false;
+		IsPermanent = false; 
+		CanStack = false; 
 		MaxStacks = 1;
 		Priority = 0;
 	}

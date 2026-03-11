@@ -39,7 +39,7 @@ namespace ClawRPG.Scripts.UI
         private VBoxContainer _timersContainer;
         
         // Visibility
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         public override void _Ready()
         {
@@ -206,7 +206,7 @@ namespace ClawRPG.Scripts.UI
             if (_isVisible)
             {
                 Hide();
-                _isVisible = false;
+                _isVisible = false; 
             }
             else
             {
@@ -331,7 +331,7 @@ namespace ClawRPG.Scripts.UI
             }
             
             var activeBosses = system.GetActiveBosses();
-            bool hasActive = false;
+            bool hasActive = false; 
             
             foreach (var boss in activeBosses)
             {
@@ -389,7 +389,7 @@ namespace ClawRPG.Scripts.UI
             healthBar.MinValue = 0;
             healthBar.MaxValue = boss.MaxHealth;
             healthBar.Value = boss.CurrentHealth;
-            healthBar.ShowPercentage = false;
+            healthBar.ShowPercentage = false; 
             healthBox.AddChild(healthBar);
             
             var healthValue = new Label();

@@ -215,7 +215,7 @@ public class QuickSlotSystem : Node
         if (player == null) return false;
         
         // Use item based on type
-        bool used = false;
+        bool used = false; 
         
         switch (GetSlotType(item))
         {

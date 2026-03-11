@@ -20,7 +20,7 @@ namespace ClawRPG.Scripts.UI
         private Button _changeWeatherButton;
         
         private WeatherSystem _weatherSystem;
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         // 效果显示标签
         private Label _damageEffect;
@@ -38,7 +38,7 @@ namespace ClawRPG.Scripts.UI
             _weatherSystem.WeatherUpdated += OnWeatherUpdated;
             
             SetupUI();
-            Visible = false;
+            Visible = false; 
         }
 
         private void SetupUI()
@@ -113,7 +113,7 @@ namespace ClawRPG.Scripts.UI
             // 进度条
             _durationProgressBar = new ProgressBar();
             _durationProgressBar.CustomMinimumSize = new Vector2(180, 12);
-            _durationProgressBar.ShowPercentage = false;
+            _durationProgressBar.ShowPercentage = false; 
             _durationProgressBar.Value = 100;
             contentVBox.AddChild(_durationProgressBar);
 

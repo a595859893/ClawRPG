@@ -131,7 +131,7 @@ public class ElementalTrialSystem
 
     private void CompleteTrial()
     {
-        _isTrialActive = false;
+        _isTrialActive = false; 
         if (_trialTimer != null)
         {
             _trialTimer.Stop();
@@ -187,7 +187,7 @@ public class ElementalTrialSystem
 
     private void FailTrial(string reason)
     {
-        _isTrialActive = false;
+        _isTrialActive = false; 
         if (_trialTimer != null)
         {
             _trialTimer.Stop();

@@ -20,7 +20,7 @@ namespace ClawRPG.Scripts.UI {
         private Label _timerLabel;
         private Button _closeButton;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         public override void _Ready() {
             // Get nodes
@@ -36,7 +36,7 @@ namespace ClawRPG.Scripts.UI {
             }
             
             // Initial state
-            Visible = false;
+            Visible = false; 
         }
         
         public override void _Process(float delta) {

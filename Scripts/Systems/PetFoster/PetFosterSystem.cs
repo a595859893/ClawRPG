@@ -13,7 +13,7 @@ namespace ClawRPG.Scripts.Systems.PetFoster
         public static PetFosterSystem Instance { get; private set; }
         
         private PlayerFosterData _playerData;
-        private bool _initialized = false;
+        private bool _initialized = false; 
         
         // 信号系统
         public delegate void FosterStartedHandler(string petId, string configId);

@@ -23,11 +23,11 @@ public class RelicUI : Control
     private Button _selectedButton;
     
     // 商店/背包模式
-    private bool _isShopMode = false;
+    private bool _isShopMode = false; 
     
     public override void _Ready()
     {
-        Visible = false;
+        Visible = false; 
         SetupUI();
         ConnectSignals();
     }

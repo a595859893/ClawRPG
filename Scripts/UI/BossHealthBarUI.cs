@@ -23,10 +23,10 @@ namespace ClawRPG.Scripts.UI {
         
         // State
         private Node2D _currentBoss;
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         private float _displayTimer = 0f;
         private float _fadeTimer = 0f;
-        private bool _wasEnraged = false;
+        private bool _wasEnraged = false; 
         private int _lastEnrageSecond = -1;
         private const float AutoHideTime = 3f;
         private const float FadeTime = 0.5f;
@@ -41,7 +41,7 @@ namespace ClawRPG.Scripts.UI {
         public override void _Ready()
         {
             SetupUI();
-            Visible = false;
+            Visible = false; 
         }
         
         private void SetupUI()
@@ -97,7 +97,7 @@ namespace ClawRPG.Scripts.UI {
             _healthBar.MinValue = 0;
             _healthBar.MaxValue = 100;
             _healthBar.Value = 100;
-            _healthBar.ShowPercentage = false;
+            _healthBar.ShowPercentage = false; 
             
             // Health bar style
             var healthBg = new StyleBoxFlat();
@@ -148,8 +148,8 @@ namespace ClawRPG.Scripts.UI {
             _enrageBar.MinValue = 0;
             _enrageBar.MaxValue = 100;
             _enrageBar.Value = 0;
-            _enrageBar.ShowPercentage = false;
-            _enrageBar.Visible = false;
+            _enrageBar.ShowPercentage = false; 
+            _enrageBar.Visible = false; 
             
             var enrageBg = new StyleBoxFlat();
             enrageBg.BgColor = new Color(0.15f, 0.15f, 0.15f, 1f);
@@ -175,7 +175,7 @@ namespace ClawRPG.Scripts.UI {
             _enrageLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _enrageLabel.AddThemeFontSizeOverride("font_size", 11);
             _enrageLabel.AddThemeColorOverride("font_color", new Color(1f, 0.3f, 0f));
-            _enrageLabel.Visible = false;
+            _enrageLabel.Visible = false; 
             vbox.AddChild(_enrageLabel);
         }
         
@@ -208,8 +208,8 @@ namespace ClawRPG.Scripts.UI {
                 
                 if (_fadeTimer <= 0)
                 {
-                    _isVisible = false;
-                    Visible = false;
+                    _isVisible = false; 
+                    Visible = false; 
                 }
             }
         }
@@ -350,16 +350,16 @@ namespace ClawRPG.Scripts.UI {
                 else
                 {
                     // Hide enrage display
-                    _enrageBar.Visible = false;
-                    _enrageLabel.Visible = false;
+                    _enrageBar.Visible = false; 
+                    _enrageLabel.Visible = false; 
                     _enrageWarningLabel.Text = "";
                 }
             }
             else
             {
                 // No enrage system or already enraged
-                _enrageBar.Visible = false;
-                _enrageLabel.Visible = false;
+                _enrageBar.Visible = false; 
+                _enrageLabel.Visible = false; 
                 _enrageWarningLabel.Text = "";
             }
         }

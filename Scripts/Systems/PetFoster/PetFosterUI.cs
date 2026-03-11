@@ -35,7 +35,7 @@ namespace ClawRPG.Scripts.Systems.PetFoster
         private Label _totalGoldLabel;
         private Label _totalMaterialsLabel;
         
-        private bool _visible = false;
+        private bool _visible = false; 
         
         public override void _Ready()
         {
@@ -452,7 +452,7 @@ namespace ClawRPG.Scripts.Systems.PetFoster
                 
                 if (activeFosters != null)
                 {
-                    bool needsRefresh = false;
+                    bool needsRefresh = false; 
                     foreach (var kvp in activeFosters.ActiveFosters)
                     {
                         var foster = kvp.Value;

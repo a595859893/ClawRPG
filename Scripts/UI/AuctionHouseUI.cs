@@ -382,8 +382,8 @@ namespace UI
             _sellerLabel.Text = $"卖家: {auction.SellerName}";
             _timeRemainingLabel.Text = $"剩余时间: {AuctionHouseSystem.Instance.FormatTimeRemaining(auction.EndTime)}";
 
-            _bidButton.Disabled = false;
-            _buyNowButton.Disabled = false;
+            _bidButton.Disabled = false; 
+            _buyNowButton.Disabled = false; 
         }
 
         private void UpdateStats()

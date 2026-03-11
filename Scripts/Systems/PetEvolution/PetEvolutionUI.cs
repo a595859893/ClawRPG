@@ -30,7 +30,7 @@ public class PetEvolutionUI : Control
 	
 	public override void _Ready()
 	{
-		Visible = false;
+		Visible = false; 
 		SetProcess(false);
 		SetupUI();
 	}
@@ -283,7 +283,7 @@ public class PetEvolutionUI : Control
 			else if (curExp >= reqExp && curKills >= reqKills && curItems >= reqItems)
 			{
 				_evolveButton.Text = "  🔄 进化宠物 ";
-				_evolveButton.Disabled = false;
+				_evolveButton.Disabled = false; 
 			}
 			else
 			{
@@ -386,7 +386,7 @@ public class PetEvolutionUI : Control
 	
 	public void HideUI()
 	{
-		Visible = false;
+		Visible = false; 
 		SetProcess(false);
 	}
 	

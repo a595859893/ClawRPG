@@ -32,12 +32,12 @@ public class DailyDungeonUI : Control
     private ProgressBar _timerProgress;
 
     private DailyDungeonData _selectedDungeon;
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
 
     public override void _Ready()
     {
         SetupUI();
-        Visible = false;
+        Visible = false; 
     }
 
     private void SetupUI()
@@ -96,7 +96,7 @@ public class DailyDungeonUI : Control
 
         // Info panel
         _infoPanel = new PanelContainer();
-        _infoPanel.Visible = false;
+        _infoPanel.Visible = false; 
         
         var infoStyle = new StyleBoxFlat();
         infoStyle.BgColor = new Color(0.15f, 0.15f, 0.2f);
@@ -155,7 +155,7 @@ public class DailyDungeonUI : Control
     private void SetupCombatUI()
     {
         _combatUI = new Control();
-        _combatUI.Visible = false;
+        _combatUI.Visible = false; 
         _combatUI.SetAnchor(AnchorPreset.FullRect);
         AddChild(_combatUI);
 
@@ -236,7 +236,7 @@ public class DailyDungeonUI : Control
         if (system.IsInDungeon())
         {
             _combatUI.Visible = true;
-            _mainContainer.Visible = false;
+            _mainContainer.Visible = false; 
 
             var dungeon = system.GetCurrentDungeon();
             var floor = system.GetCurrentFloor();
@@ -266,7 +266,7 @@ public class DailyDungeonUI : Control
         }
         else
         {
-            _combatUI.Visible = false;
+            _combatUI.Visible = false; 
             _mainContainer.Visible = true;
         }
     }
@@ -283,7 +283,7 @@ public class DailyDungeonUI : Control
         }
         else
         {
-            _combatUI.Visible = false;
+            _combatUI.Visible = false; 
         }
     }
 

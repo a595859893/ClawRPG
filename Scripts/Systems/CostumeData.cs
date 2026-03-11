@@ -29,9 +29,9 @@ namespace ClawRPG.Scripts.Systems {
         public string ResourcePath; // 资源路径
         
         public CostumeData() {
-            IsDefault = false;
-            IsPurchased = false;
-            IsEquipped = false;
+            IsDefault = false; 
+            IsPurchased = false; 
+            IsEquipped = false; 
         }
     }
     

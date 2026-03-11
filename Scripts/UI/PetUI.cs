@@ -40,7 +40,7 @@ namespace ClawRPG.Scripts.UI
         private PetSystem _petManager;
         private Pet _selectedPet;
         private Array<Button> _petButtons = new Array<Button>();
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
 
         public override void _Ready()
         {
@@ -62,7 +62,7 @@ namespace ClawRPG.Scripts.UI
             _petManager.OnActivePetChanged += OnActivePetChanged;
             
             // 初始化
-            Visible = false;
+            Visible = false; 
             RefreshPetList();
         }
 
@@ -87,8 +87,8 @@ namespace ClawRPG.Scripts.UI
 
         private void OnClosePressed()
         {
-            Visible = false;
-            _isVisible = false;
+            Visible = false; 
+            _isVisible = false; 
         }
 
         private void RefreshPetList()

@@ -26,9 +26,9 @@ namespace ClawRPG.Scripts.Database {
         [Export] public float DropRateMultiplier { get; set; } = 1.0f;
         
         // Environmental effects
-        [Export] public bool HasPoisonFog { get; set; } = false;
-        [Export] public bool HasFireDamage { get; set; } = false;
-        [Export] public bool HasIceDamage { get; set; } = false;
+        [Export] public bool HasPoisonFog { get; set; } = false; 
+        [Export] public bool HasFireDamage { get; set; } = false; 
+        [Export] public bool HasIceDamage { get; set; } = false; 
         [Export] public float EnvironmentalDamagePerSecond { get; set; } = 0f;
     }
 

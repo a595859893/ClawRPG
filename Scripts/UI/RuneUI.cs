@@ -39,7 +39,7 @@ public class RuneUI : Control
 
     public override void _Ready()
     {
-        Visible = false;
+        Visible = false; 
         SetupUI();
         
         // Connect signals
@@ -534,7 +534,7 @@ public class RuneUI : Control
         runeSetLabel.Text = rune.Set != RuneSet.None ? $"Set: {rune.Set}" : "No set";
 
         // Check if rune is equipped
-        bool isEquipped = false;
+        bool isEquipped = false; 
         for (int i = 0; i < 5; i++)
         {
             var equipped = RuneManager.Instance.GetEquippedRune(i);
@@ -586,7 +586,7 @@ public class RuneUI : Control
         if (player == null) return;
 
         // Check if rune is equipped
-        bool isEquipped = false;
+        bool isEquipped = false; 
         for (int i = 0; i < 5; i++)
         {
             var equipped = RuneManager.Instance.GetEquippedRune(i);

@@ -17,7 +17,7 @@ public partial class AnimationEffectManager : Node
     private float _attackAnimationTime = 0f;
     private float _attackAnimationDuration = 0.3f;
     private Vector2 _attackOrigin = Vector2.Zero;
-    private bool _isPlayingAttackAnimation = false;
+    private bool _isPlayingAttackAnimation = false; 
     
     // 打击效果
     private float _hitStopTime = 0f;
@@ -27,12 +27,12 @@ public partial class AnimationEffectManager : Node
     private double _shakeTimer = 0.0;
     
     // 攻击拖尾
-    private bool _enableAttackTrail = false;
+    private bool _enableAttackTrail = false; 
     private Color _attackTrailColor = new Color(1f, 0.8f, 0.3f, 0.6f);
     private float _trailWidth = 20f;
     
     // 慢动作效果
-    private bool _isSlowMotion = false;
+    private bool _isSlowMotion = false; 
     private float _slowMotionScale = 1.0f;
     private double _slowMotionDuration = 0.0;
     private double _slowMotionTimer = 0.0;
@@ -78,7 +78,7 @@ public partial class AnimationEffectManager : Node
             
             if (_attackAnimationTime >= _attackAnimationDuration)
             {
-                _isPlayingAttackAnimation = false;
+                _isPlayingAttackAnimation = false; 
                 _currentState = AnimationState.Idle;
             }
         }
@@ -107,7 +107,7 @@ public partial class AnimationEffectManager : Node
             _slowMotionTimer -= delta;
             if (_slowMotionTimer <= 0)
             {
-                _isSlowMotion = false;
+                _isSlowMotion = false; 
                 Engine.TimeScale = 1.0f;
             }
         }

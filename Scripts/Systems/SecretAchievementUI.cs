@@ -244,7 +244,7 @@ namespace ClawRPG.Scripts.Systems
                 progressBar.Position = new Vector2(10, 70);
                 progressBar.CustomMinimumSize = new Vector2(330, 15);
                 progressBar.Value = progressPercent * 100;
-                progressBar.ShowPercentage = false;
+                progressBar.ShowPercentage = false; 
                 progressBar.Modulate = new Color(0.3f, 0.3f, 0.3f, 0.8f);
                 itemContainer.AddChild(progressBar);
                 

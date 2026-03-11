@@ -26,7 +26,7 @@ public partial class DialogueUI : Control {
     
     public override void _Ready() {
         SetupUI();
-        Visible = false;
+        Visible = false; 
         
         // Connect to dialogue system
         if (DialogueSystem.Instance != null) {
@@ -122,7 +122,7 @@ public partial class DialogueUI : Control {
         if (e.IsActionPressed("ui_accept") || e.IsActionPressed("ui_text_completion_replace")) {
             if (_isTyping) {
                 // Complete text immediately
-                _isTyping = false;
+                _isTyping = false; 
                 _dialogueText.Text = _fullText;
             } else if (!(_currentNode?.HasChoices ?? false)) {
                 // Advance dialogue
@@ -256,7 +256,7 @@ public partial class DialogueUI : Control {
             _dialogueText.Text = _fullText.Substring(0, _revealIndex + 1);
             _revealIndex++;
         } else {
-            _isTyping = false;
+            _isTyping = false; 
         }
     }
 }

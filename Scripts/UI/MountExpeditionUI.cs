@@ -270,7 +270,7 @@ namespace ClawRPG.UI
                     MaxValue = 100,
                     CustomMinimumSize = new Vector2(0, 20)
                 };
-                progressBar.ShowPercentage = false;
+                progressBar.ShowPercentage = false; 
                 vbox.AddChild(progressBar);
                 
                 var statusLabel = new Label();

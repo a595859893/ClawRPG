@@ -36,7 +36,7 @@ namespace ClawRPG.Scripts.UI {
         private int _totalCrits = 0;
         private int _maxCombo = 0;
         private float _combatStartTime = 0;
-        private bool _inCombat = false;
+        private bool _inCombat = false; 
         
         // Rating system
         private PanelContainer _ratingPanel;
@@ -324,7 +324,7 @@ namespace ClawRPG.Scripts.UI {
         {
             if (_inCombat)
             {
-                _inCombat = false;
+                _inCombat = false; 
                 
                 // Calculate and show rating
                 if (_showRatingOnEnd && _totalKills > 0)
@@ -446,7 +446,7 @@ namespace ClawRPG.Scripts.UI {
         /// </summary>
         public void HideRating()
         {
-            _ratingPanel.Visible = false;
+            _ratingPanel.Visible = false; 
         }
         
         public void ResetStats()

@@ -284,7 +284,7 @@ namespace ClawRPG.Scripts.Systems.Pets
             float distToPlayer = _player != null ? GlobalPosition.DistanceTo(_player.GlobalPosition) : float.MaxValue;
             
             // 玩家血量检查
-            bool playerLowHealth = false;
+            bool playerLowHealth = false; 
             if (_player != null && _player.HasMethod("GetCurrentHealth"))
             {
                 int playerHp = (int)_player.Call("GetCurrentHealth");

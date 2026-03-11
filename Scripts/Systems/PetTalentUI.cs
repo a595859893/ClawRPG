@@ -24,7 +24,7 @@ public class PetTalentUI : Control
 
     public override void _Ready()
     {
-        Visible = false;
+        Visible = false; 
         SetupUI();
         
         _petSystem = GetNode<PetSystem>("/root/Main/PetSystem");
@@ -290,6 +290,6 @@ public class PetTalentUI : Control
 
     private void _OnClosePressed()
     {
-        Visible = false;
+        Visible = false; 
     }
 }

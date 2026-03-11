@@ -26,7 +26,7 @@ public class PetBattleArenaSystem : Node
     private int _playerMaxHealth;
     private float _battleTimer = 0f;
     private float _waveDelayTimer = 0f;
-    private bool _waveInProgress = false;
+    private bool _waveInProgress = false; 
     
     // Battle statistics
     private int _totalDamageDealt = 0;
@@ -98,7 +98,7 @@ public class PetBattleArenaSystem : Node
         _playerCurrentHealth = pet.CurrentHealth;
         _battleTimer = 0f;
         _waveDelayTimer = 0f;
-        _waveInProgress = false;
+        _waveInProgress = false; 
         
         // Reset stats
         _totalDamageDealt = 0;
@@ -177,7 +177,7 @@ public class PetBattleArenaSystem : Node
     
     private void OnWaveComplete()
     {
-        _waveInProgress = false;
+        _waveInProgress = false; 
         
         if (_currentWave >= _currentArena.TotalWaves)
         {

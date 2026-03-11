@@ -215,7 +215,7 @@ namespace ClawRPG.Scripts.UI {
                         _selectedWeaponId = kvp.Key;
                         var visual = kvp.Value;
                         _weaponDescription.Text = $"{visual.Name}\n\n品质: {GetRarityText(visual.Rarity)}\n\n{visual.Description}\n\n解锁条件: {GetUnlockText(visual.UnlockRequirement)}";
-                        _equipWeaponButton.Disabled = false;
+                        _equipWeaponButton.Disabled = false; 
                         break;
                     }
                     i++;
@@ -228,7 +228,7 @@ namespace ClawRPG.Scripts.UI {
                         _selectedArmorId = kvp.Key;
                         var visual = kvp.Value;
                         _armorDescription.Text = $"{visual.Name}\n\n品质: {GetRarityText(visual.Rarity)}\n\n{visual.Description}\n\n解锁条件: {GetUnlockText(visual.UnlockRequirement)}";
-                        _equipArmorButton.Disabled = false;
+                        _equipArmorButton.Disabled = false; 
                         break;
                     }
                     i++;
@@ -241,7 +241,7 @@ namespace ClawRPG.Scripts.UI {
                         _selectedAccessoryId = kvp.Key;
                         var visual = kvp.Value;
                         _accessoryDescription.Text = $"{visual.Name}\n\n品质: {GetRarityText(visual.Rarity)}\n\n{visual.Description}\n\n解锁条件: {GetUnlockText(visual.UnlockRequirement)}";
-                        _equipAccessoryButton.Disabled = false;
+                        _equipAccessoryButton.Disabled = false; 
                         break;
                     }
                     i++;

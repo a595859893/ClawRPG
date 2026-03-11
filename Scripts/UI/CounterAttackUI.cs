@@ -19,12 +19,12 @@ namespace ClawRPG.Scripts.UI
         private VBoxContainer _counterTypeContainer;
         private Label _descriptionLabel;
         
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         private Button[] _counterTypeButtons;
         
         public override void _Ready()
         {
-            Visible = false;
+            Visible = false; 
             _CreateUI();
             
             // Connect signals

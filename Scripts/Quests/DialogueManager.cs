@@ -167,7 +167,7 @@ namespace ClawRPG.Scripts.Quests {
                 _completedDialogues.Add(_currentDialogue.Id);
             }
 
-            _isInDialogue = false;
+            _isInDialogue = false; 
             _currentDialogue = null;
             _currentNode = null;
             _currentNpcId = null;
@@ -359,7 +359,7 @@ namespace ClawRPG.Scripts.Quests {
         /// </summary>
         public void Reset() {
             _completedDialogues.Clear();
-            _isInDialogue = false;
+            _isInDialogue = false; 
             _currentDialogue = null;
             _currentNode = null;
             _currentNpcId = null;

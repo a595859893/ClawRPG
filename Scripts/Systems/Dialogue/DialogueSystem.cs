@@ -192,7 +192,7 @@ public partial class DialogueSystem : Node {
     /// End the current dialogue.
     /// </summary>
     public void EndDialogue() {
-        _isActive = false;
+        _isActive = false; 
         _currentTree = null;
         _currentNode = null;
         DialogueEnded?.Invoke();

@@ -12,7 +12,7 @@ namespace ClawRPG.Scripts.Systems {
 
         private BalanceConfig _config;
         private string _configPath = "user://balance_config.json";
-        private bool _configLoaded = false;
+        private bool _configLoaded = false; 
 
         // 信号系统
         [Signal]

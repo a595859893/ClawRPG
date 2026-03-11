@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Database
     public static class WorldBossDatabase
     {
         private static Dictionary<string, WorldBossData.WorldBoss> _bosses;
-        private static bool _initialized = false;
+        private static bool _initialized = false; 
         
         public static void Initialize()
         {

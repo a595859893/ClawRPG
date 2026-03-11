@@ -33,7 +33,7 @@ namespace ClawRPG.Scripts.Systems {
         private Tween _tween;
         
         // 按键绑定
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         public ChoiceEventUI() {
             _instance = this;
@@ -44,7 +44,7 @@ namespace ClawRPG.Scripts.Systems {
             _mainPanel = new Panel();
             _mainPanel.SetSize(new Vector2(500, 400));
             _mainPanel.Position = new Vector2(100, 100);
-            _mainPanel.Visible = false;
+            _mainPanel.Visible = false; 
             AddChild(_mainPanel);
             
             // 创建样式
@@ -231,7 +231,7 @@ namespace ClawRPG.Scripts.Systems {
         public void Hide() {
             if (_mainPanel == null) return;
             
-            _isVisible = false;
+            _isVisible = false; 
             _currentEvent = null;
             
             // 淡出动画
@@ -239,7 +239,7 @@ namespace ClawRPG.Scripts.Systems {
             _tween.TweenProperty(_mainPanel, "modulate:a", 0.0f, 0.2f);
             _tween.TweenProperty(_mainPanel, "scale", new Vector2(0.95f, 0.95f), 0.2f);
             _tween.TweenCallback(() => {
-                _mainPanel.Visible = false;
+                _mainPanel.Visible = false; 
                 _mainPanel.Scale = new Vector2(1.0f, 1.0f);
             });
         }

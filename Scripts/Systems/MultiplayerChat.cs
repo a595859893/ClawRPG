@@ -46,7 +46,7 @@ public class MultiplayerChat : Node
     // 状态
     private List<ChatMessage> _messageHistory = new List<ChatMessage>();
     private int _maxHistory = 100;
-    private bool _isOpen = false;
+    private bool _isOpen = false; 
     private ChatType _currentChannel = ChatType.Lobby;
 
     public bool IsOpen => _isOpen;
@@ -192,7 +192,7 @@ public class MultiplayerChat : Node
     /// </summary>
     public void Close()
     {
-        _isOpen = false;
+        _isOpen = false; 
     }
 
     /// <summary>

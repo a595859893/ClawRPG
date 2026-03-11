@@ -23,7 +23,7 @@ namespace ClawRPG.Scripts.UI {
 
         public override void _Ready() {
             SetupUI();
-            Visible = false;
+            Visible = false; 
             
             // 连接信号
             if (MountManager.Instance != null) {
@@ -116,7 +116,7 @@ namespace ClawRPG.Scripts.UI {
             _noMountsLabel.Text = "暂无坐骑\n\n可以通过商店购买或在\n探索中发现新的坐骑！";
             _noMountsLabel.Align = Label.AlignEnum.Center;
             _noMountsLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f, 1f));
-            _noMountsLabel.Visible = false;
+            _noMountsLabel.Visible = false; 
             detailsVBox.AddChild(_noMountsLabel);
 
             // 底部按钮
@@ -148,7 +148,7 @@ namespace ClawRPG.Scripts.UI {
                 return;
             }
 
-            _noMountsLabel.Visible = false;
+            _noMountsLabel.Visible = false; 
 
             foreach (var kvp in ownedMounts) {
                 var mountData = MountDatabase.Instance.GetMount(kvp.Key);

@@ -200,7 +200,7 @@ public class BossMechanicSystem
         }
         
         // 重置战斗状态
-        IsInBossBattle = false;
+        IsInBossBattle = false; 
         CurrentBossId = null;
         CurrentPhaseIndex = 0;
     }
@@ -222,7 +222,7 @@ public class BossMechanicSystem
         {
             var phase = config.Phases[i];
             
-            bool shouldTransition = false;
+            bool shouldTransition = false; 
             
             switch (phase.TriggerType)
             {

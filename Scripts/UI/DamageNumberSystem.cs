@@ -18,7 +18,7 @@ public partial class DamageNumberSystem : CanvasLayer
     [Export] private float _defaultSpeed = 80f;
     [Export] private float _critSpeed = 100f;
     [Export] private int _maxSimultaneous = 30;
-    [Export] private bool _use3D = false; // 2D游戏设为false
+    [Export] private bool _use3D = false;  // 2D游戏设为false
 
     private List<Label> _activeLabels = new();
     private Dictionary<int, float> _entityLastSpawnTime = new();
@@ -379,7 +379,7 @@ public partial class DamageNumberSystem : CanvasLayer
     {
         Color color;
         int fontSize;
-        bool outline = false;
+        bool outline = false; 
         Color outlineColor = Colors.Black;
 
         switch (type)

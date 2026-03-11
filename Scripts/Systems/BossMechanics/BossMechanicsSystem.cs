@@ -207,7 +207,7 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
             float healthPercent = (fight.currentHealth / fight.maxHealth) * 100f;
             
             foreach (var enrage in enrages) {
-                bool shouldEnrage = false;
+                bool shouldEnrage = false; 
                 
                 switch (enrage.triggerType) {
                     case EnrageTriggerType.TimeBased:

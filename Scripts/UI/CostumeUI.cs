@@ -243,7 +243,7 @@ namespace ClawRPG.Scripts.UI {
         
         public void Hide()
         {
-            Visible = false;
+            Visible = false; 
         }
         
         public void Toggle()

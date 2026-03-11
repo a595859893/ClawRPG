@@ -295,11 +295,11 @@ public class MountBattleArenaUI : Control
             
             // Type filter
             if (_arenaTypeFilter.GetSelectedId() > 0 && arena.Type != typeFilter)
-                addArena = false;
+                addArena = false; 
             
             // Difficulty filter
             if (_difficultyFilter.GetSelectedId() > 0 && arena.Difficulty != diffFilter)
-                addArena = false;
+                addArena = false; 
             
             if (addArena)
             {
@@ -347,10 +347,10 @@ public class MountBattleArenaUI : Control
             bool addArena = true;
             
             if (_arenaTypeFilter.GetSelectedId() > 0 && arena.Type != typeFilter)
-                addArena = false;
+                addArena = false; 
             
             if (_difficultyFilter.GetSelectedId() > 0 && arena.Difficulty != diffFilter)
-                addArena = false;
+                addArena = false; 
             
             if (addArena)
             {
@@ -372,7 +372,7 @@ public class MountBattleArenaUI : Control
                 $"入场费: {selectedArena.EntryFee}金币\n" +
                 $"基础奖励: {selectedArena.BaseGoldReward}金币, {selectedArena.BaseExpReward}经验";
             
-            _startBattleButton.Disabled = false;
+            _startBattleButton.Disabled = false; 
         }
     }
     
@@ -404,10 +404,10 @@ public class MountBattleArenaUI : Control
             bool addArena = true;
             
             if (_arenaTypeFilter.GetSelectedId() > 0 && arena.Type != typeFilter)
-                addArena = false;
+                addArena = false; 
             
             if (_difficultyFilter.GetSelectedId() > 0 && arena.Difficulty != diffFilter)
-                addArena = false;
+                addArena = false; 
             
             if (addArena)
             {
@@ -436,7 +436,7 @@ public class MountBattleArenaUI : Control
     
     private void OnBattleStarted(string arenaId)
     {
-        _cancelBattleButton.Disabled = false;
+        _cancelBattleButton.Disabled = false; 
     }
     
     private void OnBattleEnded(string arenaId)

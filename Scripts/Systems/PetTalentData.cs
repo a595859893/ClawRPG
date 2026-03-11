@@ -53,7 +53,7 @@ public class PetTalent : Godot.Object
     public PetTalent() 
     {
         Level = 1;
-        IsUnlocked = false;
+        IsUnlocked = false; 
     }
 
     public PetTalent(string talentId, int level = 1)

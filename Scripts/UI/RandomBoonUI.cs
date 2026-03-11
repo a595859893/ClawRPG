@@ -39,7 +39,7 @@ public class RandomBoonUI : Control
         SetupSignals();
         RefreshUI();
         
-        Visible = false;
+        Visible = false; 
     }
     
     private void SetupUI()
@@ -121,7 +121,7 @@ public class RandomBoonUI : Control
         _offerPanel = new PanelContainer();
         _offerPanel.SetAnchorsPreset(Control.LayoutPreset.Center);
         _offerPanel.CustomMinimumSize = new Vector2(600, 400);
-        _offerPanel.Visible = false;
+        _offerPanel.Visible = false; 
         AddChild(_offerPanel);
         
         _offerVBox = new VBoxContainer();
@@ -203,8 +203,8 @@ public class RandomBoonUI : Control
     
     private void HideOfferPanel()
     {
-        _isOfferMode = false;
-        _offerPanel.Visible = false;
+        _isOfferMode = false; 
+        _offerPanel.Visible = false; 
         RefreshUI();
     }
     

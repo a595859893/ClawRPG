@@ -24,12 +24,12 @@ namespace ClawRPG.Scripts.Systems {
         // Track management
         private string _currentTrack = "";
         private string _currentBattleTrack = "";
-        private bool _inBattle = false;
+        private bool _inBattle = false; 
         
         // Crossfade settings
         private float _crossfadeDuration = 2.0f;
         private float _crossfadeTimer = 0f;
-        private bool _isCrossfading = false;
+        private bool _isCrossfading = false; 
         private AudioStream _nextTrack = null;
         
         // Music database - maps zone/event to music tracks
@@ -200,7 +200,7 @@ namespace ClawRPG.Scripts.Systems {
         /// </summary>
         public void StopBattleMusic() {
             if (_inBattle) {
-                _inBattle = false;
+                _inBattle = false; 
                 CrossfadeToZoneMusic(_currentZone);
                 GD.Print("[BGM] Stopping battle music");
                 
@@ -270,8 +270,8 @@ namespace ClawRPG.Scripts.Systems {
         /// Resume music
         /// </summary>
         public void ResumeMusic() {
-            _musicPlayer.StreamPaused = false;
-            _battleMusicPlayer.StreamPaused = false;
+            _musicPlayer.StreamPaused = false; 
+            _battleMusicPlayer.StreamPaused = false; 
         }
         
         /// <summary>
@@ -352,7 +352,7 @@ namespace ClawRPG.Scripts.Systems {
                 float progress = _crossfadeTimer / _crossfadeDuration;
                 
                 if (progress >= 1.0f) {
-                    _isCrossfading = false;
+                    _isCrossfading = false; 
                     _crossfadeTimer = 0f;
                     _musicPlayer.VolumeDb = LinearToDb(_musicVolume);
                 } else {

@@ -26,7 +26,7 @@ namespace ClawRPG.Scripts.UI {
         private VBoxContainer _utilityTree;
         
         private Player _player;
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         // Animation
         private Tween _uiTween;

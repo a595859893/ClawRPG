@@ -30,7 +30,7 @@ public partial class TradeUI : Control {
         Instance = this;
         SetupUI();
         ConnectSignals();
-        Visible = false;
+        Visible = false; 
 
         TradeSystem.Instance.Connect(TradeSystem.SignalName.TradeStarted, Callable.From(OnTradeStarted));
         TradeSystem.Instance.Connect(TradeSystem.SignalName.OfferUpdated, Callable.From(OnOfferUpdated));
@@ -202,7 +202,7 @@ public partial class TradeUI : Control {
     }
 
     private void HideTrade() {
-        Visible = false;
+        Visible = false; 
     }
 
     private void UpdateUI() {

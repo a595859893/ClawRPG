@@ -12,11 +12,11 @@ public class TeamSkillUI : Control
     private Label _titleLabel;
     private Dictionary<TeamSkillSystem.TeamSkillType, Label> _skillLabels = new Dictionary<TeamSkillSystem.TeamSkillType, Label>();
     private Dictionary<TeamSkillSystem.TeamSkillType, float> _cooldownTimers = new Dictionary<TeamSkillSystem.TeamSkillType, float>();
-    private bool _isVisible = false;
+    private bool _isVisible = false; 
 
     public override void _Ready()
     {
-        Visible = false;
+        Visible = false; 
         SetupUI();
         ConnectSignals();
     }
@@ -132,8 +132,8 @@ public class TeamSkillUI : Control
 
     public void HideUI()
     {
-        _isVisible = false;
-        Visible = false;
+        _isVisible = false; 
+        Visible = false; 
     }
 
     public bool IsVisible() => _isVisible;

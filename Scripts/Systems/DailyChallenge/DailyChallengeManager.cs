@@ -274,7 +274,7 @@ namespace ClawRPG.Scripts.Systems {
         }
         
         private void UpdateChallengeProgress(ChallengeType type, int newValue) {
-            bool anyCompleted = false;
+            bool anyCompleted = false; 
             
             foreach (var challenge in _dailyChallenges) {
                 if (challenge.Type == type && !challenge.IsCompleted) {

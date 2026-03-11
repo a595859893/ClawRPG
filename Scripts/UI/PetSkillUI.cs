@@ -31,7 +31,7 @@ namespace ClawRPG.Scripts.UI
         private PetManager _petManager;
         private Pet _selectedPet;
         private List<PetSkill> _displayedSkills = new List<PetSkill>();
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
 
         public override void _Ready()
         {
@@ -54,7 +54,7 @@ namespace ClawRPG.Scripts.UI
             
             // 初始隐藏
             if (Visible)
-                Visible = false;
+                Visible = false; 
                 
             GD.Print("宠物技能界面已加载");
         }
@@ -177,7 +177,7 @@ namespace ClawRPG.Scripts.UI
                 else if (_skillSystem.CanLearnSkill(_selectedPet.PetId, skill.SkillId, _selectedPet.Level))
                 {
                     _learnButton.Text = "学习";
-                    _learnButton.Disabled = false;
+                    _learnButton.Disabled = false; 
                 }
                 else
                 {

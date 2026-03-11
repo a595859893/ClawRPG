@@ -50,7 +50,7 @@ namespace ClawRPG.Scripts.Systems {
         private const int MAX_RUNE_INVENTORY = 50;
         
         // Tutorial tracking
-        private bool _hasTriggeredFirstRune = false;
+        private bool _hasTriggeredFirstRune = false; 
 
         // 信号
         public delegate void RuneEvent();

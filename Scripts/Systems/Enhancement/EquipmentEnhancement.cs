@@ -84,7 +84,7 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         private Player _player;
         
         // Tutorial tracking
-        private bool _hasTriggeredFirstEnhance = false;
+        private bool _hasTriggeredFirstEnhance = false; 
         
         public override void _Ready() {
             Instance = this;

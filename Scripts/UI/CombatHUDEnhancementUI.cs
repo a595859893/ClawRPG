@@ -31,7 +31,7 @@ public class CombatHUDEnhancementUI : Control
 	private ProgressBar _paceBar;
 	
 	// Toggle
-	private bool _isVisible = false;
+	private bool _isVisible = false; 
 	private KeyToggleHandler _toggleHandler;
 	
 	public override void _Ready()
@@ -284,7 +284,7 @@ public class CombatHUDEnhancementUI : Control
 		if (_isVisible)
 		{
 			Hide();
-			_isVisible = false;
+			_isVisible = false; 
 		}
 		else
 		{

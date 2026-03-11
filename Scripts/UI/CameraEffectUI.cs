@@ -18,19 +18,19 @@ namespace ClawRPG.Scripts.UI {
         [Export] private Label shakeValueLabel;
         [Export] private Label vignetteValueLabel;
         
-        private bool isVisible = false;
+        private bool isVisible = false; 
         
         // 设置数据
         private bool enableDynamicFOV = true;
         private bool enableShake = true;
-        private bool enableVignette = false;
+        private bool enableVignette = false; 
         private float fovIntensity = 0.5f;
         private float shakeIntensity = 0.5f;
         private float vignetteIntensity = 0.3f;
         
         public override void _Ready() {
             Instance = this;
-            Visible = false;
+            Visible = false; 
             
             // 尝试自动获取UI元素
             TryAutoConnect();
@@ -114,7 +114,7 @@ namespace ClawRPG.Scripts.UI {
             if (isVisible) {
                 GetTree().Paused = true;
             } else {
-                GetTree().Paused = false;
+                GetTree().Paused = false; 
             }
         }
         

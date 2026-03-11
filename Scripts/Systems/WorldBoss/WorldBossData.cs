@@ -72,7 +72,7 @@ namespace ClawRPG.Scripts.Systems.WorldBoss
             public float Y { get; set; } = 0;
             public DateTime SpawnTime { get; set; } = DateTime.Now;
             public int LifeTimeMinutes { get; set; } = 30;
-            public bool IsDefeated { get; set; } = false;
+            public bool IsDefeated { get; set; } = false; 
             public int TotalDamageDealt { get; set; } = 0;
             public int PlayerCount { get; set; } = 0;
         }
@@ -87,7 +87,7 @@ namespace ClawRPG.Scripts.Systems.WorldBoss
             public int DamageDealt { get; set; } = 0;
             public float DamagePercent { get; set; } = 0f;
             public DateTime LastHitTime { get; set; } = DateTime.Now;
-            public bool HasClaimed { get; set; } = false;
+            public bool HasClaimed { get; set; } = false; 
         }
         
         /// <summary>

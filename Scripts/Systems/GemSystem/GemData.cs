@@ -124,7 +124,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         
         public EquipmentGemSlot() {
             GemId = "";
-            IsUnlocked = false;
+            IsUnlocked = false; 
         }
         
         public EquipmentGemSlot(int index, bool unlocked = false) {

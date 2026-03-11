@@ -319,7 +319,7 @@ namespace ClawRPG.Scripts.Characters {
             
             // Flip sprite
             if (direction.x < 0) _sprite.FlipH = true;
-            else if (direction.x > 0) _sprite.FlipH = false;
+            else if (direction.x > 0) _sprite.FlipH = false; 
         }
         
         public void StopMovement()

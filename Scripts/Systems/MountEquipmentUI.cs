@@ -30,7 +30,7 @@ namespace GameSystems {
         
         public override void _Ready() {
             SetupUI();
-            Visible = false;
+            Visible = false; 
             
             // 连接信号
             if (MountSystem.Instance != null) {

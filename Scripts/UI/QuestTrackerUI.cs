@@ -100,7 +100,7 @@ namespace ClawrRPG.Scripts.UI {
             var quests = questManager.GetActiveQuests();
             
             // 检查是否需要更新显示
-            bool needsUpdate = false;
+            bool needsUpdate = false; 
             if (quests.Count != activeQuests.Count)
             {
                 needsUpdate = true;

@@ -27,7 +27,7 @@ namespace ClawRPG.Scripts.UI {
         // State
         private string _currentStation = "forge";
         private CraftingRecipe _selectedRecipe;
-        private bool _isVisible = false;
+        private bool _isVisible = false; 
         
         // References
         private Player _player;
@@ -262,7 +262,7 @@ namespace ClawRPG.Scripts.UI {
             {
                 if (!HasMaterial(material.Key, material.Value))
                 {
-                    canCraft = false;
+                    canCraft = false; 
                     break;
                 }
             }

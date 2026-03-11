@@ -279,7 +279,7 @@ public class AuctionHouseSystem : Node
         
         // Process sale
         auction.Status = AuctionItemStatus.Sold;
-        auction.IsActive = false;
+        auction.IsActive = false; 
         auction.HighestBidder = _player.PlayerName;
         
         // Update seller data
@@ -340,7 +340,7 @@ public class AuctionHouseSystem : Node
         
         // Cancel auction
         auction.Status = AuctionItemStatus.Cancelled;
-        auction.IsActive = false;
+        auction.IsActive = false; 
         
         // Update player data
         var playerData = AuctionDatabase.GetPlayerData(_player.PlayerName);

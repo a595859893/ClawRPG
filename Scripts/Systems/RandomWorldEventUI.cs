@@ -83,7 +83,7 @@ namespace ClawRPG.Scripts.Systems {
             _mainContainer.AddChild(_closeButton);
             
             // 默认隐藏
-            Visible = false;
+            Visible = false; 
         }
 
         private void ConnectSignals() {
@@ -292,7 +292,7 @@ namespace ClawRPG.Scripts.Systems {
         /// 关闭按钮按下
         /// </summary>
         private void OnClosePressed() {
-            Visible = false;
+            Visible = false; 
         }
 
         /// <summary>
@@ -317,7 +317,7 @@ namespace ClawRPG.Scripts.Systems {
         /// 关闭UI
         /// </summary>
         public void Close() {
-            Visible = false;
+            Visible = false; 
         }
     }
 }

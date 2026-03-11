@@ -308,7 +308,7 @@ public class PlayerTalentUI : Control
         else if (canUnlock)
         {
             _unlockButton.Text = $"解锁 (消耗{talent.Cost}点)";
-            _unlockButton.Disabled = false;
+            _unlockButton.Disabled = false; 
         }
         else
         {
