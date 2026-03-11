@@ -351,6 +351,12 @@ namespace ClawRPG.Scripts {
             petTalentSystem.Name = "PetTalentSystem";
             AddChild(petTalentSystem);
             
+            // Initialize pet affection system
+            var petAffectionSystem = new Systems.PetAffectionSystem();
+            petAffectionSystem.Name = "PetAffectionSystem";
+            AddChild(petAffectionSystem);
+            petAffectionSystem.Initialize();
+            
             // Initialize elemental trial system
             var elementalTrialSystem = new Systems.ElementalTrialSystem();
             elementalTrialSystem.Name = "ElementalTrialSystem";
@@ -686,6 +692,12 @@ namespace ClawRPG.Scripts {
             petTalentUI.Name = "PetTalentUI";
             petTalentUI.Visible = false;
             ui.AddChild(petTalentUI);
+            
+            // Pet Affection UI
+            var petAffectionUI = new Systems.PetAffectionUI();
+            petAffectionUI.Name = "PetAffectionUI";
+            petAffectionUI.Visible = false;
+            ui.AddChild(petAffectionUI);
             
             // Mystery Treasure UI
             var mysteryTreasureUI = new MysteryTreasureUI();
@@ -1161,6 +1173,12 @@ namespace ClawRPG.Scripts {
                 TogglePetTalentUI();
             }
             
+            // Handle pet affection UI toggle (Shift+P)
+            if (Input.IsActionJustPressed("ui_pet_affection"))
+            {
+                TogglePetAffectionUI();
+            }
+            
             // Handle mystery treasure UI toggle (T key)
             if (Input.IsActionJustPressed("ui_mystery_treasure"))
             {
@@ -1513,6 +1531,18 @@ namespace ClawRPG.Scripts {
             if (petTalentUI != null)
             {
                 petTalentUI.ToggleUI();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle pet affection UI
+        /// </summary>
+        private void TogglePetAffectionUI()
+        {
+            var petAffectionUI = GetNodeOrNull<Systems.PetAffectionUI>("UI/PetAffectionUI");
+            if (petAffectionUI != null)
+            {
+                petAffectionUI.ToggleUI();
             }
         }
         
