@@ -361,6 +361,12 @@ namespace ClawRPG.Scripts {
             randomBoonSystem.Name = "RandomBoonSystem";
             AddChild(randomBoonSystem);
             
+            // Initialize daily quest system
+            var dailyQuestSystem = new Systems.DailyQuest.DailyQuestSystem();
+            dailyQuestSystem.Name = "DailyQuestSystem";
+            AddChild(dailyQuestSystem);
+            dailyQuestSystem.Initialize();
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -679,6 +685,12 @@ namespace ClawRPG.Scripts {
             randomBoonUI.Visible = false;
             ui.AddChild(randomBoonUI);
             
+            // Daily Quest UI
+            var dailyQuestUI = new Systems.DailyQuest.DailyQuestUI();
+            dailyQuestUI.Name = "DailyQuestUI";
+            dailyQuestUI.Visible = false;
+            ui.AddChild(dailyQuestUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -989,6 +1001,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_boon"))
             {
                 ToggleRandomBoonUI();
+            }
+            
+            // Handle daily quest UI toggle (Q key)
+            if (Input.IsActionJustPressed("ui_daily_quest"))
+            {
+                ToggleDailyQuestUI();
             }
             
             // Handle auction house UI toggle (Y key)
@@ -1713,6 +1731,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(randomBoonUI);
                 }
                 randomBoonUI.Show();
+            }
+        }
+        
+        /// <summary>
+        /// 切换每日任务界面
+        /// </summary>
+        private void ToggleDailyQuestUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+            
+            var dailyQuestUI = ui.GetNodeOrNull<Systems.DailyQuest.DailyQuestUI>("DailyQuestUI");
+            if (dailyQuestUI != null && dailyQuestUI.Visible)
+            {
+                dailyQuestUI.Hide();
+            }
+            else
+            {
+                if (dailyQuestUI == null)
+                {
+                    dailyQuestUI = new Systems.DailyQuest.DailyQuestUI();
+                    dailyQuestUI.Name = "DailyQuestUI";
+                    ui.AddChild(dailyQuestUI);
+                }
+                dailyQuestUI.Show();
             }
         }
         
