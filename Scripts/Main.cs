@@ -300,6 +300,9 @@ namespace ClawRPG.Scripts {
             tradeSystem.Name = "TradeSystem";
             AddChild(tradeSystem);
             
+            // Initialize gem system
+            var gemSystem = GemSystem.Instance;
+            
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
             
@@ -560,6 +563,11 @@ namespace ClawRPG.Scripts {
             var dailyLoginRewardUI = new DailyLoginRewardUI();
             dailyLoginRewardUI.Name = "DailyLoginRewardUI";
             ui.AddChild(dailyLoginRewardUI);
+            
+            // Gem UI
+            var gemUI = new Systems.GemSystem.GemUI();
+            gemUI.Name = "GemUI";
+            ui.AddChild(gemUI);
             
             GD.Print("UI initialized");
             
@@ -915,6 +923,12 @@ namespace ClawRPG.Scripts {
                 ToggleWorldEventUI();
             }
             
+            // Handle gem UI toggle (Z key)
+            if (Input.IsActionJustPressed("ui_gem"))
+            {
+                ToggleGemUI();
+            }
+            
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -1136,6 +1150,22 @@ namespace ClawRPG.Scripts {
             if (worldEventUI != null)
             {
                 worldEventUI.ToggleVisibility();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle gem UI
+        /// </summary>
+        private void ToggleGemUI()
+        {
+            var gemUI = GetNodeOrNull<Systems.GemSystem.GemUI>("UI/GemUI");
+            if (gemUI != null)
+            {
+                gemUI.Visible = !gemUI.Visible;
+                if (gemUI.Visible)
+                {
+                    gemUI.RefreshUI();
+                }
             }
         }
         
