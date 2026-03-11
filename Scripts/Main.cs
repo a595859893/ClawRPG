@@ -221,6 +221,11 @@ namespace ClawRPG.Scripts {
             leaderboardSystem.Name = "MultiplayerLeaderboard";
             AddChild(leaderboardSystem);
 
+            // Initialize network quality UI
+            var networkQualityUI = new NetworkQualityUI();
+            networkQualityUI.Name = "NetworkQualityUI";
+            AddChild(networkQualityUI);
+
             // Initialize equipment set system
             var equipmentSetManager = new EquipmentSetManager();
             equipmentSetManager.Name = "EquipmentSetManager";
