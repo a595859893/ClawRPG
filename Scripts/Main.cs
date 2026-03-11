@@ -256,6 +256,11 @@ namespace ClawRPG.Scripts {
             backgroundMusicSystem.Name = "BackgroundMusicSystem";
             AddChild(backgroundMusicSystem);
 
+            // Initialize music collection system
+            var musicCollectionSystem = new MusicCollectionSystem();
+            musicCollectionSystem.Name = "MusicCollectionSystem";
+            AddChild(musicCollectionSystem);
+
             // Initialize multiplayer leaderboard system
             var leaderboardSystem = new MultiplayerLeaderboard();
             leaderboardSystem.Name = "MultiplayerLeaderboard";
@@ -1144,6 +1149,12 @@ namespace ClawRPG.Scripts {
             runeUI.Visible = false; 
             ui.AddChild(runeUI);
 
+            // Music Collection UI
+            var musicCollectionUI = new UI.MusicCollectionUI();
+            musicCollectionUI.Name = "MusicCollectionUI";
+            musicCollectionUI.Visible = false;
+            ui.AddChild(musicCollectionUI);
+
             GD.Print("UI initialized");
 
             // Survival Challenge System
@@ -1480,6 +1491,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.H))
             {
                 ToggleTreasureHuntUI();
+            }
+
+            // Handle music collection UI toggle (Shift+M key)
+            if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.M))
+            {
+                ToggleMusicCollectionUI();
             }
 
             // Handle player profile UI toggle (F key)
@@ -1980,6 +1997,15 @@ namespace ClawRPG.Scripts {
             if (choiceEventUI != null)
             {
                 choiceEventUI.ToggleVisibility();
+            }
+        }
+
+        private void ToggleMusicCollectionUI()
+        {
+            var musicCollectionUI = GetNodeOrNull<UI.MusicCollectionUI>("CanvasLayer/MusicCollectionUI");
+            if (musicCollectionUI != null)
+            {
+                musicCollectionUI.Visible = !musicCollectionUI.Visible;
             }
         }
 
