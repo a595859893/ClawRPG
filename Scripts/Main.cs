@@ -752,6 +752,17 @@ namespace ClawRPG.Scripts {
             lootDropUI.Visible = false;
             ui.AddChild(lootDropUI);
             
+            // Equipment Durability System
+            var durabilitySystem = new Systems.EquipmentDurability.EquipmentDurabilitySystem();
+            durabilitySystem.Name = "EquipmentDurabilitySystem";
+            AddChild(durabilitySystem);
+            
+            // Equipment Durability UI
+            var durabilityUI = new Systems.EquipmentDurability.EquipmentDurabilityUI();
+            durabilityUI.Name = "EquipmentDurabilityUI";
+            durabilityUI.Visible = false;
+            ui.AddChild(durabilityUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -1086,6 +1097,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_loot"))
             {
                 ToggleLootDropUI();
+            }
+            
+            // Handle equipment durability UI toggle (U key - using Shift+U)
+            if (Input.IsKeyPressed(KEY_SHIFT) && Input.IsKeyPressed(KEY_U))
+            {
+                ToggleEquipmentDurabilityUI();
             }
             
             // Handle auction house UI toggle (Y key)
@@ -1958,6 +1975,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(lootUI);
                 }
                 lootUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// 切换装备耐久度界面
+        /// </summary>
+        private void ToggleEquipmentDurabilityUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+            
+            var durabilityUI = ui.GetNodeOrNull<Systems.EquipmentDurability.EquipmentDurabilityUI>("EquipmentDurabilityUI");
+            if (durabilityUI != null && durabilityUI.Visible)
+            {
+                durabilityUI.ToggleUI();
+            }
+            else
+            {
+                if (durabilityUI == null)
+                {
+                    durabilityUI = new Systems.EquipmentDurability.EquipmentDurabilityUI();
+                    durabilityUI.Name = "EquipmentDurabilityUI";
+                    ui.AddChild(durabilityUI);
+                }
+                durabilityUI.ToggleUI();
             }
         }
         
