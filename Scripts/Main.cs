@@ -407,6 +407,16 @@ namespace ClawRPG.Scripts {
             AddChild(petExpeditionSystem);
             petExpeditionSystem.Initialize();
 
+            // Initialize pet training system
+            var petTrainingSystem = new Systems.Pets.PetTrainingSystem();
+            petTrainingSystem.Name = "PetTrainingSystem";
+            AddChild(petTrainingSystem);
+
+            // Initialize pet training UI
+            var petTrainingUI = new Systems.Pets.PetTrainingUI();
+            petTrainingUI.Name = "PetTrainingUI";
+            AddChild(petTrainingUI);
+
             // Initialize mount expedition system
             var mountExpeditionSystem = new Systems.MountExpeditionSystem();
             mountExpeditionSystem.Name = "MountExpeditionSystem";
