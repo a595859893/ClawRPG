@@ -234,6 +234,9 @@ namespace ClawRPG.Scripts {
             teamSkillSystem.Name = "TeamSkillSystem";
             AddChild(teamSkillSystem);
             
+            // Initialize loot drop system
+            LootDropSystem.Instance.Initialize();
+            
             // Initialize mystery treasure system
             var mysteryTreasureSystem = new MysteryTreasureSystem();
             mysteryTreasureSystem.Name = "MysteryTreasureSystem";
@@ -716,6 +719,12 @@ namespace ClawRPG.Scripts {
             proceduralChallengeUI.Visible = false;
             ui.AddChild(proceduralChallengeUI);
             
+            // Loot Drop UI
+            var lootDropUI = new Systems.LootDropUI();
+            lootDropUI.Name = "LootDropUI";
+            lootDropUI.Visible = false;
+            ui.AddChild(lootDropUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -1038,6 +1047,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_challenge"))
             {
                 ToggleProceduralChallengeUI();
+            }
+            
+            // Handle loot drop UI toggle (L key)
+            if (Input.IsActionJustPressed("ui_loot"))
+            {
+                ToggleLootDropUI();
             }
             
             // Handle auction house UI toggle (Y key)
@@ -1830,6 +1845,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(challengeUI);
                 }
                 challengeUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// 切换战利品掉落统计界面
+        /// </summary>
+        private void ToggleLootDropUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+            
+            var lootUI = ui.GetNodeOrNull<Systems.LootDropUI>("LootDropUI");
+            if (lootUI != null && lootUI.Visible)
+            {
+                lootUI.Hide();
+            }
+            else
+            {
+                if (lootUI == null)
+                {
+                    lootUI = new Systems.LootDropUI();
+                    lootUI.Name = "LootDropUI";
+                    ui.AddChild(lootUI);
+                }
+                lootUI.Toggle();
             }
         }
         

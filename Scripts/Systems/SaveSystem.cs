@@ -716,5 +716,42 @@ namespace ClawRPG.Scripts.Systems {
             }
             return new PlayerPetTalentData();
         }
+        // ===== Loot Drop System Save/Load =====
+        
+        public void SaveLootDropData(LootDropData.PlayerLootData data)
+        {
+            try
+            {
+                string path = "user://loot_drop_data.json";
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(data, options);
+                File.WriteAllText(path, json);
+                GD.Print("[SaveSystem] Loot drop data saved");
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to save loot drop data: " + e.Message);
+            }
+        }
+
+        public LootDropData.PlayerLootData LoadLootDropData()
+        {
+            try
+            {
+                string path = "user://loot_drop_data.json";
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var data = JsonSerializer.Deserialize<LootDropData.PlayerLootData>(json);
+                    GD.Print("[SaveSystem] Loot drop data loaded");
+                    return data;
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to load loot drop data: " + e.Message);
+            }
+            return new LootDropData.PlayerLootData();
+        }
     }
 }
