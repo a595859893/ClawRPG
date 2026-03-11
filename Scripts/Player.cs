@@ -104,6 +104,9 @@ namespace ClawRPG.Scripts.Characters {
         public float BoonLifestealBonus { get; set; }
         public float BoonDodgeBonus { get; set; }
         
+        // Pet equipment enhancement bonuses
+        public Dictionary<string, float> EnhancementBonuses { get; set; } = new();
+        
         public float TotalMoveSpeed => BaseMoveSpeed + GetRuneBonus(RuneAttribute.MoveSpeed) + MountSpeedBonus + RelicSpeedBonus + BoonSpeedBonus;
         
         // Resistance bonuses from runes

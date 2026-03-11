@@ -349,6 +349,11 @@ namespace ClawRPG.Scripts {
             petEquipmentSystem.Name = "PetEquipmentSystem";
             AddChild(petEquipmentSystem);
 
+            // Initialize pet equipment enhancement system
+            var petEquipmentEnhancementSystem = new Systems.PetEquipment.PetEquipmentEnhancementSystem();
+            petEquipmentEnhancementSystem.Name = "PetEquipmentEnhancementSystem";
+            AddChild(petEquipmentEnhancementSystem);
+
             // Initialize trade system
             var tradeSystem = new TradeSystem();
             tradeSystem.Name = "TradeSystem";
@@ -796,6 +801,12 @@ namespace ClawRPG.Scripts {
             petEquipmentUI.Name = "PetEquipmentUI";
             petEquipmentUI.Visible = false;
             ui.AddChild(petEquipmentUI);
+
+            // Pet Equipment Enhancement UI
+            var petEquipmentEnhancementUI = new Systems.PetEquipment.PetEquipmentEnhancementUI();
+            petEquipmentEnhancementUI.Name = "PetEquipmentEnhancementUI";
+            petEquipmentEnhancementUI.Visible = false;
+            ui.AddChild(petEquipmentEnhancementUI);
 
             // Pet Evolution UI
             var petEvolutionUI = new Systems.PetEvolution.PetEvolutionUI();
@@ -1424,6 +1435,12 @@ namespace ClawRPG.Scripts {
                 TogglePetExpeditionUI();
             }
 
+            // Handle pet equipment enhancement UI toggle (Ctrl+Shift+E)
+            if (Input.IsActionJustPressed("ui_pet_equipment_enhancement"))
+            {
+                TogglePetEquipmentEnhancementUI();
+            }
+
             // Handle mount expedition UI toggle (Ctrl+R)
             if (Input.IsActionJustPressed("ui_mount_expedition"))
             {
@@ -1775,6 +1792,25 @@ namespace ClawRPG.Scripts {
             if (petEquipmentUI != null)
             {
                 petEquipmentUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet equipment enhancement UI
+        /// </summary>
+        private void TogglePetEquipmentEnhancementUI()
+        {
+            var enhancementUI = GetNodeOrNull<Systems.PetEquipment.PetEquipmentEnhancementUI>("UI/PetEquipmentEnhancementUI");
+            if (enhancementUI != null)
+            {
+                if (enhancementUI.Visible)
+                {
+                    enhancementUI.Hide();
+                }
+                else
+                {
+                    enhancementUI.Show();
+                }
             }
         }
 
