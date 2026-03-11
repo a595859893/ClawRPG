@@ -320,6 +320,11 @@ namespace ClawRPG.Scripts {
             var reputationSystem = ReputationSystem.Instance;
             reputationSystem.Initialize();
             
+            // Initialize NPC schedule system
+            var npcScheduleSystem = new NPCScheduleSystem();
+            npcScheduleSystem.Name = "NPCScheduleSystem";
+            AddChild(npcScheduleSystem);
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
