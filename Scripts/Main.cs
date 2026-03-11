@@ -295,6 +295,11 @@ namespace ClawRPG.Scripts {
             guildSystem.Name = "GuildSystem";
             AddChild(guildSystem);
             
+            // Initialize pet equipment system
+            var petEquipmentSystem = new Systems.Pets.PetEquipmentSystem();
+            petEquipmentSystem.Name = "PetEquipmentSystem";
+            AddChild(petEquipmentSystem);
+            
             // Initialize trade system
             var tradeSystem = new TradeSystem();
             tradeSystem.Name = "TradeSystem";
@@ -573,6 +578,12 @@ namespace ClawRPG.Scripts {
             var costumeUI = new UI.CostumeUI();
             costumeUI.Name = "CostumeUI";
             ui.AddChild(costumeUI);
+            
+            // Pet Equipment UI
+            var petEquipmentUI = new Systems.Pets.PetEquipmentUI();
+            petEquipmentUI.Name = "PetEquipmentUI";
+            petEquipmentUI.Visible = false;
+            ui.AddChild(petEquipmentUI);
             
             GD.Print("UI initialized");
             
@@ -940,6 +951,12 @@ namespace ClawRPG.Scripts {
                 ToggleCostumeUI();
             }
             
+            // Handle pet equipment UI toggle (Shift+P key)
+            if (Input.IsActionJustPressed("ui_pet") && Input.IsKeyPressed(Key.Shift))
+            {
+                TogglePetEquipmentUI();
+            }
+            
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -1189,6 +1206,18 @@ namespace ClawRPG.Scripts {
             if (costumeUI != null)
             {
                 costumeUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle pet equipment UI
+        /// </summary>
+        private void TogglePetEquipmentUI()
+        {
+            var petEquipmentUI = GetNodeOrNull<Systems.Pets.PetEquipmentUI>("UI/PetEquipmentUI");
+            if (petEquipmentUI != null)
+            {
+                petEquipmentUI.Toggle();
             }
         }
         
