@@ -250,6 +250,12 @@ namespace ClawRPG.Scripts {
             shopSystem.Name = "ShopSystem";
             AddChild(shopSystem);
             
+            // Initialize auction house system
+            var auctionHouseSystem = new AuctionHouseSystem();
+            auctionHouseSystem.Name = "AuctionHouseSystem";
+            AddChild(auctionHouseSystem);
+            auctionHouseSystem.Initialize(_player);
+            
             // Initialize mount combat system
             var mountCombatSystem = new Mounts.MountCombatSystem();
             mountCombatSystem.Name = "MountCombatSystem";
@@ -798,6 +804,12 @@ namespace ClawRPG.Scripts {
                 ToggleShopUI();
             }
             
+            // Handle auction house UI toggle (Y key)
+            if (Input.IsActionJustPressed("ui_auction"))
+            {
+                ToggleAuctionHouseUI();
+            }
+            
             // Handle enchantment UI toggle (E key)
             if (Input.IsActionJustPressed("ui_enchant"))
             {
@@ -1193,6 +1205,34 @@ namespace ClawRPG.Scripts {
                     {
                         existingShopUI.Toggle();
                     }
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 切换拍卖行界面
+        /// </summary>
+        private void ToggleAuctionHouseUI()
+        {
+            var auctionUI = GetNodeOrNull<UI.AuctionHouseUI>("CanvasLayer/AuctionHouseUI");
+            if (auctionUI != null && auctionUI.Visible)
+            {
+                auctionUI.Hide();
+            }
+            else
+            {
+                // AuctionHouseUI 是添加到 canvas layer 的
+                var canvasLayer = GetNodeOrNull("CanvasLayer");
+                if (canvasLayer != null)
+                {
+                    if (auctionUI == null)
+                    {
+                        auctionUI = new UI.AuctionHouseUI();
+                        auctionUI.Name = "AuctionHouseUI";
+                        canvasLayer.AddChild(auctionUI);
+                    }
+                    auctionUI.Show();
+                    auctionUI.Open();
                 }
             }
         }
