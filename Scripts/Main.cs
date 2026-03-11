@@ -991,6 +991,18 @@ namespace ClawRPG.Scripts {
 
             GD.Print("UI initialized");
 
+            // Survival Challenge System
+            var survivalChallengeSystem = new SurvivalChallengeSystem();
+            survivalChallengeSystem.Name = "SurvivalChallengeSystem";
+            AddChild(survivalChallengeSystem);
+            survivalChallengeSystem.Initialize();
+
+            // Survival Challenge UI
+            var survivalChallengeUI = new UI.SurvivalChallengeUI();
+            survivalChallengeUI.Name = "SurvivalChallengeUI";
+            survivalChallengeUI.Visible = false;
+            ui.AddChild(survivalChallengeUI);
+
             // Trigger welcome tutorial
             var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
             if (tutorialUI != null)
@@ -1074,6 +1086,13 @@ namespace ClawRPG.Scripts {
 
             // Update combat status system
             CombatStatusSystem.Instance._Process(dt);
+
+            // Update survival challenge system
+            var survivalChallengeSystem = GetNode<SurvivalChallengeSystem>("SurvivalChallengeSystem");
+            if (survivalChallengeSystem != null)
+            {
+                survivalChallengeSystem._Process(dt);
+            }
 
             // Update play time
             StatisticsManager.Instance.AddPlayTime(dt);
@@ -1535,6 +1554,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_daily_dungeon"))
             {
                 ToggleDailyDungeonUI();
+            }
+
+            // Handle survival challenge UI toggle (X key)
+            if (Input.IsActionJustPressed("ui_survival_challenge"))
+            {
+                ToggleSurvivalChallengeUI();
             }
 
             // Handle buff UI toggle (V key)
@@ -2083,6 +2108,18 @@ namespace ClawRPG.Scripts {
             if (dailyDungeonUI != null)
             {
                 dailyDungeonUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// Toggle survival challenge UI
+        /// </summary>
+        private void ToggleSurvivalChallengeUI()
+        {
+            var survivalChallengeUI = GetNodeOrNull<UI.SurvivalChallengeUI>("UI/SurvivalChallengeUI");
+            if (survivalChallengeUI != null)
+            {
+                survivalChallengeUI.Toggle();
             }
         }
 
