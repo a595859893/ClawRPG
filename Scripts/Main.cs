@@ -330,6 +330,11 @@ namespace ClawRPG.Scripts {
             relicSystem.Name = "RelicSystem";
             AddChild(relicSystem);
             
+            // Initialize pet evolution system
+            var petEvolutionSystem = new Systems.PetEvolution.PetEvolutionSystem();
+            petEvolutionSystem.Name = "PetEvolutionSystem";
+            AddChild(petEvolutionSystem);
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -611,6 +616,12 @@ namespace ClawRPG.Scripts {
             petEquipmentUI.Name = "PetEquipmentUI";
             petEquipmentUI.Visible = false;
             ui.AddChild(petEquipmentUI);
+            
+            // Pet Evolution UI
+            var petEvolutionUI = new Systems.PetEvolution.PetEvolutionUI();
+            petEvolutionUI.Name = "PetEvolutionUI";
+            petEvolutionUI.Visible = false;
+            ui.AddChild(petEvolutionUI);
             
             GD.Print("UI initialized");
             
@@ -996,6 +1007,12 @@ namespace ClawRPG.Scripts {
                 ToggleRelicUI();
             }
             
+            // Handle pet evolution UI toggle (P key - separate from pet equipment)
+            if (Input.IsActionJustPressed("ui_pet_evolution"))
+            {
+                TogglePetEvolutionUI();
+            }
+            
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -1281,6 +1298,25 @@ namespace ClawRPG.Scripts {
             if (relicUI != null)
             {
                 relicUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle pet evolution UI
+        /// </summary>
+        private void TogglePetEvolutionUI()
+        {
+            var petEvolutionUI = GetNodeOrNull<Systems.PetEvolution.PetEvolutionUI>("UI/PetEvolutionUI");
+            if (petEvolutionUI != null)
+            {
+                if (petEvolutionUI.Visible)
+                {
+                    petEvolutionUI.HideUI();
+                }
+                else
+                {
+                    petEvolutionUI.ShowUI();
+                }
             }
         }
         
