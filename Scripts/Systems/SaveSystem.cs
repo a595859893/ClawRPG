@@ -153,6 +153,9 @@ namespace ClawRPG.Scripts.Systems {
             
             // Sealed Tower system data (roguelike endless dungeon)
             public Dictionary<string, object> SealedTowerData { get; set; } = new();
+
+            // Guild Quest system data
+            public Dictionary<string, object> GuildQuestData { get; set; } = new();
             
             // Player data (legacy support)
             public object PlayerData { get; set; }

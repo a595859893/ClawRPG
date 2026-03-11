@@ -401,6 +401,11 @@ namespace ClawRPG.Scripts {
             guildSystem.Name = "GuildSystem";
             AddChild(guildSystem);
 
+            // Initialize guild quest system
+            var guildQuestSystem = new GuildQuestSystem();
+            guildQuestSystem.Name = "GuildQuestSystem";
+            AddChild(guildQuestSystem);
+
             // Initialize collectible system
             CollectibleSystem.Instance.Initialize();
 
@@ -936,6 +941,11 @@ namespace ClawRPG.Scripts {
             var guildUI = new GuildUI();
             guildUI.Name = "GuildUI";
             ui.AddChild(guildUI);
+
+            // Guild Quest UI
+            var guildQuestUI = new GuildQuestUI();
+            guildQuestUI.Name = "GuildQuestUI";
+            ui.AddChild(guildQuestUI);
 
             // Multiplayer Leaderboard UI
             var leaderboardUI = new UI.MultiplayerLeaderboardUI();
@@ -1590,6 +1600,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_guild"))
             {
                 ToggleGuildUI();
+            }
+
+            // Handle guild quest UI toggle (Shift+G key)
+            if (Input.IsActionJustPressed("ui_guild_quest"))
+            {
+                ToggleGuildQuestUI();
             }
 
             // Handle trade UI toggle (T key)
@@ -2914,6 +2930,21 @@ namespace ClawRPG.Scripts {
                 }
                 guildUI.Show();
                 guildUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// 切换公会任务界面 (Shift+G)
+        /// </summary>
+        private void ToggleGuildQuestUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var guildQuestUI = ui.GetNodeOrNull<GuildQuestUI>("GuildQuestUI");
+            if (guildQuestUI != null)
+            {
+                guildQuestUI.ToggleUI();
             }
         }
 
