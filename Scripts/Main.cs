@@ -261,6 +261,11 @@ namespace ClawRPG.Scripts {
             musicCollectionSystem.Name = "MusicCollectionSystem";
             AddChild(musicCollectionSystem);
 
+            // Initialize gathering system
+            var gatheringSystem = new GatheringSystem();
+            gatheringSystem.Name = "GatheringSystem";
+            AddChild(gatheringSystem);
+
             // Initialize multiplayer leaderboard system
             var leaderboardSystem = new MultiplayerLeaderboard();
             leaderboardSystem.Name = "MultiplayerLeaderboard";
@@ -1165,6 +1170,12 @@ namespace ClawRPG.Scripts {
             musicCollectionUI.Visible = false;
             ui.AddChild(musicCollectionUI);
 
+            // Gathering UI
+            var gatheringUI = new GatheringUI();
+            gatheringUI.Name = "GatheringUI";
+            gatheringUI.Visible = false;
+            ui.AddChild(gatheringUI);
+
             GD.Print("UI initialized");
 
             // Survival Challenge System
@@ -1507,6 +1518,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.M))
             {
                 ToggleMusicCollectionUI();
+            }
+
+            // Handle gathering UI toggle (Shift+G key)
+            if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.G))
+            {
+                ToggleGatheringUI();
             }
 
             // Handle player profile UI toggle (F key)
@@ -2022,6 +2039,15 @@ namespace ClawRPG.Scripts {
             if (musicCollectionUI != null)
             {
                 musicCollectionUI.Visible = !musicCollectionUI.Visible;
+            }
+        }
+
+        private void ToggleGatheringUI()
+        {
+            var gatheringUI = GetNodeOrNull<GatheringUI>("CanvasLayer/GatheringUI");
+            if (gatheringUI != null)
+            {
+                gatheringUI.ToggleUI();
             }
         }
 
