@@ -327,6 +327,11 @@ namespace ClawRPG.Scripts {
             mysteryTreasureSystem.Name = "MysteryTreasureSystem";
             AddChild(mysteryTreasureSystem);
 
+            // Initialize ranked system
+            var rankedSystem = new RankedSystem();
+            rankedSystem.Name = "RankedSystem";
+            AddChild(rankedSystem);
+
             // Initialize elemental reaction system
             var elementalReactionManager = new Systems.ElementalReactionManager();
             elementalReactionManager.Name = "ElementalReactionManager";
@@ -1059,6 +1064,12 @@ namespace ClawRPG.Scripts {
             mysteryTreasureUI.Visible = false; 
             ui.AddChild(mysteryTreasureUI);
 
+            // Ranked UI
+            var rankedUI = new RankedUI();
+            rankedUI.Name = "RankedUI";
+            rankedUI.Visible = false;
+            ui.AddChild(rankedUI);
+
             // Dynamic Difficulty UI
             var dynamicDifficultyUI = new DynamicDifficultyUI();
             dynamicDifficultyUI.Name = "DynamicDifficultyUI";
@@ -1512,6 +1523,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.H))
             {
                 ToggleTreasureHuntUI();
+            }
+
+            // Handle ranked UI toggle (Shift+K key)
+            if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.K))
+            {
+                ToggleRankedUI();
             }
 
             // Handle music collection UI toggle (Shift+M key)
@@ -2718,6 +2735,23 @@ namespace ClawRPG.Scripts {
                     }
                     canvasLayer.AddChild(newUI);
                     newUI.Visible = true;
+                }
+            }
+        }
+
+        private void ToggleRankedUI()
+        {
+            var rankedUI = GetNodeOrNull<RankedUI>("CanvasLayer/RankedUI");
+            if (rankedUI != null)
+            {
+                rankedUI.Toggle();
+            }
+            else
+            {
+                var ui = GetNodeOrNull<RankedUI>("UI/RankedUI");
+                if (ui != null)
+                {
+                    ui.Toggle();
                 }
             }
         }
