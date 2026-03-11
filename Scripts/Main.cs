@@ -235,6 +235,11 @@ namespace ClawRPG.Scripts {
             sealedTowerManager.Name = "SealedTowerManager";
             AddChild(sealedTowerManager);
 
+            // Initialize treasure hunt system
+            var treasureHuntManager = new TreasureHuntManager();
+            treasureHuntManager.Name = "TreasureHuntManager";
+            AddChild(treasureHuntManager);
+
             // Initialize region manager
             var regionManager = new RegionManager();
             regionManager.Name = "RegionManager";
@@ -1471,6 +1476,12 @@ namespace ClawRPG.Scripts {
                 ToggleSealedTowerUI();
             }
 
+            // Handle treasure hunt UI toggle (H key)
+            if (Input.IsKeyPressed(Key.H))
+            {
+                ToggleTreasureHuntUI();
+            }
+
             // Handle player profile UI toggle (F key)
             if (Input.IsActionJustPressed("player_profile"))
             {
@@ -2608,6 +2619,38 @@ namespace ClawRPG.Scripts {
             if (sealedTowerUI != null)
             {
                 sealedTowerUI.Toggle();
+            }
+        }
+
+        private void ToggleTreasureHuntUI()
+        {
+            var treasureHuntUI = GetNodeOrNull<UI.TreasureHuntUI>("CanvasLayer/TreasureHuntUI");
+            if (treasureHuntUI != null)
+            {
+                treasureHuntUI.Visible = !treasureHuntUI.Visible;
+                if (treasureHuntUI.Visible)
+                {
+                    treasureHuntUI.LoadRegions();
+                }
+            }
+            else
+            {
+                // Create UI if it doesn't exist
+                var ui = GD.Load<PackedScene>("res://UI/TreasureHuntUI.tscn");
+                if (ui != null)
+                {
+                    var newUI = ui.Instance();
+                    newUI.Name = "TreasureHuntUI";
+                    var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+                    if (canvasLayer == null)
+                    {
+                        canvasLayer = new CanvasLayer();
+                        canvasLayer.Name = "CanvasLayer";
+                        AddChild(canvasLayer);
+                    }
+                    canvasLayer.AddChild(newUI);
+                    newUI.Visible = true;
+                }
             }
         }
 
