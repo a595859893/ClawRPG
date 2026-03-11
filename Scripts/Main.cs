@@ -443,6 +443,11 @@ namespace ClawRPG.Scripts {
             AddChild(seasonalEventSystem);
             seasonalEventSystem.Initialize();
 
+            // Initialize combat HUD enhancement system
+            var combatHUDSystem = new CombatHUDEnhancementSystem();
+            combatHUDSystem.Name = "CombatHUDEnhancementSystem";
+            AddChild(combatHUDSystem);
+
             // Initialize elemental trial system
             var elementalTrialSystem = new Systems.ElementalTrialSystem();
             elementalTrialSystem.Name = "ElementalTrialSystem";
@@ -634,6 +639,12 @@ namespace ClawRPG.Scripts {
             var quickSlotUI = new UI.QuickSlotUI();
             quickSlotUI.Name = "QuickSlotUI";
             ui.AddChild(quickSlotUI);
+
+            // Combat HUD Enhancement UI
+            var combatHUDUI = new UI.CombatHUDEnhancementUI();
+            combatHUDUI.Name = "CombatHUDEnhancementUI";
+            combatHUDUI.AddToGroup("CombatHUDEnhancementUI");
+            ui.AddChild(combatHUDUI);
 
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
