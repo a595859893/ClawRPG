@@ -423,6 +423,17 @@ namespace ClawRPG.Scripts.Characters {
                         isCrit ? 1.5f : 1.0f
                     );
                 }
+                
+                // Play sound effect
+                var soundSystem = GetTree().GetFirstNodeInGroup("SoundEffectSystem") as SoundEffectSystem 
+                    ?? SoundEffectSystem.Instance;
+                if (soundSystem != null)
+                {
+                    if (isCrit)
+                        soundSystem.PlayComboMilestone();
+                    else
+                        soundSystem.PlayEnemyHit();
+                }
             }
             
             // Register combo hit
@@ -578,6 +589,11 @@ namespace ClawRPG.Scripts.Characters {
                 var particleManager = GetTree().GetFirstNodeInGroup("ParticleEffectManager") as ParticleEffectManager 
                     ?? ParticleEffectManager.Instance;
                 particleManager?.PlayParticleEffect2D(ParticleEffectType.Blood, GlobalPosition, 0.8f);
+                
+                // Play damage sound effect
+                var soundSystem = GetTree().GetFirstNodeInGroup("SoundEffectSystem") as SoundEffectSystem 
+                    ?? SoundEffectSystem.Instance;
+                soundSystem?.PlayDamage();
             }
             
             GD.Print("Player took " + finalDamage + " damage. HP: " + CurrentHealth + "/" + MaxHealth);

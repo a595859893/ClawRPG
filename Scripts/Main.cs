@@ -183,6 +183,7 @@ namespace ClawRPG.Scripts {
             // Initialize sound effect system
             var soundEffectSystem = new SoundEffectSystem();
             soundEffectSystem.Name = "SoundEffectSystem";
+            soundEffectSystem.AddToGroup("SoundEffectSystem");
             AddChild(soundEffectSystem);
             
             // Initialize background music system
