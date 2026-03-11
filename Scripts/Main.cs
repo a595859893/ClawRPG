@@ -375,6 +375,12 @@ namespace ClawRPG.Scripts {
             AddChild(petAffectionSystem);
             petAffectionSystem.Initialize();
 
+            // Initialize pet skill system
+            var petSkillSystem = new Systems.Pets.PetSkillSystem();
+            petSkillSystem.Name = "PetSkillSystem";
+            AddChild(petSkillSystem);
+            petSkillSystem.Initialize();
+
             // Initialize seasonal event system
             var seasonalEventSystem = new SeasonalEventSystem();
             seasonalEventSystem.Name = "SeasonalEventSystem";
@@ -742,6 +748,12 @@ namespace ClawRPG.Scripts {
             petAffectionUI.Name = "PetAffectionUI";
             petAffectionUI.Visible = false;
             ui.AddChild(petAffectionUI);
+
+            // Pet Skill UI
+            var petSkillUI = new PetSkillUI();
+            petSkillUI.Name = "PetSkillUI";
+            petSkillUI.Visible = false;
+            ui.AddChild(petSkillUI);
 
             // Mystery Treasure UI
             var mysteryTreasureUI = new MysteryTreasureUI();
@@ -1267,6 +1279,12 @@ namespace ClawRPG.Scripts {
                 TogglePetAffectionUI();
             }
 
+            // Handle pet skill UI toggle (Ctrl+P)
+            if (Input.IsActionJustPressed("ui_pet_skill"))
+            {
+                TogglePetSkillUI();
+            }
+
             // Handle mystery treasure UI toggle (T key)
             if (Input.IsActionJustPressed("ui_mystery_treasure"))
             {
@@ -1661,6 +1679,18 @@ namespace ClawRPG.Scripts {
             if (petAffectionUI != null)
             {
                 petAffectionUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet skill UI
+        /// </summary>
+        private void TogglePetSkillUI()
+        {
+            var petSkillUI = GetNodeOrNull<PetSkillUI>("UI/PetSkillUI");
+            if (petSkillUI != null)
+            {
+                petSkillUI.ToggleUI();
             }
         }
 
