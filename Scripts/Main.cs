@@ -255,6 +255,10 @@ namespace ClawRPG.Scripts {
             mountCombatSystem.Name = "MountCombatSystem";
             AddChild(mountCombatSystem);
             
+            // Initialize mount evolution system
+            var mountEvolutionSystem = MountEvolutionSystem.Instance;
+            mountEvolutionSystem.Initialize();
+            
             // Initialize game settings system
             var gameSettings = new GameSettings();
             gameSettings.Name = "GameSettings";
@@ -480,6 +484,11 @@ namespace ClawRPG.Scripts {
             var mountCombatUI = new UI.MountCombatUI();
             mountCombatUI.Name = "MountCombatUI";
             ui.AddChild(mountCombatUI);
+            
+            // Mount Evolution UI
+            var mountEvolutionUI = new UI.MountEvolutionUI();
+            mountEvolutionUI.Name = "MountEvolutionUI";
+            ui.AddChild(mountEvolutionUI);
             
             GD.Print("UI initialized");
             
@@ -793,6 +802,12 @@ namespace ClawRPG.Scripts {
                 ToggleMountCombatUI();
             }
             
+            // Handle mount evolution UI toggle (J key)
+            if (Input.IsActionJustPressed("ui_mount_evolution"))
+            {
+                ToggleMountEvolutionUI();
+            }
+            
             // Handle special attacks
             if (Input.IsActionJustPressed("spin_attack"))
             {
@@ -982,6 +997,18 @@ namespace ClawRPG.Scripts {
             if (mountCombatUI != null)
             {
                 mountCombatUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle mount evolution UI
+        /// </summary>
+        private void ToggleMountEvolutionUI()
+        {
+            var mountEvolutionUI = GetNodeOrNull<UI.MountEvolutionUI>("UI/MountEvolutionUI");
+            if (mountEvolutionUI != null)
+            {
+                mountEvolutionUI.ToggleUI();
             }
         }
         
