@@ -569,6 +569,11 @@ namespace ClawRPG.Scripts {
             gemUI.Name = "GemUI";
             ui.AddChild(gemUI);
             
+            // Costume UI
+            var costumeUI = new UI.CostumeUI();
+            costumeUI.Name = "CostumeUI";
+            ui.AddChild(costumeUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -929,6 +934,12 @@ namespace ClawRPG.Scripts {
                 ToggleGemUI();
             }
             
+            // Handle costume UI toggle (C key)
+            if (Input.IsActionJustPressed("ui_costume"))
+            {
+                ToggleCostumeUI();
+            }
+            
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -1166,6 +1177,18 @@ namespace ClawRPG.Scripts {
                 {
                     gemUI.RefreshUI();
                 }
+            }
+        }
+        
+        /// <summary>
+        /// Toggle costume UI
+        /// </summary>
+        private void ToggleCostumeUI()
+        {
+            var costumeUI = GetNodeOrNull<UI.CostumeUI>("UI/CostumeUI");
+            if (costumeUI != null)
+            {
+                costumeUI.Toggle();
             }
         }
         
