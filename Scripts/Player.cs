@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.UI;
+using ClawRPG.Systems;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -410,6 +411,18 @@ namespace ClawRPG.Scripts.Characters {
                 
                 // Play hit effect for each enemy hit
                 AnimationEffectManager.Instance?.PlayHitEffect(enemy.GlobalPosition, isCrit, 1.0f);
+                
+                // Play particle effect - sparks for normal, crit sparkle for critical
+                var particleManager = GetTree().GetFirstNodeInGroup("ParticleEffectManager") as ParticleEffectManager 
+                    ?? ParticleEffectManager.Instance;
+                if (particleManager != null)
+                {
+                    particleManager.PlayParticleEffect2D(
+                        isCrit ? ParticleEffectType.CritSparkle : ParticleEffectType.Sparks,
+                        enemy.GlobalPosition,
+                        isCrit ? 1.5f : 1.0f
+                    );
+                }
             }
             
             // Register combo hit
@@ -560,6 +573,11 @@ namespace ClawRPG.Scripts.Characters {
                 TriggerHitFlash();
                 // Play hit animation effect
                 AnimationEffectManager.Instance?.PlayHitAnimation(fromDirection);
+                
+                // Play blood particle effect
+                var particleManager = GetTree().GetFirstNodeInGroup("ParticleEffectManager") as ParticleEffectManager 
+                    ?? ParticleEffectManager.Instance;
+                particleManager?.PlayParticleEffect2D(ParticleEffectType.Blood, GlobalPosition, 0.8f);
             }
             
             GD.Print("Player took " + finalDamage + " damage. HP: " + CurrentHealth + "/" + MaxHealth);

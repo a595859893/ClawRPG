@@ -239,6 +239,11 @@ namespace ClawRPG.Scripts {
             var elementalSkillManager = new Systems.ElementalSkillManager();
             elementalSkillManager.Initialize();
             
+            // Initialize particle effect system
+            var particleEffectManager = new Systems.ParticleEffectManager();
+            particleEffectManager.Name = "ParticleEffectManager";
+            AddChild(particleEffectManager);
+            
             // Initialize shop system
             var shopSystem = new ShopSystem();
             shopSystem.Name = "ShopSystem";
