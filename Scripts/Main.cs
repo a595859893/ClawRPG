@@ -399,6 +399,11 @@ namespace ClawRPG.Scripts {
             petEquipmentEnhancementSystem.Name = "PetEquipmentEnhancementSystem";
             AddChild(petEquipmentEnhancementSystem);
 
+            // Initialize equipment recycle system
+            var equipmentRecycleSystem = new Systems.EquipmentRecycle.EquipmentRecycleSystem();
+            equipmentRecycleSystem.Name = "EquipmentRecycleSystem";
+            AddChild(equipmentRecycleSystem);
+
             // Initialize trade system
             var tradeSystem = new TradeSystem();
             tradeSystem.Name = "TradeSystem";
@@ -1083,6 +1088,12 @@ namespace ClawRPG.Scripts {
             durabilityUI.Visible = false; 
             ui.AddChild(durabilityUI);
 
+            // Equipment Recycle UI
+            var equipmentRecycleUI = new Systems.EquipmentRecycle.EquipmentRecycleUI();
+            equipmentRecycleUI.Name = "EquipmentRecycleUI";
+            equipmentRecycleUI.Visible = false; 
+            ui.AddChild(equipmentRecycleUI);
+
             // Buff System
             var buffSystem = new Systems.BuffSystem.BuffSystem();
             buffSystem.Name = "BuffSystem";
@@ -1565,6 +1576,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(KEY_SHIFT) && Input.IsKeyPressed(KEY_U))
             {
                 ToggleEquipmentDurabilityUI();
+            }
+
+            // Handle equipment recycle UI toggle (R key)
+            if (Input.IsKeyPressed(KEY_R))
+            {
+                ToggleEquipmentRecycleUI();
             }
 
             // Handle auction house UI toggle (Y key)
@@ -2924,6 +2941,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(durabilityUI);
                 }
                 durabilityUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// 切换装备回收界面
+        /// </summary>
+        private void ToggleEquipmentRecycleUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var recycleUI = ui.GetNodeOrNull<Systems.EquipmentRecycle.EquipmentRecycleUI>("EquipmentRecycleUI");
+            if (recycleUI != null && recycleUI.Visible)
+            {
+                recycleUI.ToggleUI();
+            }
+            else
+            {
+                if (recycleUI == null)
+                {
+                    recycleUI = new Systems.EquipmentRecycle.EquipmentRecycleUI();
+                    recycleUI.Name = "EquipmentRecycleUI";
+                    ui.AddChild(recycleUI);
+                }
+                recycleUI.ToggleUI();
             }
         }
 
