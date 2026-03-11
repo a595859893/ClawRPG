@@ -351,6 +351,11 @@ namespace ClawRPG.Scripts {
             petBattleArenaSystem.Name = "PetBattleArenaSystem";
             AddChild(petBattleArenaSystem);
             
+            // Initialize daily dungeon system
+            var dailyDungeonSystem = new Systems.DailyDungeon.DailyDungeonSystem();
+            dailyDungeonSystem.Name = "DailyDungeonSystem";
+            AddChild(dailyDungeonSystem);
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -656,6 +661,12 @@ namespace ClawRPG.Scripts {
             petBattleArenaUI.Name = "PetBattleArenaUI";
             petBattleArenaUI.Visible = false;
             ui.AddChild(petBattleArenaUI);
+            
+            // Daily Dungeon UI
+            var dailyDungeonUI = new Systems.DailyDungeon.DailyDungeonUI();
+            dailyDungeonUI.Name = "DailyDungeonUI";
+            dailyDungeonUI.Visible = false;
+            ui.AddChild(dailyDungeonUI);
             
             GD.Print("UI initialized");
             
@@ -1065,6 +1076,12 @@ namespace ClawRPG.Scripts {
                 TogglePetBattleArenaUI();
             }
             
+            // Handle daily dungeon UI toggle (D key)
+            if (Input.IsActionJustPressed("ui_daily_dungeon"))
+            {
+                ToggleDailyDungeonUI();
+            }
+            
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -1405,6 +1422,18 @@ namespace ClawRPG.Scripts {
             if (petBattleArenaUI != null)
             {
                 petBattleArenaUI.Toggle();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle daily dungeon UI
+        /// </summary>
+        private void ToggleDailyDungeonUI()
+        {
+            var dailyDungeonUI = GetNodeOrNull<Systems.DailyDungeon.DailyDungeonUI>("UI/DailyDungeonUI");
+            if (dailyDungeonUI != null)
+            {
+                dailyDungeonUI.Toggle();
             }
         }
 
