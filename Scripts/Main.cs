@@ -1023,6 +1023,12 @@ namespace ClawRPG.Scripts {
             arenaColosseumUI.Visible = false;
             ui.AddChild(arenaColosseumUI);
 
+            // Party System UI
+            var partyUI = new Systems.PartySystem.PartyUI();
+            partyUI.Name = "PartyUI";
+            partyUI.Visible = false;
+            ui.AddChild(partyUI);
+
             // Trigger welcome tutorial
             var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
             if (tutorialUI != null)
@@ -1496,6 +1502,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_colosseum"))
             {
                 ToggleArenaColosseumUI();
+            }
+
+            // Handle party UI toggle (Ctrl+P)
+            if (Input.IsActionJustPressed("ui_party"))
+            {
+                TogglePartyUI();
             }
 
             // Handle equipment enhancement UI toggle (E key - separate from enchantment)
@@ -1996,6 +2008,18 @@ namespace ClawRPG.Scripts {
                 {
                     newUI.Show();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Toggle party UI
+        /// </summary>
+        private void TogglePartyUI()
+        {
+            var partyUI = GetNodeOrNull<Systems.PartySystem.PartyUI>("CanvasLayer/PartyUI");
+            if (partyUI != null)
+            {
+                partyUI.Toggle();
             }
         }
 
