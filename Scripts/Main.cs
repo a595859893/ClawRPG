@@ -261,6 +261,11 @@ namespace ClawRPG.Scripts {
             mountCombatSystem.Name = "MountCombatSystem";
             AddChild(mountCombatSystem);
             
+            // Initialize mount equipment system
+            var mountEquipmentSystem = new Systems.MountEquipmentSystem();
+            mountEquipmentSystem.Name = "MountEquipmentSystem";
+            AddChild(mountEquipmentSystem);
+            
             // Initialize mount evolution system
             var mountEvolutionSystem = MountEvolutionSystem.Instance;
             mountEvolutionSystem.Initialize();
@@ -510,6 +515,11 @@ namespace ClawRPG.Scripts {
             var mountEvolutionUI = new UI.MountEvolutionUI();
             mountEvolutionUI.Name = "MountEvolutionUI";
             ui.AddChild(mountEvolutionUI);
+            
+            // Mount Equipment UI
+            var mountEquipmentUI = new Systems.MountEquipmentUI();
+            mountEquipmentUI.Name = "MountEquipmentUI";
+            ui.AddChild(mountEquipmentUI);
             
             // Random World Event UI
             var worldEventUI = new Systems.RandomWorldEventUI();
@@ -840,6 +850,12 @@ namespace ClawRPG.Scripts {
                 ToggleMountEvolutionUI();
             }
             
+            // Handle mount equipment UI toggle (K key)
+            if (Input.IsActionJustPressed("ui_mount_equipment"))
+            {
+                ToggleMountEquipmentUI();
+            }
+            
             // Handle world event UI toggle (O key)
             if (Input.IsActionJustPressed("ui_world_event"))
             {
@@ -1047,6 +1063,18 @@ namespace ClawRPG.Scripts {
             if (mountEvolutionUI != null)
             {
                 mountEvolutionUI.ToggleUI();
+            }
+        }
+        
+        /// <summary>
+        /// Toggle mount equipment UI
+        /// </summary>
+        private void ToggleMountEquipmentUI()
+        {
+            var mountEquipmentUI = GetNodeOrNull<Systems.MountEquipmentUI>("UI/MountEquipmentUI");
+            if (mountEquipmentUI != null)
+            {
+                mountEquipmentUI.ToggleUI();
             }
         }
         
