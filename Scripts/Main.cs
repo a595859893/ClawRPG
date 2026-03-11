@@ -185,6 +185,11 @@ namespace ClawRPG.Scripts {
             momentumSystem.Name = "MomentumSystem";
             AddChild(momentumSystem);
 
+            // Initialize skill combo system
+            var skillComboSystem = new SkillComboSystem();
+            skillComboSystem.Name = "SkillComboSystem";
+            AddChild(skillComboSystem);
+
             // Initialize AOE indicator system
             var aoeIndicatorManager = new Systems.AOEIndicatorManager();
             aoeIndicatorManager.Name = "AOEIndicatorManager";
@@ -663,6 +668,11 @@ namespace ClawRPG.Scripts {
             var momentumUI = new MomentumUI();
             momentumUI.Name = "MomentumUI";
             ui.AddChild(momentumUI);
+
+            // Skill Combo UI
+            var skillComboUI = new SkillComboUI();
+            skillComboUI.Name = "SkillComboUI";
+            ui.AddChild(skillComboUI);
 
             // Quick Slot UI
             var quickSlotUI = new UI.QuickSlotUI();
