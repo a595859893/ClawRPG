@@ -114,6 +114,16 @@ namespace ClawRPG.Scripts {
             counterAttackSystem.Name = "CounterAttackSystem";
             AddChild(counterAttackSystem);
 
+            // Initialize equipment set system
+            var equipmentSetSystem = new EquipmentSetSystem();
+            equipmentSetSystem.Name = "EquipmentSetSystem";
+            AddChild(equipmentSetSystem);
+
+            // Initialize equipment set database
+            var equipmentSetDb = new EquipmentSetDatabase();
+            equipmentSetDb.Name = "EquipmentSetDatabase";
+            AddChild(equipmentSetDb);
+
             // Initialize enchantment database
             var enchantmentDb = new EnchantmentDatabase();
             enchantmentDb.Name = "EnchantmentDatabase";
@@ -946,18 +956,10 @@ namespace ClawRPG.Scripts {
                 ToggleEnhancementUI();
             }
 
-            // Handle equipment set UI toggle (Shift+E key)
-            if (Input.IsKeyPressed(KEY_SHIFT) && Input.IsKeyPressed(KEY_E))
+            // Handle equipment set UI toggle (J key)
+            if (Input.IsActionJustPressed("ui_equipment_set"))
             {
-                if (!_shiftEToggleCooldown)
-                {
-                    ToggleEquipmentSetUI();
-                    _shiftEToggleCooldown = true;
-                }
-            }
-            else
-            {
-                _shiftEToggleCooldown = false;
+                ToggleEquipmentSetUI();
             }
 
             // Handle auto potion UI toggle (Shift+X key)
@@ -1714,7 +1716,7 @@ namespace ClawRPG.Scripts {
             var setUI = GetNodeOrNull<UI.EquipmentSetUI>("CanvasLayer/EquipmentSetUI");
             if (setUI != null)
             {
-                setUI.ToggleSetUI();
+                setUI.Toggle();
             }
         }
 
