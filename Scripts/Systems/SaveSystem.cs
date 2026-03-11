@@ -975,5 +975,43 @@ namespace ClawRPG.Scripts.Systems {
             }
             return new Dictionary<string, object>();
         }
+
+        public void SaveMountExpeditionData(Dictionary<string, object> data)
+        {
+            try
+            {
+                string path = "user://mount_expedition_data.json";
+                string json = JsonSerializer.Serialize(data);
+                File.WriteAllText(path, json);
+                GD.Print("[SaveSystem] Mount expedition data saved");
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to save mount expedition data: " + e.Message);
+            }
+        }
+
+        public Dictionary<string, object> LoadMountExpeditionData()
+        {
+            try
+            {
+                string path = "user://mount_expedition_data.json";
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    if (data != null)
+                    {
+                        GD.Print("[SaveSystem] Mount expedition data loaded");
+                        return data;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to load mount expedition data: " + e.Message);
+            }
+            return new Dictionary<string, object>();
+        }
     }
 }

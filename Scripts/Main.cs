@@ -392,6 +392,11 @@ namespace ClawRPG.Scripts {
             AddChild(petExpeditionSystem);
             petExpeditionSystem.Initialize();
 
+            // Initialize mount expedition system
+            var mountExpeditionSystem = new Systems.MountExpeditionSystem();
+            mountExpeditionSystem.Name = "MountExpeditionSystem";
+            AddChild(mountExpeditionSystem);
+
             // Initialize seasonal event system
             var seasonalEventSystem = new SeasonalEventSystem();
             seasonalEventSystem.Name = "SeasonalEventSystem";
@@ -777,6 +782,12 @@ namespace ClawRPG.Scripts {
             petExpeditionUI.Name = "PetExpeditionUI";
             petExpeditionUI.Visible = false;
             ui.AddChild(petExpeditionUI);
+
+            // Mount Expedition UI
+            var mountExpeditionUI = new MountExpeditionUI();
+            mountExpeditionUI.Name = "MountExpeditionUI";
+            mountExpeditionUI.Visible = false;
+            ui.AddChild(mountExpeditionUI);
 
             // Mystery Treasure UI
             var mysteryTreasureUI = new MysteryTreasureUI();
@@ -1320,6 +1331,12 @@ namespace ClawRPG.Scripts {
                 TogglePetExpeditionUI();
             }
 
+            // Handle mount expedition UI toggle (Ctrl+R)
+            if (Input.IsActionJustPressed("ui_mount_expedition"))
+            {
+                ToggleMountExpeditionUI();
+            }
+
             // Handle mystery treasure UI toggle (T key)
             if (Input.IsActionJustPressed("ui_mystery_treasure"))
             {
@@ -1754,6 +1771,18 @@ namespace ClawRPG.Scripts {
                 {
                     petExpeditionUI.Refresh();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Toggle mount expedition UI
+        /// </summary>
+        private void ToggleMountExpeditionUI()
+        {
+            var mountExpeditionUI = GetNodeOrNull<MountExpeditionUI>("UI/MountExpeditionUI");
+            if (mountExpeditionUI != null)
+            {
+                mountExpeditionUI.Toggle();
             }
         }
 
