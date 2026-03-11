@@ -311,6 +311,11 @@ namespace ClawRPG.Scripts {
             worldEventSystem.Name = "RandomWorldEventSystem";
             AddChild(worldEventSystem);
 
+            // Initialize choice event system (roguelike style)
+            var choiceEventSystem = new Systems.ChoiceEventSystem();
+            choiceEventSystem.Name = "ChoiceEventSystem";
+            AddChild(choiceEventSystem);
+
             // Initialize world boss system
             var worldBossSystem = new Systems.WorldBoss.WorldBossSystem();
             worldBossSystem.Name = "WorldBossSystem";
@@ -831,6 +836,12 @@ namespace ClawRPG.Scripts {
             worldBossUI.Name = "WorldBossUI";
             worldBossUI.Visible = false;
             ui.AddChild(worldBossUI);
+
+            // Choice Event UI
+            var choiceEventUI = new Systems.ChoiceEventUI();
+            choiceEventUI.Name = "ChoiceEventUI";
+            choiceEventUI.Initialize();
+            ui.AddChild(choiceEventUI);
 
             // Elemental Trial UI
             var elementalTrialUI = new Systems.ElementalTrialUI();
