@@ -386,6 +386,12 @@ namespace ClawRPG.Scripts {
             AddChild(petSkillSystem);
             petSkillSystem.Initialize();
 
+            // Initialize pet expedition system
+            var petExpeditionSystem = new Systems.PetExpeditionSystem();
+            petExpeditionSystem.Name = "PetExpeditionSystem";
+            AddChild(petExpeditionSystem);
+            petExpeditionSystem.Initialize();
+
             // Initialize seasonal event system
             var seasonalEventSystem = new SeasonalEventSystem();
             seasonalEventSystem.Name = "SeasonalEventSystem";
@@ -765,6 +771,12 @@ namespace ClawRPG.Scripts {
             petSkillUI.Name = "PetSkillUI";
             petSkillUI.Visible = false;
             ui.AddChild(petSkillUI);
+
+            // Pet Expedition UI
+            var petExpeditionUI = new PetExpeditionUI();
+            petExpeditionUI.Name = "PetExpeditionUI";
+            petExpeditionUI.Visible = false;
+            ui.AddChild(petExpeditionUI);
 
             // Mystery Treasure UI
             var mysteryTreasureUI = new MysteryTreasureUI();
@@ -1302,6 +1314,12 @@ namespace ClawRPG.Scripts {
                 TogglePetSkillUI();
             }
 
+            // Handle pet expedition UI toggle (Ctrl+E)
+            if (Input.IsActionJustPressed("ui_pet_expedition"))
+            {
+                TogglePetExpeditionUI();
+            }
+
             // Handle mystery treasure UI toggle (T key)
             if (Input.IsActionJustPressed("ui_mystery_treasure"))
             {
@@ -1720,6 +1738,22 @@ namespace ClawRPG.Scripts {
             if (petSkillUI != null)
             {
                 petSkillUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet expedition UI
+        /// </summary>
+        private void TogglePetExpeditionUI()
+        {
+            var petExpeditionUI = GetNodeOrNull<PetExpeditionUI>("UI/PetExpeditionUI");
+            if (petExpeditionUI != null)
+            {
+                petExpeditionUI.Visible = !petExpeditionUI.Visible;
+                if (petExpeditionUI.Visible)
+                {
+                    petExpeditionUI.Refresh();
+                }
             }
         }
 
