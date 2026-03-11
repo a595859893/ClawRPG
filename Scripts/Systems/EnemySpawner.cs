@@ -21,6 +21,10 @@ namespace ClawRPG.Scripts.Systems {
         [Export] public int InitialSpawnCount = 5;
         [Export] public float SpawnInterval = 5.0f;
         
+        // Object pool for performance optimization (2D game optimization: reduce instantiation)
+        [Export] public bool UseObjectPool = true;
+        private ObjectPool _enemyPool;
+        
         // Current enemies
         private List<Node2D> _activeEnemies = new();
         private float _spawnTimer;
@@ -38,6 +42,12 @@ namespace ClawRPG.Scripts.Systems {
             // Find player
             _player = GetTree().GetFirstNodeInGroup("player") as Player;
             
+            // Initialize object pool if enabled
+            if (UseObjectPool)
+            {
+                InitializeObjectPool();
+            }
+            
             if (SpawnOnReady && AutoSpawn)
             {
                 // Initial spawn
@@ -48,6 +58,34 @@ namespace ClawRPG.Scripts.Systems {
             }
             
             GD.Print("[EnemySpawner] Ready - Max Enemies: " + MaxEnemies);
+        }
+        
+        /// <summary>
+        /// Initialize the enemy object pool
+        /// </summary>
+        private void InitializeObjectPool()
+        {
+            var enemyScene = GD.Load<PackedScene>("res://Enemies/Enemy.tscn");
+            if (enemyScene == null)
+            {
+                GD.Warning("[EnemySpawner] No Enemy.tscn found, object pool disabled");
+                UseObjectPool = false;
+                return;
+            }
+            
+            // Create a dedicated object pool node
+            var poolNode = new ObjectPool
+            {
+                Name = "EnemyObjectPool",
+                PooledScene = enemyScene,
+                InitialPoolSize = Mathf.Min(MaxEnemies, 10),
+                MaxPoolSize = Mathf.Min(MaxEnemies * 2, 50),
+                AutoExpand = true
+            };
+            GetTree().CurrentScene.AddChild(poolNode);
+            _enemyPool = poolNode;
+            
+            GD.Print("[EnemySpawner] Object pool initialized");
         }
         
         public override void _PhysicsProcess(double delta)
@@ -140,15 +178,27 @@ namespace ClawRPG.Scripts.Systems {
                 );
             }
             
-            // Create enemy instance
-            var enemyScene = GD.Load<PackedScene>("res://Enemies/Enemy.tscn");
-            if (enemyScene == null)
+            // Create enemy instance - use object pool if enabled
+            Node2D enemy;
+            
+            if (UseObjectPool && _enemyPool != null)
             {
-                // Fallback: create enemy programmatically
-                return CreateEnemyProgrammatically(enemyType, spawnPos);
+                // Get from object pool (performance optimization)
+                enemy = _enemyPool.GetObject();
+                if (enemy == null)
+                {
+                    // Pool exhausted, create new
+                    var enemyScene = GD.Load<PackedScene>("res://Enemies/Enemy.tscn");
+                    enemy = enemyScene?.Instantiate<Node2D>();
+                }
+            }
+            else
+            {
+                // Traditional instantiation
+                var enemyScene = GD.Load<PackedScene>("res://Enemies/Enemy.tscn");
+                enemy = enemyScene?.Instantiate<Node2D>();
             }
             
-            var enemy = enemyScene.Instantiate<Node2D>();
             if (enemy != null)
             {
                 enemy.GlobalPosition = spawnPos;
@@ -160,7 +210,12 @@ namespace ClawRPG.Scripts.Systems {
                     ConfigureEnemyFromDatabase(enemyScript, enemyType);
                 }
                 
-                GetParent().AddChild(enemy);
+                // Add to scene
+                if (!enemy.IsInsideTree())
+                {
+                    GetParent().AddChild(enemy);
+                }
+                
                 _activeEnemies.Add(enemy);
                 
                 GD.Print($"[EnemySpawner] Spawned {enemyType.Name} at {spawnPos}");
@@ -231,7 +286,15 @@ namespace ClawRPG.Scripts.Systems {
             
             foreach (var enemy in toRemove)
             {
-                enemy.QueueFree();
+                // Return to object pool instead of destroying (performance optimization)
+                if (UseObjectPool && _enemyPool != null)
+                {
+                    _enemyPool.ReturnObject(enemy);
+                }
+                else
+                {
+                    enemy.QueueFree();
+                }
                 _activeEnemies.Remove(enemy);
             }
         }
