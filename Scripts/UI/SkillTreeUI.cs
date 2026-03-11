@@ -6,7 +6,7 @@ using ClawRPG.Scripts.Characters;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
-    /// Skill Tree UI - Visual skill tree interface
+    /// Skill Tree UI - Visual skill tree interface with animations
     /// </summary>
     public partial class SkillTreeUI : Control
     {
@@ -28,10 +28,15 @@ namespace ClawRPG.Scripts.UI {
         private Player _player;
         private bool _isVisible = false;
         
+        // Animation
+        private Tween _uiTween;
+        private Color _lastSkillPointsColor;
+        
         public override void _Ready()
         {
             SetupUI();
             Hide();
+            _lastSkillPointsColor = new Color(1, 0.8f, 0); // Gold color
         }
         
         private void SetupUI()
@@ -40,6 +45,7 @@ namespace ClawRPG.Scripts.UI {
             _mainPanel = new Control();
             _mainPanel.SetAnchorsPreset(Control.LayoutPreset.Center);
             _mainPanel.CustomMinimumSize = new Vector2(800, 600);
+            _mainPanel.Modulate = new Color(1, 1, 1, 0); // Start invisible for fade-in
             AddChild(_mainPanel);
             
             var panel = new PanelContainer();
@@ -211,7 +217,35 @@ namespace ClawRPG.Scripts.UI {
             // Click handler
             btn.Pressed += () => OnSkillButtonPressed(skill);
             
+            // Hover animation - scale up slightly
+            btn.MouseEntered += () => OnButtonHoverEnter(btn);
+            btn.MouseExited += () => OnButtonHoverExit(btn);
+            
             return btn;
+        }
+        
+        private void OnButtonHoverEnter(Button btn)
+        {
+            if (_uiTween != null && _uiTween.IsValid())
+                _uiTween.Kill();
+            
+            _uiTween = CreateTween();
+            _uiTween.SetParallel(true);
+            _uiTween.TweenProperty(btn, "scale", new Vector2(1.05f, 1.05f), 0.15f)
+                .SetTrans(Tween.TransitionType.Cubic)
+                .SetEasing(Tween.EasingFunction.EaseOut);
+        }
+        
+        private void OnButtonHoverExit(Button btn)
+        {
+            if (_uiTween != null && _uiTween.IsValid())
+                _uiTween.Kill();
+            
+            _uiTween = CreateTween();
+            _uiTween.SetParallel(true);
+            _uiTween.TweenProperty(btn, "scale", Vector2.One, 0.15f)
+                .SetTrans(Tween.TransitionType.Cubic)
+                .SetEasing(Tween.EasingFunction.EaseOut);
         }
         
         private string GetSkillTooltip(Skill skill)
@@ -252,6 +286,7 @@ namespace ClawRPG.Scripts.UI {
                 if (_player.UpgradeSkill(skill))
                 {
                     GD.Print($"升级技能: {skill.Name}");
+                    AnimateSkillUpgrade();
                     RefreshAllTrees();
                 }
                 else
@@ -265,6 +300,7 @@ namespace ClawRPG.Scripts.UI {
                 if (_player.LearnSkill(skill))
                 {
                     GD.Print($"学习技能: {skill.Name}");
+                    AnimateSkillLearn();
                     RefreshAllTrees();
                 }
                 else
@@ -272,6 +308,50 @@ namespace ClawRPG.Scripts.UI {
                     GD.Print("无法学习技能 (等级不足或前置技能未学习)");
                 }
             }
+        }
+        
+        private void AnimateSkillLearn()
+        {
+            // Flash animation on skill points label
+            if (_uiTween != null && _uiTween.IsValid())
+                _uiTween.Kill();
+            
+            _uiTween = CreateTween();
+            _uiTween.SetParallel(false);
+            
+            // Pulse the skill points label
+            _uiTween.TweenProperty(_skillPointsLabel, "scale", new Vector2(1.3f, 1.3f), 0.1f)
+                .SetTrans(Tween.TransitionType.Back)
+                .SetEasing(Tween.EasingFunction.EaseOut);
+            _uiTween.TweenProperty(_skillPointsLabel, "scale", Vector2.One, 0.2f)
+                .SetTrans(Tween.TransitionType.Cubic)
+                .SetEasing(Tween.EasingFunction.EaseInOut);
+                
+            // Color flash to green then back to gold
+            _uiTween.TweenProperty(_skillPointsLabel, "modulate", new Color(0.2f, 1f, 0.2f), 0.1f);
+            _uiTween.TweenProperty(_skillPointsLabel, "modulate", _lastSkillPointsColor, 0.3f);
+        }
+        
+        private void AnimateSkillUpgrade()
+        {
+            // Similar to learn but different color
+            if (_uiTween != null && _uiTween.IsValid())
+                _uiTween.Kill();
+            
+            _uiTween = CreateTween();
+            _uiTween.SetParallel(false);
+            
+            // Pulse the skill points label
+            _uiTween.TweenProperty(_skillPointsLabel, "scale", new Vector2(1.2f, 1.2f), 0.1f)
+                .SetTrans(Tween.TransitionType.Back)
+                .SetEasing(Tween.EasingFunction.EaseOut);
+            _uiTween.TweenProperty(_skillPointsLabel, "scale", Vector2.One, 0.2f)
+                .SetTrans(Tween.TransitionType.Cubic)
+                .SetEasing(Tween.EasingFunction.EaseInOut);
+                
+            // Color flash to cyan then back to gold
+            _uiTween.TweenProperty(_skillPointsLabel, "modulate", new Color(0.2f, 0.8f, 1f), 0.1f);
+            _uiTween.TweenProperty(_skillPointsLabel, "modulate", _lastSkillPointsColor, 0.3f);
         }
         
         private void RefreshAllTrees()
@@ -304,12 +384,61 @@ namespace ClawRPG.Scripts.UI {
                     _skillPointsLabel.Text = $"技能点: {_player.SkillPoints}";
                     RefreshAllTrees();
                 }
+                
+                // Fade in animation
                 Show();
+                AnimatePanelIn();
             }
             else
             {
-                Hide();
+                // Fade out animation
+                AnimatePanelOut();
             }
+        }
+        
+        private void AnimatePanelIn()
+        {
+            if (_uiTween != null && _uiTween.IsValid())
+                _uiTween.Kill();
+            
+            _uiTween = CreateTween();
+            _uiTween.SetParallel(true);
+            
+            // Fade in
+            _uiTween.TweenProperty(_mainPanel, "modulate:a", 1f, 0.25f)
+                .SetTrans(Tween.TransitionType.Cubic)
+                .SetEasing(Tween.EasingFunction.EaseOut);
+                
+            // Scale from 0.9 to 1.0
+            _uiTween.TweenProperty(_mainPanel, "scale", Vector2.One, 0.25f)
+                .SetTrans(Tween.TransitionType.Back)
+                .SetEasing(Tween.EasingFunction.EaseOut);
+                
+            // Initial state
+            _mainPanel.Modulate = new Color(1, 1, 1, 0);
+            _mainPanel.Scale = new Vector2(0.9f, 0.9f);
+        }
+        
+        private void AnimatePanelOut()
+        {
+            if (_uiTween != null && _uiTween.IsValid())
+                _uiTween.Kill();
+            
+            _uiTween = CreateTween();
+            _uiTween.SetParallel(true);
+            
+            // Fade out
+            _uiTween.TweenProperty(_mainPanel, "modulate:a", 0f, 0.2f)
+                .SetTrans(Tween.TransitionType.Cubic)
+                .SetEasing(Tween.EasingFunction.EaseIn);
+                
+            // Scale down slightly
+            _uiTween.TweenProperty(_mainPanel, "scale", new Vector2(0.95f, 0.95f), 0.2f)
+                .SetTrans(Tween.TransitionType.Cubic)
+                .SetEasing(Tween.EasingFunction.EaseIn);
+                
+            // Hide after animation
+            _uiTween.TweenCallback(Callable.From(Hide));
         }
         
         public void Open()
