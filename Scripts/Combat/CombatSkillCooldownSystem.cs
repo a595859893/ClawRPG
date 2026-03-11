@@ -22,10 +22,14 @@ public class CombatSkillCooldownSystem
 	private CombatSkillCooldownData.PlayerSkillCooldownData _playerCooldownData;
 	
 	// 信号系统
-	public signal void CooldownStarted(string skillId, string skillName, float cooldownTime);
-	public signal void CooldownUpdated(string skillId, float remainingTime);
-	public signal void CooldownReady(string skillId, string skillName);
-	public signal void SkillUsed(string skillId, string skillName);
+	[Signal]
+    public delegate void CooldownStarted(string skillId, string skillName, float cooldownTime);
+	[Signal]
+    public delegate void CooldownUpdated(string skillId, float remainingTime);
+	[Signal]
+    public delegate void CooldownReady(string skillId, string skillName);
+	[Signal]
+    public delegate void SkillUsed(string skillId, string skillName);
 	
 	public CombatSkillCooldownSystem()
 	{

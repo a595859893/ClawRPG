@@ -303,10 +303,14 @@ public class SeasonalEventSystem
     private Dictionary<string, int> _eventEntries = new Dictionary<string, int>();
 
     // Signals
-    public signal void EventStarted(string eventId);
-    public signal void EventEnded(string eventId);
-    public signal void EventRewardClaimed(string eventId, int score);
-    public signal void EventEntryRecorded(string eventId, int entries);
+    [Signal]
+    public delegate void EventStarted(string eventId);
+    [Signal]
+    public delegate void EventEnded(string eventId);
+    [Signal]
+    public delegate void EventRewardClaimed(string eventId, int score);
+    [Signal]
+    public delegate void EventEntryRecorded(string eventId, int entries);
 
     public SeasonalEventSystem()
     {

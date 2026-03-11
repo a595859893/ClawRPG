@@ -7,16 +7,20 @@ public class AuctionHouseSystem : Node
     public static AuctionHouseSystem Instance { get; private set; }
     
     [Signal]
-    public signal void auction_listing_updated();
+    [Signal]
+    public delegate void auction_listing_updated();
     
     [Signal]
-    public signal void bid_placed(string bidder, int auction_id, int amount);
+    [Signal]
+    public delegate void bid_placed(string bidder, int auction_id, int amount);
     
     [Signal]
-    public signal void auction_won(string winner, int auction_id, int amount);
+    [Signal]
+    public delegate void auction_won(string winner, int auction_id, int amount);
     
     [Signal]
-    public signal void auction_ended(int auction_id, string status);
+    [Signal]
+    public delegate void auction_ended(int auction_id, string status);
     
     private Player _player;
     private List<AuctionItem> _currentListings = new List<AuctionItem>();

@@ -32,9 +32,12 @@ namespace ClawRPG.Scripts.Systems {
         };
         
         // Signals
-        public signal void OnComboChanged(int newCombo, int maxCombo);
-        public signal void OnComboMilestone(int comboLevel, int goldReward, int expReward);
-        public signal void OnComboBroken();
+        [Signal]
+    public delegate void OnComboChanged(int newCombo, int maxCombo);
+        [Signal]
+    public delegate void OnComboMilestone(int comboLevel, int goldReward, int expReward);
+        [Signal]
+    public delegate void OnComboBroken();
         
         public int CurrentCombo => _currentCombo;
         public int MaxCombo => _maxCombo;

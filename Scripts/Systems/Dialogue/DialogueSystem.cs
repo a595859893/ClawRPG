@@ -13,10 +13,14 @@ public partial class DialogueSystem : Node {
     private bool _isActive;
     
     // Signals
-    public signal void DialogueStarted(string npcId);
-    public signal void DialogueEnded();
-    public signal void NodeChanged(DialogueNode node);
-    public signal void ChoiceMade(DialogueChoice choice);
+    [Signal]
+    public delegate void DialogueStarted(string npcId);
+    [Signal]
+    public delegate void DialogueEnded();
+    [Signal]
+    public delegate void NodeChanged(DialogueNode node);
+    [Signal]
+    public delegate void ChoiceMade(DialogueChoice choice);
     
     public override void _Ready() {
         Instance = this;

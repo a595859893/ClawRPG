@@ -29,9 +29,12 @@ public class QuickSlotSystem : Node
     private QuickSlotData[] _slots = new QuickSlotData[8];
     
     // Signals
-    public signal void SlotUpdated(int slotIndex, QuickSlotData data);
-    public signal void SlotUsed(int slotIndex, QuickSlotData data);
-    public signal void SlotEmpty(int slotIndex);
+    [Signal]
+    public delegate void SlotUpdated(int slotIndex, QuickSlotData data);
+    [Signal]
+    public delegate void SlotUsed(int slotIndex, QuickSlotData data);
+    [Signal]
+    public delegate void SlotEmpty(int slotIndex);
     
     public override void _Ready()
     {

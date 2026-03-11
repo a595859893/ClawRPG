@@ -61,13 +61,16 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         
         // 信号
         [Signal]
-        public signal void OnEnhancementStarted(string itemId, int level);
+        [Signal]
+    public delegate void OnEnhancementStarted(string itemId, int level);
         
         [Signal]
-        public signal void OnEnhancementComplete(string itemId, int level, EnhancementResult result);
+        [Signal]
+    public delegate void OnEnhancementComplete(string itemId, int level, EnhancementResult result);
         
         [Signal]
-        public signal void OnEnhancementMaterialsChanged();
+        [Signal]
+    public delegate void OnEnhancementMaterialsChanged();
         
         // 强化石物品ID (与ItemSystem中的ID对应)
         public const string EnhanceStoneCommon = "401";

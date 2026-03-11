@@ -8,10 +8,14 @@ public class PetEquipmentEnhancementSystem : Node
     public static PetEquipmentEnhancementSystem Instance { get; private set; }
 
     // Signals
-    public signal void EnhancementStarted(string equipmentId, int newTier);
-    public signal void EnhancementSucceeded(string equipmentId, int newTier, bool isCritical);
-    public signal void EnhancementFailed(string equipmentId, int currentTier);
-    public signal void EnhancementDataLoaded();
+    [Signal]
+    public delegate void EnhancementStarted(string equipmentId, int newTier);
+    [Signal]
+    public delegate void EnhancementSucceeded(string equipmentId, int newTier, bool isCritical);
+    [Signal]
+    public delegate void EnhancementFailed(string equipmentId, int currentTier);
+    [Signal]
+    public delegate void EnhancementDataLoaded();
 
     // Player enhancement data
     private PetEquipmentEnhancementData.PlayerEnhancementData _playerData = new PetEquipmentEnhancementData.PlayerEnhancementData();
