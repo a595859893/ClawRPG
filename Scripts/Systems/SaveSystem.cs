@@ -829,5 +829,43 @@ namespace ClawRPG.Scripts.Systems {
             }
             return new Dictionary<string, object>();
         }
+
+        // ===== Seasonal Event System Save/Load =====
+
+        public void SaveSeasonalEventData(Dictionary<string, object> data)
+        {
+            try
+            {
+                string path = "user://seasonal_event_data.json";
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(data, options);
+                File.WriteAllText(path, json);
+                GD.Print("[SaveSystem] Seasonal event data saved");
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to save seasonal event data: " + e.Message);
+            }
+        }
+
+        public Dictionary<string, object> LoadSeasonalEventData()
+        {
+            try
+            {
+                string path = "user://seasonal_event_data.json";
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    GD.Print("[SaveSystem] Seasonal event data loaded");
+                    return data;
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to load seasonal event data: " + e.Message);
+            }
+            return new Dictionary<string, object>();
+        }
     }
 }

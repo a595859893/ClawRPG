@@ -365,6 +365,12 @@ namespace ClawRPG.Scripts {
             AddChild(petAffectionSystem);
             petAffectionSystem.Initialize();
 
+            // Initialize seasonal event system
+            var seasonalEventSystem = new SeasonalEventSystem();
+            seasonalEventSystem.Name = "SeasonalEventSystem";
+            AddChild(seasonalEventSystem);
+            seasonalEventSystem.Initialize();
+
             // Initialize elemental trial system
             var elementalTrialSystem = new Systems.ElementalTrialSystem();
             elementalTrialSystem.Name = "ElementalTrialSystem";
@@ -1257,6 +1263,12 @@ namespace ClawRPG.Scripts {
                 ToggleBuffUI();
             }
 
+            // Handle seasonal event UI toggle (E key with shift - Shift+E)
+            if (Input.IsActionJustPressed("ui_seasonal_event"))
+            {
+                ToggleSeasonalEventUI();
+            }
+
             // Handle title UI toggle (N key)
             if (Input.IsActionJustPressed("ui_title"))
             {
@@ -2056,6 +2068,31 @@ namespace ClawRPG.Scripts {
             if (buffUI != null)
             {
                 buffUI.ToggleBuffUI();
+            }
+        }
+
+        /// <summary>
+        /// 切换季节性活动界面
+        /// </summary>
+        private void ToggleSeasonalEventUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var eventUI = ui.GetNodeOrNull<SeasonalEventUI>("SeasonalEventUI");
+            if (eventUI != null && eventUI.Visible)
+            {
+                eventUI.Hide();
+            }
+            else
+            {
+                if (eventUI == null)
+                {
+                    eventUI = new SeasonalEventUI();
+                    eventUI.Name = "SeasonalEventUI";
+                    ui.AddChild(eventUI);
+                }
+                eventUI.Show();
             }
         }
 
