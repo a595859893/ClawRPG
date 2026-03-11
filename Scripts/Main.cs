@@ -119,6 +119,11 @@ namespace ClawRPG.Scripts {
             artifactSystem.Name = "ArtifactSystem";
             AddChild(artifactSystem);
 
+            // Initialize weather system
+            var weatherSystem = new WeatherSystem();
+            weatherSystem.Name = "WeatherSystem";
+            AddChild(weatherSystem);
+
             // Initialize counter attack system
             var counterAttackSystem = new CounterAttackSystem();
             counterAttackSystem.Name = "CounterAttackSystem";
@@ -727,6 +732,11 @@ namespace ClawRPG.Scripts {
             artifactUI.Name = "ArtifactUI";
             ui.AddChild(artifactUI);
 
+            // Weather UI
+            var weatherUI = new WeatherUI();
+            weatherUI.Name = "WeatherUI";
+            ui.AddChild(weatherUI);
+
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
             dialogueUI.Name = "DialogueUI";
@@ -1255,6 +1265,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.K))
             {
                 ToggleArtifactUI();
+            }
+
+            // Handle weather UI toggle (Ctrl+W key)
+            if (Input.IsKeyPressed(Key.W) && Input.IsKeyPressed(Key.Ctrl))
+            {
+                ToggleWeatherUI();
             }
 
             // Handle title UI toggle (Y key)
@@ -2401,6 +2417,15 @@ namespace ClawRPG.Scripts {
             if (artifactUI != null)
             {
                 artifactUI.ToggleVisible();
+            }
+        }
+
+        private void ToggleWeatherUI()
+        {
+            var weatherUI = GetNodeOrNull<WeatherUI>("UI/WeatherUI");
+            if (weatherUI != null)
+            {
+                weatherUI.Visible = !weatherUI.Visible;
             }
         }
 
