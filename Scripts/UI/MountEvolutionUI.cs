@@ -1,444 +1,389 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using MountEvolutionDataSpace;
+using ClawRPG.Scripts.Mounts;
 
-public class MountEvolutionUI : Control
-{
-    private static MountEvolutionUI _instance;
-    public static MountEvolutionUI Instance => _instance;
-
-    // UI Components
-    private Panel _mainPanel;
-    private VBoxContainer _mountListContainer;
-    private VBoxContainer _evolutionInfoContainer;
+public partial class MountEvolutionUI : Control {
+    private PanelContainer _mainPanel;
+    private VBoxContainer _contentBox;
     private Label _titleLabel;
-    private Label _mountNameLabel;
-    private Label _stageLabel;
-    private Label _typeLabel;
-    private Label _descriptionLabel;
-    private Label _expLabel;
-    private ProgressBar _expProgressBar;
+    
+    // 坐骑列表
+    private OptionButton _mountSelect;
+    private Label _mountInfoLabel;
+    
+    // 进化信息
+    private Label _currentStageLabel;
+    private Label _currentTypeLabel;
+    private Label _battleExpLabel;
+    private ProgressBar _evolutionProgress;
     private Label _progressLabel;
+    
+    // 属性加成
+    private VBoxContainer _bonusesContainer;
+    
+    // 进化按钮
     private Button _evolveButton;
+    private OptionButton _typeSelect;
     private Label _costLabel;
-    private RichTextLabel _requirementsLabel;
+    
+    // 统计
+    private Label _statsLabel;
+    
+    // 关闭按钮
     private Button _closeButton;
-
-    // Data
-    private List<string> _availableMounts;
-    private string _selectedMountId;
+    
     private bool _isVisible = false;
-
-    public override void _Ready()
-    {
-        _instance = this;
+    
+    public override void _Ready() {
         SetupUI();
+        ConnectSignals();
         Visible = false;
+        GD.Print("[MountEvolutionUI] Initialized");
     }
-
-    private void SetupUI()
-    {
+    
+    private void SetupUI() {
         // 主面板
-        _mainPanel = new Panel
-        {
-            AnchorLeft = 0.5f,
-            AnchorTop = 0.5f,
-            AnchorRight = 0.5f,
-            AnchorBottom = 0.5f,
-            OffsetLeft = -400f,
-            OffsetTop = -300f,
-            OffsetRight = 400f,
-            OffsetBottom = 300f,
-            CustomMinimumSize = new Vector2(800, 600)
-        };
+        _mainPanel = new PanelContainer();
+        _mainPanel.SetAnchorsPreset(Control.LayoutPreset.Center);
+        _mainPanel.CustomMinimumSize = new Vector2(600, 500);
         AddChild(_mainPanel);
-
+        
+        var styleBox = new StyleBoxFlat();
+        styleBox.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.95f);
+        styleBox.BorderWidthLeft = 2f;
+        styleBox.BorderWidthRight = 2f;
+        styleBox.BorderWidthTop = 2f;
+        styleBox.BorderWidthBottom = 2f;
+        styleBox.BorderColor = new Color(0.3f, 0.3f, 0.4f);
+        styleBox.CornerRadiusTopLeft = 8f;
+        styleBox.CornerRadiusTopRight = 8f;
+        styleBox.CornerRadiusBottomLeft = 8f;
+        styleBox.CornerRadiusBottomRight = 8f;
+        _mainPanel.AddThemeStyleboxOverride("panel", styleBox);
+        
+        // 内容容器
+        _contentBox = new VBoxContainer();
+        _contentBox.SetThemeConstant("separation", 10);
+        _mainPanel.AddChild(_contentBox);
+        
         // 标题
-        _titleLabel = new Label
-        {
-            Text = "坐骑进化系统",
-            AnchorLeft = 0.5f,
-            AnchorRight = 0.5f,
-            OffsetTop = 10f,
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
+        _titleLabel = new Label();
+        _titleLabel.Text = "🐎 坐骑进化系统";
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
-        _mainPanel.AddChild(_titleLabel);
-
+        _contentBox.AddChild(_titleLabel);
+        
+        // 坐骑选择
+        var mountLabel = new Label();
+        mountLabel.Text = "选择坐骑:";
+        _contentBox.AddChild(mountLabel);
+        
+        _mountSelect = new OptionButton();
+        _mountSelect.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        _contentBox.AddChild(_mountSelect);
+        
+        // 坐骑信息
+        _mountInfoLabel = new Label();
+        _mountInfoLabel.Text = "请选择坐骑";
+        _mountInfoLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        _contentBox.AddChild(_mountInfoLabel);
+        
+        // 分隔线
+        _contentBox.AddChild(CreateSeparator());
+        
+        // 当前进化阶段
+        var stageContainer = new HBoxContainer();
+        _contentBox.AddChild(stageContainer);
+        
+        _currentStageLabel = new Label();
+        _currentStageLabel.Text = "当前阶段: 基础";
+        _currentStageLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        stageContainer.AddChild(_currentStageLabel);
+        
+        _currentTypeLabel = new Label();
+        _currentTypeLabel.Text = "元素类型: 自然";
+        _currentTypeLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        stageContainer.AddChild(_currentTypeLabel);
+        
+        // 战斗经验
+        _battleExpLabel = new Label();
+        _battleExpLabel.Text = "战斗经验: 0";
+        _contentBox.AddChild(_battleExpLabel);
+        
+        // 进化进度条
+        var progressContainer = new VBoxContainer();
+        _contentBox.AddChild(progressContainer);
+        
+        _progressLabel = new Label();
+        _progressLabel.Text = "进化进度: 0%";
+        _progressLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        progressContainer.AddChild(_progressLabel);
+        
+        _evolutionProgress = new ProgressBar();
+        _evolutionProgress.CustomMinimumSize = new Vector2(0, 20);
+        _evolutionProgress.ShowPercentage = false;
+        progressContainer.AddChild(_evolutionProgress);
+        
+        // 属性加成
+        var bonusTitle = new Label();
+        bonusTitle.Text = "属性加成:";
+        bonusTitle.AddThemeFontSizeOverride("font_size", 16);
+        _contentBox.AddChild(bonusTitle);
+        
+        _bonusesContainer = new VBoxContainer();
+        _contentBox.AddChild(_bonusesContainer);
+        UpdateBonusDisplay();
+        
+        // 分隔线
+        _contentBox.AddChild(CreateSeparator());
+        
+        // 进化选项
+        var evolveContainer = new VBoxContainer();
+        _contentBox.AddChild(evolveContainer);
+        
+        var typeLabel = new Label();
+        typeLabel.Text = "选择进化类型:";
+        evolveContainer.AddChild(typeLabel);
+        
+        _typeSelect = new OptionButton();
+        _typeSelect.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        
+        // 添加进化类型选项
+        var types = new[] { "火焰", "冰霜", "闪电", "黑暗", "神圣", "自然" };
+        for (int i = 0; i < types.Length; i++) {
+            _typeSelect.AddItem(types[i], i);
+        }
+        evolveContainer.AddChild(_typeSelect);
+        
+        _costLabel = new Label();
+        _costLabel.Text = "消耗: -";
+        _costLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        evolveContainer.AddChild(_costLabel);
+        
+        _evolveButton = new Button();
+        _evolveButton.Text = "🎯 进化坐骑";
+        _evolveButton.CustomMinimumSize = new Vector2(0, 40);
+        evolveContainer.AddChild(_evolveButton);
+        
+        // 分隔线
+        _contentBox.AddChild(CreateSeparator());
+        
+        // 统计信息
+        _statsLabel = new Label();
+        _statsLabel.Text = "总进化次数: 0 | 总战斗经验: 0";
+        _statsLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        _contentBox.AddChild(_statsLabel);
+        
         // 关闭按钮
-        _closeButton = new Button
-        {
-            Text = "×",
-            AnchorLeft = 1f,
-            AnchorRight = 1f,
-            OffsetLeft = -40f,
-            OffsetTop = 5f,
-            OffsetRight = -5f,
-            OffsetBottom = 35f
-        };
-        _closeButton.Pressed += OnCloseButtonPressed;
-        _mainPanel.AddChild(_closeButton);
-
-        // 坐骑列表容器
-        _mountListContainer = new VBoxContainer
-        {
-            AnchorLeft = 0f,
-            AnchorTop = 0.1f,
-            AnchorBottom = 1f,
-            OffsetLeft = 20f,
-            OffsetTop = 50f,
-            OffsetRight = 200f,
-            OffsetBottom = -20f
-        };
-        _mainPanel.AddChild(_mountListContainer);
-
-        // 进化信息容器
-        _evolutionInfoContainer = new VBoxContainer
-        {
-            AnchorLeft = 0.3f,
-            AnchorTop = 0.1f,
-            AnchorRight = 1f,
-            AnchorBottom = 1f,
-            OffsetLeft = 250f,
-            OffsetTop = 50f,
-            OffsetRight = -20f,
-            OffsetBottom = -20f
-        };
-        _mainPanel.AddChild(_evolutionInfoContainer);
-
-        // 坐骑名称
-        _mountNameLabel = new Label
-        {
-            Text = "选择坐骑",
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        _mountNameLabel.AddThemeFontSizeOverride("font_size", 20);
-        _mountListContainer.AddChild(_mountNameLabel);
-
-        // 刷新坐骑列表
-        RefreshMountList();
+        _closeButton = new Button();
+        _closeButton.Text = "✕ 关闭";
+        _closeButton.CustomMinimumSize = new Vector2(0, 35);
+        _contentBox.AddChild(_closeButton);
+        
+        // 居中面板
+        _mainPanel.Position = (GetViewportRect().Size - _mainPanel.CustomMinimumSize) / 2;
     }
-
-    private void RefreshMountList()
-    {
-        // 清除现有按钮
-        foreach (var child in _mountListContainer.GetChildren())
-        {
-            if (child is Button btn && btn != _mountNameLabel)
-                btn.QueueFree();
-        }
-
-        // 获取可进化的坐骑列表
-        _availableMounts = MountEvolutionSystem.Instance.GetEvolvableMounts();
-
-        // 添加坐骑按钮
-        foreach (var mountId in _availableMounts)
-        {
-            var mountName = MountEvolutionSystem.Instance.GetBaseMountName(mountId);
-            var stage = MountEvolutionSystem.Instance.GetCurrentStage(mountId);
-            var evolutionName = MountEvolutionSystem.Instance.GetEvolutionName(mountId);
-
-            var btn = new Button
-            {
-                Text = $"{mountName}\n({GetStageName(stage)})",
-                CustomMinimumSize = new Vector2(160, 60)
-            };
-            btn.Pressed += () => OnMountSelected(mountId);
-            _mountListContainer.AddChild(btn);
-        }
-
-        // 如果有坐骑但没有选中，默认选中第一个
-        if (_availableMounts.Count > 0 && string.IsNullOrEmpty(_selectedMountId))
-        {
-            OnMountSelected(_availableMounts[0]);
-        }
+    
+    private HSeparator CreateSeparator() {
+        var separator = new HSeparator();
+        separator.AddThemeConstantOverride("separation", 10);
+        return separator;
     }
-
-    private void OnMountSelected(string mountId)
-    {
-        _selectedMountId = mountId;
+    
+    private void ConnectSignals() {
+        _mountSelect.ItemSelected += OnMountSelected;
+        _typeSelect.ItemSelected += OnTypeSelected;
+        _evolveButton.Pressed += OnEvolvePressed;
+        _closeButton.Pressed += OnClosePressed;
+    }
+    
+    public override void _Process(float delta) {
+        if (!Visible) return;
+        
+        UpdateMountList();
         UpdateEvolutionInfo();
     }
-
-    private void UpdateEvolutionInfo()
-    {
-        // 清除现有内容
-        foreach (var child in _evolutionInfoContainer.GetChildren())
-        {
+    
+    private void UpdateMountList() {
+        if (MountManager.Instance == null) return;
+        
+        var previousCount = _mountSelect.ItemCount;
+        var mounts = MountManager.Instance.GetOwnedMounts();
+        
+        if (mounts.Count != previousCount - 1) { // -1 for "选择坐骑" item
+            _mountSelect.Clear();
+            _mountSelect.AddItem("选择坐骑", 0);
+            
+            int index = 1;
+            foreach (var mount in mounts) {
+                _mountSelect.AddItem($"{mount.Value.Name} (Lv.{mount.Value.Level})", index++);
+            }
+        }
+    }
+    
+    private void UpdateEvolutionInfo() {
+        if (MountManager.Instance == null || MountEvolutionSystem.Instance == null) return;
+        
+        var selectedIndex = _mountSelect.Selected;
+        if (selectedIndex <= 0) return;
+        
+        var mounts = MountManager.Instance.GetOwnedMounts();
+        var mountList = new List<string>(mounts.Keys);
+        
+        if (selectedIndex - 1 >= mountList.Count) return;
+        
+        var mountId = mountList[selectedIndex - 1];
+        var evolution = MountEvolutionSystem.Instance.GetMountEvolution(mountId);
+        
+        if (evolution == null) {
+            // 初始化进化数据
+            // 默认使用第一个进化链
+            MountEvolutionSystem.Instance.InitializeMountEvolution(mountId, MountEvolutionChain.Horse);
+            evolution = MountEvolutionSystem.Instance.GetMountEvolution(mountId);
+        }
+        
+        if (evolution != null) {
+            // 更新阶段和类型显示
+            _currentStageLabel.Text = $"当前阶段: {MountEvolutionSystem.Instance.GetStageName(evolution.CurrentStage)}";
+            _currentTypeLabel.Text = $"元素类型: {MountEvolutionSystem.Instance.GetTypeName(evolution.CurrentType)}";
+            
+            // 更新战斗经验
+            _battleExpLabel.Text = $"战斗经验: {evolution.BattleExp}";
+            
+            // 更新进度条
+            var progress = MountEvolutionSystem.Instance.GetEvolutionProgress(mountId);
+            _evolutionProgress.Value = progress * 100;
+            _progressLabel.Text = $"进化进度: {progress * 100:F1}%";
+            
+            // 更新属性加成显示
+            UpdateBonusDisplay();
+            
+            // 更新进化按钮状态
+            var canEvolve = MountEvolutionSystem.Instance.CanEvolve(mountId);
+            _evolveButton.Disabled = !canEvolve;
+            
+            if (!canEvolve && evolution.CurrentStage == MountEvolutionStage.Legendary) {
+                _costLabel.Text = "已达到最高阶段!";
+            } else if (!canEvolve) {
+                var nextStage = MountEvolutionDatabase.GetNextStage(evolution.CurrentStage);
+                var nextConfig = MountEvolutionDatabase.GetStageConfig(nextStage);
+                _costLabel.Text = $"还需要 {nextConfig.RequiredExp - evolution.BattleExp} 经验";
+            } else {
+                var nextStage = MountEvolutionDatabase.GetNextStage(evolution.CurrentStage);
+                var goldCost = MountEvolutionDatabase.GetEvolutionGoldCost(nextStage);
+                var materialName = MountEvolutionDatabase.GetEvolutionMaterialName(nextStage);
+                var materialCount = MountEvolutionDatabase.GetStageConfig(nextStage).RequiredItems;
+                _costLabel.Text = $"消耗: {goldCost}金币 + {materialCount}个{materialName}";
+            }
+        }
+        
+        // 更新统计
+        var stats = MountEvolutionSystem.Instance.GetStatistics();
+        _statsLabel.Text = $"总进化次数: {stats.TotalEvolutions} | 总战斗经验: {stats.TotalBattleExp}";
+    }
+    
+    private void UpdateBonusDisplay() {
+        // 清空现有显示
+        foreach (var child in _bonusesContainer.GetChildren()) {
             child.QueueFree();
         }
-
-        if (string.IsNullOrEmpty(_selectedMountId)) return;
-
-        var baseName = MountEvolutionSystem.Instance.GetBaseMountName(_selectedMountId);
-        var currentStage = MountEvolutionSystem.Instance.GetCurrentStage(_selectedMountId);
-        var evolutionName = MountEvolutionSystem.Instance.GetEvolutionName(_selectedMountId);
-        var description = MountEvolutionSystem.Instance.GetEvolutionDescription(_selectedMountId);
-        var totalExp = MountEvolutionSystem.Instance.GetTotalBattleExp(_selectedMountId);
-        var progress = MountEvolutionSystem.Instance.GetEvolutionProgress(_selectedMountId);
-        var canEvolve = MountEvolutionSystem.Instance.CanEvolve(_selectedMountId);
-        var requirements = MountEvolutionSystem.Instance.GetEvolutionRequirements(_selectedMountId);
-
-        // 坐骑名称
-        var nameLabel = new Label
-        {
-            Text = $"坐骑: {evolutionName}",
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        nameLabel.AddThemeFontSizeOverride("font_size", 22);
-        _evolutionInfoContainer.AddChild(nameLabel);
-
-        // 当前阶段
-        var stageLabel = new Label
-        {
-            Text = $"当前阶段: {GetStageName(currentStage)}",
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        stageLabel.AddThemeFontSizeOverride("font_size", 16);
-        _evolutionInfoContainer.AddChild(stageLabel);
-
-        // 经验值
-        _expLabel = new Label
-        {
-            Text = $"战斗经验: {totalExp}",
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        _expLabel.AddThemeFontSizeOverride("font_size", 14);
-        _evolutionInfoContainer.AddChild(_expLabel);
-
-        // 经验进度条
-        _expProgressBar = new ProgressBar
-        {
-            Value = progress * 100f,
-            CustomMinimumSize = new Vector2(400, 20)
-        };
-        _expProgressBar.AddThemeStyleboxOverride("fill", CreateProgressStyle());
-        _evolutionInfoContainer.AddChild(_expProgressBar);
-
-        // 进度百分比
-        _progressLabel = new Label
-        {
-            Text = $"进化进度: {progress * 100f:F1}%",
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        _expProgressBar.AddChild(_progressLabel);
-
-        // 描述
-        var descLabel = new Label
-        {
-            Text = $"描述: {description}"
-        };
-        descLabel.AddThemeFontSizeOverride("font_size", 14);
-        _evolutionInfoContainer.AddChild(descLabel);
-
-        // 分割线
-        _evolutionInfoContainer.AddChild(new HSeparator());
-
-        // 进化需求
-        if (requirements != null)
-        {
-            var reqTitle = new Label
-            {
-                Text = "下一阶段进化需求:",
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-            reqTitle.AddThemeFontSizeOverride("font_size", 16);
-            _evolutionInfoContainer.AddChild(reqTitle);
-
-            var reqLabel = new Label
-            {
-                Text = $"• 等级需求: {requirements.RequiredLevel}\n" +
-                       $"• 战斗经验: {requirements.RequiredBattleExp}\n" +
-                       $"• 金币: {requirements.GoldCost}",
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-            reqLabel.AddThemeFontSizeOverride("font_size", 14);
-            _evolutionInfoContainer.AddChild(reqLabel);
-
-            // 物品需求
-            if (requirements.RequiredItemId > 0)
-            {
-                var itemName = GetItemName(requirements.RequiredItemId);
-                var itemCount = requirements.RequiredItemCount;
-                var hasItem = HasItem(requirements.RequiredItemId, requirements.RequiredItemCount);
-                
-                var itemLabel = new Label
-                {
-                    Text = $"• 物品需求: {itemName} x{itemCount} {(hasItem ? "✓" : "✗")}",
-                    HorizontalAlignment = HorizontalAlignment.Left
-                };
-                itemLabel.AddThemeFontSizeOverride("font_size", 14);
-                if (!hasItem)
-                    itemLabel.Modulate = new Color(1f, 0.5f, 0.5f);
-                _evolutionInfoContainer.AddChild(itemLabel);
+        
+        var selectedIndex = _mountSelect.Selected;
+        if (selectedIndex <= 0) return;
+        
+        var mounts = MountManager.Instance.GetOwnedMounts();
+        var mountList = new List<string>(mounts.Keys);
+        
+        if (selectedIndex - 1 >= mountList.Count) return;
+        
+        var mountId = mountList[selectedIndex - 1];
+        var bonuses = MountEvolutionSystem.Instance.GetMountEvolutionBonuses(mountId);
+        
+        foreach (var kvp in bonuses) {
+            if (kvp.Value > 0) {
+                var bonusLabel = new Label();
+                var bonusName = kvp.Key.Replace("Bonus", "");
+                bonusLabel.Text = $"  {bonusName}: +{kvp.Value:F1}%";
+                _bonusesContainer.AddChild(bonusLabel);
             }
-
-            // 属性加成预览
-            var bonusTitle = new Label
-            {
-                Text = "进化后属性加成:",
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-            bonusTitle.AddThemeFontSizeOverride("font_size", 16);
-            _evolutionInfoContainer.AddChild(bonusTitle);
-
-            var bonusText = "";
-            if (requirements.HealthBonus > 0) bonusText += $"• 生命 +{requirements.HealthBonus * 100f:F0}%\n";
-            if (requirements.AttackBonus > 0) bonusText += $"• 攻击 +{requirements.AttackBonus * 100f:F0}%\n";
-            if (requirements.DefenseBonus > 0) bonusText += $"• 防御 +{requirements.DefenseBonus * 100f:F0}%\n";
-            if (requirements.SpeedBonus > 0) bonusText += $"• 速度 +{requirements.SpeedBonus * 100f:F0}%\n";
-
-            var bonusLabel = new Label
-            {
-                Text = bonusText,
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-            bonusLabel.AddThemeFontSizeOverride("font_size", 14);
-            _evolutionInfoContainer.AddChild(bonusLabel);
-
-            // 进化按钮
-            _evolveButton = new Button
-            {
-                Text = canEvolve ? "进化" : "条件不足",
-                Disabled = !canEvolve,
-                CustomMinimumSize = new Vector2(200, 50)
-            };
-            _evolveButton.AddThemeFontSizeOverride("font_size", 18);
-            if (canEvolve)
-            {
-                _evolveButton.Pressed += OnEvolveButtonPressed;
-            }
-            _evolutionInfoContainer.AddChild(_evolveButton);
         }
-        else
-        {
-            var maxLabel = new Label
-            {
-                Text = "已达成最高进化阶段!",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Modulate = new Color(1f, 0.8f, 0.2f)
-            };
-            maxLabel.AddThemeFontSizeOverride("font_size", 18);
-            _evolutionInfoContainer.AddChild(maxLabel);
+        
+        if (_bonusesContainer.GetChildCount() == 0) {
+            var noBonusLabel = new Label();
+            noBonusLabel.Text = "  无属性加成";
+            _bonusesContainer.AddChild(noBonusLabel);
         }
     }
-
-    private StyleBoxFlat CreateProgressStyle()
-    {
-        var style = new StyleBoxFlat();
-        style.BgColor = new Color(0.2f, 0.4f, 0.2f);
-        style.CornerRadiusTopLeft = 5f;
-        style.CornerRadiusTopRight = 5f;
-        style.CornerRadiusBottomLeft = 5f;
-        style.CornerRadiusBottomRight = 5f;
-        return style;
+    
+    private void OnMountSelected(int index) {
+        UpdateEvolutionInfo();
     }
-
-    private void OnEvolveButtonPressed()
-    {
-        if (string.IsNullOrEmpty(_selectedMountId)) return;
-
-        var success = MountEvolutionSystem.Instance.Evolve(_selectedMountId);
-        if (success)
-        {
-            UpdateEvolutionInfo();
-            
-            // 显示成功提示
-            var notification = new Label
-            {
-                Text = "进化成功!",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Modulate = new Color(0.5f, 1f, 0.5f)
-            };
-            notification.AddThemeFontSizeOverride("font_size", 24);
-            _evolutionInfoContainer.AddChild(notification);
-            
-            // 延迟刷新
-            var timer = GetTree().CreateTimer(2f);
-            timer.Timeout += () => 
-            {
-                notification.QueueFree();
-                UpdateEvolutionInfo();
-            };
+    
+    private void OnTypeSelected(int index) {
+        // 类型选择变化
+    }
+    
+    private void OnEvolvePressed() {
+        var selectedIndex = _mountSelect.Selected;
+        if (selectedIndex <= 0) {
+            ShowMessage("请先选择坐骑!");
+            return;
         }
+        
+        var mounts = MountManager.Instance.GetOwnedMounts();
+        var mountList = new List<string>(mounts.Keys);
+        
+        if (selectedIndex - 1 >= mountList.Count) return;
+        
+        var mountId = mountList[selectedIndex - 1];
+        var targetType = (MountEvolutionType)_typeSelect.Selected;
+        
+        var result = MountEvolutionSystem.Instance.TryEvolveMount(mountId, targetType);
+        
+        switch (result) {
+            case EvolutionResult.Success:
+                ShowMessage("🎉 进化成功!");
+                break;
+            case EvolutionResult.MaxStage:
+                ShowMessage("已达到最高进化阶段!");
+                break;
+            case EvolutionResult.InsufficientExp:
+                ShowMessage("经验不足!");
+                break;
+            case EvolutionResult.InsufficientItems:
+                ShowMessage("材料不足!");
+                break;
+            default:
+                ShowMessage("进化失败!");
+                break;
+        }
+        
+        UpdateEvolutionInfo();
     }
-
-    private void OnCloseButtonPressed()
-    {
+    
+    private void OnClosePressed() {
         ToggleUI();
     }
-
-    public void ToggleUI()
-    {
+    
+    public void ToggleUI() {
         _isVisible = !_isVisible;
         Visible = _isVisible;
         
-        if (_isVisible)
-        {
-            RefreshMountList();
+        if (_isVisible) {
+            UpdateMountList();
             UpdateEvolutionInfo();
         }
     }
-
-    public static string GetStageName(MountEvolutionData.EvolutionStage stage)
-    {
-        switch (stage)
-        {
-            case MountEvolutionData.EvolutionStage.Basic: return "基础";
-            case MountEvolutionData.EvolutionStage.Advanced: return "进阶";
-            case MountEvolutionData.EvolutionStage.Elite: return "精英";
-            case MountEvolutionData.EvolutionStage.Epic: return "史诗";
-            case MountEvolutionData.EvolutionStage.Legendary: return "传奇";
-            default: return "未知";
-        }
+    
+    private void ShowMessage(string message) {
+        // 简单的消息显示
+        GD.Print($"[MountEvolutionUI] {message}");
     }
-
-    private string GetItemName(int itemId)
-    {
-        // 物品ID到名称的映射
-        switch (itemId)
-        {
-            case 1001: return "圣光之羽";
-            case 1002: return "天使之羽";
-            case 1003: return "光明神印";
-            case 1011: return "暗影之石";
-            case 1012: return "深渊魔晶";
-            case 1013: return "毁灭本源";
-            case 1021: return "冰晶";
-            case 1022: return "永恒冰晶";
-            case 1023: return "冰封王座";
-            case 1031: return "强化钢板";
-            case 1032: return "山岳之心";
-            case 1033: return "自然之源";
-            case 1041: return "雷电精华";
-            case 1042: return "苍穹之雷";
-            case 1043: return "雷霆本源";
-            case 1051: return "火焰之心";
-            case 1052: return "熔岩核心";
-            case 1053: return "炎帝之印";
-            case 1097: return "炎狱核心";
-            case 1098: return "灭世之源";
-            case 1099: return "创世神晶";
-            default: return $"物品{itemId}";
-        }
-    }
-
-    private bool HasItem(int itemId, int count)
-    {
-        var item = InventorySystem.Instance.GetItem(itemId);
-        return item != null && item.Quantity >= count;
-    }
-
-    public override void _Input(InputEvent event2)
-    {
-        if (event2 is InputEventKey keyEvent && keyEvent.Pressed)
-        {
-            // J键切换显示
-            if (keyEvent.Keycode == Key.J)
-            {
-                ToggleUI();
-            }
+    
+    public override void _Input(InputEvent eventEvent) {
+        if (eventEvent.IsActionPressed("ui_cancel") && Visible) {
+            ToggleUI();
         }
     }
 }
