@@ -266,6 +266,11 @@ namespace ClawRPG.Scripts {
             gatheringSystem.Name = "GatheringSystem";
             AddChild(gatheringSystem);
 
+            // Initialize monster taming system
+            var monsterTamingSystem = new MonsterTamingSystem();
+            monsterTamingSystem.Name = "MonsterTamingSystem";
+            AddChild(monsterTamingSystem);
+
             // Initialize multiplayer leaderboard system
             var leaderboardSystem = new MultiplayerLeaderboard();
             leaderboardSystem.Name = "MultiplayerLeaderboard";
@@ -1187,6 +1192,12 @@ namespace ClawRPG.Scripts {
             gatheringUI.Visible = false;
             ui.AddChild(gatheringUI);
 
+            // Initialize Monster Taming UI
+            var monsterTamingUI = new MonsterTamingUI();
+            monsterTamingUI.Name = "MonsterTamingUI";
+            monsterTamingUI.Visible = false;
+            ui.AddChild(monsterTamingUI);
+
             GD.Print("UI initialized");
 
             // Survival Challenge System
@@ -1541,6 +1552,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.G))
             {
                 ToggleGatheringUI();
+            }
+
+            // Handle monster taming UI toggle (T key)
+            if (Input.IsKeyPressed(Key.T))
+            {
+                ToggleMonsterTamingUI();
             }
 
             // Handle player profile UI toggle (F key)
@@ -2065,6 +2082,15 @@ namespace ClawRPG.Scripts {
             if (gatheringUI != null)
             {
                 gatheringUI.ToggleUI();
+            }
+        }
+
+        private void ToggleMonsterTamingUI()
+        {
+            var monsterTamingUI = GetNodeOrNull<MonsterTamingUI>("CanvasLayer/MonsterTamingUI");
+            if (monsterTamingUI != null)
+            {
+                monsterTamingUI.ToggleUI();
             }
         }
 
