@@ -173,9 +173,16 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
                 return false;
             }
             
-            // TODO: 检查玩家金币是否足够
-            // 这里需要访问玩家金币系统，暂时跳过
-            // if (!HasEnoughGold(unlockCost)) { ... }
+            // 检查玩家金币是否足够
+            var player = Main.Instance?.GetPlayer();
+            if (player == null || player.Gold < unlockCost) {
+                GD.PrintErr($"[GemSystem] Not enough gold: need {unlockCost}, have {player?.Gold ?? 0}");
+                GemSlotUnlocked?.Invoke(equipmentId, slotIndex, false);
+                return false;
+            }
+            
+            // 扣除金币
+            player.Gold -= unlockCost;
             
             // 解锁槽位
             slot.IsUnlocked = true;
