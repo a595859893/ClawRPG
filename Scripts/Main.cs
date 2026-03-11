@@ -180,6 +180,11 @@ namespace ClawRPG.Scripts {
             comboSystem.Name = "ComboSystem";
             AddChild(comboSystem);
 
+            // Initialize momentum system
+            var momentumSystem = new MomentumSystem();
+            momentumSystem.Name = "MomentumSystem";
+            AddChild(momentumSystem);
+
             // Initialize AOE indicator system
             var aoeIndicatorManager = new Systems.AOEIndicatorManager();
             aoeIndicatorManager.Name = "AOEIndicatorManager";
@@ -653,6 +658,11 @@ namespace ClawRPG.Scripts {
             combatStatsPanel.Name = "CombatStatsPanel";
             combatStatsPanel.AddToGroup("CombatStatsPanel");
             ui.AddChild(combatStatsPanel);
+
+            // Momentum UI
+            var momentumUI = new MomentumUI();
+            momentumUI.Name = "MomentumUI";
+            ui.AddChild(momentumUI);
 
             // Quick Slot UI
             var quickSlotUI = new UI.QuickSlotUI();
@@ -1189,6 +1199,12 @@ namespace ClawRPG.Scripts {
                 ToggleSkillCooldownUI();
             }
 
+            // Handle momentum UI toggle (M key)
+            if (Input.IsKeyPressed(Key.M))
+            {
+                ToggleMomentumUI();
+            }
+
             // Handle choice event UI toggle (C key)
             if (Input.IsKeyPressed(Key.C))
             {
@@ -1723,6 +1739,15 @@ namespace ClawRPG.Scripts {
             if (skillCooldownUI != null)
             {
                 skillCooldownUI.Toggle();
+            }
+        }
+
+        private void ToggleMomentumUI()
+        {
+            var momentumUI = GetNodeOrNull<MomentumUI>("CanvasLayer/MomentumUI");
+            if (momentumUI != null)
+            {
+                momentumUI.ToggleVisibility();
             }
         }
 
