@@ -903,6 +903,41 @@ namespace ClawRPG.Scripts.Systems {
             return new Dictionary<string, object>();
         }
 
+        public void SaveMountBattleArenaData(Dictionary<string, object> data)
+        {
+            try
+            {
+                string path = "user://mount_battle_arena_data.json";
+                string json = JsonSerializer.Serialize(data);
+                File.WriteAllText(path, json);
+                GD.Print("[SaveSystem] Mount battle arena data saved");
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to save mount battle arena data: " + e.Message);
+            }
+        }
+
+        public Dictionary<string, object> LoadMountBattleArenaData()
+        {
+            try
+            {
+                string path = "user://mount_battle_arena_data.json";
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    GD.Print("[SaveSystem] Mount battle arena data loaded");
+                    return data;
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to load mount battle arena data: " + e.Message);
+            }
+            return new Dictionary<string, object>();
+        }
+
         public void SavePlayerTalentData(Dictionary<string, object> data)
         {
             try

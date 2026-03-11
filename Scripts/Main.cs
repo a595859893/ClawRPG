@@ -302,6 +302,11 @@ namespace ClawRPG.Scripts {
             mountCombatSystem.Name = "MountCombatSystem";
             AddChild(mountCombatSystem);
 
+            // Initialize mount battle arena system
+            var mountBattleArenaSystem = new Systems.MountBattleArenaSystem();
+            mountBattleArenaSystem.Name = "MountBattleArenaSystem";
+            AddChild(mountBattleArenaSystem);
+
             // Initialize mount equipment system
             var mountEquipmentSystem = new Systems.MountEquipmentSystem();
             mountEquipmentSystem.Name = "MountEquipmentSystem";
@@ -755,6 +760,12 @@ namespace ClawRPG.Scripts {
             mountRaceUI.Name = "MountRaceUI";
             ui.AddChild(mountRaceUI);
 
+            // Mount Battle Arena UI
+            var mountBattleArenaUI = new Systems.MountBattleArenaUI();
+            mountBattleArenaUI.Name = "MountBattleArenaUI";
+            mountBattleArenaUI.Hide();
+            ui.AddChild(mountBattleArenaUI);
+
             // Guild UI
             var guildUI = new GuildUI();
             guildUI.Name = "GuildUI";
@@ -1147,6 +1158,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_mount_race"))
             {
                 ToggleMountRaceUI();
+            }
+
+            // Handle mount battle arena UI toggle (Ctrl+M key)
+            if (Input.IsActionJustPressed("ui_mount_arena"))
+            {
+                ToggleMountBattleArenaUI();
             }
 
             // Handle auto potion UI toggle (Shift+X key)
@@ -2089,6 +2106,15 @@ namespace ClawRPG.Scripts {
             if (raceUI != null)
             {
                 raceUI.Toggle();
+            }
+        }
+
+        private void ToggleMountBattleArenaUI()
+        {
+            var arenaUI = GetNodeOrNull<Systems.MountBattleArenaUI>("CanvasLayer/MountBattleArenaUI");
+            if (arenaUI != null)
+            {
+                arenaUI.Toggle();
             }
         }
 
