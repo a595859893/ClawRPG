@@ -211,6 +211,11 @@ namespace ClawRPG.Scripts {
             backgroundMusicSystem.Name = "BackgroundMusicSystem";
             AddChild(backgroundMusicSystem);
 
+            // Initialize multiplayer leaderboard system
+            var leaderboardSystem = new MultiplayerLeaderboard();
+            leaderboardSystem.Name = "MultiplayerLeaderboard";
+            AddChild(leaderboardSystem);
+
             // Initialize equipment set system
             var equipmentSetManager = new EquipmentSetManager();
             equipmentSetManager.Name = "EquipmentSetManager";
@@ -713,6 +718,11 @@ namespace ClawRPG.Scripts {
             var guildUI = new GuildUI();
             guildUI.Name = "GuildUI";
             ui.AddChild(guildUI);
+
+            // Multiplayer Leaderboard UI
+            var leaderboardUI = new UI.MultiplayerLeaderboardUI();
+            leaderboardUI.Name = "LeaderboardUI";
+            ui.AddChild(leaderboardUI);
 
             // Trade UI
             var tradeUI = new UI.TradeUI();
