@@ -356,6 +356,11 @@ namespace ClawRPG.Scripts {
             dailyDungeonSystem.Name = "DailyDungeonSystem";
             AddChild(dailyDungeonSystem);
             
+            // Initialize random boon system
+            var randomBoonSystem = new Systems.RandomBoon.RandomBoonSystem();
+            randomBoonSystem.Name = "RandomBoonSystem";
+            AddChild(randomBoonSystem);
+            
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -668,6 +673,12 @@ namespace ClawRPG.Scripts {
             dailyDungeonUI.Visible = false;
             ui.AddChild(dailyDungeonUI);
             
+            // Random Boon UI
+            var randomBoonUI = new UI.RandomBoonUI();
+            randomBoonUI.Name = "RandomBoonUI";
+            randomBoonUI.Visible = false;
+            ui.AddChild(randomBoonUI);
+            
             GD.Print("UI initialized");
             
             // Trigger welcome tutorial
@@ -972,6 +983,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_daily_login"))
             {
                 ToggleDailyLoginRewardUI();
+            }
+            
+            // Handle random boon UI toggle (B key)
+            if (Input.IsActionJustPressed("ui_boon"))
+            {
+                ToggleRandomBoonUI();
             }
             
             // Handle auction house UI toggle (Y key)
@@ -1671,6 +1688,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(dailyLoginRewardUI);
                 }
                 dailyLoginRewardUI.Show();
+            }
+        }
+        
+        /// <summary>
+        /// 切换随机祝福界面
+        /// </summary>
+        private void ToggleRandomBoonUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+            
+            var randomBoonUI = ui.GetNodeOrNull<UI.RandomBoonUI>("RandomBoonUI");
+            if (randomBoonUI != null && randomBoonUI.Visible)
+            {
+                randomBoonUI.Hide();
+            }
+            else
+            {
+                if (randomBoonUI == null)
+                {
+                    randomBoonUI = new UI.RandomBoonUI();
+                    randomBoonUI.Name = "RandomBoonUI";
+                    ui.AddChild(randomBoonUI);
+                }
+                randomBoonUI.Show();
             }
         }
         

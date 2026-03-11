@@ -71,12 +71,12 @@ namespace ClawRPG.Scripts.Characters {
         public float BaseMoveSpeed { get; private set; } = 200f;
         
         // Rune system - total attributes (after runes applied)
-        public float TotalAttackDamage => BaseAttackDamage + GetRuneBonus(RuneAttribute.Damage) + RelicAttackBonus;
-        public float TotalDefense => BaseDefense + GetRuneBonus(RuneAttribute.Defense) + RelicDefenseBonus;
-        public float TotalMaxHealth => (int)(BaseMaxHealth + GetRuneBonus(RuneAttribute.MaxHealth) + RelicHealthBonus);
-        public float TotalMaxMana => (int)(BaseMaxMana + GetRuneBonus(RuneAttribute.MaxMana));
-        public float TotalCritChance => BaseCritChance + GetRuneBonus(RuneAttribute.CritChance) / 100f + RelicCritRateBonus;
-        public float TotalCritDamage => BaseCritDamage + GetRuneBonus(RuneAttribute.CritDamage) / 100f + RelicCritDamageBonus;
+        public float TotalAttackDamage => BaseAttackDamage + GetRuneBonus(RuneAttribute.Damage) + RelicAttackBonus + BoonAttackBonus;
+        public float TotalDefense => BaseDefense + GetRuneBonus(RuneAttribute.Defense) + RelicDefenseBonus + BoonDefenseBonus;
+        public float TotalMaxHealth => (int)(BaseMaxHealth + GetRuneBonus(RuneAttribute.MaxHealth) + RelicHealthBonus + BoonHealthBonus);
+        public float TotalMaxMana => (int)(BaseMaxMana + GetRuneBonus(RuneAttribute.MaxMana) + BoonMagicBonus);
+        public float TotalCritChance => BaseCritChance + GetRuneBonus(RuneAttribute.CritChance) / 100f + RelicCritRateBonus + BoonCritRateBonus;
+        public float TotalCritDamage => BaseCritDamage + GetRuneBonus(RuneAttribute.CritDamage) / 100f + RelicCritDamageBonus + BoonCritDamageBonus;
         public float TotalAttackSpeed => BaseAttackSpeed;
         
         // Mount system bonuses (applied on top of base + runes)
@@ -93,7 +93,18 @@ namespace ClawRPG.Scripts.Characters {
         public float RelicLifestealBonus { get; set; }
         public float RelicDodgeBonus { get; set; }
         
-        public float TotalMoveSpeed => BaseMoveSpeed + GetRuneBonus(RuneAttribute.MoveSpeed) + MountSpeedBonus + RelicSpeedBonus;
+        // Boon system bonuses (applied on top of base + runes + relic)
+        public int BoonAttackBonus { get; set; }
+        public int BoonDefenseBonus { get; set; }
+        public int BoonHealthBonus { get; set; }
+        public int BoonMagicBonus { get; set; }
+        public int BoonSpeedBonus { get; set; }
+        public float BoonCritRateBonus { get; set; }
+        public float BoonCritDamageBonus { get; set; }
+        public float BoonLifestealBonus { get; set; }
+        public float BoonDodgeBonus { get; set; }
+        
+        public float TotalMoveSpeed => BaseMoveSpeed + GetRuneBonus(RuneAttribute.MoveSpeed) + MountSpeedBonus + RelicSpeedBonus + BoonSpeedBonus;
         
         // Resistance bonuses from runes
         public float FireResistance { get; private set; }
@@ -533,6 +544,24 @@ namespace ClawRPG.Scripts.Characters {
             FireResistance = GetRuneBonus(RuneAttribute.FireResistance);
             IceResistance = GetRuneBonus(RuneAttribute.IceResistance);
             DarkResistance = GetRuneBonus(RuneAttribute.DarkResistance);
+        }
+        
+        /// <summary>
+        /// Apply boons bonuses from RandomBoonSystem
+        /// </summary>
+        public void ApplyBoonBonuses()
+        {
+            if (RandomBoonSystem.Instance == null) return;
+            
+            BoonAttackBonus = RandomBoonSystem.Instance.GetAttackBonus();
+            BoonDefenseBonus = RandomBoonSystem.Instance.GetDefenseBonus();
+            BoonHealthBonus = RandomBoonSystem.Instance.GetHealthBonus();
+            BoonMagicBonus = RandomBoonSystem.Instance.GetMagicBonus();
+            BoonSpeedBonus = RandomBoonSystem.Instance.GetSpeedBonus();
+            BoonCritRateBonus = RandomBoonSystem.Instance.GetCritRateBonus();
+            BoonCritDamageBonus = RandomBoonSystem.Instance.GetCritDamageBonus();
+            BoonLifestealBonus = RandomBoonSystem.Instance.GetLifestealBonus();
+            BoonDodgeBonus = RandomBoonSystem.Instance.GetDodgeBonus();
         }
         
         public void TakeDamage(int damage, bool isCrit = false, Vector2 fromDirection = default)
