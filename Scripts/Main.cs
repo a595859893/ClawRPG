@@ -1366,6 +1366,17 @@ namespace ClawRPG.Scripts {
             emoteUI.Visible = false;
             ui.AddChild(emoteUI);
 
+            // Economic Dashboard System
+            var economicDashboardSystem = new EconomicDashboardSystem();
+            economicDashboardSystem.Name = "EconomicDashboardSystem";
+            AddChild(economicDashboardSystem);
+
+            // Economic Dashboard UI
+            var economicDashboardUI = new EconomicDashboardUI();
+            economicDashboardUI.Name = "EconomicDashboardUI";
+            economicDashboardUI.Visible = false;
+            ui.AddChild(economicDashboardUI);
+
             // Trigger welcome tutorial
             var tutorialUI = GetNodeOrNull<UI.TutorialUI>("CanvasLayer/TutorialUI");
             if (tutorialUI != null)
@@ -2154,6 +2165,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.E))
             {
                 ToggleEmoteUI();
+            }
+
+            // Handle economic dashboard UI toggle (Shift+E key)
+            if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.E))
+            {
+                ToggleEconomicDashboardUI();
             }
 
             // Handle title UI toggle (N key)
@@ -3707,6 +3724,28 @@ namespace ClawRPG.Scripts {
                 emoteUI.Name = "EmoteUI";
                 ui.AddChild(emoteUI);
                 emoteUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// 切换经济监控面板
+        /// </summary>
+        private void ToggleEconomicDashboardUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var economicDashboardUI = ui.GetNodeOrNull<EconomicDashboardUI>("EconomicDashboardUI");
+            if (economicDashboardUI != null)
+            {
+                economicDashboardUI.ToggleVisibility();
+            }
+            else
+            {
+                economicDashboardUI = new EconomicDashboardUI();
+                economicDashboardUI.Name = "EconomicDashboardUI";
+                ui.AddChild(economicDashboardUI);
+                economicDashboardUI.ToggleVisibility(true);
             }
         }
 
