@@ -7,6 +7,7 @@ using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Enhancement;
 using ClawRPG.Scripts.Systems.ArtifactFusion;
+using ClawRPG.Scripts.Systems.EnemyWeakness;
 using ClawRPG.Scripts.UI;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Quests;
@@ -792,6 +793,25 @@ namespace ClawRPG.Scripts {
             var bossMechanicsSystem = new Systems.BossMechanics.BossMechanicsSystem();
             bossMechanicsSystem.Name = "BossMechanicsSystem";
             AddChild(bossMechanicsSystem);
+
+            // Initialize enemy weakness system
+            var enemyWeaknessData = new EnemyWeaknessData();
+            enemyWeaknessData.Name = "EnemyWeaknessData";
+            AddChild(enemyWeaknessData);
+
+            var enemyWeaknessDatabase = new EnemyWeaknessDatabase();
+            enemyWeaknessDatabase.Name = "EnemyWeaknessDatabase";
+            AddChild(enemyWeaknessDatabase);
+
+            var enemyWeaknessSystem = new EnemyWeaknessSystem();
+            enemyWeaknessSystem.Name = "EnemyWeaknessSystem";
+            AddChild(enemyWeaknessSystem);
+
+            // Initialize UI
+            var enemyWeaknessUI = new EnemyWeaknessUI();
+            enemyWeaknessUI.Name = "EnemyWeaknessUI";
+            GetNode("/root/CanvasLayer/UI").AddChild(enemyWeaknessUI);
+            enemyWeaknessUI.Visible = false;
 
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
@@ -2470,6 +2490,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_world_boss"))
             {
                 ToggleWorldBossUI();
+            }
+
+            // Handle enemy weakness UI toggle (Ctrl+W)
+            if (Input.IsKeyPressed(Key.W) && Input.IsKeyPressed(Key.Control))
+            {
+                ToggleEnemyWeaknessUI();
             }
             
             // Handle contract bounty UI toggle (Ctrl+C)
@@ -4310,6 +4336,18 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(enchantUI);
                 }
                 enchantUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换敌人弱点界面
+        /// </summary>
+        private void ToggleEnemyWeaknessUI()
+        {
+            var enemyWeaknessUI = GetNodeOrNull<EnemyWeaknessUI>("UI/EnemyWeaknessUI");
+            if (enemyWeaknessUI != null)
+            {
+                enemyWeaknessUI.Toggle();
             }
         }
 
