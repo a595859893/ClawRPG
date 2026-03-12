@@ -645,3 +645,4 @@ public class PartySystem
         GD.Print($"[PartySystem] Loaded {_parties.Count} parties");
     }
 }
+}

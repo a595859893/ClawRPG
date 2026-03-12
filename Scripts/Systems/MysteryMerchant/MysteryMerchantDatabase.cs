@@ -183,7 +183,7 @@ namespace ClawRPG.Scripts.Systems
         };
 
         // 预定义商品列表（按类型和稀有度）
-        public static Dictionary<string, List<Dictionary<string, object>>> ItemPool = new Dictionary<string, List<Dictionary<string, object>>>
+        public static Dictionary<string, List<Dictionary<string, object>> > ItemPool = new Dictionary<string, List<Dictionary<string, object>> >
         {
             { "weapon", new List<Dictionary<string, object>>
                 {

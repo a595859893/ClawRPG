@@ -33,7 +33,7 @@ public class WeatherUI : Control
     {
         // Main container
         var main_container = new VBoxContainer();
-        main_container.SetAnchorsPreset(Control Preset.Center);
+        main_container.SetAnchorsPreset(Control.LayoutPreset.Center);
         main_container.CustomMinimumSize = new Vector2(500, 600);
         main_container.Position = new Vector2(-250, -300);
         AddChild(main_container);

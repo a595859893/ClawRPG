@@ -136,10 +136,10 @@ public class BoonDatabase
         
         // Utility Boons - Epic
         AddBoon(new BoonData("utility_7", "金银满屋", "+50% 金币获取", BoonType.Utility, BoonRarity.Epic) { GoldMultiplier = 50 });
-        AddBoon(new BoonData("utility_8", "学富五车", "+50% 经验获取", BoonType.Utility, BoonRarity.Epic) { ExpMultiplier = 50 };
+        AddBoon(new BoonData("utility_8", "学富五车", "+50% 经验获取", BoonType.Utility, BoonRarity.Epic) { ExpMultiplier = 50 });
         
         // Utility Boons - Legendary
-        AddBoon(new BoonData("utility_9", "气运之子", "+75% 金币获取, +75% 经验获取", BoonType.Utility, BoonRarity.Legendary) { GoldMultiplier = 75, ExpMultiplier = 75 };
+        AddBoon(new BoonData("utility_9", "气运之子", "+75% 金币获取, +75% 经验获取", BoonType.Utility, BoonRarity.Legendary) { GoldMultiplier = 75, ExpMultiplier = 75 });
         
         // Special Boons - Rare
         AddBoon(new BoonData("special_1", "全能", "+20 攻击, +20 防御, +50 生命", BoonType.Special, BoonRarity.Rare) { AttackBonus = 20, DefenseBonus = 20, HealthBonus = 50 });
