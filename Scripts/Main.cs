@@ -880,6 +880,12 @@ namespace ClawRPG.Scripts {
             craftingMasteryUI.Visible = false;
             ui.AddChild(craftingMasteryUI);
 
+            // Hotkey HUD - 显示所有快捷键
+            var hotkeyHUD = new HotkeyHUD();
+            hotkeyHUD.Name = "HotkeyHUD";
+            hotkeyHUD.Visible = false;
+            ui.AddChild(hotkeyHUD);
+
             // Equipment Set UI
             var equipmentSetUI = new UI.EquipmentSetUI();
             equipmentSetUI.Name = "EquipmentSetUI";
@@ -1666,6 +1672,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("player_profile"))
             {
                 TogglePlayerProfileUI();
+            }
+
+            // Handle hotkey HUD toggle (F1 key) - 显示快捷键指南
+            if (Input.IsKeyPressed(Key.F1))
+            {
+                ToggleHotkeyHUD();
             }
 
             // Handle keybinding UI toggle (F10 key)
@@ -2988,6 +3000,15 @@ namespace ClawRPG.Scripts {
             if (profileUI != null)
             {
                 profileUI.Toggle();
+            }
+        }
+
+        private void ToggleHotkeyHUD()
+        {
+            var hotkeyHUD = GetNodeOrNull<HotkeyHUD>("UI/HotkeyHUD");
+            if (hotkeyHUD != null)
+            {
+                hotkeyHUD.Toggle();
             }
         }
 
