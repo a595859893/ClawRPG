@@ -251,6 +251,11 @@ namespace ClawRPG.Scripts {
             skillSynergySystem.Name = "SkillSynergySystem";
             AddChild(skillSynergySystem);
 
+            // Initialize soul bond system
+            var soulBondSystem = new SoulBondSystem();
+            soulBondSystem.Name = "SoulBondSystem";
+            AddChild(soulBondSystem);
+
             // Initialize AOE indicator system
             var aoeIndicatorManager = new Systems.AOEIndicatorManager();
             aoeIndicatorManager.Name = "AOEIndicatorManager";
@@ -952,6 +957,12 @@ namespace ClawRPG.Scripts {
             artifactFusionUI.Name = "ArtifactFusionUI";
             artifactFusionUI.Visible = false;
             ui.AddChild(artifactFusionUI);
+
+            // Soul Bond UI
+            var soulBondUI = new SoulBondUI();
+            soulBondUI.Name = "SoulBondUI";
+            soulBondUI.Visible = false;
+            ui.AddChild(soulBondUI);
 
             // Weather UI
             var weatherUI = new WeatherUI();
@@ -1663,6 +1674,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.F) && Input.IsKeyPressed(Key.Ctrl))
             {
                 ToggleArtifactFusionUI();
+            }
+
+            // Handle soul bond UI toggle (Ctrl+Shift+B key)
+            if (Input.IsKeyPressed(Key.B) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleSoulBondUI();
             }
 
             // Handle weather UI toggle (Ctrl+W key)
@@ -3356,6 +3373,19 @@ namespace ClawRPG.Scripts {
             if (artifactFusionUI != null)
             {
                 artifactFusionUI.Toggle();
+            }
+        }
+
+        private void ToggleSoulBondUI()
+        {
+            var soulBondUI = GetNodeOrNull<SoulBondUI>("UI/SoulBondUI");
+            if (soulBondUI != null)
+            {
+                soulBondUI.Visible = !soulBondUI.Visible;
+                if (soulBondUI.Visible)
+                {
+                    soulBondUI.Refresh();
+                }
             }
         }
 
