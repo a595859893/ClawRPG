@@ -768,6 +768,11 @@ namespace ClawRPG.Scripts {
             proceduralChallengeSystem.Name = "ProceduralChallengeSystem";
             AddChild(proceduralChallengeSystem);
 
+            // Initialize dynamic quest challenge system
+            var dynamicQuestChallengeSystem = new Systems.DynamicQuestChallenge.DynamicQuestChallengeSystem();
+            dynamicQuestChallengeSystem.Name = "DynamicQuestChallengeSystem";
+            AddChild(dynamicQuestChallengeSystem);
+
             // Initialize boss mechanics system
             var bossMechanicsSystem = new Systems.BossMechanics.BossMechanicsSystem();
             bossMechanicsSystem.Name = "BossMechanicsSystem";
@@ -1382,6 +1387,12 @@ namespace ClawRPG.Scripts {
             proceduralChallengeUI.Name = "ProceduralChallengeUI";
             proceduralChallengeUI.Visible = false; 
             ui.AddChild(proceduralChallengeUI);
+
+            // Dynamic Quest Challenge UI
+            var dynamicQuestChallengeUI = new Systems.DynamicQuestChallenge.DynamicQuestChallengeUI();
+            dynamicQuestChallengeUI.Name = "DynamicQuestChallengeUI";
+            dynamicQuestChallengeUI.Visible = false;
+            ui.AddChild(dynamicQuestChallengeUI);
 
             // Loot Drop UI
             var lootDropUI = new Systems.LootDropUI();
@@ -2073,6 +2084,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_challenge"))
             {
                 ToggleProceduralChallengeUI();
+            }
+
+            // Handle dynamic quest challenge UI toggle (Ctrl+Shift+D)
+            if (Input.IsActionJustPressed("ui_dynamic_quest_challenge"))
+            {
+                ToggleDynamicQuestChallengeUI();
             }
 
             // Handle loot drop UI toggle (L key)
@@ -4011,6 +4028,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(challengeUI);
                 }
                 challengeUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// 切换动态任务挑战界面
+        /// </summary>
+        private void ToggleDynamicQuestChallengeUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var challengeUI = ui.GetNodeOrNull<Systems.DynamicQuestChallenge.DynamicQuestChallengeUI>("DynamicQuestChallengeUI");
+            if (challengeUI != null && challengeUI.Visible)
+            {
+                challengeUI.Hide();
+            }
+            else
+            {
+                if (challengeUI == null)
+                {
+                    challengeUI = new Systems.DynamicQuestChallenge.DynamicQuestChallengeUI();
+                    challengeUI.Name = "DynamicQuestChallengeUI";
+                    ui.AddChild(challengeUI);
+                }
+                challengeUI.Show();
             }
         }
 
