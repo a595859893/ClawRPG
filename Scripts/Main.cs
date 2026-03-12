@@ -445,6 +445,11 @@ namespace ClawRPG.Scripts {
             AddChild(auctionHouseSystem);
             auctionHouseSystem.Initialize(_player);
 
+            // Initialize dynamic market tax system
+            var dynamicMarketTaxSystem = new DynamicMarketTaxSystem();
+            dynamicMarketTaxSystem.Name = "DynamicMarketTaxSystem";
+            AddChild(dynamicMarketTaxSystem);
+
             // Initialize mount combat system
             var mountCombatSystem = new Mounts.MountCombatSystem();
             mountCombatSystem.Name = "MountCombatSystem";
@@ -2067,6 +2072,12 @@ namespace ClawRPG.Scripts {
                 ToggleAuctionHouseUI();
             }
 
+            // Handle dynamic market tax UI toggle (T key)
+            if (Input.IsKeyPressed(KEY_T) && Input.IsKeyPressed(KEY_CONTROL))
+            {
+                ToggleDynamicMarketTaxUI();
+            }
+
             // Handle enchantment UI toggle (E key)
             if (Input.IsActionJustPressed("ui_enchant"))
             {
@@ -3682,6 +3693,33 @@ namespace ClawRPG.Scripts {
                     }
                     auctionUI.Show();
                     auctionUI.Open();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 切换动态市场税率界面
+        /// </summary>
+        private void ToggleDynamicMarketTaxUI()
+        {
+            var taxUI = GetNodeOrNull<DynamicMarketTaxUI>("CanvasLayer/DynamicMarketTaxUI");
+            if (taxUI != null && taxUI.Visible)
+            {
+                taxUI.Hide();
+            }
+            else
+            {
+                var canvasLayer = GetNodeOrNull("CanvasLayer");
+                if (canvasLayer != null)
+                {
+                    if (taxUI == null)
+                    {
+                        taxUI = new DynamicMarketTaxUI();
+                        taxUI.Name = "DynamicMarketTaxUI";
+                        canvasLayer.AddChild(taxUI);
+                    }
+                    taxUI.Show();
+                    taxUI.Toggle();
                 }
             }
         }
