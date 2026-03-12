@@ -522,6 +522,11 @@ namespace ClawRPG.Scripts {
             // Initialize guild technology system (singleton)
             _ = GuildTechnologySystem.Instance;
 
+            // Initialize guild war league system
+            var guildWarLeagueSystem = new GuildWarLeagueSystem();
+            guildWarLeagueSystem.Name = "GuildWarLeagueSystem";
+            AddChild(guildWarLeagueSystem);
+
             // Initialize collectible system
             CollectibleSystem.Instance.Initialize();
 
@@ -1197,6 +1202,12 @@ namespace ClawRPG.Scripts {
             guildTechnologyUI.Name = "GuildTechnologyUI";
             guildTechnologyUI.Hide();
             ui.AddChild(guildTechnologyUI);
+
+            // Guild War League UI
+            var guildWarLeagueUI = new GuildWarLeagueUI();
+            guildWarLeagueUI.Name = "GuildWarLeagueUI";
+            guildWarLeagueUI.Hide();
+            ui.AddChild(guildWarLeagueUI);
 
             // Multiplayer Leaderboard UI
             var leaderboardUI = new UI.MultiplayerLeaderboardUI();
@@ -2054,6 +2065,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_guild_tech"))
             {
                 ToggleGuildTechnologyUI();
+            }
+
+            // Handle guild war league UI toggle (Ctrl+Shift+G key)
+            if (Input.IsActionJustPressed("ui_guild_war_league"))
+            {
+                ToggleGuildWarLeagueUI();
             }
 
             // Handle trade UI toggle (T key)
@@ -3920,6 +3937,31 @@ namespace ClawRPG.Scripts {
                 }
                 guildTechnologyUI.Show();
                 guildTechnologyUI.Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Toggle Guild War League UI
+        /// </summary>
+        private void ToggleGuildWarLeagueUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var guildWarLeagueUI = ui.GetNodeOrNull<GuildWarLeagueUI>("GuildWarLeagueUI");
+            if (guildWarLeagueUI != null && guildWarLeagueUI.Visible)
+            {
+                guildWarLeagueUI.Hide();
+            }
+            else
+            {
+                if (guildWarLeagueUI == null)
+                {
+                    guildWarLeagueUI = new GuildWarLeagueUI();
+                    guildWarLeagueUI.Name = "GuildWarLeagueUI";
+                    ui.AddChild(guildWarLeagueUI);
+                }
+                guildWarLeagueUI.Show();
             }
         }
 
