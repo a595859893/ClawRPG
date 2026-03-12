@@ -606,6 +606,11 @@ namespace ClawRPG.Scripts {
             AddChild(petAffectionSystem);
             petAffectionSystem.Initialize();
 
+            // Initialize pet interaction system
+            var petInteractionSystem = new Systems.PetInteraction.PetInteractionSystem();
+            petInteractionSystem.Name = "PetInteractionSystem";
+            AddChild(petInteractionSystem);
+
             // Initialize pet foster system
             var petFosterSystem = new Systems.PetFoster.PetFosterSystem();
             petFosterSystem.Name = "PetFosterSystem";
@@ -1265,6 +1270,12 @@ namespace ClawRPG.Scripts {
             petAffectionUI.Name = "PetAffectionUI";
             petAffectionUI.Visible = false; 
             ui.AddChild(petAffectionUI);
+
+            // Pet Interaction UI
+            var petInteractionUI = new Systems.PetInteraction.PetInteractionUI();
+            petInteractionUI.Name = "PetInteractionUI";
+            petInteractionUI.Visible = false;
+            ui.AddChild(petInteractionUI);
 
             // Pet Foster UI
             var petFosterUI = new Systems.PetFoster.PetFosterUI();
@@ -2209,6 +2220,12 @@ namespace ClawRPG.Scripts {
                 TogglePetAffectionUI();
             }
 
+            // Handle pet interaction UI toggle (I)
+            if (Input.IsActionJustPressed("pet_interaction_toggle"))
+            {
+                TogglePetInteractionUI();
+            }
+
             // Handle pet breeding UI toggle (Ctrl+B)
             if (Input.IsActionJustPressed("pet_breeding_toggle"))
             {
@@ -2938,6 +2955,18 @@ namespace ClawRPG.Scripts {
             if (petAffectionUI != null)
             {
                 petAffectionUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet interaction UI
+        /// </summary>
+        private void TogglePetInteractionUI()
+        {
+            var petInteractionUI = GetNodeOrNull<Systems.PetInteraction.PetInteractionUI>("UI/PetInteractionUI");
+            if (petInteractionUI != null)
+            {
+                petInteractionUI.ToggleVisibility();
             }
         }
 
