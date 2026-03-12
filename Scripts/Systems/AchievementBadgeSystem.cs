@@ -34,15 +34,15 @@ namespace ClawRPG.Systems {
             // 铜色徽章 (Tier 1)
             RegisterBadge(new AchievementBadge {
                 BadgeId = "first_blood", DisplayName = "初战告捷", Description = "击败第一个敌人",
-                BadgeColor = new Color(0.8f, 0.5f, 0.2f), IconName = "sword", Tier= 1;
+                BadgeColor = new Color(0.8f, 0.5f, 0.2f), IconName = "sword", Tier = 1,
             });
             RegisterBadge(new AchievementBadge {
                 BadgeId = "collector", DisplayName = "收藏家", Description = "收集10件物品",
-                BadgeColor = new Color(0.8f, 0.5f, 0.2f), IconName = "chest", Tier= 1;
+                BadgeColor = new Color(0.8f, 0.5f, 0.2f), IconName = "chest", Tier = 1,
             });
             RegisterBadge(new AchievementBadge {
                 BadgeId = "explorer", DisplayName = "探索者", Description = "发现5个区域",
-                BadgeColor = new Color(0.8f, 0.5f, 0.2f), IconName = "map", Tier= 1;
+                BadgeColor = new Color(0.8f, 0.5f, 0.2f), IconName = "map", Tier = 1,
             });
 
             // 银色徽章 (Tier 2)

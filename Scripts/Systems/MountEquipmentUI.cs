@@ -131,7 +131,7 @@ namespace GameSystems {
             var filterLabel = new Label { Text = "筛选: " };
             filterBox.AddChild(filterLabel);
             
-            var typeFilter = new OptionButton;
+            var typeFilter = new OptionButton();
             typeFilter.AddItem("全部类型");
             typeFilter.AddItem("马鞍");
             typeFilter.AddItem("马蹄铁");
@@ -142,7 +142,7 @@ namespace GameSystems {
             typeFilter.ItemSelected += (index) => RefreshShopGrid((int)index - 1);
             filterBox.AddChild(typeFilter);
             
-            var rarityFilter = new OptionButton;
+            var rarityFilter = new OptionButton();
             rarityFilter.AddItem("全部稀有度");
             rarityFilter.AddItem("普通");
             rarityFilter.AddItem("优秀");

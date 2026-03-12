@@ -437,7 +437,7 @@ public class ComboSystem : Node
         
         if (data.ContainsKey("progress"))
         {
-            var progressData, object>)data = (Dictionary<string["progress"];
+            var progressData = (Dictionary<string, object>)data["progress"];
             foreach (var entry in progressData)
             {
                 if (_playerCombos.TryGetValue(entry.Key, out var progress))
