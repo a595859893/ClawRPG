@@ -240,6 +240,11 @@ namespace ClawRPG.Scripts {
             sealedTowerManager.Name = "SealedTowerManager";
             AddChild(sealedTowerManager);
 
+            // Initialize crafting mastery system
+            var craftingMasterySystem = new CraftingMasterySystem();
+            craftingMasterySystem.Name = "CraftingMasterySystem";
+            AddChild(craftingMasterySystem);
+
             // Initialize treasure hunt system
             var treasureHuntManager = new TreasureHuntManager();
             treasureHuntManager.Name = "TreasureHuntManager";
@@ -868,6 +873,12 @@ namespace ClawRPG.Scripts {
             sealedTowerUI.Name = "SealedTowerUI";
             sealedTowerUI.Visible = false;
             ui.AddChild(sealedTowerUI);
+
+            // Crafting Mastery UI
+            var craftingMasteryUI = new CraftingMasteryUI();
+            craftingMasteryUI.Name = "CraftingMasteryUI";
+            craftingMasteryUI.Visible = false;
+            ui.AddChild(craftingMasteryUI);
 
             // Equipment Set UI
             var equipmentSetUI = new UI.EquipmentSetUI();
@@ -1601,6 +1612,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.H))
             {
                 ToggleTreasureHuntUI();
+            }
+
+            // Handle crafting mastery UI toggle (Ctrl+M key)
+            if (Input.IsKeyPressed(Key.M) && Input.IsKeyPressed(Key.Ctrl))
+            {
+                ToggleCraftingMasteryUI();
             }
 
             // Handle dice master UI toggle (D key)
@@ -2871,6 +2888,19 @@ namespace ClawRPG.Scripts {
                     }
                     canvasLayer.AddChild(newUI);
                     newUI.Visible = true;
+                }
+            }
+        }
+
+        private void ToggleCraftingMasteryUI()
+        {
+            var craftingMasteryUI = GetNodeOrNull<CraftingMasteryUI>("CanvasLayer/CraftingMasteryUI");
+            if (craftingMasteryUI != null)
+            {
+                craftingMasteryUI.Visible = !craftingMasteryUI.Visible;
+                if (craftingMasteryUI.Visible)
+                {
+                    craftingMasteryUI.Refresh();
                 }
             }
         }
