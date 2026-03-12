@@ -621,6 +621,16 @@ namespace ClawRPG.Scripts {
             petRecycleSystem.Name = "PetRecycleSystem";
             AddChild(petRecycleSystem);
 
+            // Initialize elite monster system
+            var eliteMonsterDatabase = new Systems.EliteMonster.EliteMonsterDatabase();
+            eliteMonsterDatabase.Name = "EliteMonsterDatabase";
+            AddChild(eliteMonsterDatabase);
+
+            // Initialize elite monster system
+            var eliteMonsterSystem = new Systems.EliteMonster.EliteMonsterSystem();
+            eliteMonsterSystem.Name = "EliteMonsterSystem";
+            AddChild(eliteMonsterSystem);
+
             // Initialize pet foster system
             var petFosterSystem = new Systems.PetFoster.PetFosterSystem();
             petFosterSystem.Name = "PetFosterSystem";
@@ -1303,6 +1313,12 @@ namespace ClawRPG.Scripts {
             petRecycleUI.Name = "PetRecycleUI";
             petRecycleUI.Visible = false;
             ui.AddChild(petRecycleUI);
+
+            // Elite Monster UI
+            var eliteMonsterUI = new Systems.EliteMonster.EliteMonsterUI();
+            eliteMonsterUI.Name = "EliteMonsterUI";
+            eliteMonsterUI.Visible = false;
+            ui.AddChild(eliteMonsterUI);
 
             // Pet Foster UI
             var petFosterUI = new Systems.PetFoster.PetFosterUI();
@@ -2277,6 +2293,12 @@ namespace ClawRPG.Scripts {
                 TogglePetRecycleUI();
             }
 
+            // Handle elite monster UI toggle (E key)
+            if (Input.IsActionJustPressed("elite_monster_toggle"))
+            {
+                ToggleEliteMonsterUI();
+            }
+
             // Handle pet breeding UI toggle (Ctrl+B)
             if (Input.IsActionJustPressed("pet_breeding_toggle"))
             {
@@ -3035,6 +3057,18 @@ namespace ClawRPG.Scripts {
                     petRecycleUI.Initialize(petRecycleSystem);
                 }
                 petRecycleUI.Visible = !petRecycleUI.Visible;
+            }
+        }
+
+        /// <summary>
+        /// Toggle elite monster UI
+        /// </summary>
+        private void ToggleEliteMonsterUI()
+        {
+            var eliteMonsterUI = GetNodeOrNull<Systems.EliteMonster.EliteMonsterUI>("UI/EliteMonsterUI");
+            if (eliteMonsterUI != null)
+            {
+                eliteMonsterUI.ToggleVisibility();
             }
         }
 
