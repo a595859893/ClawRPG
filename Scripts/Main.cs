@@ -554,6 +554,11 @@ namespace ClawRPG.Scripts {
             petEvolutionSystem.Name = "PetEvolutionSystem";
             AddChild(petEvolutionSystem);
 
+            // Initialize pet breeding system
+            var petBreedingSystem = new Systems.PetBreeding.PetBreedingSystem();
+            petBreedingSystem.Name = "PetBreedingSystem";
+            AddChild(petBreedingSystem);
+
             // Initialize pet talent system
             var petTalentSystem = new Systems.PetTalentSystem();
             petTalentSystem.Name = "PetTalentSystem";
@@ -1172,6 +1177,12 @@ namespace ClawRPG.Scripts {
             petTalentUI.Name = "PetTalentUI";
             petTalentUI.Visible = false; 
             ui.AddChild(petTalentUI);
+
+            // Pet Breeding UI
+            var petBreedingUI = new Systems.PetBreeding.PetBreedingUI();
+            petBreedingUI.Name = "PetBreedingUI";
+            petBreedingUI.Visible = false;
+            ui.AddChild(petBreedingUI);
 
             // Pet Affection UI
             var petAffectionUI = new Systems.PetAffectionUI();
@@ -2074,6 +2085,12 @@ namespace ClawRPG.Scripts {
                 TogglePetAffectionUI();
             }
 
+            // Handle pet breeding UI toggle (Ctrl+B)
+            if (Input.IsActionJustPressed("pet_breeding_toggle"))
+            {
+                TogglePetBreedingUI();
+            }
+
             // Handle pet foster UI toggle (Alt+P)
             if (Input.IsActionJustPressed("ui_pet_foster"))
             {
@@ -2754,6 +2771,18 @@ namespace ClawRPG.Scripts {
             if (petAffectionUI != null)
             {
                 petAffectionUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet breeding UI
+        /// </summary>
+        private void TogglePetBreedingUI()
+        {
+            var petBreedingUI = GetNodeOrNull<Systems.PetBreeding.PetBreedingUI>("UI/PetBreedingUI");
+            if (petBreedingUI != null)
+            {
+                petBreedingUI.Toggle();
             }
         }
 

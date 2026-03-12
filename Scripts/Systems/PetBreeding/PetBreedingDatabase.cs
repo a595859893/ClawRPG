@@ -1,228 +1,223 @@
+using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ClawRPG.Systems
+public class PetBreedingDatabase : Resource
 {
-    /// <summary>
-    /// 宠物繁殖数据库 - 定义繁殖规则和配置
-    /// </summary>
-    public static class PetBreedingDatabase
+    [Export] public Dictionary<string, PetBreedConfig> BreedConfigs = new Dictionary<string, PetBreedConfig>();
+
+    public PetBreedingDatabase()
     {
-        // 繁殖配置
-        public static Dictionary<PetBreedingData.BreedingType, BreedingConfig> BreedingConfigs = new Dictionary<PetBreedingData.BreedingType, BreedingConfig>();
-        
-        // 稀有度继承权重
-        public static Dictionary<string, RarityInheritance> RarityInheritance = new Dictionary<string, RarityInheritance>();
-        
-        // 属性继承系数
-        public static AttributeInheritance AttributeInheritance = new AttributeInheritance();
-        
-        // 繁殖类型
-        public enum BreedingType
+        // Fire Dragon + Ice Dragon = Volcanic Dragon
+        BreedConfigs["FireDragon_IceDragon"] = new PetBreedConfig
         {
-            Basic,      // 基础繁殖
-            Advanced,   // 高级繁殖  
-            Legendary   // 传奇繁殖
-        }
-        
-        public class BreedingConfig
-        {
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public int BaseDuration { get; set; } // 秒
-            public int GoldCost { get; set; }
-            public float BaseSuccessRate { get; set; }
-            public float LegendaryChance { get; set; }
-            public int MinParentLevel { get; set; }
-            public int OffspringMinLevel { get; set; }
-        }
-        
-        public class RarityInheritance
-        {
-            public string Rarity { get; set; }
-            public float Weight { get; set; }
-        }
-        
-        public class AttributeInheritance
-        {
-            public float MinInheritRate { get; set; } = 0.3f;
-            public float MaxInheritRate { get; set; } = 0.7f;
-            public float MutationChance { get; set; } = 0.15f;
-            public float MutationBonus { get; set; } = 0.2f;
-        }
-        
-        static PetBreedingDatabase()
-        {
-            InitializeBreedingConfigs();
-            InitializeRarityInheritance();
-        }
-        
-        private static void InitializeBreedingConfigs()
-        {
-            // 基础繁殖
-            BreedingConfigs[PetBreedingData.BreedingType.Basic] = new BreedingConfig
+            ResultType = "VolcanicDragon",
+            ResultName = "Volcanic Dragon",
+            Description = "A dragon born from the fusion of fire and ice elements",
+            BaseSuccessRate = 0.25f,
+            RarityWeights = new Dictionary<int, float>
             {
-                Name = "基础繁殖",
-                Description = "普通的宠物繁殖方式，成功率较低",
-                BaseDuration = 300, // 5分钟
-                GoldCost = 100,
-                BaseSuccessRate = 0.6f,
-                LegendaryChance = 0.02f,
-                MinParentLevel = 5,
-                OffspringMinLevel = 1
-            };
-            
-            // 高级繁殖
-            BreedingConfigs[PetBreedingData.BreedingType.Advanced] = new BreedingConfig
-            {
-                Name = "高级繁殖",
-                Description = "使用特殊道具提高成功率",
-                BaseDuration = 180, // 3分钟
-                GoldCost = 500,
-                BaseSuccessRate = 0.75f,
-                LegendaryChance = 0.08f,
-                MinParentLevel = 10,
-                OffspringMinLevel = 5
-            };
-            
-            // 传奇繁殖
-            BreedingConfigs[PetBreedingData.BreedingType.Legendary] = new BreedingConfig
-            {
-                Name = "传奇繁殖",
-                Description = "使用传奇繁殖石，成功率最高",
-                BaseDuration = 60, // 1分钟
-                GoldCost = 2000,
-                BaseSuccessRate = 0.9f,
-                LegendaryChance = 0.2f,
-                MinParentLevel = 20,
-                OffspringMinLevel = 10
-            };
-        }
-        
-        private static void InitializeRarityInheritance()
-        {
-            // 普通
-            RarityInheritance["Common"] = new RarityInheritance { Rarity = "Common", Weight = 0.5f };
-            // 优秀
-            RarityInheritance["Uncommon"] = new RarityInheritance { Rarity = "Uncommon", Weight = 0.3f };
-            // 稀有
-            RarityInheritance["Rare"] = new RarityInheritance { Rarity = "Rare", Weight = 0.15f };
-            // 史诗
-            RarityInheritance["Epic"] = new RarityInheritance { Rarity = "Epic", Weight = 0.04f };
-            // 传说
-            RarityInheritance["Legendary"] = new RarityInheritance { Rarity = "Legendary", Weight = 0.01f };
-        }
-        
-        /// <summary>
-        /// 获取繁殖配置
-        /// </summary>
-        public static BreedingConfig GetConfig(PetBreedingData.BreedingType type)
-        {
-            return BreedingConfigs.ContainsKey(type) ? BreedingConfigs[type] : null;
-        }
-        
-        /// <summary>
-        /// 计算繁殖成功率
-        /// </summary>
-        public static float CalculateSuccessRate(PetBreedingData.BreedingType type, int parent1Level, int parent2Level)
-        {
-            var config = GetConfig(type);
-            if (config == null) return 0.5f;
-            
-            // 等级加成
-            float levelBonus = (parent1Level + parent2Level) / 200f;
-            
-            return Math.Min(config.BaseSuccessRate + levelBonus, 0.95f);
-        }
-        
-        /// <summary>
-        /// 随机选择后代稀有度
-        /// </summary>
-        public static string SelectOffspringRarity(string parent1Rarity, string parent2Rarity, float legendaryChance)
-        {
-            // 父母稀有度平均值作为基础
-            int parent1Rank = GetRarityRank(parent1Rarity);
-            int parent2Rank = GetRarityRank(parent2Rarity);
-            float avgRank = (parent1Rank + parent2Rank) / 2f;
-            
-            // 随机浮动
-            float random = new Random().NextFloat();
-            float rankOffset = (random - 0.5f) * 2f; // -1 到 1
-            
-            int finalRank = (int)(avgRank + rankOffset);
-            finalRank = Math.Max(0, Math.Min(4, finalRank));
-            
-            // 传奇检查
-            if (random < legendaryChance)
-            {
-                return "Legendary";
+                { 1, 0.50f }, // Common
+                { 2, 0.30f }, // Uncommon
+                { 3, 0.15f }, // Rare
+                { 4, 0.04f }, // Epic
+                { 5, 0.01f }  // Legendary
             }
-            
-            return GetRarityByRank(finalRank);
-        }
-        
-        /// <summary>
-        /// 计算后代属性
-        /// </summary>
-        public static void CalculateOffspringAttributes(
-            PetBreedingData.ParentPet parent1, 
-            PetBreedingData.ParentPet parent2, 
-            out int attack, out int defense, out int health, out int speed)
+        };
+
+        // Wolf + Fox = Fenris
+        BreedConfigs["Wolf_Fox"] = new PetBreedConfig
         {
-            var random = new Random();
-            float inheritRate = AttributeInheritance.MinInheritRate + 
-                (float)(random.NextDouble() * (AttributeInheritance.MaxInheritRate - AttributeInheritance.MinInheritRate));
-            
-            // 基础属性继承
-            attack = (int)((parent1.Attack + parent2.Attack) / 2f * inheritRate);
-            defense = (int)((parent1.Defense + parent2.Defense) / 2f * inheritRate);
-            health = (int)((parent1.Health + parent2.Health) / 2f * inheritRate);
-            speed = (int)((parent1.Speed + parent2.Speed) / 2f * inheritRate);
-            
-            // 突变检查
-            if (random.NextDouble() < AttributeInheritance.MutationChance)
+            ResultType = "Fenris",
+            ResultName = "Fenris Wolf",
+            Description = "A cunning predator combining wolf and fox traits",
+            BaseSuccessRate = 0.35f,
+            RarityWeights = new Dictionary<int, float>
             {
-                float bonus = 1f + AttributeInheritance.MutationBonus;
-                switch (random.Next(4))
-                {
-                    case 0: attack = (int)(attack * bonus); break;
-                    case 1: defense = (int)(defense * bonus); break;
-                    case 2: health = (int)(health * bonus); break;
-                    case 3: speed = (int)(speed * bonus); break;
-                }
+                { 1, 0.45f },
+                { 2, 0.35f },
+                { 3, 0.15f },
+                { 4, 0.04f },
+                { 5, 0.01f }
             }
-            
-            // 最小值保证
-            attack = Math.Max(attack, 5);
-            defense = Math.Max(defense, 5);
-            health = Math.Max(health, 20);
-            speed = Math.Max(speed, 3);
-        }
-        
-        private static int GetRarityRank(string rarity)
+        };
+
+        // Phoenix + Thunderbird = Solar Phoenix
+        BreedConfigs["Phoenix_Thunderbird"] = new PetBreedConfig
         {
-            switch (rarity.ToLower())
+            ResultType = "SolarPhoenix",
+            ResultName = "Solar Phoenix",
+            Description = "A magnificent bird of light and storms",
+            BaseSuccessRate = 0.20f,
+            RarityWeights = new Dictionary<int, float>
             {
-                case "common": return 0;
-                case "uncommon": return 1;
-                case "rare": return 2;
-                case "epic": return 3;
-                case "legendary": return 4;
-                default: return 0;
+                { 1, 0.40f },
+                { 2, 0.35f },
+                { 3, 0.18f },
+                { 5, 0.07f } // Higher legendary chance
             }
-        }
-        
-        private static string GetRarityByRank(int rank)
+        };
+
+        // Slime + Jelly = Mega Slime
+        BreedConfigs["Slime_Jelly"] = new PetBreedConfig
         {
-            switch (rank)
+            ResultType = "MegaSlime",
+            ResultName = "Mega Slime",
+            Description = "A giant slime with enhanced properties",
+            BaseSuccessRate = 0.50f,
+            RarityWeights = new Dictionary<int, float>
             {
-                case 0: return "Common";
-                case 1: return "Uncommon";
-                case 2: return "Rare";
-                case 3: return "Epic";
-                case 4: return "Legendary";
-                default: return "Common";
+                { 1, 0.40f },
+                { 2, 0.40f },
+                { 3, 0.15f },
+                { 4, 0.04f },
+                { 5, 0.01f }
             }
-        }
+        };
+
+        // Ghost + Skeleton = Lich Pet
+        BreedConfigs["Ghost_Skeleton"] = new PetBreedConfig
+        {
+            ResultType = "LichPet",
+            ResultName = "Lich Familiar",
+            Description = "An undead spirit bound to serve",
+            BaseSuccessRate = 0.30f,
+            RarityWeights = new Dictionary<int, float>
+            {
+                { 1, 0.45f },
+                { 2, 0.30f },
+                { 3, 0.18f },
+                { 4, 0.06f },
+                { 5, 0.01f }
+            }
+        };
+
+        // Bear + Turtle = Armored Bear
+        BreedConfigs["Bear_Turtle"] = new PetBreedConfig
+        {
+            ResultType = "ArmoredBear",
+            ResultName = "Armored Bear",
+            Description = "A heavily protected bear with turtle shell",
+            BaseSuccessRate = 0.40f,
+            RarityWeights = new Dictionary<int, float>
+            {
+                { 1, 0.40f },
+                { 2, 0.35f },
+                { 3, 0.20f },
+                { 4, 0.04f },
+                { 5, 0.01f }
+            }
+        };
+
+        // Owl + Eagle = Sky Guardian
+        BreedConfigs["Owl_Eagle"] = new PetBreedConfig
+        {
+            ResultType = "SkyGuardian",
+            ResultName = "Sky Guardian",
+            Description = "A wise and powerful aerial predator",
+            BaseSuccessRate = 0.35f,
+            RarityWeights = new Dictionary<int, float>
+            {
+                { 1, 0.45f },
+                { 2, 0.30f },
+                { 3, 0.18f },
+                { 4, 0.06f },
+                { 5, 0.01f }
+            }
+        };
+
+        // Fish + Serpent = Sea Dragon
+        BreedConfigs["Fish_Serpent"] = new PetBreedConfig
+        {
+            ResultType = "SeaDragon",
+            ResultName = "Sea Dragon",
+            Description = "A dragon of the oceanic depths",
+            BaseSuccessRate = 0.20f,
+            RarityWeights = new Dictionary<int, float>
+            {
+                { 1, 0.40f },
+                { 2, 0.35f },
+                { 3, 0.18f },
+                { 4, 0.05f },
+                { 5, 0.02f }
+            }
+        };
+
+        // Cat + Tiger = Sabertooth
+        BreedConfigs["Cat_Tiger"] = new PetBreedConfig
+        {
+            ResultType = "Sabertooth",
+            ResultName = "Sabertooth",
+            Description = "A powerful feline predator",
+            BaseSuccessRate = 0.35f,
+            RarityWeights = new Dictionary<int, float>
+            {
+                { 1, 0.45f },
+                { 2, 0.30f },
+                { 3, 0.18f },
+                { 4, 0.06f },
+                { 5, 0.01f }
+            }
+        };
+
+        // Butterfly + Beetle = Crystal Insect
+        BreedConfigs["Butterfly_Beetle"] = new PetBreedConfig
+        {
+            ResultType = "CrystalInsect",
+            ResultName = "Crystal Insect",
+            Description = "A beautiful insect with crystalline wings",
+            BaseSuccessRate = 0.45f,
+            RarityWeights = new Dictionary<int, float>
+            {
+                { 1, 0.35f },
+                { 2, 0.40f },
+                { 3, 0.20f },
+                { 4, 0.04f },
+                { 5, 0.01f }
+            }
+        };
+
+        // Unicorn + Pegasus = Celestial Steed
+        BreedConfigs["Unicorn_Pegasus"] = new PetBreedConfig
+        {
+            ResultType = "CelestialSteed",
+            ResultName = "Celestial Steed",
+            Description = "A divine winged horse of pure light",
+            BaseSuccessRate = 0.15f,
+            RarityWeights = new Dictionary<int, float>
+            {
+                { 1, 0.35f },
+                { 2, 0.35f },
+                { 3, 0.20f },
+                { 4, 0.08f },
+                { 5, 0.02f }
+            }
+        };
+
+        // Elemental + Elemental = Pure Elemental (same type bonus)
+        BreedConfigs["Elemental_Elemental"] = new PetBreedConfig
+        {
+            ResultType = "PureElemental",
+            ResultName = "Pure Elemental",
+            Description = "A concentrated form of elemental energy",
+            BaseSuccessRate = 0.40f,
+            RarityWeights = new Dictionary<int, float>
+            {
+                { 1, 0.30f },
+                { 2, 0.35f },
+                { 3, 0.25f },
+                { 4, 0.08f },
+                { 5, 0.02f }
+            }
+        };
     }
+}
+
+public class PetBreedConfig
+{
+    public string ResultType { get; set; }
+    public string ResultName { get; set; }
+    public string Description { get; set; }
+    public float BaseSuccessRate { get; set; }
+    public Dictionary<int, float> RarityWeights { get; set; }
 }

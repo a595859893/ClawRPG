@@ -1,647 +1,438 @@
+using Godot;
 using System;
 using System.Collections.Generic;
-using Godot;
-using Godot.Collections;
+using System.Linq;
 
-namespace ClawRPG.Systems
+public class PetBreedingUI : Control
 {
-    /// <summary>
-    /// 宠物繁殖UI界面
-    /// </summary>
-    public partial class PetBreedingUI : Control
+    private PetBreedingSystem _breedingSystem;
+    private VBoxContainer _mainContainer;
+    private TabContainer _tabContainer;
+
+    // Pet selection
+    private OptionButton _parent1Selector;
+    private OptionButton _parent2Selector;
+    private Label _selectedParent1Label;
+    private Label _selectedParent2Label;
+    private Button _breedButton;
+    private Label _resultLabel;
+
+    // Stats
+    private Label _totalBreedsLabel;
+    private Label _successRateLabel;
+    private Label _legendaryCountLabel;
+
+    // History
+    private VBoxContainer _historyContainer;
+
+    // Breed info
+    private Label _breedInfoLabel;
+
+    private Color _rarityCommon = new Color(0.7f, 0.7f, 0.7f);
+    private Color _rarityUncommon = new Color(0.2f, 0.8f, 0.2f);
+    private Color _rarityRare = new Color(0.2f, 0.5f, 1.0f);
+    private Color _rarityEpic = new Color(0.6f, 0.3f, 0.9f);
+    private Color _rarityLegendary = new Color(1.0f, 0.7f, 0.0f);
+
+    public override void _Ready()
     {
-        private Control _mainContainer;
-        private VBoxContainer _breedingsContainer;
-        private VBoxContainer _historyContainer;
-        private VBoxContainer _statsContainer;
-        private TabContainer _tabContainer;
-        
-        private Label _titleLabel;
-        private Label _statsLabel;
-        
-        // 当前选中
-        private string _selectedParent1;
-        private string _selectedParent2;
-        private PetBreedingData.BreedingType _selectedType = PetBreedingData.BreedingType.Basic;
-        
-        // UI组件引用
-        private OptionButton _typeOption;
-        private Button _startButton;
-        private ItemList _parent1List;
-        private ItemList _parent2List;
-        
-        public override void _Ready()
+        _breedingSystem = GetNode<PetBreedingSystem>("/root/PetBreedingSystem");
+        if (_breedingSystem == null)
         {
-            SetupUI();
-            SetupInput();
-            RefreshData();
+            GD.PrintErr("PetBreedingSystem not found!");
+            return;
         }
-        
-        private void SetupUI()
+
+        SetupUI();
+        ConnectSignals();
+        RefreshUI();
+    }
+
+    private void SetupUI()
+    {
+        // Main panel
+        var panel = new PanelContainer
         {
-            // 主容器
-            _mainContainer = new Control
-            {
-                Name = "MainContainer",
-                LayoutMode = 1,
-                AnchorsPreset = 15,
-                AnchorRight = 1.0f,
-                AnchorBottom = 1.0f,
-                OffsetLeft = 100,
-                OffsetTop = 50,
-                OffsetRight = -100,
-                OffsetBottom = -50
-            };
-            AddChild(_mainContainer);
-            
-            // 背景面板
-            var bgPanel = new PanelContainer
-            {
-                LayoutMode = 1,
-                AnchorsPreset = 15,
-                AnchorRight = 1.0f,
-                AnchorBottom = 1.0f,
-                ThemeOverrideStyles/panel = new StyleBoxFlat
-                {
-                    BgColor = new Color(0.1f, 0.1f, 0.15f, 0.95f),
-                    BorderWidthLeft = 2,
-                    BorderWidthTop = 2,
-                    BorderWidthRight = 2,
-                    BorderWidthBottom = 2,
-                    BorderColor = new Color(0.3f, 0.3f, 0.4f)
-                }
-            };
-            _mainContainer.AddChild(bgPanel);
-            
-            // 标题
-            _titleLabel = new Label
-            {
-                Text = "宠物繁殖系统",
-                LayoutMode = 1,
-                OffsetLeft = 20,
-                OffsetTop = 10,
-                OffsetRight = -20,
-                OffsetBottom = 50,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                ThemeOverrideFonts/font = new FontFile()
-            };
-            _titleLabel.AddThemeFontSizeOverride("font_size", 24);
-            bgPanel.AddChild(_titleLabel);
-            
-            // 关闭按钮
-            var closeButton = new Button
-            {
-                Text = "X",
-                LayoutMode = 1,
-                AnchorLeft = 1.0f,
-                AnchorRight = 1.0f,
-                OffsetLeft = -50,
-                OffsetTop = 10,
-                OffsetRight = -20,
-                OffsetBottom = 40,
-                SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd
-            };
-            closeButton.Pressed += () => Hide();
-            bgPanel.AddChild(closeButton);
-            
-            // Tab容器
-            _tabContainer = new TabContainer
-            {
-                LayoutMode = 1,
-                AnchorsPreset = 15,
-                AnchorRight = 1.0f,
-                AnchorBottom = 1.0f,
-                OffsetLeft = 10,
-                OffsetTop = 60,
-                OffsetRight = -10,
-                OffsetBottom = -10
-            };
-            bgPanel.AddChild(_tabContainer);
-            
-            // 繁殖标签页
-            var breedingTab = new Control { Name = "Breeding" };
-            _tabContainer.AddChild(breedingTab);
-            SetupBreedingTab(breedingTab);
-            
-            // 进行中标签页
-            var activeTab = new Control { Name = "Active" };
-            _tabContainer.AddChild(activeTab);
-            SetupActiveTab(activeTab);
-            
-            // 历史标签页
-            var historyTab = new Control { Name = "History" };
-            _tabContainer.AddChild(historyTab);
-            SetupHistoryTab(historyTab);
-            
-            // 统计标签页
-            var statsTab = new Control { Name = "Statistics" };
-            _tabContainer.AddChild(statsTab);
-            SetupStatsTab(statsTab);
-            
-            // 初始隐藏
-            _mainContainer.Visible = false; 
+            AnchorRight = 1f,
+            AnchorBottom = 1f,
+            MarginLeft = 50,
+            MarginTop = 50,
+            MarginRight = -50,
+            MarginBottom = -50
+        };
+        AddChild(panel);
+
+        var panelStyle = new StyleBoxFlat();
+        panelStyle.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.95f);
+        panelStyle.CornerRadiusTopLeft = 10;
+        panelStyle.CornerRadiusTopRight = 10;
+        panelStyle.CornerRadiusBottomLeft = 10;
+        panelStyle.CornerRadiusBottomRight = 10;
+        panel.AddStyleboxOverride("panel", panelStyle);
+
+        _mainContainer = new VBoxContainer
+        {
+            AnchorRight = 1f,
+            AnchorBottom = 1f,
+            CustomMinimumSize = new Vector2(600, 500)
+        };
+        panel.AddChild(_mainContainer);
+
+        // Title
+        var titleLabel = new Label
+        {
+            Text = "🐾 Pet Breeding System",
+            Align = Label.AlignEnum.Center,
+            CustomMinimumSize = new Vector2(0, 50)
+        };
+        titleLabel.AddThemeFontSizeOverride("font_size", 24);
+        _mainContainer.AddChild(titleLabel);
+
+        // Tab container
+        _tabContainer = new TabContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
+            SizeFlagsVertical = SizeFlags.ExpandAndFill
+        };
+        _mainContainer.AddChild(_tabContainer);
+
+        // Create tabs
+        CreateBreedingTab();
+        CreateHistoryTab();
+        CreateStatisticsTab();
+
+        // Close button
+        var closeButton = new Button
+        {
+            Text = "Close (ESC)",
+            CustomMinimumSize = new Vector2(120, 40)
+        };
+        closeButton.Pressed += () => Hide();
+        _mainContainer.AddChild(closeButton);
+    }
+
+    private void CreateBreedingTab()
+    {
+        var tab = new VBoxContainer();
+        tab.Name = "Breeding";
+        _tabContainer.AddChild(tab);
+
+        var infoLabel = new Label
+        {
+            Text = "Select two pets to breed",
+            Align = Label.AlignEnum.Center
+        };
+        tab.AddChild(infoLabel);
+
+        // Parent selection
+        var selectionBox = new HBoxContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
+            CustomMinimumSize = new Vector2(0, 150)
+        };
+        tab.AddChild(selectionBox);
+
+        // Parent 1
+        var parent1Box = new VBoxContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
+            SizeFlagsVertical = SizeFlags.ExpandAndFill
+        };
+        selectionBox.AddChild(parent1Box);
+
+        var parent1Title = new Label { Text = "Parent 1", Align = Label.AlignEnum.Center };
+        parent1Box.AddChild(parent1Title);
+
+        _parent1Selector = new OptionButton
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandAndFill
+        };
+        parent1Box.AddChild(_parent1Selector);
+
+        _selectedParent1Label = new Label { Text = "", Align = Label.AlignEnum.Center };
+        parent1Box.AddChild(_selectedParent1Label);
+
+        // VS label
+        var vsLabel = new Label
+        {
+            Text = "×",
+            CustomMinimumSize = new Vector2(50, 0),
+            Align = Label.AlignEnum.Center
+        };
+        vsLabel.AddThemeFontSizeOverride("font_size", 32);
+        selectionBox.AddChild(vsLabel);
+
+        // Parent 2
+        var parent2Box = new VBoxContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
+            SizeFlagsVertical = SizeFlags.ExpandAndFill
+        };
+        selectionBox.AddChild(parent2Box);
+
+        var parent2Title = new Label { Text = "Parent 2", Align = Label.AlignEnum.Center };
+        parent2Box.AddChild(parent2Title);
+
+        _parent2Selector = new OptionButton
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandAndFill
+        };
+        parent2Box.AddChild(_parent2Selector);
+
+        _selectedParent2Label = new Label { Text = "", Align = Label.AlignEnum.Center };
+        parent2Box.AddChild(_selectedParent2Label);
+
+        // Breed info
+        _breedInfoLabel = new Label
+        {
+            Text = "",
+            Align = Label.AlignEnum.Center,
+            CustomMinimumSize = new Vector2(0, 60)
+        };
+        tab.AddChild(_breedInfoLabel);
+
+        // Breed button
+        _breedButton = new Button
+        {
+            Text = "🔄 Breed Pets",
+            CustomMinimumSize = new Vector2(200, 50)
+        };
+        _breedButton.Pressed += OnBreedPressed;
+        tab.AddChild(_breedButton);
+
+        // Result
+        _resultLabel = new Label
+        {
+            Text = "",
+            Align = Label.AlignEnum.Center,
+            CustomMinimumSize = new Vector2(0, 80)
+        };
+        _resultLabel.AddThemeFontSizeOverride("font_size", 20);
+        tab.AddChild(_resultLabel);
+
+        // Populate selectors
+        PopulatePetSelectors();
+    }
+
+    private void CreateHistoryTab()
+    {
+        var tab = new ScrollContainer();
+        tab.Name = "History";
+        _tabContainer.AddChild(tab);
+
+        _historyContainer = new VBoxContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
+            SizeFlagsVertical = SizeFlags.ExpandAndFill
+        };
+        tab.AddChild(_historyContainer);
+
+        RefreshHistory();
+    }
+
+    private void CreateStatisticsTab()
+    {
+        var tab = new VBoxContainer();
+        tab.Name = "Statistics";
+        _tabContainer.AddChild(tab);
+
+        var statsTitle = new Label
+        {
+            Text = "📊 Breeding Statistics",
+            Align = Label.AlignEnum.Center
+        };
+        statsTitle.AddThemeFontSizeOverride("font_size", 20);
+        tab.AddChild(statsTitle);
+
+        _totalBreedsLabel = new Label { Text = "Total Breeds: 0" };
+        tab.AddChild(_totalBreedsLabel);
+
+        _successRateLabel = new Label { Text = "Success Rate: 0%" };
+        tab.AddChild(_successRateLabel);
+
+        _legendaryCountLabel = new Label { Text = "Legendary Offspring: 0" };
+        tab.AddChild(_legendaryCountLabel);
+
+        tab.AddChild(new HSeparator());
+
+        var clearButton = new Button { Text = "Clear History" };
+        clearButton.Pressed += () =>
+        {
+            _breedingSystem.ClearHistory();
+            RefreshUI();
+        };
+        tab.AddChild(clearButton);
+
+        RefreshStatistics();
+    }
+
+    private void PopulatePetSelectors()
+    {
+        var petTypes = _breedingSystem.GetAvailablePetTypes();
+
+        _parent1Selector.Clear();
+        _parent2Selector.Clear();
+
+        foreach (var pet in petTypes)
+        {
+            _parent1Selector.AddItem(pet);
+            _parent2Selector.AddItem(pet);
         }
-        
-        private void SetupBreedingTab(Control tab)
+
+        if (petTypes.Count > 1)
+            _parent2Selector.Select(1);
+    }
+
+    private void ConnectSignals()
+    {
+        _parent1Selector.ItemSelected += (index) => UpdateBreedInfo();
+        _parent2Selector.ItemSelected += (index) => UpdateBreedInfo();
+    }
+
+    private void UpdateBreedInfo()
+    {
+        string pet1 = _parent1Selector.GetItemText(_parent1Selector.Selected);
+        string pet2 = _parent2Selector.GetItemText(_parent2Selector.Selected);
+
+        _selectedParent1Label.Text = pet1;
+        _selectedParent2Label.Text = pet2;
+
+        var config = _breedingSystem.GetBreedConfig(pet1, pet2);
+        if (config != null)
         {
-            var vbox = new VBoxContainer
-            {
-                LayoutMode = 1,
-                AnchorsPreset = 15,
-                AnchorRight = 1.0f,
-                AnchorBottom = 1.0f,
-                OffsetLeft = 10,
-                OffsetTop = 10,
-                OffsetRight = -10,
-                OffsetBottom = -10
-            };
-            tab.AddChild(vbox);
-            
-            // 繁殖类型选择
-            var typeLabel = new Label { Text = "繁殖类型:" };
-            typeLabel.AddThemeFontSizeOverride("font_size", 18);
-            vbox.AddChild(typeLabel);
-            
-            _typeOption = new OptionButton
-            {
-                CustomMinimumSize = new Vector2(200, 40)
-            };
-            _typeOption.AddItem("基础繁殖 (100金, 5分钟)", (int)PetBreedingData.BreedingType.Basic);
-            _typeOption.AddItem("高级繁殖 (500金, 3分钟)", (int)PetBreedingData.BreedingType.Advanced);
-            _typeOption.AddItem("传奇繁殖 (2000金, 1分钟)", (int)PetBreedingData.BreedingType.Legendary);
-            _typeOption.ItemSelected += OnTypeSelected;
-            vbox.AddChild(_typeOption);
-            
-            // 亲本1选择
-            var parent1Label = new Label { Text = "选择亲本1:" };
-            parent1Label.AddThemeFontSizeOverride("font_size", 18);
-            vbox.AddChild(parent1Label);
-            
-            _parent1List = new ItemList
-            {
-                CustomMinimumSize = new Vector2(0, 150)
-            };
-            _parent1List.ItemSelected += (index) => OnParent1Selected(index);
-            vbox.AddChild(_parent1List);
-            
-            // 亲本2选择
-            var parent2Label = new Label { Text = "选择亲本2:" };
-            parent2Label.AddThemeFontSizeOverride("font_size", 18);
-            vbox.AddChild(parent2Label);
-            
-            _parent2List = new ItemList
-            {
-                CustomMinimumSize = new Vector2(0, 150)
-            };
-            _parent2List.ItemSelected += (index) => OnParent2Selected(index);
-            vbox.AddChild(_parent2List);
-            
-            // 开始繁殖按钮
-            _startButton = new Button
-            {
-                Text = "开始繁殖",
-                CustomMinimumSize = new Vector2(200, 50)
-            };
-            _startButton.AddThemeFontSizeOverride("font_size", 20);
-            _startButton.Pressed += OnStartBreedingPressed;
-            vbox.AddChild(_startButton);
+            _breedInfoLabel.Text = $"{config.ResultName}\n{config.Description}\nSuccess Rate: {config.BaseSuccessRate * 100}%";
         }
-        
-        private void SetupActiveTab(Control tab)
+        else
         {
-            var scroll = new ScrollContainer
+            _breedInfoLabel.Text = "Generic Hybrid\nCustom combination\nSuccess Rate: 40%";
+        }
+    }
+
+    private void OnBreedPressed()
+    {
+        string pet1 = _parent1Selector.GetItemText(_parent1Selector.Selected);
+        string pet2 = _parent2Selector.GetItemText(_parent2Selector.Selected);
+
+        if (pet1 == pet2)
+        {
+            _resultLabel.Text = "⚠️ Please select different pets!";
+            _resultLabel.Modulate = new Color(1f, 0.5f, 0.5f);
+            return;
+        }
+
+        var result = _breedingSystem.Breed(pet1, pet2);
+
+        switch (result)
+        {
+            case PetBreedResult.Failure:
+                _resultLabel.Text = "💔 Breeding Failed!\nThe pets were incompatible.";
+                _resultLabel.Modulate = _rarityCommon;
+                break;
+            case PetBreedResult.Common:
+                _resultLabel.Text = "✅ Success! Common Offspring\nThe breeding was successful.";
+                _resultLabel.Modulate = _rarityCommon;
+                break;
+            case PetBreedResult.Uncommon:
+                _resultLabel.Text = "✨ Success! Uncommon Offspring\nA rare find!";
+                _resultLabel.Modulate = _rarityUncommon;
+                break;
+            case PetBreedResult.Rare:
+                _resultLabel.Text = "🌟 Success! Rare Offspring\nAn exceptional companion!";
+                _resultLabel.Modulate = _rarityRare;
+                break;
+            case PetBreedResult.Epic:
+                _resultLabel.Text = "💎 Success! Epic Offspring\nA magnificent creature!";
+                _resultLabel.Modulate = _rarityEpic;
+                break;
+            case PetBreedResult.Legendary:
+                _resultLabel.Text = "👑 LEGENDARY Offspring! 👑\nA truly mythical companion!";
+                _resultLabel.Modulate = _rarityLegendary;
+                break;
+        }
+
+        RefreshUI();
+    }
+
+    private void RefreshUI()
+    {
+        PopulatePetSelectors();
+        UpdateBreedInfo();
+        RefreshHistory();
+        RefreshStatistics();
+    }
+
+    private void RefreshHistory()
+    {
+        foreach (var child in _historyContainer.GetChildren())
+            child.QueueFree();
+
+        var history = _breedingSystem.GetBreedingHistory(20);
+
+        if (history.Count == 0)
+        {
+            var emptyLabel = new Label { Text = "No breeding history yet" };
+            _historyContainer.AddChild(emptyLabel);
+            return;
+        }
+
+        foreach (var record in history)
+        {
+            var recordBox = new HBoxContainer
             {
-                LayoutMode = 1,
-                AnchorsPreset = 15,
-                AnchorRight = 1.0f,
-                AnchorBottom = 1.0f,
-                OffsetLeft = 10,
-                OffsetTop = 10,
-                OffsetRight = -10,
-                OffsetBottom = -10
+                CustomMinimumSize = new Vector2(0, 40)
             };
-            tab.AddChild(scroll);
-            
-            _breedingsContainer = new VBoxContainer
+
+            var color = GetRarityColor(record.Rarity);
+            var rarityName = _breedingSystem.GetRarityNames()[record.Rarity];
+
+            var label = new Label
             {
-                LayoutMode = 1,
-                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+                Text = $"{record.Parent1Id} + {record.Parent2Id} → {record.OffspringType} [{rarityName}]",
+                Modulate = color
             };
-            scroll.AddChild(_breedingsContainer);
+            recordBox.AddChild(label);
+
+            _historyContainer.AddChild(recordBox);
         }
-        
-        private void SetupHistoryTab(Control tab)
+    }
+
+    private void RefreshStatistics()
+    {
+        var data = _breedingSystem.GetData();
+        _totalBreedsLabel.Text = $"Total Breeds: {data.TotalBreeds}";
+        _successRateLabel.Text = $"Success Rate: {_breedingSystem.GetSuccessRate() * 100:F1}%";
+        _legendaryCountLabel.Text = $"Legendary Offspring: {data.LegendaryBreeds}";
+    }
+
+    private Color GetRarityColor(int rarity)
+    {
+        switch (rarity)
         {
-            var scroll = new ScrollContainer
-            {
-                LayoutMode = 1,
-                AnchorsPreset = 15,
-                AnchorRight = 1.0f,
-                AnchorBottom = 1.0f,
-                OffsetLeft = 10,
-                OffsetTop = 10,
-                OffsetRight = -10,
-                OffsetBottom = -10
-            };
-            tab.AddChild(scroll);
-            
-            _historyContainer = new VBoxContainer
-            {
-                LayoutMode = 1,
-                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-            };
-            scroll.AddChild(_historyContainer);
+            case 1: return _rarityCommon;
+            case 2: return _rarityUncommon;
+            case 3: return _rarityRare;
+            case 4: return _rarityEpic;
+            case 5: return _rarityLegendary;
+            default: return _rarityCommon;
         }
-        
-        private void SetupStatsTab(Control tab)
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        if (@event.IsActionPressed("ui_cancel"))
         {
-            var vbox = new VBoxContainer
-            {
-                LayoutMode = 1,
-                AnchorsPreset = 15,
-                AnchorRight = 1.0f,
-                AnchorBottom = 1.0f,
-                OffsetLeft = 20,
-                OffsetTop = 20,
-                OffsetRight = -20,
-                OffsetBottom = -20
-            };
-            tab.AddChild(vbox);
-            
-            _statsLabel = new Label
-            {
-                Text = "繁殖统计",
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-            _statsLabel.AddThemeFontSizeOverride("font_size", 24);
-            vbox.AddChild(_statsLabel);
-            
-            _statsContainer = new VBoxContainer();
-            vbox.AddChild(_statsContainer);
+            Hide();
         }
-        
-        private void SetupInput()
+    }
+
+    private bool _isVisible = false;
+    public void Toggle()
+    {
+        _isVisible = !_isVisible;
+        Visible = _isVisible;
+        if (_isVisible)
         {
-            // 输入绑定
-        }
-        
-        private void RefreshData()
-        {
-            RefreshPetLists();
-            RefreshActiveBreedings();
-            RefreshHistory();
-            RefreshStats();
-        }
-        
-        private void RefreshPetLists()
-        {
-            if (_parent1List == null || _parent2List == null) return;
-            
-            _parent1List.Clear();
-            _parent2List.Clear();
-            
-            // 从宠物管理器获取宠物列表
-            if (PetManager.Instance != null)
-            {
-                var pets = PetManager.Instance.GetPets();
-                foreach (var pet in pets)
-                {
-                    string displayText = $"{pet.Name} (Lv.{pet.Level} {pet.Rarity})";
-                    _parent1List.AddItem(displayText);
-                    _parent2List.AddItem(displayText);
-                }
-            }
-        }
-        
-        private void RefreshActiveBreedings()
-        {
-            if (_breedingsContainer == null) return;
-            
-            foreach (var child in _breedingsContainer.GetChildren())
-            {
-                child.QueueFree();
-            }
-            
-            if (PetBreedingSystem.Instance == null) return;
-            
-            var breedings = PetBreedingSystem.Instance.GetActiveBreedings();
-            
-            if (breedings.Count == 0)
-            {
-                var emptyLabel = new Label
-                {
-                    Text = "暂无进行中的繁殖",
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
-                _breedingsContainer.AddChild(emptyLabel);
-                return;
-            }
-            
-            foreach (var breeding in breedings)
-            {
-                var panel = CreateBreedingCard(breeding);
-                _breedingsContainer.AddChild(panel);
-            }
-        }
-        
-        private void RefreshHistory()
-        {
-            if (_historyContainer == null) return;
-            
-            foreach (var child in _historyContainer.GetChildren())
-            {
-                child.QueueFree();
-            }
-            
-            if (PetBreedingSystem.Instance == null) return;
-            
-            var history = PetBreedingSystem.Instance.GetBreedingHistory();
-            
-            if (history.Count == 0)
-            {
-                var emptyLabel = new Label
-                {
-                    Text = "暂无繁殖历史",
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
-                _historyContainer.AddChild(emptyLabel);
-                return;
-            }
-            
-            foreach (var record in history)
-            {
-                var panel = CreateHistoryCard(record);
-                _historyContainer.AddChild(panel);
-            }
-        }
-        
-        private void RefreshStats()
-        {
-            if (_statsContainer == null) return;
-            
-            foreach (var child in _statsContainer.GetChildren())
-            {
-                child.QueueFree();
-            }
-            
-            if (PetBreedingSystem.Instance == null) return;
-            
-            var stats = PetBreedingSystem.Instance.GetStatistics();
-            
-            AddStatRow("总繁殖次数:", stats["total_breedings"].ToString());
-            AddStatRow("成功次数:", stats["successful_breedings"].ToString());
-            AddStatRow("传奇繁殖次数:", stats["legendary_breedings"].ToString());
-            AddStatRow("成功率:", $"{float.Parse(stats["success_rate"].ToString()):P1}");
-        }
-        
-        private void AddStatRow(string label, string value)
-        {
-            var hbox = new HBoxContainer();
-            _statsContainer.AddChild(hbox);
-            
-            var labelNode = new Label
-            {
-                Text = label,
-                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-            };
-            labelNode.AddThemeFontSizeOverride("font_size", 18);
-            hbox.AddChild(labelNode);
-            
-            var valueLabel = new Label
-            {
-                Text = value,
-                HorizontalAlignment = HorizontalAlignment.Right
-            };
-            valueLabel.AddThemeFontSizeOverride("font_size", 18);
-            hbox.AddChild(valueLabel);
-        }
-        
-        private Control CreateBreedingCard(PetBreedingData.BreedingInstance breeding)
-        {
-            var panel = new PanelContainer
-            {
-                CustomMinimumSize = new Vector2(0, 80),
-                ThemeOverrideStyles/panel = new StyleBoxFlat
-                {
-                    BgColor = new Color(0.2f, 0.2f, 0.3f)
-                }
-            };
-            
-            var hbox = new HBoxContainer
-            {
-                OffsetLeft = 10,
-                OffsetTop = 10,
-                OffsetRight = -10,
-                OffsetBottom = -10
-            };
-            panel.AddChild(hbox);
-            
-            var vbox = new VBoxContainer
-            {
-                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-            };
-            hbox.AddChild(vbox);
-            
-            // 亲本信息
-            var infoLabel = new Label
-            {
-                Text = $"{breeding.Parent1?.PetName} x {breeding.Parent2?.PetName}"
-            };
-            infoLabel.AddThemeFontSizeOverride("font_size", 16);
-            vbox.AddChild(infoLabel);
-            
-            // 类型
-            var typeLabel = new Label
-            {
-                Text = $"类型: {PetBreedingDatabase.GetConfig(breeding.Type)?.Name}"
-            };
-            vbox.AddChild(typeLabel);
-            
-            // 进度条
-            var progress = new ProgressBar
-            {
-                CustomMinimumSize = new Vector2(0, 20),
-                Value = PetBreedingSystem.Instance.GetBreedingProgress(breeding.InstanceId) * 100
-            };
-            vbox.AddChild(progress);
-            
-            // 剩余时间
-            var timeLabel = new Label
-            {
-                Text = $"剩余时间: {PetBreedingSystem.Instance.GetRemainingTime(breeding.InstanceId)}秒"
-            };
-            vbox.AddChild(timeLabel);
-            
-            // 取消按钮
-            var cancelButton = new Button { Text = "取消" };
-            cancelButton.Pressed += () => OnCancelBreeding(breeding.InstanceId);
-            hbox.AddChild(cancelButton);
-            
-            return panel;
-        }
-        
-        private Control CreateHistoryCard(PetBreedingData.BreedingRecord record)
-        {
-            var panel = new PanelContainer
-            {
-                CustomMinimumSize = new Vector2(0, 60),
-                ThemeOverrideStyles/panel = new StyleBoxFlat
-                {
-                    BgColor = record.Success ? new Color(0.15f, 0.3f, 0.15f) : new Color(0.3f, 0.15f, 0.15f)
-                }
-            };
-            
-            var hbox = new HBoxContainer
-            {
-                OffsetLeft = 10,
-                OffsetTop = 10,
-                OffsetRight = -10,
-                OffsetBottom = -10
-            };
-            panel.AddChild(hbox);
-            
-            var infoLabel = new Label
-            {
-                Text = $"{record.Parent1Name} x {record.Parent2Name} -> {(record.Success ? record.OffspringName : "失败")} ({record.OffspringRarity})",
-                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
-            };
-            infoLabel.AddThemeFontSizeOverride("font_size", 14);
-            hbox.AddChild(infoLabel);
-            
-            var timeLabel = new Label
-            {
-                Text = record.BreedingTime.ToString("MM-dd HH:mm"),
-                HorizontalAlignment = HorizontalAlignment.Right
-            };
-            hbox.AddChild(timeLabel);
-            
-            return panel;
-        }
-        
-        #region 事件处理
-        
-        private void OnTypeSelected(long index)
-        {
-            _selectedType = (PetBreedingData.BreedingType)index;
-        }
-        
-        private void OnParent1Selected(long index)
-        {
-            if (PetManager.Instance == null) return;
-            
-            var pets = PetManager.Instance.GetPets();
-            if (index >= 0 && index < pets.Count)
-            {
-                _selectedParent1 = pets[(int)index].Id;
-            }
-        }
-        
-        private void OnParent2Selected(long index)
-        {
-            if (PetManager.Instance == null) return;
-            
-            var pets = PetManager.Instance.GetPets();
-            if (index >= 0 && index < pets.Count)
-            {
-                _selectedParent2 = pets[(int)index].Id;
-            }
-        }
-        
-        private void OnStartBreedingPressed()
-        {
-            if (string.IsNullOrEmpty(_selectedParent1) || string.IsNullOrEmpty(_selectedParent2))
-            {
-                GD.PrintErr("[PetBreedingUI] Please select both parents");
-                return;
-            }
-            
-            if (_selectedParent1 == _selectedParent2)
-            {
-                GD.PrintErr("[PetBreedingUI] Please select different parents");
-                return;
-            }
-            
-            if (PetBreedingSystem.Instance == null)
-            {
-                GD.PrintErr("[PetBreedingUI] PetBreedingSystem not initialized");
-                return;
-            }
-            
-            bool success = PetBreedingSystem.Instance.StartBreeding(
-                _selectedParent1, 
-                _selectedParent2, 
-                _selectedType
-            );
-            
-            if (success)
-            {
-                // 切换到进行中标签页
-                _tabContainer.CurrentTab = 1;
-                RefreshData();
-            }
-        }
-        
-        private void OnCancelBreeding(string instanceId)
-        {
-            if (PetBreedingSystem.Instance != null)
-            {
-                PetBreedingSystem.Instance.CancelBreeding(instanceId);
-                RefreshData();
-            }
-        }
-        
-        #endregion
-        
-        #region 显示/隐藏
-        
-        public void Show()
-        {
-            if (_mainContainer != null)
-            {
-                _mainContainer.Visible = true;
-                RefreshData();
-                
-                // 显示动画
-                var tween = CreateTween();
-                tween.TweenProperty(_mainContainer, "modulate:a", 1.0, 0.3f);
-            }
-        }
-        
-        public void Hide()
-        {
-            if (_mainContainer != null)
-            {
-                var tween = CreateTween();
-                tween.TweenProperty(_mainContainer, "modulate:a", 0.0, 0.3f);
-                tween.TweenCallback(() => _mainContainer.Visible = false);
-            }
-        }
-        
-        public void Toggle()
-        {
-            if (_mainContainer != null && _mainContainer.Visible)
-            {
-                Hide();
-            }
-            else
-            {
-                Show();
-            }
-        }
-        
-        #endregion
-        
-        public override void _Input(InputEvent e)
-        {
-            if (e is InputEventKey keyEvent && keyEvent.Pressed)
-            {
-                // Ctrl+B 打开/关闭繁殖界面
-                if (keyEvent.CtrlKey && keyEvent.Keycode == Key.B)
-                {
-                    Toggle();
-                    GetTree().SetInputAsHandled();
-                }
-            }
+            RefreshUI();
         }
     }
 }
