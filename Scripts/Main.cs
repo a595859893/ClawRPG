@@ -171,6 +171,11 @@ namespace ClawRPG.Scripts {
             dailyLoginRewardSystem.Name = "DailyLoginRewardSystem";
             AddChild(dailyLoginRewardSystem);
 
+            // Initialize daily ritual system
+            var dailyRitualSystem = new DailyRitualSystem();
+            dailyRitualSystem.Name = "DailyRitualSystem";
+            AddChild(dailyRitualSystem);
+
             // Initialize weather system
             var weatherSystem = new WeatherSystem();
             weatherSystem.Name = "WeatherSystem";
@@ -1494,6 +1499,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("titles"))
             {
                 ToggleTitleUI();
+            }
+
+            // Handle daily ritual UI toggle (Ctrl+Shift+R key)
+            if (Input.IsKeyPressed(Key.R) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleDailyRitualUI();
             }
 
             // Handle bookmarks UI toggle (N key)
@@ -3057,6 +3068,28 @@ namespace ClawRPG.Scripts {
                 if (canvasLayer != null)
                 {
                     canvasLayer.AddChild(newLabUI);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Toggle daily ritual UI
+        /// </summary>
+        private void ToggleDailyRitualUI()
+        {
+            var ritualUI = GetNodeOrNull<DailyRitualUI>("CanvasLayer/DailyRitualUI");
+            if (ritualUI != null)
+            {
+                ritualUI.QueueFree();
+            }
+            else
+            {
+                var newRitualUI = new DailyRitualUI();
+                newRitualUI.Name = "DailyRitualUI";
+                var canvasLayer = GetNodeOrNull("CanvasLayer");
+                if (canvasLayer != null)
+                {
+                    canvasLayer.AddChild(newRitualUI);
                 }
             }
         }
