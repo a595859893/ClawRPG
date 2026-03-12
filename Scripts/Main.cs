@@ -286,6 +286,13 @@ namespace ClawRPG.Scripts {
             identificationSystem.Name = "IdentificationSystem";
             AddChild(identificationSystem);
 
+            // Initialize alchemy laboratory system
+            var alchemyLaboratorySystem = new AlchemyLaboratorySystem();
+            alchemyLaboratorySystem.Name = "AlchemyLaboratorySystem";
+            alchemyLaboratorySystem.UnlockLaboratory();
+            alchemyLaboratorySystem.GenerateNewResearches();
+            AddChild(alchemyLaboratorySystem);
+
             // Initialize multiplayer leaderboard system
             var leaderboardSystem = new MultiplayerLeaderboard();
             leaderboardSystem.Name = "MultiplayerLeaderboard";
@@ -926,6 +933,12 @@ namespace ClawRPG.Scripts {
             alchemyUI.Name = "AlchemyUI";
             ui.AddChild(alchemyUI);
 
+            // Alchemy Laboratory UI
+            var alchemyLabUI = new AlchemyLaboratoryUI();
+            alchemyLabUI.Name = "AlchemyLaboratoryUI";
+            alchemyLabUI.Visible = false;
+            ui.AddChild(alchemyLabUI);
+
             // Cooking System
             var cookingSystem = new Systems.Cooking.CookingSystem();
             cookingSystem.Name = "CookingSystem";
@@ -1457,6 +1470,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.C))
             {
                 ToggleChoiceEventUI();
+            }
+
+            // Handle alchemy laboratory UI toggle (Ctrl+L key)
+            if (Input.IsKeyPressed(Key.L) && Input.IsKeyPressed(Key.Ctrl))
+            {
+                ToggleAlchemyLaboratoryUI();
             }
 
             // Handle artifact UI toggle (K key - when not in combat)
@@ -3016,6 +3035,28 @@ namespace ClawRPG.Scripts {
                 if (canvasLayer != null)
                 {
                     canvasLayer.AddChild(newSecretUI);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 切换炼金实验室界面
+        /// </summary>
+        private void ToggleAlchemyLaboratoryUI()
+        {
+            var labUI = GetNodeOrNull<AlchemyLaboratoryUI>("CanvasLayer/AlchemyLaboratoryUI");
+            if (labUI != null)
+            {
+                labUI.QueueFree();
+            }
+            else
+            {
+                var newLabUI = new AlchemyLaboratoryUI();
+                newLabUI.Name = "AlchemyLaboratoryUI";
+                var canvasLayer = GetNodeOrNull("CanvasLayer");
+                if (canvasLayer != null)
+                {
+                    canvasLayer.AddChild(newLabUI);
                 }
             }
         }
