@@ -235,6 +235,11 @@ namespace ClawRPG.Scripts {
             skillTreeSystem.Name = "SkillTreeSystem";
             AddChild(skillTreeSystem);
 
+            // Initialize skill synergy system
+            var skillSynergySystem = new SkillSynergySystem();
+            skillSynergySystem.Name = "SkillSynergySystem";
+            AddChild(skillSynergySystem);
+
             // Initialize AOE indicator system
             var aoeIndicatorManager = new Systems.AOEIndicatorManager();
             aoeIndicatorManager.Name = "AOEIndicatorManager";
@@ -875,6 +880,11 @@ namespace ClawRPG.Scripts {
             var skillTreeUI = new SkillTreeUI();
             skillTreeUI.Name = "SkillTreeUI";
             ui.AddChild(skillTreeUI);
+
+            // Skill Synergy UI
+            var skillSynergyUI = new SkillSynergyUI();
+            skillSynergyUI.Name = "SkillSynergyUI";
+            ui.AddChild(skillSynergyUI);
 
             // Quick Slot UI
             var quickSlotUI = new UI.QuickSlotUI();
@@ -1588,6 +1598,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.K))
             {
                 ToggleSkillCooldownUI();
+            }
+
+            // Handle skill synergy UI toggle (Shift+K key)
+            if (Input.IsKeyPressed(Key.K) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleSkillSynergyUI();
             }
 
             // Handle momentum UI toggle (M key)
@@ -2322,6 +2338,15 @@ namespace ClawRPG.Scripts {
             if (skillCooldownUI != null)
             {
                 skillCooldownUI.Toggle();
+            }
+        }
+
+        private void ToggleSkillSynergyUI()
+        {
+            var skillSynergyUI = GetNodeOrNull<SkillSynergyUI>("CanvasLayer/SkillSynergyUI");
+            if (skillSynergyUI != null)
+            {
+                skillSynergyUI.ToggleVisibility();
             }
         }
 
