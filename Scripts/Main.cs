@@ -109,6 +109,11 @@ namespace ClawRPG.Scripts {
             secretAchievementSystem.Name = "SecretAchievementSystem";
             AddChild(secretAchievementSystem);
 
+            // Initialize faction system
+            var factionSystem = new FactionSystem();
+            factionSystem.Name = "FactionSystem";
+            AddChild(factionSystem);
+
             // Initialize player profile system
             var playerProfileSystem = new PlayerProfileSystem();
             playerProfileSystem.Name = "PlayerProfileSystem";
@@ -908,6 +913,12 @@ namespace ClawRPG.Scripts {
             equipmentSetUI.Name = "EquipmentSetUI";
             ui.AddChild(equipmentSetUI);
 
+            // Faction UI
+            var factionUI = new FactionUI();
+            factionUI.Name = "FactionUI";
+            factionUI.Visible = false;
+            ui.AddChild(factionUI);
+
             // Keybinding UI
             var keybindingUI = new UI.KeybindingUI();
             keybindingUI.Name = "KeybindingUI";
@@ -1643,6 +1654,12 @@ namespace ClawRPG.Scripts {
                 ToggleSealedTowerUI();
             }
 
+            // Handle faction UI toggle (F key)
+            if (Input.IsKeyPressed(Key.F) && !Input.IsKeyPressed(Key.Control))
+            {
+                ToggleFactionUI();
+            }
+
             // Handle treasure hunt UI toggle (H key)
             if (Input.IsKeyPressed(Key.H))
             {
@@ -2326,6 +2343,18 @@ namespace ClawRPG.Scripts {
             if (enchantmentUI != null)
             {
                 enchantmentUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// 切换声望界面
+        /// </summary>
+        private void ToggleFactionUI()
+        {
+            var factionUI = GetNodeOrNull<FactionUI>("UI/FactionUI");
+            if (factionUI != null)
+            {
+                factionUI.Toggle();
             }
         }
 
