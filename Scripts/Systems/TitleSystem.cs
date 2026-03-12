@@ -2,427 +2,440 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+public class TitleData
+{
+    public string TitleId { get; set; }
+    public string TitleName { get; set; }
+    public string Description { get; set; }
+    public TitleCategory Category { get; set; }
+    public TitleRarity Rarity { get; set; }
+    public int RequiredValue { get; set; }
+    public string IconPath { get; set; }
+    public bool IsUnlocked { get; set; }
+    public DateTime UnlockTime { get; set; }
+
+    public TitleData()
+    {
+        TitleId = "";
+        TitleName = "";
+        Description = "";
+        Category = TitleCategory.Combat;
+        Rarity = TitleRarity.Common;
+        RequiredValue = 0;
+        IconPath = "";
+        IsUnlocked = false;
+        UnlockTime = DateTime.MinValue;
+    }
+}
+
+public enum TitleCategory
+{
+    Combat,      // 战斗相关
+    Exploration, // 探索相关
+    Collection,  // 收藏相关
+    Social,      // 社交相关
+    Economy,     // 经济相关
+    Special,     // 特殊成就
+    Seasonal     // 季节活动
+}
+
+public enum TitleRarity
+{
+    Common,      // 普通
+    Uncommon,    // 优秀
+    Rare,        // 稀有
+    Epic,        // 史诗
+    Legendary    // 传说
+}
+
 public class TitleSystem : Node
 {
+    // Singleton
     private static TitleSystem _instance;
     public static TitleSystem Instance
     {
         get
         {
+            if (_instance == null)
+            {
+                _instance = new TitleSystem();
+            }
             return _instance;
         }
     }
+
+    // Title Database
+    private Dictionary<string, TitleData> _titleDatabase = new Dictionary<string, TitleData>();
     
-    public PlayerTitleCollection PlayerTitles = new PlayerTitleCollection();
-    public SignalManager.Signals Signals => SignalManager.Instance.Signals;
+    // Player's unlocked titles
+    private HashSet<string> _unlockedTitles = new HashSet<string>();
     
-    // 统计跟踪
-    private int _totalKills = 0;
-    private int _bossKills = 0;
-    private int _maxCombo = 0;
-    private int _totalCrits = 0;
-    private int _totalDamageTaken = 0;
-    private int _fishingCount = 0;
-    private int _alchemyCount = 0;
-    private int _areasVisited = 0;
-    private int _itemsCollected = 0;
-    private int _dungeonsCompleted = 0;
-    private int _playersHelped = 0;
-    private int _itemsSold = 0;
-    private int _friendsAdded = 0;
-    private int _treasurePointsFound = 0;
-    private HashSet<string> _visitedAreas = new HashSet<string>();
-    private HashSet<string> _collectedItems = new HashSet<string>();
+    // Currently equipped title
+    private string _equippedTitle = "";
     
+    // Title statistics
+    private int _totalTitlesUnlocked = 0;
+    private int _titlesByRarity => GetTitlesByRarityCount();
+    
+    // Signals
+    public signal void TitleUnlocked(string titleId, TitleData title);
+    public signal void TitleEquipped(string titleId);
+    public signal void TitleProgressUpdated(string titleId, int current, int required);
+
     public override void _Ready()
     {
         _instance = this;
-        AddToGroup("TitleSystem");
-        LoadTitleData();
+        InitializeTitleDatabase();
     }
-    
-    public void Initialize()
+
+    private void InitializeTitleDatabase()
     {
-        // 初始化数据库
-        var db = TitleDatabase.Instance;
+        // Combat Titles - based on kill counts
+        AddTitle("killer_novice", "Novice Killer", "Defeat 100 enemies", TitleCategory.Combat, TitleRarity.Common, 100);
+        AddTitle("killer_expert", "Expert Killer", "Defeat 500 enemies", TitleCategory.Combat, TitleRarity.Uncommon, 500);
+        AddTitle("killer_master", "Master Killer", "Defeat 1000 enemies", TitleCategory.Combat, TitleRarity.Rare, 1000);
+        AddTitle("killer_legend", "Legendary Killer", "Defeat 5000 enemies", TitleCategory.Combat, TitleRarity.Epic, 5000);
+        AddTitle("killer_god", "God of Death", "Defeat 10000 enemies", TitleCategory.Combat, TitleRarity.Legendary, 10000);
         
-        // 确保所有称号数据存在
-        foreach (var titleDef in db.GetAllTitles())
-        {
-            if (!PlayerTitles.Titles.ContainsKey(titleDef.Id))
-            {
-                PlayerTitles.Titles[titleDef.Id] = new PlayerTitleData
-                {
-                    TitleId = titleDef.Id,
-                    IsUnlocked = false,
-                    IsActive = false
-                };
-            }
-        }
+        // Boss Titles
+        AddTitle("boss_slayer_novice", "Novice Boss Slayer", "Defeat 10 bosses", TitleCategory.Combat, TitleRarity.Common, 10);
+        AddTitle("boss_slayer_expert", "Expert Boss Slayer", "Defeat 50 bosses", TitleCategory.Combat, TitleRarity.Rare, 50);
+        AddTitle("boss_slayer_legend", "Legendary Boss Slayer", "Defeat 100 bosses", TitleCategory.Combat, TitleRarity.Legendary, 100);
         
-        GD.Print($"[TitleSystem] Initialized with {PlayerTitles.Titles.Count} titles");
-    }
-    
-    // 解锁称号
-    public bool UnlockTitle(string titleId)
-    {
-        if (PlayerTitles.Titles.ContainsKey(titleId))
-        {
-            var titleData = PlayerTitles.Titles[titleId];
-            if (!titleData.IsUnlocked)
-            {
-                titleData.IsUnlocked = true;
-                titleData.UnlockTime = DateTime.Now;
-                SaveTitleData();
-                Signals.EmitSignal(SignalManager.SignalNames.TitleUnlocked, titleId);
-                GD.Print($"[TitleSystem] Title unlocked: {titleId}");
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    // 激活称号
-    public bool ActivateTitle(string titleId)
-    {
-        if (PlayerTitles.Titles.ContainsKey(titleId))
-        {
-            var titleData = PlayerTitles.Titles[titleId];
-            if (titleData.IsUnlocked)
-            {
-                // 取消之前的激活状态
-                if (PlayerTitles.ActiveTitleId != "" && PlayerTitles.Titles.ContainsKey(PlayerTitles.ActiveTitleId))
-                {
-                    PlayerTitles.Titles[PlayerTitles.ActiveTitleId].IsActive = false; 
-                }
-                
-                titleData.IsActive = true;
-                PlayerTitles.ActiveTitleId = titleId;
-                SaveTitleData();
-                
-                var titleDef = TitleDatabase.Instance.GetTitle(titleId);
-                if (titleDef != null)
-                {
-                    Signals.EmitSignal(SignalManager.SignalNames.TitleActivated, titleId, titleDef.Name);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    // 取消激活称号
-    public void DeactivateTitle(string titleId)
-    {
-        if (PlayerTitles.Titles.ContainsKey(titleId))
-        {
-            PlayerTitles.Titles[titleId].IsActive = false; 
-            if (PlayerTitles.ActiveTitleId == titleId)
-            {
-                PlayerTitles.ActiveTitleId = "";
-            }
-            SaveTitleData();
-        }
-    }
-    
-    // 获取激活称号的属性加成
-    public Dictionary<string, float> GetActiveTitleBonuses()
-    {
-        Dictionary<string, float> bonuses = new Dictionary<string, float>();
+        // Gold Titles
+        AddTitle("rich_novice", "Novice Rich", "Accumulate 10000 gold", TitleCategory.Economy, TitleRarity.Common, 10000);
+        AddTitle("rich_merchant", "Merchant Prince", "Accumulate 100000 gold", TitleCategory.Economy, TitleRarity.Uncommon, 100000);
+        AddTitle("rich_king", "Gold King", "Accumulate 1000000 gold", TitleCategory.Economy, TitleRarity.Epic, 1000000);
+        AddTitle("rich_god", "Wealth God", "Accumulate 10000000 gold", TitleCategory.Economy, TitleRarity.Legendary, 10000000);
         
-        if (PlayerTitles.ActiveTitleId != "" && PlayerTitles.Titles.ContainsKey(PlayerTitles.ActiveTitleId))
-        {
-            var titleDef = TitleDatabase.Instance.GetTitle(PlayerTitles.ActiveTitleId);
-            if (titleDef != null && titleDef.AttributeBonuses != null)
-            {
-                foreach (var kvp in titleDef.AttributeBonuses)
-                {
-                    bonuses[kvp.Key] = kvp.Value;
-                }
-            }
-        }
+        // Level Titles
+        AddTitle("level_10", "Adventurer", "Reach level 10", TitleCategory.Combat, TitleRarity.Common, 10);
+        AddTitle("level_25", "Veteran Adventurer", "Reach level 25", TitleCategory.Combat, TitleRarity.Uncommon, 25);
+        AddTitle("level_50", "Elite Adventurer", "Reach level 50", TitleCategory.Combat, TitleRarity.Rare, 50);
+        AddTitle("level_75", "Master Adventurer", "Reach level 75", TitleCategory.Combat, TitleRarity.Epic, 75);
+        AddTitle("level_100", "Legendary Hero", "Reach level 100", TitleCategory.Combat, TitleRarity.Legendary, 100);
         
-        return bonuses;
-    }
-    
-    // 检查并更新称号解锁状态
-    public void CheckAndUnlockTitles()
-    {
-        var db = TitleDatabase.Instance;
+        // Exploration Titles
+        AddTitle("explorer_novice", "Novice Explorer", "Discover 10 locations", TitleCategory.Exploration, TitleRarity.Common, 10);
+        AddTitle("explorer_expert", "Expert Explorer", "Discover 50 locations", TitleCategory.Exploration, TitleRarity.Uncommon, 50);
+        AddTitle("explorer_master", "Master Explorer", "Discover 100 locations", TitleCategory.Exploration, TitleRarity.Rare, 100);
+        AddTitle("explorer_legend", "Legendary Explorer", "Discover all locations", TitleCategory.Exploration, TitleRarity.Legendary, 200);
         
-        // 战斗称号检查
-        CheckTitle("combat_novice", _totalKills >= 1);
-        CheckTitle("combat_veteran", _totalKills >= 100);
-        CheckTitle("boss_slayer", _bossKills >= 10);
-        CheckTitle("unstoppable", _maxCombo >= 10);
-        CheckTitle("critical_master", _totalCrits >= 100);
-        CheckTitle("tank_master", _totalDamageTaken >= 1000);
+        // Pet Titles
+        AddTitle("pet_collector_novice", "Pet Collector", "Own 5 different pets", TitleCategory.Collection, TitleRarity.Common, 5);
+        AddTitle("pet_collector_expert", "Pet Master", "Own 15 different pets", TitleCategory.Collection, TitleRarity.Uncommon, 15);
+        AddTitle("pet_collector_legend", "Legendary Pet Master", "Own 30 different pets", TitleCategory.Collection, TitleRarity.Epic, 30);
         
-        // 采集称号检查
-        CheckTitle("fisherman", _fishingCount >= 10);
-        CheckTitle("miner", true); // 需要根据挖掘系统集成
+        // Mount Titles
+        AddTitle("mount_rider_novice", "Mount Rider", "Own 3 mounts", TitleCategory.Collection, TitleRarity.Common, 3);
+        AddTitle("mount_rider_expert", "Mount Master", "Own 10 mounts", TitleCategory.Collection, TitleRarity.Uncommon, 10);
         
-        // 探索称号检查
-        CheckTitle("explorer", _areasVisited >= 5);
-        CheckTitle("collector", _itemsCollected >= 100);
-        CheckTitle("treasure_hunter", _treasurePointsFound >= 50);
+        // Guild Titles
+        AddTitle("guild_founder", "Guild Founder", "Create a guild", TitleCategory.Social, TitleRarity.Rare, 1);
+        AddTitle("guild_leader", "Guild Leader", "Lead a guild with 10 members", TitleCategory.Social, TitleRarity.Epic, 10);
         
-        // 社交称号检查
-        CheckTitle("team_leader", _dungeonsCompleted >= 10);
-        CheckTitle("mentor", _playersHelped >= 10);
-        CheckTitle("merchant", _itemsSold >= 100);
-        CheckTitle("social_butterfly", _friendsAdded >= 50);
+        // PvP Titles
+        AddTitle("pvp_novice", "Novice Warrior", "Win 10 PvP battles", TitleCategory.Combat, TitleRarity.Common, 10);
+        AddTitle("pvp_expert", "Expert Warrior", "Win 50 PvP battles", TitleCategory.Combat, TitleRarity.Rare, 50);
+        AddTitle("pvp_legend", "Legendary Warrior", "Win 100 PvP battles", TitleCategory.Combat, TitleRarity.Epic, 100);
         
-        // 检查完美主义者
-        int unlockedCount = 0;
-        foreach (var titleData in PlayerTitles.Titles.Values)
-        {
-            if (titleData.IsUnlocked)
-                unlockedCount++;
-        }
+        // Crafting Titles
+        AddTitle("crafter_novice", "Novice Crafter", "Craft 50 items", TitleCategory.Economy, TitleRarity.Common, 50);
+        AddTitle("crafter_expert", "Expert Crafter", "Craft 200 items", TitleCategory.Economy, TitleRarity.Uncommon, 200);
+        AddTitle("crafter_master", "Master Crafter", "Craft 500 items", TitleCategory.Economy, TitleRarity.Rare, 500);
+        AddTitle("crafter_legend", "Legendary Crafter", "Craft 1000 items", TitleCategory.Economy, TitleRarity.Epic, 1000);
         
-        var allTitles = db.GetAllTitles();
-        if (unlockedCount >= allTitles.Count - 1) // 减去完美主义者本身
+        // Special Titles
+        AddTitle("first_blood", "First Blood", "Win your first battle", TitleCategory.Special, TitleRarity.Common, 1);
+        AddTitle("survivor", "Survivor", "Survive 100 battles", TitleCategory.Special, TitleRarity.Rare, 100);
+        AddTitle("dedicated", "Dedicated Player", "Play for 100 hours", TitleCategory.Special, TitleRarity.Epic, 100);
+        AddTitle("veteran", "Veteran", "Play for 500 hours", TitleCategory.Special, TitleRarity.Legendary, 500);
+        
+        // Achievement Titles
+        AddTitle("achiever_novice", "Novice Achiever", "Unlock 10 achievements", TitleCategory.Special, TitleRarity.Common, 10);
+        AddTitle("achiever_expert", "Expert Achiever", "Unlock 25 achievements", TitleCategory.Special, TitleRarity.Uncommon, 25);
+        AddTitle("achiever_master", "Master Achiever", "Unlock 50 achievements", TitleCategory.Special, TitleRarity.Rare, 50);
+        AddTitle("achiever_legend", "Legendary Achiever", "Unlock all achievements", TitleCategory.Special, TitleRarity.Legendary, 100);
+        
+        // Seasonal Titles (placeholder for events)
+        AddTitle("season_champion", "Season Champion", "Win a seasonal event", TitleCategory.Seasonal, TitleRarity.Epic, 1);
+        AddTitle("season_legend", "Season Legend", "Win 3 seasonal events", TitleCategory.Seasonal, TitleRarity.Legendary, 3);
+        
+        GD.Print($"[TitleSystem] Initialized {_titleDatabase.Count} titles");
+    }
+
+    private void AddTitle(string id, string name, string desc, TitleCategory cat, TitleRarity rarity, int required)
+    {
+        var title = new TitleData
         {
-            CheckTitle("perfectionist", true);
+            TitleId = id,
+            TitleName = name,
+            Description = desc,
+            Category = cat,
+            Rarity = rarity,
+            RequiredValue = required,
+            IconPath = ""
+        };
+        _titleDatabase[id] = title;
+    }
+
+    // Check if player meets requirements for a title
+    public bool CheckTitleRequirements(string titleId, int killCount = 0, int bossKills = 0, 
+        int gold = 0, int level = 0, int locations = 0, int pets = 0, int mounts = 0,
+        int guildMembers = 0, int pvpWins = 0, int crafted = 0, int battles = 0, 
+        int hoursPlayed = 0, int achievements = 0, int seasonalWins = 0)
+    {
+        if (!_titleDatabase.ContainsKey(titleId))
+            return false;
+
+        var title = _titleDatabase[titleId];
+        int currentValue = 0;
+
+        switch (titleId)
+        {
+            case "killer_novice":
+            case "killer_expert":
+            case "killer_master":
+            case "killer_legend":
+            case "killer_god":
+                currentValue = killCount;
+                break;
+            case "boss_slayer_novice":
+            case "boss_slayer_expert":
+            case "boss_slayer_legend":
+                currentValue = bossKills;
+                break;
+            case "rich_novice":
+            case "rich_merchant":
+            case "rich_king":
+            case "rich_god":
+                currentValue = gold;
+                break;
+            case "level_10":
+            case "level_25":
+            case "level_50":
+            case "level_75":
+            case "level_100":
+                currentValue = level;
+                break;
+            case "explorer_novice":
+            case "explorer_expert":
+            case "explorer_master":
+            case "explorer_legend":
+                currentValue = locations;
+                break;
+            case "pet_collector_novice":
+            case "pet_collector_expert":
+            case "pet_collector_legend":
+                currentValue = pets;
+                break;
+            case "mount_rider_novice":
+            case "mount_rider_expert":
+                currentValue = mounts;
+                break;
+            case "guild_founder":
+            case "guild_leader":
+                currentValue = guildMembers > 0 ? 1 : 0;
+                if (titleId == "guild_leader") currentValue = guildMembers;
+                break;
+            case "pvp_novice":
+            case "pvp_expert":
+            case "pvp_legend":
+                currentValue = pvpWins;
+                break;
+            case "crafter_novice":
+            case "crafter_expert":
+            case "crafter_master":
+            case "crafter_legend":
+                currentValue = crafted;
+                break;
+            case "first_blood":
+            case "survivor":
+                currentValue = battles;
+                break;
+            case "dedicated":
+            case "veteran":
+                currentValue = hoursPlayed;
+                break;
+            case "achiever_novice":
+            case "achiever_expert":
+            case "achiever_master":
+            case "achiever_legend":
+                currentValue = achievements;
+                break;
+            case "season_champion":
+            case "season_legend":
+                currentValue = seasonalWins;
+                break;
         }
+
+        // Update progress
+        TitleProgressUpdated?.Call(titleId, currentValue, title.RequiredValue);
+
+        // Check if requirement is met
+        return currentValue >= title.RequiredValue;
     }
-    
-    private void CheckTitle(string titleId, bool condition)
+
+    // Unlock a title
+    public void UnlockTitle(string titleId)
     {
-        if (condition && PlayerTitles.Titles.ContainsKey(titleId))
+        if (!_titleDatabase.ContainsKey(titleId))
+            return;
+
+        if (_unlockedTitles.Contains(titleId))
+            return;
+
+        var title = _titleDatabase[titleId];
+        title.IsUnlocked = true;
+        title.UnlockTime = DateTime.Now;
+        _unlockedTitles.Add(titleId);
+        _totalTitlesUnlocked++;
+
+        GD.Print($"[TitleSystem] Title unlocked: {title.TitleName}");
+        TitleUnlocked?.Call(titleId, title);
+    }
+
+    // Equip a title
+    public void EquipTitle(string titleId)
+    {
+        if (!_unlockedTitles.Contains(titleId))
         {
-            UnlockTitle(titleId);
+            GD.Print($"[TitleSystem] Cannot equip locked title: {titleId}");
+            return;
         }
+
+        _equippedTitle = titleId;
+        GD.Print($"[TitleSystem] Title equipped: {_titleDatabase[titleId].TitleName}");
+        TitleEquipped?.Call(titleId);
     }
-    
-    // 统计更新方法
-    public void OnEnemyKilled(bool isBoss)
+
+    // Unequip current title
+    public void UnequipTitle()
     {
-        _totalKills++;
-        if (isBoss)
+        _equippedTitle = "";
+        GD.Print("[TitleSystem] Title unequipped");
+    }
+
+    // Get all titles in a category
+    public List<TitleData> GetTitlesByCategory(TitleCategory category)
+    {
+        var result = new List<TitleData>();
+        foreach (var title in _titleDatabase.Values)
         {
-            _bossKills++;
-            CheckAndUnlockTitles();
-        }
-    }
-    
-    public void OnComboMilestone(int combo)
-    {
-        if (combo > _maxCombo)
-        {
-            _maxCombo = combo;
-            CheckAndUnlockTitles();
-        }
-    }
-    
-    public void OnCrit()
-    {
-        _totalCrits++;
-        CheckAndUnlockTitles();
-    }
-    
-    public void OnDamageTaken(int damage)
-    {
-        _totalDamageTaken += damage;
-        CheckAndUnlockTitles();
-    }
-    
-    public void OnFishCaught()
-    {
-        _fishingCount++;
-        CheckAndUnlockTitles();
-    }
-    
-    public void OnAlchemyCrafted()
-    {
-        _alchemyCount++;
-        CheckAndUnlockTitles();
-    }
-    
-    public void OnAreaVisited(string areaId)
-    {
-        if (_visitedAreas.Add(areaId))
-        {
-            _areasVisited++;
-            CheckAndUnlockTitles();
-        }
-    }
-    
-    public void OnItemCollected(string itemId)
-    {
-        if (_collectedItems.Add(itemId))
-        {
-            _itemsCollected++;
-            CheckAndUnlockTitles();
-        }
-    }
-    
-    public void OnDungeonCompleted()
-    {
-        _dungeonsCompleted++;
-        CheckAndUnlockTitles();
-    }
-    
-    public void OnPlayerHelped()
-    {
-        _playersHelped++;
-        CheckAndUnlockTitles();
-    }
-    
-    public void OnItemSold()
-    {
-        _itemsSold++;
-        CheckAndUnlockTitles();
-    }
-    
-    public void OnFriendAdded()
-    {
-        _friendsAdded++;
-        CheckAndUnlockTitles();
-    }
-    
-    public void OnTreasurePointFound()
-    {
-        _treasurePointsFound++;
-        CheckAndUnlockTitles();
-    }
-    
-    public void OnGoldChanged(int newGold)
-    {
-        if (newGold >= 1000000)
-        {
-            CheckTitle("millionaire", true);
-        }
-    }
-    
-    public void OnLevelUp(int newLevel)
-    {
-        // 假设满级是100
-        if (newLevel >= 100)
-        {
-            CheckTitle("legend", true);
-        }
-    }
-    
-    // 获取玩家称号数据
-    public PlayerTitleData GetTitleData(string titleId)
-    {
-        if (PlayerTitles.Titles.ContainsKey(titleId))
-            return PlayerTitles.Titles[titleId];
-        return null;
-    }
-    
-    // 获取所有已解锁称号
-    public List<TitleDefinition> GetUnlockedTitles()
-    {
-        List<TitleDefinition> result = new List<TitleDefinition>();
-        foreach (var kvp in PlayerTitles.Titles)
-        {
-            if (kvp.Value.IsUnlocked)
-            {
-                var titleDef = TitleDatabase.Instance.GetTitle(kvp.Key);
-                if (titleDef != null)
-                    result.Add(titleDef);
-            }
+            if (title.Category == category)
+                result.Add(title);
         }
         return result;
     }
-    
-    // 获取所有未解锁称号
-    public List<TitleDefinition> GetLockedTitles()
+
+    // Get all unlocked titles
+    public List<TitleData> GetUnlockedTitles()
     {
-        List<TitleDefinition> result = new List<TitleDefinition>();
-        foreach (var kvp in PlayerTitles.Titles)
+        var result = new List<TitleData>();
+        foreach (var titleId in _unlockedTitles)
         {
-            if (!kvp.Value.IsUnlocked)
-            {
-                var titleDef = TitleDatabase.Instance.GetTitle(kvp.Key);
-                if (titleDef != null)
-                    result.Add(titleDef);
-            }
+            if (_titleDatabase.ContainsKey(titleId))
+                result.Add(_titleDatabase[titleId]);
         }
         return result;
     }
-    
-    // 获取当前激活称号
-    public TitleDefinition GetActiveTitle()
+
+    // Get equipped title
+    public string GetEquippedTitle()
     {
-        if (PlayerTitles.ActiveTitleId != "")
-            return TitleDatabase.Instance.GetTitle(PlayerTitles.ActiveTitleId);
-        return null;
+        return _equippedTitle;
     }
-    
-    // 存档/读档
-    public void SaveTitleData()
+
+    // Get equipped title name
+    public string GetEquippedTitleName()
     {
-        if (!IsInTree()) return;
-        
-        var saveSystem = GetTree().Root.GetNode<SaveSystem>("SaveSystem");
-        if (saveSystem != null)
-        {
-            // 保存统计和称号数据
-            var saveData = new Dictionary<string, object>();
-            saveData["player_titles"] = PlayerTitles;
-            saveData["title_stats"] = new Dictionary<string, int>
-            {
-                {"total_kills", _totalKills},
-                {"boss_kills", _bossKills},
-                {"max_combo", _maxCombo},
-                {"total_crits", _totalCrits},
-                {"total_damage_taken", _totalDamageTaken},
-                {"fishing_count", _fishingCount},
-                {"alchemy_count", _alchemyCount},
-                {"areas_visited", _areasVisited},
-                {"items_collected", _itemsCollected},
-                {"dungeons_completed", _dungeonsCompleted},
-                {"players_helped", _playersHelped},
-                {"items_sold", _itemsSold},
-                {"friends_added", _friendsAdded},
-                {"treasure_points_found", _treasurePointsFound}
-            };
-            
-            saveSystem.SaveCustomData("title_system", saveData);
-        }
+        if (string.IsNullOrEmpty(_equippedTitle) || !_titleDatabase.ContainsKey(_equippedTitle))
+            return "";
+        return _titleDatabase[_equippedTitle].TitleName;
     }
-    
-    public void LoadTitleData()
+
+    // Check if title is unlocked
+    public bool IsTitleUnlocked(string titleId)
     {
-        var saveSystem = GetTree().Root.GetNode<SaveSystem>("SaveSystem");
-        if (saveSystem != null)
+        return _unlockedTitles.Contains(titleId);
+    }
+
+    // Get total unlocked count
+    public int GetTotalUnlockedCount()
+    {
+        return _unlockedTitles.Count;
+    }
+
+    // Get titles by rarity count
+    private int GetTitlesByRarityCount()
+    {
+        int count = 0;
+        foreach (var titleId in _unlockedTitles)
         {
-            var saveData = saveSystem.LoadCustomData("title_system");
-            if (saveData != null)
+            if (_titleDatabase.ContainsKey(titleId))
             {
-                if (saveData.ContainsKey("player_titles"))
-                {
-                    PlayerTitles = JsonUtils.Deserialize<PlayerTitleCollection>(JsonUtils.Serialize(saveData["player_titles"]));
-                }
-                
-                if (saveData.ContainsKey("title_stats"))
-                {
-                    var stats = saveData["title_stats"] as Dictionary<string, object>;
-                    if (stats != null)
-                    {
-                        _totalKills = stats.ContainsKey("total_kills") ? Convert.ToInt32(stats["total_kills"]) : 0;
-                        _bossKills = stats.ContainsKey("boss_kills") ? Convert.ToInt32(stats["boss_kills"]) : 0;
-                        _maxCombo = stats.ContainsKey("max_combo") ? Convert.ToInt32(stats["max_combo"]) : 0;
-                        _totalCrits = stats.ContainsKey("total_crits") ? Convert.ToInt32(stats["total_crits"]) : 0;
-                        _totalDamageTaken = stats.ContainsKey("total_damage_taken") ? Convert.ToInt32(stats["total_damage_taken"]) : 0;
-                        _fishingCount = stats.ContainsKey("fishing_count") ? Convert.ToInt32(stats["fishing_count"]) : 0;
-                        _alchemyCount = stats.ContainsKey("alchemy_count") ? Convert.ToInt32(stats["alchemy_count"]) : 0;
-                        _areasVisited = stats.ContainsKey("areas_visited") ? Convert.ToInt32(stats["areas_visited"]) : 0;
-                        _itemsCollected = stats.ContainsKey("items_collected") ? Convert.ToInt32(stats["items_collected"]) : 0;
-                        _dungeonsCompleted = stats.ContainsKey("dungeons_completed") ? Convert.ToInt32(stats["dungeons_completed"]) : 0;
-                        _playersHelped = stats.ContainsKey("players_helped") ? Convert.ToInt32(stats["players_helped"]) : 0;
-                        _itemsSold = stats.ContainsKey("items_sold") ? Convert.ToInt32(stats["items_sold"]) : 0;
-                        _friendsAdded = stats.ContainsKey("friends_added") ? Convert.ToInt32(stats["friends_added"]) : 0;
-                        _treasurePointsFound = stats.ContainsKey("treasure_points_found") ? Convert.ToInt32(stats["treasure_points_found"]) : 0;
-                    }
-                }
+                var title = _titleDatabase[titleId];
+                if (title.Rarity == TitleRarity.Legendary)
+                    count++;
             }
         }
+        return count;
+    }
+
+    // Get title data
+    public TitleData GetTitleData(string titleId)
+    {
+        if (_titleDatabase.ContainsKey(titleId))
+            return _titleDatabase[titleId];
+        return null;
+    }
+
+    // Get all titles
+    public List<TitleData> GetAllTitles()
+    {
+        return new List<TitleData>(_titleDatabase.Values);
+    }
+
+    // Save title data
+    public Dictionary<string, bool> SaveTitleData()
+    {
+        var saveData = new Dictionary<string, bool>();
+        foreach (var titleId in _unlockedTitles)
+        {
+            saveData[titleId] = true;
+        }
+        return saveData;
+    }
+
+    // Load title data
+    public void LoadTitleData(Dictionary<string, bool> data)
+    {
+        if (data == null) return;
         
-        Initialize();
+        _unlockedTitles.Clear();
+        foreach (var kvp in data)
+        {
+            if (kvp.Value && _titleDatabase.ContainsKey(kvp.Key))
+            {
+                _unlockedTitles.Add(kvp.Key);
+                _titleDatabase[kvp.Key].IsUnlocked = true;
+            }
+        }
+        _totalTitlesUnlocked = _unlockedTitles.Count;
+    }
+
+    // Save equipped title
+    public string SaveEquippedTitle()
+    {
+        return _equippedTitle;
+    }
+
+    // Load equipped title
+    public void LoadEquippedTitle(string titleId)
+    {
+        if (!string.IsNullOrEmpty(titleId) && _unlockedTitles.Contains(titleId))
+        {
+            _equippedTitle = titleId;
+        }
     }
 }
