@@ -1,367 +1,427 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Game.EquipmentSetDataSpace;
 
-namespace Game
+public class EquipmentSetSystem : Node
 {
-    /// <summary>
-    /// 装备套装系统管理器
-    /// </summary>
-    public class EquipmentSetSystem : Node
+    // Singleton instance
+    public static EquipmentSetSystem Instance { get; private set; }
+
+    // Set data storage
+    public Dictionary<string, EquipmentSet> Sets { get; private set; }
+    
+    // Player's unlocked sets
+    public HashSet<string> UnlockedSets { get; private set; }
+    
+    // Currently equipped set bonuses
+    public Dictionary<string, int> EquippedPieces { get; private set; }
+
+    // Signals
+    public static string SetUnlockedSignal => "set_unlocked";
+    public static string SetBonusActivatedSignal => "set_bonus_activated";
+
+    public override void _Ready()
     {
-        private static EquipmentSetSystem _instance;
-        public static EquipmentSetSystem Instance
+        Instance = this;
+        Sets = new Dictionary<string, EquipmentSet>();
+        UnlockedSets = new HashSet<string>();
+        EquippedPieces = new Dictionary<string, int>();
+        
+        InitializeSets();
+        
+        // Connect to player equipment changes
+        // This would ideally connect to an equipment system signal
+    }
+
+    private void InitializeSets()
+    {
+        // Warrior Sets - Heavy armor focus
+        AddSet(new EquipmentSet(
+            id: "iron_warrior",
+            name: "Iron Warrior",
+            description: "Standard issue armor for frontline soldiers",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Iron Helmet" },
+                { "chest", "Iron Chestplate" },
+                { "legs", "Iron Leggings" },
+                { "weapon", "Iron Sword" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+10% Defense" },
+                { 4, "+20% Attack, +10% Defense" }
+            },
+            rarity: Rarity.Common
+        ));
+
+        AddSet(new EquipmentSet(
+            id: "dragon_slayer",
+            name: "Dragon Slayer",
+            description: "Armor forged to hunt the mightiest of beasts",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Dragon Helm" },
+                { "chest", "Dragon Chestplate" },
+                { "legs", "Dragon Leggings" },
+                { "weapon", "Dragon Slayer Greatsword" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+15% Attack against Bosses" },
+                { 4, "+30% Attack against Bosses, +20% Fire Resistance" }
+            },
+            rarity: Rarity.Epic
+        ));
+
+        // Mage Sets - Magic focus
+        AddSet(new EquipmentSet(
+            id: "arcane_mage",
+            name: "Arcane Mage",
+            description: "Robes imbued with ancient magical knowledge",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Arcane Hat" },
+                { "chest", "Arcane Robe" },
+                { "legs", "Arcane Pants" },
+                { "weapon", "Arcane Staff" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+15% Magic Damage" },
+                { 4, "+30% Magic Damage, +20% Mana Regen" }
+            },
+            rarity: Rarity.Rare
+        ));
+
+        AddSet(new EquipmentSet(
+            id: "frost_wizard",
+            name: "Frost Wizard",
+            description: "Frozen artifacts from the eternal winter realm",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Frost Crown" },
+                { "chest", "Frost Robe" },
+                { "legs", "Frost Greaves" },
+                { "weapon", "Frost Staff" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+20% Ice Damage" },
+                { 4, "+40% Ice Damage, Enemies frozen take +10% damage" }
+            },
+            rarity: Rarity.Epic
+        ));
+
+        // Ranger Sets - Speed and crit focus
+        AddSet(new EquipmentSet(
+            id: "shadow_assassin",
+            name: "Shadow Assassin",
+            description: "Gear of the silent night hunters",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Shadow Hood" },
+                { "chest", "Shadow Vest" },
+                { "legs", "Shadow Pants" },
+                { "weapon", "Shadow Daggers" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+15% Critical Chance" },
+                { 4, "+30% Critical Chance, +20% Attack Speed" }
+            },
+            rarity: Rarity.Rare
+        ));
+
+        // Healer Sets - Support focus
+        AddSet(new EquipmentSet(
+            id: "holy_priest",
+            name: "Holy Priest",
+            description: "Sacred armor blessed by the divine light",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Holy Circlet" },
+                { "chest", "Holy Vestment" },
+                { "legs", "Holy Sandals" },
+                { "weapon", "Holy Staff" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+20% Healing Received" },
+                { 4, "+40% Healing Received, +25% Holy Damage" }
+            },
+            rarity: Rarity.Rare
+        ));
+
+        // Elemental Sets
+        AddSet(new EquipmentSet(
+            id: "inferno",
+            name: "Inferno",
+            description: "Burning armor from the heart of a volcano",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Inferno Helm" },
+                { "chest", "Inferno Plate" },
+                { "legs", "Inferno Greaves" },
+                { "weapon", "Inferno Blade" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+25% Fire Damage" },
+                { 4, "+50% Fire Damage, Enemies burn for extra damage" }
+            },
+            rarity: Rarity.Epic
+        ));
+
+        AddSet(new EquipmentSet(
+            id: "thunder_lord",
+            name: "Thunder Lord",
+            description: "Storm-infused armor crackling with lightning",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Thunder Crown" },
+                { "chest", "Thunder Plate" },
+                { "legs", "Thunder Greaves" },
+                { "weapon", "Thunder Hammer" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+25% Lightning Damage" },
+                { 4, "+50% Lightning Damage, Chance to stun enemies" }
+            },
+            rarity: Rarity.Epic
+        ));
+
+        // Legendary Sets
+        AddSet(new EquipmentSet(
+            id: "chaos_king",
+            name: "Chaos King",
+            description: "Corrupted armor that bends reality itself",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Chaos Crown" },
+                { "chest", "Chaos Armor" },
+                { "legs", "Chaos Greaves" },
+                { "weapon", "Chaos Reaper" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+20% All Damage" },
+                { 4, "+40% All Damage, +15% Critical Chance" }
+            },
+            rarity: Rarity.Legendary
+        ));
+
+        AddSet(new EquipmentSet(
+            id: "divine_guardian",
+            name: "Divine Guardian",
+            description: "Heavenly armor blessed by the gods themselves",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Divine Helm" },
+                { "chest", "Divine Plate" },
+                { "legs", "Divine Greaves" },
+                { "weapon", "Divine Shield" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+30% Defense, +20% Health" },
+                { 4, "+50% Defense, +40% Health, Reflect 10% damage" }
+            },
+            rarity: Rarity.Legendary
+        ));
+
+        // Beginner Sets
+        AddSet(new EquipmentSet(
+            id: "adventurer",
+            name: "Adventurer",
+            description: "Basic gear for those starting their journey",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Adventurer Hat" },
+                { "chest", "Adventurer Vest" },
+                { "legs", "Adventurer Pants" },
+                { "weapon", "Adventurer Sword" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+5% All Stats" },
+                { 4, "+10% All Stats, +5% Movement Speed" }
+            },
+            rarity: Rarity.Common
+        ));
+
+        // Nature Sets
+        AddSet(new EquipmentSet(
+            id: "druid",
+            name: "Druid of the Grove",
+            description: "Natural armor infused with forest magic",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Druid Hood" },
+                { "chest", "Druid Tunic" },
+                { "legs", "Druid Pants" },
+                { "weapon", "Druid Staff" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+20% Nature Damage, +10% Health Regen" },
+                { 4, "+40% Nature Damage, +20% Health Regen" }
+            },
+            rarity: Rarity.Rare
+        ));
+
+        // Poison Sets
+        AddSet(new EquipmentSet(
+            id: "plague_bringer",
+            name: "Plague Bringer",
+            description: "Toxic armor of the alchemist's craft",
+            pieces: new Dictionary<string, string> {
+                { "helmet", "Plague Mask" },
+                { "chest", "Plague Coat" },
+                { "legs", "Plague Greaves" },
+                { "weapon", "Plague Dagger" }
+            },
+            bonuses: new Dictionary<int, string> {
+                { 2, "+25% Poison Damage" },
+                { 4, "+50% Poison Damage, Enemies take poison damage over time" }
+            },
+            rarity: Rarity.Epic
+        ));
+    }
+
+    private void AddSet(EquipmentSet set)
+    {
+        Sets[set.Id] = set;
+    }
+
+    // Get all sets
+    public List<EquipmentSet> GetAllSets()
+    {
+        return new List<EquipmentSet>(Sets.Values);
+    }
+
+    // Get sets by rarity
+    public List<EquipmentSet> GetSetsByRarity(Rarity rarity)
+    {
+        List<EquipmentSet> result = new List<EquipmentSet>();
+        foreach (var set in Sets.Values)
         {
-            get { return _instance; }
+            if (set.Rarity == rarity)
+                result.Add(set);
         }
+        return result;
+    }
 
-        // 玩家套装数据
-        private PlayerSetData _playerSetData = new PlayerSetData();
-
-        // 信号定义
-        [Signal]
-        public delegate void SetItemAcquired(string setId, string itemId);
-
-        [Signal]
-        public delegate void SetCompleted(string setId);
-
-        [Signal]
-        public delegate void BonusActivated(string setId, int pieceCount);
-
-        public override void _Ready()
+    // Check if player has a piece from a set
+    public void OnEquipmentChanged(string slot, string itemId)
+    {
+        // This would be called when player equips/unequips items
+        // Check which sets the item belongs to
+        foreach (var set in Sets.Values)
         {
-            _instance = this;
-        }
-
-        /// <summary>
-        /// 获取玩家套装数据
-        /// </summary>
-        public PlayerSetData GetPlayerSetData()
-        {
-            return _playerSetData;
-        }
-
-        /// <summary>
-        /// 加载玩家套装数据
-        /// </summary>
-        public void LoadPlayerSetData(PlayerSetData data)
-        {
-            if (data != null)
+            foreach (var piece in set.Pieces.Values)
             {
-                _playerSetData = data;
-            }
-        }
-
-        /// <summary>
-        /// 添加套装物品
-        /// </summary>
-        public void AddSetItem(string itemId)
-        {
-            var db = EquipmentSetDatabase.Instance;
-            var setId = db.GetSetIdByItemId(itemId);
-            
-            if (setId == null)
-                return;
-
-            // 初始化套装数据
-            if (!_playerSetData.OwnedItems.ContainsKey(setId))
-            {
-                _playerSetData.OwnedItems[setId] = new List<string>();
-            }
-
-            // 检查是否已拥有
-            if (_playerSetData.OwnedItems[setId].Contains(itemId))
-                return;
-
-            // 添加物品
-            _playerSetData.OwnedItems[setId].Add(itemId);
-
-            // 检查套装完成
-            var set = db.GetSet(setId);
-            int pieceCount = _playerSetData.OwnedItems[setId].Count;
-
-            // 发送信号
-            EmitSignal(nameof(SetItemAcquired), setId, itemId);
-
-            // 检查是否激活新效果
-            CheckBonusActivation(setId, pieceCount);
-
-            // 检查是否完成套装
-            if (pieceCount >= set.Items.Count && !_playerSetData.ActivatedBonuses.ContainsKey(setId + "_complete"))
-            {
-                _playerSetData.ActivatedBonuses[setId + "_complete"] = set.Items.Count;
-                EmitSignal(nameof(SetCompleted), setId);
-            }
-        }
-
-        /// <summary>
-        /// 检查并激活套装效果
-        /// </summary>
-        private void CheckBonusActivation(string setId, int pieceCount)
-        {
-            var set = EquipmentSetDatabase.Instance.GetSet(setId);
-            if (set == null)
-                return;
-
-            foreach (var bonus in set.Bonuses)
-            {
-                if (pieceCount >= bonus.PieceCount)
+                if (piece == itemId)
                 {
-                    string key = setId + "_" + bonus.PieceCount;
-                    if (!_playerSetData.ActivatedBonuses.ContainsKey(key))
-                    {
-                        _playerSetData.ActivatedBonuses[key] = bonus.PieceCount;
-                        EmitSignal(nameof(BonusActivated), setId, bonus.PieceCount);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 检查玩家是否拥有指定套装物品
-        /// </summary>
-        public bool HasSetItem(string setId, string itemId)
-        {
-            if (!_playerSetData.OwnedItems.ContainsKey(setId))
-                return false;
-            return _playerSetData.OwnedItems[setId].Contains(itemId);
-        }
-
-        /// <summary>
-        /// 获取指定套装的物品数量
-        /// </summary>
-        public int GetSetPieceCount(string setId)
-        {
-            if (!_playerSetData.OwnedItems.ContainsKey(setId))
-                return 0;
-            return _playerSetData.OwnedItems[setId].Count;
-        }
-
-        /// <summary>
-        /// 获取套装已激活的效果数量
-        /// </summary>
-        public int GetActivatedBonusCount(string setId)
-        {
-            int count = 0;
-            var set = EquipmentSetDatabase.Instance.GetSet(setId);
-            if (set == null)
-                return 0;
-
-            foreach (var bonus in set.Bonuses)
-            {
-                string key = setId + "_" + bonus.PieceCount;
-                if (_playerSetData.ActivatedBonuses.ContainsKey(key))
-                    count++;
-            }
-            return count;
-        }
-
-        /// <summary>
-        /// 获取套装收集进度
-        /// </summary>
-        public float GetSetProgress(string setId)
-        {
-            var set = EquipmentSetDatabase.Instance.GetSet(setId);
-            if (set == null)
-                return 0f;
-
-            int owned = GetSetPieceCount(setId);
-            return (float)owned / set.Items.Count;
-        }
-
-        /// <summary>
-        /// 获取套装是否完成
-        /// </summary>
-        public bool IsSetComplete(string setId)
-        {
-            var set = EquipmentSetDatabase.Instance.GetSet(setId);
-            if (set == null)
-                return false;
-            return GetSetPieceCount(setId) >= set.Items.Count;
-        }
-
-        /// <summary>
-        /// 获取套装属性加成
-        /// </summary>
-        public Dictionary<string, float> GetSetBonuses()
-        {
-            var bonuses = new Dictionary<string, float>();
-            bonuses["AttackBonus"] = 0f;
-            bonuses["DefenseBonus"] = 0f;
-            bonuses["HealthBonus"] = 0f;
-            bonuses["MagicBonus"] = 0f;
-            bonuses["SpeedBonus"] = 0f;
-            bonuses["CritRateBonus"] = 0f;
-            bonuses["CritDamageBonus"] = 0f;
-            bonuses["LifeStealBonus"] = 0f;
-            bonuses["DodgeBonus"] = 0f;
-            bonuses["EXPBonus"] = 0f;
-            bonuses["GoldBonus"] = 0f;
-
-            foreach (var setKvp in _playerSetData.OwnedItems)
-            {
-                var set = EquipmentSetDatabase.Instance.GetSet(setKvp.Key);
-                if (set == null)
-                    continue;
-
-                int pieceCount = setKvp.Value.Count;
-
-                // 累加已激活的效果
-                foreach (var bonus in set.Bonuses)
-                {
-                    if (pieceCount >= bonus.PieceCount)
-                    {
-                        bonuses["AttackBonus"] += bonus.AttackBonus;
-                        bonuses["DefenseBonus"] += bonus.DefenseBonus;
-                        bonuses["HealthBonus"] += bonus.HealthBonus;
-                        bonuses["MagicBonus"] += bonus.MagicBonus;
-                        bonuses["SpeedBonus"] += bonus.SpeedBonus;
-                        bonuses["CritRateBonus"] += bonus.CritRateBonus;
-                        bonuses["CritDamageBonus"] += bonus.CritDamageBonus;
-                        bonuses["LifeStealBonus"] += bonus.LifeStealBonus;
-                        bonuses["DodgeBonus"] += bonus.DodgeBonus;
-                        bonuses["EXPBonus"] += bonus.EXPBonus;
-                        bonuses["GoldBonus"] += bonus.GoldBonus;
-                    }
-                }
-            }
-
-            return bonuses;
-        }
-
-        /// <summary>
-        /// 获取玩家套装统计
-        /// </summary>
-        public SetStatistics GetStatistics()
-        {
-            var stats = new SetStatistics();
-            var db = EquipmentSetDatabase.Instance;
-            var allSets = db.GetAllSets();
-
-            stats.TotalSets = allSets.Count;
-            stats.MaxPieceCount = 0;
-
-            foreach (var set in allSets)
-            {
-                int pieceCount = GetSetPieceCount(set.SetId);
-                stats.SetPieceCounts[set.SetId] = pieceCount;
-
-                if (pieceCount >= set.Items.Count)
-                    stats.CompletedSets++;
-
-                if (pieceCount > stats.MaxPieceCount)
-                    stats.MaxPieceCount = pieceCount;
-            }
-
-            return stats;
-        }
-
-        /// <summary>
-        /// 获取套装列表
-        /// </summary>
-        public List<EquipmentSet> GetOwnedSets()
-        {
-            var result = new List<EquipmentSet>();
-            foreach (var setId in _playerSetData.OwnedItems.Keys)
-            {
-                var set = EquipmentSetDatabase.Instance.GetSet(setId);
-                if (set != null)
-                    result.Add(set);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 获取所有套装（包括未拥有的）
-        /// </summary>
-        public List<EquipmentSet> GetAllSetsWithOwnership()
-        {
-            var result = new List<EquipmentSet>();
-            var db = EquipmentSetDatabase.Instance;
-            
-            foreach (var set in db.GetAllSets())
-            {
-                // 标记物品拥有状态
-                if (_playerSetData.OwnedItems.ContainsKey(set.SetId))
-                {
-                    result.Add(set);
-                }
-            }
-            
-            // 添加未拥有的套装
-            foreach (var set in db.GetAllSets())
-            {
-                if (!_playerSetData.OwnedItems.ContainsKey(set.SetId))
-                {
-                    result.Add(set);
-                }
-            }
-            
-            return result;
-        }
-
-        /// <summary>
-        /// 保存套装数据
-        /// </summary>
-        public Dictionary<string, object> GetSaveData()
-        {
-            var data = new Dictionary<string, object>();
-            
-            // 保存已拥有的物品
-            var ownedItems = new Dictionary<string, List<string>>();
-            foreach (var kvp in _playerSetData.OwnedItems)
-            {
-                ownedItems[kvp.Key] = kvp.Value;
-            }
-            data["owned_items"] = ownedItems;
-            
-            // 保存已激活的效果
-            var activatedBonuses = new Dictionary<string, int>();
-            foreach (var kvp in _playerSetData.ActivatedBonuses)
-            {
-                activatedBonuses[kvp.Key] = kvp.Value;
-            }
-            data["activated_bonuses"] = activatedBonuses;
-            
-            return data;
-        }
-
-        /// <summary>
-        /// 加载套装数据
-        /// </summary>
-        public void LoadSaveData(Dictionary<string, object> data)
-        {
-            if (data == null)
-                return;
-
-            _playerSetData = new PlayerSetData();
-
-            // 加载已拥有的物品
-            if (data.ContainsKey("owned_items"))
-            {
-                var ownedItems = (Dictionary<string, object>)data["owned_items"];
-                foreach (var kvp in ownedItems)
-                {
-                    var items = new List<string>();
-                    var itemList = (Godot.Collections.Array)kvp.Value;
-                    foreach (var item in itemList)
-                    {
-                        items.Add((string)item);
-                    }
-                    _playerSetData.OwnedItems[kvp.Key] = items;
-                }
-            }
-
-            // 加载已激活的效果
-            if (data.ContainsKey("activated_bonuses"))
-            {
-                var activatedBonuses = (Dictionary<string, object>)data["activated_bonuses"];
-                foreach (var kvp in activatedBonuses)
-                {
-                    _playerSetData.ActivatedBonuses[kvp.Key] = (int)(long)kvp.Value;
+                    UpdateSetProgress(set.Id);
+                    break;
                 }
             }
         }
     }
+
+    // Update equipped piece count for a set
+    private void UpdateSetProgress(string setId)
+    {
+        if (!Sets.ContainsKey(setId))
+            return;
+
+        var set = Sets[setId];
+        int equippedCount = 0;
+
+        // This would check actual player inventory
+        // For now, we'll track it conceptually
+        if (EquippedPieces.ContainsKey(setId))
+            equippedCount = EquippedPieces[setId];
+        else
+            EquippedPieces[setId] = 0;
+
+        // Check for set bonus activation
+        int newBonusLevel = 0;
+        if (equippedCount >= 4)
+            newBonusLevel = 4;
+        else if (equippedCount >= 2)
+            newBonusLevel = 2;
+
+        if (newBonusLevel > 0 && set.Bonuses.ContainsKey(newBonusLevel))
+        {
+            // Emit bonus activated signal
+            EmitSignal(SetBonusActivatedSignal, setId, newBonusLevel, set.Bonuses[newBonusLevel]);
+        }
+    }
+
+    // Unlock a set (for tracking/achievements)
+    public void UnlockSet(string setId)
+    {
+        if (!UnlockedSets.Contains(setId))
+        {
+            UnlockedSets.Add(setId);
+            if (Sets.ContainsKey(setId))
+            {
+                EmitSignal(SetUnlockedSignal, setId, Sets[setId].Name);
+            }
+        }
+    }
+
+    // Get set by ID
+    public EquipmentSet GetSet(string setId)
+    {
+        return Sets.ContainsKey(setId) ? Sets[setId] : null;
+    }
+
+    // Calculate set bonus for a specific set
+    public string GetActiveBonus(string setId)
+    {
+        if (!Sets.ContainsKey(setId) || !EquippedPieces.ContainsKey(setId))
+            return "";
+
+        int count = EquippedPieces[setId];
+        if (count >= 4 && Sets[setId].Bonuses.ContainsKey(4))
+            return Sets[setId].Bonuses[4];
+        if (count >= 2 && Sets[setId].Bonuses.ContainsKey(2))
+            return Sets[setId].Bonuses[2];
+
+        return "";
+    }
+
+    // Save/Load support
+    public Dictionary<string, object> Serialize()
+    {
+        return new Dictionary<string, object>
+        {
+            { "unlocked_sets", new List<string>(UnlockedSets) },
+            { "equipped_pieces", EquippedPieces }
+        };
+    }
+
+    public void Deserialize(Dictionary<string, object> data)
+    {
+        if (data.ContainsKey("unlocked_sets"))
+        {
+            UnlockedSets = new HashSet<string>((List<string>)data["unlocked_sets"]);
+        }
+        if (data.ContainsKey("equipped_pieces"))
+        {
+            EquippedPieces = new Dictionary<string, int>((Dictionary<string, object>)data["equipped_pieces"]);
+        }
+    }
+}
+
+// Equipment Set data class
+public class EquipmentSet
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public Dictionary<string, string> Pieces { get; set; } // slot -> item name
+    public Dictionary<int, string> Bonuses { get; set; } // piece count -> bonus description
+    public Rarity Rarity { get; set; }
+
+    public EquipmentSet(string id, string name, string description, 
+        Dictionary<string, string> pieces, Dictionary<int, string> bonuses, Rarity rarity)
+    {
+        Id = id;
+        Name = name;
+        Description = description;
+        Pieces = pieces;
+        Bonuses = bonuses;
+        Rarity = rarity;
+    }
+}
+
+// Rarity enum
+public enum Rarity
+{
+    Common,
+    Uncommon,
+    Rare,
+    Epic,
+    Legendary
 }
