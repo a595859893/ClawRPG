@@ -2993,8 +2993,13 @@ namespace ClawRPG.Scripts {
         private void TogglePetRecycleUI()
         {
             var petRecycleUI = GetNodeOrNull<Systems.PetRecycle.PetRecycleUI>("UI/PetRecycleUI");
+            var petRecycleSystem = GetNodeOrNull<Systems.PetRecycle.PetRecycleSystem>("PetRecycleSystem");
             if (petRecycleUI != null)
             {
+                if (!petRecycleUI.Visible && petRecycleSystem != null)
+                {
+                    petRecycleUI.Initialize(petRecycleSystem);
+                }
                 petRecycleUI.Visible = !petRecycleUI.Visible;
             }
         }

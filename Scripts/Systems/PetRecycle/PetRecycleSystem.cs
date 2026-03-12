@@ -1,227 +1,297 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ClawRPG.Scripts.Systems.PetRecycle;
 
-public partial class PetRecycleSystem : Node
-{
-    public static PetRecycleSystem Instance { get; private set; }
-    
-    private PetRecycleData _data = new();
-    private Random _random = new();
-    
-    // 信号
-    public signal void RecycleCompleted(RecycleRecord record);
-    public signal void StatisticsUpdated(PetRecycleData data);
-    
-    public override void _Ready()
-    {
-        Instance = this;
-        LoadData();
-    }
-    
+namespace ClawRPG.Scripts.Systems {
     /// <summary>
-    /// 回收宠物
+    /// 宠物回收系统 - 核心系统
     /// </summary>
-    public RecycleRecord RecyclePet(string petId, string petName, string petType, string rarity, int level)
+    public class PetRecycleSystem : Node
     {
-        // 获取配置
-        var config = PetRecycleDatabase.GetConfig(petType);
-        var rarityBonus = PetRecycleDatabase.GetRarityBonus(rarity);
-        float levelBonus = PetRecycleDatabase.GetLevelBonus(level);
+        private PetRecycleData _data;
+        private PetRecycleDatabase _database;
         
-        // 计算金币
-        int goldEarned = (int)(config.BaseGold * rarityBonus.GoldMultiplier * levelBonus);
+        // 信号
+        public signal void RecycleCompleted(PetRecycleRecord record);
+        public signal void MaterialAdded(MaterialReward material);
+        public signal void StatisticsUpdated();
         
-        // 生成材料
-        List<string> materialsEarned = new();
-        foreach (var material in config.Materials)
+        public override void _Ready()
         {
-            // 根据权重随机
-            if (_random.Next(100) < material.Weight)
+            base._Ready();
+            
+            // 初始化数据和数据库
+            _data = new PetRecycleData();
+            _database = new PetRecycleDatabase();
+            
+            // 添加到场景树
+            AddChild(_data);
+            AddChild(_database);
+            
+            GD.Print("[PetRecycleSystem] Initialized");
+        }
+        
+        /// <summary>
+        /// 回收宠物
+        /// </summary>
+        public PetRecycleRecord RecyclePet(string petType, string petName, string rarity, int level)
+        {
+            var record = new PetRecycleRecord
             {
-                int amount = _random.Next(material.AmountMin, material.AmountMax + 1);
-                // 稀有度加成
-                amount += rarityBonus.MaterialBonus;
-                
-                string materialStr = $"{material.Name} x{amount}";
-                materialsEarned.Add(materialStr);
-                
-                // 添加到背包（如果有背包系统）
-                AddMaterialToInventory(material.MaterialId, amount);
+                PetType = petType,
+                PetName = petName,
+                Rarity = rarity,
+                Level = level,
+                Timestamp = OS.GetUnixTime()
+            };
+            
+            // 获取配置
+            var petConfig = _database.GetPetTypeConfig(petType);
+            var rarityConfig = _database.GetRarityConfig(rarity);
+            var levelBonus = _database.GetLevelBonus(level);
+            
+            // 生成基础材料
+            int baseMaterialCount = 2 + (int)(level / 10); // 2-12个基础材料
+            for (int i = 0; i < baseMaterialCount; i++)
+            {
+                var materialId = petConfig.BaseMaterials[GD.RandI() % petConfig.BaseMaterials.Count];
+                var materialConfig = _database.GetMaterialConfig(materialId);
+                if (materialConfig != null)
+                {
+                    int quantity = (int)(GD.RandI() % 3 + 1) * rarityConfig.MaterialMultiplier * levelBonus;
+                    var reward = new MaterialReward
+                    {
+                        MaterialId = materialId,
+                        MaterialName = materialConfig.DisplayName,
+                        Quantity = Math.Max(1, quantity),
+                        Value = materialConfig.BaseValue * Math.Max(1, quantity)
+                    };
+                    record.Materials.Add(reward);
+                    _data.TotalMaterials += reward.Quantity;
+                    MaterialAdded?.Invoke(reward);
+                }
             }
-        }
-        
-        // 添加金币
-        AddGold(goldEarned);
-        
-        // 创建记录
-        var record = new RecycleRecord
-        {
-            PetId = petId,
-            PetName = petName,
-            PetType = petType,
-            Rarity = rarity,
-            Level = level,
-            GoldEarned = goldEarned,
-            MaterialsEarned = materialsEarned,
-            Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-        };
-        
-        // 更新统计
-        _data.RecycleHistory.Insert(0, record);
-        _data.TotalRecycled++;
-        _data.TotalGoldEarned += goldEarned;
-        _data.TotalMaterialsEarned += materialsEarned.Count;
-        
-        // 稀有度统计
-        switch (rarity)
-        {
-            case "Rare":
-                _data.RarePetsRecycled++;
-                break;
-            case "Epic":
-                _data.EpicPetsRecycled++;
-                break;
-            case "Legendary":
-                _data.LegendaryPetsRecycled++;
-                break;
-        }
-        
-        // 保存数据
-        SaveData();
-        
-        // 触发信号
-        RecycleCompleted(record);
-        StatisticsUpdated(_data);
-        
-        GD.Print($"[PetRecycle] Recycled {petName} ({rarity}) - Gold: {goldEarned}, Materials: {materialsEarned.Count}");
-        
-        return record;
-    }
-    
-    /// <summary>
-    /// 获取回收预览
-    /// </summary>
-    public Dictionary<string, object> GetRecyclePreview(string petType, string rarity, int level)
-    {
-        var config = PetRecycleDatabase.GetConfig(petType);
-        var rarityBonus = PetRecycleDatabase.GetRarityBonus(rarity);
-        float levelBonus = PetRecycleDatabase.GetLevelBonus(level);
-        
-        int goldEarned = (int)(config.BaseGold * rarityBonus.GoldMultiplier * levelBonus);
-        
-        List<Dictionary<string, object>> materials = new();
-        foreach (var material in config.Materials)
-        {
-            int amount = _random.Next(material.AmountMin, material.AmountMax + 1) + rarityBonus.MaterialBonus;
-            materials.Add(new Dictionary<string, object>
+            
+            // 尝试生成特殊材料
+            if (GD.RandF() < rarityConfig.SpecialDropChance)
             {
-                { "name", material.Name },
-                { "amount", amount },
-                { "weight", material.Weight }
-            });
-        }
-        
-        return new Dictionary<string, object>
-        {
-            { "gold", goldEarned },
-            { "materials", materials }
-        };
-    }
-    
-    /// <summary>
-    /// 获取统计
-    /// </summary>
-    public PetRecycleData GetStatistics()
-    {
-        return _data;
-    }
-    
-    /// <summary>
-    /// 获取回收历史
-    /// </summary>
-    public List<RecycleRecord> GetHistory(int limit = 20)
-    {
-        if (_data.RecycleHistory.Count <= limit)
-            return _data.RecycleHistory;
-        
-        return _data.RecycleHistory.GetRange(0, limit);
-    }
-    
-    /// <summary>
-    /// 重置统计
-    /// </summary>
-    public void ResetStatistics()
-    {
-        _data.TotalRecycled = 0;
-        _data.TotalGoldEarned = 0;
-        _data.TotalMaterialsEarned = 0;
-        _data.RarePetsRecycled = 0;
-        _data.EpicPetsRecycled = 0;
-        _data.LegendaryPetsRecycled = 0;
-        _data.RecycleHistory.Clear();
-        
-        SaveData();
-        StatisticsUpdated(_data);
-        
-        GD.Print("[PetRecycle] Statistics reset");
-    }
-    
-    // 添加金币到玩家
-    private void AddGold(int amount)
-    {
-        // 尝试获取经济系统
-        var economySystem = GetTree().GetFirstNodeInGroup("EconomySystem");
-        if (economySystem != null)
-        {
-            economySystem.Call("AddGold", amount);
-        }
-        else
-        {
-            // 直接修改 Player 数据
-            var player = GetTree().GetFirstNodeInGroup("Player");
-            if (player != null && player.HasMethod("AddGold"))
-            {
-                player.Call("AddGold", amount);
+                var bonusMaterialId = petConfig.BonusMaterials[GD.RandI() % petConfig.BonusMaterials.Count];
+                var bonusMaterialConfig = _database.GetMaterialConfig(bonusMaterialId);
+                if (bonusMaterialConfig != null)
+                {
+                    int quantity = 1;
+                    var reward = new MaterialReward
+                    {
+                        MaterialId = bonusMaterialId,
+                        MaterialName = bonusMaterialConfig.DisplayName,
+                        Quantity = quantity,
+                        Value = bonusMaterialConfig.BaseValue * quantity
+                    };
+                    record.Materials.Add(reward);
+                    _data.TotalMaterials += quantity;
+                    MaterialAdded?.Invoke(reward);
+                }
             }
-        }
-    }
-    
-    // 添加材料到背包
-    private void AddMaterialToInventory(string materialId, int amount)
-    {
-        var inventorySystem = GetTree().GetFirstNodeInGroup("InventorySystem");
-        if (inventorySystem != null)
-        {
-            inventorySystem.Call("AddItem", materialId, amount);
-        }
-    }
-    
-    // 保存数据
-    private void SaveData()
-    {
-        var saveSystem = GetTree().GetFirstNodeInGroup("SaveSystem");
-        if (saveSystem != null)
-        {
-            var saveData = _data.GetSaveData();
-            saveSystem.Call("SaveSystemData", "PetRecycle", saveData);
-        }
-    }
-    
-    // 加载数据
-    private void LoadData()
-    {
-        var saveSystem = GetTree().GetFirstNodeInGroup("SaveSystem");
-        if (saveSystem != null)
-        {
-            var data = saveSystem.Call("LoadSystemData", "PetRecycle") as Dictionary<string, int>;
-            if (data != null)
+            
+            // 计算经验奖励
+            int baseExp = level * 10;
+            record.ExperienceGained = (int)(baseExp * rarityConfig.ExperienceMultiplier);
+            _data.TotalExperience += record.ExperienceGained;
+            
+            // 更新统计
+            _data.TotalRecycled++;
+            switch (rarity)
             {
-                _data.LoadFromData(data);
+                case "Common": _data.CommonRecycled++; break;
+                case "Uncommon": _data.UncommonRecycled++; break;
+                case "Rare": _data.RareRecycled++; break;
+                case "Epic": _data.EpicRecycled++; break;
+                case "Legendary": _data.LegendaryRecycled++; break;
             }
+            
+            // 添加到历史记录
+            _data.RecycleHistory.Insert(0, record);
+            if (_data.RecycleHistory.Count > 100)
+            {
+                _data.RecycleHistory.RemoveAt(_data.RecycleHistory.Count - 1);
+            }
+            
+            // 解锁宠物类型
+            _data.UnlockedPetTypes.Add(petType);
+            
+            // 触发信号
+            RecycleCompleted?.Invoke(record);
+            StatisticsUpdated?.Invoke();
+            
+            GD.Print($"[PetRecycleSystem] Recycled {petName} ({rarity}, Lv.{level}) -> {record.Materials.Count} materials, {record.ExperienceGained} XP");
+            
+            return record;
         }
         
-        GD.Print($"[PetRecycle] Loaded - Total Recycled: {_data.TotalRecycled}, Gold: {_data.TotalGoldEarned}");
+        /// <summary>
+        /// 获取预览材料
+        /// </summary>
+        public List<MaterialReward> PreviewRecycle(string petType, string rarity, int level)
+        {
+            var preview = new List<MaterialReward>();
+            
+            var petConfig = _database.GetPetTypeConfig(petType);
+            var rarityConfig = _database.GetRarityConfig(rarity);
+            var levelBonus = _database.GetLevelBonus(level);
+            
+            // 基础材料预览
+            int baseMaterialCount = 2 + (int)(level / 10);
+            for (int i = 0; i < baseMaterialCount; i++)
+            {
+                var materialId = petConfig.BaseMaterials[GD.RandI() % petConfig.BaseMaterials.Count];
+                var materialConfig = _database.GetMaterialConfig(materialId);
+                if (materialConfig != null)
+                {
+                    int quantity = (int)(GD.RandI() % 3 + 1) * rarityConfig.MaterialMultiplier * levelBonus;
+                    preview.Add(new MaterialReward
+                    {
+                        MaterialId = materialId,
+                        MaterialName = materialConfig.DisplayName,
+                        Quantity = Math.Max(1, quantity),
+                        Value = materialConfig.BaseValue * Math.Max(1, quantity)
+                    });
+                }
+            }
+            
+            // 特殊材料预览 (50%概率显示)
+            if (GD.RandF() < rarityConfig.SpecialDropChance * 0.5f)
+            {
+                var bonusMaterialId = petConfig.BonusMaterials[GD.RandI() % petConfig.BonusMaterials.Count];
+                var bonusMaterialConfig = _database.GetMaterialConfig(bonusMaterialId);
+                if (bonusMaterialConfig != null)
+                {
+                    preview.Add(new MaterialReward
+                    {
+                        MaterialId = bonusMaterialId,
+                        MaterialName = bonusMaterialConfig.DisplayName,
+                        Quantity = 1,
+                        Value = bonusMaterialConfig.BaseValue
+                    });
+                }
+            }
+            
+            return preview;
+        }
+        
+        /// <summary>
+        /// 获取统计数据
+        /// </summary>
+        public Dictionary<string, int> GetStatistics()
+        {
+            return new Dictionary<string, int>
+            {
+                { "TotalRecycled", _data.TotalRecycled },
+                { "CommonRecycled", _data.CommonRecycled },
+                { "UncommonRecycled", _data.UncommonRecycled },
+                { "RareRecycled", _data.RareRecycled },
+                { "EpicRecycled", _data.EpicRecycled },
+                { "LegendaryRecycled", _data.LegendaryRecycled },
+                { "TotalMaterials", _data.TotalMaterials },
+                { "TotalExperience", _data.TotalExperience }
+            };
+        }
+        
+        /// <summary>
+        /// 获取回收历史
+        /// </summary>
+        public List<PetRecycleRecord> GetRecycleHistory(int count = 10)
+        {
+            return _data.RecycleHistory.Take(count).ToList();
+        }
+        
+        /// <summary>
+        /// 获取已解锁的宠物类型
+        /// </summary>
+        public HashSet<string> GetUnlockedPetTypes()
+        {
+            return _data.UnlockedPetTypes;
+        }
+        
+        /// <summary>
+        /// 获取稀有度列表
+        /// </summary>
+        public List<string> GetRarityList()
+        {
+            return new List<string> { "Common", "Uncommon", "Rare", "Epic", "Legendary" };
+        }
+        
+        /// <summary>
+        /// 获取宠物类型列表
+        /// </summary>
+        public List<string> GetPetTypeList()
+        {
+            return new List<string> { "Dog", "Cat", "Bird", "Rabbit", "Dragon", "Slime", "Skeleton", "Elemental" };
+        }
+        
+        /// <summary>
+        /// 模拟回收（测试用）
+        /// </summary>
+        public void SimulateRecycle()
+        {
+            var petTypes = GetPetTypeList();
+            var rarities = GetRarityList();
+            
+            var randomPetType = petTypes[GD.RandI() % petTypes.Count];
+            var randomRarity = rarities[GD.RandI() % rarities.Count];
+            var randomLevel = GD.RandI() % 50 + 1;
+            var randomName = $"Test Pet {GD.RandI() % 1000}";
+            
+            RecyclePet(randomPetType, randomName, randomRarity, randomLevel);
+        }
+        
+        /// <summary>
+        /// 保存数据
+        /// </summary>
+        public Dictionary<string, object> SaveData()
+        {
+            return new Dictionary<string, object>
+            {
+                { "UnlockedPetTypes", _data.UnlockedPetTypes.ToList() },
+                { "TotalRecycled", _data.TotalRecycled },
+                { "CommonRecycled", _data.CommonRecycled },
+                { "UncommonRecycled", _data.UncommonRecycled },
+                { "RareRecycled", _data.RareRecycled },
+                { "EpicRecycled", _data.EpicRecycled },
+                { "LegendaryRecycled", _data.LegendaryRecycled },
+                { "TotalMaterials", _data.TotalMaterials },
+                { "TotalExperience", _data.TotalExperience }
+            };
+        }
+        
+        /// <summary>
+        /// 加载数据
+        /// </summary>
+        public void LoadData(Dictionary<string, object> saveData)
+        {
+            if (saveData == null) return;
+            
+            if (saveData.ContainsKey("UnlockedPetTypes"))
+            {
+                var list = saveData["UnlockedPetTypes"] as Godot.Collections.Array;
+                _data.UnlockedPetTypes = new HashSet<string>();
+                foreach (var item in list)
+                {
+                    _data.UnlockedPetTypes.Add(item.ToString());
+                }
+            }
+            
+            _data.TotalRecycled = saveData.ContainsKey("TotalRecycled") ? (int)saveData["TotalRecycled"] : 0;
+            _data.CommonRecycled = saveData.ContainsKey("CommonRecycled") ? (int)saveData["CommonRecycled"] : 0;
+            _data.UncommonRecycled = saveData.ContainsKey("UncommonRecycled") ? (int)saveData["UncommonRecycled"] : 0;
+            _data.RareRecycled = saveData.ContainsKey("RareRecycled") ? (int)saveData["RareRecycled"] : 0;
+            _data.EpicRecycled = saveData.ContainsKey("EpicRecycled") ? (int)saveData["EpicRecycled"] : 0;
+            _data.LegendaryRecycled = saveData.ContainsKey("LegendaryRecycled") ? (int)saveData["LegendaryRecycled"] : 0;
+            _data.TotalMaterials = saveData.ContainsKey("TotalMaterials") ? (int)saveData["TotalMaterials"] : 0;
+            _data.TotalExperience = saveData.ContainsKey("TotalExperience") ? (int)saveData["TotalExperience"] : 0;
+            
+            GD.Print("[PetRecycleSystem] Data loaded");
+        }
     }
 }
