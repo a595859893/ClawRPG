@@ -71,7 +71,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             };
             mainContainer.AddChild(leftPanel);
             
-            var leftVBox = new VBoxContainer;
+            var leftVBox = new VBoxContainer();
             leftPanel.AddChild(leftVBox);
             
             // 标题
@@ -83,7 +83,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             leftVBox.AddChild(leftTitle);
             
             // 筛选按钮
-            var filterContainer = new HBoxContainer;
+            var filterContainer = new HBoxContainer();
             leftVBox.AddChild(filterContainer);
             
             // 类型筛选
@@ -131,7 +131,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             };
             mainContainer.AddChild(centerPanel);
             
-            var centerVBox = new VBoxContainer;
+            var centerVBox = new VBoxContainer();
             centerPanel.AddChild(centerVBox);
             
             // 标题
@@ -151,7 +151,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             centerVBox.AddChild(_equipmentList);
             
             // 宝石槽位显示
-            _equipmentSlotsContainer = new VBoxContainer;
+            _equipmentSlotsContainer = new VBoxContainer();
             centerVBox.AddChild(_equipmentSlotsContainer);
             
             // ===== 右侧：详情面板 =====
@@ -161,7 +161,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             };
             mainContainer.AddChild(rightPanel);
             
-            var rightVBox = new VBoxContainer;
+            var rightVBox = new VBoxContainer();
             rightPanel.AddChild(rightVBox);
             
             // 标题

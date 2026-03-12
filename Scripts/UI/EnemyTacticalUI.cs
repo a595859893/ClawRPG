@@ -195,7 +195,7 @@ namespace ClawRPG.Scripts.UI {
             entryContainer.AddChild(nameLabel);
             
             // Health bar
-            var healthContainer = new HBoxContainer;
+            var healthContainer = new HBoxContainer();
             entryContainer.AddChild(healthContainer);
             
             var healthLabel = new Label {

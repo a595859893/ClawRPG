@@ -81,7 +81,7 @@ public class CombatHUDEnhancementUI : Control
 		AddHSeparator(_mainContainer);
 		
 		// Combat time and DPS row
-		var topRow = new HBoxContainer;
+		var topRow = new HBoxContainer();
 		_mainContainer.AddChild(topRow);
 		
 		_combatTimeLabel = new Label();

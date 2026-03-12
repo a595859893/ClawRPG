@@ -83,7 +83,7 @@ namespace GameSystems
             titleBar.AddChild(closeButton);
             
             // 内容区域
-            _contentBox = new VBoxContainer;
+            _contentBox = new VBoxContainer();
             _contentBox.SetHorizontalExpandFillOverride(_mainPanel);
             _contentBox.AddChild(titleBar);
             _mainPanel.AddChild(_contentBox);
@@ -196,10 +196,10 @@ namespace GameSystems
         
         private Button CreateHabitatButton(HabitatConfig habitat)
         {
-            var button = new Button;
+            var button = new Button();
             button.CustomMinimumSize = new Vector2(180, 80);
             
-            var vbox = new VBoxContainer;
+            var vbox = new VBoxContainer();
             button.AddChild(vbox);
             
             var nameLabel = new Label();
@@ -248,7 +248,7 @@ namespace GameSystems
             decorationBox.AddChild(hintLabel);
             
             // 装饰品网格
-            _decorationScroll = new ScrollContainer;
+            _decorationScroll = new ScrollContainer();
             _decorationScroll.SetVerticalExpandFillOverride(decorationBox);
             decorationBox.AddChild(_decorationScroll);
             
@@ -266,10 +266,10 @@ namespace GameSystems
         
         private Button CreateDecorationButton(DecorationConfig decoration)
         {
-            var button = new Button;
+            var button = new Button();
             button.CustomMinimumSize = new Vector2(140, 100);
             
-            var vbox = new VBoxContainer;
+            var vbox = new VBoxContainer();
             button.AddChild(vbox);
             
             var iconLabel = new Label();
@@ -314,10 +314,10 @@ namespace GameSystems
             titleLabel.AddThemeFontSizeOverride("font_size", 20);
             statsBox.AddChild(titleLabel);
             
-            var separator = new HSeparator;
+            var separator = new HSeparator();
             statsBox.AddChild(separator);
             
-            _statsBox = new VBoxContainer;
+            _statsBox = new VBoxContainer();
             _statsBox.SetVerticalExpandFillOverride(statsBox);
             statsBox.AddChild(_statsBox);
             
@@ -384,7 +384,7 @@ namespace GameSystems
         
         private void AddStatLine(string label, string value)
         {
-            var line = new HBoxContainer;
+            var line = new HBoxContainer();
             _statsBox.AddChild(line);
             
             var labelText = new Label();

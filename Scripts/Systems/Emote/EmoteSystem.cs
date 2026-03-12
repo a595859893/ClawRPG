@@ -10,10 +10,10 @@ namespace ClawRPG.Systems.Emote {
         private PlayerEmoteData playerData = new PlayerEmoteData();
         
         // Signals
-        public signal void EmoteUnlocked(string emoteId);
-        public signal void EmoteUsed(string emoteId);
-        public signal void FavoriteEmoteAdded(string emoteId);
-        public signal void FavoriteEmoteRemoved(string emoteId);
+        public static Signal<string> EmoteUnlocked { get; } = new Signal<string>();
+        public static Signal<string> EmoteUsed { get; } = new Signal<string>();
+        public static Signal<string> FavoriteEmoteAdded { get; } = new Signal<string>();
+        public static Signal<string> FavoriteEmoteRemoved { get; } = new Signal<string>();
 
         public override void _Ready() {
             Instance = this;

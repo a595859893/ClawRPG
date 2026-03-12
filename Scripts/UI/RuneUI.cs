@@ -63,7 +63,7 @@ namespace ClawRPG.Scripts.UI
             mainContainer.AddChild(contentContainer);
 
             // 符文槽位区域
-            var slotsPanel = new VBoxContainer;
+            var slotsPanel = new VBoxContainer();
             slotsPanel.CustomMinimumSize = new Vector2(300, 0);
             contentContainer.AddChild(slotsPanel);
 
@@ -94,7 +94,7 @@ namespace ClawRPG.Scripts.UI
             inventoryLabel.HorizontalAlignment = HorizontalAlignment.Center;
             inventoryPanel.AddChild(inventoryLabel);
 
-            var scrollContainer = new ScrollContainer;
+            var scrollContainer = new ScrollContainer();
             scrollContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
             inventoryPanel.AddChild(scrollContainer);
 
@@ -143,16 +143,16 @@ namespace ClawRPG.Scripts.UI
         {
             var slot = new RuneSlot();
 
-            slot.Container = new PanelContainer;
+            slot.Container = new PanelContainer();
             slot.Container.CustomMinimumSize = new Vector2(60, 60);
             slot.Container.Modulate = new Color(0.3f, 0.3f, 0.3f);
 
-            slot.Icon = new TextureRect;
+            slot.Icon = new TextureRect();
             slot.Icon.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
             slot.Icon.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
             slot.Container.AddChild(slot.Icon);
 
-            slot.IndexLabel = new Label;
+            slot.IndexLabel = new Label();
             slot.IndexLabel.Text = (index + 1).ToString();
             slot.IndexLabel.HorizontalAlignment = HorizontalAlignment.Center;
             slot.IndexLabel.VerticalAlignment = VerticalAlignment.Center;
@@ -253,32 +253,32 @@ namespace ClawRPG.Scripts.UI
 
         private Control CreateRuneItem(Rune rune)
         {
-            var container = new PanelContainer;
+            var container = new PanelContainer();
             container.CustomMinimumSize = new Vector2(0, 50);
 
-            var hbox = new HBoxContainer;
+            var hbox = new HBoxContainer();
             container.AddChild(hbox);
 
-            var colorBox = new ColorRect;
+            var colorBox = new ColorRect();
             colorBox.CustomMinimumSize = new Vector2(40, 40);
             colorBox.Color = RuneDatabase.RarityColors[rune.Rarity];
             hbox.AddChild(colorBox);
 
-            var info = new VBoxContainer;
+            var info = new VBoxContainer();
             info.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             hbox.AddChild(info);
 
-            var nameLabel = new Label;
+            var nameLabel = new Label();
             nameLabel.Text = $"{rune.Name} Lv.{rune.Level}";
             nameLabel.AddThemeFontSizeOverride("font_size", 14);
             info.AddChild(nameLabel);
 
-            var typeLabel = new Label;
+            var typeLabel = new Label();
             typeLabel.Text = $"{RuneDatabase.GetRuneTypeName(rune.Type)} +{rune.AttributeValue}";
             typeLabel.AddThemeFontSizeOverride("font_size", 12);
             info.AddChild(typeLabel);
 
-            var equipButton = new Button;
+            var equipButton = new Button();
             equipButton.Text = rune.IsEquipped ? "卸下" : "装备";
             equipButton.Pressed += () =>
             {
@@ -320,7 +320,7 @@ namespace ClawRPG.Scripts.UI
             };
             hbox.AddChild(equipButton);
 
-            var deleteButton = new Button;
+            var deleteButton = new Button();
             deleteButton.Text = "删除";
             deleteButton.Pressed += () =>
             {
@@ -361,7 +361,7 @@ namespace ClawRPG.Scripts.UI
 
         private void AddStatLine(string name, float value)
         {
-            var label = new Label;
+            var label = new Label();
             label.Text = $"{name}: +{value:F1}";
             label.AddThemeFontSizeOverride("font_size", 12);
             _statsContainer.AddChild(label);

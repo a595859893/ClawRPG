@@ -48,13 +48,13 @@ namespace ClawRPG.Scripts.Combat {
             // 创建伤害数字容器
             damageNumbersContainer = new Control();
             damageNumbersContainer.Name = "DamageNumbersContainer";
-            damageNumbersContainer.Set AnchorsPreset(Control.LayoutPreset.FullRect);
+            damageNumbersContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             damageNumbersContainer.MouseFilter = Control.MouseFilterEnum.Ignore;
             
             // 创建特效容器
             effectsContainer = new Control();
             effectsContainer.Name = "EffectsContainer";
-            effectsContainer.Set AnchorsPreset(Control.LayoutPreset.FullRect);
+            effectsContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             effectsContainer.MouseFilter = Control.MouseFilterEnum.Ignore;
             
             // 添加到CanvasLayer
@@ -333,7 +333,7 @@ namespace ClawRPG.Scripts.Combat {
             var colorRect = new ColorRect();
             colorRect.Color = effect.Color;
             colorRect.Color.A = effect.Intensity;
-            colorRect.Set AnchorsPreset(Control.LayoutPreset.FullRect);
+            colorRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             colorRect.MouseFilter = Control.MouseFilterEnum.Ignore;
             
             effectsContainer.AddChild(colorRect);

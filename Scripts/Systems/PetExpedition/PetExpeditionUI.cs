@@ -61,7 +61,7 @@ namespace ClawRPG.Systems
             AddChild(mainContainer);
             
             // 左侧 - 探险类型选择
-            var leftPanel = new VBoxContainer;
+            var leftPanel = new VBoxContainer();
             leftPanel.CustomMinimumSize = new Vector2(300, 0);
             mainContainer.AddChild(leftPanel);
             

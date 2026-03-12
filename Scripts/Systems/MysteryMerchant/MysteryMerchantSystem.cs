@@ -23,10 +23,10 @@ namespace ClawRPG.Scripts.Systems
         private Random _random = new Random();
         
         // 信号
-        public signal void MerchantSpawned(MysteryMerchant merchant);
-        public signal void MerchantExpired(MysteryMerchant merchant);
-        public signal void ItemPurchased(string itemId, int quantity, int totalPrice);
-        public signal void MerchantRefreshed(MysteryMerchant merchant);
+        public static Signal<MysteryMerchant> MerchantSpawned { get; } = new Signal<MysteryMerchant>();
+        public static Signal<MysteryMerchant> MerchantExpired { get; } = new Signal<MysteryMerchant>();
+        public static Signal<string, int, int> ItemPurchased { get; } = new Signal<string, int, int>();
+        public static Signal<MysteryMerchant> MerchantRefreshed { get; } = new Signal<MysteryMerchant>();
         
         public override void _Ready()
         {

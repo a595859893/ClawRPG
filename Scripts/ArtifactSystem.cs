@@ -10,9 +10,9 @@ public class ArtifactSystem : Node
     private string _equippedArtifact = "";
     
     // 信号
-    public signal void ArtifactUnlocked(string artifactId);
-    public signal void ArtifactEquipped(string artifactId);
-    public signal void ArtifactUnequipped(string artifactId);
+    public static Signal<string> ArtifactUnlocked { get; } = new Signal<string>();
+    public static Signal<string> ArtifactEquipped { get; } = new Signal<string>();
+    public static Signal<string> ArtifactUnequipped { get; } = new Signal<string>();
     
     // 持久化
     private const string SAVE_KEY = "artifact_system";

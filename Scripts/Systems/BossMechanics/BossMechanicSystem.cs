@@ -342,10 +342,10 @@ public class BossMechanicSystem
             stats.Victories++;
             _playerStats.ConsecutiveWins++;
             _playerStats.ConsecutiveLosses = 0;
-               {
-            stats.Defeats++;
- }
+        }
         else
+        {
+            stats.Defeats++;
             _playerStats.ConsecutiveLosses++;
             _playerStats.ConsecutiveWins = 0;
         }

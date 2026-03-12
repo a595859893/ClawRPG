@@ -73,12 +73,12 @@ public class ClassUI : Control
         titleBar.AddChild(_closeButton);
         
         // 内容区域
-        var contentHBox = new HBoxContainer;
+        var contentHBox = new HBoxContainer();
         contentHBox.SizeFlagsVertical = SizeFlags.ExpandFill;
         mainVBox.AddChild(contentHBox);
         
         // 左侧 - 职业列表
-        var leftPanel = new VBoxContainer;
+        var leftPanel = new VBoxContainer();
         leftPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         leftPanel.CustomMinimumSize = new Vector2(300, 0);
         contentHBox.AddChild(leftPanel);
@@ -126,14 +126,14 @@ public class ClassUI : Control
         _detailPanel.AddChild(_switchClassButton);
         
         // 底部 - 当前职业信息
-        var bottomPanel = new VBoxContainer;
+        var bottomPanel = new VBoxContainer();
         mainVBox.AddChild(bottomPanel);
         
         var currentClassTitle = new Label { Text = "当前职业:" };
         currentClassTitle.AddThemeFontSizeOverride("font_size", 16);
         bottomPanel.AddChild(currentClassTitle);
         
-        var currentInfoHBox = new HBoxContainer;
+        var currentInfoHBox = new HBoxContainer();
         bottomPanel.AddChild(currentInfoHBox);
         
         _levelLabel = new Label { Text = "等级: 1" };

@@ -19,11 +19,11 @@ public class MountEvolutionSystem
 	private MountEvolutionData.PlayerMountEvolutionData _playerData;
 	private Dictionary<int, MountEvolutionData.MountEvolutionInstance> _activeEvolutions;
 	
-	public static signal void EvolutionStarted(int mountId, int configId);
-	public static signal void EvolutionCompleted(int mountId, int configId);
-	public static signal void ExpGained(int mountId, int amount, int totalExp);
-	public static signal void SkillUnlocked(int mountId, string skillName);
-	public static signal void EvolutionFailed(int mountId, string reason);
+	public static Signal<int, int> EvolutionStarted { get; } = new Signal<int, int>();
+	public static Signal<int, int> EvolutionCompleted { get; } = new Signal<int, int>();
+	public static Signal<int, int, int> ExpGained { get; } = new Signal<int, int, int>();
+	public static Signal<int, string> SkillUnlocked { get; } = new Signal<int, string>();
+	public static Signal<int, string> EvolutionFailed { get; } = new Signal<int, string>();
 	
 	public void Initialize()
 	{

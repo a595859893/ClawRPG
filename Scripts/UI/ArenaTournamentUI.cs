@@ -173,7 +173,7 @@ public class ArenaTournamentUI : Control
         container.AddChild(hbox);
         
         // Tournament info
-        var infoVBox = new VBoxContainer;
+        var infoVBox = new VBoxContainer();
         hbox.AddChild(infoVBox);
         
         var nameLabel = new Label
@@ -203,7 +203,7 @@ public class ArenaTournamentUI : Control
         hbox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.Expand });
         
         // Status and register button
-        var statusVBox = new VBoxContainer;
+        var statusVBox = new VBoxContainer();
         hbox.AddChild(statusVBox);
         
         var stateLabel = new Label

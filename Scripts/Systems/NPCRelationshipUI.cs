@@ -45,100 +45,100 @@ namespace ClawRPG.Systems {
         private void SetupUI()
         {
             // 主容器
-            var mainContainer = HBoxContainer.new();
+            var mainContainer = new HBoxContainer();
             mainContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             mainContainer.AddThemeConstantOverride("separation", 20);
             AddChild(mainContainer);
             
             // 左侧NPC列表
-            var listPanel = PanelContainer.new();
+            var listPanel = new PanelContainer();
             listPanel.SetCustomMinimumSize(new Vector2(300, 0));
             mainContainer.AddChild(listPanel);
             
-            var listVBox = VBoxContainer.new();
+            var listVBox = new VBoxContainer();
             listVBox.AddThemeConstantOverride("separation", 10);
             listPanel.AddChild(listVBox);
             
             // 标题
-            _titleLabel = Label.new();
+            _titleLabel = new Label();
             _titleLabel.Text = "NPC 关系";
             _titleLabel.AddThemeFontSizeOverride("font_size", 24);
             _titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.7f));
             listVBox.AddChild(_titleLabel);
             
             // NPC列表容器
-            _npcListContainer = VBoxContainer.new();
+            _npcListContainer = new VBoxContainer();
             _npcListContainer.AddThemeConstantOverride("separation", 8);
             listVBox.AddChild(_npcListContainer);
             
             // 右侧详情面板
-            _detailPanel = PanelContainer.new();
+            _detailPanel = new PanelContainer();
             _detailPanel.SetCustomMinimumSize(new Vector2(400, 0));
             mainContainer.AddChild(_detailPanel);
             
-            var detailVBox = VBoxContainer.new();
+            var detailVBox = new VBoxContainer();
             detailVBox.AddThemeConstantOverride("separation", 15);
             _detailPanel.AddChild(detailVBox);
             
             // NPC名称
-            _detailNameLabel = Label.new();
+            _detailNameLabel = new Label();
             _detailNameLabel.AddThemeFontSizeOverride("font_size", 28);
             _detailNameLabel.AddThemeColorOverride("font_color", new Color(1f, 0.95f, 0.8f));
             detailVBox.AddChild(_detailNameLabel);
             
             // 等级
-            _detailLevelLabel = Label.new();
+            _detailLevelLabel = new Label();
             _detailLevelLabel.AddThemeFontSizeOverride("font_size", 20);
             detailVBox.AddChild(_detailLevelLabel);
             
             // 好感度进度条
-            var progressLabel = Label.new();
+            var progressLabel = new Label();
             progressLabel.Text = "好感度进度";
             progressLabel.AddThemeFontSizeOverride("font_size", 16);
             detailVBox.AddChild(progressLabel);
             
-            _favorProgressBar = ProgressBar.new();
+            _favorProgressBar = new ProgressBar();
             _favorProgressBar.SetCustomMinimumSize(new Vector2(0, 30));
             _favorProgressBar.PercentVisible = true;
             detailVBox.AddChild(_favorProgressBar);
             
             // 好感度数值
-            _detailFavorLabel = Label.new();
+            _detailFavorLabel = new Label();
             _detailFavorLabel.AddThemeFontSizeOverride("font_size", 18);
             detailVBox.AddChild(_detailFavorLabel);
             
             // 描述
-            _detailDescriptionLabel = Label.new();
+            _detailDescriptionLabel = new Label();
             _detailDescriptionLabel.AutowrapMode = TextServer.AutowrapMode.Word;
             _detailDescriptionLabel.AddThemeFontSizeOverride("font_size", 14);
             detailVBox.AddChild(_detailDescriptionLabel);
             
             // 统计信息
-            var statsTitle = Label.new();
+            var statsTitle = new Label();
             statsTitle.Text = "互动统计";
             statsTitle.AddThemeFontSizeOverride("font_size", 18);
             statsTitle.AddThemeColorOverride("font_color", new Color(0.8f, 0.9f, 1f));
             detailVBox.AddChild(statsTitle);
             
-            _statsLabel = Label.new();
+            _statsLabel = new Label();
             _statsLabel.AddThemeFontSizeOverride("font_size", 14);
             _statsLabel.AutowrapMode = TextServer.AutowrapMode.Word;
             detailVBox.AddChild(_statsLabel);
             
             // 商店折扣信息
-            var discountTitle = Label.new();
+            var discountTitle = new Label();
             discountTitle.Text = "商店折扣";
             discountTitle.AddThemeFontSizeOverride("font_size", 18);
             discountTitle.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.6f));
             detailVBox.AddChild(discountTitle);
             
-            var discountLabel = Label.new();
+            var discountLabel = new Label();
             discountLabel.Name = "DiscountLabel";
             discountLabel.AddThemeFontSizeOverride("font_size", 16);
             detailVBox.AddChild(discountLabel);
             
             // 关闭按钮
-            var closeButton = Button.new();
+            var closeButton = new Button();
             closeButton.Text = "关闭 (ESC)";
             closeButton.Pressed += () => Hide();
             detailVBox.AddChild(closeButton);
@@ -168,7 +168,7 @@ namespace ClawRPG.Systems {
 
         private Button CreateNPCButton(string npcId, string name, NPCRelationshipSystem.RelationshipLevel level, int favor)
         {
-            var button = Button.new();
+            var button = new Button();
             button.Text = $"{name} - {NPCRelationshipSystem.Instance.GetLevelName(level)} ({favor})";
             button.Pressed += () => SelectNPC(npcId);
             

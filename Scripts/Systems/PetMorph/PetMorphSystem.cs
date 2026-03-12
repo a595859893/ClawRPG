@@ -19,13 +19,13 @@ public class PetMorphSystem
     private bool _isInitialized = false;
     
     // 信号系统
-    public signal void MorphUnlocked(string petId, string morphId);
-    public signal void MorphActivated(string petId, string morphId);
-    public signal void MorphDeactivated(string petId);
-    public signal void MorphTransformed(string petId, string morphId);
-    public signal void TransformationStarted(string petId, string morphId);
-    public signal void TransformationCompleted(string petId, string morphId);
-    public signal void TransformationFailed(string petId, string reason);
+    public static Signal<string, string> MorphUnlocked { get; } = new Signal<string, string>();
+    public static Signal<string, string> MorphActivated { get; } = new Signal<string, string>();
+    public static Signal<string> MorphDeactivated { get; } = new Signal<string>();
+    public static Signal<string, string> MorphTransformed { get; } = new Signal<string, string>();
+    public static Signal<string, string> TransformationStarted { get; } = new Signal<string, string>();
+    public static Signal<string, string> TransformationCompleted { get; } = new Signal<string, string>();
+    public static Signal<string, string> TransformationFailed { get; } = new Signal<string, string>();
     
     public void Initialize()
     {

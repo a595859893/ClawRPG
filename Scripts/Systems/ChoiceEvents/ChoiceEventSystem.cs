@@ -21,10 +21,10 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
         private Random _random;
         
         // Signals
-        public signal void EventStarted(ChoiceEventType eventType, string title);
-        public signal void EventEnded(ChoiceEventType eventType, string chosenOption);
-        public signal void OptionSelected(ChoiceOption option);
-        public signal void RewardGranted(int gold, int exp, List<string> items);
+        public static Signal<ChoiceEventType, string> EventStarted { get; } = new Signal<ChoiceEventType, string>();
+        public static Signal<ChoiceEventType, string> EventEnded { get; } = new Signal<ChoiceEventType, string>();
+        public static Signal<ChoiceOption> OptionSelected { get; } = new Signal<ChoiceOption>();
+        public static Signal<int, int, List<string>> RewardGranted { get; } = new Signal<int, int, List<string>>();
         
         public ChoiceEventSystem()
         {

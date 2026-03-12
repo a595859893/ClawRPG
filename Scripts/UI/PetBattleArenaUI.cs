@@ -305,7 +305,7 @@ public class PetBattleArenaUI : Control
         foreach (var arena in arenas)
         {
             var arenaButton = new Button();
-            arenaButton.Text = $"{(bool)arena["unlocked"] ? "✅" : "🔒"} {(string)arena["name"]} (Lv.{arena["difficulty"]})";
+            arenaButton.Text = $"{( (bool)arena["unlocked"] ? "✅" : "🔒" )} {(string)arena["name"]} (Lv.{arena["difficulty"]})";
             arenaButton.CustomMinimumSize = new Vector2(260, 35);
             
             if ((bool)arena["unlocked"])

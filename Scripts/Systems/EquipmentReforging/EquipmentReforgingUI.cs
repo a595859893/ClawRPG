@@ -120,7 +120,7 @@ namespace Game.Scripts.UI
             _equipmentLabel.AddThemeFontSizeOverride("font_size", 16);
             _mainContainer.AddChild(_equipmentLabel);
 
-            _equipmentOption = new OptionButton;
+            _equipmentOption = new OptionButton();
             _equipmentOption.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _mainContainer.AddChild(_equipmentOption);
 
@@ -129,7 +129,7 @@ namespace Game.Scripts.UI
             _typeLabel.AddThemeFontSizeOverride("font_size", 16);
             _mainContainer.AddChild(_typeLabel);
 
-            _typeOption = new OptionButton;
+            _typeOption = new OptionButton();
             _typeOption.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _mainContainer.AddChild(_typeOption);
 
@@ -138,7 +138,7 @@ namespace Game.Scripts.UI
             _rarityLabel.AddThemeFontSizeOverride("font_size", 16);
             _mainContainer.AddChild(_rarityLabel);
 
-            _rarityOption = new OptionButton;
+            _rarityOption = new OptionButton();
             _rarityOption.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _mainContainer.AddChild(_rarityOption);
 
@@ -204,7 +204,7 @@ namespace Game.Scripts.UI
 
         private void AddSeparator()
         {
-            var separator = new HSeparator;
+            var separator = new HSeparator();
             separator.AddThemeConstantOverride("separation", 10);
             _mainContainer.AddChild(separator);
         }

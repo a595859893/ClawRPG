@@ -63,5 +63,5 @@ public class ActiveCooking
     public float progress;
     public float totalTime;
     public bool isComplete;
-    public bool is burning;
+    public bool isBurning;
 }

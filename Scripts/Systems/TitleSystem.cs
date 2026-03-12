@@ -78,9 +78,9 @@ public class TitleSystem : Node
     private int _titlesByRarity => GetTitlesByRarityCount();
     
     // Signals
-    public signal void TitleUnlocked(string titleId, TitleData title);
-    public signal void TitleEquipped(string titleId);
-    public signal void TitleProgressUpdated(string titleId, int current, int required);
+    public static Signal<string, TitleData> TitleUnlocked { get; } = new Signal<string, TitleData>();
+    public static Signal<string> TitleEquipped { get; } = new Signal<string>();
+    public static Signal<string, int, int> TitleProgressUpdated { get; } = new Signal<string, int, int>();
 
     public override void _Ready()
     {

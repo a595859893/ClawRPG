@@ -47,7 +47,7 @@ namespace ClawRPG.Scripts.UI {
         private void SetupUI() {
             // 主面板
             mainPanel = new PanelContainer();
-            mainPanel.Set AnchorsPreset(Control.LayoutPreset.CenterRight);
+            mainPanel.SetAnchorsPreset(Control.LayoutPreset.CenterRight);
             mainPanel.OffsetLeft = -400;
             mainPanel.OffsetRight = -50;
             mainPanel.OffsetTop = 50;

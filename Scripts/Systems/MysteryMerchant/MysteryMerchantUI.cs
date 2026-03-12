@@ -112,22 +112,22 @@ namespace ClawRPG.Scripts.Systems
             _mainContainer.AddChild(contentArea);
             
             // 左侧：商店列表
-            var leftPanel = new PanelContainer;
+            var leftPanel = new PanelContainer();
             leftPanel.CustomMinimumSize = new Vector2(250, 0);
             contentArea.AddChild(leftPanel);
             
-            _merchantListContainer = new ScrollContainer;
+            _merchantListContainer = new ScrollContainer();
             leftPanel.AddChild(_merchantListContainer);
             
-            _merchantList = new VBoxContainer;
+            _merchantList = new VBoxContainer();
             _merchantListContainer.AddChild(_merchantList);
             
             // 中间：商店详情
-            _merchantDetailPanel = new PanelContainer;
+            _merchantDetailPanel = new PanelContainer();
             _merchantDetailPanel.SetHExpandMode(Control.ContainerSizingMode.ExpandFill);
             contentArea.AddChild(_merchantDetailPanel);
             
-            var detailVBox = new VBoxContainer;
+            var detailVBox = new VBoxContainer();
             _merchantDetailPanel.AddChild(detailVBox);
             
             _merchantNameLabel = new Label
@@ -151,11 +151,11 @@ namespace ClawRPG.Scripts.Systems
             };
             detailVBox.AddChild(_merchantTimerLabel);
             
-            _itemListContainer = new ScrollContainer;
+            _itemListContainer = new ScrollContainer();
             _itemListContainer.SetVExpandMode(Control.ContainerSizingMode.ExpandFill);
             detailVBox.AddChild(_itemListContainer);
             
-            _itemList = new VBoxContainer;
+            _itemList = new VBoxContainer();
             _itemListContainer.AddChild(_itemList);
             
             // 刷新按钮
@@ -168,7 +168,7 @@ namespace ClawRPG.Scripts.Systems
             detailVBox.AddChild(_refreshButton);
             
             // 右侧：统计面板
-            _statsPanel = new PanelContainer;
+            _statsPanel = new PanelContainer();
             _statsPanel.CustomMinimumSize = new Vector2(200, 0);
             contentArea.AddChild(_statsPanel);
             
@@ -269,11 +269,11 @@ namespace ClawRPG.Scripts.Systems
             
             foreach (var item in merchant.Items)
             {
-                var itemPanel = new PanelContainer;
+                var itemPanel = new PanelContainer();
                 itemPanel.CustomMinimumSize = new Vector2(0, 80);
                 _itemList.AddChild(itemPanel);
                 
-                var itemHBox = new HBoxContainer;
+                var itemHBox = new HBoxContainer();
                 itemPanel.AddChild(itemHBox);
                 
                 // 商品名称和稀有度颜色
