@@ -2,564 +2,463 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ClawRPG.Scripts.Systems {
-    /// <summary>
-    /// 世界事件类型
-    /// </summary>
-    public enum WorldEventType {
-        MonsterInvasion,    // 怪物入侵
-        TreasureSpawn,      // 宝藏出现
-        MerchantVisit,      // 商人拜访
-        WeatherChange,      // 天气变化
-        LuckyDrop,          // 幸运掉落
-        DoubleXP,           // 双倍经验
-        RareEnemySpawn,     // 稀有敌人出现
-        BossRush,           // Bossrush
-        PeacefulDay,       // 和平之日
-        StormRush           // 风暴侵袭
+public class WorldEventSystem : Node
+{
+    // Event types
+    public enum EventType
+    {
+        Festival,           // 节日庆典
+        DragonAttack,       // 巨龙袭击
+        MerchantCaravan,    // 商队到来
+        GoblinRaid,         // 哥布林突袭
+        BountyHunt,        // 赏金猎杀
+        Tournament,         // 竞技大赛
+        Eclipse,            // 日食现象
+        HarvestFestival,    // 丰收祭
+        Blizzard,          // 暴风雪
+        Plague,             // 瘟疫蔓延
+        TreasureDiscovery,  // 宝藏发现
+        AncientAwakening   // 远古苏醒
     }
 
-    /// <summary>
-    /// 世界事件难度
-    /// </summary>
-    public enum WorldEventDifficulty {
-        Easy,       // 简单
-        Normal,     // 普通
-        Hard,       // 困难
-        Epic        // 史诗
+    // Event status
+    public enum EventStatus
+    {
+        Inactive,
+        Announced,    // 即将发生
+        Active,       // 进行中
+        Concluding,   // 即将结束
+        Completed     // 已完成
     }
 
-    /// <summary>
-    /// 世界事件数据类
-    /// </summary>
-    public class WorldEvent {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public WorldEventType Type { get; set; }
-        public WorldEventDifficulty Difficulty { get; set; }
-        public int Duration { get; set; }  // 持续时间（秒）
-        public int Cooldown { get; set; }  // 冷却时间（秒）
-        public float XPMultiplier { get; set; } = 1.0f;
-        public float DropMultiplier { get; set; } = 1.0f;
-        public float GoldMultiplier { get; set; } = 1.0f;
-        public string Icon { get; set; }
-        public string Color { get; set; }
-        
-        // 事件特定属性
-        public string SpawnEnemyId { get; set; }
-        public int SpawnCount { get; set; }
-        public float SpawnRadius { get; set; }
-        public string WeatherType { get; set; }
-        public int DiscountPercent { get; set; }
-        public List<string> BonusItemIds { get; set; }
+    // Event data structure
+    public class WorldEvent
+    {
+        public string id;
+        public string name;
+        public string description;
+        public EventType type;
+        public EventStatus status;
+        public int duration;        // 持续时间(秒)
+        public int timeRemaining;   // 剩余时间
+        public int announceTime;    // 提前预告时间
+        public float spawnChance;   // 触发概率
+        public List<string> rewards; // 奖励列表
+        public Dictionary<string, int> rewardAmounts;
+        public bool playerParticipated;
+        public int participantCount;
+        public float completionProgress; // 0.0 - 1.0
 
-        public WorldEvent() {
-            BonusItemIds = new List<string>();
-        }
-
-        public float GetDifficultyMultiplier() {
-            return Difficulty switch {
-                WorldEventDifficulty.Easy => 1.0f,
-                WorldEventDifficulty.Normal => 1.5f,
-                WorldEventDifficulty.Hard => 2.0f,
-                WorldEventDifficulty.Epic => 3.0f,
-                _ => 1.0f
-            };
-        }
-
-        public string GetDifficultyText() {
-            return Difficulty switch {
-                WorldEventDifficulty.Easy => "简单",
-                WorldEventDifficulty.Normal => "普通",
-                WorldEventDifficulty.Hard => "困难",
-                WorldEventDifficulty.Epic => "史诗",
-                _ => "未知"
-            };
+        public WorldEvent(string eventId, string eventName, EventType eventType)
+        {
+            id = eventId;
+            name = eventName;
+            type = eventType;
+            status = EventStatus.Inactive;
+            rewards = new List<string>();
+            rewardAmounts = new Dictionary<string, int>();
+            playerParticipated = false;
+            participantCount = 0;
+            completionProgress = 0f;
         }
     }
 
-    /// <summary>
-    /// 世界事件数据库
-    /// </summary>
-    public class WorldEventDatabase {
-        private static WorldEventDatabase _instance;
-        public static WorldEventDatabase Instance => _instance ??= new WorldEventDatabase();
-
-        private List<WorldEvent> _events = new List<WorldEvent>();
-
-        public WorldEventDatabase() {
-            InitializeEvents();
-        }
-
-        private void InitializeEvents() {
-            // 怪物入侵
-            _events.Add(new WorldEvent {
-                Id = "monster_invasion_easy",
-                Name = "怪物入侵",
-                Description = "大量怪物从裂缝中涌出，击败它们获得额外奖励！",
-                Type = WorldEventType.MonsterInvasion,
-                Difficulty = WorldEventDifficulty.Easy,
-                Duration = 180,
-                Cooldown = 600,
-                XPMultiplier = 1.5f,
-                DropMultiplier = 1.5f,
-                GoldMultiplier = 1.5f,
-                Icon = "⚔️",
-                Color = "#FF6B6B",
-                SpawnEnemyId = "goblin",
-                SpawnCount = 15,
-                SpawnRadius = 50f
-            });
-
-            _events.Add(new WorldEvent {
-                Id = "monster_invasion_hard",
-                Name = "怪物大军",
-                Description = "前所未有的怪物大军来袭！准备战斗！",
-                Type = WorldEventType.MonsterInvasion,
-                Difficulty = WorldEventDifficulty.Hard,
-                Duration = 300,
-                Cooldown = 1200,
-                XPMultiplier = 2.5f,
-                DropMultiplier = 2.5f,
-                GoldMultiplier = 2.5f,
-                Icon = "💀",
-                Color = "#FF0000",
-                SpawnEnemyId = "skeleton_warrior",
-                SpawnCount = 30,
-                SpawnRadius = 80f
-            });
-
-            // 宝藏出现
-            _events.Add(new WorldEvent {
-                Id = "treasure_spawn",
-                Name = "宝藏出现",
-                Description = "传说中的宝藏箱出现在世界中！",
-                Type = WorldEventType.TreasureSpawn,
-                Difficulty = WorldEventDifficulty.Normal,
-                Duration = 120,
-                Cooldown = 900,
-                XPMultiplier = 1.2f,
-                DropMultiplier = 3.0f,
-                GoldMultiplier = 2.0f,
-                Icon = "💎",
-                Color = "#FFD700",
-                SpawnCount = 5,
-                SpawnRadius = 100f,
-                BonusItemIds = new List<string> { "dragon_scale", "phoenix_feather", "shadow_crystal" }
-            });
-
-            // 商人拜访
-            _events.Add(new WorldEvent {
-                Id = "merchant_visit",
-                Name = "神秘商人",
-                Description = "神秘商人来到此地，商品打折出售！",
-                Type = WorldEventType.MerchantVisit,
-                Difficulty = WorldEventDifficulty.Normal,
-                Duration = 300,
-                Cooldown = 1800,
-                XPMultiplier = 1.0f,
-                DropMultiplier = 1.0f,
-                GoldMultiplier = 1.0f,
-                Icon = "🛒",
-                Color = "#4ECDC4",
-                DiscountPercent = 30
-            });
-
-            // 天气变化 - 晴天
-            _events.Add(new WorldEvent {
-                Id = "weather_sunny",
-                Name = "晴朗之日",
-                Description = "阳光普照，经验获得提升！",
-                Type = WorldEventType.WeatherChange,
-                Difficulty = WorldEventDifficulty.Easy,
-                Duration = 600,
-                Cooldown = 300,
-                XPMultiplier = 1.3f,
-                DropMultiplier = 1.0f,
-                GoldMultiplier = 1.0f,
-                Icon = "☀️",
-                Color = "#FFE66D",
-                WeatherType = "sunny"
-            });
-
-            // 天气变化 - 暴风雨
-            _events.Add(new WorldEvent {
-                Id = "weather_storm",
-                Name = "暴风雨",
-                Description = "暴风雨来了，敌人变得更强，但掉落更好！",
-                Type = WorldEventType.WeatherChange,
-                Difficulty = WorldEventDifficulty.Hard,
-                Duration = 300,
-                Cooldown = 900,
-                XPMultiplier = 2.0f,
-                DropMultiplier = 2.0f,
-                GoldMultiplier = 1.5f,
-                Icon = "⛈️",
-                Color = "#6C5CE7",
-                WeatherType = "storm"
-            });
-
-            // 幸运掉落
-            _events.Add(new WorldEvent {
-                Id = "lucky_drop",
-                Name = "幸运时刻",
-                Description = "幸运女神眷顾你！所有掉落率大幅提升！",
-                Type = WorldEventType.LuckyDrop,
-                Difficulty = WorldEventDifficulty.Normal,
-                Duration = 180,
-                Cooldown = 720,
-                XPMultiplier = 1.0f,
-                DropMultiplier = 3.0f,
-                GoldMultiplier = 2.0f,
-                Icon = "🍀",
-                Color = "#00FF7F"
-            });
-
-            // 双倍经验
-            _events.Add(new WorldEvent {
-                Id = "double_xp",
-                Name = "双倍经验",
-                Description = "今日经验翻倍！是升级的好时机！",
-                Type = WorldEventType.DoubleXP,
-                Difficulty = WorldEventDifficulty.Normal,
-                Duration = 600,
-                Cooldown = 14400, // 4小时
-                XPMultiplier = 2.0f,
-                DropMultiplier = 1.0f,
-                GoldMultiplier = 1.0f,
-                Icon = "⭐",
-                Color = "#00D9FF"
-            });
-
-            // 稀有敌人
-            _events.Add(new WorldEvent {
-                Id = "rare_enemy_golden",
-                Name = "黄金生物",
-                Description = "传说中的黄金生物出现了！",
-                Type = WorldEventType.RareEnemySpawn,
-                Difficulty = WorldEventDifficulty.Epic,
-                Duration = 120,
-                Cooldown = 3600,
-                XPMultiplier = 3.0f,
-                DropMultiplier = 5.0f,
-                GoldMultiplier = 5.0f,
-                Icon = "🐲",
-                Color = "#FFD700",
-                SpawnEnemyId = "golden_dragon",
-                SpawnCount = 1,
-                SpawnRadius = 30f
-            });
-
-            // Bossrush
-            _events.Add(new WorldEvent {
-                Id = "boss_rush",
-                Name = "Bossrush",
-                Description = "Boss不断来袭，挑战你的极限！",
-                Type = WorldEventType.BossRush,
-                Difficulty = WorldEventDifficulty.Epic,
-                Duration = 600,
-                Cooldown = 7200,
-                XPMultiplier = 4.0f,
-                DropMultiplier = 3.0f,
-                GoldMultiplier = 3.0f,
-                Icon = "👹",
-                Color = "#FF4500",
-                SpawnCount = 5,
-                SpawnRadius = 100f
-            });
-
-            // 和平之日
-            _events.Add(new WorldEvent {
-                Id = "peaceful_day",
-                Name = "和平之日",
-                Description = "今天是和平之日，怪物不会主动攻击！",
-                Type = WorldEventType.PeacefulDay,
-                Difficulty = WorldEventDifficulty.Easy,
-                Duration = 600,
-                Cooldown = 10800,
-                XPMultiplier = 0.5f,
-                DropMultiplier = 0.8f,
-                GoldMultiplier = 0.8f,
-                Icon = "🕊️",
-                Color = "#98FB98"
-            });
-
-            // 风暴侵袭
-            _events.Add(new WorldEvent {
-                Id = "storm_rush",
-                Name = "风暴侵袭",
-                Description = "致命风暴来袭，危险与机遇并存！",
-                Type = WorldEventType.StormRush,
-                Difficulty = WorldEventDifficulty.Hard,
-                Duration = 240,
-                Cooldown = 1800,
-                XPMultiplier = 2.0f,
-                DropMultiplier = 2.5f,
-                GoldMultiplier = 2.0f,
-                Icon = "🌪️",
-                Color = "#8B0000",
-                WeatherType = "storm",
-                SpawnCount = 20,
-                SpawnRadius = 60f
-            });
-        }
-
-        public List<WorldEvent> GetAllEvents() => new List<WorldEvent>(_events);
-
-        public List<WorldEvent> GetEventsByType(WorldEventType type) {
-            return _events.FindAll(e => e.Type == type);
-        }
-
-        public List<WorldEvent> GetAvailableEvents(int playerLevel) {
-            // 返回玩家等级可以参与的事件
-            return _events.FindAll(e => playerLevel >= 1); // 暂时所有事件对1级以上玩家开放
-        }
-
-        public WorldEvent GetRandomEvent(int playerLevel) {
-            var available = GetAvailableEvents(playerLevel);
-            if (available.Count == 0) return null;
-            
-            var random = new Random();
-            return available[random.Next(available.Count)];
-        }
-
-        public WorldEvent GetEventById(string id) {
-            return _events.Find(e => e.Id == id);
+    // Singleton instance
+    private static WorldEventSystem _instance;
+    public static WorldEventSystem Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new WorldEventSystem();
+            }
+            return _instance;
         }
     }
 
-    /// <summary>
-    /// 世界事件管理器
-    /// </summary>
-    public class WorldEventManager : Node {
-        private static WorldEventManager _instance;
-        public static WorldEventManager Instance => _instance;
+    // Event database
+    private Dictionary<string, WorldEvent> _events = new Dictionary<string, WorldEvent>();
+    private List<string> _activeEventIds = new List<string>();
+    private List<string> _eventHistory = new List<string>();
+    private Random _random = new Random();
 
-        [Signal]
-        public delegate void EventStarted(WorldEvent evt);
+    // Configuration
+    private int _minEventInterval = 300;   // 最小事件间隔(5分钟)
+    private int _maxEventInterval = 900;  // 最大事件间隔(15分钟)
+    private int _nextEventTime;
+    private bool _eventSystemEnabled = true;
 
-        [Signal]
-        public delegate void EventEnded(WorldEvent evt);
+    // Statistics
+    private int _totalEventsTriggered;
+    private int _totalPlayerParticipations;
+    private int _totalRewardsClaimed;
 
-        [Signal]
-        public delegate void EventUpdated(WorldEvent evt, int remainingTime);
+    public override void _Ready()
+    {
+        _instance = this;
+        InitializeEventDatabase();
+        ScheduleNextEvent();
+        GD.Print("[WorldEventSystem] World Event System initialized");
+    }
 
-        private WorldEvent _currentEvent;
-        private int _eventTimer;
-        private int _nextEventCountdown;
-        private bool _isEventActive;
-        private Dictionary<string, int> _eventCooldowns = new Dictionary<string, int>();
-        private int _globalCooldown = 60; // 全局冷却时间
+    public override void _Process(float delta)
+    {
+        UpdateEventTimers(delta);
+    }
 
-        public WorldEvent CurrentEvent => _currentEvent;
-        public bool IsEventActive => _isEventActive;
-        public int EventRemainingTime => _eventTimer;
-        public int NextEventCountdown => _nextEventCountdown;
+    private void InitializeEventDatabase()
+    {
+        // Festival - 节日庆典
+        var festival = new WorldEvent("festival", "春季庆典", EventType.Festival);
+        festival.description = "村庄举办盛大的春季庆典，所有参与者都能获得经验加成！";
+        festival.duration = 180;
+        festival.announceTime = 60;
+        festival.spawnChance = 0.15f;
+        festival.rewards.Add("experience");
+        festival.rewardAmounts["experience"] = 50;
+        festival.rewards.Add("gold");
+        festival.rewardAmounts["gold"] = 100;
+        _events["festival"] = festival;
 
-        public override void _Ready() {
-            _instance = this;
-            _nextEventCountdown = 60; // 1分钟后开始第一次事件
-            GD.Print("世界事件管理器已启动");
+        // DragonAttack - 巨龙袭击
+        var dragonAttack = new WorldEvent("dragon_attack", "巨龙来袭", EventType.DragonAttack);
+        dragonAttack.description = "一条巨龙出现在村庄附近，需要勇敢的冒险者将其击退！";
+        dragonAttack.duration = 300;
+        dragonAttack.announceTime = 120;
+        dragonAttack.spawnChance = 0.08f;
+        dragonAttack.rewards.Add("gold");
+        dragonAttack.rewardAmounts["gold"] = 500;
+        dragonAttack.rewards.Add("dragon_scale");
+        dragonAttack.rewardAmounts["dragon_scale"] = 3;
+        _events["dragon_attack"] = dragonAttack;
+
+        // MerchantCaravan - 商队到来
+        var merchant = new WorldEvent("merchant_caravan", "商队抵达", EventType.MerchantCaravan);
+        merchant.description = "远方商队带来了稀有货物，商店商品打折出售！";
+        merchant.duration = 240;
+        merchant.announceTime = 90;
+        merchant.spawnChance = 0.18f;
+        merchant.rewards.Add("discount_token");
+        merchant.rewardAmounts["discount_token"] = 1;
+        _events["merchant_caravan"] = merchant;
+
+        // GoblinRaid - 哥布林突袭
+        var goblin = new WorldEvent("goblin_raid", "哥布林突袭", EventType.GoblinRaid);
+        goblin.description = "大批哥布林正在袭击农场，需要帮助击退它们！";
+        goblin.duration = 180;
+        goblin.announceTime = 60;
+        goblin.spawnChance = 0.12f;
+        goblin.rewards.Add("gold");
+        goblin.rewardAmounts["gold"] = 150;
+        goblin.rewards.Add("goblin_ear");
+        goblin.rewardAmounts["goblin_ear"] = 5;
+        _events["goblin_raid"] = goblin;
+
+        // BountyHunt - 赏金猎杀
+        var bounty = new WorldEvent("bounty_hunt", "赏金任务", EventType.BountyHunt);
+        bounty.description = "一名危险的逃犯正在附近出没，赏金猎人集合！";
+        bounty.duration = 360;
+        bounty.announceTime = 120;
+        bounty.spawnChance = 0.10f;
+        bounty.rewards.Add("gold");
+        bounty.rewardAmounts["gold"] = 300;
+        bounty.rewards.Add("bounty_token");
+        bounty.rewardAmounts["bounty_token"] = 2;
+        _events["bounty_hunt"] = bounty;
+
+        // Tournament - 竞技大赛
+        var tournament = new WorldEvent("tournament", "竞技大赛", EventType.Tournament);
+        tournament.description = "一年一度的竞技大赛开始了，展示你实力的时候到了！";
+        tournament.duration = 420;
+        tournament.announceTime = 180;
+        tournament.spawnChance = 0.07f;
+        tournament.rewards.Add("gold");
+        tournament.rewardAmounts["gold"] = 400;
+        tournament.rewards.Add("trophy");
+        tournament.rewardAmounts["trophy"] = 1;
+        _events["tournament"] = tournament;
+
+        // Eclipse - 日食现象
+        var eclipse = new WorldEvent("eclipse", "日食奇观", EventType.Eclipse);
+        eclipse.description = "天空出现了罕见的日食现象，传说此时蕴含着神秘力量...";
+        eclipse.duration = 150;
+        eclipse.announceTime = 60;
+        eclipse.spawnChance = 0.05f;
+        eclipse.rewards.Add("mystic_essence");
+        eclipse.rewardAmounts["mystic_essence"] = 5;
+        _events["eclipse"] = eclipse;
+
+        // HarvestFestival - 丰收祭
+        var harvest = new WorldEvent("harvest_festival", "丰收祭", EventType.HarvestFestival);
+        harvest.description = "秋天到了，村民们庆祝丰收，分享美食和喜悦！";
+        harvest.duration = 200;
+        harvest.announceTime = 90;
+        harvest.spawnChance = 0.12f;
+        harvest.rewards.Add("experience");
+        harvest.rewardAmounts["experience"] = 75;
+        harvest.rewards.Add("food_pack");
+        harvest.rewardAmounts["food_pack"] = 3;
+        _events["harvest_festival"] = harvest;
+
+        // Blizzard - 暴风雪
+        var blizzard = new WorldEvent("blizzard", "暴风雪", EventType.Blizzard);
+        blizzard.description = "一场猛烈的暴风雪来临，村庄需要帮助清理积雪！";
+        blizzard.duration = 240;
+        blizzard.announceTime = 120;
+        blizzard.spawnChance = 0.08f;
+        blizzard.rewards.Add("gold");
+        blizzard.rewardAmounts["gold"] = 100;
+        blizzard.rewards.Add("ice_crystal");
+        blizzard.rewardAmounts["ice_crystal"] = 2;
+        _events["blizzard"] = blizzard;
+
+        // Plague - 瘟疫蔓延
+        var plague = new WorldEvent("plague", "瘟疫蔓延", EventType.Plague);
+        plague.description = "一种奇怪的疾病在村庄蔓延，需要收集药材制作解药！";
+        plague.duration = 300;
+        plague.announceTime = 150;
+        plague.spawnChance = 0.06f;
+        plague.rewards.Add("gold");
+        plague.rewardAmounts["gold"] = 200;
+        plague.rewards.Add("herbal_medicine");
+        plague.rewardAmounts["herbal_medicine"] = 5;
+        _events["plague"] = plague;
+
+        // TreasureDiscovery - 宝藏发现
+        var treasure = new WorldEvent("treasure_discovery", "宝藏发现", EventType.TreasureDiscovery);
+        treasure.description = "探险者在附近发现了古代宝藏的线索！";
+        treasure.duration = 180;
+        treasure.announceTime = 90;
+        treasure.spawnChance = 0.10f;
+        treasure.rewards.Add("gold");
+        treasure.rewardAmounts["gold"] = 250;
+        treasure.rewards.Add("ancient_coin");
+        treasure.rewardAmounts["ancient_coin"] = 3;
+        _events["treasure_discovery"] = treasure;
+
+        // AncientAwakening - 远古苏醒
+        var ancient = new WorldEvent("ancient_awakening", "远古苏醒", EventType.AncientAwakening);
+        ancient.description = "沉睡已久的远古巨兽即将苏醒，世界需要英雄！";
+        ancient.duration = 480;
+        ancient.announceTime = 240;
+        ancient.spawnChance = 0.04f;
+        ancient.rewards.Add("gold");
+        ancient.rewardAmounts["gold"] = 1000;
+        ancient.rewards.Add("ancient_relic");
+        ancient.rewardAmounts["ancient_relic"] = 1;
+        _events["ancient_awakening"] = ancient;
+    }
+
+    private void ScheduleNextEvent()
+    {
+        int interval = _random.Next(_minEventInterval, _maxEventInterval + 1);
+        _nextEventTime = OS.GetSystemTimeMsecs() / 1000 + interval;
+    }
+
+    private void UpdateEventTimers(float delta)
+    {
+        long currentTime = OS.GetSystemTimeMsecs() / 1000;
+
+        // Check if it's time to trigger a new event
+        if (currentTime >= _nextEventTime && _eventSystemEnabled)
+        {
+            TryTriggerRandomEvent();
+            ScheduleNextEvent();
         }
 
-        public override void _Process(float delta) {
-            // 更新事件倒计时
-            if (_isEventActive && _currentEvent != null) {
-                _eventTimer -= (int)(delta * 60); // 假设60fps
-                
-                EmitSignal(nameof(EventUpdated), _currentEvent, _eventTimer);
+        // Update active event timers
+        for (int i = _activeEventIds.Count - 1; i >= 0; i--)
+        {
+            string eventId = _activeEventIds[i];
+            if (_events.ContainsKey(eventId))
+            {
+                WorldEvent evt = _events[eventId];
+                if (evt.status == EventStatus.Active || evt.status == EventStatus.Announced)
+                {
+                    evt.timeRemaining -= (int)(delta);
 
-                if (_eventTimer <= 0) {
-                    EndEvent();
+                    if (evt.status == EventStatus.Announced && evt.timeRemaining <= 0)
+                    {
+                        evt.status = EventStatus.Active;
+                        evt.timeRemaining = evt.duration;
+                        EmitSignal(nameof(EventStarted), eventId);
+                    }
+                    else if (evt.status == EventStatus.Active && evt.timeRemaining <= 0)
+                    {
+                        CompleteEvent(eventId);
+                    }
                 }
-            } else {
-                // 等待下一次事件
-                _nextEventCountdown -= (int)(delta * 60);
-                if (_nextEventCountdown <= 0) {
-                    StartRandomEvent();
+            }
+        }
+    }
+
+    private void TryTriggerRandomEvent()
+    {
+        // Filter events that can spawn
+        List<string> availableEvents = new List<string>();
+        foreach (var kvp in _events)
+        {
+            if (kvp.Value.status == EventStatus.Inactive)
+            {
+                if (_random.NextDouble() < kvp.Value.spawnChance)
+                {
+                    availableEvents.Add(kvp.Key);
                 }
             }
         }
 
-        private void StartRandomEvent() {
-            var player = GetTree().GetFirstNodeInGroup("player") as Player;
-            int playerLevel = player != null ? player.Level : 1;
-
-            var database = WorldEventDatabase.Instance;
-            var availableEvents = database.GetAvailableEvents(playerLevel);
-
-            // 过滤掉还在冷却中的事件
-            availableEvents.RemoveAll(e => IsEventOnCooldown(e.Id));
-
-            if (availableEvents.Count == 0) {
-                _nextEventCountdown = _globalCooldown * 60;
-                return;
-            }
-
-            // 根据权重随机选择事件
-            var random = new Random();
-            var selectedEvent = availableEvents[random.Next(availableEvents.Count)];
-
+        // Pick one random event from available
+        if (availableEvents.Count > 0)
+        {
+            string selectedEvent = availableEvents[_random.Next(availableEvents.Count)];
             StartEvent(selectedEvent);
         }
+    }
 
-        public void StartEvent(WorldEvent evt) {
-            if (_isEventActive) return;
+    public void StartEvent(string eventId)
+    {
+        if (!_events.ContainsKey(eventId)) return;
 
-            _currentEvent = evt;
-            _eventTimer = evt.Duration;
-            _isEventActive = true;
+        WorldEvent evt = _events[eventId];
+        evt.status = EventStatus.Announced;
+        evt.timeRemaining = evt.announceTime;
+        evt.playerParticipated = false;
+        evt.participantCount = 0;
+        evt.completionProgress = 0f;
 
-            // 设置事件冷却
-            _eventCooldowns[evt.Id] = evt.Cooldown;
-
-            GD.Print($"世界事件开始: {evt.Name} - {evt.Description}");
-
-            // 应用事件效果
-            ApplyEventEffects(evt);
-
-            // 发送通知
-            var main = GetTree().CurrentScene as Main;
-            main?.ShowNotification($"世界事件: {evt.Name}", evt.Icon + " " + evt.Description);
-
-            EmitSignal(nameof(EventStarted), evt);
+        if (!_activeEventIds.Contains(eventId))
+        {
+            _activeEventIds.Add(eventId);
         }
 
-        public void EndEvent() {
-            if (_currentEvent == null) return;
+        _totalEventsTriggered++;
+        EmitSignal(nameof(EventAnnounced), eventId, evt.name, evt.description);
+        GD.Print($"[WorldEventSystem] Event announced: {evt.name}");
+    }
 
-            var evt = _currentEvent;
-            _isEventActive = false; 
-            _currentEvent = null;
-            _nextEventCountdown = _globalCooldown * 60 + evt.Cooldown;
+    public void CompleteEvent(string eventId)
+    {
+        if (!_events.ContainsKey(eventId)) return;
 
-            GD.Print($"世界事件结束: {evt.Name}");
+        WorldEvent evt = _events[eventId];
+        evt.status = EventStatus.Completed;
 
-            // 移除事件效果
-            RemoveEventEffects(evt);
-
-            EmitSignal(nameof(EventEnded), evt);
+        if (_activeEventIds.Contains(eventId))
+        {
+            _activeEventIds.Remove(eventId);
         }
 
-        private void ApplyEventEffects(WorldEvent evt) {
-            var player = GetTree().GetFirstNodeInGroup("player") as Player;
-            if (player == null) return;
-
-            // 应用经验倍率
-            player.EventXPMultiplier = evt.XPMultiplier;
-            
-            // 应用掉落倍率
-            player.EventDropMultiplier = evt.DropMultiplier;
-            
-            // 应用金币倍率
-            player.EventGoldMultiplier = evt.GoldMultiplier;
-
-            // 根据事件类型应用特殊效果
-            switch (evt.Type) {
-                case WorldEventType.PeacefulDay:
-                    // 和平模式下敌人不主动攻击
-                    SetEnemyAggressive(false);
-                    break;
-                    
-                case WorldEventType.StormRush:
-                case WorldEventType.WeatherChange:
-                    // 天气效果 - 可以在此处添加视觉特效
-                    break;
-                    
-                case WorldEventType.MonsterInvasion:
-                case WorldEventType.BossRush:
-                case WorldEventType.RareEnemySpawn:
-                    // 召唤特殊敌人
-                    SpawnSpecialEnemies(evt);
-                    break;
-            }
+        _eventHistory.Add(eventId);
+        if (_eventHistory.Count > 50)
+        {
+            _eventHistory.RemoveAt(0);
         }
 
-        private void RemoveEventEffects(WorldEvent evt) {
-            var player = GetTree().GetFirstNodeInGroup("player") as Player;
-            if (player == null) return;
+        EmitSignal(nameof(EventCompleted), eventId, evt.name);
+        GD.Print($"[WorldEventSystem] Event completed: {evt.name}");
 
-            // 移除倍率效果
-            player.EventXPMultiplier = 1.0f;
-            player.EventDropMultiplier = 1.0f;
-            player.EventGoldMultiplier = 1.0f;
+        // Reset event after some time
+        evt.status = EventStatus.Inactive;
+    }
 
-            // 移除特殊效果
-            switch (evt.Type) {
-                case WorldEventType.PeacefulDay:
-                    SetEnemyAggressive(true);
-                    break;
-            }
+    public bool ParticipateInEvent(string eventId)
+    {
+        if (!_events.ContainsKey(eventId)) return false;
+
+        WorldEvent evt = _events[eventId];
+        if (evt.status != EventStatus.Active && evt.status != EventStatus.Announced) return false;
+        if (evt.playerParticipated) return false;
+
+        evt.playerParticipated = true;
+        evt.participantCount++;
+        _totalPlayerParticipations++;
+
+        // Award rewards
+        foreach (string reward in evt.rewards)
+        {
+            int amount = evt.rewardAmounts.ContainsKey(reward) ? evt.rewardAmounts[reward] : 1;
+            AwardReward(reward, amount);
         }
 
-        private void SetEnemyAggressive(bool aggressive) {
-            var enemies = GetTree().GetNodesInGroup("enemy");
-            foreach (var enemy in enemies) {
-                if (enemy is Enemy e) {
-                    e.IsPeacefulMode = !aggressive;
-                }
-            }
-        }
+        _totalRewardsClaimed += evt.rewards.Count;
+        EmitSignal(nameof(PlayerParticipated), eventId, evt.name);
+        GD.Print($"[WorldEventSystem] Player participated in event: {evt.name}");
 
-        private void SpawnSpecialEnemies(WorldEvent evt) {
-            if (string.IsNullOrEmpty(evt.SpawnEnemyId) && evt.SpawnCount > 0) {
-                // 通用敌人生成
-                return;
-            }
+        return true;
+    }
 
-            // 可以在这里调用敌人生成器生成特殊敌人
-            var enemyDatabase = EnemyDatabase.Instance;
-            if (enemyDatabase != null) {
-                var enemyType = enemyDatabase.GetEnemyType(evt.SpawnEnemyId);
-                if (enemyType != null) {
-                    GD.Print($"世界事件生成特殊敌人: {evt.SpawnEnemyId} x{evt.SpawnCount}");
-                }
-            }
-        }
-
-        public bool IsEventOnCooldown(string eventId) {
-            return _eventCooldowns.ContainsKey(eventId) && _eventCooldowns[eventId] > 0;
-        }
-
-        public int GetCooldownRemaining(string eventId) {
-            return _eventCooldowns.ContainsKey(eventId) ? _eventCooldowns[eventId] : 0;
-        }
-
-        public float GetCurrentXPMultiplier() {
-            if (_currentEvent != null) {
-                return _currentEvent.XPMultiplier;
-            }
-            return 1.0f;
-        }
-
-        public float GetCurrentDropMultiplier() {
-            if (_currentEvent != null) {
-                return _currentEvent.DropMultiplier;
-            }
-            return 1.0f;
-        }
-
-        public float GetCurrentGoldMultiplier() {
-            if (_currentEvent != null) {
-                return _currentEvent.GoldMultiplier;
-            }
-            return 1.0f;
-        }
-
-        // 手动触发事件（用于测试或特殊活动）
-        public void TriggerEvent(string eventId) {
-            var evt = WorldEventDatabase.Instance.GetEventById(eventId);
-            if (evt != null && !_isEventActive) {
-                StartEvent(evt);
-            }
-        }
-
-        // 跳过等待时间，直接开始事件
-        public void SkipWait() {
-            if (!_isEventActive) {
-                _nextEventCountdown = 0;
-            }
+    private void AwardReward(string rewardType, int amount)
+    {
+        // This would integrate with the game's reward system
+        switch (rewardType)
+        {
+            case "gold":
+                // Award gold - would integrate with game economy
+                GD.Print($"[WorldEventSystem] Awarded {amount} gold");
+                break;
+            case "experience":
+                GD.Print($"[WorldEventSystem] Awarded {amount} experience");
+                break;
+            case "dragon_scale":
+            case "goblin_ear":
+            case "bounty_token":
+            case "trophy":
+            case "discount_token":
+            case "mystic_essence":
+            case "food_pack":
+            case "ice_crystal":
+            case "herbal_medicine":
+            case "ancient_coin":
+            case "ancient_relic":
+                GD.Print($"[WorldEventSystem] Awarded {amount} {rewardType}");
+                break;
         }
     }
+
+    // Public API
+    public Dictionary<string, WorldEvent> GetActiveEvents()
+    {
+        Dictionary<string, WorldEvent> activeEvents = new Dictionary<string, WorldEvent>();
+        foreach (string eventId in _activeEventIds)
+        {
+            if (_events.ContainsKey(eventId))
+            {
+                activeEvents[eventId] = _events[eventId];
+            }
+        }
+        return activeEvents;
+    }
+
+    public WorldEvent GetEvent(string eventId)
+    {
+        return _events.ContainsKey(eventId) ? _events[eventId] : null;
+    }
+
+    public List<string> GetEventHistory()
+    {
+        return new List<string>(_eventHistory);
+    }
+
+    public void SetEventSystemEnabled(bool enabled)
+    {
+        _eventSystemEnabled = enabled;
+    }
+
+    public int GetTotalEventsTriggered() => _totalEventsTriggered;
+    public int GetTotalParticipations() => _totalPlayerParticipations;
+    public int GetTotalRewardsClaimed() => _totalRewardsClaimed;
+
+    // Signals
+    [Signal]
+    public delegate void EventAnnounced(string eventId, string eventName, string description);
+
+    [Signal]
+    public delegate void EventStarted(string eventId);
+
+    [Signal]
+    public delegate void EventCompleted(string eventId, string eventName);
+
+    [Signal]
+    public delegate void PlayerParticipated(string eventId, string eventName);
 }
