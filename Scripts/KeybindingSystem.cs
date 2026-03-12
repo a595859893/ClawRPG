@@ -97,6 +97,9 @@ namespace ClawRPG.Systems {
             
             // 商店
             AddKeybinding("shop", Key.S, "商店");
+            
+            // 事件连锁系统
+            AddKeybinding("event_chain", Key.L, "事件连锁");
         }
 
         private void AddKeybinding(string actionName, Key key, string description)
