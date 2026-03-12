@@ -480,6 +480,11 @@ namespace ClawRPG.Scripts {
             // Initialize keybinding system
             var keybindingSystem = new Systems.KeybindingSystem();
 
+            // Initialize accessibility system
+            var accessibilitySystem = new Systems.AccessibilityManager();
+            accessibilitySystem.Name = "AccessibilityManager";
+            AddChild(accessibilitySystem);
+
             // Initialize reputation system
             var reputationSystem = ReputationSystem.Instance;
             reputationSystem.Initialize();
@@ -861,6 +866,11 @@ namespace ClawRPG.Scripts {
             var keybindingUI = new UI.KeybindingUI();
             keybindingUI.Name = "KeybindingUI";
             ui.AddChild(keybindingUI);
+
+            // Accessibility UI
+            var accessibilityUI = new UI.AccessibilityUI();
+            accessibilityUI.Name = "AccessibilityUI";
+            ui.AddChild(accessibilityUI);
 
             // Counter Attack UI
             var counterAttackUI = new UI.CounterAttackUI();
