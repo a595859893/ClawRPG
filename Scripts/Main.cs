@@ -468,6 +468,9 @@ namespace ClawRPG.Scripts {
             guildBankSystem.Name = "GuildBankSystem";
             AddChild(guildBankSystem);
 
+            // Initialize guild technology system (singleton)
+            _ = GuildTechnologySystem.Instance;
+
             // Initialize collectible system
             CollectibleSystem.Instance.Initialize();
 
@@ -1066,6 +1069,12 @@ namespace ClawRPG.Scripts {
             guildBankUI.Name = "GuildBankUI";
             guildBankUI.Hide();
             ui.AddChild(guildBankUI);
+
+            // Guild Technology UI
+            var guildTechnologyUI = new GuildTechnologyUI();
+            guildTechnologyUI.Name = "GuildTechnologyUI";
+            guildTechnologyUI.Hide();
+            ui.AddChild(guildTechnologyUI);
 
             // Multiplayer Leaderboard UI
             var leaderboardUI = new UI.MultiplayerLeaderboardUI();
@@ -1834,6 +1843,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_guild_bank"))
             {
                 ToggleGuildBankUI();
+            }
+
+            // Handle guild technology UI toggle (Ctrl+Shift+T key)
+            if (Input.IsActionJustPressed("ui_guild_tech"))
+            {
+                ToggleGuildTechnologyUI();
             }
 
             // Handle trade UI toggle (T key)
@@ -3391,6 +3406,32 @@ namespace ClawRPG.Scripts {
             if (guildBankUI != null)
             {
                 GuildBankUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// 切换公会科技界面 (Ctrl+Shift+T)
+        /// </summary>
+        private void ToggleGuildTechnologyUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var guildTechnologyUI = ui.GetNodeOrNull<GuildTechnologyUI>("GuildTechnologyUI");
+            if (guildTechnologyUI != null && guildTechnologyUI.Visible)
+            {
+                guildTechnologyUI.Hide();
+            }
+            else
+            {
+                if (guildTechnologyUI == null)
+                {
+                    guildTechnologyUI = new GuildTechnologyUI();
+                    guildTechnologyUI.Name = "GuildTechnologyUI";
+                    ui.AddChild(guildTechnologyUI);
+                }
+                guildTechnologyUI.Show();
+                guildTechnologyUI.Refresh();
             }
         }
 
