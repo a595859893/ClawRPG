@@ -652,6 +652,18 @@ namespace ClawRPG.Scripts {
             petFriendshipUI.Visible = false;
             ui.AddChild(petFriendshipUI);
 
+            // Initialize pet synthesis system
+            var petSynthesisSystem = new PetSynthesisSystem();
+            petSynthesisSystem.Name = "PetSynthesisSystem";
+            AddChild(petSynthesisSystem);
+            petSynthesisSystem.Initialize();
+
+            // Initialize pet synthesis UI
+            var petSynthesisUI = new PetSynthesisUI();
+            petSynthesisUI.Name = "PetSynthesisUI";
+            petSynthesisUI.Visible = false;
+            ui.AddChild(petSynthesisUI);
+
             // Initialize mount expedition system
             var mountExpeditionSystem = new Systems.MountExpeditionSystem();
             mountExpeditionSystem.Name = "MountExpeditionSystem";
@@ -2107,6 +2119,12 @@ namespace ClawRPG.Scripts {
                 TogglePetBreedingUI();
             }
 
+            // Handle pet synthesis UI toggle (Ctrl+Shift+S)
+            if (Input.IsActionJustPressed("pet_synthesis_toggle"))
+            {
+                TogglePetSynthesisUI();
+            }
+
             // Handle pet foster UI toggle (Alt+P)
             if (Input.IsActionJustPressed("ui_pet_foster"))
             {
@@ -2814,6 +2832,18 @@ namespace ClawRPG.Scripts {
             if (petBreedingUI != null)
             {
                 petBreedingUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet synthesis UI
+        /// </summary>
+        private void TogglePetSynthesisUI()
+        {
+            var petSynthesisUI = GetNodeOrNull<PetSynthesisUI>("UI/PetSynthesisUI");
+            if (petSynthesisUI != null)
+            {
+                petSynthesisUI.Toggle();
             }
         }
 
