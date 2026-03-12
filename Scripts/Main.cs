@@ -463,6 +463,11 @@ namespace ClawRPG.Scripts {
             guildQuestSystem.Name = "GuildQuestSystem";
             AddChild(guildQuestSystem);
 
+            // Initialize guild bank system
+            var guildBankSystem = new GuildBankSystem();
+            guildBankSystem.Name = "GuildBankSystem";
+            AddChild(guildBankSystem);
+
             // Initialize collectible system
             CollectibleSystem.Instance.Initialize();
 
@@ -1055,6 +1060,12 @@ namespace ClawRPG.Scripts {
             var guildQuestUI = new GuildQuestUI();
             guildQuestUI.Name = "GuildQuestUI";
             ui.AddChild(guildQuestUI);
+
+            // Guild Bank UI
+            var guildBankUI = new GuildBankUI();
+            guildBankUI.Name = "GuildBankUI";
+            guildBankUI.Hide();
+            ui.AddChild(guildBankUI);
 
             // Multiplayer Leaderboard UI
             var leaderboardUI = new UI.MultiplayerLeaderboardUI();
@@ -1817,6 +1828,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_guild_quest"))
             {
                 ToggleGuildQuestUI();
+            }
+
+            // Handle guild bank UI toggle (Shift+B key)
+            if (Input.IsActionJustPressed("ui_guild_bank"))
+            {
+                ToggleGuildBankUI();
             }
 
             // Handle trade UI toggle (T key)
@@ -3359,6 +3376,21 @@ namespace ClawRPG.Scripts {
             if (guildQuestUI != null)
             {
                 guildQuestUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// 切换公会银行界面 (Shift+B)
+        /// </summary>
+        private void ToggleGuildBankUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var guildBankUI = ui.GetNodeOrNull<GuildBankUI>("GuildBankUI");
+            if (guildBankUI != null)
+            {
+                GuildBankUI.Toggle();
             }
         }
 

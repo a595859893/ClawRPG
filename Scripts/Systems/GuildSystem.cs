@@ -69,6 +69,9 @@ public partial class GuildSystem : Node {
         PlayerData.Contribution = 0;
         PlayerData.JoinDate = DateTime.Now;
 
+        // Initialize guild bank
+        GuildBankSystem.Instance.InitializeBank(guildId);
+
         GD.Print($"公会创建成功: {name}");
         EmitSignal(SignalName.GuildCreated, guild);
         return true;
@@ -119,6 +122,9 @@ public partial class GuildSystem : Node {
         PlayerData.Contribution = 0;
         PlayerData.JoinDate = DateTime.Now;
 
+        // Initialize guild bank data (load from save)
+        // Note: In a full implementation, this would load from save data
+        
         GD.Print($"成功加入公会: {guild.Name}");
         EmitSignal(SignalName.GuildJoined, guild);
         return true;
