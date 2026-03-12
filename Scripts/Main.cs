@@ -829,6 +829,12 @@ namespace ClawRPG.Scripts {
             comboDisplayUI.AddToGroup("ComboDisplay");
             ui.AddChild(comboDisplayUI);
 
+            // Hit Stop UI
+            var hitStopUI = new HitStopUI();
+            hitStopUI.Name = "HitStopUI";
+            hitStopUI.Visible = false;
+            ui.AddChild(hitStopUI);
+
             // Combat Stats Panel
             var combatStatsPanel = new UI.CombatStatsPanel();
             combatStatsPanel.Name = "CombatStatsPanel";
@@ -2161,6 +2167,12 @@ namespace ClawRPG.Scripts {
                 ToggleSeasonalEventUI();
             }
 
+            // Handle hit stop UI toggle (Ctrl+Shift+H)
+            if (Input.IsActionJustPressed("hit_stop_toggle"))
+            {
+                ToggleHitStopUI();
+            }
+
             // Handle emote UI toggle (E key)
             if (Input.IsKeyPressed(Key.E))
             {
@@ -2851,6 +2863,18 @@ namespace ClawRPG.Scripts {
             if (elementalTrialUI != null)
             {
                 elementalTrialUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// Toggle hit stop effect UI
+        /// </summary>
+        private void ToggleHitStopUI()
+        {
+            var hitStopUI = GetNodeOrNull<HitStopUI>("UI/HitStopUI");
+            if (hitStopUI != null)
+            {
+                hitStopUI.Visible = !hitStopUI.Visible;
             }
         }
 
