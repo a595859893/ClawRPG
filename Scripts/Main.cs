@@ -6,6 +6,7 @@ using ClawRPG.Systems;
 using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Enhancement;
+using ClawRPG.Scripts.Systems.ArtifactFusion;
 using ClawRPG.Scripts.UI;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Quests;
@@ -158,6 +159,16 @@ namespace ClawRPG.Scripts {
             var mountTrainingDb = new MountTrainingDatabase();
             mountTrainingDb.Name = "MountTrainingDatabase";
             AddChild(mountTrainingDb);
+
+            // Initialize artifact fusion database
+            var artifactFusionDb = new ArtifactFusionDatabase();
+            artifactFusionDb.Name = "ArtifactFusionDatabase";
+            AddChild(artifactFusionDb);
+
+            // Initialize artifact fusion system
+            var artifactFusionSystem = new ArtifactFusionSystem();
+            artifactFusionSystem.Name = "ArtifactFusionSystem";
+            AddChild(artifactFusionSystem);
 
             // Connect counter attack system signals to sound effects
             counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttackPerformed,
@@ -936,6 +947,12 @@ namespace ClawRPG.Scripts {
             artifactUI.Name = "ArtifactUI";
             ui.AddChild(artifactUI);
 
+            // Artifact Fusion UI
+            var artifactFusionUI = new ArtifactFusionUI();
+            artifactFusionUI.Name = "ArtifactFusionUI";
+            artifactFusionUI.Visible = false;
+            ui.AddChild(artifactFusionUI);
+
             // Weather UI
             var weatherUI = new WeatherUI();
             weatherUI.Name = "WeatherUI";
@@ -1640,6 +1657,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.K))
             {
                 ToggleArtifactUI();
+            }
+
+            // Handle artifact fusion UI toggle (Ctrl+F key)
+            if (Input.IsKeyPressed(Key.F) && Input.IsKeyPressed(Key.Ctrl))
+            {
+                ToggleArtifactFusionUI();
             }
 
             // Handle weather UI toggle (Ctrl+W key)
@@ -3324,6 +3347,15 @@ namespace ClawRPG.Scripts {
             if (artifactUI != null)
             {
                 artifactUI.ToggleVisible();
+            }
+        }
+
+        private void ToggleArtifactFusionUI()
+        {
+            var artifactFusionUI = GetNodeOrNull<ArtifactFusionUI>("UI/ArtifactFusionUI");
+            if (artifactFusionUI != null)
+            {
+                artifactFusionUI.Toggle();
             }
         }
 
