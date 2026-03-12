@@ -450,6 +450,11 @@ namespace ClawRPG.Scripts {
             dynamicMarketTaxSystem.Name = "DynamicMarketTaxSystem";
             AddChild(dynamicMarketTaxSystem);
 
+            // Initialize economic warning system
+            var economicWarningSystem = new EconomicWarningSystem();
+            economicWarningSystem.Name = "EconomicWarningSystem";
+            AddChild(economicWarningSystem);
+
             // Initialize mount combat system
             var mountCombatSystem = new Mounts.MountCombatSystem();
             mountCombatSystem.Name = "MountCombatSystem";
@@ -2076,6 +2081,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(KEY_T) && Input.IsKeyPressed(KEY_CONTROL))
             {
                 ToggleDynamicMarketTaxUI();
+            }
+
+            // Handle economic warning UI toggle (K key)
+            if (Input.IsKeyPressed(KEY_K) && Input.IsKeyPressed(KEY_CONTROL))
+            {
+                ToggleEconomicWarningUI();
             }
 
             // Handle enchantment UI toggle (E key)
@@ -3720,6 +3731,32 @@ namespace ClawRPG.Scripts {
                     }
                     taxUI.Show();
                     taxUI.Toggle();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 切换经济预警界面
+        /// </summary>
+        private void ToggleEconomicWarningUI()
+        {
+            var warningUI = GetNodeOrNull<EconomicWarningUI>("CanvasLayer/EconomicWarningUI");
+            if (warningUI != null && warningUI.Visible)
+            {
+                warningUI.Hide();
+            }
+            else
+            {
+                var canvasLayer = GetNodeOrNull("CanvasLayer");
+                if (canvasLayer != null)
+                {
+                    if (warningUI == null)
+                    {
+                        warningUI = new EconomicWarningUI();
+                        warningUI.Name = "EconomicWarningUI";
+                        canvasLayer.AddChild(warningUI);
+                    }
+                    warningUI.Show();
                 }
             }
         }
