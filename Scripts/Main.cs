@@ -611,6 +611,11 @@ namespace ClawRPG.Scripts {
             petInteractionSystem.Name = "PetInteractionSystem";
             AddChild(petInteractionSystem);
 
+            // Initialize pet recycle system
+            var petRecycleSystem = new Systems.PetRecycle.PetRecycleSystem();
+            petRecycleSystem.Name = "PetRecycleSystem";
+            AddChild(petRecycleSystem);
+
             // Initialize pet foster system
             var petFosterSystem = new Systems.PetFoster.PetFosterSystem();
             petFosterSystem.Name = "PetFosterSystem";
@@ -1276,6 +1281,12 @@ namespace ClawRPG.Scripts {
             petInteractionUI.Name = "PetInteractionUI";
             petInteractionUI.Visible = false;
             ui.AddChild(petInteractionUI);
+
+            // Pet Recycle UI
+            var petRecycleUI = new Systems.PetRecycle.PetRecycleUI();
+            petRecycleUI.Name = "PetRecycleUI";
+            petRecycleUI.Visible = false;
+            ui.AddChild(petRecycleUI);
 
             // Pet Foster UI
             var petFosterUI = new Systems.PetFoster.PetFosterUI();
@@ -2226,6 +2237,12 @@ namespace ClawRPG.Scripts {
                 TogglePetInteractionUI();
             }
 
+            // Handle pet recycle UI toggle (Ctrl+Shift+R)
+            if (Input.IsActionJustPressed("pet_recycle_toggle"))
+            {
+                TogglePetRecycleUI();
+            }
+
             // Handle pet breeding UI toggle (Ctrl+B)
             if (Input.IsActionJustPressed("pet_breeding_toggle"))
             {
@@ -2967,6 +2984,18 @@ namespace ClawRPG.Scripts {
             if (petInteractionUI != null)
             {
                 petInteractionUI.ToggleVisibility();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet recycle UI
+        /// </summary>
+        private void TogglePetRecycleUI()
+        {
+            var petRecycleUI = GetNodeOrNull<Systems.PetRecycle.PetRecycleUI>("UI/PetRecycleUI");
+            if (petRecycleUI != null)
+            {
+                petRecycleUI.Visible = !petRecycleUI.Visible;
             }
         }
 
