@@ -237,6 +237,10 @@ namespace ClawRPG.Scripts {
             momentumSystem.Name = "MomentumSystem";
             AddChild(momentumSystem);
 
+            // Initialize enemy scaling system
+            var enemyScalingSystem = EnemyScalingSystem.Instance;
+            enemyScalingSystem.Initialize();
+
             // Initialize skill combo system
             var skillComboSystem = new SkillComboSystem();
             skillComboSystem.Name = "SkillComboSystem";
@@ -1764,6 +1768,12 @@ namespace ClawRPG.Scripts {
                 ToggleMomentumUI();
             }
 
+            // Handle enemy scaling UI toggle (Ctrl+S key)
+            if (Input.IsKeyPressed(Key.S) && Input.IsKeyPressed(Key.Ctrl))
+            {
+                ToggleEnemyScalingUI();
+            }
+
             // Handle choice event UI toggle (C key)
             if (Input.IsKeyPressed(Key.C))
             {
@@ -2614,6 +2624,21 @@ namespace ClawRPG.Scripts {
             if (momentumUI != null)
             {
                 momentumUI.ToggleVisibility();
+            }
+        }
+
+        private void ToggleEnemyScalingUI()
+        {
+            var enemyScalingUI = GetNodeOrNull<EnemyScalingUI>("CanvasLayer/EnemyScalingUI");
+            if (enemyScalingUI != null)
+            {
+                enemyScalingUI.QueueFree();
+            }
+            else
+            {
+                var newUI = new EnemyScalingUI();
+                newUI.Name = "EnemyScalingUI";
+                GetNode("CanvasLayer").AddChild(newUI);
             }
         }
 
