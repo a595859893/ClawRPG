@@ -2,476 +2,518 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ClawRPG.Scripts.Systems.Enchantment
+public class EnchantmentDatabase
 {
-    /// <summary>
-    /// 附魔类型
-    /// </summary>
-    public enum EnchantmentType
+    private static EnchantmentDatabase _instance;
+    public static EnchantmentDatabase Instance => _instance ?? (_instance = new EnchantmentDatabase());
+
+    private Dictionary<string, EnchantmentData> _enchantments;
+    private List<EnchantmentData> _allEnchantments;
+
+    public EnchantmentDatabase()
     {
-        Attack,      // 攻击附魔
-        Defense,     // 防御附魔
-        Magic,       // 魔法附魔
-        Utility,     // 辅助附魔
-        Legendary    // 传奇附魔
+        _enchantments = new Dictionary<string, EnchantmentData>();
+        _allEnchantments = new List<EnchantmentData>();
+        InitializeDatabase();
     }
 
-    /// <summary>
-    /// 附魔稀有度
-    /// </summary>
-    public enum EnchantmentRarity
+    private void InitializeDatabase()
     {
-        Common,     // 普通
-        Uncommon,   // 优秀
-        Rare,       // 稀有
-        Epic,       // 史诗
-        Legendary   // 传说
+        // ===== 武器附魔 =====
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_fire_weapon",
+            Name = "火焰附魔",
+            Description = "赋予武器火焰伤害",
+            Type = EnchantmentData.EnchantmentType.Weapon,
+            RarityLevel = EnchantmentData.Rarity.Uncommon,
+            RequiredLevel = 10,
+            MaxLevel = 5,
+            BaseCost = 100,
+            SuccessRate = 0.8f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Attack, 10f },
+                { EnchantmentData.PropertyType.FireResistance, 5f }
+            },
+            IconName = "fire"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_ice_weapon",
+            Name = "冰霜附魔",
+            Description = "赋予武器冰霜伤害",
+            Type = EnchantmentData.EnchantmentType.Weapon,
+            RarityLevel = EnchantmentData.Rarity.Uncommon,
+            RequiredLevel = 10,
+            MaxLevel = 5,
+            BaseCost = 100,
+            SuccessRate = 0.8f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Attack, 8f },
+                { EnchantmentData.PropertyType.IceResistance, 5f }
+            },
+            IconName = "ice"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_thunder_weapon",
+            Name = "雷电附魔",
+            Description = "赋予武器雷电伤害",
+            Type = EnchantmentData.EnchantmentType.Weapon,
+            RarityLevel = EnchantmentData.Rarity.Rare,
+            RequiredLevel = 20,
+            MaxLevel = 5,
+            BaseCost = 200,
+            SuccessRate = 0.7f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Attack, 12f },
+                { EnchantmentData.PropertyType.LightningResistance, 8f }
+            },
+            IconName = "thunder"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_blood_weapon",
+            Name = "嗜血附魔",
+            Description = "攻击时吸取生命",
+            Type = EnchantmentData.EnchantmentType.Weapon,
+            RarityLevel = EnchantmentData.Rarity.Rare,
+            RequiredLevel = 25,
+            MaxLevel = 5,
+            BaseCost = 250,
+            SuccessRate = 0.65f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Attack, 15f },
+                { EnchantmentData.PropertyType.LifeSteal, 5f }
+            },
+            IconName = "blood"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_shadow_weapon",
+            Name = "暗影附魔",
+            Description = "赋予武器暗影之力",
+            Type = EnchantmentData.EnchantmentType.Weapon,
+            RarityLevel = EnchantmentData.Rarity.Epic,
+            RequiredLevel = 35,
+            MaxLevel = 5,
+            BaseCost = 400,
+            SuccessRate = 0.55f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Attack, 20f },
+                { EnchantmentData.PropertyType.Critical, 3f }
+            },
+            IconName = "shadow"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_divine_weapon",
+            Name = "神圣附魔",
+            Description = "蕴含神圣之力",
+            Type = EnchantmentData.EnchantmentType.Weapon,
+            RarityLevel = EnchantmentData.Rarity.Legendary,
+            RequiredLevel = 45,
+            MaxLevel = 5,
+            BaseCost = 800,
+            SuccessRate = 0.4f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Attack, 30f },
+                { EnchantmentData.PropertyType.MagicAttack, 15f }
+            },
+            IconName = "divine"
+        });
+
+        // ===== 护甲附魔 =====
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_steel_armor",
+            Name = "钢化附魔",
+            Description = "提升防御力",
+            Type = EnchantmentData.EnchantmentType.Armor,
+            RarityLevel = EnchantmentData.Rarity.Common,
+            RequiredLevel = 5,
+            MaxLevel = 5,
+            BaseCost = 50,
+            SuccessRate = 0.9f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Defense, 15f }
+            },
+            IconName = "steel"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_fire_armor",
+            Name = "火焰抗性附魔",
+            Description = "提升火焰抗性",
+            Type = EnchantmentData.EnchantmentType.Armor,
+            RarityLevel = EnchantmentData.Rarity.Uncommon,
+            RequiredLevel = 15,
+            MaxLevel = 5,
+            BaseCost = 120,
+            SuccessRate = 0.8f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Defense, 10f },
+                { EnchantmentData.PropertyType.FireResistance, 15f }
+            },
+            IconName = "fire"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_ice_armor",
+            Name = "冰霜抗性附魔",
+            Description = "提升冰霜抗性",
+            Type = EnchantmentData.EnchantmentType.Armor,
+            RarityLevel = EnchantmentData.Rarity.Uncommon,
+            RequiredLevel = 15,
+            MaxLevel = 5,
+            BaseCost = 120,
+            SuccessRate = 0.8f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Defense, 10f },
+                { EnchantmentData.PropertyType.IceResistance, 15f }
+            },
+            IconName = "ice"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_thunder_armor",
+            Name = "雷电抗性附魔",
+            Description = "提升雷电抗性",
+            Type = EnchantmentData.EnchantmentType.Armor,
+            RarityLevel = EnchantmentData.Rarity.Rare,
+            RequiredLevel = 25,
+            MaxLevel = 5,
+            BaseCost = 250,
+            SuccessRate = 0.7f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Defense, 15f },
+                { EnchantmentData.PropertyType.LightningResistance, 20f }
+            },
+            IconName = "thunder"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_titan_armor",
+            Name = "泰坦附魔",
+            Description = "大幅提升防御和生命",
+            Type = EnchantmentData.EnchantmentType.Armor,
+            RarityLevel = EnchantmentData.Rarity.Epic,
+            RequiredLevel = 35,
+            MaxLevel = 5,
+            BaseCost = 500,
+            SuccessRate = 0.5f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Defense, 25f },
+                { EnchantmentData.PropertyType.Health, 100f }
+            },
+            IconName = "titan"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_divine_armor",
+            Name = "神圣护甲附魔",
+            Description = "神圣之力护体",
+            Type = EnchantmentData.EnchantmentType.Armor,
+            RarityLevel = EnchantmentData.Rarity.Legendary,
+            RequiredLevel = 50,
+            MaxLevel = 5,
+            BaseCost = 1000,
+            SuccessRate = 0.35f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Defense, 35f },
+                { EnchantmentData.PropertyType.MagicDefense, 20f },
+                { EnchantmentData.PropertyType.Health, 150f }
+            },
+            IconName = "divine"
+        });
+
+        // ===== 饰品附魔 =====
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_lucky_accessory",
+            Name = "幸运附魔",
+            Description = "提升暴击率",
+            Type = EnchantmentData.EnchantmentType.Accessory,
+            RarityLevel = EnchantmentData.Rarity.Uncommon,
+            RequiredLevel = 10,
+            MaxLevel = 5,
+            BaseCost = 100,
+            SuccessRate = 0.75f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Critical, 5f }
+            },
+            IconName = "lucky"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_speed_accessory",
+            Name = "速度附魔",
+            Description = "提升移动和攻击速度",
+            Type = EnchantmentData.EnchantmentType.Accessory,
+            RarityLevel = EnchantmentData.Rarity.Uncommon,
+            RequiredLevel = 15,
+            MaxLevel = 5,
+            BaseCost = 150,
+            SuccessRate = 0.7f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Speed, 10f }
+            },
+            IconName = "speed"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_vampiric_accessory",
+            Name = "吸血附魔",
+            Description = "攻击时吸取生命",
+            Type = EnchantmentData.EnchantmentType.Accessory,
+            RarityLevel = EnchantmentData.Rarity.Rare,
+            RequiredLevel = 25,
+            MaxLevel = 5,
+            BaseCost = 300,
+            SuccessRate = 0.6f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.LifeSteal, 8f }
+            },
+            IconName = "blood"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_arcane_accessory",
+            Name = "奥术附魔",
+            Description = "提升魔法攻击",
+            Type = EnchantmentData.EnchantmentType.Accessory,
+            RarityLevel = EnchantmentData.Rarity.Epic,
+            RequiredLevel = 35,
+            MaxLevel = 5,
+            BaseCost = 500,
+            SuccessRate = 0.5f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.MagicAttack, 25f }
+            },
+            IconName = "arcane"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_mythical_accessory",
+            Name = "神话附魔",
+            Description = "全属性大幅提升",
+            Type = EnchantmentData.EnchantmentType.Accessory,
+            RarityLevel = EnchantmentData.Rarity.Legendary,
+            RequiredLevel = 50,
+            MaxLevel = 5,
+            BaseCost = 1500,
+            SuccessRate = 0.3f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Attack, 15f },
+                { EnchantmentData.PropertyType.Defense, 15f },
+                { EnchantmentData.PropertyType.Health, 80f },
+                { EnchantmentData.PropertyType.Speed, 8f },
+                { EnchantmentData.PropertyType.Critical, 3f }
+            },
+            IconName = "mythical"
+        });
+
+        // ===== 头盔附魔 =====
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_wisdom_helmet",
+            Name = "智慧附魔",
+            Description = "提升智力属性",
+            Type = EnchantmentData.EnchantmentType.Helmet,
+            RarityLevel = EnchantmentData.Rarity.Uncommon,
+            RequiredLevel = 15,
+            MaxLevel = 5,
+            BaseCost = 120,
+            SuccessRate = 0.75f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.MagicAttack, 12f }
+            },
+            IconName = "wisdom"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_protection_helmet",
+            Name = "保护附魔",
+            Description = "提升魔法防御",
+            Type = EnchantmentData.EnchantmentType.Helmet,
+            RarityLevel = EnchantmentData.Rarity.Rare,
+            RequiredLevel = 25,
+            MaxLevel = 5,
+            BaseCost = 250,
+            SuccessRate = 0.65f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.MagicDefense, 18f }
+            },
+            IconName = "protection"
+        });
+
+        // ===== 鞋子附魔 =====
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_swift_boots",
+            Name = "迅捷附魔",
+            Description = "大幅提升速度",
+            Type = EnchantmentData.EnchantmentType.Boots,
+            RarityLevel = EnchantmentData.Rarity.Uncommon,
+            RequiredLevel = 10,
+            MaxLevel = 5,
+            BaseCost = 100,
+            SuccessRate = 0.8f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Speed, 15f },
+                { EnchantmentData.PropertyType.Evasion, 3f }
+            },
+            IconName = "swift"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_agility_boots",
+            Name = "敏捷附魔",
+            Description = "提升闪避率",
+            Type = EnchantmentData.EnchantmentType.Boots,
+            RarityLevel = EnchantmentData.Rarity.Rare,
+            RequiredLevel = 20,
+            MaxLevel = 5,
+            BaseCost = 200,
+            SuccessRate = 0.7f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Speed, 10f },
+                { EnchantmentData.PropertyType.Evasion, 8f }
+            },
+            IconName = "agility"
+        });
+
+        // ===== 手套附魔 =====
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_power_gloves",
+            Name = "力量附魔",
+            Description = "提升攻击力和暴击率",
+            Type = EnchantmentData.EnchantmentType.Gloves,
+            RarityLevel = EnchantmentData.Rarity.Uncommon,
+            RequiredLevel = 15,
+            MaxLevel = 5,
+            BaseCost = 150,
+            SuccessRate = 0.75f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Attack, 12f },
+                { EnchantmentData.PropertyType.Critical, 2f }
+            },
+            IconName = "power"
+        });
+
+        AddEnchantment(new EnchantmentData
+        {
+            Id = "enchant_assassin_gloves",
+            Name = "刺客附魔",
+            Description = "提升暴击和闪避",
+            Type = EnchantmentData.EnchantmentType.Gloves,
+            RarityLevel = EnchantmentData.Rarity.Epic,
+            RequiredLevel = 30,
+            MaxLevel = 5,
+            BaseCost = 400,
+            SuccessRate = 0.5f,
+            Properties = new Dictionary<EnchantmentData.PropertyType, float>
+            {
+                { EnchantmentData.PropertyType.Critical, 8f },
+                { EnchantmentData.PropertyType.Evasion, 10f }
+            },
+            IconName = "assassin"
+        });
     }
 
-    /// <summary>
-    /// 附魔属性类型
-    /// </summary>
-    public enum EnchantmentAttribute
+    private void AddEnchantment(EnchantmentData data)
     {
-        Damage,           // 伤害
-        Defense,          // 防御
-        Health,           // 生命
-        Mana,             // 法力
-        CriticalRate,     // 暴击率
-        CriticalDamage,   // 暴击伤害
-        AttackSpeed,      // 攻击速度
-        MoveSpeed,        // 移动速度
-        FireResistance,   // 火焰抗性
-        IceResistance,    // 冰霜抗性
-        LightningResistance, // 雷电抗性
-        PoisonResistance, // 毒抗性
-        AllAttributes     // 全属性
+        _enchantments[data.Id] = data;
+        _allEnchantments.Add(data);
     }
 
-    /// <summary>
-    /// 附魔数据
-    /// </summary>
-    public class EnchantmentData
+    public EnchantmentData GetEnchantment(string id)
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public EnchantmentType Type { get; set; }
-        public EnchantmentRarity Rarity { get; set; }
-        public EnchantmentAttribute Attribute { get; set; }
-        public float AttributeValue { get; set; }
-        public float SuccessRate { get; set; }
-        public int Cost { get; set; }
-        public int RequiredPlayerLevel { get; set; }
-        public List<int> RequiredItemIds { get; set; }
-        public int RequiredItemCount { get; set; }
+        return _enchantments.ContainsKey(id) ? _enchantments[id] : null;
+    }
 
-        public Color GetRarityColor()
+    public List<EnchantmentData> GetAllEnchantments()
+    {
+        return new List<EnchantmentData>(_allEnchantments);
+    }
+
+    public List<EnchantmentData> GetEnchantmentsByType(EnchantmentData.EnchantmentType type)
+    {
+        return _allEnchantments.FindAll(e => e.Type == type);
+    }
+
+    public List<EnchantmentData> GetEnchantmentsByRarity(EnchantmentData.Rarity rarity)
+    {
+        return _allEnchantments.FindAll(e => e.RarityLevel == rarity);
+    }
+
+    public List<EnchantmentData> GetAvailableEnchantments(int playerLevel)
+    {
+        return _allEnchantments.FindAll(e => e.RequiredLevel <= playerLevel);
+    }
+
+    public string GetRarityColor(EnchantmentData.Rarity rarity)
+    {
+        switch (rarity)
         {
-            return Rarity switch
-            {
-                EnchantmentRarity.Common => new Color(0.7f, 0.7f, 0.7f),
-                EnchantmentRarity.Uncommon => new Color(0.2f, 0.8f, 0.2f),
-                EnchantmentRarity.Rare => new Color(0.3f, 0.5f, 1.0f),
-                EnchantmentRarity.Epic => new Color(0.6f, 0.3f, 0.9f),
-                EnchantmentRarity.Legendary => new Color(1.0f, 0.6f, 0.0f),
-                _ => Colors.White
-            };
+            case EnchantmentData.Rarity.Common: return "#FFFFFF";
+            case EnchantmentData.Rarity.Uncommon: return "#1EFF00";
+            case EnchantmentData.Rarity.Rare: return "#0070FF";
+            case EnchantmentData.Rarity.Epic: return "#A335EE";
+            case EnchantmentData.Rarity.Legendary: return "#FF8000";
+            default: return "#FFFFFF";
         }
     }
 
-    /// <summary>
-    /// 装备上的附魔实例
-    /// </summary>
-    public class EquipmentEnchantment
+    public int GetRarityWeight(EnchantmentData.Rarity rarity)
     {
-        public int EnchantmentId { get; set; }
-        public string EnchantmentName { get; set; }
-        public EnchantmentRarity Rarity { get; set; }
-        public EnchantmentAttribute Attribute { get; set; }
-        public float AttributeValue { get; set; }
-        public int Durability { get; set; }
-        public int MaxDurability { get; set; }
-    }
-
-    /// <summary>
-    /// 附魔数据库
-    /// </summary>
-    public class EnchantmentDatabase
-    {
-        private static EnchantmentDatabase _instance;
-        public static EnchantmentDatabase Instance => _instance ??= new EnchantmentDatabase();
-
-        private Dictionary<int, EnchantmentData> _enchantments = new Dictionary<int, EnchantmentData>();
-
-        public EnchantmentDatabase()
+        switch (rarity)
         {
-            InitializeEnchantments();
-        }
-
-        private void InitializeEnchantments()
-        {
-            // 攻击附魔
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 1,
-                Name = "锋利",
-                Description = "增加物理伤害",
-                Type = EnchantmentType.Attack,
-                Rarity = EnchantmentRarity.Common,
-                Attribute = EnchantmentAttribute.Damage,
-                AttributeValue = 5f,
-                SuccessRate = 0.8f,
-                Cost = 100,
-                RequiredPlayerLevel = 1,
-                RequiredItemIds = new List<int> { 301 },
-                RequiredItemCount = 2
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 2,
-                Name = "锐利",
-                Description = "增加更多物理伤害",
-                Type = EnchantmentType.Attack,
-                Rarity = EnchantmentRarity.Uncommon,
-                Attribute = EnchantmentAttribute.Damage,
-                AttributeValue = 10f,
-                SuccessRate = 0.7f,
-                Cost = 250,
-                RequiredPlayerLevel = 5,
-                RequiredItemIds = new List<int> { 301, 302 },
-                RequiredItemCount = 3
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 3,
-                Name = "致命",
-                Description = "增加暴击率",
-                Type = EnchantmentType.Attack,
-                Rarity = EnchantmentRarity.Rare,
-                Attribute = EnchantmentAttribute.CriticalRate,
-                AttributeValue = 5f,
-                SuccessRate = 0.6f,
-                Cost = 500,
-                RequiredPlayerLevel = 10,
-                RequiredItemIds = new List<int> { 302, 303 },
-                RequiredItemCount = 2
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 4,
-                Name = "撕裂",
-                Description = "增加暴击伤害",
-                Type = EnchantmentType.Attack,
-                Rarity = EnchantmentRarity.Epic,
-                Attribute = EnchantmentAttribute.CriticalDamage,
-                AttributeValue = 20f,
-                SuccessRate = 0.5f,
-                Cost = 1000,
-                RequiredPlayerLevel = 20,
-                RequiredItemIds = new List<int> { 303, 304 },
-                RequiredItemCount = 3
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 5,
-                Name = "毁灭",
-                Description = "大幅增加伤害",
-                Type = EnchantmentType.Attack,
-                Rarity = EnchantmentRarity.Legendary,
-                Attribute = EnchantmentAttribute.Damage,
-                AttributeValue = 30f,
-                SuccessRate = 0.3f,
-                Cost = 5000,
-                RequiredPlayerLevel = 30,
-                RequiredItemIds = new List<int> { 304, 305 },
-                RequiredItemCount = 2
-            });
-
-            // 防御附魔
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 6,
-                Name = "坚固",
-                Description = "增加防御力",
-                Type = EnchantmentType.Defense,
-                Rarity = EnchantmentRarity.Common,
-                Attribute = EnchantmentAttribute.Defense,
-                AttributeValue = 5f,
-                SuccessRate = 0.8f,
-                Cost = 100,
-                RequiredPlayerLevel = 1,
-                RequiredItemIds = new List<int> { 301 },
-                RequiredItemCount = 2
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 7,
-                Name = "铁壁",
-                Description = "增加更多防御力",
-                Type = EnchantmentType.Defense,
-                Rarity = EnchantmentRarity.Uncommon,
-                Attribute = EnchantmentAttribute.Defense,
-                AttributeValue = 10f,
-                SuccessRate = 0.7f,
-                Cost = 250,
-                RequiredPlayerLevel = 5,
-                RequiredItemIds = new List<int> { 301, 302 },
-                RequiredItemCount = 3
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 8,
-                Name = "重生",
-                Description = "增加生命值",
-                Type = EnchantmentType.Defense,
-                Rarity = EnchantmentRarity.Rare,
-                Attribute = EnchantmentAttribute.Health,
-                AttributeValue = 50f,
-                SuccessRate = 0.65f,
-                Cost = 600,
-                RequiredPlayerLevel = 12,
-                RequiredItemIds = new List<int> { 302, 303 },
-                RequiredItemCount = 3
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 9,
-                Name = "护体",
-                Description = "大幅增加生命值",
-                Type = EnchantmentType.Defense,
-                Rarity = EnchantmentRarity.Epic,
-                Attribute = EnchantmentAttribute.Health,
-                AttributeValue = 100f,
-                SuccessRate = 0.5f,
-                Cost = 1200,
-                RequiredPlayerLevel = 22,
-                RequiredItemIds = new List<int> { 303, 304 },
-                RequiredItemCount = 3
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 10,
-                Name = "不朽",
-                Description = "极大增加生命值",
-                Type = EnchantmentType.Defense,
-                Rarity = EnchantmentRarity.Legendary,
-                Attribute = EnchantmentAttribute.Health,
-                AttributeValue = 200f,
-                SuccessRate = 0.3f,
-                Cost = 5000,
-                RequiredPlayerLevel = 30,
-                RequiredItemIds = new List<int> { 304, 305 },
-                RequiredItemCount = 2
-            });
-
-            // 魔法附魔
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 11,
-                Name = "魔力",
-                Description = "增加法力值",
-                Type = EnchantmentType.Magic,
-                Rarity = EnchantmentRarity.Common,
-                Attribute = EnchantmentAttribute.Mana,
-                AttributeValue = 20f,
-                SuccessRate = 0.8f,
-                Cost = 100,
-                RequiredPlayerLevel = 1,
-                RequiredItemIds = new List<int> { 301 },
-                RequiredItemCount = 2
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 12,
-                Name = "、奥术",
-                Description = "增加更多法力值",
-                Type = EnchantmentType.Magic,
-                Rarity = EnchantmentRarity.Uncommon,
-                Attribute = EnchantmentAttribute.Mana,
-                AttributeValue = 40f,
-                SuccessRate = 0.7f,
-                Cost = 250,
-                RequiredPlayerLevel = 5,
-                RequiredItemIds = new List<int> { 301, 302 },
-                RequiredItemCount = 3
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 13,
-                Name = "法力洪流",
-                Description = "大幅增加法力值",
-                Type = EnchantmentType.Magic,
-                Rarity = EnchantmentRarity.Rare,
-                Attribute = EnchantmentAttribute.Mana,
-                AttributeValue = 80f,
-                SuccessRate = 0.6f,
-                Cost = 550,
-                RequiredPlayerLevel = 10,
-                RequiredItemIds = new List<int> { 302, 303 },
-                RequiredItemCount = 2
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 14,
-                Name = "奥术大师",
-                Description = "极大增加法力值",
-                Type = EnchantmentType.Magic,
-                Rarity = EnchantmentRarity.Epic,
-                Attribute = EnchantmentAttribute.Mana,
-                AttributeValue = 150f,
-                SuccessRate = 0.45f,
-                Cost = 1100,
-                RequiredPlayerLevel = 20,
-                RequiredItemIds = new List<int> { 303, 304 },
-                RequiredItemCount = 3
-            });
-
-            // 抗性附魔
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 15,
-                Name = "火焰抗性",
-                Description = "减少火焰伤害",
-                Type = EnchantmentType.Utility,
-                Rarity = EnchantmentRarity.Common,
-                Attribute = EnchantmentAttribute.FireResistance,
-                AttributeValue = 10f,
-                SuccessRate = 0.8f,
-                Cost = 120,
-                RequiredPlayerLevel = 3,
-                RequiredItemIds = new List<int> { 301 },
-                RequiredItemCount = 2
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 16,
-                Name = "冰霜抗性",
-                Description = "减少冰霜伤害",
-                Type = EnchantmentType.Utility,
-                Rarity = EnchantmentRarity.Common,
-                Attribute = EnchantmentAttribute.IceResistance,
-                AttributeValue = 10f,
-                SuccessRate = 0.8f,
-                Cost = 120,
-                RequiredPlayerLevel = 3,
-                RequiredItemIds = new List<int> { 301 },
-                RequiredItemCount = 2
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 17,
-                Name = "雷电抗性",
-                Description = "减少雷电伤害",
-                Type = EnchantmentType.Utility,
-                Rarity = EnchantmentRarity.Common,
-                Attribute = EnchantmentAttribute.LightningResistance,
-                AttributeValue = 10f,
-                SuccessRate = 0.8f,
-                Cost = 120,
-                RequiredPlayerLevel = 3,
-                RequiredItemIds = new List<int> { 301 },
-                RequiredItemCount = 2
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 18,
-                Name = "毒素抗性",
-                Description = "减少毒素伤害",
-                Type = EnchantmentType.Utility,
-                Rarity = EnchantmentRarity.Common,
-                Attribute = EnchantmentAttribute.PoisonResistance,
-                AttributeValue = 10f,
-                SuccessRate = 0.8f,
-                Cost = 120,
-                RequiredPlayerLevel = 3,
-                RequiredItemIds = new List<int> { 301 },
-                RequiredItemCount = 2
-            });
-
-            // 传奇附魔
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 19,
-                Name = "全知",
-                Description = "增加所有属性",
-                Type = EnchantmentType.Legendary,
-                Rarity = EnchantmentRarity.Legendary,
-                Attribute = EnchantmentAttribute.AllAttributes,
-                AttributeValue = 15f,
-                SuccessRate = 0.25f,
-                Cost = 8000,
-                RequiredPlayerLevel = 35,
-                RequiredItemIds = new List<int> { 305 },
-                RequiredItemCount = 5
-            });
-
-            AddEnchantment(new EnchantmentData
-            {
-                Id = 20,
-                Name = "极速",
-                Description = "增加攻击速度和移动速度",
-                Type = EnchantmentType.Legendary,
-                Rarity = EnchantmentRarity.Legendary,
-                Attribute = EnchantmentAttribute.AttackSpeed,
-                AttributeValue = 15f,
-                SuccessRate = 0.28f,
-                Cost = 7000,
-                RequiredPlayerLevel = 32,
-                RequiredItemIds = new List<int> { 304, 305 },
-                RequiredItemCount = 3
-            });
-        }
-
-        private void AddEnchantment(EnchantmentData enchantment)
-        {
-            _enchantments[enchantment.Id] = enchantment;
-        }
-
-        public EnchantmentData GetEnchantment(int id)
-        {
-            return _enchantments.ContainsKey(id) ? _enchantments[id] : null;
-        }
-
-        public List<EnchantmentData> GetAllEnchantments()
-        {
-            return new List<EnchantmentData>(_enchantments.Values);
-        }
-
-        public List<EnchantmentData> GetEnchantmentsByType(EnchantmentType type)
-        {
-            List<EnchantmentData> result = new List<EnchantmentData>();
-            foreach (var e in _enchantments.Values)
-            {
-                if (e.Type == type)
-                    result.Add(e);
-            }
-            return result;
-        }
-
-        public List<EnchantmentData> GetAvailableEnchantments(int playerLevel)
-        {
-            List<EnchantmentData> result = new List<EnchantmentData>();
-            foreach (var e in _enchantments.Values)
-            {
-                if (e.RequiredPlayerLevel <= playerLevel)
-                    result.Add(e);
-            }
-            return result;
+            case EnchantmentData.Rarity.Common: return 60;
+            case EnchantmentData.Rarity.Uncommon: return 25;
+            case EnchantmentData.Rarity.Rare: return 10;
+            case EnchantmentData.Rarity.Epic: return 4;
+            case EnchantmentData.Rarity.Legendary: return 1;
+            default: return 0;
         }
     }
 }
