@@ -1,0 +1,466 @@
+using Godot;
+using System;
+using System.Collections.Generic;
+using Godot.Collections;
+
+public class AchievementSystem : Node
+{
+    public static AchievementSystem Instance { get; private set; }
+
+    private Dictionary<string, AchievementData.Achievement> _achievements = new Dictionary<string, AchievementData.Achievement>();
+    private Dictionary<AchievementData.AchievementCategory, List<string>> _categoryAchievements = new Dictionary<AchievementData.AchievementCategory, List<string>>();
+
+    // Stats tracking
+    private int _totalKills;
+    private int _bossKills;
+    private int _pvpWins;
+    private int _zonesDiscovered;
+    private int _sealedTowerFloor;
+    private int _petsCollected;
+    private int _mountsCollected;
+    private int _equipmentCollected;
+    private int _friendsMade;
+    private int _goldAccumulated;
+    private int _goldSpent;
+    private int _skillPointsSpent;
+    private int _itemsCrafted;
+    private int _loginStreak;
+    private float _playTimeHours;
+
+    // Signals
+    [Signal] public delegate void AchievementUnlocked(AchievementData.Achievement achievement);
+    [Signal] public delegate void ProgressUpdated(string achievementId, int current, int required);
+    [Signal] public delegate void CategoryCompleted(AchievementData.AchievementCategory category);
+
+    public override void _Ready()
+    {
+        Instance = this;
+        InitializeAchievements();
+        LoadData();
+    }
+
+    private void InitializeAchievements()
+    {
+        // Initialize category mapping
+        foreach (AchievementData.AchievementCategory cat in Enum.GetValues(typeof(AchievementData.AchievementCategory)))
+        {
+            _categoryAchievements[cat] = new List<string>();
+        }
+
+        // Load from database
+        var dbAchievements = AchievementDatabase.GetAllAchievements();
+        foreach (var achievement in dbAchievements)
+        {
+            _achievements[achievement.id] = achievement;
+            _categoryAchievements[achievement.category].Add(achievement.id);
+        }
+    }
+
+    public void LoadData()
+    {
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) return;
+
+        // Load achievement progress
+        if (data.Contains("achievements"))
+        {
+            var achievementsArray = (Godot.Array)data["achievements"];
+            foreach (Dictionary achievementData in achievementsArray)
+            {
+                string id = (string)achievementData["id"];
+                if (_achievements.ContainsKey(id))
+                {
+                    _achievements[id].currentProgress = (int)achievementData["progress"];
+                    _achievements[id].isUnlocked = (bool)achievementData["unlocked"];
+                    if (achievementData.Contains("unlocked_at"))
+                    {
+                        _achievements[id].unlockedAt = DateTime.Parse((string)achievementData["unlocked_at"]);
+                    }
+                }
+            }
+        }
+
+        // Load stats
+        if (data.Contains("achievement_stats"))
+        {
+            var stats = (Godot.Dictionary)data["achievement_stats"];
+            _totalKills = (int)stats.Get("total_kills", 0);
+            _bossKills = (int)stats.Get("boss_kills", 0);
+            _pvpWins = (int)stats.Get("pvp_wins", 0);
+            _zonesDiscovered = (int)stats.Get("zones_discovered", 0);
+            _sealedTowerFloor = (int)stats.Get("sealed_tower_floor", 0);
+            _petsCollected = (int)stats.Get("pets_collected", 0);
+            _mountsCollected = (int)stats.Get("mounts_collected", 0);
+            _equipmentCollected = (int)stats.Get("equipment_collected", 0);
+            _friendsMade = (int)stats.Get("friends_made", 0);
+            _goldAccumulated = (int)stats.Get("gold_accumulated", 0);
+            _goldSpent = (int)stats.Get("gold_spent", 0);
+            _skillPointsSpent = (int)stats.Get("skill_points_spent", 0);
+            _itemsCrafted = (int)stats.Get("items_crafted", 0);
+            _loginStreak = (int)stats.Get("login_streak", 0);
+            _playTimeHours = (float)stats.Get("playtime_hours", 0.0);
+        }
+    }
+
+    public void SaveData()
+    {
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) data = new Godot.Dictionary();
+
+        // Save achievement progress
+        var achievementsArray = new Godot.Array();
+        foreach (var achievement in _achievements.Values)
+        {
+            var achievementData = new Godot.Dictionary();
+            achievementData["id"] = achievement.id;
+            achievementData["progress"] = achievement.currentProgress;
+            achievementData["unlocked"] = achievement.isUnlocked;
+            if (achievement.unlockedAt.HasValue)
+            {
+                achievementData["unlocked_at"] = achievement.unlockedAt.Value.ToString("o");
+            }
+            achievementsArray.Add(achievementData);
+        }
+        data["achievements"] = achievementsArray;
+
+        // Save stats
+        var stats = new Godot.Dictionary();
+        stats["total_kills"] = _totalKills;
+        stats["boss_kills"] = _bossKills;
+        stats["pvp_wins"] = _pvpWins;
+        stats["zones_discovered"] = _zonesDiscovered;
+        stats["sealed_tower_floor"] = _sealedTowerFloor;
+        stats["pets_collected"] = _petsCollected;
+        stats["mounts_collected"] = _mountsCollected;
+        stats["equipment_collected"] = _equipmentCollected;
+        stats["friends_made"] = _friendsMade;
+        stats["gold_accumulated"] = _goldAccumulated;
+        stats["gold_spent"] = _goldSpent;
+        stats["skill_points_spent"] = _skillPointsSpent;
+        stats["items_crafted"] = _itemsCrafted;
+        stats["login_streak"] = _loginStreak;
+        stats["playtime_hours"] = _playTimeHours;
+        data["achievement_stats"] = stats;
+
+        saveSystem.SaveGame(data);
+    }
+
+    // Progress tracking methods
+    public void AddKill(bool isBoss = false)
+    {
+        _totalKills++;
+        if (isBoss) _bossKills++;
+
+        UpdateAchievementProgress("combat_kills_100", _totalKills);
+        UpdateAchievementProgress("combat_kills_500", _totalKills);
+        UpdateAchievementProgress("combat_kills_1000", _totalKills);
+        UpdateAchievementProgress("combat_kills_5000", _totalKills);
+        UpdateAchievementProgress("combat_kills_10000", _totalKills);
+
+        if (isBoss)
+        {
+            UpdateAchievementProgress("boss_kills_10", _bossKills);
+            UpdateAchievementProgress("boss_kills_50", _bossKills);
+            UpdateAchievementProgress("boss_kills_100", _bossKills);
+        }
+
+        SaveData();
+    }
+
+    public void AddPvpWin()
+    {
+        _pvpWins++;
+        UpdateAchievementProgress("pvp_wins_10", _pvpWins);
+        UpdateAchievementProgress("pvp_wins_50", _pvpWins);
+        UpdateAchievementProgress("pvp_wins_100", _pvpWins);
+        UpdateAchievementProgress("pvp_wins_500", _pvpWins);
+        SaveData();
+    }
+
+    public void DiscoverZone(int zoneCount)
+    {
+        _zonesDiscovered = zoneCount;
+        UpdateAchievementProgress("explore_zones_5", _zonesDiscovered);
+        UpdateAchievementProgress("explore_zones_10", _zonesDiscovered);
+        UpdateAchievementProgress("explore_zones_20", _zonesDiscovered);
+        UpdateAchievementProgress("explore_zones_all", _zonesDiscovered);
+        SaveData();
+    }
+
+    public void UpdateSealedTower(int floor)
+    {
+        _sealedTowerFloor = floor;
+        UpdateAchievementProgress("sealed_tower_10", _sealedTowerFloor);
+        UpdateAchievementProgress("sealed_tower_50", _sealedTowerFloor);
+        UpdateAchievementProgress("sealed_tower_100", _sealedTowerFloor);
+        SaveData();
+    }
+
+    public void AddPet()
+    {
+        _petsCollected++;
+        UpdateAchievementProgress("pets_5", _petsCollected);
+        UpdateAchievementProgress("pets_10", _petsCollected);
+        UpdateAchievementProgress("pets_all", _petsCollected);
+        SaveData();
+    }
+
+    public void AddMount()
+    {
+        _mountsCollected++;
+        UpdateAchievementProgress("mounts_3", _mountsCollected);
+        UpdateAchievementProgress("mounts_8", _mountsCollected);
+        UpdateAchievementProgress("mounts_all", _mountsCollected);
+        SaveData();
+    }
+
+    public void AddEquipment(int count = 1)
+    {
+        _equipmentCollected += count;
+        UpdateAchievementProgress("equipment_50", _equipmentCollected);
+        UpdateAchievementProgress("equipment_200", _equipmentCollected);
+        UpdateAchievementProgress("equipment_500", _equipmentCollected);
+        SaveData();
+    }
+
+    public void AddFriend()
+    {
+        _friendsMade++;
+        UpdateAchievementProgress("friends_10", _friendsMade);
+        UpdateAchievementProgress("friends_50", _friendsMade);
+        SaveData();
+    }
+
+    public void UpdateGold(int currentGold)
+    {
+        if (currentGold > _goldAccumulated)
+        {
+            _goldAccumulated = currentGold;
+            UpdateAchievementProgress("gold_10000", _goldAccumulated);
+            UpdateAchievementProgress("gold_100000", _goldAccumulated);
+            UpdateAchievementProgress("gold_1000000", _goldAccumulated);
+            UpdateAchievementProgress("gold_10000000", _goldAccumulated);
+            SaveData();
+        }
+    }
+
+    public void AddGoldSpent(int amount)
+    {
+        _goldSpent += amount;
+        UpdateAchievementProgress("spend_50000", _goldSpent);
+        UpdateAchievementProgress("spend_500000", _goldSpent);
+        SaveData();
+    }
+
+    public void AddSkillPointsSpent(int points)
+    {
+        _skillPointsSpent += points;
+        UpdateAchievementProgress("skill_points_50", _skillPointsSpent);
+        UpdateAchievementProgress("skill_points_200", _skillPointsSpent);
+        SaveData();
+    }
+
+    public void AddCraftedItem()
+    {
+        _itemsCrafted++;
+        UpdateAchievementProgress("craft_10", _itemsCrafted);
+        UpdateAchievementProgress("craft_100", _itemsCrafted);
+        UpdateAchievementProgress("craft_500", _itemsCrafted);
+        SaveData();
+    }
+
+    public void UpdateLoginStreak(int streak)
+    {
+        _loginStreak = streak;
+        UpdateAchievementProgress("login_7", _loginStreak);
+        UpdateAchievementProgress("login_30", _loginStreak);
+        SaveData();
+    }
+
+    public void UpdatePlayTime(float hours)
+    {
+        _playTimeHours = hours;
+        UpdateAchievementProgress("playtime_1h", (int)_playTimeHours);
+        UpdateAchievementProgress("playtime_10h", (int)_playTimeHours);
+        UpdateAchievementProgress("playtime_50h", (int)_playTimeHours);
+        UpdateAchievementProgress("playtime_100h", (int)_playTimeHours);
+        SaveData();
+    }
+
+    public void UpdateLevel(int level)
+    {
+        UpdateAchievementProgress("level_10", level);
+        UpdateAchievementProgress("level_50", level);
+        UpdateAchievementProgress("level_100", level);
+        UpdateAchievementProgress("level_200", level);
+        SaveData();
+    }
+
+    public void SetGuildJoined(bool isLeader = false)
+    {
+        UpdateAchievementProgress("guild_join", 1);
+        if (isLeader)
+        {
+            UpdateAchievementProgress("guild_leader", 1);
+        }
+        SaveData();
+    }
+
+    public void SetFirstBattle()
+    {
+        UpdateAchievementProgress("first_blood", 1);
+        SaveData();
+    }
+
+    private void UpdateAchievementProgress(string achievementId, int value)
+    {
+        if (!_achievements.ContainsKey(achievementId)) return;
+
+        var achievement = _achievements[achievementId];
+        if (achievement.isUnlocked) return;
+
+        achievement.currentProgress = Mathf.Min(value, achievement.requirement);
+        EmitSignal(nameof(ProgressUpdated), achievementId, achievement.currentProgress, achievement.requirement);
+
+        if (achievement.currentProgress >= achievement.requirement)
+        {
+            UnlockAchievement(achievement);
+        }
+    }
+
+    private void UnlockAchievement(AchievementData.Achievement achievement)
+    {
+        achievement.isUnlocked = true;
+        achievement.unlockedAt = DateTime.Now;
+
+        // Grant rewards
+        var player = GetNode<Player>("/root/Player");
+        if (player != null)
+        {
+            player.AddGold(achievement.rewardGold);
+            player.AddExp(achievement.rewardExp);
+        }
+
+        EmitSignal(nameof(AchievementUnlocked), achievement);
+        GD.Print($"Achievement Unlocked: {achievement.name}! Reward: {achievement.rewardGold} gold, {achievement.rewardExp} exp");
+
+        // Check if category is completed
+        CheckCategoryCompletion(achievement.category);
+    }
+
+    private void CheckCategoryCompletion(AchievementData.AchievementCategory category)
+    {
+        var categoryIds = _categoryAchievements[category];
+        bool allComplete = true;
+
+        foreach (var id in categoryIds)
+        {
+            if (!_achievements[id].isUnlocked)
+            {
+                allComplete = false;
+                break;
+            }
+        }
+
+        if (allComplete)
+        {
+            EmitSignal(nameof(CategoryCompleted), category);
+        }
+    }
+
+    // Public getters
+    public Dictionary<string, AchievementData.Achievement> GetAllAchievements()
+    {
+        return _achievements;
+    }
+
+    public List<AchievementData.Achievement> GetAchievementsByCategory(AchievementData.AchievementCategory category)
+    {
+        var result = new List<AchievementData.Achievement>();
+        if (_categoryAchievements.ContainsKey(category))
+        {
+            foreach (var id in _categoryAchievements[category])
+            {
+                result.Add(_achievements[id]);
+            }
+        }
+        return result;
+    }
+
+    public List<AchievementData.Achievement> GetUnlockedAchievements()
+    {
+        var result = new List<AchievementData.Achievement>();
+        foreach (var achievement in _achievements.Values)
+        {
+            if (achievement.isUnlocked)
+            {
+                result.Add(achievement);
+            }
+        }
+        return result;
+    }
+
+    public int GetUnlockedCount()
+    {
+        int count = 0;
+        foreach (var achievement in _achievements.Values)
+        {
+            if (achievement.isUnlocked) count++;
+        }
+        return count;
+    }
+
+    public int GetTotalAchievementCount()
+    {
+        return _achievements.Count;
+    }
+
+    public int GetTotalRewardGold()
+    {
+        int total = 0;
+        foreach (var achievement in _achievements.Values)
+        {
+            if (achievement.isUnlocked)
+            {
+                total += achievement.rewardGold;
+            }
+        }
+        return total;
+    }
+
+    public int GetTotalRewardExp()
+    {
+        int total = 0;
+        foreach (var achievement in _achievements.Values)
+        {
+            if (achievement.isUnlocked)
+            {
+                total += achievement.rewardExp;
+            }
+        }
+        return total;
+    }
+
+    // Stats getters
+    public int GetTotalKills() => _totalKills;
+    public int GetBossKills() => _bossKills;
+    public int GetPvpWins() => _pvpWins;
+    public int GetZonesDiscovered() => _zonesDiscovered;
+    public int GetSealedTowerFloor() => _sealedTowerFloor;
+    public int GetPetsCollected() => _petsCollected;
+    public int GetMountsCollected() => _mountsCollected;
+    public int GetEquipmentCollected() => _equipmentCollected;
+    public int GetFriendsMade() => _friendsMade;
+    public int GetGoldAccumulated() => _goldAccumulated;
+    public int GetGoldSpent() => _goldSpent;
+    public int GetSkillPointsSpent() => _skillPointsSpent;
+    public int GetItemsCrafted() => _itemsCrafted;
+    public int GetLoginStreak() => _loginStreak;
+    public float GetPlayTimeHours() => _playTimeHours;
+}
