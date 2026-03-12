@@ -2,65 +2,109 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ConstellationData
+public class ConstellationData : Node
 {
+    // Constellation types
     public enum ConstellationType
     {
-        Aries,         // 白羊座 - 攻击
-        Taurus,        // 金牛座 - 防御
-        Gemini,        // 双子座 - 速度
-        Cancer,        // 巨蟹座 - 生命
-        Leo,           // 狮子座 - 暴击
-        Virgo,         // 处女座 - 治疗
-        Libra,        // 天秤座 - 平衡
-        Scorpio,       // 天蝎座 - 暴击伤害
-        Sagittarius,   // 射手座 - 经验
-        Capricorn,    // 摩羯座 - 金币
-        Aquarius,      // 水瓶座 - 魔法
-        Pisces         // 双鱼座 - 特殊
+        Fire,      // Aries, Leo, Sagittarius
+        Water,     // Cancer, Scorpio, Pisces
+        Earth,     // Taurus, Virgo, Capricorn
+        Air,       // Gemini, Libra, Aquarius
+        Light,     // Orion, Phoenix, Sirius
+        Dark       // Shadow, Void, Eclipse
     }
-
-    public enum StarTier
+    
+    // Rarity levels
+    public enum ConstellationRarity
     {
-        Common,    // 普通星
-        Uncommon,  // 优秀星
-        Rare,      // 稀有星
-        Epic,      // 史诗星
-        Legendary  // 传奇星 - 星座核心
+        Common,
+        Uncommon,
+        Rare,
+        Epic,
+        Legendary
     }
-
-    [System.Serializable]
-    public class ConstellationStar
+    
+    // Single constellation data
+    public class Constellation
     {
-        public string Id;
-        public string Name;
-        public string Description;
-        public StarTier Tier;
-        public ConstellationType Constellation;
-        public int StarIndex;        // 在星座中的位置 0-8
-        public int RequiredPoints;   // 需要的天赋点数
-        public string RequiredItem; // 需要的物品（可选）
-        public Dictionary<string, float> Attributes; // 属性加成
-        public bool IsCore;         // 是否是星座核心星
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public ConstellationType Type { get; set; }
+        public ConstellationRarity Rarity { get; set; }
+        public int Stars { get; set; } // Number of stars in constellation
+        public float AttackBonus { get; set; }
+        public float DefenseBonus { get; set; }
+        public float HealthBonus { get; set; }
+        public float SpeedBonus { get; set; }
+        public float CriticalBonus { get; set; }
+        public float EvasionBonus { get; set; }
+        public float GoldBonus { get; set; }
+        public float ExpBonus { get; set; }
+        public int UnlockCost { get; set; }
+        public int RequiredLevel { get; set; }
     }
-
-    [System.Serializable]
-    public class ConstellationInfo
+    
+    // Player's constellation progress
+    public class ConstellationProgress
     {
-        public ConstellationType Type;
-        public string Name;
-        public string Description;
-        public string ChineseName;
-        public int TotalStars;
-        public float[] CoreBonus;   // 激活核心星的额外加成
+        public string ConstellationId { get; set; }
+        public bool Unlocked { get; set; }
+        public int ActivatedStars { get; set; }
+        public int TotalStars { get; set; }
+        public DateTime UnlockTime { get; set; }
     }
-
-    [System.Serializable]
-    public class PlayerConstellationData
+    
+    // Data storage
+    public Dictionary<string, ConstellationProgress> UnlockedConstellations { get; set; } = new Dictionary<string, ConstellationProgress>();
+    public int TotalActivationPoints { get; set; }
+    public int UsedActivationPoints { get; set; }
+    public int ConstellationFragments { get; set; }
+    
+    // Statistics
+    public int TotalConstellationsUnlocked { get; set; }
+    public int TotalStarsActivated { get; set; }
+    public int GoldSpentOnConstellations { get; set; }
+    public int FragmentsCollected { get; set; }
+    
+    public override void _Ready()
     {
-        public HashSet<string> UnlockedStars = new HashSet<string>();
-        public HashSet<string> ActivatedStars = new HashSet<string>();
-        public ConstellationType[] ActivatedConstellations = new ConstellationType[0];
-        public int TotalPointsSpent = 0;
+        // Initialize data
+    }
+    
+    public Dictionary<string, object> Serialize()
+    {
+        return new Dictionary<string, object>
+        {
+            { "unlocked_constellations", UnlockedConstellations },
+            { "total_activation_points", TotalActivationPoints },
+            { "used_activation_points", UsedActivationPoints },
+            { "constellation_fragments", ConstellationFragments },
+            { "total_constellations_unlocked", TotalConstellationsUnlocked },
+            { "total_stars_activated", TotalStarsActivated },
+            { "gold_spent_on_constellations", GoldSpentOnConstellations },
+            { "fragments_collected", FragmentsCollected }
+        };
+    }
+    
+    public void Deserialize(Dictionary<string, object> data)
+    {
+        if (data.ContainsKey("unlocked_constellations"))
+            UnlockedConstellations = (Dictionary<string, ConstellationProgress>)data["unlocked_constellations"];
+        if (data.ContainsKey("total_activation_points"))
+            TotalActivationPoints = (int)data["total_activation_points"];
+        if (data.ContainsKey("used_activation_points"))
+            UsedActivationPoints = (int)data["used_activation_points"];
+        if (data.ContainsKey("constellation_fragments"))
+            ConstellationFragments = (int)data["constellation_fragments"];
+        if (data.ContainsKey("total_constellations_unlocked"))
+            TotalConstellationsUnlocked = (int)data["total_constellations_unlocked"];
+        if (data.ContainsKey("total_stars_activated"))
+            TotalStarsActivated = (int)data["total_stars_activated"];
+        if (data.ContainsKey("gold_spent_on_constellations"))
+            GoldSpentOnConstellations = (int)data["gold_spent_on_constellations"];
+        if (data.ContainsKey("fragments_collected"))
+            FragmentsCollected = (int)data["fragments_collected"];
     }
 }

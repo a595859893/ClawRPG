@@ -2,226 +2,264 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ConstellationSystem
+public class ConstellationSystem : Node
 {
-    private static ConstellationSystem _instance;
-    public static ConstellationSystem Instance
+    private ConstellationData _data;
+    private ConstellationDatabase _database;
+    
+    // Singleton instance
+    public static ConstellationSystem Instance { get; private set; }
+    
+    public override void _Ready()
     {
-        get
+        Instance = this;
+        
+        _data = new ConstellationData();
+        _data._Ready();
+        
+        _database = new ConstellationDatabase();
+        _database._Ready();
+        
+        LoadConstellationData();
+    }
+    
+    private void LoadConstellationData()
+    {
+        // Try to load from save
+        var saveSystem = GetNode("/root/SaveSystem");
+        if (saveSystem != null)
         {
-            if (_instance == null)
-                _instance = new ConstellationSystem();
-            return _instance;
+            // Load constellation data if save exists
         }
     }
-
-    // 星座类型
-    public enum ConstellationType
+    
+    // Unlock a constellation
+    public bool UnlockConstellation(string constellationId, int playerGold, int playerLevel)
     {
-        Aries, Taurus, Gemini, Cancer, Leo, Virgo,
-        Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces
-    }
-
-    // 星点数据
-    private Dictionary<string, Dictionary<string, float>> _starData = new Dictionary<string, Dictionary<string, float>>();
-    private HashSet<string> _unlockedStars = new HashSet<string>();
-    private HashSet<string> _activatedStars = new HashSet<string>();
-    private int _totalPointsSpent = 0;
-
-    // 星座解锁需要的总星数
-    private Dictionary<ConstellationType, int> _constellationUnlockRequirements = new Dictionary<ConstellationType, int>();
-
-    public ConstellationSystem()
-    {
-        InitializeStarData();
-        InitializeConstellationRequirements();
-    }
-
-    private void InitializeConstellationRequirements()
-    {
-        _constellationUnlockRequirements[ConstellationType.Aries] = 3;
-        _constellationUnlockRequirements[ConstellationType.Taurus] = 3;
-        _constellationUnlockRequirements[ConstellationType.Gemini] = 3;
-        _constellationUnlockRequirements[ConstellationType.Cancer] = 3;
-        _constellationUnlockRequirements[ConstellationType.Leo] = 3;
-        _constellationUnlockRequirements[ConstellationType.Virgo] = 3;
-        _constellationUnlockRequirements[ConstellationType.Libra] = 3;
-        _constellationUnlockRequirements[ConstellationType.Scorpio] = 3;
-        _constellationUnlockRequirements[ConstellationType.Sagittarius] = 3;
-        _constellationUnlockRequirements[ConstellationType.Capricorn] = 3;
-        _constellationUnlockRequirements[ConstellationType.Aquarius] = 3;
-        _constellationUnlockRequirements[ConstellationType.Pisces] = 3;
-    }
-
-    private void InitializeStarData()
-    {
-        // Aries - Attack
-        AddStar("aries_1", "Aries Spark", new Dictionary<string, float> { { "attack", 5 } });
-        AddStar("aries_2", "Aries Fury", new Dictionary<string, float> { { "attack", 8 } });
-        AddStar("aries_3", "Aries Strike", new Dictionary<string, float> { { "attack", 12 } });
-        AddStar("aries_4", "Aries Power", new Dictionary<string, float> { { "attack", 15 }, { "crit_rate", 2 } });
-        AddStar("aries_5", "Aries Champion", new Dictionary<string, float> { { "attack", 20 }, { "crit_rate", 3 }, { "crit_damage", 10 } });
-        AddStar("aries_core", "Aries Core", new Dictionary<string, float> { { "attack", 30 }, { "crit_rate", 5 }, { "crit_damage", 15 } });
-
-        // Taurus - Defense
-        AddStar("taurus_1", "Taurus Stone", new Dictionary<string, float> { { "defense", 5 } });
-        AddStar("taurus_2", "Taurus Wall", new Dictionary<string, float> { { "defense", 8 } });
-        AddStar("taurus_3", "Taurus Shield", new Dictionary<string, float> { { "defense", 12 } });
-        AddStar("taurus_4", "Taurus Iron", new Dictionary<string, float> { { "defense", 15 }, { "health", 50 } });
-        AddStar("taurus_5", "Taurus Guardian", new Dictionary<string, float> { { "defense", 20 }, { "health", 80 }, { "dodge", 3 } });
-        AddStar("taurus_core", "Taurus Core", new Dictionary<string, float> { { "defense", 30 }, { "health", 120 }, { "dodge", 5 } });
-
-        // Gemini - Speed
-        AddStar("gemini_1", "Gemini Swift", new Dictionary<string, float> { { "speed", 2 } });
-        AddStar("gemini_2", "Gemini Wind", new Dictionary<string, float> { { "speed", 3 } });
-        AddStar("gemini_3", "Gemini Breeze", new Dictionary<string, float> { { "speed", 5 } });
-        AddStar("gemini_4", "Gemini Lightning", new Dictionary<string, float> { { "speed", 7 }, { "dodge", 3 } });
-        AddStar("gemini_5", "Gemini Phantom", new Dictionary<string, float> { { "speed", 10 }, { "dodge", 5 }, { "crit_rate", 3 } });
-        AddStar("gemini_core", "Gemini Core", new Dictionary<string, float> { { "speed", 15 }, { "dodge", 8 }, { "crit_rate", 5 } });
-
-        // Cancer - Health
-        AddStar("cancer_1", "Cancer Drop", new Dictionary<string, float> { { "health", 30 } });
-        AddStar("cancer_2", "Cancer Stream", new Dictionary<string, float> { { "health", 50 } });
-        AddStar("cancer_3", "Cancer River", new Dictionary<string, float> { { "health", 80 } });
-        AddStar("cancer_4", "Cancer Sea", new Dictionary<string, float> { { "health", 100 }, { "health_regen", 2 } });
-        AddStar("cancer_5", "Cancer Leviathan", new Dictionary<string, float> { { "health", 150 }, { "health_regen", 4 }, { "lifesteal", 3 } });
-        AddStar("cancer_core", "Cancer Core", new Dictionary<string, float> { { "health", 200 }, { "health_regen", 6 }, { "lifesteal", 5 } });
-
-        // Leo - Crit Rate
-        AddStar("leo_1", "Leo Spark", new Dictionary<string, float> { { "crit_rate", 1 } });
-        AddStar("leo_2", "Leo Flame", new Dictionary<string, float> { { "crit_rate", 2 } });
-        AddStar("leo_3", "Leo Blaze", new Dictionary<string, float> { { "crit_rate", 3 } });
-        AddStar("leo_4", "Leo Sun", new Dictionary<string, float> { { "crit_rate", 4 }, { "attack", 10 } });
-        AddStar("leo_5", "Leo Radiant", new Dictionary<string, float> { { "crit_rate", 5 }, { "attack", 15 }, { "crit_damage", 10 } });
-        AddStar("leo_core", "Leo Core", new Dictionary<string, float> { { "crit_rate", 8 }, { "attack", 25 }, { "crit_damage", 15 } });
-
-        // Virgo - Healing
-        AddStar("virgo_1", "Virgo Drop", new Dictionary<string, float> { { "healing", 5 } });
-        AddStar("virgo_2", "Virgo Spring", new Dictionary<string, float> { { "healing", 8 } });
-        AddStar("virgo_3", "Virgo Fountain", new Dictionary<string, float> { { "healing", 12 } });
-        AddStar("virgo_4", "Virgo Lotus", new Dictionary<string, float> { { "healing", 15 }, { "health_regen", 3 } });
-        AddStar("virgo_5", "Virgo Garden", new Dictionary<string, float> { { "healing", 20 }, { "health_regen", 5 }, { "lifesteal", 5 } });
-        AddStar("virgo_core", "Virgo Core", new Dictionary<string, float> { { "healing", 30 }, { "health_regen", 8 }, { "lifesteal", 8 } });
-
-        // Libra - Balance
-        AddStar("libra_1", "Libra Balance", new Dictionary<string, float> { { "attack", 2 }, { "defense", 2 } });
-        AddStar("libra_2", "Libra Harmony", new Dictionary<string, float> { { "attack", 3 }, { "defense", 3 } });
-        AddStar("libra_3", "Libra Order", new Dictionary<string, float> { { "attack", 5 }, { "defense", 5 } });
-        AddStar("libra_4", "Libra Scale", new Dictionary<string, float> { { "attack", 7 }, { "defense", 7 }, { "health", 30 } });
-        AddStar("libra_5", "Libra Perfect", new Dictionary<string, float> { { "attack", 10 }, { "defense", 10 }, { "health", 50 }, { "speed", 2 } });
-        AddStar("libra_core", "Libra Core", new Dictionary<string, float> { { "attack", 15 }, { "defense", 15 }, { "health", 80 }, { "speed", 3 } });
-
-        // Scorpio - Crit Damage
-        AddStar("scorpio_1", "Scorpio Sting", new Dictionary<string, float> { { "crit_damage", 5 } });
-        AddStar("scorpio_2", "Scorpio Venom", new Dictionary<string, float> { { "crit_damage", 8 } });
-        AddStar("scorpio_3", "Scorpio Poison", new Dictionary<string, float> { { "crit_damage", 12 } });
-        AddStar("scorpio_4", "Scorpio Assassin", new Dictionary<string, float> { { "crit_damage", 15 }, { "crit_rate", 3 } });
-        AddStar("scorpio_5", "Scorpio Night", new Dictionary<string, float> { { "crit_damage", 20 }, { "crit_rate", 4 }, { "lifesteal", 5 } });
-        AddStar("scorpio_core", "Scorpio Core", new Dictionary<string, float> { { "crit_damage", 30 }, { "crit_rate", 6 }, { "lifesteal", 8 } });
-
-        // Sagittarius - EXP
-        AddStar("sagittarius_1", "Sagittarius Arrow", new Dictionary<string, float> { { "exp_bonus", 3 } });
-        AddStar("sagittarius_2", "Sagittarius Bow", new Dictionary<string, float> { { "exp_bonus", 5 } });
-        AddStar("sagittarius_3", "Sagittarius Hunter", new Dictionary<string, float> { { "exp_bonus", 8 } });
-        AddStar("sagittarius_4", "Sagittarius Archer", new Dictionary<string, float> { { "exp_bonus", 10 }, { "attack", 8 } });
-        AddStar("sagittarius_5", "Sagittarius Legend", new Dictionary<string, float> { { "exp_bonus", 15 }, { "attack", 15 }, { "speed", 3 } });
-        AddStar("sagittarius_core", "Sagittarius Core", new Dictionary<string, float> { { "exp_bonus", 20 }, { "attack", 20 }, { "speed", 5 } });
-
-        // Capricorn - Gold
-        AddStar("capricorn_1", "Capricorn Coin", new Dictionary<string, float> { { "gold_bonus", 3 } });
-        AddStar("capricorn_2", "Capricorn Silver", new Dictionary<string, float> { { "gold_bonus", 5 } });
-        AddStar("capricorn_3", "Capricorn Gold", new Dictionary<string, float> { { "gold_bonus", 8 } });
-        AddStar("capricorn_4", "Capricorn Rich", new Dictionary<string, float> { { "gold_bonus", 10 }, { "defense", 8 } });
-        AddStar("capricorn_5", "Capricorn King", new Dictionary<string, float> { { "gold_bonus", 15 }, { "defense", 15 }, { "luck", 3 } });
-        AddStar("capricorn_core", "Capricorn Core", new Dictionary<string, float> { { "gold_bonus", 20 }, { "defense", 20 }, { "luck", 5 } });
-
-        // Aquarius - Magic
-        AddStar("aquarius_1", "Aquarius Drop", new Dictionary<string, float> { { "magic", 5 } });
-        AddStar("aquarius_2", "Aquarius Stream", new Dictionary<string, float> { { "magic", 8 } });
-        AddStar("aquarius_3", "Aquarius River", new Dictionary<string, float> { { "magic", 12 } });
-        AddStar("aquarius_4", "Aquarius Storm", new Dictionary<string, float> { { "magic", 15 }, { "mana", 30 } });
-        AddStar("aquarius_5", "Aquarius Master", new Dictionary<string, float> { { "magic", 20 }, { "mana", 50 }, { "health_regen", 3 } });
-        AddStar("aquarius_core", "Aquarius Core", new Dictionary<string, float> { { "magic", 30 }, { "mana", 80 }, { "health_regen", 5 } });
-
-        // Pisces - Special
-        AddStar("pisces_1", "Pisces Drop", new Dictionary<string, float> { { "lifesteal", 2 } });
-        AddStar("pisces_2", "Pisces Stream", new Dictionary<string, float> { { "lifesteal", 3 } });
-        AddStar("pisces_3", "Pisces River", new Dictionary<string, float> { { "lifesteal", 5 } });
-        AddStar("pisces_4", "Pisces Ocean", new Dictionary<string, float> { { "lifesteal", 7 }, { "dodge", 3 } });
-        AddStar("pisces_5", "Pisces Divine", new Dictionary<string, float> { { "lifesteal", 10 }, { "dodge", 5 }, { "luck", 3 } });
-        AddStar("pisces_core", "Pisces Core", new Dictionary<string, float> { { "lifesteal", 15 }, { "dodge", 8 }, { "luck", 5 } });
-    }
-
-    private void AddStar(string id, string name, Dictionary<string, float> attributes)
-    {
-        _starData[id] = attributes;
-    }
-
-    public bool UnlockStar(string starId)
-    {
-        if (_unlockedStars.Contains(starId))
-            return false;
-
-        _unlockedStars.Add(starId);
-        return true;
-    }
-
-    public bool ActivateStar(string starId)
-    {
-        if (!_unlockedStars.Contains(starId))
-            return false;
-
-        if (_activatedStars.Contains(starId))
-            return false;
-
-        _activatedStars.Add(starId);
-        _totalPointsSpent++;
-        return true;
-    }
-
-    public Dictionary<string, float> GetActivatedBonuses()
-    {
-        Dictionary<string, float> totalBonuses = new Dictionary<string, float>();
-
-        foreach (string starId in _activatedStars)
+        var constellation = _database.GetConstellation(constellationId);
+        if (constellation == null)
         {
-            if (_starData.ContainsKey(starId))
-            {
-                foreach (var kvp in _starData[starId])
-                {
-                    if (totalBonuses.ContainsKey(kvp.Key))
-                        totalBonuses[kvp.Key] += kvp.Value;
-                    else
-                        totalBonuses[kvp.Key] = kvp.Value;
-                }
-            }
+            GD.Print($"[ConstellationSystem] Constellation not found: {constellationId}");
+            return false;
         }
-
-        return totalBonuses;
-    }
-
-    public HashSet<string> GetUnlockedStars() { return _unlockedStars; }
-    public HashSet<string> GetActivatedStars() { return _activatedStars; }
-    public Dictionary<string, Dictionary<string, float>> GetAllStarData() { return _starData; }
-    public int GetTotalPointsSpent() { return _totalPointsSpent; }
-
-    public bool IsStarUnlocked(string starId) { return _unlockedStars.Contains(starId); }
-    public bool IsStarActivated(string starId) { return _activatedStars.Contains(starId); }
-
-    public void LoadData(HashSet<string> unlocked, HashSet<string> activated, int pointsSpent)
-    {
-        _unlockedStars = unlocked;
-        _activatedStars = activated;
-        _totalPointsSpent = pointsSpent;
-    }
-
-    public Dictionary<string, object> SaveData()
-    {
-        return new Dictionary<string, object>
+        
+        // Check if already unlocked
+        if (_data.UnlockedConstellations.ContainsKey(constellationId) && 
+            _data.UnlockedConstellations[constellationId].Unlocked)
         {
-            { "unlocked", new List<string>(_unlockedStars) },
-            { "activated", new List<string>(_activatedStars) },
-            { "pointsSpent", _totalPointsSpent }
+            GD.Print($"[ConstellationSystem] Constellation already unlocked: {constellationId}");
+            return false;
+        }
+        
+        // Check level requirement
+        if (playerLevel < constellation.RequiredLevel)
+        {
+            GD.Print($"[ConstellationSystem] Player level {playerLevel} too low, required: {constellation.RequiredLevel}");
+            return false;
+        }
+        
+        // Check gold
+        if (playerGold < constellation.UnlockCost)
+        {
+            GD.Print($"[ConstellationSystem] Not enough gold: {playerGold}, required: {constellation.UnlockCost}");
+            return false;
+        }
+        
+        // Unlock the constellation
+        var progress = new ConstellationData.ConstellationProgress
+        {
+            ConstellationId = constellationId,
+            Unlocked = true,
+            ActivatedStars = 0,
+            TotalStars = constellation.Stars,
+            UnlockTime = DateTime.Now
         };
+        
+        _data.UnlockedConstellations[constellationId] = progress;
+        _data.TotalConstellationsUnlocked++;
+        _data.GoldSpentOnConstellations += constellation.UnlockCost;
+        
+        // Deduct gold (assume caller handles this)
+        SaveConstellationData();
+        
+        GD.Print($"[ConstellationSystem] Unlocked constellation: {constellation.Name} for {constellation.UnlockCost} gold");
+        return true;
+    }
+    
+    // Activate stars in a constellation
+    public bool ActivateStars(string constellationId, int starsToActivate, int playerGold)
+    {
+        if (!_data.UnlockedConstellations.ContainsKey(constellationId))
+        {
+            GD.Print($"[ConstellationSystem] Constellation not unlocked: {constellationId}");
+            return false;
+        }
+        
+        var progress = _data.UnlockedConstellations[constellationId];
+        var constellation = _database.GetConstellation(constellationId);
+        
+        if (constellation == null)
+            return false;
+        
+        int maxStars = constellation.Stars;
+        int currentStars = progress.ActivatedStars;
+        int availableStars = maxStars - currentStars;
+        
+        if (availableStars <= 0)
+        {
+            GD.Print($"[ConstellationSystem] All stars already activated for: {constellationId}");
+            return false;
+        }
+        
+        int starsToAdd = Math.Min(starsToActivate, availableStars);
+        int costPerStar = 50 + (currentStars * 10); // Cost increases with each star
+        int totalCost = costPerStar * starsToAdd;
+        
+        if (playerGold < totalCost)
+        {
+            GD.Print($"[ConstellationSystem] Not enough gold for stars: {playerGold}, required: {totalCost}");
+            return false;
+        }
+        
+        progress.ActivatedStars += starsToAdd;
+        _data.UsedActivationPoints += starsToAdd;
+        _data.TotalStarsActivated += starsToAdd;
+        _data.GoldSpentOnConstellations += totalCost;
+        
+        SaveConstellationData();
+        
+        GD.Print($"[ConstellationSystem] Activated {starsToAdd} stars in {constellation.Name}, total: {progress.ActivatedStars}/{maxStars}");
+        return true;
+    }
+    
+    // Get total bonuses from all activated constellations
+    public Dictionary<string, float> GetTotalBonuses()
+    {
+        Dictionary<string, float> bonuses = new Dictionary<string, float>
+        {
+            { "attack", 0f },
+            { "defense", 0f },
+            { "health", 0f },
+            { "speed", 0f },
+            { "critical", 0f },
+            { "evasion", 0f },
+            { "gold", 0f },
+            { "exp", 0f }
+        };
+        
+        foreach (var kvp in _data.UnlockedConstellations)
+        {
+            var progress = kvp.Value;
+            if (!progress.Unlocked || progress.ActivatedStars <= 0)
+                continue;
+            
+            var constellation = _database.GetConstellation(kvp.Key);
+            if (constellation == null)
+                continue;
+            
+            float activationRatio = (float)progress.ActivatedStars / progress.TotalStars;
+            
+            bonuses["attack"] += constellation.AttackBonus * activationRatio;
+            bonuses["defense"] += constellation.DefenseBonus * activationRatio;
+            bonuses["health"] += constellation.HealthBonus * activationRatio;
+            bonuses["speed"] += constellation.SpeedBonus * activationRatio;
+            bonuses["critical"] += constellation.CriticalBonus * activationRatio;
+            bonuses["evasion"] += constellation.EvasionBonus * activationRatio;
+            bonuses["gold"] += constellation.GoldBonus * activationRatio;
+            bonuses["exp"] += constellation.ExpBonus * activationRatio;
+        }
+        
+        return bonuses;
+    }
+    
+    // Check if constellation is unlocked
+    public bool IsConstellationUnlocked(string constellationId)
+    {
+        if (_data.UnlockedConstellations.ContainsKey(constellationId))
+            return _data.UnlockedConstellations[constellationId].Unlocked;
+        return false;
+    }
+    
+    // Get constellation progress
+    public ConstellationData.ConstellationProgress GetConstellationProgress(string constellationId)
+    {
+        if (_data.UnlockedConstellations.ContainsKey(constellationId))
+            return _data.UnlockedConstellations[constellationId];
+        return null;
+    }
+    
+    // Get all unlocked constellations
+    public Dictionary<string, ConstellationData.ConstellationProgress> GetUnlockedConstellations()
+    {
+        return new Dictionary<string, ConstellationData.ConstellationProgress>(_data.UnlockedConstellations);
+    }
+    
+    // Add constellation fragments (currency for constellation system)
+    public void AddFragments(int amount)
+    {
+        _data.ConstellationFragments += amount;
+        _data.FragmentsCollected += amount;
+        SaveConstellationData();
+    }
+    
+    // Spend fragments to unlock constellation (alternative to gold)
+    public bool UnlockWithFragments(string constellationId, int playerLevel)
+    {
+        var constellation = _database.GetConstellation(constellationId);
+        if (constellation == null)
+            return false;
+        
+        int fragmentCost = constellation.UnlockCost / 2; // Fragments are more valuable
+        
+        if (_data.ConstellationFragments < fragmentCost)
+        {
+            GD.Print($"[ConstellationSystem] Not enough fragments: {_data.ConstellationFragments}, required: {fragmentCost}");
+            return false;
+        }
+        
+        if (playerLevel < constellation.RequiredLevel)
+        {
+            GD.Print($"[ConstellationSystem] Player level too low: {playerLevel}, required: {constellation.RequiredLevel}");
+            return false;
+        }
+        
+        _data.ConstellationFragments -= fragmentCost;
+        
+        return UnlockConstellation(constellationId, 0, playerLevel);
+    }
+    
+    // Get statistics
+    public Dictionary<string, int> GetStatistics()
+    {
+        return new Dictionary<string, int>
+        {
+            { "total_unlocked", _data.TotalConstellationsUnlocked },
+            { "total_stars_activated", _data.TotalStarsActivated },
+            { "gold_spent", _data.GoldSpentOnConstellations },
+            { "fragments_collected", _data.FragmentsCollected },
+            { "current_fragments", _data.ConstellationFragments }
+        };
+    }
+    
+    // Save data
+    private void SaveConstellationData()
+    {
+        var saveSystem = GetNode("/root/SaveSystem");
+        if (saveSystem != null)
+        {
+            // Save constellation data
+        }
+    }
+    
+    // Get database reference
+    public ConstellationDatabase GetDatabase()
+    {
+        return _database;
+    }
+    
+    // Get data reference
+    public ConstellationData GetData()
+    {
+        return _data;
     }
 }

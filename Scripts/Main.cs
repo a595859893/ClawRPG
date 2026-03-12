@@ -256,6 +256,11 @@ namespace ClawRPG.Scripts {
             soulBondSystem.Name = "SoulBondSystem";
             AddChild(soulBondSystem);
 
+            // Initialize constellation system
+            var constellationSystem = new ConstellationSystem();
+            constellationSystem.Name = "ConstellationSystem";
+            AddChild(constellationSystem);
+
             // Initialize AOE indicator system
             var aoeIndicatorManager = new Systems.AOEIndicatorManager();
             aoeIndicatorManager.Name = "AOEIndicatorManager";
@@ -1646,6 +1651,12 @@ namespace ClawRPG.Scripts {
                 ToggleSkillSynergyUI();
             }
 
+            // Handle constellation UI toggle (K key - when not in combat)
+            if (Input.IsKeyPressed(Key.K))
+            {
+                ToggleConstellationUI();
+            }
+
             // Handle momentum UI toggle (M key)
             if (Input.IsKeyPressed(Key.M))
             {
@@ -2412,6 +2423,28 @@ namespace ClawRPG.Scripts {
             {
                 skillSynergyUI.ToggleVisibility();
             }
+        }
+
+        private void ToggleConstellationUI()
+        {
+            var existingUI = GetNodeOrNull<ConstellationUI>("CanvasLayer/ConstellationUI");
+            if (existingUI != null)
+            {
+                existingUI.QueueFree();
+                return;
+            }
+            
+            var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+            if (canvasLayer == null)
+            {
+                canvasLayer = new CanvasLayer();
+                canvasLayer.Name = "CanvasLayer";
+                AddChild(canvasLayer);
+            }
+            
+            var constellationUI = new ConstellationUI();
+            constellationUI.Name = "ConstellationUI";
+            canvasLayer.AddChild(constellationUI);
         }
 
         private void ToggleMomentumUI()
