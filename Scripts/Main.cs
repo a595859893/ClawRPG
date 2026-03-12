@@ -919,6 +919,11 @@ namespace ClawRPG.Scripts {
             skillSynergyUI.Name = "SkillSynergyUI";
             ui.AddChild(skillSynergyUI);
 
+            // Trade Route UI
+            var tradeRouteUI = new TradeRouteUI();
+            tradeRouteUI.Name = "TradeRouteUI";
+            ui.AddChild(tradeRouteUI);
+
             // Quick Slot UI
             var quickSlotUI = new UI.QuickSlotUI();
             quickSlotUI.Name = "QuickSlotUI";
@@ -1691,6 +1696,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.B) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleSoulBondUI();
+            }
+
+            // Handle trade route UI toggle (Shift+Y key)
+            if (Input.IsKeyPressed(Key.Y) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleTradeRouteUI();
             }
 
             // Handle weather UI toggle (Ctrl+W key)
@@ -3419,6 +3430,15 @@ namespace ClawRPG.Scripts {
                 {
                     soulBondUI.Refresh();
                 }
+            }
+        }
+
+        private void ToggleTradeRouteUI()
+        {
+            var tradeRouteUI = GetNodeOrNull<TradeRouteUI>("UI/TradeRouteUI");
+            if (tradeRouteUI != null)
+            {
+                tradeRouteUI.ToggleVisibility();
             }
         }
 
