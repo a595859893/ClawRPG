@@ -597,6 +597,18 @@ namespace ClawRPG.Scripts {
             petEggUI.Visible = false;
             ui.AddChild(petEggUI);
 
+            // Initialize pet friendship system
+            var petFriendshipSystem = new PetFriendshipSystem();
+            petFriendshipSystem.Name = "PetFriendshipSystem";
+            AddChild(petFriendshipSystem);
+            petFriendshipSystem.LoadData();
+
+            // Initialize pet friendship UI
+            var petFriendshipUI = new PetFriendshipUI();
+            petFriendshipUI.Name = "PetFriendshipUI";
+            petFriendshipUI.Visible = false;
+            ui.AddChild(petFriendshipUI);
+
             // Initialize mount expedition system
             var mountExpeditionSystem = new Systems.MountExpeditionSystem();
             mountExpeditionSystem.Name = "MountExpeditionSystem";
@@ -2031,6 +2043,12 @@ namespace ClawRPG.Scripts {
                 TogglePetEggUI();
             }
 
+            // Handle pet friendship UI toggle (Ctrl+Shift+P key)
+            if (Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.P))
+            {
+                TogglePetFriendshipUI();
+            }
+
             // Handle daily dungeon UI toggle (D key)
             if (Input.IsActionJustPressed("ui_daily_dungeon"))
             {
@@ -2795,6 +2813,25 @@ namespace ClawRPG.Scripts {
                 else
                 {
                     petEggUI.Show();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet friendship UI
+        /// </summary>
+        private void TogglePetFriendshipUI()
+        {
+            var petFriendshipUI = GetNodeOrNull<PetFriendshipUI>("UI/PetFriendshipUI");
+            if (petFriendshipUI != null)
+            {
+                if (petFriendshipUI.Visible)
+                {
+                    petFriendshipUI.Hide();
+                }
+                else
+                {
+                    petFriendshipUI.Show();
                 }
             }
         }
