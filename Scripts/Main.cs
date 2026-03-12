@@ -181,6 +181,11 @@ namespace ClawRPG.Scripts {
             dailyRitualSystem.Name = "DailyRitualSystem";
             AddChild(dailyRitualSystem);
 
+            // Initialize weekly challenge system
+            var weeklyChallengeSystem = new WeeklyChallengeSystem();
+            weeklyChallengeSystem.Name = "WeeklyChallengeSystem";
+            AddChild(weeklyChallengeSystem);
+
             // Initialize weather system
             var weatherSystem = new WeatherSystem();
             weatherSystem.Name = "WeatherSystem";
@@ -1576,6 +1581,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.R) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleDailyRitualUI();
+            }
+
+            // Handle weekly challenge UI toggle (Ctrl+Shift+W key)
+            if (Input.IsKeyPressed(Key.W) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleWeeklyChallengeUI();
             }
 
             // Handle bookmarks UI toggle (N key)
@@ -3272,6 +3283,28 @@ namespace ClawRPG.Scripts {
                 if (canvasLayer != null)
                 {
                     canvasLayer.AddChild(newRitualUI);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Toggle weekly challenge UI
+        /// </summary>
+        private void ToggleWeeklyChallengeUI()
+        {
+            var challengeUI = GetNodeOrNull<WeeklyChallengeUI>("CanvasLayer/WeeklyChallengeUI");
+            if (challengeUI != null)
+            {
+                challengeUI.QueueFree();
+            }
+            else
+            {
+                var newChallengeUI = new WeeklyChallengeUI();
+                newChallengeUI.Name = "WeeklyChallengeUI";
+                var canvasLayer = GetNodeOrNull("CanvasLayer");
+                if (canvasLayer != null)
+                {
+                    canvasLayer.AddChild(newChallengeUI);
                 }
             }
         }

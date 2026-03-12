@@ -75,6 +75,7 @@ namespace ClawRPG.Systems {
             AddKeybinding("world_events", Key.W, "世界事件");
             AddKeybinding("bounty", Key.B, "赏金任务");
             AddKeybinding("daily_challenge", Key.J, "每日挑战");
+            AddKeybinding("weekly_challenge", Key.Shift + Key.W, "每周挑战");
             AddKeybinding("bookmarks", Key.N, "收藏点");
             AddKeybinding("settings", Key.F10, "设置");
             AddKeybinding("hotkey_help", Key.H, "快捷键帮助");
