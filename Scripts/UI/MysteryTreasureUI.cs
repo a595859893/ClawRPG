@@ -85,7 +85,7 @@ public class MysteryTreasureUI : Control
 
         // 标签页容器
         _tabContainer = new TabContainer();
-        _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags VERTICAL);
+        _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.VERTICAL);
         _mainVBox.AddChild(_tabContainer);
 
         // ===== 统计标签页 =====
@@ -117,7 +117,7 @@ public class MysteryTreasureUI : Control
         _tabContainer.AddChild(_activeTab);
 
         _activeScroll = new ScrollContainer();
-        _activeScroll.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags VERTICAL);
+        _activeScroll.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.VERTICAL);
         _activeTab.AddChild(_activeScroll);
 
         _activeList = new VBoxContainer();
@@ -130,7 +130,7 @@ public class MysteryTreasureUI : Control
         _tabContainer.AddChild(_historyTab);
 
         _historyScroll = new ScrollContainer();
-        _historyScroll.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags VERTICAL);
+        _historyScroll.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.VERTICAL);
         _historyTab.AddChild(_historyScroll);
 
         _historyList = new VBoxContainer();

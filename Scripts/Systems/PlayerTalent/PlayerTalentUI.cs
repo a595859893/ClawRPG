@@ -4,8 +4,8 @@ using Godot;
 
 public class PlayerTalentUI : Control
 {
-    private Control;
-    private VBoxContainer _tree _panelContainer;
+    private Control _mainContainer;
+    private VBoxContainer _treePanelContainer;
     private Label _pointsLabel;
     private Label _treeTitleLabel;
     private Label _talentNameLabel;

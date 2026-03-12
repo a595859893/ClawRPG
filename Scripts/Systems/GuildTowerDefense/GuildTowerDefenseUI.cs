@@ -91,7 +91,6 @@ public class GuildTowerDefenseUI : Control
         SetupDefenseTab();
         SetupowersTab();
         SetupStatsTab();
-T        
         // Close button
         var closeBtn = new Button
         {
