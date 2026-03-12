@@ -418,6 +418,11 @@ namespace ClawRPG.Scripts {
             var mountEvolutionSystem = MountEvolutionSystem.Instance;
             mountEvolutionSystem.Initialize();
 
+            // Initialize mount weather bonus system
+            var mountWeatherBonusSystem = new Systems.MountWeatherBonusSystem();
+            mountWeatherBonusSystem.Name = "MountWeatherBonusSystem";
+            AddChild(mountWeatherBonusSystem);
+
             // Initialize random world event system
             var worldEventSystem = new Systems.RandomWorldEventSystem();
             worldEventSystem.Name = "RandomWorldEventSystem";
@@ -1024,6 +1029,12 @@ namespace ClawRPG.Scripts {
             mountBattleArenaUI.Hide();
             ui.AddChild(mountBattleArenaUI);
 
+            // Mount Weather Bonus UI
+            var mountWeatherBonusUI = new UI.MountWeatherBonusUI();
+            mountWeatherBonusUI.Name = "MountWeatherBonusUI";
+            mountWeatherBonusUI.Hide();
+            ui.AddChild(mountWeatherBonusUI);
+
             // Guild UI
             var guildUI = new GuildUI();
             guildUI.Name = "GuildUI";
@@ -1576,6 +1587,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_mount_arena"))
             {
                 ToggleMountBattleArenaUI();
+            }
+
+            // Handle mount weather bonus UI toggle (Ctrl+Shift+W key)
+            if (Input.IsKeyPressed(Key.W) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleMountWeatherBonusUI();
             }
 
             // Handle auto potion UI toggle (Shift+X key)
@@ -3028,6 +3045,22 @@ namespace ClawRPG.Scripts {
             if (arenaUI != null)
             {
                 arenaUI.Toggle();
+            }
+        }
+
+        private void ToggleMountWeatherBonusUI()
+        {
+            var weatherUI = GetNodeOrNull<UI.MountWeatherBonusUI>("CanvasLayer/MountWeatherBonusUI");
+            if (weatherUI != null)
+            {
+                if (weatherUI.Visible)
+                {
+                    weatherUI.Hide();
+                }
+                else
+                {
+                    weatherUI.ShowUI();
+                }
             }
         }
 
