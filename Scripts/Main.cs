@@ -924,6 +924,12 @@ namespace ClawRPG.Scripts {
             tradeRouteUI.Name = "TradeRouteUI";
             ui.AddChild(tradeRouteUI);
 
+            // Market Trend UI
+            var marketTrendUI = new MarketTrendUI();
+            marketTrendUI.Name = "MarketTrendUI";
+            marketTrendUI.Visible = false;
+            ui.AddChild(marketTrendUI);
+
             // Quick Slot UI
             var quickSlotUI = new UI.QuickSlotUI();
             quickSlotUI.Name = "QuickSlotUI";
@@ -1702,6 +1708,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.Y) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleTradeRouteUI();
+            }
+
+            // Handle market trend UI toggle (Ctrl+M key)
+            if (Input.IsKeyPressed(Key.M) && Input.IsKeyPressed(Key.Ctrl))
+            {
+                ToggleMarketTrendUI();
             }
 
             // Handle weather UI toggle (Ctrl+W key)
@@ -3439,6 +3451,15 @@ namespace ClawRPG.Scripts {
             if (tradeRouteUI != null)
             {
                 tradeRouteUI.ToggleVisibility();
+            }
+        }
+
+        private void ToggleMarketTrendUI()
+        {
+            var marketTrendUI = GetNodeOrNull<MarketTrendUI>("UI/MarketTrendUI");
+            if (marketTrendUI != null)
+            {
+                marketTrendUI.Visible = !marketTrendUI.Visible;
             }
         }
 
