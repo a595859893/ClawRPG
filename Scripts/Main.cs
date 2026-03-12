@@ -149,6 +149,16 @@ namespace ClawRPG.Scripts {
             enchantmentDb.Name = "EnchantmentDatabase";
             AddChild(enchantmentDb);
 
+            // Initialize mount training system
+            var mountTrainingSystem = new MountTrainingSystem();
+            mountTrainingSystem.Name = "MountTrainingSystem";
+            AddChild(mountTrainingSystem);
+
+            // Initialize mount training database
+            var mountTrainingDb = new MountTrainingDatabase();
+            mountTrainingDb.Name = "MountTrainingDatabase";
+            AddChild(mountTrainingDb);
+
             // Connect counter attack system signals to sound effects
             counterAttackSystem.Connect(CounterAttackSystem.SignalName.CounterAttackPerformed,
                 this, nameof(_OnCounterAttackPerformed));
@@ -816,6 +826,11 @@ namespace ClawRPG.Scripts {
             var enchantmentUI = new EnchantmentUI();
             enchantmentUI.Name = "EnchantmentUI";
             ui.AddChild(enchantmentUI);
+
+            // Mount Training UI
+            var mountTrainingUI = new MountTrainingUI();
+            mountTrainingUI.Name = "MountTrainingUI";
+            ui.AddChild(mountTrainingUI);
 
             // Dynamic screen effect (for vignette, damage overlays, combo pulses)
             var dynamicScreenEffect = new DynamicScreenEffect();
@@ -1550,6 +1565,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("mounts"))
             {
                 ToggleMountUI();
+            }
+
+            // Handle mount training UI toggle (Ctrl+T key)
+            if (Input.IsKeyPressed(Key.T) && Input.IsKeyPressed(Key.Ctrl))
+            {
+                ToggleMountTrainingUI();
             }
 
             // Handle skill cooldown UI toggle (K key)
@@ -2506,6 +2527,18 @@ namespace ClawRPG.Scripts {
             if (mountEquipmentUI != null)
             {
                 mountEquipmentUI.ToggleUI();
+            }
+        }
+
+        /// <summary>
+        /// Toggle mount training UI
+        /// </summary>
+        private void ToggleMountTrainingUI()
+        {
+            var mountTrainingUI = GetNodeOrNull<Systems.MountTrainingUI>("UI/MountTrainingUI");
+            if (mountTrainingUI != null)
+            {
+                mountTrainingUI.Toggle();
             }
         }
 
