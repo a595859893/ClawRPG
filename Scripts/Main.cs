@@ -2267,6 +2267,12 @@ namespace ClawRPG.Scripts {
             {
                 ToggleWorldBossUI();
             }
+            
+            // Handle contract bounty UI toggle (Ctrl+C)
+            if (Input.IsActionJustPressed("contract_bounty_toggle"))
+            {
+                ToggleContractBountyUI();
+            }
         }
 
         private void ToggleRunesUI()
@@ -3907,6 +3913,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(worldBossUI);
                 }
                 worldBossUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换委托赏金界面
+        /// </summary>
+        private void ToggleContractBountyUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var contractBountyUI = ui.GetNodeOrNull<Systems.ContractBounty.ContractBountyUI>("ContractBountyUI");
+            if (contractBountyUI != null && contractBountyUI.Visible)
+            {
+                contractBountyUI.Hide();
+            }
+            else
+            {
+                if (contractBountyUI == null)
+                {
+                    contractBountyUI = new Systems.ContractBounty.ContractBountyUI();
+                    contractBountyUI.Name = "ContractBountyUI";
+                    ui.AddChild(contractBountyUI);
+                }
+                contractBountyUI.Show();
             }
         }
 
