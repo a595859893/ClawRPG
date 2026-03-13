@@ -9,6 +9,7 @@ using ClawRPG.Scripts.Systems.PetFusion;
 using ClawRPG.Scripts.Systems.Enhancement;
 using ClawRPG.Scripts.Systems.ArtifactFusion;
 using ClawRPG.Scripts.Systems.EnemyWeakness;
+using ClawRPG.Scripts.Systems.DailyLoginBonus;
 using ClawRPG.Scripts.UI;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Quests;
@@ -522,6 +523,11 @@ namespace ClawRPG.Scripts {
             var bossRushSystem = new BossRushSystem();
             bossRushSystem.Name = "BossRushSystem";
             AddChild(bossRushSystem);
+
+            // Initialize daily login bonus system
+            var dailyLoginBonusSystem = new DailyLoginBonusSystem();
+            dailyLoginBonusSystem.Name = "DailyLoginBonusSystem";
+            AddChild(dailyLoginBonusSystem);
 
             // Initialize game settings system
             var gameSettings = new GameSettings();
@@ -2754,6 +2760,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("boss_rush_toggle"))
             {
                 ToggleBossRushUI();
+            }
+
+            // Handle daily login bonus UI toggle (L key)
+            if (Input.IsKeyPressed(Key.L) && !Input.IsKeyPressed(Key.Control))
+            {
+                ToggleDailyLoginBonusUI();
             }
 
             // Handle enemy weakness UI toggle (Ctrl+W)
@@ -5201,6 +5213,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(bossRushUI);
                 }
                 bossRushUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换每日登录奖励界面
+        /// </summary>
+        private void ToggleDailyLoginBonusUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var bonusUI = ui.GetNodeOrNull<Systems.DailyLoginBonus.DailyLoginBonusUI>("DailyLoginBonusUI");
+            if (bonusUI != null && bonusUI.Visible)
+            {
+                bonusUI.Hide();
+            }
+            else
+            {
+                if (bonusUI == null)
+                {
+                    bonusUI = new Systems.DailyLoginBonus.DailyLoginBonusUI();
+                    bonusUI.Name = "DailyLoginBonusUI";
+                    ui.AddChild(bonusUI);
+                }
+                bonusUI.Show();
             }
         }
 
