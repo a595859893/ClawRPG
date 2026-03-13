@@ -2431,6 +2431,12 @@ namespace ClawRPG.Scripts {
                 TogglePetFriendshipUI();
             }
 
+            // Handle pet genetics UI toggle (G key)
+            if (Input.IsActionJustPressed("ui_pet_genetics"))
+            {
+                TogglePetGeneticsUI();
+            }
+
             // Handle daily dungeon UI toggle (D key)
             if (Input.IsActionJustPressed("ui_daily_dungeon"))
             {
@@ -3386,6 +3392,31 @@ namespace ClawRPG.Scripts {
                 {
                     petFriendshipUI.Show();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet genetics UI
+        /// </summary>
+        private void TogglePetGeneticsUI()
+        {
+            var petGeneticsUI = GetNodeOrNull<PetGeneticsUI>("UI/PetGeneticsUI");
+            if (petGeneticsUI != null)
+            {
+                if (petGeneticsUI.Visible)
+                {
+                    petGeneticsUI.Hide();
+                }
+                else
+                {
+                    petGeneticsUI.Show();
+                }
+            }
+            else
+            {
+                var newUI = new PetGeneticsUI();
+                newUI.Name = "PetGeneticsUI";
+                GetNode("UI").AddChild(newUI);
             }
         }
 
