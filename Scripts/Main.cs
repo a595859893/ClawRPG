@@ -546,6 +546,15 @@ namespace ClawRPG.Scripts {
             guildWarLeagueSystem.Name = "GuildWarLeagueSystem";
             AddChild(guildWarLeagueSystem);
 
+            // Initialize guild hall system
+            var guildHallDatabase = new Systems.GuildHall.GuildHallDatabase();
+            guildHallDatabase.Name = "GuildHallDatabase";
+            AddChild(guildHallDatabase);
+
+            var guildHallSystem = new Systems.GuildHall.GuildHallSystem();
+            guildHallSystem.Name = "GuildHallSystem";
+            AddChild(guildHallSystem);
+
             // Initialize collectible system
             CollectibleSystem.Instance.Initialize();
 
@@ -2180,6 +2189,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_guild_war_league"))
             {
                 ToggleGuildWarLeagueUI();
+            }
+
+            // Handle guild hall UI toggle (H key with Ctrl)
+            if (Input.IsKeyPressed(Key.H) && Input.IsKeyPressed(Key.Ctrl))
+            {
+                ToggleGuildHallUI();
             }
 
             // Handle trade UI toggle (T key)
@@ -4218,6 +4233,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(guildWarLeagueUI);
                 }
                 guildWarLeagueUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// Toggle Guild Hall UI
+        /// </summary>
+        private void ToggleGuildHallUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var guildHallUI = ui.GetNodeOrNull<Systems.GuildHall.GuildHallUI>("GuildHallUI");
+            if (guildHallUI != null && guildHallUI.Visible)
+            {
+                guildHallUI.Hide();
+            }
+            else
+            {
+                if (guildHallUI == null)
+                {
+                    guildHallUI = new Systems.GuildHall.GuildHallUI();
+                    guildHallUI.Name = "GuildHallUI";
+                    ui.AddChild(guildHallUI);
+                }
+                guildHallUI.Show();
             }
         }
 
