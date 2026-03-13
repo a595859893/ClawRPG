@@ -2488,6 +2488,12 @@ namespace ClawRPG.Scripts {
                 ToggleArenaColosseumUI();
             }
 
+            // Handle tutorial UI toggle (F1)
+            if (Input.IsActionJustPressed("ui_tutorial"))
+            {
+                ToggleTutorialUI();
+            }
+
             // Handle party UI toggle (Ctrl+P)
             if (Input.IsActionJustPressed("ui_party"))
             {
@@ -4995,6 +5001,15 @@ namespace ClawRPG.Scripts {
             var arenaColosseumUI = new ArenaColosseumUI();
             arenaColosseumUI.Name = "ArenaColosseumUI";
             ui.AddChild(arenaColosseumUI);
+
+            // Initialize tutorial system
+            var tutorialSystem = new TutorialSystem();
+            tutorialSystem.Name = "TutorialSystem";
+            AddChild(tutorialSystem);
+
+            var tutorialUI = new TutorialUI();
+            tutorialUI.Name = "TutorialUI";
+            ui.AddChild(tutorialUI);
         }
 
         /// <summary>
@@ -5063,6 +5078,18 @@ namespace ClawRPG.Scripts {
             if (colosseumUI != null)
             {
                 colosseumUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// 切换游戏教程界面
+        /// </summary>
+        private void ToggleTutorialUI()
+        {
+            var tutorialUI = GetNodeOrNull<TutorialUI>("TutorialUI");
+            if (tutorialUI != null)
+            {
+                tutorialUI.ToggleTutorialUI();
             }
         }
 
