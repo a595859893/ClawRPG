@@ -2071,6 +2071,12 @@ namespace ClawRPG.Scripts {
                 ToggleStyleMasteryUI();
             }
 
+            // Handle random name UI toggle (N key)
+            if (Input.IsActionJustPressed("random_name_toggle"))
+            {
+                ToggleRandomNameUI();
+            }
+
             // Handle bounty UI toggle (B key)
             if (Input.IsActionJustPressed("bounty"))
             {
@@ -4781,6 +4787,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(styleMasteryUI);
                 }
                 styleMasteryUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换随机名字生成器界面
+        /// </summary>
+        private void ToggleRandomNameUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var randomNameUI = ui.GetNodeOrNull<RandomNameUI>("RandomNameUI");
+            if (randomNameUI != null && randomNameUI.Visible)
+            {
+                randomNameUI.Hide();
+            }
+            else
+            {
+                if (randomNameUI == null)
+                {
+                    randomNameUI = new RandomNameUI();
+                    randomNameUI.Name = "RandomNameUI";
+                    ui.AddChild(randomNameUI);
+                }
+                randomNameUI.Show();
             }
         }
 
