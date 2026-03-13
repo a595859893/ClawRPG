@@ -245,12 +245,111 @@ public class PetBreedingSystem : Node
 
     private void LoadData()
     {
-        // TODO: Implement load from file
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) return;
+
+        // Load unlocked breeds
+        if (data.Contains("pet_breeding_unlocked"))
+        {
+            var unlockedArray = (Godot.Array)data["pet_breeding_unlocked"];
+            foreach (string key in unlockedArray)
+            {
+                _data.UnlockedBreeds[key] = true;
+            }
+        }
+
+        // Load breeding history
+        if (data.Contains("pet_breeding_history"))
+        {
+            var historyArray = (Godot.Array)data["pet_breeding_history"];
+            foreach (Dictionary historyData in historyArray)
+            {
+                var record = new PetBreedingRecord
+                {
+                    Parent1Id = (string)historyData["parent1"],
+                    Parent2Id = (string)historyData["parent2"],
+                    OffspringId = (string)historyData["offspring_id"],
+                    OffspringType = (string)historyData["offspring_type"],
+                    Rarity = (int)historyData["rarity"],
+                    BreedingTime = DateTime.Parse((string)historyData["time"]),
+                    WasSuccessful = (bool)historyData["success"]
+                };
+                _data.BreedingHistory.Add(record);
+            }
+        }
+
+        // Load stats
+        if (data.Contains("pet_breeding_stats"))
+        {
+            var stats = (Godot.Dictionary)data["pet_breeding_stats"];
+            _data.TotalBreeds = (int)stats.Get("total_breeds", 0);
+            _data.SuccessfulBreeds = (int)stats.Get("successful_breeds", 0);
+            _data.LegendaryBreeds = (int)stats.Get("legendary_breeds", 0);
+        }
+
+        // Load offspring stats
+        if (data.Contains("pet_breeding_offspring"))
+        {
+            var offspringData = (Godot.Dictionary)data["pet_breeding_offspring"];
+            foreach (string key in offspringData.Keys)
+            {
+                _data.OffspringStats[key] = (int)offspringData[key];
+            }
+        }
     }
 
     private void SaveData()
     {
-        // TODO: Implement save to file
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) data = new Godot.Dictionary();
+
+        // Save unlocked breeds
+        var unlockedArray = new Godot.Array();
+        foreach (var key in _data.UnlockedBreeds.Keys)
+        {
+            unlockedArray.Add(key);
+        }
+        data["pet_breeding_unlocked"] = unlockedArray;
+
+        // Save breeding history (limit to last 50)
+        var historyArray = new Godot.Array();
+        var recentHistory = _data.BreedingHistory.TakeLast(50).ToList();
+        foreach (var record in recentHistory)
+        {
+            var historyData = new Godot.Dictionary();
+            historyData["parent1"] = record.Parent1Id;
+            historyData["parent2"] = record.Parent2Id;
+            historyData["offspring_id"] = record.OffspringId;
+            historyData["offspring_type"] = record.OffspringType;
+            historyData["rarity"] = record.Rarity;
+            historyData["time"] = record.BreedingTime.ToString("o");
+            historyData["success"] = record.WasSuccessful;
+            historyArray.Add(historyData);
+        }
+        data["pet_breeding_history"] = historyArray;
+
+        // Save stats
+        var stats = new Godot.Dictionary();
+        stats["total_breeds"] = _data.TotalBreeds;
+        stats["successful_breeds"] = _data.SuccessfulBreeds;
+        stats["legendary_breeds"] = _data.LegendaryBreeds;
+        data["pet_breeding_stats"] = stats;
+
+        // Save offspring stats
+        var offspringData = new Godot.Dictionary();
+        foreach (var kvp in _data.OffspringStats)
+        {
+            offspringData[kvp.Key] = kvp.Value;
+        }
+        data["pet_breeding_offspring"] = offspringData;
+
+        saveSystem.SaveGame(data);
     }
 
     public void DebugReset()

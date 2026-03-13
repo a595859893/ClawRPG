@@ -29,12 +29,91 @@ namespace ClawRPG.Scripts.Systems
         
         private void LoadData()
         {
-            // TODO: Implement save to file
+            var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+            if (saveSystem == null) return;
+
+            var data = saveSystem.LoadGame();
+            if (data == null) return;
+
+            // Load unlocked traits
+            if (data.Contains("pet_trait_unlocked"))
+            {
+                var unlockedArray = (Godot.Array)data["pet_trait_unlocked"];
+                foreach (string traitId in unlockedArray)
+                {
+                    _data.UnlockedTraits[traitId] = true;
+                }
+            }
+
+            // Load trait levels
+            if (data.Contains("pet_trait_levels"))
+            {
+                var levelsData = (Godot.Dictionary)data["pet_trait_levels"];
+                foreach (string key in levelsData.Keys)
+                {
+                    _data.TraitLevels[key] = (int)levelsData[key];
+                }
+            }
+
+            // Load active traits
+            if (data.Contains("pet_trait_active"))
+            {
+                var activeArray = (Godot.Array)data["pet_trait_active"];
+                foreach (string traitId in activeArray)
+                {
+                    if (!_data.ActiveTraits.Contains(traitId))
+                        _data.ActiveTraits.Add(traitId);
+                }
+            }
+
+            // Load stats
+            if (data.Contains("pet_trait_stats"))
+            {
+                var stats = (Godot.Dictionary)data["pet_trait_stats"];
+                _totalTraitsUnlocked = (int)stats.Get("unlocked", 0);
+                _totalTraitsActivated = (int)stats.Get("activated", 0);
+            }
         }
         
         private void SaveData()
         {
-            // TODO: Implement load from file
+            var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+            if (saveSystem == null) return;
+
+            var data = saveSystem.LoadGame();
+            if (data == null) data = new Godot.Dictionary();
+
+            // Save unlocked traits
+            var unlockedArray = new Godot.Array();
+            foreach (var key in _data.UnlockedTraits.Keys)
+            {
+                unlockedArray.Add(key);
+            }
+            data["pet_trait_unlocked"] = unlockedArray;
+
+            // Save trait levels
+            var levelsData = new Godot.Dictionary();
+            foreach (var kvp in _data.TraitLevels)
+            {
+                levelsData[kvp.Key] = kvp.Value;
+            }
+            data["pet_trait_levels"] = levelsData;
+
+            // Save active traits
+            var activeArray = new Godot.Array();
+            foreach (var traitId in _data.ActiveTraits)
+            {
+                activeArray.Add(traitId);
+            }
+            data["pet_trait_active"] = activeArray;
+
+            // Save stats
+            var stats = new Godot.Dictionary();
+            stats["unlocked"] = _totalTraitsUnlocked;
+            stats["activated"] = _totalTraitsActivated;
+            data["pet_trait_stats"] = stats;
+
+            saveSystem.SaveGame(data);
         }
         
         public void ResetData()

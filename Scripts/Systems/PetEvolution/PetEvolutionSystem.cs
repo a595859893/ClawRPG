@@ -316,13 +316,116 @@ public class PetEvolutionSystem
     // Save data
     public void SaveData()
     {
-        // TODO: Implement save to file
+        var saveSystem = SaveSystem.Instance;
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) data = new Godot.Dictionary();
+
+        // Save evolved pets
+        var evolvedPetsArray = new Godot.Array();
+        foreach (var kvp in _data.EvolvedPets)
+        {
+            var petData = new Godot.Dictionary();
+            petData["pet_id"] = kvp.Key;
+            petData["current_form"] = kvp.Value.CurrentForm;
+            petData["target_form"] = kvp.Value.TargetForm;
+            petData["evolution_points"] = kvp.Value.EvolutionPoints;
+            petData["required_points"] = kvp.Value.RequiredPoints;
+            petData["is_evolved"] = kvp.Value.IsEvolved;
+            if (kvp.Value.LastEvolutionTime != default(DateTime))
+                petData["last_evolution"] = kvp.Value.LastEvolutionTime.ToString("o");
+            evolvedPetsArray.Add(petData);
+        }
+        data["pet_evolution_pets"] = evolvedPetsArray;
+
+        // Save evolution history (limit to last 50)
+        var historyArray = new Godot.Array();
+        var recentHistory = _data.EvolutionHistory.TakeLast(50).ToList();
+        foreach (var entry in recentHistory)
+        {
+            var historyData = new Godot.Dictionary();
+            historyData["pet_id"] = entry.PetId;
+            historyData["original_form"] = entry.OriginalForm;
+            historyData["new_form"] = entry.NewForm;
+            historyData["evolution_type"] = entry.EvolutionType;
+            historyData["time"] = entry.EvolutionTime.ToString("o");
+            historyData["points_used"] = entry.PointsUsed;
+            historyArray.Add(historyData);
+        }
+        data["pet_evolution_history"] = historyArray;
+
+        // Save stats
+        var stats = new Godot.Dictionary();
+        stats["total_evolutions"] = _data.TotalEvolutions;
+        stats["legendary_evolutions"] = _data.LegendaryEvolutions;
+        stats["epic_evolutions"] = _data.EpicEvolutions;
+        stats["rare_evolutions"] = _data.RareEvolutions;
+        stats["total_points"] = _data.TotalEvolutionPoints;
+        data["pet_evolution_stats"] = stats;
+
+        saveSystem.SaveGame(data);
     }
 
     // Load data
     public void LoadData()
     {
-        // TODO: Implement load from file
+        var saveSystem = SaveSystem.Instance;
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) return;
+
+        // Load evolved pets
+        if (data.Contains("pet_evolution_pets"))
+        {
+            var petsArray = (Godot.Array)data["pet_evolution_pets"];
+            foreach (Dictionary petData in petsArray)
+            {
+                var record = new PetEvolutionRecord
+                {
+                    PetId = (int)petData["pet_id"],
+                    CurrentForm = (string)petData["current_form"],
+                    TargetForm = (string)petData["target_form"],
+                    EvolutionPoints = (int)petData["evolution_points"],
+                    RequiredPoints = (int)petData["required_points"],
+                    IsEvolved = (bool)petData["is_evolved"]
+                };
+                if (petData.Contains("last_evolution"))
+                    record.LastEvolutionTime = DateTime.Parse((string)petData["last_evolution"]);
+                _data.EvolvedPets[record.PetId] = record;
+            }
+        }
+
+        // Load evolution history
+        if (data.Contains("pet_evolution_history"))
+        {
+            var historyArray = (Godot.Array)data["pet_evolution_history"];
+            foreach (Dictionary historyData in historyArray)
+            {
+                var entry = new EvolutionHistoryEntry
+                {
+                    PetId = (int)historyData["pet_id"],
+                    OriginalForm = (string)historyData["original_form"],
+                    NewForm = (string)historyData["new_form"],
+                    EvolutionType = (string)historyData["evolution_type"],
+                    EvolutionTime = DateTime.Parse((string)historyData["time"]),
+                    PointsUsed = (int)historyData["points_used"]
+                };
+                _data.EvolutionHistory.Add(entry);
+            }
+        }
+
+        // Load stats
+        if (data.Contains("pet_evolution_stats"))
+        {
+            var stats = (Godot.Dictionary)data["pet_evolution_stats"];
+            _data.TotalEvolutions = (int)stats.Get("total_evolutions", 0);
+            _data.LegendaryEvolutions = (int)stats.Get("legendary_evolutions", 0);
+            _data.EpicEvolutions = (int)stats.Get("epic_evolutions", 0);
+            _data.RareEvolutions = (int)stats.Get("rare_evolutions", 0);
+            _data.TotalEvolutionPoints = (int)stats.Get("total_points", 0);
+        }
     }
 }
 

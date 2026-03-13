@@ -331,7 +331,43 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         private void SaveData()
         {
-            // TODO: Implement save to file
+            var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+            if (saveSystem == null) return;
+
+            var data = saveSystem.LoadGame();
+            if (data == null) data = new Godot.Dictionary();
+
+            // Save pet emotions
+            var emotionsArray = new Godot.Array();
+            foreach (var kvp in _petEmotions)
+            {
+                var emotionData = new Godot.Dictionary();
+                emotionData["pet_id"] = kvp.Key;
+                emotionData["dominant_emotion"] = (int)kvp.Value.DominantEmotion;
+                emotionData["intensity"] = (int)kvp.Value.CurrentIntensity;
+                emotionData["total_changes"] = kvp.Value.TotalEmotionChanges;
+                if (kvp.Value.LastEmotionChange != default(DateTime))
+                    emotionData["last_change"] = kvp.Value.LastEmotionChange.ToString("o");
+                
+                // Save emotion values
+                var emotionValues = new Godot.Dictionary();
+                foreach (var emotionKvp in kvp.Value.CurrentEmotions)
+                {
+                    emotionValues[(int)emotionKvp.Key] = emotionKvp.Value;
+                }
+                emotionData["emotion_values"] = emotionValues;
+                
+                emotionsArray.Add(emotionData);
+            }
+            data["pet_emotions"] = emotionsArray;
+
+            // Save stats
+            var stats = new Godot.Dictionary();
+            stats["total_changes"] = TotalEmotionChanges;
+            stats["dominant_counts"] = DominantEmotionCounts;
+            data["pet_emotion_stats"] = stats;
+
+            saveSystem.SaveGame(data);
         }
 
         /// <summary>
@@ -339,7 +375,51 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         private void LoadData()
         {
-            // TODO: Implement load from file
+            var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+            if (saveSystem == null) return;
+
+            var data = saveSystem.LoadGame();
+            if (data == null) return;
+
+            // Load pet emotions
+            if (data.Contains("pet_emotions"))
+            {
+                var emotionsArray = (Godot.Array)data["pet_emotions"];
+                foreach (Dictionary emotionData in emotionsArray)
+                {
+                    string petId = (string)emotionData["pet_id"];
+                    var petData = new Data.PetEmotionData
+                    {
+                        PetId = petId,
+                        DominantEmotion = (Data.PetEmotionData.EmotionType)(int)emotionData["dominant_emotion"],
+                        CurrentIntensity = (Data.PetEmotionData.EmotionIntensity)(int)emotionData["intensity"],
+                        TotalEmotionChanges = (int)emotionData["total_changes"]
+                    };
+                    
+                    if (emotionData.Contains("last_change"))
+                        petData.LastEmotionChange = DateTime.Parse((string)emotionData["last_change"]);
+                    
+                    // Load emotion values
+                    if (emotionData.Contains("emotion_values"))
+                    {
+                        var emotionValues = (Godot.Dictionary)emotionData["emotion_values"];
+                        foreach (var key in emotionValues.Keys)
+                        {
+                            petData.CurrentEmotions[(Data.PetEmotionData.EmotionType)(int)key] = (float)emotionValues[key];
+                        }
+                    }
+                    
+                    _petEmotions[petId] = petData;
+                }
+            }
+
+            // Load stats
+            if (data.Contains("pet_emotion_stats"))
+            {
+                var stats = (Godot.Dictionary)data["pet_emotion_stats"];
+                TotalEmotionChanges = (int)stats.Get("total_changes", 0);
+                DominantEmotionCounts = (int)stats.Get("dominant_counts", 0);
+            }
         }
 
         /// <summary>
