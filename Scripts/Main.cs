@@ -267,6 +267,19 @@ namespace ClawRPG.Scripts {
             constellationSystem.Name = "ConstellationSystem";
             AddChild(constellationSystem);
 
+            // Initialize procedural story generation system
+            var proceduralStoryData = new ProceduralStoryData();
+            proceduralStoryData.Name = "ProceduralStoryData";
+            AddChild(proceduralStoryData);
+
+            var proceduralStoryDatabase = new ProceduralStoryDatabase();
+            proceduralStoryDatabase.Name = "ProceduralStoryDatabase";
+            AddChild(proceduralStoryDatabase);
+
+            var proceduralStorySystem = new ProceduralStorySystem();
+            proceduralStorySystem.Name = "ProceduralStorySystem";
+            AddChild(proceduralStorySystem);
+
             // Initialize AOE indicator system
             var aoeIndicatorManager = new Systems.AOEIndicatorManager();
             aoeIndicatorManager.Name = "AOEIndicatorManager";
@@ -994,6 +1007,12 @@ namespace ClawRPG.Scripts {
             marketTrendUI.Name = "MarketTrendUI";
             marketTrendUI.Visible = false;
             ui.AddChild(marketTrendUI);
+
+            // Procedural Story UI
+            var proceduralStoryUI = new ProceduralStoryUI();
+            proceduralStoryUI.Name = "ProceduralStoryUI";
+            proceduralStoryUI.Visible = false;
+            ui.AddChild(proceduralStoryUI);
 
             // Quick Slot UI
             var quickSlotUI = new UI.QuickSlotUI();
@@ -1761,6 +1780,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.K))
             {
                 ToggleConstellationUI();
+            }
+
+            // Handle procedural story UI toggle (Ctrl+Shift+S key)
+            if (Input.IsKeyPressed(Key.S) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleProceduralStoryUI();
             }
 
             // Handle momentum UI toggle (M key)
@@ -2629,6 +2654,28 @@ namespace ClawRPG.Scripts {
             var constellationUI = new ConstellationUI();
             constellationUI.Name = "ConstellationUI";
             canvasLayer.AddChild(constellationUI);
+        }
+
+        private void ToggleProceduralStoryUI()
+        {
+            var existingUI = GetNodeOrNull<ProceduralStoryUI>("CanvasLayer/ProceduralStoryUI");
+            if (existingUI != null)
+            {
+                existingUI.QueueFree();
+                return;
+            }
+            
+            var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+            if (canvasLayer == null)
+            {
+                canvasLayer = new CanvasLayer();
+                canvasLayer.Name = "CanvasLayer";
+                AddChild(canvasLayer);
+            }
+            
+            var proceduralStoryUI = new ProceduralStoryUI();
+            proceduralStoryUI.Name = "ProceduralStoryUI";
+            canvasLayer.AddChild(proceduralStoryUI);
         }
 
         private void ToggleMomentumUI()
