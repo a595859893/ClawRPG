@@ -1981,6 +1981,12 @@ namespace ClawRPG.Scripts {
                 ToggleMilestoneUI();
             }
 
+            // Handle game guide UI toggle (G key)
+            if (Input.IsActionJustPressed("game_guide_toggle"))
+            {
+                ToggleGameGuideUI();
+            }
+
             // Handle streak UI toggle (Alt+S key)
             if (Input.IsKeyPressed(Key.S) && Input.IsKeyPressed(Key.Alt) && !Input.IsKeyPressed(Key.Ctrl) && !Input.IsKeyPressed(Key.Shift))
             {
@@ -4845,6 +4851,31 @@ namespace ClawRPG.Scripts {
             var milestoneUI = new Systems.Milestone.MilestoneUI();
             milestoneUI.Name = "MilestoneUI";
             canvasLayer.AddChild(milestoneUI);
+        }
+
+        /// <summary>
+        /// 切换游戏指南界面
+        /// </summary>
+        private void ToggleGameGuideUI()
+        {
+            var existingUI = GetNodeOrNull<Systems.GameGuide.GameGuideUI>("CanvasLayer/GameGuideUI");
+            if (existingUI != null)
+            {
+                existingUI.QueueFree();
+                return;
+            }
+            
+            var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+            if (canvasLayer == null)
+            {
+                canvasLayer = new CanvasLayer();
+                canvasLayer.Name = "CanvasLayer";
+                AddChild(canvasLayer);
+            }
+            
+            var gameGuideUI = new Systems.GameGuide.GameGuideUI();
+            gameGuideUI.Name = "GameGuideUI";
+            canvasLayer.AddChild(gameGuideUI);
         }
 
         /// <summary>
