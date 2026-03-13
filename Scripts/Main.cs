@@ -2744,6 +2744,12 @@ namespace ClawRPG.Scripts {
             {
                 ToggleMultiplayerLobbyUI();
             }
+
+            // Handle arena colosseum UI toggle (K key)
+            if (Input.IsKeyPressed(Key.K))
+            {
+                ToggleArenaColosseumUI();
+            }
             
             // Handle contract bounty UI toggle (Ctrl+C)
             if (Input.IsActionJustPressed("contract_bounty_toggle"))
@@ -4949,6 +4955,15 @@ namespace ClawRPG.Scripts {
             proceduralWeaponUI.Name = "ProceduralWeaponUI";
             proceduralWeaponUI.Initialize(proceduralWeaponSystem, proceduralWeaponData, proceduralWeaponDatabase);
             ui.AddChild(proceduralWeaponUI);
+
+            // Initialize arena colosseum system (existing system)
+            var arenaColosseumSystem = ArenaColosseumSystem.Instance;
+            arenaColosseumSystem.Name = "ArenaColosseumSystem";
+            AddChild(arenaColosseumSystem);
+
+            var arenaColosseumUI = new ArenaColosseumUI();
+            arenaColosseumUI.Name = "ArenaColosseumUI";
+            ui.AddChild(arenaColosseumUI);
         }
 
         /// <summary>
@@ -5005,6 +5020,18 @@ namespace ClawRPG.Scripts {
                 {
                     chatUI.Show();
                 }
+            }
+        }
+
+        /// <summary>
+        /// 切换竞技场角斗界面
+        /// </summary>
+        private void ToggleArenaColosseumUI()
+        {
+            var colosseumUI = GetNodeOrNull<ArenaColosseumUI>("ArenaColosseumUI");
+            if (colosseumUI != null)
+            {
+                colosseumUI.Toggle();
             }
         }
 
