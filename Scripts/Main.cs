@@ -15,6 +15,7 @@ using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Quests;
 using ClawRPG.Scripts.Achievements;
 using ClawRPG.Scripts.Combat;
+using ClawRPG.Scripts.Systems.TitleCollection;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -76,6 +77,11 @@ namespace ClawRPG.Scripts {
             var titleSystem = new TitleSystem();
             titleSystem.Name = "TitleSystem";
             AddChild(titleSystem);
+
+            // Initialize title collection system
+            var titleCollectionSystem = new TitleCollectionSystem();
+            titleCollectionSystem.Name = "TitleCollectionSystem";
+            AddChild(titleCollectionSystem);
 
             // Initialize pet combat AI
             var petCombatAI = new PetCombatAI();
@@ -2014,6 +2020,12 @@ namespace ClawRPG.Scripts {
                 ToggleTitleUI();
             }
 
+            // Handle title collection UI toggle (Ctrl+Shift+C key)
+            if (Input.IsKeyPressed(Key.C) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleTitleCollectionUI();
+            }
+
             // Handle daily ritual UI toggle (Ctrl+Shift+R key)
             if (Input.IsKeyPressed(Key.R) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
@@ -3080,6 +3092,22 @@ namespace ClawRPG.Scripts {
             if (titleUI != null)
             {
                 titleUI.ToggleUI();
+            }
+        }
+
+        private void ToggleTitleCollectionUI()
+        {
+            var existingUI = GetNodeOrNull<TitleCollectionUI>("CanvasLayer/TitleCollectionUI");
+            if (existingUI != null)
+            {
+                existingUI.QueueFree();
+            }
+            else
+            {
+                var canvasLayer = GetNode<CanvasLayer>("CanvasLayer");
+                var titleCollectionUI = new TitleCollectionUI();
+                titleCollectionUI.Name = "TitleCollectionUI";
+                canvasLayer.AddChild(titleCollectionUI);
             }
         }
 
