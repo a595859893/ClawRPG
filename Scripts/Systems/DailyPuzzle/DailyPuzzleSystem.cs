@@ -188,12 +188,108 @@ public class DailyPuzzleSystem
     // Load data from file
     private static void LoadData()
     {
-        // TODO: Load from file
+        var saveSystem = SaveSystem.Instance;
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null || data.Count == 0) return;
+
+        // Load daily puzzle data
+        if (data.Contains("daily_puzzle"))
+        {
+            var puzzleData = (Godot.Dictionary)data["daily_puzzle"];
+            
+            if (puzzleData.Contains("current_daily_puzzle_id"))
+                _data.CurrentDailyPuzzleId = (int)puzzleData["current_daily_puzzle_id"];
+            
+            if (puzzleData.Contains("last_puzzle_date"))
+                _data.LastPuzzleDate = DateTime.Parse((string)puzzleData["last_puzzle_date"]);
+            
+            if (puzzleData.Contains("current_streak"))
+                _data.CurrentStreak = (int)puzzleData["current_streak"];
+            
+            if (puzzleData.Contains("best_streak"))
+                _data.BestStreak = (int)puzzleData["best_streak"];
+            
+            if (puzzleData.Contains("total_solved"))
+                _data.TotalSolved = (int)puzzleData["total_solved"];
+            
+            if (puzzleData.Contains("total_failed"))
+                _data.TotalFailed = (int)puzzleData["total_failed"];
+            
+            if (puzzleData.Contains("hints_used"))
+                _data.HintsUsed = (int)puzzleData["hints_used"];
+            
+            if (puzzleData.Contains("total_gold_earned"))
+                _data.TotalGoldEarned = (int)puzzleData["total_gold_earned"];
+            
+            if (puzzleData.Contains("total_exp_earned"))
+                _data.TotalExpEarned = (int)puzzleData["total_exp_earned"];
+            
+            // Load solved puzzles
+            if (puzzleData.Contains("solved_puzzles"))
+            {
+                var solvedArray = (Godot.Array)puzzleData["solved_puzzles"];
+                foreach (Godot.Dictionary puzzleRecord in solvedArray)
+                {
+                    var record = new PuzzleRecord
+                    {
+                        PuzzleId = (int)puzzleRecord["puzzle_id"],
+                        SolvedDate = DateTime.Parse((string)puzzleRecord["solved_date"]),
+                        TimeTakenSeconds = (int)puzzleRecord["time_taken"],
+                        HintsUsed = (int)puzzleRecord["hints_used"],
+                        UsedBonusTime = (bool)puzzleRecord["used_bonus_time"],
+                        GoldEarned = (int)puzzleRecord["gold_earned"],
+                        ExpEarned = (int)puzzleRecord["exp_earned"]
+                    };
+                    _data.SolvedPuzzles[record.PuzzleId] = record;
+                    
+                    if (!_data.SolvedPuzzleIds.Contains(record.PuzzleId))
+                        _data.SolvedPuzzleIds.Add(record.PuzzleId);
+                }
+            }
+        }
     }
     
     // Save data to file
     private static void SaveData()
     {
-        // TODO: Save to file
+        var saveSystem = SaveSystem.Instance;
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) data = new Godot.Dictionary();
+
+        // Save daily puzzle data
+        var puzzleData = new Godot.Dictionary();
+        puzzleData["current_daily_puzzle_id"] = _data.CurrentDailyPuzzleId;
+        puzzleData["last_puzzle_date"] = _data.LastPuzzleDate.ToString("o");
+        puzzleData["current_streak"] = _data.CurrentStreak;
+        puzzleData["best_streak"] = _data.BestStreak;
+        puzzleData["total_solved"] = _data.TotalSolved;
+        puzzleData["total_failed"] = _data.TotalFailed;
+        puzzleData["hints_used"] = _data.HintsUsed;
+        puzzleData["total_gold_earned"] = _data.TotalGoldEarned;
+        puzzleData["total_exp_earned"] = _data.TotalExpEarned;
+
+        // Save solved puzzles
+        var solvedArray = new Godot.Array();
+        foreach (var kvp in _data.SolvedPuzzles)
+        {
+            var record = kvp.Value;
+            var puzzleRecord = new Godot.Dictionary();
+            puzzleRecord["puzzle_id"] = record.PuzzleId;
+            puzzleRecord["solved_date"] = record.SolvedDate.ToString("o");
+            puzzleRecord["time_taken"] = record.TimeTakenSeconds;
+            puzzleRecord["hints_used"] = record.HintsUsed;
+            puzzleRecord["used_bonus_time"] = record.UsedBonusTime;
+            puzzleRecord["gold_earned"] = record.GoldEarned;
+            puzzleRecord["exp_earned"] = record.ExpEarned;
+            solvedArray.Add(puzzleRecord);
+        }
+        puzzleData["solved_puzzles"] = solvedArray;
+
+        data["daily_puzzle"] = puzzleData;
+        saveSystem.SaveGame(data);
     }
 }

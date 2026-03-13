@@ -19,12 +19,138 @@ public class MilestoneSystem
     
     public void LoadData()
     {
-        // TODO: Load from file
+        var saveSystem = SaveSystem.Instance;
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null || data.Count == 0) return;
+
+        // Load milestone data
+        if (data.Contains("milestones"))
+        {
+            var milestoneData = (Godot.Dictionary)data["milestones"];
+            
+            // Load milestone entries
+            if (milestoneData.Contains("entries"))
+            {
+                var entriesArray = (Godot.Array)milestoneData["entries"];
+                foreach (Godot.Dictionary entryDict in entriesArray)
+                {
+                    var entry = new MilestoneData.MilestoneEntry
+                    {
+                        Id = (string)entryDict["id"],
+                        Name = (string)entryDict["name"],
+                        Description = (string)entryDict["description"],
+                        Category = (string)entryDict["category"],
+                        Tier = (MilestoneData.MilestoneTier)(int)entryDict["tier"],
+                        RequiredValue = (int)entryDict["required_value"],
+                        CurrentValue = (int)entryDict["current_value"],
+                        Unlocked = (bool)entryDict["unlocked"]
+                    };
+                    
+                    if (entryDict.Contains("unlock_time") && entryDict["unlock_time"] != null)
+                        entry.UnlockTime = DateTime.Parse((string)entryDict["unlock_time"]);
+                    
+                    if (entryDict.Contains("rewards"))
+                    {
+                        var rewardsArray = (Godot.Array)entryDict["rewards"];
+                        entry.Rewards = new List<string>();
+                        foreach (string reward in rewardsArray)
+                            entry.Rewards.Add(reward);
+                    }
+                    
+                    _data.Milestones[entry.Id] = entry;
+                }
+            }
+            
+            // Load category progress
+            if (milestoneData.Contains("category_progress"))
+            {
+                var catProgressDict = (Godot.Dictionary)milestoneData["category_progress"];
+                foreach (var key in catProgressDict.Keys)
+                {
+                    _data.CategoryProgress[(string)key] = (int)catProgressDict[key];
+                }
+            }
+            
+            // Load statistics
+            if (milestoneData.Contains("statistics"))
+            {
+                var statsDict = (Godot.Dictionary)milestoneData["statistics"];
+                _data.Statistics.TotalMilestones = statsDict.Contains("total_milestones") ? (int)statsDict["total_milestones"] : 0;
+                _data.Statistics.UnlockedMilestones = statsDict.Contains("unlocked_milestones") ? (int)statsDict["unlocked_milestones"] : 0;
+                _data.Statistics.BronzeMilestones = statsDict.Contains("bronze_milestones") ? (int)statsDict["bronze_milestones"] : 0;
+                _data.Statistics.SilverMilestones = statsDict.Contains("silver_milestones") ? (int)statsDict["silver_milestones"] : 0;
+                _data.Statistics.GoldMilestones = statsDict.Contains("gold_milestones") ? (int)statsDict["gold_milestones"] : 0;
+                _data.Statistics.PlatinumMilestones = statsDict.Contains("platinum_milestones") ? (int)statsDict["platinum_milestones"] : 0;
+                _data.Statistics.DiamondMilestones = statsDict.Contains("diamond_milestones") ? (int)statsDict["diamond_milestones"] : 0;
+                _data.Statistics.LegendaryMilestones = statsDict.Contains("legendary_milestones") ? (int)statsDict["legendary_milestones"] : 0;
+                _data.Statistics.TotalRewardsClaimed = statsDict.Contains("total_rewards_claimed") ? (int)statsDict["total_rewards_claimed"] : 0;
+                _data.Statistics.TotalGoldEarned = statsDict.Contains("total_gold_earned") ? (int)statsDict["total_gold_earned"] : 0;
+                _data.Statistics.TotalExpEarned = statsDict.Contains("total_exp_earned") ? (int)statsDict["total_exp_earned"] : 0;
+            }
+        }
     }
     
     public void SaveData()
     {
-        // TODO: Save to file
+        var saveSystem = SaveSystem.Instance;
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) data = new Godot.Dictionary();
+
+        // Save milestone data
+        var milestoneData = new Godot.Dictionary();
+        
+        // Save milestone entries
+        var entriesArray = new Godot.Array();
+        foreach (var kvp in _data.Milestones)
+        {
+            var entry = kvp.Value;
+            var entryDict = new Godot.Dictionary();
+            entryDict["id"] = entry.Id;
+            entryDict["name"] = entry.Name;
+            entryDict["description"] = entry.Description;
+            entryDict["category"] = entry.Category;
+            entryDict["tier"] = (int)entry.Tier;
+            entryDict["required_value"] = entry.RequiredValue;
+            entryDict["current_value"] = entry.CurrentValue;
+            entryDict["unlocked"] = entry.Unlocked;
+            entryDict["unlock_time"] = entry.UnlockTime?.ToString("o") ?? "";
+            
+            var rewardsArray = new Godot.Array();
+            foreach (string reward in entry.Rewards)
+                rewardsArray.Add(reward);
+            entryDict["rewards"] = rewardsArray;
+            
+            entriesArray.Add(entryDict);
+        }
+        milestoneData["entries"] = entriesArray;
+        
+        // Save category progress
+        var catProgressDict = new Godot.Dictionary();
+        foreach (var kvp in _data.CategoryProgress)
+            catProgressDict[kvp.Key] = kvp.Value;
+        milestoneData["category_progress"] = catProgressDict;
+        
+        // Save statistics
+        var statsDict = new Godot.Dictionary();
+        statsDict["total_milestones"] = _data.Statistics.TotalMilestones;
+        statsDict["unlocked_milestones"] = _data.Statistics.UnlockedMilestones;
+        statsDict["bronze_milestones"] = _data.Statistics.BronzeMilestones;
+        statsDict["silver_milestones"] = _data.Statistics.SilverMilestones;
+        statsDict["gold_milestones"] = _data.Statistics.GoldMilestones;
+        statsDict["platinum_milestones"] = _data.Statistics.PlatinumMilestones;
+        statsDict["diamond_milestones"] = _data.Statistics.DiamondMilestones;
+        statsDict["legendary_milestones"] = _data.Statistics.LegendaryMilestones;
+        statsDict["total_rewards_claimed"] = _data.Statistics.TotalRewardsClaimed;
+        statsDict["total_gold_earned"] = _data.Statistics.TotalGoldEarned;
+        statsDict["total_exp_earned"] = _data.Statistics.TotalExpEarned;
+        milestoneData["statistics"] = statsDict;
+
+        data["milestones"] = milestoneData;
+        saveSystem.SaveGame(data);
     }
     
     public void UpdateProgress(string milestoneId, int newValue)
