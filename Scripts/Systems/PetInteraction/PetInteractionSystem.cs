@@ -229,14 +229,143 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
         /// 保存数据
         /// </summary>
         public void SaveData() {
-            // TODO: Implement save to file
+            var saveSystem = SaveSystem.Instance;
+            if (saveSystem == null) return;
+
+            var data = saveSystem.LoadGame();
+            if (data == null) data = new Godot.Dictionary();
+
+            // Save pet interactions
+            var interactionsArray = new Godot.Array();
+            foreach (var kvp in _data.petInteractions)
+            {
+                var petData = new Godot.Dictionary();
+                petData["pet_id"] = kvp.Key;
+                petData["pet_name"] = kvp.Value.petName;
+                petData["total_interactions"] = kvp.Value.totalInteractions;
+                petData["favorite_interaction"] = kvp.Value.favoriteInteraction;
+                petData["favorite_type"] = (int)kvp.Value.favoriteType;
+                if (kvp.Value.lastInteractionTime != default(DateTime))
+                    petData["last_interaction"] = kvp.Value.lastInteractionTime.ToString("o");
+                petData["happiness_gained"] = kvp.Value.happinessGained;
+                petData["affection_gained"] = kvp.Value.affectionGained;
+
+                // Save interaction history (limit to last 30)
+                var historyArray = new Godot.Array();
+                var recentHistory = kvp.Value.history.TakeLast(30).ToList();
+                foreach (var entry in recentHistory)
+                {
+                    var historyData = new Godot.Dictionary();
+                    historyData["type"] = (int)entry.type;
+                    historyData["result"] = (int)entry.result;
+                    historyData["happiness"] = entry.happinessGained;
+                    historyData["affection"] = entry.affectionGained;
+                    if (entry.timestamp != default(DateTime))
+                        historyData["timestamp"] = entry.timestamp.ToString("o");
+                    historyData["sound"] = entry.soundPlayed ?? "";
+                    historyArray.Add(historyData);
+                }
+                petData["history"] = historyArray;
+                interactionsArray.Add(petData);
+            }
+            data["pet_interactions"] = interactionsArray;
+
+            // Save statistics
+            data["pet_interaction_total"] = _data.totalInteractions;
+            data["pet_interaction_special"] = _data.specialInteractions;
+
+            // Save interaction type counts
+            var typeCountArray = new Godot.Array();
+            foreach (var kvp in _data.interactionTypeCount)
+            {
+                var typeData = new Godot.Dictionary();
+                typeData["type"] = (int)kvp.Key;
+                typeData["count"] = kvp.Value;
+                typeCountArray.Add(typeData);
+            }
+            data["pet_interaction_type_counts"] = typeCountArray;
+
+            if (_data.lastInteractionTime != default(DateTime))
+                data["pet_interaction_last_time"] = _data.lastInteractionTime.ToString("o");
+
+            saveSystem.SaveGame(data);
         }
 
         /// <summary>
         /// 加载数据
         /// </summary>
         public void LoadData() {
-            // TODO: Implement load from file
+            var saveSystem = SaveSystem.Instance;
+            if (saveSystem == null) return;
+
+            var data = saveSystem.LoadGame();
+            if (data == null || data.Count == 0) return;
+
+            // Load pet interactions
+            if (data.Contains("pet_interactions"))
+            {
+                var interactionsArray = (Godot.Array)data["pet_interactions"];
+                foreach (Godot.Dictionary petData in interactionsArray)
+                {
+                    var petId = (string)petData["pet_id"];
+                    var record = new PetInteractionRecord
+                    {
+                        petId = petId,
+                        petName = (string)petData["pet_name"],
+                        totalInteractions = (int)petData["total_interactions"],
+                        favoriteInteraction = (int)petData["favorite_interaction"],
+                        favoriteType = (InteractionType)(int)petData["favorite_type"],
+                        happinessGained = (int)petData["happiness_gained"],
+                        affectionGained = (int)petData["affection_gained"]
+                    };
+
+                    if (petData.Contains("last_interaction"))
+                        record.lastInteractionTime = DateTime.Parse((string)petData["last_interaction"]);
+
+                    // Load history
+                    if (petData.Contains("history"))
+                    {
+                        var historyArray = (Godot.Array)petData["history"];
+                        foreach (Godot.Dictionary historyData in historyArray)
+                        {
+                            var entry = new InteractionHistory
+                            {
+                                type = (InteractionType)(int)historyData["type"],
+                                result = (InteractionResult)(int)historyData["result"],
+                                happinessGained = (int)historyData["happiness"],
+                                affectionGained = (int)historyData["affection"],
+                                soundPlayed = (string)historyData["sound"]
+                            };
+                            if (historyData.Contains("timestamp"))
+                                entry.timestamp = DateTime.Parse((string)historyData["timestamp"]);
+                            record.history.Add(entry);
+                        }
+                    }
+
+                    _data.petInteractions[petId] = record;
+                }
+            }
+
+            // Load statistics
+            if (data.Contains("pet_interaction_total"))
+                _data.totalInteractions = (int)data["pet_interaction_total"];
+            if (data.Contains("pet_interaction_special"))
+                _data.specialInteractions = (int)data["pet_interaction_special"];
+
+            // Load interaction type counts
+            if (data.Contains("pet_interaction_type_counts"))
+            {
+                var typeCountArray = (Godot.Array)data["pet_interaction_type_counts"];
+                foreach (Godot.Dictionary typeData in typeCountArray)
+                {
+                    var type = (InteractionType)(int)typeData["type"];
+                    var count = (int)typeData["count"];
+                    _data.interactionTypeCount[type] = count;
+                }
+            }
+
+            if (data.Contains("pet_interaction_last_time"))
+                _data.lastInteractionTime = DateTime.Parse((string)data["pet_interaction_last_time"]);
         }
     }
 }
