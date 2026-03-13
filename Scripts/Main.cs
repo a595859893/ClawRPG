@@ -2144,6 +2144,12 @@ namespace ClawRPG.Scripts {
                 ToggleTattooUI();
             }
 
+            // Handle procedural weapon generation UI toggle (Ctrl+G key)
+            if (Input.IsKeyPressed(Key.G) && Input.IsKeyPressed(Key.Control))
+            {
+                ToggleProceduralWeaponUI();
+            }
+
             // Handle multiplayer chat UI toggle (Ctrl+Shift+C key)
             if (Input.IsKeyPressed(Key.C) && Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.Shift))
             {
@@ -4833,6 +4839,25 @@ namespace ClawRPG.Scripts {
             var chatUI = new Systems.MultiplayerChat.MultiplayerChatUI();
             chatUI.Name = "MultiplayerChatUI";
             ui.AddChild(chatUI);
+
+            // Initialize procedural weapon generation system
+            var proceduralWeaponData = new Systems.ProceduralWeaponGeneration.ProceduralWeaponData();
+            proceduralWeaponData.Name = "ProceduralWeaponData";
+            AddChild(proceduralWeaponData);
+
+            var proceduralWeaponDatabase = new Systems.ProceduralWeaponGeneration.ProceduralWeaponDatabase();
+            proceduralWeaponDatabase.Name = "ProceduralWeaponDatabase";
+            AddChild(proceduralWeaponDatabase);
+
+            var proceduralWeaponSystem = new Systems.ProceduralWeaponGeneration.ProceduralWeaponSystem();
+            proceduralWeaponSystem.Name = "ProceduralWeaponSystem";
+            proceduralWeaponSystem.Initialize(proceduralWeaponData, proceduralWeaponDatabase);
+            AddChild(proceduralWeaponSystem);
+
+            var proceduralWeaponUI = new Systems.ProceduralWeaponGeneration.ProceduralWeaponUI();
+            proceduralWeaponUI.Name = "ProceduralWeaponUI";
+            proceduralWeaponUI.Initialize(proceduralWeaponSystem, proceduralWeaponData, proceduralWeaponDatabase);
+            ui.AddChild(proceduralWeaponUI);
         }
 
         /// <summary>
@@ -4850,6 +4875,25 @@ namespace ClawRPG.Scripts {
                 else
                 {
                     tattooUI.Show();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 切换程序化武器生成界面
+        /// </summary>
+        private void ToggleProceduralWeaponUI()
+        {
+            var weaponUI = GetNodeOrNull<Systems.ProceduralWeaponGeneration.ProceduralWeaponUI>("ProceduralWeaponUI");
+            if (weaponUI != null)
+            {
+                if (weaponUI.Visible)
+                {
+                    weaponUI.Hide();
+                }
+                else
+                {
+                    weaponUI.Show();
                 }
             }
         }
