@@ -888,6 +888,12 @@ namespace ClawRPG.Scripts {
             GetNode("/root/CanvasLayer/UI").AddChild(itemSmeltingUI);
             itemSmeltingUI.Visible = false;
 
+            // Seeded Run UI
+            var seededRunUI = new SeededRunUI();
+            seededRunUI.Name = "SeededRunUI";
+            GetNode("/root/CanvasLayer/UI").AddChild(seededRunUI);
+            seededRunUI.Visible = false;
+
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -1927,6 +1933,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.R) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleDailyRitualUI();
+            }
+
+            // Handle seeded run UI toggle (Ctrl+Shift+Z key)
+            if (Input.IsKeyPressed(Key.Z) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleSeededRunUI();
             }
 
             // Handle weekly challenge UI toggle (Ctrl+Shift+W key)
@@ -4631,6 +4643,25 @@ namespace ClawRPG.Scripts {
                 else
                 {
                     itemSmeltingUI.Show();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 切换种子跑图界面
+        /// </summary>
+        private void ToggleSeededRunUI()
+        {
+            var seededRunUI = GetNodeOrNull<SeededRunUI>("UI/SeededRunUI");
+            if (seededRunUI != null)
+            {
+                if (seededRunUI.Visible)
+                {
+                    seededRunUI.Hide();
+                }
+                else
+                {
+                    seededRunUI.Show();
                 }
             }
         }
