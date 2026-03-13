@@ -905,6 +905,12 @@ namespace ClawRPG.Scripts {
             keybindingSystem.Name = "KeybindingSystem";
             AddChild(keybindingSystem);
 
+            // Guild Tournament Bracket System
+            var guildTournamentBracketSystem = new GuildTournamentBracket.GuildTournamentBracketSystem();
+            guildTournamentBracketSystem.Name = "GuildTournamentBracketSystem";
+            AddChild(guildTournamentBracketSystem);
+            GD.Print("Guild Tournament Bracket System initialized");
+
             // Connect sound effect signals
             ConnectSoundSignals();
 
@@ -2178,6 +2184,12 @@ namespace ClawRPG.Scripts {
 
             // Handle team skill hotkeys (1-9, 0, -, =, ])
             HandleTeamSkillInput();
+
+            // Handle guild tournament bracket UI toggle (B key)
+            if (Input.IsActionJustPressed("guild_tournament_bracket"))
+            {
+                ToggleGuildTournamentBracketUI();
+            }
 
             // Handle combat stats panel toggle (F12 key)
             if (Input.IsActionJustPressed("combat_stats"))
@@ -4843,6 +4855,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(contractBountyUI);
                 }
                 contractBountyUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换公会锦标赛赛程 UI
+        /// </summary>
+        private void ToggleGuildTournamentBracketUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var bracketUI = ui.GetNodeOrNull<Systems.GuildTournamentBracket.GuildTournamentBracketUI>("GuildTournamentBracketUI");
+            if (bracketUI != null && bracketUI.Visible)
+            {
+                bracketUI.Hide();
+            }
+            else
+            {
+                if (bracketUI == null)
+                {
+                    bracketUI = new Systems.GuildTournamentBracket.GuildTournamentBracketUI();
+                    bracketUI.Name = "GuildTournamentBracketUI";
+                    ui.AddChild(bracketUI);
+                }
+                bracketUI.Show();
             }
         }
 
