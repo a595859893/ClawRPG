@@ -681,6 +681,11 @@ namespace ClawRPG.Scripts {
             petInventoryDatabase.Name = "PetInventoryDatabase";
             AddChild(petInventoryDatabase);
 
+            // Initialize pet life cycle system
+            var petLifeCycleSystem = new Systems.PetLifeCycle.PetLifeCycleSystem();
+            petLifeCycleSystem.Name = "PetLifeCycleSystem";
+            AddChild(petLifeCycleSystem);
+
             // Initialize elite monster system
             var eliteMonsterDatabase = new Systems.EliteMonster.EliteMonsterDatabase();
             eliteMonsterDatabase.Name = "EliteMonsterDatabase";
@@ -2519,6 +2524,12 @@ namespace ClawRPG.Scripts {
                 TogglePetInventoryUI();
             }
 
+            // Handle pet life cycle UI toggle (Ctrl+Shift+L)
+            if (Input.IsActionJustPressed("pet_life_cycle_toggle"))
+            {
+                TogglePetLifeCycleUI();
+            }
+
             // Handle elite monster UI toggle (E key)
             if (Input.IsActionJustPressed("elite_monster_toggle"))
             {
@@ -3387,6 +3398,24 @@ namespace ClawRPG.Scripts {
             if (petInventoryUI != null)
             {
                 petInventoryUI.Visible = !petInventoryUI.Visible;
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet life cycle UI
+        /// </summary>
+        private void TogglePetLifeCycleUI()
+        {
+            var petLifeCycleUI = GetNodeOrNull<Systems.PetLifeCycle.PetLifeCycleUI>("UI/PetLifeCycleUI");
+            if (petLifeCycleUI != null)
+            {
+                petLifeCycleUI.Visible = !petLifeCycleUI.Visible;
+            }
+            else
+            {
+                var newUI = new Systems.PetLifeCycle.PetLifeCycleUI();
+                newUI.Name = "PetLifeCycleUI";
+                GetNode("/root").AddChild(newUI);
             }
         }
 
