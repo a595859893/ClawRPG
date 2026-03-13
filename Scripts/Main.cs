@@ -555,6 +555,23 @@ namespace ClawRPG.Scripts {
             guildHallSystem.Name = "GuildHallSystem";
             AddChild(guildHallSystem);
 
+            // Initialize multiplayer lobby system
+            var multiplayerLobbyData = new Systems.MultiplayerLobby.MultiplayerLobbyData();
+            multiplayerLobbyData.Name = "MultiplayerLobbyData";
+            AddChild(multiplayerLobbyData);
+
+            var multiplayerLobbyDatabase = new Systems.MultiplayerLobby.MultiplayerLobbyDatabase();
+            multiplayerLobbyDatabase.Name = "MultiplayerLobbyDatabase";
+            AddChild(multiplayerLobbyDatabase);
+
+            var multiplayerLobbySystem = new Systems.MultiplayerLobby.MultiplayerLobbySystem();
+            multiplayerLobbySystem.Name = "MultiplayerLobbySystem";
+            AddChild(multiplayerLobbySystem);
+
+            var multiplayerLobbyUI = new Systems.MultiplayerLobby.MultiplayerLobbyUI();
+            multiplayerLobbyUI.Name = "MultiplayerLobbyUI";
+            AddChild(multiplayerLobbyUI);
+
             // Initialize collectible system
             CollectibleSystem.Instance.Initialize();
 
@@ -2609,6 +2626,12 @@ namespace ClawRPG.Scripts {
             {
                 ToggleItemSmeltingUI();
             }
+
+            // Handle multiplayer lobby UI toggle (Ctrl+Shift+L)
+            if (Input.IsActionJustPressed("multiplayer_lobby_toggle"))
+            {
+                ToggleMultiplayerLobbyUI();
+            }
             
             // Handle contract bounty UI toggle (Ctrl+C)
             if (Input.IsActionJustPressed("contract_bounty_toggle"))
@@ -4602,6 +4625,25 @@ namespace ClawRPG.Scripts {
                 else
                 {
                     itemSmeltingUI.Show();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 切换多人游戏大厅界面
+        /// </summary>
+        private void ToggleMultiplayerLobbyUI()
+        {
+            var multiplayerLobbyUI = GetNodeOrNull<Systems.MultiplayerLobby.MultiplayerLobbyUI>("MultiplayerLobbyUI");
+            if (multiplayerLobbyUI != null)
+            {
+                if (multiplayerLobbyUI.Visible)
+                {
+                    multiplayerLobbyUI.Hide();
+                }
+                else
+                {
+                    multiplayerLobbyUI.Show();
                 }
             }
         }
