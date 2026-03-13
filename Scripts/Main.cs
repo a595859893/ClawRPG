@@ -2126,6 +2126,12 @@ namespace ClawRPG.Scripts {
                 ToggleMonsterTamingUI();
             }
 
+            // Handle tattoo UI toggle (Ctrl+T key)
+            if (Input.IsKeyPressed(Key.T) && Input.IsKeyPressed(Key.Control))
+            {
+                ToggleTattooUI();
+            }
+
             // Handle prestige UI toggle (Ctrl+P key)
             if (Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.P))
             {
@@ -4762,6 +4768,39 @@ namespace ClawRPG.Scripts {
             var newStreakUI = new Systems.Streak.StreakUI();
             newStreakUI.Name = "StreakUI";
             ui.AddChild(newStreakUI);
+
+            // Initialize tattoo system
+            var tattooSystem = new Systems.Tattoo.TattooSystem();
+            tattooSystem.Name = "TattooSystem";
+            AddChild(tattooSystem);
+
+            var tattooDatabase = new Systems.Tattoo.TattooDatabase();
+            tattooDatabase.Name = "TattooDatabase";
+            AddChild(tattooDatabase);
+
+            var tattooUI = new Systems.Tattoo.TattooUI();
+            tattooUI.Name = "TattooUI";
+            tattooUI.Initialize(tattooSystem, tattooDatabase);
+            ui.AddChild(tattooUI);
+        }
+
+        /// <summary>
+        /// 切换纹身界面
+        /// </summary>
+        private void ToggleTattooUI()
+        {
+            var tattooUI = GetNodeOrNull<Systems.Tattoo.TattooUI>("TattooUI");
+            if (tattooUI != null)
+            {
+                if (tattooUI.Visible)
+                {
+                    tattooUI.Hide();
+                }
+                else
+                {
+                    tattooUI.Show();
+                }
+            }
         }
 
         /// <summary>
