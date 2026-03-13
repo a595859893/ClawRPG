@@ -2132,6 +2132,12 @@ namespace ClawRPG.Scripts {
                 ToggleTattooUI();
             }
 
+            // Handle multiplayer chat UI toggle (Ctrl+Shift+C key)
+            if (Input.IsKeyPressed(Key.C) && Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleMultiplayerChatUI();
+            }
+
             // Handle prestige UI toggle (Ctrl+P key)
             if (Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.P))
             {
@@ -4782,6 +4788,23 @@ namespace ClawRPG.Scripts {
             tattooUI.Name = "TattooUI";
             tattooUI.Initialize(tattooSystem, tattooDatabase);
             ui.AddChild(tattooUI);
+
+            // Initialize multiplayer chat system
+            var chatData = new Systems.MultiplayerChat.MultiplayerChatData();
+            chatData.Name = "MultiplayerChatData";
+            AddChild(chatData);
+
+            var chatDatabase = new Systems.MultiplayerChat.MultiplayerChatDatabase();
+            chatDatabase.Name = "MultiplayerChatDatabase";
+            AddChild(chatDatabase);
+
+            var chatSystem = new Systems.MultiplayerChat.MultiplayerChatSystem();
+            chatSystem.Name = "MultiplayerChatSystem";
+            AddChild(chatSystem);
+
+            var chatUI = new Systems.MultiplayerChat.MultiplayerChatUI();
+            chatUI.Name = "MultiplayerChatUI";
+            ui.AddChild(chatUI);
         }
 
         /// <summary>
@@ -4799,6 +4822,25 @@ namespace ClawRPG.Scripts {
                 else
                 {
                     tattooUI.Show();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 切换多人聊天界面
+        /// </summary>
+        private void ToggleMultiplayerChatUI()
+        {
+            var chatUI = GetNodeOrNull<Systems.MultiplayerChat.MultiplayerChatUI>("MultiplayerChatUI");
+            if (chatUI != null)
+            {
+                if (chatUI.Visible)
+                {
+                    chatUI.Hide();
+                }
+                else
+                {
+                    chatUI.Show();
                 }
             }
         }
