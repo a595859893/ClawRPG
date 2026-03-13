@@ -2054,6 +2054,12 @@ namespace ClawRPG.Scripts {
                 ToggleEnchantmentUI();
             }
 
+            // Handle style mastery UI toggle (Shift+S key)
+            if (Input.IsActionJustPressed("style_mastery_toggle"))
+            {
+                ToggleStyleMasteryUI();
+            }
+
             // Handle bounty UI toggle (B key)
             if (Input.IsActionJustPressed("bounty"))
             {
@@ -4709,6 +4715,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(enchantUI);
                 }
                 enchantUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换战斗风格大师界面
+        /// </summary>
+        private void ToggleStyleMasteryUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var styleMasteryUI = ui.GetNodeOrNull<StyleMasteryUI>("StyleMasteryUI");
+            if (styleMasteryUI != null && styleMasteryUI.Visible)
+            {
+                styleMasteryUI.Hide();
+            }
+            else
+            {
+                if (styleMasteryUI == null)
+                {
+                    styleMasteryUI = new StyleMasteryUI();
+                    styleMasteryUI.Name = "StyleMasteryUI";
+                    ui.AddChild(styleMasteryUI);
+                }
+                styleMasteryUI.Show();
             }
         }
 
