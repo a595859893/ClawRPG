@@ -326,16 +326,183 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
         /// Save data to file
         /// </summary>
         public void SaveData() {
-            // TODO: Implement save to file
-            GD.Print("[ProceduralWeaponSystem] Save not implemented");
+            var saveSystem = SaveSystem.Instance;
+            if (saveSystem == null) return;
+
+            var data = saveSystem.LoadGame();
+            if (data == null) data = new Godot.Dictionary();
+
+            // Save generation history (limit to last 50)
+            var historyArray = new Godot.Array();
+            var recentHistory = _data.GenerationHistory.TakeLast(50).ToList();
+            foreach (var record in recentHistory)
+            {
+                var recordData = new Godot.Dictionary();
+                recordData["weapon_name"] = record.WeaponName;
+                recordData["weapon_type"] = record.WeaponType;
+                recordData["rarity"] = record.Rarity;
+                recordData["level"] = record.Level;
+                recordData["attack"] = record.Attack;
+                recordData["defense"] = record.Defense;
+                recordData["speed"] = record.Speed;
+                
+                var effectsArray = new Godot.Array();
+                foreach (var effect in record.SpecialEffects)
+                {
+                    effectsArray.Add(effect);
+                }
+                recordData["special_effects"] = effectsArray;
+                
+                if (record.GenerationTime != default(DateTime))
+                    recordData["generation_time"] = record.GenerationTime.ToString("o");
+                recordData["gold_cost"] = record.GoldCost;
+                recordData["is_reroll"] = record.IsReroll;
+                historyArray.Add(recordData);
+            }
+            data["procedural_weapon_history"] = historyArray;
+
+            // Save statistics
+            data["procedural_weapon_total"] = _data.TotalWeaponsGenerated;
+            data["procedural_weapon_legendary"] = _data.LegendaryWeapons;
+            data["procedural_weapon_epic"] = _data.EpicWeapons;
+            data["procedural_weapon_rare"] = _data.RareWeapons;
+            data["procedural_weapon_gold_spent"] = _data.TotalGoldSpent;
+            data["procedural_weapon_materials_used"] = _data.TotalMaterialsUsed;
+
+            // Save unlocked types
+            var unlockedTypesArray = new Godot.Array();
+            foreach (var type in _data.UnlockedWeaponTypes)
+            {
+                unlockedTypesArray.Add(type);
+            }
+            data["procedural_weapon_unlocked_types"] = unlockedTypesArray;
+
+            // Save unlocked prefixes
+            var unlockedPrefixesArray = new Godot.Array();
+            foreach (var prefix in _data.UnlockedPrefixes)
+            {
+                unlockedPrefixesArray.Add(prefix);
+            }
+            data["procedural_weapon_unlocked_prefixes"] = unlockedPrefixesArray;
+
+            // Save unlocked suffixes
+            var unlockedSuffixesArray = new Godot.Array();
+            foreach (var suffix in _data.UnlockedSuffixes)
+            {
+                unlockedSuffixesArray.Add(suffix);
+            }
+            data["procedural_weapon_unlocked_suffixes"] = unlockedSuffixesArray;
+
+            // Save rarity distribution
+            var rarityDistDict = new Godot.Dictionary();
+            foreach (var kvp in _data.RarityGenerationCount)
+            {
+                rarityDistDict[kvp.Key] = kvp.Value;
+            }
+            data["procedural_weapon_rarity_dist"] = rarityDistDict;
+
+            saveSystem.SaveGame(data);
+            GD.Print("[ProceduralWeaponSystem] Data saved successfully");
         }
         
         /// <summary>
         /// Load data from file
         /// </summary>
         public void LoadData() {
-            // TODO: Implement load from file
-            GD.Print("[ProceduralWeaponSystem] Load not implemented");
+            var saveSystem = SaveSystem.Instance;
+            if (saveSystem == null) return;
+
+            var data = saveSystem.LoadGame();
+            if (data == null) return;
+
+            // Load generation history
+            if (data.Contains("procedural_weapon_history")) {
+                var historyArray = (Godot.Array)data["procedural_weapon_history"];
+                _data.GenerationHistory.Clear();
+                foreach (Godot.Dictionary recordData in historyArray)
+                {
+                    var record = new WeaponGenerationRecord();
+                    record.WeaponName = recordData.Contains("weapon_name") ? (string)recordData["weapon_name"] : "";
+                    record.WeaponType = recordData.Contains("weapon_type") ? (string)recordData["weapon_type"] : "";
+                    record.Rarity = recordData.Contains("rarity") ? (string)recordData["rarity"] : "";
+                    record.Level = recordData.Contains("level") ? (int)recordData["level"] : 1;
+                    record.Attack = recordData.Contains("attack") ? (int)recordData["attack"] : 0;
+                    record.Defense = recordData.Contains("defense") ? (int)recordData["defense"] : 0;
+                    record.Speed = recordData.Contains("speed") ? (int)recordData["speed"] : 0;
+                    
+                    if (recordData.Contains("special_effects")) {
+                        var effectsArray = (Godot.Array)recordData["special_effects"];
+                        foreach (string effect in effectsArray)
+                        {
+                            record.SpecialEffects.Add(effect);
+                        }
+                    }
+                    
+                    if (recordData.Contains("generation_time") && recordData["generation_time"] != null) {
+                        if (DateTime.TryParse((string)recordData["generation_time"], out var genTime)) {
+                            record.GenerationTime = genTime;
+                        }
+                    }
+                    record.GoldCost = recordData.Contains("gold_cost") ? (int)recordData["gold_cost"] : 0;
+                    record.IsReroll = recordData.Contains("is_reroll") && (bool)recordData["is_reroll"];
+                    _data.GenerationHistory.Add(record);
+                }
+            }
+
+            // Load statistics
+            if (data.Contains("procedural_weapon_total"))
+                _data.TotalWeaponsGenerated = (int)data["procedural_weapon_total"];
+            if (data.Contains("procedural_weapon_legendary"))
+                _data.LegendaryWeapons = (int)data["procedural_weapon_legendary"];
+            if (data.Contains("procedural_weapon_epic"))
+                _data.EpicWeapons = (int)data["procedural_weapon_epic"];
+            if (data.Contains("procedural_weapon_rare"))
+                _data.RareWeapons = (int)data["procedural_weapon_rare"];
+            if (data.Contains("procedural_weapon_gold_spent"))
+                _data.TotalGoldSpent = (int)data["procedural_weapon_gold_spent"];
+            if (data.Contains("procedural_weapon_materials_used"))
+                _data.TotalMaterialsUsed = (int)data["procedural_weapon_materials_used"];
+
+            // Load unlocked types
+            if (data.Contains("procedural_weapon_unlocked_types")) {
+                var typesArray = (Godot.Array)data["procedural_weapon_unlocked_types"];
+                _data.UnlockedWeaponTypes.Clear();
+                foreach (string type in typesArray)
+                {
+                    _data.UnlockedWeaponTypes.Add(type);
+                }
+            }
+
+            // Load unlocked prefixes
+            if (data.Contains("procedural_weapon_unlocked_prefixes")) {
+                var prefixesArray = (Godot.Array)data["procedural_weapon_unlocked_prefixes"];
+                _data.UnlockedPrefixes.Clear();
+                foreach (string prefix in prefixesArray)
+                {
+                    _data.UnlockedPrefixes.Add(prefix);
+                }
+            }
+
+            // Load unlocked suffixes
+            if (data.Contains("procedural_weapon_unlocked_suffixes")) {
+                var suffixesArray = (Godot.Array)data["procedural_weapon_unlocked_suffixes"];
+                _data.UnlockedSuffixes.Clear();
+                foreach (string suffix in suffixesArray)
+                {
+                    _data.UnlockedSuffixes.Add(suffix);
+                }
+            }
+
+            // Load rarity distribution
+            if (data.Contains("procedural_weapon_rarity_dist")) {
+                var rarityDistDict = (Godot.Dictionary)data["procedural_weapon_rarity_dist"];
+                foreach (var key in rarityDistDict.Keys)
+                {
+                    _data.RarityGenerationCount[(string)key] = (int)rarityDistDict[key];
+                }
+            }
+
+            GD.Print("[ProceduralWeaponSystem] Data loaded successfully");
         }
     }
 }
