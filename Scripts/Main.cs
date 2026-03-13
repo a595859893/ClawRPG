@@ -1803,6 +1803,12 @@ namespace ClawRPG.Scripts {
                 ToggleMultiplayerUI();
             }
 
+            // Handle combat rating UI toggle (R key)
+            if (Input.IsActionJustPressed("combat_rating"))
+            {
+                ToggleCombatRatingUI();
+            }
+
             // Handle weapon mastery UI toggle (W key)
             if (Input.IsActionJustPressed("weapon_mastery"))
             {
@@ -4645,6 +4651,31 @@ namespace ClawRPG.Scripts {
                 {
                     multiplayerLobbyUI.Show();
                 }
+            }
+        }
+
+        /// <summary>
+        /// 切换战斗评级界面
+        /// </summary>
+        private void ToggleCombatRatingUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var combatRatingUI = ui.GetNodeOrNull<Systems.CombatRating.CombatRatingUI>("CombatRatingUI");
+            if (combatRatingUI != null && combatRatingUI.Visible)
+            {
+                combatRatingUI.Hide();
+            }
+            else
+            {
+                if (combatRatingUI == null)
+                {
+                    combatRatingUI = new Systems.CombatRating.CombatRatingUI();
+                    combatRatingUI.Name = "CombatRatingUI";
+                    ui.AddChild(combatRatingUI);
+                }
+                combatRatingUI.Show();
             }
         }
 
