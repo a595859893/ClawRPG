@@ -1615,6 +1615,12 @@ namespace ClawRPG.Scripts {
             monsterTamingUI.Visible = false;
             ui.AddChild(monsterTamingUI);
 
+            // Initialize Daily Puzzle UI
+            var dailyPuzzleUI = new DailyPuzzleUI();
+            dailyPuzzleUI.Name = "DailyPuzzleUI";
+            dailyPuzzleUI.Visible = false;
+            ui.AddChild(dailyPuzzleUI);
+
             // Initialize Prestige UI
             var prestigeUI = new PrestigeUI();
             prestigeUI.Name = "PrestigeUI";
@@ -2124,6 +2130,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.T))
             {
                 ToggleMonsterTamingUI();
+            }
+
+            // Handle daily puzzle UI toggle (P key with no modifiers)
+            if (Input.IsKeyPressed(Key.P) && !Input.IsKeyPressed(Key.Shift) && !Input.IsKeyPressed(Key.Control) && !Input.IsKeyPressed(Key.Alt))
+            {
+                ToggleDailyPuzzleUI();
             }
 
             // Handle tattoo UI toggle (Ctrl+T key)
@@ -2902,6 +2914,22 @@ namespace ClawRPG.Scripts {
             if (monsterTamingUI != null)
             {
                 monsterTamingUI.ToggleUI();
+            }
+        }
+
+        private void ToggleDailyPuzzleUI()
+        {
+            var dailyPuzzleUI = GetNodeOrNull<DailyPuzzleUI>("CanvasLayer/DailyPuzzleUI");
+            if (dailyPuzzleUI != null)
+            {
+                if (dailyPuzzleUI.Visible)
+                {
+                    dailyPuzzleUI.Visible = false;
+                }
+                else
+                {
+                    dailyPuzzleUI.Visible = true;
+                }
             }
         }
 
