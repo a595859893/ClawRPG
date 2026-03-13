@@ -5,6 +5,7 @@ using ClawRPG.Scripts.Systems;
 using ClawRPG.Systems;
 using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.Systems.Pets;
+using ClawRPG.Scripts.Systems.PetFusion;
 using ClawRPG.Scripts.Systems.Enhancement;
 using ClawRPG.Scripts.Systems.ArtifactFusion;
 using ClawRPG.Scripts.Systems.EnemyWeakness;
@@ -2437,6 +2438,12 @@ namespace ClawRPG.Scripts {
                 TogglePetGeneticsUI();
             }
 
+            // Handle pet fusion UI toggle (Ctrl+F key)
+            if (Input.IsKeyPressed(Key.F) && Input.IsKeyPressed(Key.Ctrl))
+            {
+                TogglePetFusionUI();
+            }
+
             // Handle daily dungeon UI toggle (D key)
             if (Input.IsActionJustPressed("ui_daily_dungeon"))
             {
@@ -3416,6 +3423,31 @@ namespace ClawRPG.Scripts {
             {
                 var newUI = new PetGeneticsUI();
                 newUI.Name = "PetGeneticsUI";
+                GetNode("UI").AddChild(newUI);
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet fusion UI
+        /// </summary>
+        private void TogglePetFusionUI()
+        {
+            var petFusionUI = GetNodeOrNull<PetFusionUI>("UI/PetFusionUI");
+            if (petFusionUI != null)
+            {
+                if (petFusionUI.Visible)
+                {
+                    petFusionUI.Hide();
+                }
+                else
+                {
+                    petFusionUI.Show();
+                }
+            }
+            else
+            {
+                var newUI = new PetFusionUI();
+                newUI.Name = "PetFusionUI";
                 GetNode("UI").AddChild(newUI);
             }
         }
