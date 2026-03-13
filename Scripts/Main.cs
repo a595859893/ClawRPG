@@ -1964,6 +1964,12 @@ namespace ClawRPG.Scripts {
                 ToggleMilestoneUI();
             }
 
+            // Handle streak UI toggle (Alt+S key)
+            if (Input.IsKeyPressed(Key.S) && Input.IsKeyPressed(Key.Alt) && !Input.IsKeyPressed(Key.Ctrl) && !Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleStreakUI();
+            }
+
             // Handle weekly challenge UI toggle (Ctrl+Shift+W key)
             if (Input.IsKeyPressed(Key.W) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
@@ -4721,6 +4727,29 @@ namespace ClawRPG.Scripts {
             var milestoneUI = new Systems.Milestone.MilestoneUI();
             milestoneUI.Name = "MilestoneUI";
             canvasLayer.AddChild(milestoneUI);
+        }
+
+        /// <summary>
+        /// 切换连续系统界面
+        /// </summary>
+        private void ToggleStreakUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var streakUI = ui.GetNodeOrNull<Systems.Streak.StreakUI>("StreakUI");
+            if (streakUI != null)
+            {
+                streakUI.QueueFree();
+                return;
+            }
+
+            // Initialize streak system if not already
+            Systems.Streak.StreakMain.Initialize();
+
+            var newStreakUI = new Systems.Streak.StreakUI();
+            newStreakUI.Name = "StreakUI";
+            ui.AddChild(newStreakUI);
         }
 
         /// <summary>
