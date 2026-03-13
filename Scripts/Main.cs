@@ -640,6 +640,16 @@ namespace ClawRPG.Scripts {
             petRecycleSystem.Name = "PetRecycleSystem";
             AddChild(petRecycleSystem);
 
+            // Initialize pet inventory system
+            var petInventorySystem = new Systems.PetInventory.PetInventorySystem();
+            petInventorySystem.Name = "PetInventorySystem";
+            AddChild(petInventorySystem);
+
+            // Initialize pet inventory database
+            var petInventoryDatabase = new Systems.PetInventory.PetInventoryDatabase();
+            petInventoryDatabase.Name = "PetInventoryDatabase";
+            AddChild(petInventoryDatabase);
+
             // Initialize elite monster system
             var eliteMonsterDatabase = new Systems.EliteMonster.EliteMonsterDatabase();
             eliteMonsterDatabase.Name = "EliteMonsterDatabase";
@@ -1357,6 +1367,12 @@ namespace ClawRPG.Scripts {
             petRecycleUI.Name = "PetRecycleUI";
             petRecycleUI.Visible = false;
             ui.AddChild(petRecycleUI);
+
+            // Pet Inventory UI
+            var petInventoryUI = new Systems.PetInventory.PetInventoryUI();
+            petInventoryUI.Name = "PetInventoryUI";
+            petInventoryUI.Visible = false;
+            ui.AddChild(petInventoryUI);
 
             // Elite Monster UI
             var eliteMonsterUI = new Systems.EliteMonster.EliteMonsterUI();
@@ -2349,6 +2365,12 @@ namespace ClawRPG.Scripts {
                 TogglePetRecycleUI();
             }
 
+            // Handle pet inventory UI toggle (Ctrl+Shift+I)
+            if (Input.IsActionJustPressed("pet_inventory_toggle"))
+            {
+                TogglePetInventoryUI();
+            }
+
             // Handle elite monster UI toggle (E key)
             if (Input.IsActionJustPressed("elite_monster_toggle"))
             {
@@ -3168,6 +3190,18 @@ namespace ClawRPG.Scripts {
                     petRecycleUI.Initialize(petRecycleSystem);
                 }
                 petRecycleUI.Visible = !petRecycleUI.Visible;
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet inventory UI
+        /// </summary>
+        private void TogglePetInventoryUI()
+        {
+            var petInventoryUI = GetNodeOrNull<Systems.PetInventory.PetInventoryUI>("UI/PetInventoryUI");
+            if (petInventoryUI != null)
+            {
+                petInventoryUI.Visible = !petInventoryUI.Visible;
             }
         }
 
