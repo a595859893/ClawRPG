@@ -1,0 +1,36 @@
+using Godot;
+using System;
+
+public class MilestoneMain : Node
+{
+    public static MilestoneSystem MilestoneSystem { get; private set; }
+    public static MilestoneUI MilestoneUI { get; private set; }
+    
+    public override void _Ready()
+    {
+        MilestoneSystem = new MilestoneSystem();
+        GD.Print("Milestone System initialized");
+    }
+    
+    public static void ToggleMilestoneUI()
+    {
+        var sceneTree = Engine.GetSingleton("Engine").GetMainLoop() as SceneTree;
+        if (sceneTree == null) return;
+        
+        var root = sceneTree.Root;
+        
+        // Find existing UI
+        foreach (Node child in root.GetChildren())
+        {
+            if (child is MilestoneUI)
+            {
+                child.QueueFree();
+                return;
+            }
+        }
+        
+        // Create new UI
+        var ui = new MilestoneUI();
+        root.AddChild(ui);
+    }
+}

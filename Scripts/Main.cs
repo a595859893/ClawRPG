@@ -1958,6 +1958,12 @@ namespace ClawRPG.Scripts {
                 ToggleSeededRunUI();
             }
 
+            // Handle milestone UI toggle (M key)
+            if (Input.IsKeyPressed(Key.M) && !Input.IsKeyPressed(Key.Ctrl) && !Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleMilestoneUI();
+            }
+
             // Handle weekly challenge UI toggle (Ctrl+Shift+W key)
             if (Input.IsKeyPressed(Key.W) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
@@ -4690,6 +4696,31 @@ namespace ClawRPG.Scripts {
                     seededRunUI.Show();
                 }
             }
+        }
+
+        /// <summary>
+        /// 切换里程碑界面
+        /// </summary>
+        private void ToggleMilestoneUI()
+        {
+            var existingUI = GetNodeOrNull<Systems.Milestone.MilestoneUI>("CanvasLayer/MilestoneUI");
+            if (existingUI != null)
+            {
+                existingUI.QueueFree();
+                return;
+            }
+            
+            var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+            if (canvasLayer == null)
+            {
+                canvasLayer = new CanvasLayer();
+                canvasLayer.Name = "CanvasLayer";
+                AddChild(canvasLayer);
+            }
+            
+            var milestoneUI = new Systems.Milestone.MilestoneUI();
+            milestoneUI.Name = "MilestoneUI";
+            canvasLayer.AddChild(milestoneUI);
         }
 
         /// <summary>
