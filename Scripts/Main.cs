@@ -252,6 +252,11 @@ namespace ClawRPG.Scripts {
             skillTreeSystem.Name = "SkillTreeSystem";
             AddChild(skillTreeSystem);
 
+            // Initialize skill tree reset system
+            var skillTreeResetSystem = new SkillTreeResetSystem();
+            skillTreeResetSystem.Name = "SkillTreeResetSystem";
+            AddChild(skillTreeResetSystem);
+
             // Initialize skill synergy system
             var skillSynergySystem = new SkillSynergySystem();
             skillSynergySystem.Name = "SkillSynergySystem";
@@ -1055,6 +1060,12 @@ namespace ClawRPG.Scripts {
             skillTreeUI.Name = "SkillTreeUI";
             ui.AddChild(skillTreeUI);
 
+            // Skill Tree Reset UI
+            var skillTreeResetUI = new SkillTreeResetUI();
+            skillTreeResetUI.Name = "SkillTreeResetUI";
+            skillTreeResetUI.Visible = false;
+            ui.AddChild(skillTreeResetUI);
+
             // Skill Synergy UI
             var skillSynergyUI = new SkillSynergyUI();
             skillSynergyUI.Name = "SkillSynergyUI";
@@ -1849,6 +1860,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.K) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleSkillSynergyUI();
+            }
+
+            // Handle skill tree reset UI toggle (Ctrl+Shift+R key)
+            if (Input.IsKeyPressed(Key.R) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleSkillTreeResetUI();
             }
 
             // Handle constellation UI toggle (K key - when not in combat)
@@ -2736,6 +2753,15 @@ namespace ClawRPG.Scripts {
             if (skillSynergyUI != null)
             {
                 skillSynergyUI.ToggleVisibility();
+            }
+        }
+
+        private void ToggleSkillTreeResetUI()
+        {
+            var skillTreeResetUI = GetNodeOrNull<SkillTreeResetUI>("CanvasLayer/SkillTreeResetUI");
+            if (skillTreeResetUI != null)
+            {
+                skillTreeResetUI.Toggle();
             }
         }
 
