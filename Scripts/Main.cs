@@ -915,6 +915,19 @@ namespace ClawRPG.Scripts {
             GetNode("/root/CanvasLayer/UI").AddChild(seededRunUI);
             seededRunUI.Visible = false;
 
+            // Combat Effect Overlay System
+            var combatEffectOverlaySystem = new CombatEffectOverlaySystem();
+            combatEffectOverlaySystem.Name = "CombatEffectOverlaySystem";
+            AddChild(combatEffectOverlaySystem);
+            GD.Print("Combat Effect Overlay System initialized");
+
+            // Combat Effect Overlay UI
+            var combatEffectOverlayUI = new CombatEffectOverlayUI();
+            combatEffectOverlayUI.Name = "CombatEffectOverlayUI";
+            GetNode("/root/CanvasLayer/UI").AddChild(combatEffectOverlayUI);
+            combatEffectOverlayUI.Visible = false;
+            GD.Print("Combat Effect Overlay UI initialized");
+
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -2110,6 +2123,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.V))
             {
                 ToggleCombatVFXUI();
+            }
+
+            // Handle combat effect overlay UI toggle (Shift+E key)
+            if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.E))
+            {
+                ToggleCombatEffectOverlayUI();
             }
 
             // Handle story UI toggle (K key)
@@ -3848,6 +3867,15 @@ namespace ClawRPG.Scripts {
             if (combatVFXUI != null)
             {
                 combatVFXUI.Toggle();
+            }
+        }
+
+        private void ToggleCombatEffectOverlayUI()
+        {
+            var combatEffectOverlayUI = GetNodeOrNull<CombatEffectOverlayUI>("CanvasLayer/UI/CombatEffectOverlayUI");
+            if (combatEffectOverlayUI != null)
+            {
+                combatEffectOverlayUI.Visible = !combatEffectOverlayUI.Visible;
             }
         }
 
