@@ -518,6 +518,11 @@ namespace ClawRPG.Scripts {
             worldBossSystem.Name = "WorldBossSystem";
             AddChild(worldBossSystem);
 
+            // Initialize boss rush system
+            var bossRushSystem = new BossRushSystem();
+            bossRushSystem.Name = "BossRushSystem";
+            AddChild(bossRushSystem);
+
             // Initialize game settings system
             var gameSettings = new GameSettings();
             gameSettings.Name = "GameSettings";
@@ -1502,6 +1507,12 @@ namespace ClawRPG.Scripts {
             worldBossUI.Name = "WorldBossUI";
             worldBossUI.Visible = false; 
             ui.AddChild(worldBossUI);
+
+            // Boss Rush UI
+            var bossRushUI = new BossRushUI();
+            bossRushUI.Name = "BossRushUI";
+            bossRushUI.Visible = false;
+            ui.AddChild(bossRushUI);
 
             // Choice Event UI
             var choiceEventUI = new Systems.ChoiceEvents.ChoiceEventUI();
@@ -2737,6 +2748,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("ui_world_boss"))
             {
                 ToggleWorldBossUI();
+            }
+
+            // Handle boss rush UI toggle (Ctrl+Shift+B)
+            if (Input.IsActionJustPressed("boss_rush_toggle"))
+            {
+                ToggleBossRushUI();
             }
 
             // Handle enemy weakness UI toggle (Ctrl+W)
@@ -5159,6 +5176,31 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(worldBossUI);
                 }
                 worldBossUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换Boss冲刺界面
+        /// </summary>
+        private void ToggleBossRushUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var bossRushUI = ui.GetNodeOrNull<BossRushUI>("BossRushUI");
+            if (bossRushUI != null && bossRushUI.Visible)
+            {
+                bossRushUI.Hide();
+            }
+            else
+            {
+                if (bossRushUI == null)
+                {
+                    bossRushUI = new BossRushUI();
+                    bossRushUI.Name = "BossRushUI";
+                    ui.AddChild(bossRushUI);
+                }
+                bossRushUI.Show();
             }
         }
 
