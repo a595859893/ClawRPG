@@ -234,6 +234,21 @@ namespace ClawRPG.Scripts {
             comboSystem.Name = "ComboSystem";
             AddChild(comboSystem);
 
+            // Initialize combo chain data
+            var comboChainData = new ComboChainData();
+            comboChainData.Name = "ComboChainData";
+            AddChild(comboChainData);
+
+            // Initialize combo chain database
+            var comboChainDb = ComboChainDatabase.Instance;
+            comboChainDb.Name = "ComboChainDatabase";
+            AddChild(comboChainDb);
+
+            // Initialize combo chain system
+            var comboChainSystem = ComboChainSystem.Instance;
+            comboChainSystem.Name = "ComboChainSystem";
+            AddChild(comboChainSystem);
+
             // Initialize momentum system
             var momentumSystem = new MomentumSystem();
             momentumSystem.Name = "MomentumSystem";
@@ -1943,6 +1958,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.C))
             {
                 ToggleChoiceEventUI();
+            }
+
+            // Handle combo chain UI toggle (Ctrl+Shift+C key)
+            if (Input.IsKeyPressed(Key.C) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleComboChainUI();
             }
 
             // Handle alchemy laboratory UI toggle (Ctrl+L key)
@@ -5316,6 +5337,27 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(bracketUI);
                 }
                 bracketUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换连击链 UI
+        /// </summary>
+        private void ToggleComboChainUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var comboChainUI = ui.GetNodeOrNull<Systems.ComboChain.ComboChainUI>("ComboChainUI");
+            if (comboChainUI != null && comboChainUI.Visible)
+            {
+                comboChainUI.QueueFree();
+            }
+            else
+            {
+                comboChainUI = new Systems.ComboChain.ComboChainUI();
+                comboChainUI.Name = "ComboChainUI";
+                ui.AddChild(comboChainUI);
             }
         }
 
