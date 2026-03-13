@@ -241,12 +241,115 @@ public class PetLifeCycleSystem : Node
     // 存档
     private void SaveData()
     {
-        // TODO: 实现存档逻辑
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) data = new Godot.Dictionary();
+
+        // 保存宠物生命周期数据
+        var petCyclesArray = new Godot.Array();
+        foreach (var kvp in _data.PetLifeCycles)
+        {
+            var petData = new Godot.Dictionary();
+            petData["pet_id"] = kvp.Key;
+            petData["pet_name"] = kvp.Value.PetName;
+            petData["current_age"] = kvp.Value.CurrentAge;
+            petData["max_age"] = kvp.Value.MaxAge;
+            petData["current_stage"] = (int)kvp.Value.CurrentStage;
+            petData["is_immortal"] = kvp.Value.IsImmortal;
+            petData["life_extension_used"] = kvp.Value.LifeExtensionUsed;
+            petData["days_since_stage_change"] = kvp.Value.DaysSinceLastStageChange;
+            petCyclesArray.Add(petData);
+        }
+        data["pet_life_cycle_pets"] = petCyclesArray;
+
+        // 保存统计数据
+        var stats = new Godot.Dictionary();
+        stats["total_life_cycles"] = _data.TotalLifeCycles;
+        stats["total_deaths"] = _data.TotalDeaths;
+        stats["total_life_extensions"] = _data.TotalLifeExtensions;
+        stats["longest_life_span"] = _data.LongestLifeSpan;
+        data["pet_life_cycle_stats"] = stats;
+
+        // 保存历史记录 (限制最近50条)
+        var historyArray = new Godot.Array();
+        var recentHistory = _data.History.TakeLast(50).ToList();
+        foreach (var record in recentHistory)
+        {
+            var historyData = new Godot.Dictionary();
+            historyData["pet_id"] = record.PetId;
+            historyData["pet_name"] = record.PetName;
+            historyData["age_at_death"] = record.AgeAtDeath;
+            historyData["stage_at_death"] = (int)record.StageAtDeath;
+            historyData["was_extended"] = record.WasExtended;
+            historyData["life_extensions"] = record.LifeExtensions;
+            historyData["timestamp"] = record.Timestamp;
+            historyArray.Add(historyData);
+        }
+        data["pet_life_cycle_history"] = historyArray;
+
+        saveSystem.SaveGame(data);
     }
     
     // 读档
     private void LoadData()
     {
-        // TODO: 实现读档逻辑
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) return;
+
+        // 加载宠物生命周期数据
+        if (data.Contains("pet_life_cycle_pets"))
+        {
+            var petCyclesArray = (Godot.Array)data["pet_life_cycle_pets"];
+            foreach (Godot.Dictionary petData in petCyclesArray)
+            {
+                var entry = new PetLifeCycleEntry
+                {
+                    PetId = (int)petData["pet_id"],
+                    PetName = (string)petData["pet_name"],
+                    CurrentAge = (int)petData["current_age"],
+                    MaxAge = (int)petData["max_age"],
+                    CurrentStage = (LifeStage)(int)petData["current_stage"],
+                    IsImmortal = (bool)petData["is_immortal"],
+                    LifeExtensionUsed = (int)petData["life_extension_used"],
+                    DaysSinceLastStageChange = (int)petData["days_since_stage_change"]
+                };
+                _data.PetLifeCycles[entry.PetId] = entry;
+            }
+        }
+
+        // 加载统计数据
+        if (data.Contains("pet_life_cycle_stats"))
+        {
+            var stats = (Godot.Dictionary)data["pet_life_cycle_stats"];
+            _data.TotalLifeCycles = (int)stats["total_life_cycles"];
+            _data.TotalDeaths = (int)stats["total_deaths"];
+            _data.TotalLifeExtensions = (int)stats["total_life_extensions"];
+            _data.LongestLifeSpan = (int)stats["longest_life_span"];
+        }
+
+        // 加载历史记录
+        if (data.Contains("pet_life_cycle_history"))
+        {
+            var historyArray = (Godot.Array)data["pet_life_cycle_history"];
+            foreach (Godot.Dictionary historyData in historyArray)
+            {
+                var record = new LifeCycleHistoryEntry
+                {
+                    PetId = (int)historyData["pet_id"],
+                    PetName = (string)historyData["pet_name"],
+                    AgeAtDeath = (int)historyData["age_at_death"],
+                    StageAtDeath = (LifeStage)(int)historyData["stage_at_death"],
+                    WasExtended = (bool)historyData["was_extended"],
+                    LifeExtensions = (int)historyData["life_extensions"],
+                    Timestamp = (long)historyData["timestamp"]
+                };
+                _data.History.Add(record);
+            }
+        }
     }
 }

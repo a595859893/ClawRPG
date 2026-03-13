@@ -346,13 +346,147 @@ public class PetPhotoSystem
     // Load from file
     public void LoadFromFile(string filePath)
     {
-        // TODO: Implement load from file
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) return;
+
+        // 加载已解锁地点
+        if (data.Contains("pet_photo_unlocked_locations"))
+        {
+            var locationsArray = (Godot.Array)data["pet_photo_unlocked_locations"];
+            _data.UnlockedLocations.Clear();
+            foreach (int locId in locationsArray)
+            {
+                _data.UnlockedLocations.Add(locId);
+            }
+        }
+
+        // 加载照片数据
+        if (data.Contains("pet_photo_photos"))
+        {
+            var photosArray = (Godot.Array)data["pet_photo_photos"];
+            _data.AllPhotos.Clear();
+            foreach (Godot.Dictionary photoData in photosArray)
+            {
+                var photo = new PetPhotoData.PhotoEntry
+                {
+                    PhotoId = (string)photoData["photo_id"],
+                    PetId = (string)photoData["pet_id"],
+                    PetName = (string)photoData["pet_name"],
+                    LocationId = (int)photoData["location_id"],
+                    LocationName = (string)photoData["location_name"],
+                    Timestamp = DateTime.Parse((string)photoData["timestamp"]),
+                    PhotoQuality = (int)photoData["quality"],
+                    IsFavorite = (bool)photoData["is_favorite"],
+                    Notes = (string)photoData["notes"]
+                };
+                _data.AllPhotos.Add(photo);
+                
+                // 更新 nextPhotoId
+                int photoNum = int.Parse(photo.PhotoId.Replace("photo_", ""));
+                if (photoNum >= _nextPhotoId)
+                    _nextPhotoId = photoNum + 1;
+            }
+        }
+
+        // 加载相册数据
+        if (data.Contains("pet_photo_albums"))
+        {
+            var albumsArray = (Godot.Array)data["pet_photo_albums"];
+            _data.Albums.Clear();
+            foreach (Godot.Dictionary albumData in albumsArray)
+            {
+                var album = new PetPhotoData.PhotoAlbum
+                {
+                    AlbumName = (string)albumData["album_name"],
+                    CreatedAt = DateTime.Parse((string)albumData["created_at"])
+                };
+                var photoIdsArray = (Godot.Array)albumData["photo_ids"];
+                foreach (string photoId in photoIdsArray)
+                {
+                    album.PhotoIds.Add(photoId);
+                }
+                _data.Albums.Add(album);
+            }
+        }
+
+        // 加载统计数据
+        if (data.Contains("pet_photo_stats"))
+        {
+            var stats = (Godot.Dictionary)data["pet_photo_stats"];
+            _data.TotalPhotos = (int)stats["total_photos"];
+            _data.FavoritePhotos = (int)stats["favorite_photos"];
+            _data.TotalAlbums = (int)stats["total_albums"];
+            _data.LocationsUnlocked = (int)stats["locations_unlocked"];
+        }
+
+        GD.Print($"[PetPhotoSystem] Loaded {_data.AllPhotos.Count} photos, {_data.Albums.Count} albums");
     }
 
     // Save to file
     public void SaveToFile(string filePath)
     {
-        // TODO: Implement save to file
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) data = new Godot.Dictionary();
+
+        // 保存已解锁地点
+        var locationsArray = new Godot.Array();
+        foreach (int locId in _data.UnlockedLocations)
+        {
+            locationsArray.Add(locId);
+        }
+        data["pet_photo_unlocked_locations"] = locationsArray;
+
+        // 保存照片数据
+        var photosArray = new Godot.Array();
+        foreach (var photo in _data.AllPhotos)
+        {
+            var photoData = new Godot.Dictionary();
+            photoData["photo_id"] = photo.PhotoId;
+            photoData["pet_id"] = photo.PetId;
+            photoData["pet_name"] = photo.PetName;
+            photoData["location_id"] = photo.LocationId;
+            photoData["location_name"] = photo.LocationName;
+            photoData["timestamp"] = photo.Timestamp.ToString("o");
+            photoData["quality"] = photo.PhotoQuality;
+            photoData["is_favorite"] = photo.IsFavorite;
+            photoData["notes"] = photo.Notes;
+            photosArray.Add(photoData);
+        }
+        data["pet_photo_photos"] = photosArray;
+
+        // 保存相册数据
+        var albumsArray = new Godot.Array();
+        foreach (var album in _data.Albums)
+        {
+            var albumData = new Godot.Dictionary();
+            albumData["album_name"] = album.AlbumName;
+            albumData["created_at"] = album.CreatedAt.ToString("o");
+            var photoIdsArray = new Godot.Array();
+            foreach (string photoId in album.PhotoIds)
+            {
+                photoIdsArray.Add(photoId);
+            }
+            albumData["photo_ids"] = photoIdsArray;
+            albumsArray.Add(albumData);
+        }
+        data["pet_photo_albums"] = albumsArray;
+
+        // 保存统计数据
+        var stats = new Godot.Dictionary();
+        stats["total_photos"] = _data.TotalPhotos;
+        stats["favorite_photos"] = _data.FavoritePhotos;
+        stats["total_albums"] = _data.TotalAlbums;
+        stats["locations_unlocked"] = _data.LocationsUnlocked;
+        data["pet_photo_stats"] = stats;
+
+        saveSystem.SaveGame(data);
+        GD.Print($"[PetPhotoSystem] Saved {_data.AllPhotos.Count} photos, {_data.Albums.Count} albums");
     }
 }
 
