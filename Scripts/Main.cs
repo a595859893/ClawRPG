@@ -841,6 +841,27 @@ namespace ClawRPG.Scripts {
             GetNode("/root/CanvasLayer/UI").AddChild(enemyWeaknessUI);
             enemyWeaknessUI.Visible = false;
 
+            // Item Smelting System
+            var itemSmeltingData = new ItemSmeltingData();
+            itemSmeltingData.Name = "ItemSmeltingData";
+            AddChild(itemSmeltingData);
+
+            // Item Smelting Database
+            var itemSmeltingDatabase = new ItemSmeltingDatabase();
+            itemSmeltingDatabase.Name = "ItemSmeltingDatabase";
+            AddChild(itemSmeltingDatabase);
+
+            // Item Smelting System Core
+            var itemSmeltingSystem = new ItemSmeltingSystem();
+            itemSmeltingSystem.Name = "ItemSmeltingSystem";
+            AddChild(itemSmeltingSystem);
+
+            // Item Smelting UI
+            var itemSmeltingUI = new ItemSmeltingUI();
+            itemSmeltingUI.Name = "ItemSmeltingUI";
+            GetNode("/root/CanvasLayer/UI").AddChild(itemSmeltingUI);
+            itemSmeltingUI.Visible = false;
+
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
             GD.Print("Tutorial database initialized");
@@ -2566,6 +2587,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.W) && Input.IsKeyPressed(Key.Control))
             {
                 ToggleEnemyWeaknessUI();
+            }
+
+            // Handle item smelting UI toggle (Ctrl+Shift+M)
+            if (Input.IsActionJustPressed("item_smelting_toggle"))
+            {
+                ToggleItemSmeltingUI();
             }
             
             // Handle contract bounty UI toggle (Ctrl+C)
@@ -4517,6 +4544,25 @@ namespace ClawRPG.Scripts {
             if (enemyWeaknessUI != null)
             {
                 enemyWeaknessUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// 切换物品熔炼界面
+        /// </summary>
+        private void ToggleItemSmeltingUI()
+        {
+            var itemSmeltingUI = GetNodeOrNull<ItemSmeltingUI>("UI/ItemSmeltingUI");
+            if (itemSmeltingUI != null)
+            {
+                if (itemSmeltingUI.Visible)
+                {
+                    itemSmeltingUI.Hide();
+                }
+                else
+                {
+                    itemSmeltingUI.Show();
+                }
             }
         }
 

@@ -1,0 +1,71 @@
+using Godot;
+using System;
+using System.Collections.Generic;
+
+public class ItemSmeltingData : Node
+{
+    // Smelting recipes unlocked
+    public HashSet<string> UnlockedRecipes = new HashSet<string>();
+    
+    // Smelting history
+    public List<SmeltingRecord> History = new List<SmeltingRecord>();
+    
+    // Statistics
+    public int TotalSmelts = 0;
+    public int TotalItemsSmelted = 0;
+    public int TotalMaterialsGenerated = 0;
+    public int GoldSpent = 0;
+    
+    // Per recipe stats
+    public Dictionary<string, int> RecipeUsageCount = new Dictionary<string, int>();
+    
+    public override void _Ready()
+    {
+        // Load data from save if exists
+        LoadData();
+    }
+    
+    public void LoadData()
+    {
+        if (FileAccess.FileExists("user://item_smelting_data.json"))
+        {
+            var file = FileAccess.Open("user://item_smelting_data.json", FileAccess.ModeFlags.Read);
+            string json = file.GetAsText();
+            file.Close();
+            
+            // Parse JSON (simplified)
+            if (json.Contains("\"TotalSmelts\""))
+            {
+                // Load stats
+                var data = Json.ParseString(json).AsGodotDictionary();
+                if (data.Contains("TotalSmelts")) TotalSmelts = (int)data["TotalSmelts"];
+                if (data.Contains("TotalItemsSmelted")) TotalItemsSmelted = (int)data["TotalItemsSmelted"];
+                if (data.Contains("TotalMaterialsGenerated")) TotalMaterialsGenerated = (int)data["TotalMaterialsGenerated"];
+                if (data.Contains("GoldSpent")) GoldSpent = (int)data["GoldSpent"];
+            }
+        }
+    }
+    
+    public void SaveData()
+    {
+        var file = FileAccess.Open("user://item_smelting_data.json", FileAccess.ModeFlags.Write);
+        string json = Json.Stringify(new Godot.Collections.Dictionary
+        {
+            ["TotalSmelts"] = TotalSmelts,
+            ["TotalItemsSmelted"] = TotalItemsSmelted,
+            ["TotalMaterialsGenerated"] = TotalMaterialsGenerated,
+            ["GoldSpent"] = GoldSpent
+        });
+        file.StoreString(json);
+        file.Close();
+    }
+}
+
+public class SmeltingRecord
+{
+    public string RecipeId;
+    public int ItemCount;
+    public int MaterialsGenerated;
+    public int GoldSpent;
+    public long Timestamp;
+}
