@@ -18,6 +18,9 @@ using ClawRPG.Scripts.Achievements;
 using ClawRPG.Scripts.Combat;
 using ClawRPG.Scripts.Systems.TitleCollection;
 using ClawRPG.Scripts.BossMechanics;
+using ClawRPG.Scripts.Systems.MythicPlusDungeon;
+using ClawRPG.Scripts.Systems.ProceduralDungeon;
+using ClawRPG.Scripts.Systems.ArenaTournament;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -237,6 +240,11 @@ namespace ClawRPG.Scripts {
             var arenaTournamentSystem = new ArenaTournament.ArenaTournamentSystem();
             arenaTournamentSystem.Name = "ArenaTournamentSystem";
             AddChild(arenaTournamentSystem);
+
+            // Initialize mythic+ dungeon system
+            var mythicPlusDungeonSystem = new MythicPlusDungeon.MythicPlusDungeonSystem();
+            mythicPlusDungeonSystem.Name = "MythicPlusDungeonSystem";
+            AddChild(mythicPlusDungeonSystem);
 
             // Initialize combat UI system
             var combatUISystem = new Combat.CombatUISystem();
@@ -1117,6 +1125,11 @@ namespace ClawRPG.Scripts {
             var proceduralDungeonUI = new ProceduralDungeon.ProceduralDungeonUI();
             proceduralDungeonUI.Name = "ProceduralDungeonUI";
             ui.AddChild(proceduralDungeonUI);
+
+            // Mythic+ Dungeon UI
+            var mythicPlusDungeonUI = new MythicPlusDungeon.MythicPlusDungeonUI();
+            mythicPlusDungeonUI.Name = "MythicPlusDungeonUI";
+            ui.AddChild(mythicPlusDungeonUI);
 
             // Mount Training UI
             var mountTrainingUI = new MountTrainingUI();
@@ -2196,6 +2209,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.G) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleProceduralDungeonUI();
+            }
+
+            // Handle mythic+ dungeon UI toggle (Ctrl+Shift+M key - alternative to meditation)
+            if (Input.IsKeyPressed(Key.M) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleMythicPlusDungeonUI();
             }
 
             // Handle arena tournament UI toggle (Ctrl+Shift+T key)
@@ -3360,6 +3379,33 @@ namespace ClawRPG.Scripts {
                 }
                 canvasLayer.AddChild(dungeonUI);
                 dungeonUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换大秘境 UI 界面 (Ctrl+Shift+M)
+        /// </summary>
+        private void ToggleMythicPlusDungeonUI()
+        {
+            var mythicUI = GetNodeOrNull<MythicPlusDungeon.MythicPlusDungeonUI>("CanvasLayer/MythicPlusDungeonUI");
+            if (mythicUI != null)
+            {
+                mythicUI.Toggle();
+            }
+            else
+            {
+                // Create and add the UI if it doesn't exist
+                mythicUI = new MythicPlusDungeon.MythicPlusDungeonUI();
+                mythicUI.Name = "MythicPlusDungeonUI";
+                var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+                if (canvasLayer == null)
+                {
+                    canvasLayer = new CanvasLayer();
+                    canvasLayer.Name = "CanvasLayer";
+                    AddChild(canvasLayer);
+                }
+                canvasLayer.AddChild(mythicUI);
+                mythicUI.Show();
             }
         }
 
