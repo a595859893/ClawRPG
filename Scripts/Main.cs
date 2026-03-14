@@ -1409,6 +1409,17 @@ namespace ClawRPG.Scripts {
             fishingUI.Visible = false;
             ui.AddChild(fishingUI);
 
+            // Parallel Dimension System
+            var parallelDimensionSystem = new Systems.ParallelDimension.ParallelDimensionSystem();
+            parallelDimensionSystem.Name = "ParallelDimensionSystem";
+            AddChild(parallelDimensionSystem);
+
+            // Parallel Dimension UI
+            var parallelDimensionUI = new Systems.ParallelDimension.ParallelDimensionUI();
+            parallelDimensionUI.Name = "ParallelDimensionUI";
+            parallelDimensionUI.Visible = false;
+            ui.AddChild(parallelDimensionUI);
+
             // Alchemy System
             var alchemySystem = Systems.AlchemySystem.Instance;
             alchemySystem.Initialize();
@@ -2014,6 +2025,15 @@ namespace ClawRPG.Scripts {
             }
         }
         
+        private void ToggleParallelDimensionUI()
+        {
+            var parallelDimensionUI = GetNodeOrNull<Systems.ParallelDimension.ParallelDimensionUI>("UI/ParallelDimensionUI");
+            if (parallelDimensionUI != null)
+            {
+                parallelDimensionUI.ToggleUI();
+            }
+        }
+        
         private void ToggleCraftingMasteryUI()
         {
             if (_craftingMasteryUI != null)
@@ -2210,6 +2230,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.Z) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleSealedDungeonUI();
+            }
+
+            // Handle parallel dimension UI toggle (Ctrl+Shift+P key)
+            if (Input.IsKeyPressed(Key.P) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleParallelDimensionUI();
             }
 
             // Handle alchemy laboratory UI toggle (Ctrl+L key)
