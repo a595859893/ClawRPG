@@ -1040,6 +1040,9 @@ namespace ClawRPG.Scripts {
             // Initialize crafting mastery system
             InitializeCraftingMastery();
 
+            // Initialize achievement milestone system
+            InitializeAchievementMilestone();
+
             // Load game data
             LoadGameData();
 
@@ -1902,6 +1905,10 @@ namespace ClawRPG.Scripts {
         private CraftingMastery.CraftingMasterySystem _craftingMasterySystem;
         private CraftingMastery.CraftingMasteryUI _craftingMasteryUI;
         
+        // Initialize achievement milestone system
+        private AchievementMilestoneSystem _achievementMilestoneSystem;
+        private AchievementMilestoneUI _achievementMilestoneUI;
+        
         private void InitializeCraftingMastery()
         {
             // Initialize crafting mastery system
@@ -1915,6 +1922,29 @@ namespace ClawRPG.Scripts {
             AddChild(_craftingMasteryUI);
             
             GD.Print("Crafting Mastery System initialized!");
+        }
+        
+        private void InitializeAchievementMilestone()
+        {
+            // Initialize achievement milestone system
+            _achievementMilestoneSystem = new AchievementMilestoneSystem();
+            _achievementMilestoneSystem.Name = "AchievementMilestoneSystem";
+            AddChild(_achievementMilestoneSystem);
+            
+            // Initialize achievement milestone UI
+            _achievementMilestoneUI = new AchievementMilestoneUI();
+            _achievementMilestoneUI.Name = "AchievementMilestoneUI";
+            AddChild(_achievementMilestoneUI);
+            
+            GD.Print("Achievement Milestone System initialized!");
+        }
+        
+        private void ToggleAchievementMilestoneUI()
+        {
+            if (_achievementMilestoneUI != null)
+            {
+                _achievementMilestoneUI.ToggleVisibility();
+            }
         }
         
         private void ToggleCraftingMasteryUI()
@@ -2101,6 +2131,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.K) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleCraftingMasteryUI();
+            }
+
+            // Handle achievement milestone UI toggle (Ctrl+Shift+A key)
+            if (Input.IsKeyPressed(Key.A) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleAchievementMilestoneUI();
             }
 
             // Handle alchemy laboratory UI toggle (Ctrl+L key)
