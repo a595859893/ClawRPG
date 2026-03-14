@@ -228,6 +228,11 @@ namespace ClawRPG.Scripts {
             bossMechanicsSystem.Name = "BossMechanicsSystem";
             AddChild(bossMechanicsSystem);
 
+            // Initialize combat UI system
+            var combatUISystem = new Combat.CombatUISystem();
+            combatUISystem.Name = "CombatUISystem";
+            AddChild(combatUISystem);
+
             // Initialize daily ritual system
             var dailyRitualSystem = new DailyRitualSystem();
             dailyRitualSystem.Name = "DailyRitualSystem";
@@ -2156,6 +2161,12 @@ namespace ClawRPG.Scripts {
                 ToggleBossMechanicsUI();
             }
 
+            // Handle combat UI toggle (Ctrl+Shift+D key)
+            if (Input.IsKeyPressed(Key.D) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleCombatUI();
+            }
+
             // Handle style mastery UI toggle (Shift+S key)
             if (Input.IsActionJustPressed("style_mastery_toggle"))
             {
@@ -3243,6 +3254,33 @@ namespace ClawRPG.Scripts {
                 }
                 canvasLayer.AddChild(bossMechanicsUI);
                 bossMechanicsUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换战斗 UI 界面 (Ctrl+Shift+D)
+        /// </summary>
+        private void ToggleCombatUI()
+        {
+            var combatUI = GetNodeOrNull<Combat.CombatUI>("CanvasLayer/CombatUI");
+            if (combatUI != null)
+            {
+                combatUI.Toggle();
+            }
+            else
+            {
+                // Create and add the UI if it doesn't exist
+                combatUI = new Combat.CombatUI();
+                combatUI.Name = "CombatUI";
+                var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+                if (canvasLayer == null)
+                {
+                    canvasLayer = new CanvasLayer();
+                    canvasLayer.Name = "CanvasLayer";
+                    AddChild(canvasLayer);
+                }
+                canvasLayer.AddChild(combatUI);
+                combatUI.Show();
             }
         }
 
