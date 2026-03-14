@@ -183,7 +183,7 @@ namespace ClawRPG.Scripts.Systems
         };
 
         // 预定义商品列表（按类型和稀有度）
-        public static Dictionary<string, List<Dictionary<string, object>> > ItemPool = new Dictionary<string, List<Dictionary<string, object>> >
+        public static Dictionary<string, List<Dictionary<string, object>>> ItemPool = new Dictionary<string, List<Dictionary<string, object>>>
         {
             { "weapon", new List<Dictionary<string, object>>
                 {
@@ -205,9 +205,13 @@ namespace ClawRPG.Scripts.Systems
                     new Dictionary<string, object> { { "id", "armor_legendary" }, { "name", "神圣战甲" }, { "price", 25000 } }
                 }
             },
-            { "accessory", new Dictionary<string, object>>
+            { "accessory", new List<Dictionary<string, object>>
                 {
-                    { "id", "ring_power" }, { "name", "力量之戒" }, { "price", 150 }
+                    new Dictionary<string, object> { { "id", "ring_power" }, { "name", "力量之戒" }, { "price", 150 } },
+                    new Dictionary<string, object> { { "id", "ring_speed" }, { "name", "敏捷之戒" }, { "price", 200 } },
+                    new Dictionary<string, object> { { "id", "amulet_health" }, { "name", "生命护符" }, { "price", 300 } },
+                    new Dictionary<string, object> { { "id", "amulet_magic" }, { "name", "魔力护符" }, { "price", 350 } },
+                    new Dictionary<string, object> { { "id", "accessory_legendary" }, { "name", "神器配件" }, { "price", 10000 } }
                 }
             },
             { "potion", new List<Dictionary<string, object>>
