@@ -24,6 +24,7 @@ using ClawRPG.Scripts.Systems.ProceduralDungeon;
 using ClawRPG.Scripts.Systems.ArenaTournament;
 using ClawRPG.Scripts.Systems.GuildWar;
 using ClawRPG.Systems.CraftingMastery;
+using ClawRPG.Modules.MultiplayerVote;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -675,6 +676,16 @@ namespace ClawRPG.Scripts {
             var multiplayerLobbyUI = new Systems.MultiplayerLobby.MultiplayerLobbyUI();
             multiplayerLobbyUI.Name = "MultiplayerLobbyUI";
             AddChild(multiplayerLobbyUI);
+
+            // Initialize multiplayer vote & party system
+            var multiplayerVoteSystem = new MultiplayerVoteSystem();
+            multiplayerVoteSystem.Name = "MultiplayerVoteSystem";
+            AddChild(multiplayerVoteSystem);
+
+            // Initialize multiplayer vote & party UI
+            var multiplayerVoteUI = new MultiplayerVote.MultiplayerVoteUI();
+            multiplayerVoteUI.Name = "MultiplayerVoteUI";
+            AddChild(multiplayerVoteUI);
 
             // Initialize collectible system
             CollectibleSystem.Instance.Initialize();
@@ -3039,6 +3050,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("multiplayer_lobby_toggle"))
             {
                 ToggleMultiplayerLobbyUI();
+            }
+
+            // Handle multiplayer vote & party UI toggle (Ctrl+Shift+P)
+            if (Input.IsKeyPressed(Key.P) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleMultiplayerVoteUI();
             }
 
             // Handle leaderboard UI toggle (L key with shift - Shift+L)
@@ -5612,6 +5629,18 @@ namespace ClawRPG.Scripts {
                 {
                     multiplayerLobbyUI.Show();
                 }
+            }
+        }
+
+        /// <summary>
+        /// 切换多人投票与队伍界面
+        /// </summary>
+        private void ToggleMultiplayerVoteUI()
+        {
+            var multiplayerVoteUI = GetNodeOrNull<MultiplayerVote.MultiplayerVoteUI>("MultiplayerVoteUI");
+            if (multiplayerVoteUI != null)
+            {
+                multiplayerVoteUI.Toggle();
             }
         }
 
