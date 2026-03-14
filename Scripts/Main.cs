@@ -5,6 +5,7 @@ using ClawRPG.Scripts.Systems;
 using ClawRPG.Systems;
 using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.Systems.Pets;
+using ClawRPG.Scripts.Systems.PetAIImprovements;
 using ClawRPG.Scripts.Systems.PetFusion;
 using ClawRPG.Scripts.Systems.Enhancement;
 using ClawRPG.Scripts.Systems.ArtifactFusion;
@@ -775,6 +776,16 @@ namespace ClawRPG.Scripts {
             var petInteractionSystem = new Systems.PetInteraction.PetInteractionSystem();
             petInteractionSystem.Name = "PetInteractionSystem";
             AddChild(petInteractionSystem);
+
+            // Initialize pet AI improvements system
+            var petAIImprovementsSystem = new PetAIImprovementsSystem();
+            petAIImprovementsSystem.Name = "PetAIImprovementsSystem";
+            AddChild(petAIImprovementsSystem);
+
+            // Initialize pet AI improvements database
+            var petAIImprovementsDatabase = new PetAIImprovementsDatabase();
+            petAIImprovementsDatabase.Name = "PetAIImprovementsDatabase";
+            AddChild(petAIImprovementsDatabase);
 
             // Initialize pet recycle system
             var petRecycleSystem = new Systems.PetRecycle.PetRecycleSystem();
@@ -1584,6 +1595,12 @@ namespace ClawRPG.Scripts {
             petInteractionUI.Name = "PetInteractionUI";
             petInteractionUI.Visible = false;
             ui.AddChild(petInteractionUI);
+
+            // Pet AI Improvements UI
+            var petAIImprovementsUI = new PetAIImprovementsUI();
+            petAIImprovementsUI.Name = "PetAIImprovementsUI";
+            petAIImprovementsUI.Visible = false;
+            ui.AddChild(petAIImprovementsUI);
 
             // Pet Recycle UI
             var petRecycleUI = new Systems.PetRecycle.PetRecycleUI();
@@ -2856,6 +2873,12 @@ namespace ClawRPG.Scripts {
                 TogglePetInteractionUI();
             }
 
+            // Handle pet AI improvements UI toggle (Ctrl+Shift+P)
+            if (Input.IsKeyPressed(Key.P) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                TogglePetAIImprovementsUI();
+            }
+
             // Handle pet recycle UI toggle (Ctrl+Shift+R)
             if (Input.IsActionJustPressed("pet_recycle_toggle"))
             {
@@ -3947,6 +3970,23 @@ namespace ClawRPG.Scripts {
             if (petInteractionUI != null)
             {
                 petInteractionUI.ToggleVisibility();
+            }
+        }
+
+        /// <summary>
+        /// Toggle pet AI improvements UI (Ctrl+Shift+P)
+        /// </summary>
+        private void TogglePetAIImprovementsUI()
+        {
+            var petAIImprovementsUI = GetNodeOrNull<PetAIImprovementsUI>("UI/PetAIImprovementsUI");
+            var petAIImprovementsSystem = GetNodeOrNull<PetAIImprovementsSystem>("PetAIImprovementsSystem");
+            if (petAIImprovementsUI != null)
+            {
+                if (petAIImprovementsSystem != null)
+                {
+                    petAIImprovementsUI.set_ai_system(petAIImprovementsSystem);
+                }
+                petAIImprovementsUI.toggle();
             }
         }
 
