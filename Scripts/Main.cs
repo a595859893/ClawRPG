@@ -17,6 +17,7 @@ using ClawRPG.Scripts.Quests;
 using ClawRPG.Scripts.Achievements;
 using ClawRPG.Scripts.Combat;
 using ClawRPG.Scripts.Systems.TitleCollection;
+using ClawRPG.Scripts.BossMechanics;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -221,6 +222,11 @@ namespace ClawRPG.Scripts {
             var enchantmentSystem = new Enchantment.EnchantmentSystem();
             enchantmentSystem.Name = "EnchantmentSystem";
             AddChild(enchantmentSystem);
+
+            // Initialize boss mechanics system
+            var bossMechanicsSystem = new BossMechanics.BossMechanicsSystem();
+            bossMechanicsSystem.Name = "BossMechanicsSystem";
+            AddChild(bossMechanicsSystem);
 
             // Initialize daily ritual system
             var dailyRitualSystem = new DailyRitualSystem();
@@ -2144,6 +2150,12 @@ namespace ClawRPG.Scripts {
                 ToggleEnchantmentUI();
             }
 
+            // Handle boss mechanics UI toggle (Ctrl+Shift+B key)
+            if (Input.IsKeyPressed(Key.B) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleBossMechanicsUI();
+            }
+
             // Handle style mastery UI toggle (Shift+S key)
             if (Input.IsActionJustPressed("style_mastery_toggle"))
             {
@@ -3204,6 +3216,33 @@ namespace ClawRPG.Scripts {
             if (enchantmentUI != null)
             {
                 enchantmentUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// 切换 Boss 战斗界面
+        /// </summary>
+        private void ToggleBossMechanicsUI()
+        {
+            var bossMechanicsUI = GetNodeOrNull<BossMechanics.BossMechanicsUI>("CanvasLayer/BossMechanicsUI");
+            if (bossMechanicsUI != null)
+            {
+                bossMechanicsUI.Toggle();
+            }
+            else
+            {
+                // Create and add the UI if it doesn't exist
+                bossMechanicsUI = new BossMechanics.BossMechanicsUI();
+                bossMechanicsUI.Name = "BossMechanicsUI";
+                var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+                if (canvasLayer == null)
+                {
+                    canvasLayer = new CanvasLayer();
+                    canvasLayer.Name = "CanvasLayer";
+                    AddChild(canvasLayer);
+                }
+                canvasLayer.AddChild(bossMechanicsUI);
+                bossMechanicsUI.Show();
             }
         }
 
