@@ -2019,6 +2019,12 @@ namespace ClawRPG.Scripts {
                 ToggleMomentumUI();
             }
 
+            // Handle weather UI toggle (W key)
+            if (Input.IsKeyPressed(Key.W))
+            {
+                ToggleWeatherUI();
+            }
+
             // Handle enemy scaling UI toggle (Ctrl+S key)
             if (Input.IsKeyPressed(Key.S) && Input.IsKeyPressed(Key.Ctrl))
             {
@@ -3150,6 +3156,22 @@ namespace ClawRPG.Scripts {
                 var newUI = new EnemyScalingUI();
                 newUI.Name = "EnemyScalingUI";
                 GetNode("CanvasLayer").AddChild(newUI);
+            }
+        }
+
+        private void ToggleWeatherUI()
+        {
+            var weatherUI = GetNodeOrNull<WeatherUI>("CanvasLayer/WeatherUI");
+            if (weatherUI != null)
+            {
+                weatherUI.ToggleWeatherUI();
+            }
+            else
+            {
+                var newUI = new WeatherUI();
+                newUI.Name = "WeatherUI";
+                GetNode("CanvasLayer").AddChild(newUI);
+                newUI.ShowWeatherUI();
             }
         }
 
