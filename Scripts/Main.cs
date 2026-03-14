@@ -18,6 +18,7 @@ using ClawRPG.Scripts.Achievements;
 using ClawRPG.Scripts.Combat;
 using ClawRPG.Scripts.Systems.TitleCollection;
 using ClawRPG.Scripts.BossMechanics;
+using ClawRPG.Scripts.Leaderboard;
 using ClawRPG.Scripts.Systems.MythicPlusDungeon;
 using ClawRPG.Scripts.Systems.ProceduralDungeon;
 using ClawRPG.Scripts.Systems.ArenaTournament;
@@ -252,6 +253,16 @@ namespace ClawRPG.Scripts {
             var guildWarSystem = new GuildWar.GuildWarSystem();
             guildWarSystem.Name = "GuildWarSystem";
             AddChild(guildWarSystem);
+
+            // Initialize leaderboard system
+            var leaderboardSystem = new Leaderboard.LeaderboardSystem();
+            leaderboardSystem.Name = "LeaderboardSystem";
+            AddChild(leaderboardSystem);
+
+            // Initialize leaderboard database
+            var leaderboardDatabase = new Leaderboard.LeaderboardDatabase();
+            leaderboardDatabase.Name = "LeaderboardDatabase";
+            AddChild(leaderboardDatabase);
 
             // Initialize combat UI system
             var combatUISystem = new Combat.CombatUISystem();
@@ -1267,6 +1278,12 @@ namespace ClawRPG.Scripts {
             var weatherUI = new WeatherUI();
             weatherUI.Name = "WeatherUI";
             ui.AddChild(weatherUI);
+
+            // Leaderboard UI
+            var leaderboardUI = new Leaderboard.LeaderboardUI();
+            leaderboardUI.Name = "LeaderboardUI";
+            leaderboardUI.Visible = false;
+            ui.AddChild(leaderboardUI);
 
             // Dialogue UI
             var dialogueUI = new UI.DialogueUI();
@@ -2986,6 +3003,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsActionJustPressed("multiplayer_lobby_toggle"))
             {
                 ToggleMultiplayerLobbyUI();
+            }
+
+            // Handle leaderboard UI toggle (L key with shift - Shift+L)
+            if (Input.IsKeyPressed(Key.L) && !Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleLeaderboardUI();
             }
 
             // Handle arena colosseum UI toggle (K key)
@@ -5553,6 +5576,18 @@ namespace ClawRPG.Scripts {
                 {
                     multiplayerLobbyUI.Show();
                 }
+            }
+        }
+
+        /// <summary>
+        /// 切换排行榜界面
+        /// </summary>
+        private void ToggleLeaderboardUI()
+        {
+            var leaderboardUI = GetNodeOrNull<Leaderboard.LeaderboardUI>("LeaderboardUI");
+            if (leaderboardUI != null)
+            {
+                leaderboardUI.ToggleVisibility();
             }
         }
 
