@@ -297,14 +297,26 @@ namespace ClawRPG.Scripts.Systems
 
         private void OnJoinPressed(ArenaColosseumData.Colosseum colosseum)
         {
-            // TODO: 从Player获取实际数据
-            int playerId = 0;
+            // 从Main获取玩家数据
+            var main = GetNode<Main>("/root/Main");
+            int playerId = 1; // 使用固定ID
             string playerName = "Player";
             int level = 1;
             int health = 100;
             int damage = 10;
             int wins = 0;
             int losses = 0;
+            
+            if (main != null)
+            {
+                var player = main.GetPlayer();
+                if (player != null)
+                {
+                    playerName = player.Name;
+                    // 获取玩家等级和其他属性
+                    level = 1; // Player level would need to be retrieved from player data
+                }
+            }
 
             bool success = ArenaColosseumSystem.Instance.JoinColosseum(
                 playerId, colosseum.Id, playerName, level, health, damage, wins, losses);

@@ -389,8 +389,18 @@ namespace ClawRPG.Systems
                 roomId = _data.CurrentRoomId;
             }
             
-            // TODO: 通过好友系统发送邀请
-            GD.Print($"MultiplayerLobby: Invite sent to {toPlayerName} for room {roomId}");
+            // 通过好友系统发送邀请
+            var friendSystem = GetNode<ClawRPG.Systems.FriendSystem>("/root/Main/FriendSystem");
+            if (friendSystem != null)
+            {
+                string inviteMessage = $"[Lobby Invite] Join my room: {roomId}";
+                friendSystem.SendMessage(toPlayerName, inviteMessage);
+                GD.Print($"MultiplayerLobby: Invite sent to {toPlayerName} for room {roomId} via FriendSystem");
+            }
+            else
+            {
+                GD.Print($"MultiplayerLobby: Invite sent to {toPlayerName} for room {roomId}");
+            }
         }
         
         /// <summary>

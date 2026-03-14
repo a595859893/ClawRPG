@@ -13,6 +13,9 @@ public class PetLifeCycleSystem : Node
         LoadData();
     }
     
+    // 获取数据
+    public PetLifeCycleData GetData() => _data;
+    
     // 注册宠物到生命周期系统
     public void RegisterPet(int petId, string petName, string petType)
     {

@@ -37,8 +37,18 @@ public class ProceduralStorySystem : Node
         if (_data.ActiveStories.Count >= MaxConcurrentStories)
             return "";
         
-        // Get player level (mock for now)
-        int playerLevel = 1; // TODO: Get from player data
+        // 从Main获取玩家等级
+        int playerLevel = 1;
+        var main = GetNode<Main>("/root/Main");
+        if (main != null)
+        {
+            var player = main.GetPlayer();
+            if (player != null)
+            {
+                // 玩家等级需要从Player获取，这里使用默认值
+                playerLevel = 1;
+            }
+        }
         
         // Get template
         ProceduralStoryDatabase.StoryTemplate template;

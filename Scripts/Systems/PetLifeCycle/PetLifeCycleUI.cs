@@ -218,9 +218,31 @@ public class PetLifeCycleUI : Control
         var root = _petsTree.CreateItem();
         root.SetText(0, "宠物列表");
         
-        // TODO: 从系统获取宠物列表并显示
-        var testPet = _petsTree.CreateItem(root);
-        testPet.SetText(0, "测试宠物 (ID: 1) - 成年期");
+        // 从系统获取宠物列表并显示
+        if (_system != null && _system.GetData() != null)
+        {
+            var petCycles = _system.GetData().PetLifeCycles;
+            if (petCycles != null && petCycles.Count > 0)
+            {
+                foreach (var kvp in petCycles)
+                {
+                    var pet = kvp.Value;
+                    var petItem = _petsTree.CreateItem(root);
+                    string stageName = pet.CurrentStage.ToString();
+                    petItem.SetText(0, $"宠物 (ID: {pet.PetId}) - {stageName}");
+                }
+            }
+            else
+            {
+                var emptyItem = _petsTree.CreateItem(root);
+                emptyItem.SetText(0, "暂无宠物数据");
+            }
+        }
+        else
+        {
+            var testPet = _petsTree.CreateItem(root);
+            testPet.SetText(0, "测试宠物 (ID: 1) - 成年期");
+        }
     }
     
     private void OnClosePressed()
