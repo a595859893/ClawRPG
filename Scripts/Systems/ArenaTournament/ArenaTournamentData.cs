@@ -1,118 +1,181 @@
-using Godot;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-public class ArenaTournamentData : Resource
+namespace ClawRPG.Scripts.Data
 {
-    // 锦标赛配置
-    public string TournamentName { get; set; } = "Arena Championship";
-    public ArenaTournamentType TournamentType { get; set; } = ArenaTournamentType.SingleElimination;
-    public ArenaTournamentState State { get; set; } = ArenaTournamentState.Registration;
-    
-    // 参赛选手
-    public List<ArenaTournamentParticipant> Participants { get; set; } = new List<ArenaTournamentParticipant>();
-    
-    // 比赛记录
-    public List<ArenaTournamentMatch> Matches { get; set; } = new List<ArenaTournamentMatch>();
-    public List<int> GroupA { get; set; } = new List<int>();
-    public List<int> GroupB { get; set; } = new List<int>();
-    public List<int> GroupC { get; set; } = new List<int>();
-    public List<int> GroupD { get; set; } = new List<int>();
-    
-    // 当前轮次
-    public int CurrentRound { get; set; } = 0;
-    public int TotalRounds { get; set; } = 0;
-    
-    // 锦标赛设置
-    public int MaxParticipants { get; set; } = 16;
-    public int MinParticipants { get; set; } = 4;
-    public int PointsPerWin { get; set; } = 3;
-    public int PointsPerDraw { get; set; } = 1;
-    public int PointsPerLoss { get; set; } = 0;
-    
-    // 奖励配置
-    public int WinnerReward { get; set; } = 10000;
-    public int SecondPlaceReward { get; set; } = 5000;
-    public int ThirdPlaceReward { get; set; } = 2500;
-    
-    // 统计
-    public int TotalTournaments { get; set; } = 0;
-    public int TournamentsWon { get; set; } = 0;
-    public int TournamentsParticipated { get; set; } = 0;
-    public int TotalMatchesPlayed { get; set; } = 0;
-    public int TotalWins { get; set; } = 0;
-    public int TotalLosses { get; set; } = 0;
-    public int TotalDraws { get; set; } = 0;
-    public int HighestPlacement { get; set; } = 0;
-    
-    // 历史记录
-    public List<ArenaTournamentHistory> History { get; set; } = new List<ArenaTournamentHistory>();
-}
+    /// <summary>
+    /// 锦标赛阶段类型
+    /// </summary>
+    public enum TournamentStage
+    {
+        Registration,    // 报名阶段
+        GroupStage,      // 小组赛
+        QuarterFinals,   // 四分之一决赛
+        SemiFinals,      // 半决赛
+        Finals,          // 决赛
+        Completed        // 已完成
+    }
 
-public enum ArenaTournamentType
-{
-    SingleElimination,    // 单败淘汰
-    DoubleElimination,    // 双败淘汰
-    RoundRobin,           // 循环赛
-    Swiss                 // 瑞士制
-}
+    /// <summary>
+    /// 锦标赛赛制类型
+    /// </summary>
+    public enum TournamentFormat
+    {
+        SingleElimination,   // 单败淘汰
+        DoubleElimination,   // 双败淘汰
+        RoundRobin,          // 循环赛
+        SwissSystem          // 瑞士制
+    }
 
-public enum ArenaTournamentState
-{
-    Registration,    // 报名中
-    Seeding,         // 抽签中
-    InProgress,      // 进行中
-    Completed,       // 已完成
-    Cancelled        // 已取消
-}
+    /// <summary>
+    /// 锦标赛状态
+    /// </summary>
+    public enum TournamentStatus
+    {
+        Pending,     // 等待开始
+        Active,      // 进行中
+        Completed,   // 已完成
+        Cancelled    // 已取消
+    }
 
-public class ArenaTournamentParticipant
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public int Seed { get; set; } = 0;
-    public int Points { get; set; } = 0;
-    public int Wins { get; set; } = 0;
-    public int Losses { get; set; } = 0;
-    public int Draws { get; set; } = 0;
-    public int GoalsFor { get; set; } = 0;
-    public int GoalsAgainst { get; set; } = 0;
-    public int Placement { get; set; } = 0;
-    public bool IsEliminated { get; set; } = false;
-    public bool IsWinnerBracket { get; set; } = true;
-    public int GroupId { get; set; } = 0;
-}
+    /// <summary>
+    /// 单个参赛选手数据
+    /// </summary>
+    public class TournamentPlayer
+    {
+        public string playerId;
+        public string playerName;
+        public int seedNumber;           // 种子编号
+        public int score;                // 当前得分
+        public int wins;
+        public int losses;
+        public int matchesPlayed;
+        public bool isEliminated;
+        public bool hasLostOnce;         // 双败赛制中使用
+        public DateTime registrationTime;
+        public List<string> matchHistory = new List<string>();
+    }
 
-public class ArenaTournamentMatch
-{
-    public int MatchId { get; set; }
-    public int Round { get; set; }
-    public int Player1Id { get; set; } = -1;
-    public int Player2Id { get; set; } = -1;
-    public int Player1Score { get; set; } = 0;
-    public int Player2Score { get; set; } = 0;
-    public int WinnerId { get; set; } = -1;
-    public bool IsCompleted { get; set; } = false;
-    public bool IsDraw { get; set; } = false;
-    public ArenaTournamentMatchState MatchState { get; set; } = ArenaTournamentMatchState.Pending;
-}
+    /// <summary>
+    /// 单场锦标赛比赛
+    /// </summary>
+    public class TournamentMatch
+    {
+        public string matchId;
+        public int roundNumber;
+        public int matchNumber;
+        public TournamentStage stage;
+        public string player1Id;
+        public string player2Id;
+        public string winnerId;
+        public int player1Score;
+        public int player2Score;
+        public bool isCompleted;
+        public DateTime scheduledTime;
+        public DateTime? completedTime;
+    }
 
-public enum ArenaTournamentMatchState
-{
-    Pending,
-    Ready,
-    InProgress,
-    Completed,
-    Bye
-}
+    /// <summary>
+    /// 锦标赛小组（用于循环赛/瑞士制）
+    /// </summary>
+    public class TournamentGroup
+    {
+        public string groupId;
+        public string groupName;
+        public List<string> playerIds = new List<string>();
+        public List<TournamentMatch> matches = new List<TournamentMatch>();
+    }
 
-public class ArenaTournamentHistory
-{
-    public string TournamentName { get; set; } = "";
-    public ArenaTournamentType Type { get; set; }
-    public int Placement { get; set; }
-    public int Participants { get; set; }
-    public int Reward { get; set; }
-    public long Timestamp { get; set; }
+    /// <summary>
+    /// 完整锦标赛数据
+    /// </summary>
+    public class Tournament
+    {
+        public string tournamentId;
+        public string tournamentName;
+        public string description;
+        public TournamentFormat format;
+        public TournamentStatus status;
+        public TournamentStage currentStage;
+        
+        public int maxPlayers;
+        public int minPlayers;
+        public int currentPlayerCount;
+        
+        public DateTime registrationStart;
+        public DateTime registrationEnd;
+        public DateTime? startTime;
+        public DateTime? endTime;
+        
+        public int rounds;                    // 预计轮次
+        public int currentRound;              // 当前轮次
+        
+        public List<TournamentPlayer> registeredPlayers = new List<TournamentPlayer>();
+        public List<TournamentMatch> matches = new List<TournamentMatch>();
+        public List<TournamentGroup> groups = new List<TournamentGroup>();
+        
+        public int prizePool;                 // 奖金池
+        public List<TournamentReward> rewards = new List<TournamentReward>();
+        
+        public string organizerId;
+        public DateTime createdAt;
+        public DateTime updatedAt;
+    }
+
+    /// <summary>
+    /// 锦标赛奖励配置
+    /// </summary>
+    public class TournamentReward
+    {
+        public int rankStart;
+        public int rankEnd;
+        public string rewardType;        // gold/item/title
+        public string rewardId;
+        public int rewardAmount;
+    }
+
+    /// <summary>
+    /// 玩家锦标赛记录
+    /// </summary>
+    public class PlayerTournamentRecord
+    {
+        public string playerId;
+        public string tournamentId;
+        public string tournamentName;
+        public int finalRank;
+        public int score;
+        public int wins;
+        public int losses;
+        public DateTime participatedAt;
+    }
+
+    /// <summary>
+    /// 玩家锦标赛统计
+    /// </summary>
+    public class TournamentStatistics
+    {
+        public string playerId;
+        public int totalTournaments;
+        public int firstPlace;
+        public int secondPlace;
+        public int thirdPlace;
+        public int top4;
+        public int top8;
+        public int top16;
+        public int totalWins;
+        public int totalLosses;
+        public int highestRank;
+        public int totalPrizeWon;
+    }
+
+    /// <summary>
+    /// 锦标赛进度数据
+    /// </summary>
+    public class TournamentProgress
+    {
+        public string playerId;
+        public List<string> participatedTournaments = new List<string>();
+        public List<PlayerTournamentRecord> recentRecords = new List<PlayerTournamentRecord>();
+        public TournamentStatistics statistics;
+    }
 }

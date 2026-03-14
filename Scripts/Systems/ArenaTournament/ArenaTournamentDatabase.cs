@@ -1,144 +1,335 @@
-using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Data;
 
-public class ArenaTournamentDatabase
+namespace ClawRPG.Scripts.Database
 {
-    // 锦标赛类型配置
-    public static Dictionary<ArenaTournamentType, Dictionary<string, object>> TournamentTypeConfigs = new Dictionary<ArenaTournamentType, Dictionary<string, object>>
+    /// <summary>
+    /// 锦标赛数据库配置
+    /// </summary>
+    public static class ArenaTournamentDatabase
     {
-        { ArenaTournamentType.SingleElimination, new Dictionary<string, object>
-            {
-                { "name", "Single Elimination" },
-                { "description", "单败淘汰赛，输一场即被淘汰" },
-                { "min_participants", 4 },
-                { "max_participants", 32 },
-                { "rounds_estimate", 5 }
-            }
-        },
-        { ArenaTournamentType.DoubleElimination, new Dictionary<string, object>
-            {
-                { "name", "Double Elimination" },
-                { "description", "双败淘汰赛，输两场被淘汰" },
-                { "min_participants", 4 },
-                { "max_participants", 16 },
-                { "rounds_estimate", 8 }
-            }
-        },
-        { ArenaTournamentType.RoundRobin, new Dictionary<string, object>
-            {
-                { "name", "Round Robin" },
-                { "description", "循环赛，每人与所有对手交手一次" },
-                { "min_participants", 4 },
-                { "max_participants", 8 },
-                { "rounds_estimate", 7 }
-            }
-        },
-        { ArenaTournamentType.Swiss, new Dictionary<string, object>
-            {
-                { "name", "Swiss System" },
-                { "description", "瑞士制，每轮根据战绩匹配对手" },
-                { "min_participants", 4 },
-                { "max_participants", 32 },
-                { "rounds_estimate", 5 }
-            }
-        }
-    };
-    
-    // 奖励配置
-    public static Dictionary<int, Dictionary<string, int>> PlacementRewards = new Dictionary<int, Dictionary<string, int>>
-    {
-        { 1, new Dictionary<string, int> { { "gold", 10000 }, { "exp", 5000 } } },
-        { 2, new Dictionary<string, int> { { "gold", 5000 }, { "exp", 2500 } } },
-        { 3, new Dictionary<string, int> { { "gold", 2500 }, { "exp", 1250 } } },
-        { 4, new Dictionary<string, int> { { "gold", 1000 }, { "exp", 500 } } }
-    };
-    
-    // 锦标赛难度配置
-    public static Dictionary<string, Dictionary<string, object>> DifficultyConfigs = new Dictionary<string, Dictionary<string, object>>
-    {
-        { "Easy", new Dictionary<string, object>
-            {
-                { "name", "Easy" },
-                { "description", "简单难度，适合新手" },
-                { "reward_multiplier", 0.5f },
-                { "enemy_difficulty", 0.8f }
-            }
-        },
-        { "Normal", new Dictionary<string, object>
-            {
-                { "name", "Normal" },
-                { "description", "普通难度" },
-                { "reward_multiplier", 1.0f },
-                { "enemy_difficulty", 1.0f }
-            }
-        },
-        { "Hard", new Dictionary<string, object>
-            {
-                { "name", "Hard" },
-                { "description", "困难难度" },
-                { "reward_multiplier", 1.5f },
-                { "enemy_difficulty", 1.5f }
-            }
-        },
-        { "Nightmare", new Dictionary<string, object>
-            {
-                { "name", "Nightmare" },
-                { "description", "噩梦难度" },
-                { "reward_multiplier", 2.0f },
-                { "enemy_difficulty", 2.0f }
-            }
-        },
-        { "Legendary", new Dictionary<string, object>
-            {
-                { "name", "Legendary" },
-                { "description", "传奇难度" },
-                { "reward_multiplier", 3.0f },
-                { "enemy_difficulty", 3.0f }
-            }
-        }
-    };
-    
-    // 获取锦标赛类型名称
-    public static string GetTournamentTypeName(ArenaTournamentType type)
-    {
-        if (TournamentTypeConfigs.TryGetValue(type, out var config))
+        // 预定义锦标赛模板
+        public static Dictionary<string, TournamentTemplate> Templates = new Dictionary<string, TournamentTemplate>();
+        
+        // 奖励配置
+        public static Dictionary<string, List<TournamentReward>> RewardPools = new Dictionary<string, List<TournamentReward>>();
+        
+        // 赛制配置
+        public static Dictionary<TournamentFormat, FormatConfig> FormatConfigs = new Dictionary<TournamentFormat, FormatConfig>();
+        
+        // 阶段配置
+        public static Dictionary<TournamentStage, StageConfig> StageConfigs = new Dictionary<TournamentStage, StageConfig>();
+
+        static ArenaTournamentDatabase()
         {
-            return config["name"].ToString();
+            InitializeTemplates();
+            InitializeRewardPools();
+            InitializeFormatConfigs();
+            InitializeStageConfigs();
         }
-        return "Unknown";
+
+        private static void InitializeTemplates()
+        {
+            // 每日锦标赛
+            Templates["daily_arena"] = new TournamentTemplate
+            {
+                templateId = "daily_arena",
+                name = "每日竞技场",
+                description = "每日举办的竞技场比赛，所有玩家均可参加",
+                format = TournamentFormat.SingleElimination,
+                maxPlayers = 16,
+                minPlayers = 4,
+                rounds = 4,
+                registrationDuration = 3600, // 1小时
+                matchDuration = 600,        // 10分钟
+                prizePool = 1000,
+                entryFee = 100,
+                allowLateJoin = false
+            };
+
+            // 周锦标赛
+            Templates["weekly_championship"] = new TournamentTemplate
+            {
+                templateId = "weekly_championship",
+                name = "周冠军赛",
+                description = "每周举办的锦标赛，冠军可获得专属称号",
+                format = TournamentFormat.DoubleElimination,
+                maxPlayers = 32,
+                minPlayers = 8,
+                rounds = 6,
+                registrationDuration = 7200, // 2小时
+                matchDuration = 900,        // 15分钟
+                prizePool = 5000,
+                entryFee = 500,
+                allowLateJoin = false
+            };
+
+            // 大师赛
+            Templates["master_series"] = new TournamentTemplate
+            {
+                templateId = "master_series",
+                name = "大师系列赛",
+                description = "高水平玩家专用锦标赛",
+                format = TournamentFormat.DoubleElimination,
+                maxPlayers = 64,
+                minPlayers = 16,
+                rounds = 7,
+                registrationDuration = 14400, // 4小时
+                matchDuration = 1200,         // 20分钟
+                prizePool = 20000,
+                entryFee = 2000,
+                allowLateJoin = false,
+                requiredRank = 5 // 需要一定排名
+            };
+
+            // 练习赛
+            Templates["practice_arena"] = new TournamentTemplate
+            {
+                templateId = "practice_arena",
+                name = "练习赛场",
+                description = "免费练习赛，无奖励",
+                format = TournamentFormat.SingleElimination,
+                maxPlayers = 8,
+                minPlayers = 2,
+                rounds = 3,
+                registrationDuration = 1800, // 30分钟
+                matchDuration = 300,        // 5分钟
+                prizePool = 0,
+                entryFee = 0,
+                allowLateJoin = true
+            };
+
+            // 瑞士制锦标赛
+            Templates["swiss_system"] = new TournamentTemplate
+            {
+                templateId = "swiss_system",
+                name = "瑞士制公开赛",
+                description = "采用瑞士制的公平竞技锦标赛",
+                format = TournamentFormat.SwissSystem,
+                maxPlayers = 32,
+                minPlayers = 8,
+                rounds = 5,
+                registrationDuration = 3600,
+                matchDuration = 600,
+                prizePool = 3000,
+                entryFee = 300,
+                allowLateJoin = false
+            };
+        }
+
+        private static void InitializeRewardPools()
+        {
+            // 小型奖励池 (8人)
+            RewardPools["small"] = new List<TournamentReward>
+            {
+                new TournamentReward { rankStart = 1, rankEnd = 1, rewardType = "gold", rewardId = "gold", rewardAmount = 500 },
+                new TournamentReward { rankStart = 2, rankEnd = 2, rewardType = "gold", rewardId = "gold", rewardAmount = 300 },
+                new TournamentReward { rankStart = 3, rankEnd = 3, rewardType = "gold", rewardId = "gold", rewardAmount = 150 },
+                new TournamentReward { rankStart = 4, rankEnd = 4, rewardType = "gold", rewardId = "gold", rewardAmount = 50 }
+            };
+
+            // 中型奖励池 (16人)
+            RewardPools["medium"] = new List<TournamentReward>
+            {
+                new TournamentReward { rankStart = 1, rankEnd = 1, rewardType = "gold", rewardId = "gold", rewardAmount = 1000 },
+                new TournamentReward { rankStart = 2, rankEnd = 2, rewardType = "gold", rewardId = "gold", rewardAmount = 600 },
+                new TournamentReward { rankStart = 3, rankEnd = 3, rewardType = "gold", rewardId = "gold", rewardAmount = 400 },
+                new TournamentReward { rankStart = 4, rankEnd = 4, rewardType = "gold", rewardId = "gold", rewardAmount = 200 },
+                new TournamentReward { rankStart = 5, rankEnd = 8, rewardType = "gold", rewardId = "gold", rewardAmount = 100 }
+            };
+
+            // 大型奖励池 (32人以上)
+            RewardPools["large"] = new List<TournamentReward>
+            {
+                new TournamentReward { rankStart = 1, rankEnd = 1, rewardType = "gold", rewardId = "gold", rewardAmount = 5000 },
+                new TournamentReward { rankStart = 1, rankEnd = 1, rewardType = "title", rewardId = "champion", rewardAmount = 1 },
+                new TournamentReward { rankStart = 2, rankEnd = 2, rewardType = "gold", rewardId = "gold", rewardAmount = 2500 },
+                new TournamentReward { rankStart = 3, rankEnd = 3, rewardType = "gold", rewardId = "gold", rewardAmount = 1500 },
+                new TournamentReward { rankStart = 4, rankEnd = 4, rewardType = "gold", rewardId = "gold", rewardAmount = 800 },
+                new TournamentReward { rankStart = 5, rankEnd = 8, rewardType = "gold", rewardId = "gold", rewardAmount = 400 },
+                new TournamentReward { rankStart = 9, rankEnd = 16, rewardType = "gold", rewardId = "gold", rewardAmount = 200 }
+            };
+        }
+
+        private static void InitializeFormatConfigs()
+        {
+            FormatConfigs[TournamentFormat.SingleElimination] = new FormatConfig
+            {
+                format = TournamentFormat.SingleElimination,
+                name = "单败淘汰",
+                description = "输一场即被淘汰",
+                maxRoundsMultiplier = 4, // log2(maxPlayers)
+                requiresThirdPlaceMatch = true,
+                supportsByes = true
+            };
+
+            FormatConfigs[TournamentFormat.DoubleElimination] = new FormatConfig
+            {
+                format = TournamentFormat.DoubleElimination,
+                name = "双败淘汰",
+                description = "输两场被淘汰",
+                maxRoundsMultiplier = 7, // 2 * log2(maxPlayers) - 1
+                requiresThirdPlaceMatch = false,
+                supportsByes = true
+            };
+
+            FormatConfigs[TournamentFormat.RoundRobin] = new FormatConfig
+            {
+                format = TournamentFormat.RoundRobin,
+                name = "循环赛",
+                description = "每人都要交手",
+                maxRoundsMultiplier = 10, // maxPlayers - 1
+                requiresThirdPlaceMatch = false,
+                supportsByes = false
+            };
+
+            FormatConfigs[TournamentFormat.SwissSystem] = new FormatConfig
+            {
+                format = TournamentFormat.SwissSystem,
+                name = "瑞士制",
+                description = "每轮按成绩匹配对手",
+                maxRoundsMultiplier = 5, // 通常5-7轮
+                requiresThirdPlaceMatch = false,
+                supportsByes = false
+            };
+        }
+
+        private static void InitializeStageConfigs()
+        {
+            StageConfigs[TournamentStage.Registration] = new StageConfig
+            {
+                stage = TournamentStage.Registration,
+                displayName = "报名中",
+                allowRegistration = true,
+                allowMatches = false
+            };
+
+            StageConfigs[TournamentStage.GroupStage] = new StageConfig
+            {
+                stage = TournamentStage.GroupStage,
+                displayName = "小组赛",
+                allowRegistration = false,
+                allowMatches = true
+            };
+
+            StageConfigs[TournamentStage.QuarterFinals] = new StageConfig
+            {
+                stage = TournamentStage.QuarterFinals,
+                displayName = "四分之一决赛",
+                allowRegistration = false,
+                allowMatches = true
+            };
+
+            StageConfigs[TournamentStage.SemiFinals] = new StageConfig
+            {
+                stage = TournamentStage.SemiFinals,
+                displayName = "半决赛",
+                allowRegistration = false,
+                allowMatches = true
+            };
+
+            StageConfigs[TournamentStage.Finals] = new StageConfig
+            {
+                stage = TournamentStage.Finals,
+                displayName = "决赛",
+                allowRegistration = false,
+                allowMatches = true
+            };
+
+            StageConfigs[TournamentStage.Completed] = new StageConfig
+            {
+                stage = TournamentStage.Completed,
+                displayName = "已结束",
+                allowRegistration = false,
+                allowMatches = false
+            };
+        }
+
+        /// <summary>
+        /// 获取模板
+        /// </summary>
+        public static TournamentTemplate GetTemplate(string templateId)
+        {
+            return Templates.ContainsKey(templateId) ? Templates[templateId] : null;
+        }
+
+        /// <summary>
+        /// 获取所有模板
+        /// </summary>
+        public static List<TournamentTemplate> GetAllTemplates()
+        {
+            return new List<TournamentTemplate>(Templates.Values);
+        }
+
+        /// <summary>
+        /// 根据玩家数获取合适的奖励池
+        /// </summary>
+        public static List<TournamentReward> GetRewardPool(int playerCount)
+        {
+            if (playerCount <= 8) return RewardPools["small"];
+            if (playerCount <= 16) return RewardPools["medium"];
+            return RewardPools["large"];
+        }
+
+        /// <summary>
+        /// 获取赛制配置
+        /// </summary>
+        public static FormatConfig GetFormatConfig(TournamentFormat format)
+        {
+            return FormatConfigs.ContainsKey(format) ? FormatConfigs[format] : null;
+        }
+
+        /// <summary>
+        /// 获取阶段配置
+        /// </summary>
+        public static StageConfig GetStageConfig(TournamentStage stage)
+        {
+            return StageConfigs.ContainsKey(stage) ? StageConfigs[stage] : null;
+        }
     }
-    
-    // 获取锦标赛类型描述
-    public static string GetTournamentTypeDescription(ArenaTournamentType type)
+
+    /// <summary>
+    /// 锦标赛模板
+    /// </summary>
+    public class TournamentTemplate
     {
-        if (TournamentTypeConfigs.TryGetValue(type, out var config))
-        {
-            return config["description"].ToString();
-        }
-        return "";
+        public string templateId;
+        public string name;
+        public string description;
+        public TournamentFormat format;
+        public int maxPlayers;
+        public int minPlayers;
+        public int rounds;
+        public int registrationDuration;   // 报名持续时间(秒)
+        public int matchDuration;          // 单场比赛时间(秒)
+        public int prizePool;
+        public int entryFee;
+        public bool allowLateJoin;
+        public int? requiredRank;
     }
-    
-    // 获取奖励
-    public static (int gold, int exp) GetReward(int placement, string difficulty = "Normal")
+
+    /// <summary>
+    /// 赛制配置
+    /// </summary>
+    public class FormatConfig
     {
-        int gold = 0;
-        int exp = 0;
-        
-        if (PlacementRewards.TryGetValue(placement, out var rewards))
-        {
-            gold = rewards["gold"];
-            exp = rewards["exp"];
-        }
-        
-        // 应用难度乘数
-        if (DifficultyConfigs.TryGetValue(difficulty, out var diffConfig))
-        {
-            float multiplier = (float)diffConfig["reward_multiplier"];
-            gold = (int)(gold * multiplier);
-            exp = (int)(exp * multiplier);
-        }
-        
-        return (gold, exp);
+        public TournamentFormat format;
+        public string name;
+        public string description;
+        public int maxRoundsMultiplier;
+        public bool requiresThirdPlaceMatch;
+        public bool supportsByes;
+    }
+
+    /// <summary>
+    /// 阶段配置
+    /// </summary>
+    public class StageConfig
+    {
+        public TournamentStage stage;
+        public string displayName;
+        public bool allowRegistration;
+        public bool allowMatches;
     }
 }

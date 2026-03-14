@@ -233,6 +233,11 @@ namespace ClawRPG.Scripts {
             proceduralDungeonSystem.Name = "ProceduralDungeonSystem";
             AddChild(proceduralDungeonSystem);
 
+            // Initialize arena tournament system
+            var arenaTournamentSystem = new ArenaTournament.ArenaTournamentSystem();
+            arenaTournamentSystem.Name = "ArenaTournamentSystem";
+            AddChild(arenaTournamentSystem);
+
             // Initialize combat UI system
             var combatUISystem = new Combat.CombatUISystem();
             combatUISystem.Name = "CombatUISystem";
@@ -2193,6 +2198,12 @@ namespace ClawRPG.Scripts {
                 ToggleProceduralDungeonUI();
             }
 
+            // Handle arena tournament UI toggle (Ctrl+Shift+T key)
+            if (Input.IsKeyPressed(Key.T) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleArenaTournamentUI();
+            }
+
             // Handle style mastery UI toggle (Shift+S key)
             if (Input.IsActionJustPressed("style_mastery_toggle"))
             {
@@ -3349,6 +3360,33 @@ namespace ClawRPG.Scripts {
                 }
                 canvasLayer.AddChild(dungeonUI);
                 dungeonUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换竞技场锦标赛 UI 界面 (Ctrl+Shift+T)
+        /// </summary>
+        private void ToggleArenaTournamentUI()
+        {
+            var tournamentUI = GetNodeOrNull<ArenaTournament.ArenaTournamentUI>("CanvasLayer/ArenaTournamentUI");
+            if (tournamentUI != null)
+            {
+                tournamentUI.Toggle();
+            }
+            else
+            {
+                // Create and add the UI if it doesn't exist
+                tournamentUI = new ArenaTournament.ArenaTournamentUI();
+                tournamentUI.Name = "ArenaTournamentUI";
+                var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+                if (canvasLayer == null)
+                {
+                    canvasLayer = new CanvasLayer();
+                    canvasLayer.Name = "CanvasLayer";
+                    AddChild(canvasLayer);
+                }
+                canvasLayer.AddChild(tournamentUI);
+                tournamentUI.Show();
             }
         }
 

@@ -1,407 +1,383 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ClawRPG.Scripts.Data;
+using ClawRPG.Scripts.Systems;
 
-public class ArenaTournamentUI : Control
+namespace ClawRPG.Scripts.UI
 {
-    private ArenaTournamentSystem _system;
-    private TabContainer _tabContainer;
-    private VBoxContainer _overviewTab;
-    private VBoxContainer _participantsTab;
-    private VBoxContainer _matchesTab;
-    private VBoxContainer _statisticsTab;
-    
-    // 锦标赛控制
-    private LineEdit _nameInput;
-    private OptionButton _typeSelector;
-    private OptionButton _difficultySelector;
-    private Button _createButton;
-    private Button _startSeedingButton;
-    private Button _startTournamentButton;
-    
-    // 状态显示
-    private Label _stateLabel;
-    private Label _roundLabel;
-    private Label _participantsLabel;
-    
-    // 列表
-    private ItemList _participantsList;
-    private ItemList _matchesList;
-    private ItemList _rankingsList;
-    private ItemList _historyList;
-    
-    // 统计
-    private Label _statsLabel;
-    
-    public ArenaTournamentUI()
-    {
-        _system = new ArenaTournamentSystem();
-    }
-    
-    public override void _Ready()
-    {
-        SetupUI();
-    }
-    
-    private void SetupUI()
+    /// <summary>
+    /// 竞技场锦标赛 UI
+    /// </summary>
+    public class ArenaTournamentUI : Control
     {
         // 主容器
-        var mainVBox = new VBoxContainer();
-        mainVBox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        mainVBox.AddThemeConstantOverride("separation", 10);
-        AddChild(mainVBox);
+        private VBoxContainer _mainContainer;
+        private TabContainer _tabContainer;
         
-        // 标题
-        var title = new Label();
-        title.Text = "🏟️ Arena Tournament";
-        title.Align = Label.AlignEnum.Center;
-        title.AddThemeFontSizeOverride("font_size", 24);
-        mainVBox.AddChild(title);
+        // 标签页
+        private Control _availableTab;
+        private Control _activeTab;
+        private Control _myTournamentsTab;
+        private Control _statisticsTab;
         
-        // 状态栏
-        var statusBar = new HBoxContainer();
-        mainVBox.AddChild(statusBar);
+        // 当前选中
+        private Tournament _selectedTournament;
         
-        _stateLabel = new Label();
-        _stateLabel.Text = "State: Registration";
-        statusBar.AddChild(_stateLabel);
-        
-        statusBar.AddChild(new Label { Text = "  |  " });
-        
-        _roundLabel = new Label();
-        _roundLabel.Text = "Round: 0/0";
-        statusBar.AddChild(_roundLabel);
-        
-        statusBar.AddChild(new Label { Text = "  |  " });
-        
-        _participantsLabel = new Label();
-        _participantsLabel.Text = "Participants: 0/16";
-        statusBar.AddChild(_participantsLabel);
-        
-        // Tab 容器
-        _tabContainer = new TabContainer();
-        _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlagsVertical);
-        mainVBox.AddChild(_tabContainer);
-        
-        // Overview Tab
-        _overviewTab = new VBoxContainer();
-        _overviewTab.AddThemeConstantOverride("separation", 10);
-        _tabContainer.AddChild(_overviewTab);
-        _tabContainer.SetTabTitle(_overviewTab, "Overview");
-        SetupOverviewTab();
-        
-        // Participants Tab
-        _participantsTab = new VBoxContainer();
-        _participantsTab.AddThemeConstantOverride("separation", 10);
-        _tabContainer.AddChild(_participantsTab);
-        _tabContainer.SetTabTitle(_participantsTab, "Participants");
-        SetupParticipantsTab();
-        
-        // Matches Tab
-        _matchesTab = new VBoxContainer();
-        _matchesTab.AddThemeConstantOverride("separation", 10);
-        _tabContainer.AddChild(_matchesTab);
-        _tabContainer.SetTabTitle(_matchesTab, "Matches");
-        SetupMatchesTab();
-        
-        // Statistics Tab
-        _statisticsTab = new VBoxContainer();
-        _statisticsTab.AddThemeConstantOverride("separation", 10);
-        _tabContainer.AddChild(_statisticsTab);
-        _tabContainer.SetTabTitle(_statisticsTab, "Statistics");
-        SetupStatisticsTab();
-        
-        UpdateUI();
-    }
-    
-    private void SetupOverviewTab()
-    {
-        // 创建锦标赛区域
-        var createSection = new VBoxContainer();
-        createSection.AddThemeConstantOverride("separation", 5);
-        _overviewTab.AddChild(createSection);
-        
-        var createLabel = new Label();
-        createLabel.Text = "Create Tournament";
-        createLabel.AddThemeFontSizeOverride("font_size", 18);
-        createSection.AddChild(createLabel);
-        
-        // 名称输入
-        var nameRow = new HBoxContainer();
-        createSection.AddChild(nameRow);
-        nameRow.AddChild(new Label { Text = "Name: " });
-        _nameInput = new LineEdit();
-        _nameInput.PlaceholderText = "Tournament Name";
-        _nameInput.Text = "Arena Championship";
-        _nameInput.CustomMinimumSize = new Vector2(200, 0);
-        nameRow.AddChild(_nameInput);
-        
-        // 类型选择
-        var typeRow = new HBoxContainer();
-        createSection.AddChild(typeRow);
-        typeRow.AddChild(new Label { Text = "Type: " });
-        _typeSelector = new OptionButton();
-        _typeSelector.AddItem("Single Elimination", (int)ArenaTournamentType.SingleElimination);
-        _typeSelector.AddItem("Double Elimination", (int)ArenaTournamentType.DoubleElimination);
-        _typeSelector.AddItem("Round Robin", (int)ArenaTournamentType.RoundRobin);
-        _typeSelector.AddItem("Swiss System", (int)ArenaTournamentType.Swiss);
-        _typeSelector.Select(0);
-        typeRow.AddChild(_typeSelector);
-        
-        // 难度选择
-        var diffRow = new HBoxContainer();
-        createSection.AddChild(diffRow);
-        diffRow.AddChild(new Label { Text = "Difficulty: " });
-        _difficultySelector = new OptionButton();
-        _difficultySelector.AddItem("Easy", 0);
-        _difficultySelector.AddItem("Normal", 1);
-        _difficultySelector.AddItem("Hard", 2);
-        _difficultySelector.AddItem("Nightmare", 3);
-        _difficultySelector.AddItem("Legendary", 4);
-        _difficultySelector.Select(1);
-        diffRow.AddChild(_difficultySelector);
-        
-        // 按钮行
-        var buttonRow = new HBoxContainer();
-        buttonRow.AddThemeConstantOverride("separation", 10);
-        _overviewTab.AddChild(buttonRow);
-        
-        _createButton = new Button();
-        _createButton.Text = "Create";
-        _createButton.Pressed += OnCreatePressed;
-        buttonRow.AddChild(_createButton);
-        
-        _startSeedingButton = new Button();
-        _startSeedingButton.Text = "Start Seeding";
-        _startSeedingButton.Pressed += OnStartSeedingPressed;
-        _startSeedingButton.Disabled = true;
-        buttonRow.AddChild(_startSeedingButton);
-        
-        _startTournamentButton = new Button();
-        _startTournamentButton.Text = "Start Tournament";
-        _startTournamentButton.Pressed += OnStartTournamentPressed;
-        _startTournamentButton.Disabled = true;
-        buttonRow.AddChild(_startTournamentButton);
-        
-        // 排行榜
-        var rankingsLabel = new Label();
-        rankingsLabel.Text = "Current Rankings";
-        rankingsLabel.AddThemeFontSizeOverride("font_size", 18);
-        _overviewTab.AddChild(rankingsLabel);
-        
-        _rankingsList = new ItemList();
-        _rankingsList.CustomMinimumSize = new Vector2(0, 200);
-        _rankingsList.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlagsVertical);
-        _overviewTab.AddChild(_rankingsList);
-    }
-    
-    private void SetupParticipantsTab()
-    {
-        // 注册选手区域
-        var registerSection = new VBoxContainer();
-        registerSection.AddThemeConstantOverride("separation", 5);
-        _participantsTab.AddChild(registerSection);
-        
-        var registerLabel = new Label();
-        registerLabel.Text = "Register Participant";
-        registerLabel.AddThemeFontSizeOverride("font_size", 16);
-        registerSection.AddChild(registerLabel);
-        
-        var registerButton = new Button();
-        registerButton.Text = "Register Current Player";
-        registerButton.Pressed += OnRegisterPlayerPressed;
-        registerSection.AddChild(registerButton);
-        
-        // 参赛选手列表
-        var listLabel = new Label();
-        listLabel.Text = "Registered Participants";
-        listLabel.AddThemeFontSizeOverride("font_size", 16);
-        _participantsTab.AddChild(listLabel);
-        
-        _participantsList = new ItemList();
-        _participantsList.CustomMinimumSize = new Vector2(0, 300);
-        _participantsList.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlagsVertical);
-        _participantsTab.AddChild(_participantsList);
-    }
-    
-    private void SetupMatchesTab()
-    {
-        // 当前比赛
-        var matchesLabel = new Label();
-        matchesLabel.Text = "Current Matches";
-        matchesLabel.AddThemeFontSizeOverride("font_size", 16);
-        _matchesTab.AddChild(matchesLabel);
-        
-        _matchesList = new ItemList();
-        _matchesList.CustomMinimumSize = new Vector2(0, 250);
-        _matchesList.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlagsVertical);
-        _matchesTab.AddChild(_matchesList);
-        
-        // 完成比赛按钮
-        var completeButton = new Button();
-        completeButton.Text = "Simulate Match Completion";
-        completeButton.Pressed += OnSimulateMatchPressed;
-        _matchesTab.AddChild(completeButton);
-        
-        // 历史记录
-        var historyLabel = new Label();
-        historyLabel.Text = "Tournament History";
-        historyLabel.AddThemeFontSizeOverride("font_size", 16);
-        _matchesTab.AddChild(historyLabel);
-        
-        _historyList = new ItemList();
-        _historyList.CustomMinimumSize = new Vector2(0, 150);
-        _historyList.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlagsVertical);
-        _matchesTab.AddChild(_historyList);
-    }
-    
-    private void SetupStatisticsTab()
-    {
-        var statsTitle = new Label();
-        statsTitle.Text = "Tournament Statistics";
-        statsTitle.AddThemeFontSizeOverride("font_size", 20);
-        _statisticsTab.AddChild(statsTitle);
-        
-        _statsLabel = new Label();
-        _statsLabel.Text = "No statistics yet";
-        _statisticsTab.AddChild(_statsLabel);
-        
-        var refreshButton = new Button();
-        refreshButton.Text = "Refresh Statistics";
-        refreshButton.Pressed += OnRefreshStatsPressed;
-        _statisticsTab.AddChild(refreshButton);
-    }
-    
-    private void OnCreatePressed()
-    {
-        string name = _nameInput.Text;
-        var type = (ArenaTournamentType)_typeSelector.GetSelectedId();
-        
-        if (_system.CreateTournament(name, type))
+        public override void _Ready()
         {
-            GD.Print("Tournament created: " + name);
-            UpdateUI();
+            SetupUI();
+            RefreshData();
         }
-    }
-    
-    private void OnStartSeedingPressed()
-    {
-        if (_system.GetData().StartSeeding())
+
+        private void SetupUI()
         {
-            GD.Print("Seeding started");
-            UpdateUI();
+            // 主容器
+            _mainContainer = new VBoxContainer();
+            _mainContainer.SetAnchorPreset(ControlPreset.FullRect);
+            _mainContainer.AddThemeConstantOverride("separation", 10);
+            AddChild(_mainContainer);
+            
+            // 标题
+            var title = new Label();
+            title.Text = "🏆 竞技场锦标赛";
+            title.AddThemeFontSizeOverride("font_size", 24);
+            title.HorizontalAlignment = HorizontalAlignment.Center;
+            _mainContainer.AddChild(title);
+            
+            // 分隔线
+            var hsep = new HSeparator();
+            _mainContainer.AddChild(hsep);
+            
+            // Tab容器
+            _tabContainer = new TabContainer();
+            _tabContainer.SetVExpand(ExpandMode.Expand);
+            _mainContainer.AddChild(_tabContainer);
+            
+            // 创建标签页
+            _availableTab = CreateAvailableTab();
+            _availableTab.Name = "Available";
+            _tabContainer.AddChild(_availableTab);
+            
+            _activeTab = CreateActiveTab();
+            _activeTab.Name = "Active";
+            _tabContainer.AddChild(_activeTab);
+            
+            _myTournamentsTab = CreateMyTournamentsTab();
+            _myTournamentsTab.Name = "MyTournaments";
+            _tabContainer.AddChild(_myTournamentsTab);
+            
+            _statisticsTab = CreateStatisticsTab();
+            _statisticsTab.Name = "Statistics";
+            _tabContainer.AddChild(_statisticsTab);
+            
+            // 设置Tab标题
+            _tabContainer.SetTabTitle(0, "📋 可报名");
+            _tabContainer.SetTabTitle(1, "⚔️ 进行中");
+            _tabContainer.SetTabTitle(2, "🎯 我的比赛");
+            _tabContainer.SetTabTitle(3, "📊 统计");
         }
-    }
-    
-    private void OnStartTournamentPressed()
-    {
-        if (_system.GetData().StartTournament())
+
+        private Control CreateAvailableTab()
         {
-            GD.Print("Tournament started");
-            UpdateUI();
+            var scroll = new ScrollContainer();
+            var vbox = new VBoxContainer();
+            vbox.AddThemeConstantOverride("separation", 10);
+            scroll.AddChild(vbox);
+            
+            var title = new Label();
+            title.Text = "可报名的锦标赛";
+            title.AddThemeFontSizeOverride("font_size", 18);
+            vbox.AddChild(title);
+            
+            var list = new VBoxContainer();
+            list.Name = "TournamentList";
+            list.AddThemeConstantOverride("separation", 8);
+            vbox.AddChild(list);
+            
+            return scroll;
         }
-    }
-    
-    private void OnRegisterPlayerPressed()
-    {
-        var data = _system.GetData();
-        int playerId = 1; // 模拟玩家ID
-        string playerName = "Player";
-        
-        if (_system.RegisterParticipant(playerId, playerName))
+
+        private Control CreateActiveTab()
         {
-            GD.Print("Player registered");
-            UpdateUI();
+            var scroll = new ScrollContainer();
+            var vbox = new VBoxContainer();
+            vbox.AddThemeConstantOverride("separation", 10);
+            scroll.AddChild(vbox);
+            
+            var title = new Label();
+            title.Text = "正在进行中的锦标赛";
+            title.AddThemeFontSizeOverride("font_size", 18);
+            vbox.AddChild(title);
+            
+            var list = new VBoxContainer();
+            list.Name = "ActiveList";
+            list.AddThemeConstantOverride("separation", 8);
+            vbox.AddChild(list);
+            
+            return scroll;
         }
-    }
-    
-    private void OnSimulateMatchPressed()
-    {
-        var matches = _system.GetCurrentRoundMatches();
-        var pendingMatch = matches.FirstOrDefault(m => !m.IsCompleted && m.Player1Id >= 0 && m.Player2Id >= 0);
-        
-        if (pendingMatch != null)
+
+        private Control CreateMyTournamentsTab()
         {
-            var random = new Random();
-            int score1 = random.Next(0, 5);
-            int score2 = random.Next(0, 5);
-            _system.CompleteMatch(pendingMatch.MatchId, score1, score2);
-            GD.Print($"Match completed: {score1} - {score2}");
-            UpdateUI();
+            var scroll = new ScrollContainer();
+            var vbox = new VBoxContainer();
+            vbox.AddThemeConstantOverride("separation", 10);
+            scroll.AddChild(vbox);
+            
+            var title = new Label();
+            title.Text = "我的锦标赛记录";
+            title.AddThemeFontSizeOverride("font_size", 18);
+            vbox.AddChild(title);
+            
+            var list = new VBoxContainer();
+            list.Name = "MyTournamentsList";
+            list.AddThemeConstantOverride("separation", 8);
+            vbox.AddChild(list);
+            
+            return scroll;
         }
-    }
-    
-    private void OnRefreshStatsPressed()
-    {
-        var stats = _system.GetStatistics();
-        _statsLabel.Text = $"Total Tournaments: {stats["total_tournaments"]}\n" +
-            $"Tournaments Won: {stats["tournaments_won"]}\n" +
-            $"Matches Played: {stats["total_matches"]}\n" +
-            $"Wins: {stats["total_wins"]} | Losses: {stats["total_losses"]} | Draws: {stats["total_draws"]}";
-    }
-    
-    private void UpdateUI()
-    {
-        var data = _system.GetData();
-        
-        // 更新状态
-        _stateLabel.Text = $"State: {data.State}";
-        _roundLabel.Text = $"Round: {data.CurrentRound}/{data.TotalRounds}";
-        _participantsLabel.Text = $"Participants: {data.Participants.Count}/{data.MaxParticipants}";
-        
-        // 更新按钮状态
-        _createButton.Disabled = data.State != ArenaTournamentState.Registration && 
-                                  data.State != ArenaTournamentState.Completed &&
-                                  data.State != ArenaTournamentState.Cancelled;
-        _startSeedingButton.Disabled = data.State != ArenaTournamentState.Registration || 
-                                        data.Participants.Count < data.MinParticipants;
-        _startTournamentButton.Disabled = data.State != ArenaTournamentState.Seeding;
-        
-        // 更新参赛选手列表
-        _participantsList.Clear();
-        foreach (var p in data.Participants)
+
+        private Control CreateStatisticsTab()
         {
-            _participantsList.AddItem($"#{p.Seed} {p.Name} - Points: {p.Points}");
+            var scroll = new ScrollContainer();
+            var vbox = new VBoxContainer();
+            vbox.AddThemeConstantOverride("separation", 10);
+            scroll.AddChild(vbox);
+            
+            var title = new Label();
+            title.Text = "锦标赛统计";
+            title.AddThemeFontSizeOverride("font_size", 18);
+            vbox.AddChild(title);
+            
+            // 统计信息容器
+            var statsContainer = new VBoxContainer();
+            statsContainer.Name = "StatsContainer";
+            statsContainer.AddThemeConstantOverride("separation", 5);
+            vbox.AddChild(statsContainer);
+            
+            return scroll;
         }
-        
-        // 更新排行榜
-        _rankingsList.Clear();
-        var rankings = _system.GetRankings();
-        foreach (var p in rankings)
+
+        private void RefreshData()
         {
-            string status = p.IsEliminated ? " (Eliminated)" : "";
-            _rankingsList.AddItem($"#{p.Placement} {p.Name} - {p.Wins}W/{p.Losses}L/{p.Draws}D{status}");
+            RefreshAvailableTournaments();
+            RefreshActiveTournaments();
+            RefreshMyTournaments();
+            RefreshStatistics();
         }
-        
-        // 更新比赛列表
-        _matchesList.Clear();
-        var currentMatches = _system.GetCurrentRoundMatches();
-        foreach (var m in currentMatches)
+
+        private void RefreshAvailableTournaments()
         {
-            string status = m.IsCompleted ? "✓" : "○";
-            string matchInfo = $"Round {m.Round}: Player{m.Player1Id} vs Player{m.Player2Id} ({m.Player1Score}-{m.Player2Score}) {status}";
-            _matchesList.AddItem(matchInfo);
+            var list = _availableTab.GetNode<VBoxContainer>("TournamentList");
+            
+            // 清除旧内容
+            foreach (var child in list.GetChildren())
+            {
+                child.QueueFree();
+            }
+            
+            var tournaments = ArenaTournamentSystem.Instance.GetAvailableTournaments();
+            
+            if (tournaments.Count == 0)
+            {
+                var empty = new Label();
+                empty.Text = "暂无可报名的锦标赛";
+                empty.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+                list.AddChild(empty);
+                return;
+            }
+            
+            foreach (var t in tournaments)
+            {
+                var card = CreateTournamentCard(t, true);
+                list.AddChild(card);
+            }
         }
-        
-        // 更新历史
-        _historyList.Clear();
-        foreach (var h in data.History.Take(10))
+
+        private void RefreshActiveTournaments()
         {
-            _historyList.AddItem($"#{h.Placement} {h.TournamentName} - {h.Participants} players - {h.Reward}g");
+            var list = _activeTab.GetNode<VBoxContainer>("ActiveList");
+            
+            foreach (var child in list.GetChildren())
+            {
+                child.QueueFree();
+            }
+            
+            var tournaments = ArenaTournamentSystem.Instance.GetActiveTournaments();
+            
+            if (tournaments.Count == 0)
+            {
+                var empty = new Label();
+                empty.Text = "暂无进行中的锦标赛";
+                empty.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+                list.AddChild(empty);
+                return;
+            }
+            
+            foreach (var t in tournaments)
+            {
+                var card = CreateTournamentCard(t, false);
+                list.AddChild(card);
+            }
         }
-    }
-    
-    public void Toggle()
-    {
-        if (Visible)
+
+        private void RefreshMyTournaments()
         {
-            Hide();
+            var list = _myTournamentsTab.GetNode<VBoxContainer>("MyTournamentsList");
+            
+            foreach (var child in list.GetChildren())
+            {
+                child.QueueFree();
+            }
+            
+            // 获取玩家已参加的锦标赛
+            // 这里需要实际玩家ID
+            var empty = new Label();
+            empty.Text = "我的比赛记录";
+            list.AddChild(empty);
         }
-        else
+
+        private void RefreshStatistics()
         {
-            Show();
-            UpdateUI();
+            var container = _statisticsTab.GetNode<VBoxContainer>("StatsContainer");
+            
+            foreach (var child in container.GetChildren())
+            {
+                child.QueueFree();
+            }
+            
+            var statsLabel = new Label();
+            statsLabel.Text = "个人锦标赛统计";
+            statsLabel.AddThemeFontSizeOverride("font_size", 16);
+            container.AddChild(statsLabel);
+            
+            var infoLabel = new Label();
+            infoLabel.Text = "参加锦标赛以积累统计数据";
+            infoLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+            container.AddChild(infoLabel);
+        }
+
+        private Control CreateTournamentCard(Tournament tournament, bool showRegister)
+        {
+            var panel = new PanelContainer();
+            panel.CustomMinimumSize = new Vector2(0, 120);
+            
+            var vbox = new VBoxContainer();
+            vbox.AddThemeConstantOverride("separation", 5);
+            panel.AddChild(vbox);
+            
+            // 标题行
+            var header = new HBoxContainer();
+            vbox.AddChild(header);
+            
+            var nameLabel = new Label();
+            nameLabel.Text = $"🏆 {tournament.tournamentName}";
+            nameLabel.AddThemeFontSizeOverride("font_size", 16);
+            header.AddChild(nameLabel);
+            
+            header.AddChild(new Control() { SetHExpand(ExpandMode.Expand) });
+            
+            var formatLabel = new Label();
+            formatLabel.Text = GetFormatName(tournament.format);
+            formatLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.2f));
+            header.AddChild(formatLabel);
+            
+            // 描述
+            var descLabel = new Label();
+            descLabel.Text = tournament.description;
+            descLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+            vbox.AddChild(descLabel);
+            
+            // 信息行
+            var infoRow = new HBoxContainer();
+            vbox.AddChild(infoRow);
+            
+            var playersLabel = new Label();
+            playersLabel.Text = $"👥 {tournament.currentPlayerCount}/{tournament.maxPlayers}";
+            infoRow.AddChild(playersLabel);
+            
+            infoRow.AddChild(new Control() { SetHExpand(ExpandMode.Expand) });
+            
+            var prizeLabel = new Label();
+            prizeLabel.Text = $"💰 奖池: {tournament.prizePool}";
+            infoRow.AddChild(prizeLabel);
+            
+            var feeLabel = new Label();
+            feeLabel.Text = $"🎫 报名费: {tournament.entryFee}";
+            infoRow.AddChild(feeLabel);
+            
+            // 状态/报名按钮
+            var actionRow = new HBoxContainer();
+            vbox.AddChild(actionRow);
+            
+            var statusLabel = new Label();
+            if (tournament.status == TournamentStatus.Pending)
+            {
+                var timeLeft = tournament.registrationEnd - DateTime.Now;
+                statusLabel.Text = $"⏰ 报名截止: {timeLeft.Minutes}分 {timeLeft.Seconds}秒";
+            }
+            else if (tournament.status == TournamentStatus.Active)
+            {
+                statusLabel.Text = $"🔥 进行中 - 第{tournament.currentRound}轮";
+            }
+            actionRow.AddChild(statusLabel);
+            
+            actionRow.AddChild(new Control() { SetHExpand(ExpandMode.Expand) });
+            
+            if (showRegister && tournament.status == TournamentStatus.Pending)
+            {
+                var registerBtn = new Button();
+                registerBtn.Text = "📝 报名";
+                registerBtn.Pressed += () => OnRegisterPressed(tournament);
+                actionRow.AddChild(registerBtn);
+            }
+            
+            var viewBtn = new Button();
+            viewBtn.Text = "👁️ 查看详情";
+            viewBtn.Pressed += () => OnViewDetailsPressed(tournament);
+            actionRow.AddChild(viewBtn);
+            
+            return panel;
+        }
+
+        private string GetFormatName(TournamentFormat format)
+        {
+            return format switch
+            {
+                TournamentFormat.SingleElimination => "单败淘汰",
+                TournamentFormat.DoubleElimination => "双败淘汰",
+                TournamentFormat.RoundRobin => "循环赛",
+                TournamentFormat.SwissSystem => "瑞士制",
+                _ => format.ToString()
+            };
+        }
+
+        private void OnRegisterPressed(Tournament tournament)
+        {
+            // 实际实现需要玩家ID
+            // ArenaTournamentSystem.Instance.RegisterPlayer(tournament.tournamentId, playerId, playerName);
+            GD.Print($"[ArenaTournamentUI] 报名锦标赛: {tournament.tournamentName}");
+            RefreshData();
+        }
+
+        private void OnViewDetailsPressed(Tournament tournament)
+        {
+            _selectedTournament = tournament;
+            GD.Print($"[ArenaTournamentUI] 查看锦标赛详情: {tournament.tournamentName}");
+        }
+
+        public void Toggle()
+        {
+            if (Visible)
+            {
+                Hide();
+            }
+            else
+            {
+                Show();
+                RefreshData();
+            }
         }
     }
 }

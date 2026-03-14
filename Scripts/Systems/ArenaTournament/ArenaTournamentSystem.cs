@@ -1,552 +1,801 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ClawRPG.Scripts.Data;
+using ClawRPG.Scripts.Database;
 
-public class ArenaTournamentSystem
+namespace ClawRPG.Scripts.Systems
 {
-    private ArenaTournamentData _data;
-    private Random _random = new Random();
-    
-    public ArenaTournamentSystem()
+    /// <summary>
+    /// 竞技场锦标赛系统 - 管理所有锦标赛活动
+    /// </summary>
+    public class ArenaTournamentSystem : Node
     {
-        _data = new ArenaTournamentData();
-    }
-    
-    // 创建锦标赛
-    public bool CreateTournament(string name, ArenaTournamentType type, int maxParticipants = 16)
-    {
-        if (_data.State != ArenaTournamentState.Completed && 
-            _data.State != ArenaTournamentState.Cancelled &&
-            _data.Participants.Count > 0)
+        // 单例
+        private static ArenaTournamentSystem _instance;
+        public static ArenaTournamentSystem Instance => _instance;
+
+        // 锦标赛存储
+        private Dictionary<string, Tournament> _tournaments = new Dictionary<string, Tournament>();
+        private List<Tournament> _activeTournaments = new List<Tournament>();
+        
+        // 玩家进度
+        private Dictionary<string, TournamentProgress> _playerProgress = new Dictionary<string, TournamentProgress>();
+        
+        // 信号
+        public signal void tournament_created(Tournament tournament);
+        public signal void player_registered(string tournament_id, string player_id);
+        public signal void tournament_started(Tournament tournament);
+        public signal void match_started(TournamentMatch match);
+        public signal void match_completed(TournamentMatch match);
+        public signal void stage_completed(Tournament tournament, TournamentStage stage);
+        public signal void tournament_completed(Tournament tournament);
+
+        public override void _Ready()
         {
-            GD.Print("Cannot create new tournament while one is in progress");
-            return false;
+            _instance = this;
+            InitializeSystem();
         }
-        
-        _data = new ArenaTournamentData
+
+        private void InitializeSystem()
         {
-            TournamentName = name,
-            TournamentType = type,
-            State = ArenaTournamentState.Registration,
-            MaxParticipants = maxParticipants,
-            CurrentRound = 0
-        };
-        
-        // 计算预期轮数
-        switch (type)
-        {
-            case ArenaTournamentType.SingleElimination:
-                _data.TotalRounds = (int)Math.Ceiling(Math.Log2(maxParticipants));
-                break;
-            case ArenaTournamentType.DoubleElimination:
-                _data.TotalRounds = (int)(Math.Ceiling(Math.Log2(maxParticipants)) * 2);
-                break;
-            case ArenaTournamentType.RoundRobin:
-                _data.TotalRounds = maxParticipants - 1;
-                break;
-            case ArenaTournamentType.Swiss:
-                _data.TotalRounds = (int)Math.Ceiling(Math.Log2(maxParticipants));
-                break;
+            GD.Print("[ArenaTournamentSystem] 锦标赛系统初始化");
+            LoadData();
         }
-        
-        return true;
-    }
-    
-    // 注册选手
-    public bool RegisterParticipant(int playerId, string playerName)
-    {
-        if (_data.State != ArenaTournamentState.Registration)
+
+        #region Tournament Management
+
+        /// <summary>
+        /// 从模板创建锦标赛
+        /// </summary>
+        public Tournament CreateTournamentFromTemplate(string templateId, string organizerId)
         {
-            GD.Print("Registration is not open");
-            return false;
-        }
-        
-        if (_data.Participants.Count >= _data.MaxParticipants)
-        {
-            GD.Print("Tournament is full");
-            return false;
-        }
-        
-        if (_data.Participants.Any(p => p.Id == playerId))
-        {
-            GD.Print("Player already registered");
-            return false;
-        }
-        
-        _data.Participants.Add(new ArenaTournamentParticipant
-        {
-            Id = playerId,
-            Name = playerName,
-            Seed = _data.Participants.Count + 1
-        });
-        
-        return true;
-    }
-    
-    // 开始抽签
-    public bool StartSeeding()
-    {
-        if (_data.State != ArenaTournamentState.Registration)
-        {
-            GD.Print("Cannot start seeding");
-            return false;
-        }
-        
-        if (_data.Participants.Count < _data.MinParticipants)
-        {
-            GD.Print("Not enough participants");
-            return false;
-        }
-        
-        // 随机打乱种子
-        var shuffled = _data.Participants.OrderBy(x => _random.Next()).ToList();
-        for (int i = 0; i < shuffled.Count; i++)
-        {
-            shuffled[i].Seed = i + 1;
-        }
-        _data.Participants = shuffled;
-        
-        _data.State = ArenaTournamentState.Seeding;
-        
-        // 根据类型生成分组
-        if (_data.TournamentType == ArenaTournamentType.RoundRobin || 
-            _data.TournamentType == ArenaTournamentType.Swiss)
-        {
-            GenerateGroups();
-        }
-        
-        return true;
-    }
-    
-    // 生成分组（循环赛/瑞士制）
-    private void GenerateGroups()
-    {
-        int participantCount = _data.Participants.Count;
-        int groupCount = 4;
-        int playersPerGroup = participantCount / groupCount;
-        
-        _data.GroupA.Clear();
-        _data.GroupB.Clear();
-        _data.GroupC.Clear();
-        _data.GroupD.Clear();
-        
-        for (int i = 0; i < participantCount; i++)
-        {
-            int groupId = i / playersPerGroup;
-            _data.Participants[i].GroupId = groupId;
-            
-            switch (groupId)
+            var template = ArenaTournamentDatabase.GetTemplate(templateId);
+            if (template == null)
             {
-                case 0: _data.GroupA.Add(i); break;
-                case 1: _data.GroupB.Add(i); break;
-                case 2: _data.GroupC.Add(i); break;
-                default: _data.GroupD.Add(i); break;
+                GD.PrintErr($"[ArenaTournamentSystem] 模板不存在: {templateId}");
+                return null;
+            }
+
+            var tournament = new Tournament
+            {
+                tournamentId = GenerateTournamentId(),
+                tournamentName = template.name,
+                description = template.description,
+                format = template.format,
+                status = TournamentStatus.Pending,
+                currentStage = TournamentStage.Registration,
+                maxPlayers = template.maxPlayers,
+                minPlayers = template.minPlayers,
+                currentPlayerCount = 0,
+                registrationStart = DateTime.Now,
+                registrationEnd = DateTime.Now.AddSeconds(template.registrationDuration),
+                rounds = template.rounds,
+                currentRound = 0,
+                prizePool = template.prizePool,
+                entryFee = template.entryFee,
+                organizerId = organizerId,
+                createdAt = DateTime.Now,
+                updatedAt = DateTime.Now,
+                rewards = ArenaTournamentDatabase.GetRewardPool(template.maxPlayers)
+            };
+
+            _tournaments[tournament.tournamentId] = tournament;
+            tournament_created?.Emit(tournament);
+            
+            GD.Print($"[ArenaTournamentSystem] 创建锦标赛: {tournament.tournamentName} ({tournament.tournamentId})");
+            return tournament;
+        }
+
+        /// <summary>
+        /// 创建自定义锦标赛
+        /// </summary>
+        public Tournament CreateCustomTournament(string name, string description, TournamentFormat format, 
+            int maxPlayers, int minPlayers, int prizePool, int entryFee, string organizerId)
+        {
+            var tournament = new Tournament
+            {
+                tournamentId = GenerateTournamentId(),
+                tournamentName = name,
+                description = description,
+                format = format,
+                status = TournamentStatus.Pending,
+                currentStage = TournamentStage.Registration,
+                maxPlayers = maxPlayers,
+                minPlayers = minPlayers,
+                currentPlayerCount = 0,
+                registrationStart = DateTime.Now,
+                registrationEnd = DateTime.Now.AddHours(2), // 默认2小时报名
+                rounds = CalculateRounds(format, maxPlayers),
+                currentRound = 0,
+                prizePool = prizePool,
+                entryFee = entryFee,
+                organizerId = organizerId,
+                createdAt = DateTime.Now,
+                updatedAt = DateTime.Now,
+                rewards = ArenaTournamentDatabase.GetRewardPool(maxPlayers)
+            };
+
+            _tournaments[tournament.tournamentId] = tournament;
+            tournament_created?.Emit(tournament);
+            
+            GD.Print($"[ArenaTournamentSystem] 创建自定义锦标赛: {tournament.tournamentName}");
+            return tournament;
+        }
+
+        /// <summary>
+        /// 玩家报名锦标赛
+        /// </summary>
+        public bool RegisterPlayer(string tournamentId, string playerId, string playerName)
+        {
+            if (!_tournaments.ContainsKey(tournamentId))
+            {
+                GD.PrintErr($"[ArenaTournamentSystem] 锦标赛不存在: {tournamentId}");
+                return false;
+            }
+
+            var tournament = _tournaments[tournamentId];
+            
+            if (tournament.status != TournamentStatus.Pending)
+            {
+                GD.PrintErr($"[ArenaTournamentSystem] 锦标赛无法报名: {tournament.status}");
+                return false;
+            }
+
+            if (DateTime.Now > tournament.registrationEnd)
+            {
+                GD.PrintErr("[ArenaTournamentSystem] 报名已结束");
+                return false;
+            }
+
+            if (tournament.currentPlayerCount >= tournament.maxPlayers)
+            {
+                GD.PrintErr("[ArenaTournamentSystem] 锦标赛已满");
+                return false;
+            }
+
+            // 检查是否已报名
+            if (tournament.registeredPlayers.Any(p => p.playerId == playerId))
+            {
+                GD.PrintErr("[ArenaTournamentSystem] 玩家已报名");
+                return false;
+            }
+
+            // 创建玩家数据
+            var player = new TournamentPlayer
+            {
+                playerId = playerId,
+                playerName = playerName,
+                seedNumber = tournament.currentPlayerCount + 1,
+                registrationTime = DateTime.Now
+            };
+
+            tournament.registeredPlayers.Add(player);
+            tournament.currentPlayerCount++;
+            tournament.updatedAt = DateTime.Now;
+
+            player_registered?.Emit(tournamentId, playerId);
+            
+            GD.Print($"[ArenaTournamentSystem] 玩家 {playerName} 报名锦标赛 {tournament.tournamentName}");
+            return true;
+        }
+
+        /// <summary>
+        /// 开始锦标赛
+        /// </summary>
+        public bool StartTournament(string tournamentId)
+        {
+            if (!_tournaments.ContainsKey(tournamentId))
+            {
+                GD.PrintErr($"[ArenaTournamentSystem] 锦标赛不存在: {tournamentId}");
+                return false;
+            }
+
+            var tournament = _tournaments[tournamentId];
+            
+            if (tournament.currentPlayerCount < tournament.minPlayers)
+            {
+                GD.PrintErr($"[ArenaTournamentSystem] 玩家不足，无法开始 (当前: {tournament.currentPlayerCount}, 最低: {tournament.minPlayers})");
+                return false;
+            }
+
+            // 根据赛制生成比赛
+            GenerateMatches(tournament);
+            
+            tournament.status = TournamentStatus.Active;
+            tournament.startTime = DateTime.Now;
+            tournament.currentStage = TournamentStage.QuarterFinals; // 从淘汰赛开始
+            tournament.currentRound = 1;
+            tournament.updatedAt = DateTime.Now;
+
+            _activeTournaments.Add(tournament);
+            tournament_started?.Emit(tournament);
+            
+            GD.Print($"[ArenaTournamentSystem] 锦标赛 {tournament.tournamentName} 开始!");
+            return true;
+        }
+
+        /// <summary>
+        /// 生成比赛对阵
+        /// </summary>
+        private void GenerateMatches(Tournament tournament)
+        {
+            tournament.matches.Clear();
+            
+            switch (tournament.format)
+            {
+                case TournamentFormat.SingleElimination:
+                    GenerateSingleEliminationMatches(tournament);
+                    break;
+                case TournamentFormat.DoubleElimination:
+                    GenerateDoubleEliminationMatches(tournament);
+                    break;
+                case TournamentFormat.RoundRobin:
+                    GenerateRoundRobinMatches(tournament);
+                    break;
+                case TournamentFormat.SwissSystem:
+                    GenerateSwissMatches(tournament, 1);
+                    break;
             }
         }
-    }
-    
-    // 开始锦标赛
-    public bool StartTournament()
-    {
-        if (_data.State != ArenaTournamentState.Seeding)
+
+        private void GenerateSingleEliminationMatches(Tournament tournament)
         {
-            GD.Print("Cannot start tournament");
-            return false;
-        }
-        
-        _data.State = ArenaTournamentState.InProgress;
-        _data.CurrentRound = 1;
-        _data.TotalTournaments++;
-        
-        // 生成第一轮比赛
-        GenerateRoundMatches();
-        
-        return true;
-    }
-    
-    // 生成轮次比赛
-    private void GenerateRoundMatches()
-    {
-        _data.Matches.Clear();
-        
-        switch (_data.TournamentType)
-        {
-            case ArenaTournamentType.SingleElimination:
-                GenerateSingleEliminationMatches();
-                break;
-            case ArenaTournamentType.DoubleElimination:
-                GenerateDoubleEliminationMatches();
-                break;
-            case ArenaTournamentType.RoundRobin:
-                GenerateRoundRobinMatches();
-                break;
-            case ArenaTournamentType.Swiss:
-                GenerateSwissMatches();
-                break;
-        }
-    }
-    
-    // 单败淘汰赛生成
-    private void GenerateSingleEliminationMatches()
-    {
-        int participantCount = _data.Participants.Count;
-        int rounds = (int)Math.Ceiling(Math.Log2(participantCount));
-        int bracketSize = (int)Math.Pow(2, rounds);
-        
-        int matchId = 0;
-        int round1Matches = bracketSize / 2;
-        
-        // 第一轮
-        for (int i = 0; i < round1Matches; i++)
-        {
-            int player1Idx = i * 2;
-            int player2Idx = i * 2 + 1;
+            var players = tournament.registeredPlayers.OrderBy(p => p.seedNumber).ToList();
+            int round = 1;
+            int matchNum = 1;
             
-            var match = new ArenaTournamentMatch
+            // 洗牌或按种子生成对阵
+            for (int i = 0; i < players.Count - 1; i += 2)
             {
-                MatchId = matchId++,
-                Round = 1,
-                Player1Id = player1Idx < participantCount ? player1Idx : -1,
-                Player2Id = player2Idx < participantCount ? player2Idx : -1,
-                MatchState = (player1Idx < participantCount && player2Idx < participantCount) 
-                    ? ArenaTournamentMatchState.Ready 
-                    : ArenaTournamentMatchState.Bye
+                var match = new TournamentMatch
+                {
+                    matchId = $"{tournament.tournamentId}_R{round}_M{matchNum}",
+                    roundNumber = round,
+                    matchNumber = matchNum,
+                    stage = GetStageForRound(tournament.format, round),
+                    player1Id = players[i].playerId,
+                    player2Id = players[i + 1].playerId,
+                    scheduledTime = DateTime.Now.AddMinutes(matchNum * 5)
+                };
+                tournament.matches.Add(match);
+                matchNum++;
+            }
+
+            // 如果玩家数为奇数，有玩家轮空
+            if (players.Count % 2 == 1)
+            {
+                var lastPlayer = players[players.Count - 1];
+                var match = new TournamentMatch
+                {
+                    matchId = $"{tournament.tournamentId}_R{round}_M{matchNum}",
+                    roundNumber = round,
+                    matchNumber = matchNum,
+                    stage = GetStageForRound(tournament.format, round),
+                    player1Id = lastPlayer.playerId,
+                    player2Id = "", // 轮空
+                    winnerId = lastPlayer.playerId,
+                    isCompleted = true,
+                    scheduledTime = DateTime.Now
+                };
+                tournament.matches.Add(match);
+            }
+        }
+
+        private void GenerateDoubleEliminationMatches(Tournament tournament)
+        {
+            // 简化实现：先生成单败，然后在胜者组基础上生成败者组
+            GenerateSingleEliminationMatches(tournament);
+            
+            // 标记为双败赛制
+            foreach (var match in tournament.matches)
+            {
+                match.stage = TournamentStage.GroupStage; // 胜者组第一轮
+            }
+        }
+
+        private void GenerateRoundRobinMatches(Tournament tournament)
+        {
+            var players = tournament.registeredPlayers.OrderBy(p => p.seedNumber).ToList();
+            int matchNum = 1;
+            
+            // 创建小组
+            var group = new TournamentGroup
+            {
+                groupId = $"{tournament.tournamentId}_A",
+                groupName = "A组"
             };
             
-            // 自动处理轮空
-            if (match.Player1Id == -1 || match.Player2Id == -1)
+            for (int i = 0; i < players.Count; i++)
             {
-                int winnerIdx = match.Player1Id >= 0 ? match.Player1Id : match.Player2Id;
-                match.WinnerId = winnerIdx;
-                match.IsCompleted = true;
-                _data.Participants[winnerIdx].Placement = 1;
-            }
-            
-            _data.Matches.Add(match);
-        }
-        
-        // 后续轮次（空壳，等待填充）
-        for (int round = 2; round <= rounds; round++)
-        {
-            int matchesInRound = bracketSize / (int)Math.Pow(2, round);
-            for (int i = 0; i < matchesInRound; i++)
-            {
-                _data.Matches.Add(new ArenaTournamentMatch
-                {
-                    MatchId = matchId++,
-                    Round = round,
-                    MatchState = ArenaTournamentMatchState.Pending
-                });
-            }
-        }
-    }
-    
-    // 双败淘汰赛生成
-    private void GenerateDoubleEliminationMatches()
-    {
-        // 类似单败淘汰，但标记胜者组/败者组
-        GenerateSingleEliminationMatches();
-        foreach (var p in _data.Participants)
-        {
-            p.IsWinnerBracket = true;
-        }
-    }
-    
-    // 循环赛生成
-    private void GenerateRoundRobinMatches()
-    {
-        int participantCount = _data.Participants.Count;
-        int matchId = 0;
-        
-        for (int round = 0; round < participantCount - 1; round++)
-        {
-            for (int i = 0; i < participantCount / 2; i++)
-            {
-                int player1Idx = i;
-                int player2Idx = participantCount - 1 - i;
+                group.playerIds.Add(players[i].playerId);
                 
-                // 轮换对阵
-                if (round % 2 == 1)
+                for (int j = i + 1; j < players.Count; j++)
                 {
-                    (player1Idx, player2Idx) = (player2Idx, player1Idx);
+                    var match = new TournamentMatch
+                    {
+                        matchId = $"{tournament.tournamentId}_RR_{matchNum}",
+                        roundNumber = j - i,
+                        matchNumber = matchNum,
+                        stage = TournamentStage.GroupStage,
+                        player1Id = players[i].playerId,
+                        player2Id = players[j].playerId,
+                        scheduledTime = DateTime.Now.AddMinutes(matchNum * 5)
+                    };
+                    tournament.matches.Add(match);
+                    group.matches.Add(match);
+                    matchNum++;
                 }
+            }
+            
+            tournament.groups.Add(group);
+        }
+
+        private void GenerateSwissMatches(Tournament tournament, int round)
+        {
+            var players = tournament.registeredPlayers
+                .Where(p => !p.isEliminated)
+                .OrderByDescending(p => p.score)
+                .ThenBy(p => p.seedNumber)
+                .ToList();
+            
+            int matchNum = 1;
+            
+            for (int i = 0; i < players.Count - 1; i += 2)
+            {
+                // 避免重复对战
+                var player1 = players[i];
+                var player2 = players[i + 1];
                 
-                if (i == 0)
+                var match = new TournamentMatch
                 {
-                    player2Idx = (participantCount - 1 - round) % (participantCount - 1);
-                    if (player2Idx >= player1Idx) player2Idx++;
+                    matchId = $"{tournament.tournamentId}_S{round}_M{matchNum}",
+                    roundNumber = round,
+                    matchNumber = matchNum,
+                    stage = TournamentStage.GroupStage,
+                    player1Id = player1.playerId,
+                    player2Id = player2.playerId,
+                    scheduledTime = DateTime.Now.AddMinutes(matchNum * 5)
+                };
+                tournament.matches.Add(match);
+                matchNum++;
+            }
+            
+            // 轮空处理
+            if (players.Count % 2 == 1)
+            {
+                var lastPlayer = players[players.Count - 1];
+                var match = new TournamentMatch
+                {
+                    matchId = $"{tournament.tournamentId}_S{round}_M{matchNum}",
+                    roundNumber = round,
+                    matchNumber = matchNum,
+                    stage = TournamentStage.GroupStage,
+                    player1Id = lastPlayer.playerId,
+                    player2Id = "",
+                    winnerId = lastPlayer.playerId,
+                    isCompleted = true,
+                    scheduledTime = DateTime.Now
+                };
+                tournament.matches.Add(match);
+            }
+        }
+
+        private TournamentStage GetStageForRound(TournamentFormat format, int round)
+        {
+            return round switch
+            {
+                1 => TournamentStage.QuarterFinals,
+                2 => TournamentStage.SemiFinals,
+                3 => TournamentStage.Finals,
+                _ => TournamentStage.GroupStage
+            };
+        }
+
+        /// <summary>
+        /// 报告比赛结果
+        /// </summary>
+        public bool ReportMatchResult(string matchId, string winnerId, int winnerScore, int loserScore)
+        {
+            TournamentMatch match = null;
+            Tournament tournament = null;
+            
+            foreach (var t in _tournaments.Values)
+            {
+                var m = t.matches.FirstOrDefault(x => x.matchId == matchId);
+                if (m != null)
+                {
+                    match = m;
+                    tournament = t;
+                    break;
                 }
-                
-                _data.Matches.Add(new ArenaTournamentMatch
-                {
-                    MatchId = matchId++,
-                    Round = round + 1,
-                    Player1Id = player1Idx,
-                    Player2Id = player2Idx,
-                    MatchState = ArenaTournamentMatchState.Ready
-                });
-            }
-        }
-    }
-    
-    // 瑞士制生成
-    private void GenerateSwissMatches()
-    {
-        // 第一轮随机配对
-        if (_data.CurrentRound == 1)
-        {
-            var shuffled = _data.Participants.OrderBy(x => _random.Next()).ToList();
-            int matchId = 0;
-            
-            for (int i = 0; i < shuffled.Count / 2; i++)
-            {
-                _data.Matches.Add(new ArenaTournamentMatch
-                {
-                    MatchId = matchId++,
-                    Round = 1,
-                    Player1Id = shuffled[i * 2].Id,
-                    Player2Id = shuffled[i * 2 + 1].Id,
-                    MatchState = ArenaTournamentMatchState.Ready
-                });
-            }
-        }
-        else
-        {
-            // 根据战绩配对
-            GenerateSwissPairings();
-        }
-    }
-    
-    // 瑞士制配对
-    private void GenerateSwissPairings()
-    {
-        // 按积分排序
-        var sorted = _data.Participants
-            .Where(p => !p.IsEliminated)
-            .OrderByDescending(p => p.Points)
-            .ThenByDescending(p => p.GoalsFor - p.GoalsAgainst)
-            .ToList();
-        
-        int matchId = _data.Matches.Count;
-        
-        for (int i = 0; i < sorted.Count / 2; i++)
-        {
-            _data.Matches.Add(new ArenaTournamentMatch
-            {
-                MatchId = matchId++,
-                Round = _data.CurrentRound,
-                Player1Id = sorted[i * 2].Id,
-                Player2Id = sorted[i * 2 + 1].Id,
-                MatchState = ArenaTournamentMatchState.Ready
-            });
-        }
-    }
-    
-    // 完成比赛
-    public bool CompleteMatch(int matchId, int player1Score, int player2Score)
-    {
-        var match = _data.Matches.FirstOrDefault(m => m.MatchId == matchId);
-        if (match == null || match.IsCompleted)
-        {
-            return false;
-        }
-        
-        match.Player1Score = player1Score;
-        match.Player2Score = player2Score;
-        match.IsCompleted = true;
-        
-        if (player1Score == player2Score)
-        {
-            match.IsDraw = true;
-            match.WinnerId = -1;
-            
-            var player1 = _data.Participants.FirstOrDefault(p => p.Id == match.Player1Id);
-            var player2 = _data.Participants.FirstOrDefault(p => p.Id == match.Player2Id);
-            
-            if (player1 != null)
-            {
-                player1.Draws++;
-                player1.Points += _data.PointsPerDraw;
-            }
-            if (player2 != null)
-            {
-                player2.Draws++;
-                player2.Points += _data.PointsPerDraw;
             }
             
-            _data.TotalDraws++;
-        }
-        else
-        {
-            match.WinnerId = player1Score > player2Score ? match.Player1Id : match.Player2Id;
-            int loserId = player1Score > player2Score ? match.Player2Id : match.Player1Id;
+            if (match == null)
+            {
+                GD.PrintErr($"[ArenaTournamentSystem] 比赛不存在: {matchId}");
+                return false;
+            }
             
-            var winner = _data.Participants.FirstOrDefault(p => p.Id == match.WinnerId);
-            var loser = _data.Participants.FirstOrDefault(p => p.Id == loserId);
+            if (match.isCompleted)
+            {
+                GD.PrintErr("[ArenaTournamentSystem] 比赛已完成");
+                return false;
+            }
+            
+            // 验证胜者是参赛者
+            if (winnerId != match.player1Id && winnerId != match.player2Id)
+            {
+                GD.PrintErr("[ArenaTournamentSystem] 无效的胜者");
+                return false;
+            }
+            
+            string loserId = winnerId == match.player1Id ? match.player2Id : match.player1Id;
+            
+            // 更新比赛结果
+            match.winnerId = winnerId;
+            match.isCompleted = true;
+            match.completedTime = DateTime.Now;
+            
+            if (winnerId == match.player1Id)
+            {
+                match.player1Score = winnerScore;
+                match.player2Score = loserScore;
+            }
+            else
+            {
+                match.player1Score = loserScore;
+                match.player2Score = winnerScore;
+            }
+            
+            // 更新玩家统计
+            var winner = tournament.registeredPlayers.FirstOrDefault(p => p.playerId == winnerId);
+            var loser = tournament.registeredPlayers.FirstOrDefault(p => p.playerId == loserId);
             
             if (winner != null)
             {
-                winner.Wins++;
-                winner.Points += _data.PointsPerWin;
-                winner.GoalsFor += player1Score > player2Score ? player1Score : player2Score;
-                winner.GoalsAgainst += player1Score > player2Score ? player2Score : player1Score;
+                winner.wins++;
+                winner.matchesPlayed++;
+                winner.score += 3; // 胜3分
+                winner.matchHistory.Add(matchId);
             }
+            
             if (loser != null)
             {
-                loser.Losses++;
-                loser.Points += _data.PointsPerLoss;
-                loser.GoalsFor += player1Score > player2Score ? player2Score : player1Score;
-                loser.GoalsAgainst += player1Score > player2Score ? player1Score : player2Score;
-                
-                // 单败淘汰中被淘汰
-                if (_data.TournamentType == ArenaTournamentType.SingleElimination)
-                {
-                    loser.IsEliminated = true;
-                }
+                loser.losses++;
+                loser.matchesPlayed++;
+                loser.matchHistory.Add(matchId);
             }
             
-            _data.TotalWins++;
-            _data.TotalLosses++;
-            
-            // 单败淘汰中胜者进入下一轮
-            if (_data.TournamentType == ArenaTournamentType.SingleElimination)
+            // 检查是否需要淘汰
+            if (tournament.format == TournamentFormat.SingleElimination && loser != null)
             {
-                AdvanceSingleElimination(match);
+                loser.isEliminated = true;
             }
-        }
-        
-        _data.TotalMatchesPlayed++;
-        
-        // 检查是否需要进入下一轮
-        CheckRoundCompletion();
-        
-        return true;
-    }
-    
-    // 单败淘汰赛晋级
-    private void AdvanceSingleElimination(ArenaTournamentMatch match)
-    {
-        int currentRound = match.Round;
-        int matchesInRound = (int)(_data.Participants.Count / Math.Pow(2, currentRound));
-        int matchIndex = _data.Matches.FindIndex(m => m.Round == currentRound && m.MatchId == match.MatchId);
-        int nextMatchIndex = matchIndex + matchesInRound;
-        
-        if (nextMatchIndex < _data.Matches.Count)
-        {
-            var nextMatch = _data.Matches[nextMatchIndex];
-            if (nextMatch.Player1Id == -1)
+            else if (tournament.format == TournamentFormat.DoubleElimination && loser != null)
             {
-                nextMatch.Player1Id = match.WinnerId;
-                nextMatch.MatchState = ArenaTournamentMatchState.Ready;
-            }
-            else if (nextMatch.Player2Id == -1)
-            {
-                nextMatch.Player2Id = match.WinnerId;
-                nextMatch.MatchState = ArenaTournamentMatchState.Ready;
-            }
-        }
-        
-        // 检查是否产生冠军
-        if (currentRound == _data.TotalRounds)
-        {
-            var champion = _data.Participants.FirstOrDefault(p => p.Id == match.WinnerId);
-            if (champion != null)
-            {
-                champion.Placement = 1;
-                CompleteTournament();
-            }
-        }
-    }
-    
-    // 检查轮次完成
-    private void CheckRoundCompletion()
-    {
-        var currentRoundMatches = _data.Matches.Where(m => m.Round == _data.CurrentRound);
-        if (currentRoundMatches.All(m => m.IsCompleted))
-        {
-            // 循环赛/瑞士制进入下一轮
-            if (_data.TournamentType == ArenaTournamentType.RoundRobin ||
-                _data.TournamentType == ArenaTournamentType.Swiss)
-            {
-                if (_data.CurrentRound < _data.TotalRounds)
+                if (loser.hasLostOnce)
                 {
-                    _data.CurrentRound++;
-                    GenerateRoundMatches();
+                    loser.isEliminated = true;
                 }
                 else
                 {
-                    CompleteTournament();
+                    loser.hasLostOnce = true;
+                }
+            }
+            
+            // 检查阶段完成
+            CheckStageCompletion(tournament, match.stage);
+            
+            match_completed?.Emit(match);
+            
+            GD.Print($"[ArenaTournamentSystem] 比赛 {matchId} 完成，胜者: {winnerId}");
+            return true;
+        }
+
+        private void CheckStageCompletion(Tournament tournament, TournamentStage stage)
+        {
+            var stageMatches = tournament.matches
+                .Where(m => m.stage == stage && m.roundNumber == tournament.currentRound)
+                .ToList();
+            
+            if (stageMatches.All(m => m.isCompleted))
+            {
+                stage_completed?.Emit(tournament, stage);
+                
+                // 检查是否需要进入下一阶段
+                if (stage == TournamentStage.Finals)
+                {
+                    CompleteTournament(tournament);
+                }
+                else if (tournament.format == TournamentFormat.SwissSystem && 
+                         tournament.currentRound < tournament.rounds)
+                {
+                    // 瑞士制进入下一轮
+                    GenerateSwissMatches(tournament, tournament.currentRound + 1);
+                    tournament.currentRound++;
+                }
+                else
+                {
+                    // 淘汰赛进入下一阶段
+                    AdvanceToNextStage(tournament);
                 }
             }
         }
-    }
-    
-    // 完成锦标赛
-    private void CompleteTournament()
-    {
-        _data.State = ArenaTournamentState.Completed;
-        _data.TournamentsParticipated++;
-        
-        // 计算排名
-        var sorted = _data.Participants.OrderByDescending(p => p.Points).ToList();
-        for (int i = 0; i < sorted.Count; i++)
+
+        private void AdvanceToNextStage(Tournament tournament)
         {
-            sorted[i].Placement = i + 1;
-        }
-        
-        // 记录历史
-        var champion = _data.Participants.FirstOrDefault(p => p.Placement == 1);
-        if (champion != null)
-        {
-            _data.TournamentsWon++;
-            var (gold, exp) = ArenaTournamentDatabase.GetReward(1);
-            _data.History.Add(new ArenaTournamentHistory
+            var currentStage = tournament.currentStage;
+            TournamentStage nextStage;
+            
+            switch (currentStage)
             {
-                TournamentName = _data.TournamentName,
-                Type = _data.TournamentType,
-                Placement = 1,
-                Participants = _data.Participants.Count,
-                Reward = gold,
-                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-            });
+                case TournamentStage.QuarterFinals:
+                    nextStage = TournamentStage.SemiFinals;
+                    break;
+                case TournamentStage.SemiFinals:
+                    nextStage = TournamentStage.Finals;
+                    break;
+                case TournamentStage.Finals:
+                    return; // 决赛不需要进入下一阶段
+                default:
+                    return;
+            }
+            
+            tournament.currentStage = nextStage;
+            tournament.currentRound++;
+            
+            // 生成下一阶段比赛
+            GenerateNextStageMatches(tournament);
         }
-    }
-    
-    // 获取当前轮次比赛
-    public List<ArenaTournamentMatch> GetCurrentRoundMatches()
-    {
-        return _data.Matches.Where(m => m.Round == _data.CurrentRound).ToList();
-    }
-    
-    // 获取选手信息
-    public ArenaTournamentParticipant GetParticipant(int playerId)
-    {
-        return _data.Participants.FirstOrDefault(p => p.Id == playerId);
-    }
-    
-    // 获取排名
-    public List<ArenaTournamentParticipant> GetRankings()
-    {
-        return _data.Participants.OrderByDescending(p => p.Points).ToList();
-    }
-    
-    // 获取统计
-    public Dictionary<string, object> GetStatistics()
-    {
-        return new Dictionary<string, object>
+
+        private void GenerateNextStageMatches(Tournament tournament)
         {
-            { "total_tournaments", _data.TotalTournaments },
-            { "tournaments_won", _data.TournamentsWon },
-            { "tournaments_participated", _data.TournamentsParticipated },
-            { "total_matches", _data.TotalMatchesPlayed },
-            { "total_wins", _data.TotalWins },
-            { "total_losses", _data.TotalLosses },
-            { "total_draws", _data.TotalDraws },
-            { "highest_placement", _data.HighestPlacement }
-        };
+            var winners = tournament.matches
+                .Where(m => m.stage == tournament.currentStage - 1 && m.isCompleted)
+                .Select(m => m.winnerId)
+                .ToList();
+            
+            int matchNum = 1;
+            for (int i = 0; i < winners.Count - 1; i += 2)
+            {
+                var match = new TournamentMatch
+                {
+                    matchId = $"{tournament.tournamentId}_S{(int)tournament.currentStage}_M{matchNum}",
+                    roundNumber = tournament.currentRound,
+                    matchNumber = matchNum,
+                    stage = tournament.currentStage,
+                    player1Id = winners[i],
+                    player2Id = winners[i + 1],
+                    scheduledTime = DateTime.Now.AddMinutes(matchNum * 10)
+                };
+                tournament.matches.Add(match);
+                matchNum++;
+            }
+        }
+
+        /// <summary>
+        /// 完成锦标赛
+        /// </summary>
+        private void CompleteTournament(Tournament tournament)
+        {
+            tournament.status = TournamentStatus.Completed;
+            tournament.currentStage = TournamentStage.Completed;
+            tournament.endTime = DateTime.Now;
+            
+            // 计算排名
+            var rankings = tournament.registeredPlayers
+                .OrderByDescending(p => p.score)
+                .ThenByDescending(p => p.wins)
+                .ToList();
+            
+            for (int i = 0; i < rankings.Count; i++)
+            {
+                rankings[i].score = i + 1; // 临时用作排名
+            }
+            
+            // 发放奖励
+            DistributeRewards(tournament);
+            
+            // 更新玩家记录
+            foreach (var player in tournament.registeredPlayers)
+            {
+                UpdatePlayerRecord(tournament, player);
+            }
+            
+            _activeTournaments.Remove(tournament);
+            tournament_completed?.Emit(tournament);
+            
+            GD.Print($"[ArenaTournamentSystem] 锦标赛 {tournament.tournamentName} 结束!");
+        }
+
+        private void DistributeRewards(Tournament tournament)
+        {
+            var rankings = tournament.registeredPlayers
+                .OrderByDescending(p => p.score)
+                .ThenByDescending(p => p.wins)
+                .ToList();
+            
+            for (int i = 0; i < rankings.Count; i++)
+            {
+                int rank = i + 1;
+                var player = rankings[i];
+                
+                foreach (var reward in tournament.rewards)
+                {
+                    if (rank >= reward.rankStart && rank <= reward.rankEnd)
+                    {
+                        // 发放奖励 (实际实现需要与经济系统集成)
+                        GD.Print($"[ArenaTournamentSystem] 玩家 {player.playerName} 获得排名 {rank} 奖励: {reward.rewardType} x{reward.rewardAmount}");
+                    }
+                }
+            }
+        }
+
+        private void UpdatePlayerRecord(Tournament tournament, TournamentPlayer player)
+        {
+            var rankings = tournament.registeredPlayers
+                .OrderByDescending(p => p.score)
+                .ThenByDescending(p => p.wins)
+                .ToList();
+            
+            int rank = rankings.FindIndex(p => p.playerId == player.playerId) + 1;
+            
+            if (!_playerProgress.ContainsKey(player.playerId))
+            {
+                _playerProgress[player.playerId] = new TournamentProgress
+                {
+                    playerId = player.playerId,
+                    statistics = new TournamentStatistics { playerId = player.playerId }
+                };
+            }
+            
+            var progress = _playerProgress[player.playerId];
+            
+            progress.participatedTournaments.Add(tournament.tournamentId);
+            
+            var record = new PlayerTournamentRecord
+            {
+                playerId = player.playerId,
+                tournamentId = tournament.tournamentId,
+                tournamentName = tournament.tournamentName,
+                finalRank = rank,
+                score = player.score,
+                wins = player.wins,
+                losses = player.losses,
+                participatedAt = DateTime.Now
+            };
+            
+            progress.recentRecords.Insert(0, record);
+            if (progress.recentRecords.Count > 10)
+            {
+                progress.recentRecords.RemoveAt(progress.recentRecords.Count - 1);
+            }
+            
+            // 更新统计
+            var stats = progress.statistics;
+            stats.totalTournaments++;
+            stats.totalWins += player.wins;
+            stats.totalLosses += player.losses;
+            
+            if (rank == 1) stats.firstPlace++;
+            else if (rank == 2) stats.secondPlace++;
+            else if (rank == 3) stats.thirdPlace++;
+            else if (rank <= 4) stats.top4++;
+            else if (rank <= 8) stats.top8++;
+            else if (rank <= 16) stats.top16++;
+            
+            if (stats.highestRank == 0 || rank < stats.highestRank)
+            {
+                stats.highestRank = rank;
+            }
+            
+            stats.totalPrizeWon += tournament.prizePool / tournament.currentPlayerCount;
+        }
+
+        #endregion
+
+        #region Queries
+
+        /// <summary>
+        /// 获取所有可报名的锦标赛
+        /// </summary>
+        public List<Tournament> GetAvailableTournaments()
+        {
+            return _tournaments.Values
+                .Where(t => t.status == TournamentStatus.Pending && DateTime.Now <= t.registrationEnd)
+                .OrderBy(t => t.registrationEnd)
+                .ToList();
+        }
+
+        /// <summary>
+        /// 获取进行中的锦标赛
+        /// </summary>
+        public List<Tournament> GetActiveTournaments()
+        {
+            return _activeTournaments.ToList();
+        }
+
+        /// <summary>
+        /// 获取锦标赛详情
+        /// </summary>
+        public Tournament GetTournament(string tournamentId)
+        {
+            return _tournaments.ContainsKey(tournamentId) ? _tournaments[tournamentId] : null;
+        }
+
+        /// <summary>
+        /// 获取玩家的下一场比赛
+        /// </summary>
+        public TournamentMatch GetPlayerNextMatch(string tournamentId, string playerId)
+        {
+            if (!_tournaments.ContainsKey(tournamentId))
+                return null;
+            
+            var tournament = _tournaments[tournamentId];
+            return tournament.matches
+                .Where(m => !m.isCompleted && 
+                           (m.player1Id == playerId || m.player2Id == playerId))
+                .OrderBy(m => m.scheduledTime)
+                .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 获取玩家进度
+        /// </summary>
+        public TournamentProgress GetPlayerProgress(string playerId)
+        {
+            return _playerProgress.ContainsKey(playerId) ? _playerProgress[playerId] : null;
+        }
+
+        /// <summary>
+        /// 获取玩家统计
+        /// </summary>
+        public TournamentStatistics GetPlayerStatistics(string playerId)
+        {
+            var progress = GetPlayerProgress(playerId);
+            return progress?.statistics;
+        }
+
+        /// <summary>
+        /// 获取所有模板
+        /// </summary>
+        public List<TournamentTemplate> GetTemplates()
+        {
+            return ArenaTournamentDatabase.GetAllTemplates();
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private string GenerateTournamentId()
+        {
+            return $"T_{DateTime.Now:yyyyMMddHHmmss}_{GD.Randomi(1000, 9999)}";
+        }
+
+        private int CalculateRounds(TournamentFormat format, int playerCount)
+        {
+            var config = ArenaTournamentDatabase.GetFormatConfig(format);
+            if (config != null)
+            {
+                return (int)Math.Ceiling(Math.Log(playerCount, 2));
+            }
+            return 4;
+        }
+
+        private void LoadData()
+        {
+            // 实际实现需要从存档加载数据
+            GD.Print("[ArenaTournamentSystem] 数据加载完成");
+        }
+
+        public void SaveData()
+        {
+            // 实际实现需要保存数据到存档
+            GD.Print("[ArenaTournamentSystem] 数据保存完成");
+        }
+
+        #endregion
     }
-    
-    // 获取数据
-    public ArenaTournamentData GetData() => _data;
 }
