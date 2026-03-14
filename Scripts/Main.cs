@@ -26,6 +26,7 @@ using ClawRPG.Scripts.Systems.ArenaTournament;
 using ClawRPG.Scripts.Systems.GuildWar;
 using ClawRPG.Systems.CraftingMastery;
 using ClawRPG.Modules.MultiplayerVote;
+using ClawRPG.Scripts.Fishing;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -1398,13 +1399,14 @@ namespace ClawRPG.Scripts {
             ui.AddChild(shopUI);
 
             // Fishing System
-            var fishingSystem = new Crafting.FishingSystem();
+            var fishingSystem = new FishingSystem();
             fishingSystem.Name = "FishingSystem";
             AddChild(fishingSystem);
 
             // Fishing UI
-            var fishingUI = new UI.FishingUI();
+            var fishingUI = new FishingUI();
             fishingUI.Name = "FishingUI";
+            fishingUI.Visible = false;
             ui.AddChild(fishingUI);
 
             // Alchemy System
@@ -3660,17 +3662,10 @@ namespace ClawRPG.Scripts {
         /// </summary>
         private void ToggleFishingUI()
         {
-            var fishingUI = GetNodeOrNull<UI.FishingUI>("UI/FishingUI");
+            var fishingUI = GetNodeOrNull<FishingUI>("UI/FishingUI");
             if (fishingUI != null)
             {
-                if (fishingUI.Visible)
-                {
-                    fishingUI.HideFishingUI();
-                }
-                else
-                {
-                    fishingUI.ShowFishingUI();
-                }
+                fishingUI.Visible = !fishingUI.Visible;
             }
         }
 
