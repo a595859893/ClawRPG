@@ -257,6 +257,11 @@ namespace ClawRPG.Scripts {
             guildWarSystem.Name = "GuildWarSystem";
             AddChild(guildWarSystem);
 
+            // Initialize guild heritage system
+            var guildHeritageSystem = new GuildHeritageSystem();
+            guildHeritageSystem.Name = "GuildHeritageSystem";
+            AddChild(guildHeritageSystem);
+
             // Initialize leaderboard system
             var leaderboardSystem = new Leaderboard.LeaderboardSystem();
             leaderboardSystem.Name = "LeaderboardSystem";
@@ -2691,6 +2696,12 @@ namespace ClawRPG.Scripts {
                 ToggleGuildWarLeagueUI();
             }
 
+            // Handle guild heritage UI toggle (Ctrl+Shift+H key)
+            if (Input.IsKeyPressed(Key.H) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleGuildHeritageUI();
+            }
+
             // Handle guild hall UI toggle (H key with Ctrl)
             if (Input.IsKeyPressed(Key.H) && Input.IsKeyPressed(Key.Ctrl))
             {
@@ -5053,6 +5064,51 @@ namespace ClawRPG.Scripts {
                     ui.AddChild(guildWarLeagueUI);
                 }
                 guildWarLeagueUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// Toggle Guild Heritage UI (Ctrl+Shift+H)
+        /// </summary>
+        private void ToggleGuildHeritageUI()
+        {
+            var ui = GetNodeOrNull<Control>("UI");
+            if (ui == null) return;
+
+            var guildHeritageUI = ui.GetNodeOrNull<GuildHeritageUI>("GuildHeritageUI");
+            if (guildHeritageUI != null && guildHeritageUI.Visible)
+            {
+                guildHeritageUI.Hide();
+            }
+            else
+            {
+                if (guildHeritageUI == null)
+                {
+                    guildHeritageUI = new GuildHeritageUI();
+                    guildHeritageUI.Name = "GuildHeritageUI";
+                    ui.AddChild(guildHeritageUI);
+                }
+                
+                // Try to get current guild from player
+                var player = GetNodeOrNull<Player>("Player");
+                if (player != null && player.GuildId != null)
+                {
+                    guildHeritageUI.SetGuild(player.GuildId, player.GuildName ?? "My Guild");
+                }
+                else
+                {
+                    // Demo mode - create a sample guild
+                    var system = GetNodeOrNull<GuildHeritageSystem>("GuildHeritageSystem");
+                    if (system != null)
+                    {
+                        system.CreateGuildHeritage("demo_guild", "Demo Guild");
+                        system.AddContribution("demo_guild", "player1", 150);
+                        system.AddContribution("demo_guild", "player2", 300);
+                        system.AddContribution("demo_guild", "player3", 500);
+                        guildHeritageUI.SetGuild("demo_guild", "Demo Guild");
+                    }
+                }
+                guildHeritageUI.Show();
             }
         }
 
