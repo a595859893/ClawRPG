@@ -475,6 +475,10 @@ namespace ClawRPG.Scripts {
             teamSkillSystem.Name = "TeamSkillSystem";
             AddChild(teamSkillSystem);
 
+            // Initialize skill mastery system
+            var skillMasterySystem = Skills.SkillMasterySystem.Instance;
+            GD.Print("Skill Mastery System initialized");
+
             // Initialize loot drop system
             LootDropSystem.Instance.Initialize();
 
@@ -1999,6 +2003,12 @@ namespace ClawRPG.Scripts {
                 ToggleComboChainUI();
             }
 
+            // Handle skill mastery UI toggle (Ctrl+Shift+S key)
+            if (Input.IsKeyPressed(Key.S) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleSkillMasteryUI();
+            }
+
             // Handle alchemy laboratory UI toggle (Ctrl+L key)
             if (Input.IsKeyPressed(Key.L) && Input.IsKeyPressed(Key.Ctrl))
             {
@@ -3006,6 +3016,21 @@ namespace ClawRPG.Scripts {
             {
                 skillTreeResetUI.Toggle();
             }
+        }
+
+        private void ToggleSkillMasteryUI()
+        {
+            var existingUI = GetNodeOrNull<UI.SkillMasteryUI>("CanvasLayer/SkillMasteryUI");
+            if (existingUI != null)
+            {
+                existingUI.Toggle();
+                return;
+            }
+
+            var skillMasteryUI = new UI.SkillMasteryUI();
+            skillMasteryUI.Name = "SkillMasteryUI";
+            GetNode("CanvasLayer").AddChild(skillMasteryUI);
+            GD.Print("Skill Mastery UI opened");
         }
 
         private void ToggleConstellationUI()
