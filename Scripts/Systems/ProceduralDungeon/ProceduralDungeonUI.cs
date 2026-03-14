@@ -1,256 +1,301 @@
-using Godot;
 using System;
-using System.Collections.Generic;
+using Godot;
+using Godot.Collections;
 
-public class ProceduralDungeonUI : Control
+namespace ClawRPG.Scripts.Systems.ProceduralDungeon
 {
-    private ProceduralDungeonSystem dungeonSystem;
-    private Label titleLabel;
-    private Label floorLabel;
-    private Label difficultyLabel;
-    private Label shapeLabel;
-    private Label statsLabel;
-    private Button generateButton;
-    private Button generateAllButton;
-    private Button closeButton;
-    private VBoxContainer roomListContainer;
-    private TabContainer tabContainer;
-    
-    private int currentFloor = 1;
-    private DungeonShape currentShape = DungeonShape.Branching;
-    private DungeonDifficulty currentDifficulty = DungeonDifficulty.Normal;
-    
-    public override void _Ready()
+    /// <summary>
+    /// 程序化地下城UI
+    /// </summary>
+    public class ProceduralDungeonUI : Control
     {
-        dungeonSystem = GetNode<ProceduralDungeonSystem>("/root/Main/ProceduralDungeonSystem");
-        if (dungeonSystem == null)
+        private ProceduralDungeonSystem _dungeonSystem;
+        
+        // UI组件
+        private Label _titleLabel;
+        private Label _dungeonNameLabel;
+        private Label _floorLabel;
+        private Label _roomLabel;
+        private Label _difficultyLabel;
+        private Label _enemiesLabel;
+        private Label _treasureLabel;
+        private Label _statusLabel;
+        
+        private Button _generateButton;
+        private Button _enterRoomButton;
+        private Button _clearRoomButton;
+        private Button _nextFloorButton;
+        private Button _closeButton;
+        
+        private ItemList _roomList;
+        private ItemList _connectedRoomsList;
+        
+        private VBoxContainer _roomInfoContainer;
+        private HBoxContainer _dungeonInfoContainer;
+        
+        private bool _isVisible = false;
+        
+        public override void _Ready()
         {
-            dungeonSystem = new ProceduralDungeonSystem();
+            _dungeonSystem = ProceduralDungeonSystem.Instance;
+            SetupUI();
+            GD.Print("Procedural Dungeon UI initialized");
         }
         
-        SetupUI();
-        Visible = false;
-    }
-    
-    private void SetupUI()
-    {
-        // Main panel
-        Panel mainPanel = new Panel();
-        mainPanel.SetAnchorsPreset(Control.LayoutPreset.Center);
-        mainPanel.CustomMinimumSize = new Vector2(800, 600);
-        AddChild(mainPanel);
-        
-        VBoxContainer mainVBox = new VBoxContainer();
-        mainVBox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        mainVBox.AddThemeConstantOverride("separation", 10);
-        mainPanel.AddChild(mainVBox);
-        
-        // Title
-        titleLabel = new Label();
-        titleLabel.Text = "Procedural Dungeon Generator";
-        titleLabel.Align = Label.AlignEnum.Center;
-        titleLabel.AddThemeFontSizeOverride("font_size", 24);
-        mainVBox.AddChild(titleLabel);
-        
-        // Tab container
-        tabContainer = new TabContainer();
-        tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-        mainVBox.AddChild(tabContainer);
-        
-        // Generate Tab
-        VBoxContainer generateTab = new VBoxContainer();
-        generateTab.Name = "Generate";
-        tabContainer.AddChild(generateTab);
-        
-        // Floor selection
-        HBoxContainer floorHBox = new HBoxContainer();
-        floorHBox.AddThemeConstantOverride("separation", 10);
-        generateTab.AddChild(floorHBox);
-        
-        floorHBox.AddChild(new Label { Text = "Floor: " });
-        
-        SpinBox floorSpin = new SpinBox();
-        floorSpin.MinValue = 1;
-        floorSpin.MaxValue = 100;
-        floorSpin.Value = currentFloor;
-        floorSpin.ValueChanged += (val) => currentFloor = (int)val;
-        floorHBox.AddChild(floorSpin);
-        
-        // Shape selection
-        HBoxContainer shapeHBox = new HBoxContainer();
-        shapeHBox.AddThemeConstantOverride("separation", 10);
-        generateTab.AddChild(shapeHBox);
-        
-        shapeHBox.AddChild(new Label { Text = "Shape: " });
-        
-        OptionButton shapeOption = new OptionButton();
-        foreach (DungeonShape shape in Enum.GetValues(typeof(DungeonShape)))
+        private void SetupUI()
         {
-            shapeOption.AddItem(shape.ToString(), (int)shape);
-        }
-        shapeOption.Selected = (int)currentShape;
-        shapeOption.ItemSelected += (index) => currentShape = (DungeonShape)index;
-        shapeHBox.AddChild(shapeOption);
-        
-        // Difficulty selection
-        HBoxContainer diffHBox = new HBoxContainer();
-        diffHBox.AddThemeConstantOverride("separation", 10);
-        generateTab.AddChild(diffHBox);
-        
-        diffHBox.AddChild(new Label { Text = "Difficulty: " });
-        
-        OptionButton diffOption = new OptionButton();
-        foreach (DungeonDifficulty diff in Enum.GetValues(typeof(DungeonDifficulty)))
-        {
-            diffOption.AddItem(diff.ToString(), (int)diff);
-        }
-        diffOption.Selected = (int)currentDifficulty;
-        diffOption.ItemSelected += (index) => currentDifficulty = (DungeonDifficulty)index;
-        diffHBox.AddChild(diffOption);
-        
-        // Generate button
-        generateButton = new Button();
-        generateButton.Text = "Generate Dungeon";
-        generateButton.Pressed += OnGeneratePressed;
-        generateTab.AddChild(generateButton);
-        
-        // Generate all floors button
-        generateAllButton = new Button();
-        generateAllButton.Text = "Generate 5 Floors";
-        generateAllButton.Pressed += OnGenerateAllPressed;
-        generateTab.AddChild(generateAllButton);
-        
-        // Rooms list
-        ScrollContainer roomScroll = new ScrollContainer();
-        roomScroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-        generateTab.AddChild(roomScroll);
-        
-        roomListContainer = new VBoxContainer();
-        roomListContainer.AddThemeConstantOverride("separation", 5);
-        roomScroll.AddChild(roomListContainer);
-        
-        // Statistics Tab
-        VBoxContainer statsTab = new VBoxContainer();
-        statsTab.Name = "Statistics";
-        tabContainer.AddChild(statsTab);
-        
-        statsLabel = new Label();
-        statsLabel.Text = "Statistics:\n";
-        statsTab.AddChild(statsLabel);
-        
-        // Info Tab
-        VBoxContainer infoTab = new VBoxContainer();
-        infoTab.Name = "Info";
-        tabContainer.AddChild(infoTab);
-        
-        Label infoLabel = new Label();
-        infoLabel.Text = "Procedural Dungeon Generator\n\n" +
-            "This system generates random dungeons with various shapes and room types.\n\n" +
-            "Shapes:\n" +
-            "- Linear: Straight path from start to boss\n" +
-            "- Branching: Main path with side branches\n" +
-            "- Circular: Ring of rooms with center boss\n" +
-            "- Hub and Spoke: Central hub with radiating paths\n" +
-            "- Maze: Complex interconnected rooms\n\n" +
-            "Room Types:\n" +
-            "- Combat: Fight enemies\n" +
-            "- Treasure: Find loot\n" +
-            "- Boss: Challenge the boss\n" +
-            "- Shop: Buy items\n" +
-            "- Rest: Heal and save\n" +
-            "- Event: Random events";
-        infoTab.AddChild(infoLabel);
-        
-        // Close button
-        closeButton = new Button();
-        closeButton.Text = "Close (ESC)";
-        closeButton.Pressed += OnClosePressed;
-        mainVBox.AddChild(closeButton);
-    }
-    
-    private void OnGeneratePressed()
-    {
-        if (dungeonSystem != null)
-        {
-            var floor = dungeonSystem.GenerateDungeon(currentFloor, currentShape, currentDifficulty);
-            UpdateRoomList(floor);
-            UpdateStats();
-        }
-    }
-    
-    private void OnGenerateAllPressed()
-    {
-        if (dungeonSystem != null)
-        {
-            for (int i = 1; i <= 5; i++)
+            // 主容器
+            var mainContainer = new VBoxContainer
             {
-                DungeonShape shape = (DungeonShape)(i % 5);
-                dungeonSystem.GenerateDungeon(i, shape, currentDifficulty);
-            }
-            UpdateStats();
-        }
-    }
-    
-    private void OnClosePressed()
-    {
-        Visible = false;
-    }
-    
-    private void UpdateRoomList(DungeonFloor floor)
-    {
-        foreach (Node child in roomListContainer.GetChildren())
-        {
-            child.QueueFree();
-        }
-        
-        foreach (var room in floor.rooms)
-        {
-            Label roomLabel = new Label();
-            roomLabel.Text = $"Room {room.id}: {room.type} ({room.x}, {room.y})";
+                AnchorRight = Vector2.Right,
+                AnchorBottom = Vector2.Bottom,
+                OffsetRight = -20,
+                OffsetBottom = -20
+            };
+            AddChild(mainContainer);
             
-            // Color by room type
-            Color roomColor = Colors.White;
-            switch (room.type)
+            // 标题
+            _titleLabel = new Label
             {
-                case RoomType.Boss: roomColor = Colors.Red; break;
-                case RoomType.Treasure: roomColor = Colors.Gold; break;
-                case RoomType.Shop: roomColor = Colors.Green; break;
-                case RoomType.Rest: roomColor = Colors.Cyan; break;
-                case RoomType.Combat: roomColor = Colors.Orange; break;
-            }
-            roomLabel.AddThemeColorOverride("font_color", roomColor);
+                Text = "Procedural Dungeon",
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            _titleLabel.AddThemeFontSizeOverride("font_size", 24);
+            mainContainer.AddChild(_titleLabel);
             
-            roomListContainer.AddChild(roomLabel);
+            // 地下城信息
+            _dungeonInfoContainer = new HBoxContainer();
+            mainContainer.AddChild(_dungeonInfoContainer);
+            
+            _dungeonNameLabel = new Label { Text = "No dungeon" };
+            _floorLabel = new Label { Text = "Floor: 0/0" };
+            _roomLabel = new Label { Text = "Room: -" };
+            _difficultyLabel = new Label { Text = "Difficulty: -" };
+            
+            _dungeonInfoContainer.AddChild(_dungeonNameLabel);
+            _dungeonInfoContainer.AddChild(new VSeparator());
+            _dungeonInfoContainer.AddChild(_floorLabel);
+            _dungeonInfoContainer.AddChild(new VSeparator());
+            _dungeonInfoContainer.AddChild(_roomLabel);
+            _dungeonInfoContainer.AddChild(new VSeparator());
+            _dungeonInfoContainer.AddChild(_difficultyLabel);
+            
+            // 分隔
+            mainContainer.AddChild(new HSeparator());
+            
+            // 房间信息容器
+            _roomInfoContainer = new VBoxContainer();
+            mainContainer.AddChild(_roomInfoContainer);
+            
+            _enemiesLabel = new Label { Text = "Enemies: 0" };
+            _treasureLabel = new Label { Text = "Treasure: None" };
+            _statusLabel = new Label { Text = "Status: Not entered" };
+            
+            _roomInfoContainer.AddChild(_enemiesLabel);
+            _roomInfoContainer.AddChild(_treasureLabel);
+            _roomInfoContainer.AddChild(_statusLabel);
+            
+            // 分隔
+            mainContainer.AddChild(new HSeparator());
+            
+            // 房间列表
+            var roomListLabel = new Label { Text = "Current Floor Rooms:" };
+            mainContainer.AddChild(roomListLabel);
+            
+            _roomList = new ItemList();
+            _roomList.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+            _roomList.CustomMinimumSize = new Vector2(0, 150);
+            mainContainer.AddChild(_roomList);
+            
+            // 连接房间列表
+            var connectedLabel = new Label { Text = "Connected Rooms:" };
+            mainContainer.AddChild(connectedLabel);
+            
+            _connectedRoomsList = new ItemList();
+            _connectedRoomsList.CustomMinimumSize = new Vector2(0, 100);
+            mainContainer.AddChild(_connectedRoomsList);
+            
+            // 按钮容器
+            var buttonContainer = new HBoxContainer();
+            mainContainer.AddChild(buttonContainer);
+            
+            _generateButton = new Button { Text = "Generate" };
+            _generateButton.Pressed += OnGeneratePressed;
+            buttonContainer.AddChild(_generateButton);
+            
+            _enterRoomButton = new Button { Text = "Enter Room" };
+            _enterRoomButton.Pressed += OnEnterRoomPressed;
+            _enterRoomButton.Disabled = true;
+            buttonContainer.AddChild(_enterRoomButton);
+            
+            _clearRoomButton = new Button { Text = "Clear Room" };
+            _clearRoomButton.Pressed += OnClearRoomPressed;
+            _clearRoomButton.Disabled = true;
+            buttonContainer.AddChild(_clearRoomButton);
+            
+            _nextFloorButton = new Button { Text = "Next Floor" };
+            _nextFloorButton.Pressed += OnNextFloorPressed;
+            _nextFloorButton.Disabled = true;
+            buttonContainer.AddChild(_nextFloorButton);
+            
+            _closeButton = new Button { Text = "Close" };
+            _closeButton.Pressed += OnClosePressed;
+            buttonContainer.AddChild(_closeButton);
+            
+            // 初始隐藏
+            Visible = false;
         }
-    }
-    
-    private void UpdateStats()
-    {
-        if (dungeonSystem != null)
+        
+        private void UpdateUI()
         {
-            var stats = dungeonSystem.GetStatistics();
-            statsLabel.Text = "Statistics:\n";
-            foreach (var kvp in stats)
+            if (_dungeonSystem?.CurrentDungeon == null)
             {
-                statsLabel.Text += $"{kvp.Key}: {kvp.Value}\n";
+                _dungeonNameLabel.Text = "No dungeon";
+                _floorLabel.Text = "Floor: 0/0";
+                _roomLabel.Text = "Room: -";
+                _difficultyLabel.Text = "Difficulty: -";
+                _enemiesLabel.Text = "Enemies: 0";
+                _treasureLabel.Text = "Treasure: None";
+                _statusLabel.Text = "Status: Not in dungeon";
+                
+                _roomList.Clear();
+                _connectedRoomsList.Clear();
+                
+                _enterRoomButton.Disabled = true;
+                _clearRoomButton.Disabled = true;
+                _nextFloorButton.Disabled = true;
+                
+                return;
+            }
+            
+            var dungeon = _dungeonSystem.CurrentDungeon;
+            _dungeonNameLabel.Text = dungeon.DungeonName;
+            _floorLabel.Text = $"Floor: {dungeon.CurrentFloor}/{dungeon.TotalFloors}";
+            
+            var currentFloor = dungeon.Floors[dungeon.CurrentFloor - 1];
+            
+            // 更新房间列表
+            _roomList.Clear();
+            foreach (var room in currentFloor.Rooms)
+            {
+                string prefix = room.IsDiscovered ? (room.IsCleared ? "✓" : "●") : "○";
+                string roomInfo = $"{prefix} {room.Type} ({room.Difficulty})";
+                _roomList.AddItem(roomInfo);
+            }
+            
+            // 更新当前房间信息
+            if (dungeon.CurrentRoom != null)
+            {
+                var room = dungeon.CurrentRoom;
+                _roomLabel.Text = $"Room: {room.Type}";
+                _difficultyLabel.Text = $"Difficulty: {room.Difficulty}";
+                _enemiesLabel.Text = $"Enemies: {room.Enemies.Count}";
+                _treasureLabel.Text = room.TreasureId != null ? $"Treasure: {room.TreasureId}" : "Treasure: None";
+                _statusLabel.Text = room.IsCleared ? "Status: Cleared" : "Status: Not cleared";
+                
+                // 更新连接房间列表
+                _connectedRoomsList.Clear();
+                var connectedRooms = _dungeonSystem.GetConnectedRooms();
+                foreach (var connected in connectedRooms)
+                {
+                    string prefix = connected.IsDiscovered ? (connected.IsCleared ? "✓" : "●") : "○";
+                    _connectedRoomsList.AddItem($"{prefix} {connected.Type}");
+                }
+                
+                _enterRoomButton.Disabled = false;
+                _clearRoomButton.Disabled = room.IsCleared || room.Enemies.Count == 0;
+                _nextFloorButton.Disabled = dungeon.CurrentFloor >= dungeon.TotalFloors;
+            }
+            else
+            {
+                _roomLabel.Text = "Room: -";
+                _difficultyLabel.Text = "Difficulty: -";
+                _enemiesLabel.Text = "Enemies: 0";
+                _treasureLabel.Text = "Treasure: None";
+                _statusLabel.Text = "Status: Choose a room";
+                
+                _connectedRoomsList.Clear();
+                _enterRoomButton.Disabled = true;
+                _clearRoomButton.Disabled = true;
+                _nextFloorButton.Disabled = true;
             }
         }
-    }
-    
-    public override void _Input(InputEvent eventInput)
-    {
-        if (eventInput.IsActionPressed("ui_cancel"))
+        
+        private void OnGeneratePressed()
         {
-            Visible = !Visible;
+            // 随机选择地下城类型
+            var dungeonTypes = new[] { "AncientRuins", "DeepCavern", "ForgottenTemple", "AbandonedFortress", "EnchantedForest" };
+            var selectedType = dungeonTypes[new Random().Next(dungeonTypes.Length)];
+            
+            _dungeonSystem.GenerateDungeon(selectedType);
+            UpdateUI();
         }
-    }
-    
-    public void Toggle()
-    {
-        Visible = !Visible;
-        if (Visible)
+        
+        private void OnEnterRoomPressed()
         {
-            UpdateStats();
+            var selected = _connectedRoomsList.GetSelectedItems();
+            if (selected.Length > 0)
+            {
+                var connectedRooms = _dungeonSystem.GetConnectedRooms();
+                if (selected[0] < connectedRooms.Count)
+                {
+                    var room = connectedRooms[selected[0]];
+                    _dungeonSystem.EnterRoom(room.RoomId);
+                    UpdateUI();
+                }
+            }
+            else if (_roomList.GetItemCount() > 0)
+            {
+                // 进入选中的房间
+                var currentFloor = _dungeonSystem.CurrentDungeon.Floors[_dungeonSystem.CurrentDungeon.CurrentFloor - 1];
+                var selectedRooms = _roomList.GetSelectedItems();
+                if (selectedRooms.Length > 0)
+                {
+                    var room = currentFloor.Rooms[selectedRooms[0]];
+                    _dungeonSystem.EnterRoom(room.RoomId);
+                    UpdateUI();
+                }
+            }
+        }
+        
+        private void OnClearRoomPressed()
+        {
+            _dungeonSystem.ClearCurrentRoom();
+            UpdateUI();
+        }
+        
+        private void OnNextFloorPressed()
+        {
+            _dungeonSystem.CompleteFloor();
+            UpdateUI();
+        }
+        
+        private void OnClosePressed()
+        {
+            Toggle();
+        }
+        
+        public void Toggle()
+        {
+            _isVisible = !_isVisible;
+            Visible = _isVisible;
+            
+            if (_isVisible)
+            {
+                UpdateUI();
+            }
+        }
+        
+        public override void _Input(InputEvent @event)
+        {
+            if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+            {
+                // Ctrl+Shift+D 切换地下城UI
+                if (keyEvent.Ctrl && keyEvent.Shift && keyEvent.Keycode == Key.D)
+                {
+                    Toggle();
+                }
+            }
         }
     }
 }

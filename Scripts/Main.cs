@@ -228,6 +228,11 @@ namespace ClawRPG.Scripts {
             bossMechanicsSystem.Name = "BossMechanicsSystem";
             AddChild(bossMechanicsSystem);
 
+            // Initialize procedural dungeon system
+            var proceduralDungeonSystem = new ProceduralDungeon.ProceduralDungeonSystem();
+            proceduralDungeonSystem.Name = "ProceduralDungeonSystem";
+            AddChild(proceduralDungeonSystem);
+
             // Initialize combat UI system
             var combatUISystem = new Combat.CombatUISystem();
             combatUISystem.Name = "CombatUISystem";
@@ -1102,6 +1107,11 @@ namespace ClawRPG.Scripts {
             var enchantmentUI = new EnchantmentUI();
             enchantmentUI.Name = "EnchantmentUI";
             ui.AddChild(enchantmentUI);
+
+            // Procedural Dungeon UI
+            var proceduralDungeonUI = new ProceduralDungeon.ProceduralDungeonUI();
+            proceduralDungeonUI.Name = "ProceduralDungeonUI";
+            ui.AddChild(proceduralDungeonUI);
 
             // Mount Training UI
             var mountTrainingUI = new MountTrainingUI();
@@ -2175,6 +2185,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.D) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleCombatUI();
+            }
+
+            // Handle procedural dungeon UI toggle (Ctrl+Shift+G key)
+            if (Input.IsKeyPressed(Key.G) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleProceduralDungeonUI();
             }
 
             // Handle style mastery UI toggle (Shift+S key)
@@ -3306,6 +3322,33 @@ namespace ClawRPG.Scripts {
                 }
                 canvasLayer.AddChild(combatUI);
                 combatUI.Show();
+            }
+        }
+
+        /// <summary>
+        /// 切换程序化地下城 UI 界面 (Ctrl+Shift+G)
+        /// </summary>
+        private void ToggleProceduralDungeonUI()
+        {
+            var dungeonUI = GetNodeOrNull<ProceduralDungeon.ProceduralDungeonUI>("CanvasLayer/ProceduralDungeonUI");
+            if (dungeonUI != null)
+            {
+                dungeonUI.Toggle();
+            }
+            else
+            {
+                // Create and add the UI if it doesn't exist
+                dungeonUI = new ProceduralDungeon.ProceduralDungeonUI();
+                dungeonUI.Name = "ProceduralDungeonUI";
+                var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+                if (canvasLayer == null)
+                {
+                    canvasLayer = new CanvasLayer();
+                    canvasLayer.Name = "CanvasLayer";
+                    AddChild(canvasLayer);
+                }
+                canvasLayer.AddChild(dungeonUI);
+                dungeonUI.Show();
             }
         }
 
