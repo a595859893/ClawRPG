@@ -6,7 +6,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// 按键绑定系统 - 管理游戏快捷键配置
     /// </summary>
-    public class KeybindingSystem : Node
+    public class KeybindingSystem : BaseSystem
     {
         public static KeybindingSystem Instance { get; private set; }
 
@@ -24,6 +24,40 @@ namespace ClawRPG.Systems {
         {
             Instance = this;
             InitializeDefaultKeybindings();
+        }
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            var keybindings = new Dictionary<string, int>();
+            
+            foreach (var kvp in _keybindings)
+            {
+                keybindings[kvp.Key] = (int)kvp.Value.Key;
+            }
+            
+            data["keybindings"] = keybindings;
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null || !data.Contains("keybindings")) return;
+            
+            var keybindings = (Dictionary)data["keybindings"];
+            foreach (var kvp in keybindings)
+            {
+                if (_keybindings.ContainsKey(kvp.Key))
+                {
+                    _keybindings[kvp.Key].Key = (Key)kvp.Value;
+                }
+            }
         }
 
         private void InitializeDefaultKeybindings()
