@@ -217,6 +217,11 @@ namespace ClawRPG.Scripts {
             meditationDatabase.Name = "MeditationDatabase";
             AddChild(meditationDatabase);
 
+            // Initialize enchantment system
+            var enchantmentSystem = new Enchantment.EnchantmentSystem();
+            enchantmentSystem.Name = "EnchantmentSystem";
+            AddChild(enchantmentSystem);
+
             // Initialize daily ritual system
             var dailyRitualSystem = new DailyRitualSystem();
             dailyRitualSystem.Name = "DailyRitualSystem";

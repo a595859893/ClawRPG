@@ -1,116 +1,210 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 
-public class EnchantmentData
+namespace ClawRPG.Scripts.Systems.Enchantment
 {
-    // 附魔类型
+    /// <summary>
+    /// 附魔类型枚举
+    /// </summary>
     public enum EnchantmentType
     {
         Weapon,
         Armor,
         Accessory,
-        Helmet,
-        Boots,
-        Gloves
+        Universal
     }
-
-    // 稀有度
-    public enum Rarity
+    
+    /// <summary>
+    /// 附魔效果类型
+    /// </summary>
+    public enum EnchantmentEffect
     {
-        Common,
-        Uncommon,
-        Rare,
-        Epic,
-        Legendary
-    }
-
-    // 附魔属性类型
-    public enum PropertyType
-    {
-        Attack,
+        Damage,
+        CriticalRate,
+        CriticalDamage,
+        AttackSpeed,
+        LifeSteal,
         Defense,
         Health,
+        Mana,
+        ManaRegen,
         Speed,
-        Critical,
-        Evasion,
-        LifeSteal,
-        MagicAttack,
-        MagicDefense,
+        Dodge,
         FireResistance,
         IceResistance,
-        LightningResistance
+        LightningResistance,
+        PoisonResistance,
+        AllAttributes,
+        Strength,
+        Intelligence,
+        Dexterity,
+        Vitality,
+        Luck
     }
-
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public EnchantmentType Type { get; set; }
-    public Rarity RarityLevel { get; set; }
-    public Dictionary<PropertyType, float> Properties { get; set; }
-    public int RequiredLevel { get; set; }
-    public int MaxLevel { get; set; }
-    public int BaseCost { get; set; }
-    public float SuccessRate { get; set; }
-    public string IconName { get; set; }
-
-    public EnchantmentData()
+    
+    /// <summary>
+    /// 附魔等级
+    /// </summary>
+    public enum EnchantmentTier
     {
-        Properties = new Dictionary<PropertyType, float>();
+        Common,      // 普通
+        Uncommon,    // 优秀
+        Rare,        // 稀有
+        Epic,        // 史诗
+        Legendary    // 传说
     }
-
-    public float GetPropertyValue(PropertyType type)
+    
+    /// <summary>
+    /// 附魔记录
+    /// </summary>
+    public class EnchantmentRecord
     {
-        return Properties.ContainsKey(type) ? Properties[type] : 0f;
-    }
-
-    public float GetTotalPropertyBonus()
-    {
-        float total = 0f;
-        foreach (var prop in Properties.Values)
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public EnchantmentType Type { get; set; }
+        public EnchantmentEffect PrimaryEffect { get; set; }
+        public float PrimaryEffectValue { get; set; }
+        public EnchantmentEffect? SecondaryEffect { get; set; }
+        public float SecondaryEffectValue { get; set; }
+        public EnchantmentTier Tier { get; set; }
+        public int RequiredLevel { get; set; }
+        public int EnchantmentCost { get; set; }
+        public float SuccessRate { get; set; }
+        public string Description { get; set; }
+        public string IconName { get; set; }
+        
+        public EnchantmentRecord()
         {
-            total += prop;
+            Id = Guid.NewGuid().ToString();
         }
-        return total;
     }
-}
-
-public class EnchantmentInstance
-{
-    public string Id { get; set; }
-    public string TemplateId { get; set; }
-    public int CurrentLevel { get; set; }
-    public int Experience { get; set; }
-    public bool IsActive { get; set; }
-    public DateTime AppliedTime { get; set; }
-
-    public EnchantmentInstance()
+    
+    /// <summary>
+    /// 玩家已解锁的附魔
+    /// </summary>
+    public class UnlockedEnchantment
     {
-        Id = Guid.NewGuid().ToString();
-        CurrentLevel = 1;
-        Experience = 0;
-        IsActive = true;
-        AppliedTime = DateTime.Now;
+        public string EnchantmentId { get; set; }
+        public DateTime UnlockedAt { get; set; }
+        public int UsageCount { get; set; }
+        public int SuccessCount { get; set; }
+        
+        public UnlockedEnchantment()
+        {
+            UnlockedAt = DateTime.Now;
+            UsageCount = 0;
+            SuccessCount = 0;
+        }
+        
+        public float GetSuccessRate()
+        {
+            if (UsageCount == 0) return 0f;
+            return (float)SuccessCount / UsageCount * 100f;
+        }
     }
-}
-
-// 附魔应用记录
-public class EnchantmentRecord
-{
-    public string EquipmentId { get; set; }
-    public string EnchantmentId { get; set; }
-    public DateTime AppliedTime { get; set; }
-    public int TotalAttempts { get; set; }
-    public int SuccessfulAttempts { get; set; }
-
-    public EnchantmentRecord()
+    
+    /// <summary>
+    /// 装备附魔记录
+    /// </summary>
+    public class EquipmentEnchantment
     {
-        TotalAttempts = 0;
-        SuccessfulAttempts = 0;
+        public string EquipmentId { get; set; }
+        public string EnchantmentId { get; set; }
+        public int EnchantmentLevel { get; set; }
+        public DateTime EnchantedAt { get; set; }
+        public bool IsPermanent { get; set; }
+        
+        public EquipmentEnchantment()
+        {
+            EnchantedAt = DateTime.Now;
+            EnchantmentLevel = 1;
+            IsPermanent = true;
+        }
     }
-
-    public float GetSuccessRate()
+    
+    /// <summary>
+    /// 附魔会话（用于附魔过程）
+    /// </summary>
+    public class EnchantmentSession
     {
-        return TotalAttempts > 0 ? (float)SuccessfulAttempts / TotalAttempts * 100f : 0f;
+        public string SessionId { get; set; }
+        public string PlayerId { get; set; }
+        public string EquipmentId { get; set; }
+        public string EnchantmentId { get; set; }
+        public int AttemptLevel { get; set; }
+        public DateTime StartedAt { get; set; }
+        public bool IsCompleted { get; set; }
+        public bool WasSuccessful { get; set; }
+        
+        public EnchantmentSession()
+        {
+            SessionId = Guid.NewGuid().ToString();
+            StartedAt = DateTime.Now;
+            IsCompleted = false;
+            WasSuccessful = false;
+            AttemptLevel = 1;
+        }
+    }
+    
+    /// <summary>
+    /// 附魔统计
+    /// </summary>
+    public class EnchantmentStatistics
+    {
+        public int TotalAttempts { get; set; }
+        public int TotalSuccesses { get; set; }
+        public int TotalFailures { get; set; }
+        public int TotalExpenses { get; set; }
+        public Dictionary<string, int> EnchantmentUsageCount { get; set; }
+        public int HighestTierUnlocked { get; set; }
+        
+        public EnchantmentStatistics()
+        {
+            EnchantmentUsageCount = new Dictionary<string, int>();
+            HighestTierUnlocked = 0;
+            TotalAttempts = 0;
+            TotalSuccesses = 0;
+            TotalFailures = 0;
+            TotalExpenses = 0;
+        }
+        
+        public float GetOverallSuccessRate()
+        {
+            if (TotalAttempts == 0) return 0f;
+            return (float)TotalSuccesses / TotalAttempts * 100f;
+        }
+    }
+    
+    /// <summary>
+    /// 附魔进度
+    /// </summary>
+    public class EnchantmentProgress
+    {
+        public string PlayerId { get; set; }
+        public List<UnlockedEnchantment> UnlockedEnchantments { get; set; }
+        public List<EquipmentEnchantment> ActiveEnchantments { get; set; }
+        public EnchantmentStatistics Statistics { get; set; }
+        public int TotalEnchantmentsPerformed { get; set; }
+        public int CurrentFocusPoints { get; set; }
+        
+        public EnchantmentProgress()
+        {
+            PlayerId = "";
+            UnlockedEnchantments = new List<UnlockedEnchantment>();
+            ActiveEnchantments = new List<EquipmentEnchantment>();
+            Statistics = new EnchantmentStatistics();
+            TotalEnchantmentsPerformed = 0;
+            CurrentFocusPoints = 0;
+        }
+        
+        public EnchantmentProgress(string playerId)
+        {
+            PlayerId = playerId;
+            UnlockedEnchantments = new List<UnlockedEnchantment>();
+            ActiveEnchantments = new List<EquipmentEnchantment>();
+            Statistics = new EnchantmentStatistics();
+            TotalEnchantmentsPerformed = 0;
+            CurrentFocusPoints = 0;
+        }
     }
 }
