@@ -1054,6 +1054,9 @@ namespace ClawRPG.Scripts {
             // Initialize achievement milestone system
             InitializeAchievementMilestone();
 
+            // Initialize sealed dungeon system
+            InitializeSealedDungeon();
+
             // Load game data
             LoadGameData();
 
@@ -1935,6 +1938,10 @@ namespace ClawRPG.Scripts {
             GD.Print("Crafting Mastery System initialized!");
         }
         
+        // Initialize sealed dungeon system
+        private SealedDungeon.SealedDungeonSystem _sealedDungeonSystem;
+        private SealedDungeon.SealedDungeonUI _sealedDungeonUI;
+        
         private void InitializeAchievementMilestone()
         {
             // Initialize achievement milestone system
@@ -1955,6 +1962,36 @@ namespace ClawRPG.Scripts {
             if (_achievementMilestoneUI != null)
             {
                 _achievementMilestoneUI.ToggleVisibility();
+            }
+        }
+        
+        private void InitializeSealedDungeon()
+        {
+            // Initialize sealed dungeon system
+            _sealedDungeonSystem = new SealedDungeon.SealedDungeonSystem();
+            _sealedDungeonSystem.Name = "SealedDungeonSystem";
+            AddChild(_sealedDungeonSystem);
+            
+            // Initialize sealed dungeon UI
+            _sealedDungeonUI = new SealedDungeon.SealedDungeonUI();
+            _sealedDungeonUI.Name = "SealedDungeonUI";
+            AddChild(_sealedDungeonUI);
+            
+            // Add test data for demonstration
+            _sealedDungeonSystem.AddTestData();
+            
+            GD.Print("Sealed Dungeon System initialized!");
+        }
+        
+        private void ToggleSealedDungeonUI()
+        {
+            if (_sealedDungeonUI != null)
+            {
+                _sealedDungeonUI.Visible = !_sealedDungeonUI.Visible;
+                if (_sealedDungeonUI.Visible)
+                {
+                    _sealedDungeonUI.RefreshUI();
+                }
             }
         }
         
@@ -2148,6 +2185,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.A) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleAchievementMilestoneUI();
+            }
+
+            // Handle sealed dungeon UI toggle (Ctrl+Shift+Z key)
+            if (Input.IsKeyPressed(Key.Z) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleSealedDungeonUI();
             }
 
             // Handle alchemy laboratory UI toggle (Ctrl+L key)
