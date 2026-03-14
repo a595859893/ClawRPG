@@ -10,6 +10,7 @@ using ClawRPG.Scripts.Systems.Enhancement;
 using ClawRPG.Scripts.Systems.ArtifactFusion;
 using ClawRPG.Scripts.Systems.EnemyWeakness;
 using ClawRPG.Scripts.Systems.DailyLoginBonus;
+using ClawRPG.Scripts.Systems.Meditation;
 using ClawRPG.Scripts.UI;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Quests;
@@ -205,6 +206,16 @@ namespace ClawRPG.Scripts {
             var dailyLoginRewardSystem = new DailyLoginRewardSystem();
             dailyLoginRewardSystem.Name = "DailyLoginRewardSystem";
             AddChild(dailyLoginRewardSystem);
+
+            // Initialize meditation system
+            var meditationSystem = new MeditationSystem();
+            meditationSystem.Name = "MeditationSystem";
+            AddChild(meditationSystem);
+
+            // Initialize meditation database
+            var meditationDatabase = new MeditationDatabase();
+            meditationDatabase.Name = "MeditationDatabase";
+            AddChild(meditationDatabase);
 
             // Initialize daily ritual system
             var dailyRitualSystem = new DailyRitualSystem();
@@ -2294,6 +2305,12 @@ namespace ClawRPG.Scripts {
                 }
             }
 
+            // Handle meditation UI toggle (Ctrl+Shift+M)
+            if (Input.IsActionJustPressed("meditation_toggle"))
+            {
+                ToggleMeditationUI();
+            }
+
             // Handle team skill UI toggle (T key)
             if (Input.IsActionJustPressed("team_skill"))
             {
@@ -2857,6 +2874,28 @@ namespace ClawRPG.Scripts {
             if (runeUI != null)
             {
                 runeUI.Toggle();
+            }
+        }
+
+        private void ToggleMeditationUI()
+        {
+            var meditationUI = GetNodeOrNull<Meditation.MeditationUI>("CanvasLayer/MeditationUI");
+            if (meditationUI != null)
+            {
+                meditationUI.QueueFree();
+            }
+            else
+            {
+                var newUI = new Meditation.MeditationUI();
+                newUI.Name = "MeditationUI";
+                var canvasLayer = GetNodeOrNull<CanvasLayer>("CanvasLayer");
+                if (canvasLayer == null)
+                {
+                    canvasLayer = new CanvasLayer();
+                    canvasLayer.Name = "CanvasLayer";
+                    AddChild(canvasLayer);
+                }
+                canvasLayer.AddChild(newUI);
             }
         }
 
