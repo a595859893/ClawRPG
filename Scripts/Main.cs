@@ -22,6 +22,7 @@ using ClawRPG.Scripts.Systems.MythicPlusDungeon;
 using ClawRPG.Scripts.Systems.ProceduralDungeon;
 using ClawRPG.Scripts.Systems.ArenaTournament;
 using ClawRPG.Scripts.Systems.GuildWar;
+using ClawRPG.Systems.CraftingMastery;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -1025,6 +1026,9 @@ namespace ClawRPG.Scripts {
             // Initialize UI
             InitializeUI();
 
+            // Initialize crafting mastery system
+            InitializeCraftingMastery();
+
             // Load game data
             LoadGameData();
 
@@ -1877,6 +1881,33 @@ namespace ClawRPG.Scripts {
             }
         }
 
+        // Initialize crafting mastery system
+        private CraftingMastery.CraftingMasterySystem _craftingMasterySystem;
+        private CraftingMastery.CraftingMasteryUI _craftingMasteryUI;
+        
+        private void InitializeCraftingMastery()
+        {
+            // Initialize crafting mastery system
+            _craftingMasterySystem = new CraftingMastery.CraftingMasterySystem();
+            _craftingMasterySystem.Name = "CraftingMasterySystem";
+            AddChild(_craftingMasterySystem);
+            
+            // Initialize crafting mastery UI
+            _craftingMasteryUI = new CraftingMastery.CraftingMasteryUI();
+            _craftingMasteryUI.Name = "CraftingMasteryUI";
+            AddChild(_craftingMasteryUI);
+            
+            GD.Print("Crafting Mastery System initialized!");
+        }
+        
+        private void ToggleCraftingMasteryUI()
+        {
+            if (_craftingMasteryUI != null)
+            {
+                _craftingMasteryUI.ToggleUI();
+            }
+        }
+
         private float _autoSaveTimer = 0f;
         private const float AutoSaveInterval = 300f; // 5 minutes
 
@@ -2047,6 +2078,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.S) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleSkillMasteryUI();
+            }
+
+            // Handle crafting mastery UI toggle (Ctrl+Shift+K key)
+            if (Input.IsKeyPressed(Key.K) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleCraftingMasteryUI();
             }
 
             // Handle alchemy laboratory UI toggle (Ctrl+L key)
