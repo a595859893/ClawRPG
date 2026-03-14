@@ -21,6 +21,7 @@ using ClawRPG.Scripts.BossMechanics;
 using ClawRPG.Scripts.Systems.MythicPlusDungeon;
 using ClawRPG.Scripts.Systems.ProceduralDungeon;
 using ClawRPG.Scripts.Systems.ArenaTournament;
+using ClawRPG.Scripts.Systems.GuildWar;
 
 namespace ClawRPG.Scripts {
     /// <summary>
@@ -245,6 +246,11 @@ namespace ClawRPG.Scripts {
             var mythicPlusDungeonSystem = new MythicPlusDungeon.MythicPlusDungeonSystem();
             mythicPlusDungeonSystem.Name = "MythicPlusDungeonSystem";
             AddChild(mythicPlusDungeonSystem);
+
+            // Initialize guild war system
+            var guildWarSystem = new GuildWar.GuildWarSystem();
+            guildWarSystem.Name = "GuildWarSystem";
+            AddChild(guildWarSystem);
 
             // Initialize combat UI system
             var combatUISystem = new Combat.CombatUISystem();
