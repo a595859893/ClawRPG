@@ -262,6 +262,16 @@ namespace ClawRPG.Scripts {
             guildHeritageSystem.Name = "GuildHeritageSystem";
             AddChild(guildHeritageSystem);
 
+            // Initialize dreamscape system
+            var dreamscapeSystem = new DreamscapeSystem();
+            dreamscapeSystem.Name = "DreamscapeSystem";
+            AddChild(dreamscapeSystem);
+
+            // Initialize dreamscape database
+            var dreamscapeDatabase = new DreamscapeDatabase();
+            dreamscapeDatabase.Name = "DreamscapeDatabase";
+            AddChild(dreamscapeDatabase);
+
             // Initialize leaderboard system
             var leaderboardSystem = new Leaderboard.LeaderboardSystem();
             leaderboardSystem.Name = "LeaderboardSystem";
@@ -1043,6 +1053,13 @@ namespace ClawRPG.Scripts {
             GetNode("/root/CanvasLayer/UI").AddChild(combatEffectOverlayUI);
             combatEffectOverlayUI.Visible = false;
             GD.Print("Combat Effect Overlay UI initialized");
+
+            // Dreamscape UI
+            var dreamscapeUI = new DreamscapeUI();
+            dreamscapeUI.Name = "DreamscapeUI";
+            GetNode("/root/CanvasLayer/UI").AddChild(dreamscapeUI);
+            dreamscapeUI.Visible = false;
+            GD.Print("Dreamscape UI initialized");
 
             // Tutorial System
             var tutorialDb = new TutorialDatabase();
@@ -2030,6 +2047,15 @@ namespace ClawRPG.Scripts {
             }
         }
         
+        private void ToggleDreamscapeUI()
+        {
+            var dreamscapeUI = GetNodeOrNull<DreamscapeUI>("CanvasLayer/UI/DreamscapeUI");
+            if (dreamscapeUI != null)
+            {
+                dreamscapeUI.ToggleUI();
+            }
+        }
+        
         private void ToggleParallelDimensionUI()
         {
             var parallelDimensionUI = GetNodeOrNull<Systems.ParallelDimension.ParallelDimensionUI>("UI/ParallelDimensionUI");
@@ -2409,6 +2435,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.D) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
             {
                 ToggleCombatUI();
+            }
+
+            // Handle dreamscape UI toggle (Ctrl+Shift+N key - N for Nightmare)
+            if (Input.IsKeyPressed(Key.N) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleDreamscapeUI();
             }
 
             // Handle procedural dungeon UI toggle (Ctrl+Shift+G key)
