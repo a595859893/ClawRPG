@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 
 namespace ClawRPG.Systems
-
+{
 /// <summary>
 /// 社交分享系统
 /// 战绩截图功能 + 战绩分享模板 + 群聊战绩机器人集成
@@ -85,6 +85,11 @@ public class SocialSharingSystem : Node
 
         // 创建图像
         var image = _mainViewport.GetTexture().GetData();
+        if (image == null)
+        {
+            GD.PrintErr("[SocialSharing] Failed to get image from viewport");
+            return "";
+        }
         image.FlipY();
         
         _lastScreenshot = image;
@@ -123,6 +128,11 @@ public class SocialSharingSystem : Node
         }
 
         var image = targetUI.GetTexture().GetData();
+        if (image == null)
+        {
+            GD.PrintErr("[SocialSharing] Failed to get image from UI texture");
+            return "";
+        }
         image.FlipY();
         
         string name = string.IsNullOrEmpty(fileName) 

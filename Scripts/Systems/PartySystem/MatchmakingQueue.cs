@@ -349,7 +349,7 @@ namespace ClawRPG.Systems
         private void CreateGameSession(MatchResult match)
         {
             // 通知PartySystem创建队伍
-            if (PartySystem.Instance != null && match.Players.Count > 0)
+            if (PartySystem.Instance != null && match.Players != null && match.Players.Count > 0)
             {
                 // 第一个玩家创建队伍
                 var leader = match.Players[0];
