@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 贸易路线系统 - 管理世界贸易和商人路线
 /// </summary>
-public class TradeRouteSystem
+public partial class TradeRouteSystem : BaseSystem
 {
     private static TradeRouteSystem _instance;
     public static TradeRouteSystem Instance
@@ -35,6 +35,18 @@ public class TradeRouteSystem
     {
         _data = new TradeRouteData();
         InitializeDatabase();
+    }
+
+    public override void _Ready()
+    {
+        base._Ready();
+        Initialize();
+    }
+
+    protected override void Initialize()
+    {
+        IsInitialized = true;
+        GD.Print("[TradeRouteSystem] initialized");
     }
 
     private void InitializeDatabase()
@@ -349,14 +361,14 @@ public class TradeRouteSystem
     }
 
     // Save/Load
-    public Dictionary<string, object> Save()
+    protected override Dictionary ExportSaveData()
     {
-        var saveData = new Dictionary<string, object>();
+        var saveData = new Dictionary();
         
-        var routes = new List<Dictionary<string, object>>();
+        var routes = new Godot.Collections.Array();
         foreach (var route in _data.ActiveRoutes.Values)
         {
-            routes.Add(new Dictionary<string, object>
+            routes.Add(new Godot.Collections.Dictionary
             {
                 { "route_id", route.RouteId },
                 { "current_investment", route.CurrentInvestment },
@@ -368,43 +380,57 @@ public class TradeRouteSystem
             });
         }
         saveData["active_routes"] = routes;
-        saveData["unlocked_routes"] = _data.UnlockedRoutes;
+        
+        var unlockedRoutes = new Godot.Collections.Dictionary();
+        foreach (var kvp in _data.UnlockedRoutes)
+            unlockedRoutes[kvp.Key] = kvp.Value;
+        saveData["unlocked_routes"] = unlockedRoutes;
         
         return saveData;
     }
 
-    public void Load(Dictionary<string, object> saveData)
+    protected override void ImportSaveData(Dictionary saveData)
     {
         if (saveData == null) return;
 
         if (saveData.ContainsKey("unlocked_routes"))
         {
-            var unlocked = saveData["unlocked_routes"] as Dictionary<string, object>;
+            var unlocked = saveData["unlocked_routes"] as Godot.Collections.Dictionary;
             _data.UnlockedRoutes.Clear();
-            foreach (var kvp in unlocked)
+            if (unlocked != null)
             {
-                _data.UnlockedRoutes[kvp.Key] = Convert.ToInt32(kvp.Value);
+                foreach (var kvp in unlocked)
+                {
+                    _data.UnlockedRoutes[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+                }
             }
         }
 
         if (saveData.ContainsKey("active_routes"))
         {
-            var routes = saveData["active_routes"] as List<object>;
-            foreach (var routeData in routes)
+            var routes = saveData["active_routes"] as Godot.Collections.Array;
+            if (routes != null)
             {
-                var rd = routeData as Dictionary<string, object>;
-                var routeId = rd["route_id"].ToString();
-                var route = GetOrCreateRoute(routeId);
-                if (route != null)
+                foreach (var routeData in routes)
                 {
-                    route.CurrentInvestment = Convert.ToInt32(rd["current_investment"]);
-                    route.IsActive = Convert.ToBoolean(rd["is_active"]);
-                    route.TotalTrades = Convert.ToInt32(rd["total_trades"]);
-                    route.SuccessfulTrades = Convert.ToInt32(rd["successful_trades"]);
-                    route.TotalProfit = Convert.ToInt32(rd["total_profit"]);
-                    route.Level = Convert.ToInt32(rd["level"]);
+                    var rd = routeData as Godot.Collections.Dictionary;
+                    if (rd == null) continue;
+                    
+                    var routeId = rd["route_id"].ToString();
+                    var route = GetOrCreateRoute(routeId);
+                    if (route != null)
+                    {
+                        route.CurrentInvestment = Convert.ToInt32(rd["current_investment"]);
+                        route.IsActive = Convert.ToBoolean(rd["is_active"]);
+                        route.TotalTrades = Convert.ToInt32(rd["total_trades"]);
+                        route.SuccessfulTrades = Convert.ToInt32(rd["successful_trades"]);
+                        route.TotalProfit = Convert.ToInt32(rd["total_profit"]);
+                        route.Level = Convert.ToInt32(rd["level"]);
+                    }
                 }
             }
         }
+        
+        GD.Print("[TradeRouteSystem] Save data imported");
     }
 }
