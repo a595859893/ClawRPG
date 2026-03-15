@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DreamscapeSystem : Node
+public class DreamscapeSystem : BaseSystem
 {
     private static DreamscapeSystem _instance;
     public static DreamscapeSystem Instance => _instance;
@@ -26,7 +26,7 @@ public class DreamscapeSystem : Node
     public signal DreamscapeUnlocked(string dreamscapeId);
     public signal DreamscapeMastered(string dreamscapeId);
     
-    public override void _Ready()
+    protected override void Initialize()
     {
         _instance = this;
         PlayerData = new PlayerDreamscapeData();
@@ -34,6 +34,11 @@ public class DreamscapeSystem : Node
         AddChild(_timer);
         _timer.WaitTime = 1.0f;
         _timer.Connect("timeout", this, nameof(_OnTimerTick));
+    }
+
+    public override void _Ready()
+    {
+        base._Ready();
     }
     
     public void Initialize(PlayerDreamscapeData savedData)
