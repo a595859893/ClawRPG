@@ -2,16 +2,21 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BossRushSystem : Node
+public class BossRushSystem : BaseSystem
 {
     private BossRushData data;
     private BossRushState currentState = BossRushState.NotStarted;
     private string currentDifficulty = "Normal";
     private RandomNumberGenerator rng = new RandomNumberGenerator();
     
-    public override void _Ready()
+    protected override void Initialize()
     {
         LoadData();
+    }
+
+    public override void _Ready()
+    {
+        base._Ready();
     }
     
     private void LoadData()
