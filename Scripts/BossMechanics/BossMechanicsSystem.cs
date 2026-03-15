@@ -3,10 +3,11 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.BossMechanics;
+using Framework;
 
 namespace ClawRPG.Scripts.BossMechanics {
     
-    public class BossMechanicsSystem : Node {
+    public class BossMechanicsSystem : BaseSystem {
         
         private static BossMechanicsSystem _instance;
         public static BossMechanicsSystem Instance {

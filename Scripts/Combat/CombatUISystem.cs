@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using ClawRPG.Scripts.Combat;
+using Framework;
 
 namespace ClawRPG.Scripts.Combat
 {
     /// <summary>
     /// Combat UI System - Manages all combat interface elements
     /// </summary>
-    public class CombatUISystem : Node
+    public class CombatUISystem : BaseSystem
     {
         private static CombatUISystem _instance;
         public static CombatUISystem Instance => _instance;

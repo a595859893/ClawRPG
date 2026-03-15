@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Framework;
 
 namespace ClawRPG.Scripts.Combat
 {
@@ -101,7 +102,7 @@ namespace ClawRPG.Scripts.Combat
     /// <summary>
     /// Combat Log System - Tracks and displays combat events
     /// </summary>
-    public class CombatLogSystem : Node
+    public class CombatLogSystem : BaseSystem
     {
         private static CombatLogSystem _instance;
         public static CombatLogSystem Instance => _instance;

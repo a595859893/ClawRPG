@@ -1,13 +1,14 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Scripts.Crafting;
 
 /// <summary>
 /// 钓鱼系统管理器
 /// </summary>
-public class FishingSystem : Node
+public class FishingSystem : BaseSystem
 {
     private static FishingSystem _instance;
     public static FishingSystem Instance => _instance;

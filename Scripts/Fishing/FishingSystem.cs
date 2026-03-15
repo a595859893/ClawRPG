@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using ClawRPG.Scripts.Fishing;
+using Framework;
 
 namespace ClawRPG.Scripts.Fishing
 {
     /// <summary>
     /// 钓鱼系统核心逻辑
     /// </summary>
-    public class FishingSystem : Node
+    public class FishingSystem : BaseSystem
     {
         // 单例
         private static FishingSystem _instance;

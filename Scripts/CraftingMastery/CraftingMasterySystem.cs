@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using ClawRPG.Systems.CraftingMastery;
+using Framework;
 
 namespace ClawRPG.Systems
 {
     /// <summary>
     /// Core system for crafting mastery
     /// </summary>
-    public class CraftingMasterySystem : Node
+    public class CraftingMasterySystem : BaseSystem
     {
         private static CraftingMasterySystem _instance;
         public static CraftingMasterySystem Instance => _instance;
