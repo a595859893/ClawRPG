@@ -111,7 +111,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             SetupStatsTab();
             
             // Right panel - Contract details
-            var rightPanel = new VBoxContainer()
+            var rightPanel = new VBoxContainer();
             rightPanel.SetMeta("id", "right_panel");
             mainContainer.AddChild(rightPanel);
             
@@ -253,7 +253,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
         
         private Control CreateContractItem(Contract contract)
         {
-            var container = new VBoxContainer()
+            var container = new VBoxContainer();
             container.SetMeta("contract_id", contract.contractId);
             
             // Header

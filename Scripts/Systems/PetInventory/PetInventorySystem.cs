@@ -7,11 +7,11 @@ public class PetInventorySystem : BaseSystem {
     private PetInventoryDatabase _database;
     
     // Signals
-    public signal void ItemAdded(string petId, string itemId, int quantity);
-    public signal void ItemRemoved(string petId, string itemId, int quantity);
-    public signal void ItemUsed(string petId, string itemId, Dictionary<string, float> effects);
-    public signal void InventoryFull(string petId);
-    public signal void GoldChanged(string petId, int newAmount);
+    public signal ItemAdded(string petId, string itemId, int quantity);
+    public signal ItemRemoved(string petId, string itemId, int quantity);
+    public signal ItemUsed(string petId, string itemId, Dictionary<string, float> effects);
+    public signal InventoryFull(string petId);
+    public signal GoldChanged(string petId, int newAmount);
     
     public override void _Ready() {
         base._Ready();

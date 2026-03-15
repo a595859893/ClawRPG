@@ -40,11 +40,11 @@ public class ElementalReactionSystem : BaseSystem
 
     // 信号
     [Signal]
-    public signal void reaction_triggered(ReactionType type, ElementType elem1, ElementType elem2, float damage);
+    public signal reaction_triggered(ReactionType type, ElementType elem1, ElementType elem2, float damage);
     [Signal]
-    public signal void element_applied(NodeId node, ElementType type, float intensity);
+    public signal element_applied(NodeId node, ElementType type, float intensity);
     [Signal]
-    public signal void stat_changed(NodeId node, string stat, float change);
+    public signal stat_changed(NodeId node, string stat, float change);
 
     public override void _Ready()
     {

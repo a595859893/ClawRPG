@@ -333,7 +333,7 @@ public class ItemGrid : GridContainer {
     private string _categoryFilter = "All";
     private string _rarityFilter = "All";
     
-    public signal void ItemSelected(string itemId);
+    public signal ItemSelected(string itemId);
     
     public ItemGrid() {
         Columns = 5;
@@ -445,8 +445,8 @@ public class ItemDetailPanel : VBoxContainer {
     private Button _useButton;
     private Button _dropButton;
     
-    public signal void ItemUseRequested(string itemId);
-    public signal void ItemDropRequested(string itemId);
+    public signal ItemUseRequested(string itemId);
+    public signal ItemDropRequested(string itemId);
     
     public ItemDetailPanel() {
         AddThemeConstantOverride("separation", 10);

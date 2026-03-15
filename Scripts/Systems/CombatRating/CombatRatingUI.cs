@@ -339,9 +339,9 @@ public class CombatRatingUI : Control
 		// Connect ESC to close
 	}
 	
-	private void _Input(InputEvent event)
+	private void _Input(InputEvent @event)
 	{
-		if (event.IsActionPressed("ui_cancel"))
+		if (@event.IsActionPressed("ui_cancel"))
 		{
 			Hide();
 		}

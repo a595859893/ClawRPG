@@ -23,13 +23,13 @@ namespace ClawRPG.Scripts.Systems
         private Dictionary<string, TournamentProgress> _playerProgress = new Dictionary<string, TournamentProgress>();
         
         // 信号
-        public signal void tournament_created(Tournament tournament);
-        public signal void player_registered(string tournament_id, string player_id);
-        public signal void tournament_started(Tournament tournament);
-        public signal void match_started(TournamentMatch match);
-        public signal void match_completed(TournamentMatch match);
-        public signal void stage_completed(Tournament tournament, TournamentStage stage);
-        public signal void tournament_completed(Tournament tournament);
+        public signal tournament_created(Tournament tournament);
+        public signal player_registered(string tournament_id, string player_id);
+        public signal tournament_started(Tournament tournament);
+        public signal match_started(TournamentMatch match);
+        public signal match_completed(TournamentMatch match);
+        public signal stage_completed(Tournament tournament, TournamentStage stage);
+        public signal tournament_completed(Tournament tournament);
 
         public override void _Ready()
         {

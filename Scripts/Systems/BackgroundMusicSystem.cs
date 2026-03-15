@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Background Music System - Manages dynamic background music
     /// </summary>
-    public class BackgroundMusicSystem : BaseSystem {
+    public partial class BackgroundMusicSystem : BaseSystem {
         private static BackgroundMusicSystem _instance;
         public static BackgroundMusicSystem Instance => _instance;
         

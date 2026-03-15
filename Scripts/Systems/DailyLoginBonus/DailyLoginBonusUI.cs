@@ -57,7 +57,7 @@ public class DailyLoginBonusUI : Control
             Alignment = Alignment.Center
         };
         _titleLabel.Set("custom_colors/font_color", new Color(1, 0.84f, 0));
-        titleBar.AddChild(_titleBar.AddChild(_closeButton);
+        titleBar.AddChild(_closeButton);
         
         // 状态标签
         _streakLabel = new Label

@@ -28,11 +28,11 @@ namespace ClawRPG.Core.Systems.GuildWar
         private Dictionary<string, GuildWarProgress> _playerProgress = new Dictionary<string, GuildWarProgress>();
 
         // Signals
-        public signal void WarStarted(string warId, string warName);
-        public signal void WarEnded(string warId, string winnerId, List<GuildWarParticipant> rankings);
-        public signal void BattleOccurred(string battleId, string warId, string attackerId, string defenderId, BattleResult result);
-        public signal void TerritoryCaptured(string territoryId, string guildId, string guildName);
-        public signal void ScoreUpdated(string warId, string guildId, int newScore);
+        public signal WarStarted(string warId, string warName);
+        public signal WarEnded(string warId, string winnerId, List<GuildWarParticipant> rankings);
+        public signal BattleOccurred(string battleId, string warId, string attackerId, string defenderId, BattleResult result);
+        public signal TerritoryCaptured(string territoryId, string guildId, string guildName);
+        public signal ScoreUpdated(string warId, string guildId, int newScore);
 
         public override void _Ready()
         {
