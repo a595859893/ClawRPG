@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ArenaTournamentSystem : Node
+public class ArenaTournamentSystem : BaseSystem
 {
     private static ArenaTournamentSystem _instance;
     public static ArenaTournamentSystem Instance
@@ -31,10 +31,15 @@ public class ArenaTournamentSystem : Node
     public Signal<string, string> PlayerEliminated { get; } = new Signal<string, string>();
     public Signal<string, string> PlayerChampion { get; } = new Signal<string, string>();
 
-    public override void _Ready()
+    protected override void Initialize()
     {
         _instance = this;
         LoadDefaultTournaments();
+    }
+
+    public override void _Ready()
+    {
+        base._Ready();
     }
 
     private void LoadDefaultTournaments()
