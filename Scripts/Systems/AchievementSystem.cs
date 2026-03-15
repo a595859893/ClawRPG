@@ -71,6 +71,9 @@ public class AchievementSystem : BaseSystem
         }
     }
 
+    /// <summary>
+    /// 加载成就数据
+    /// </summary>
     public void LoadData()
     {
         var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
@@ -120,6 +123,9 @@ public class AchievementSystem : BaseSystem
         }
     }
 
+    /// <summary>
+    /// 保存成就数据
+    /// </summary>
     public void SaveData()
     {
         var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
@@ -167,6 +173,11 @@ public class AchievementSystem : BaseSystem
     }
 
     // Progress tracking methods
+
+    /// <summary>
+    /// 记录击杀数
+    /// </summary>
+    /// <param name="isBoss">是否为Boss</param>
     public void AddKill(bool isBoss = false)
     {
         _totalKills++;
@@ -188,6 +199,9 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 记录PVP胜利
+    /// </summary>
     public void AddPvpWin()
     {
         _pvpWins++;
@@ -198,6 +212,10 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 发现新区域
+    /// </summary>
+    /// <param name="zoneCount">已发现区域数量</param>
     public void DiscoverZone(int zoneCount)
     {
         _zonesDiscovered = zoneCount;
@@ -208,6 +226,10 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 更新封印之塔进度
+    /// </summary>
+    /// <param name="floor">当前层数</param>
     public void UpdateSealedTower(int floor)
     {
         _sealedTowerFloor = floor;
@@ -217,6 +239,9 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 添加宠物收藏
+    /// </summary>
     public void AddPet()
     {
         _petsCollected++;
@@ -226,6 +251,9 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 添加坐骑收藏
+    /// </summary>
     public void AddMount()
     {
         _mountsCollected++;
@@ -235,6 +263,10 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 添加装备收藏
+    /// </summary>
+    /// <param name="count">收藏数量</param>
     public void AddEquipment(int count = 1)
     {
         _equipmentCollected += count;
@@ -244,6 +276,9 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 添加好友
+    /// </summary>
     public void AddFriend()
     {
         _friendsMade++;
@@ -252,6 +287,10 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 更新金币数量
+    /// </summary>
+    /// <param name="currentGold">当前金币</param>
     public void UpdateGold(int currentGold)
     {
         if (currentGold > _goldAccumulated)
@@ -265,6 +304,10 @@ public class AchievementSystem : BaseSystem
         }
     }
 
+    /// <summary>
+    /// 添加金币花费
+    /// </summary>
+    /// <param name="amount">花费金额</param>
     public void AddGoldSpent(int amount)
     {
         _goldSpent += amount;
@@ -273,6 +316,10 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 添加技能点花费
+    /// </summary>
+    /// <param name="points">花费的技能点数</param>
     public void AddSkillPointsSpent(int points)
     {
         _skillPointsSpent += points;
@@ -281,6 +328,9 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 添加制造物品
+    /// </summary>
     public void AddCraftedItem()
     {
         _itemsCrafted++;
@@ -290,6 +340,10 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 更新登录天数
+    /// </summary>
+    /// <param name="streak">连续登录天数</param>
     public void UpdateLoginStreak(int streak)
     {
         _loginStreak = streak;

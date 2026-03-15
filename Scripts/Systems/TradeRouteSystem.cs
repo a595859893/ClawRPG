@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 贸易路线系统 - 管理世界贸易和商人路线
+/// </summary>
 public class TradeRouteSystem
 {
     private static TradeRouteSystem _instance;

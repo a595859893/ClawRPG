@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 随机任务系统 - 生成和管理随机任务
+/// </summary>
 public class RandomQuestSystem
 {
     private static RandomQuestSystem _instance;

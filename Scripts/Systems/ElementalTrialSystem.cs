@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 元素试炼系统 - 管理元素试炼关卡
+/// </summary>
 public class ElementalTrialSystem
 {
     private static ElementalTrialSystem _instance;

@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 世界事件UI - 显示世界事件通知和详情
+/// </summary>
 public class WorldEventUI : Control
 {
     // UI Elements

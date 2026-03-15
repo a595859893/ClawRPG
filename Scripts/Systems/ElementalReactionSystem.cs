@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using ElementalReactionData;
 
+/// <summary>
+/// 元素反应系统 - 管理元素之间的反应效果
+/// </summary>
 public class ElementalReactionSystem : Node
 {
     private static ElementalReactionSystem _instance;

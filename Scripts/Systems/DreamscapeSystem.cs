@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 梦境系统 - 管理梦境世界和梦境事件
+/// </summary>
 public class DreamscapeSystem : BaseSystem
 {
     private static DreamscapeSystem _instance;
