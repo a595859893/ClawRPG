@@ -398,6 +398,16 @@ namespace ClawRPG.Scripts.Systems
         public int GetRegisteredSystemCount() => _systemTypes.Count;
         
         /// <summary>
+        /// 初始化系统 - 由 Main 在启动时调用
+        /// </summary>
+        public void InitializeSystems()
+        {
+            GD.Print("[SystemInitializationManager] Manual initialization called");
+            // 初始化 LootDropSystem
+            LootDropSystem.Instance.Initialize();
+        }
+        
+        /// <summary>
         /// 导出保存数据
         /// </summary>
         public override Dictionary ExportSaveData()

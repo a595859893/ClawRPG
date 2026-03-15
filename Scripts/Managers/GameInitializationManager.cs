@@ -240,6 +240,24 @@ namespace ClawRPG.Scripts.Managers
         public List<string> GetInitializationOrder() => new List<string>(_initializationOrder);
         
         /// <summary>
+        /// 创建节点结构 - 由 Main 在启动时调用
+        /// </summary>
+        public void CreateNodeStructure(Node2D mainNode)
+        {
+            GD.Print("[GameInitializationManager] Creating node structure...");
+            
+            // 创建敌人节点
+            var enemies = new Node2D { Name = "Enemies" };
+            mainNode.AddChild(enemies);
+
+            // 创建物品节点
+            var items = new Node2D { Name = "Items" };
+            mainNode.AddChild(items);
+            
+            GD.Print("[GameInitializationManager] Node structure created");
+        }
+        
+        /// <summary>
         /// 导出保存数据
         /// </summary>
         public override Dictionary ExportSaveData()

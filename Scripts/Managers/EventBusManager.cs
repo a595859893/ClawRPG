@@ -345,4 +345,98 @@ public class EventBusManager : ManagerBase
     {
         // 事件总线不加载数据
     }
+    
+    #region 游戏信号连接
+    
+    /// <summary>
+    /// 连接游戏信号 - 由 Main 在启动时调用
+    /// </summary>
+    public void ConnectGameSignals()
+    {
+        GD.Print("[EventBusManager] Connecting game signals...");
+        
+        // 成就解锁声音
+        if (AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnAchievementUnlocked += achievement =>
+            {
+                SoundEffectSystem.Instance?.PlayAchievementUnlock();
+            };
+        }
+
+        // 称号解锁声音
+        if (TitleSystem.Instance != null)
+        {
+            TitleSystem.Instance.OnTitleUnlocked += title =>
+            {
+                SoundEffectSystem.Instance?.PlayTitleUnlock();
+            };
+        }
+
+        // 任务完成声音
+        QuestSystem.OnQuestCompleted += quest =>
+        {
+            SoundEffectSystem.Instance?.PlayQuestComplete();
+        };
+
+        // 订阅游戏事件
+        Subscribe<PlayerDiedEventData>(Events.PlayerDied, OnPlayerDied);
+        Subscribe<EnemyDiedEventData>(Events.EnemyDied, OnEnemyDied);
+        Subscribe<string>(Events.SceneChanged, OnSceneChanged);
+        Subscribe<GamePauseEventData>(Events.GamePaused, OnGamePaused);
+        Subscribe<GamePauseEventData>(Events.GameResumed, OnGameResumed);
+        Subscribe<GameOverEventData>(Events.GameOver, OnGameOver);
+        
+        GD.Print("[EventBusManager] Game signals connected");
+    }
+    
+    /// <summary>
+    /// 处理玩家死亡事件
+    /// </summary>
+    private void OnPlayerDied(PlayerDiedEventData data)
+    {
+        GD.Print($"[EventBusManager] Player died! Death count: {data.DeathCount}");
+    }
+    
+    /// <summary>
+    /// 处理敌人死亡事件
+    /// </summary>
+    private void OnEnemyDied(EnemyDiedEventData data)
+    {
+        GD.Print($"[EventBusManager] Enemy killed! Total kills: {data.KillCount}");
+    }
+    
+    /// <summary>
+    /// 处理场景切换事件
+    /// </summary>
+    private void OnSceneChanged(string scenePath)
+    {
+        GD.Print($"[EventBusManager] Scene changed to: {scenePath}");
+    }
+    
+    /// <summary>
+    /// 处理游戏暂停事件
+    /// </summary>
+    private void OnGamePaused(GamePauseEventData data)
+    {
+        GD.Print($"[EventBusManager] Game paused at playtime: {data.PlayTime}");
+    }
+    
+    /// <summary>
+    /// 处理游戏恢复事件
+    /// </summary>
+    private void OnGameResumed(GamePauseEventData data)
+    {
+        GD.Print("[EventBusManager] Game resumed");
+    }
+    
+    /// <summary>
+    /// 处理游戏结束事件
+    /// </summary>
+    private void OnGameOver(GameOverEventData data)
+    {
+        GD.Print($"[EventBusManager] Game Over! Play time: {data.TotalPlayTime}s, Kills: {data.KillCount}, Deaths: {data.DeathCount}");
+    }
+    
+    #endregion
 }
