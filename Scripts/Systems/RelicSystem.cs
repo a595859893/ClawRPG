@@ -342,6 +342,57 @@ public class RelicSystem : BaseSystem
         
         ApplyRelicEffects();
     }
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 拥有的遗物
+        data["owned_relics"] = _playerData.OwnedRelicIds;
+        
+        // 已装备的遗物
+        data["equipped_relics"] = _playerData.EquippedRelicIds;
+        
+        // 最大槽位
+        data["max_slots"] = _playerData.MaxRelicSlots;
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 加载拥有的遗物
+        if (data.Contains("owned_relics"))
+        {
+            var ownedArray = (Array)data["owned_relics"];
+            _playerData.OwnedRelicIds.Clear();
+            foreach (var relicId in ownedArray)
+            {
+                _playerData.OwnedRelicIds.Add(relicId.ToString());
+            }
+        }
+        
+        // 加载已装备的遗物
+        if (data.Contains("equipped_relics"))
+        {
+            var equippedArray = (Array)data["equipped_relics"];
+            _playerData.EquippedRelicIds.Clear();
+            foreach (var relicId in equippedArray)
+            {
+                _playerData.EquippedRelicIds.Add(relicId.ToString());
+            }
+        }
+        
+        // 加载最大槽位
+        if (data.Contains("max_slots"))
+            _playerData.MaxRelicSlots = (int)data["max_slots"];
+        
+        ApplyRelicEffects();
+    }
     
     #endregion
 }

@@ -354,6 +354,76 @@ public partial class TradeSystem : BaseSystem {
     private string GetSavePath() {
         return SaveSystem.Instance.GetSaveDirectory() + "/trade_history.dat";
     }
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 交易历史
+        var records = new List<Dictionary>();
+        foreach (var record in TradeHistory)
+        {
+            var recordDict = new Dictionary();
+            recordDict["record_id"] = record.RecordId;
+            recordDict["completed_at"] = record.CompletedAt.ToString("o");
+            
+            // 交易详情（简化）
+            if (record.TradeOffer != null)
+            {
+                var offerDict = new Dictionary();
+                offerDict["offer_id"] = record.TradeOffer.OfferId;
+                offerDict["player1_name"] = record.TradeOffer.Player1Name;
+                offerDict["player2_name"] = record.TradeOffer.Player2Name;
+                offerDict["player1_gold"] = record.TradeOffer.Player1Gold;
+                offerDict["player2_gold"] = record.TradeOffer.Player2Gold;
+                offerDict["player1_items_count"] = record.TradeOffer.Player1Items.Count;
+                offerDict["player2_items_count"] = record.TradeOffer.Player2Items.Count;
+                recordDict["offer"] = offerDict;
+            }
+            
+            records.Add(recordDict);
+        }
+        data["trade_history"] = records;
+        
+        // 当前交易状态
+        data["current_state"] = (int)CurrentState;
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 加载交易历史
+        if (data.Contains("trade_history"))
+        {
+            TradeHistory.Clear();
+            var records = (Array)data["trade_history"];
+            foreach (Dictionary recordDict in records)
+            {
+                var record = new TradeRecord
+                {
+                    RecordId = recordDict["record_id"].ToString()
+                };
+                
+                if (recordDict.Contains("completed_at"))
+                {
+                    DateTime.TryParse(recordDict["completed_at"].ToString(), out record.CompletedAt);
+                }
+                
+                TradeHistory.Add(record);
+            }
+        }
+        
+        // 加载当前状态
+        if (data.Contains("current_state"))
+        {
+            CurrentState = (TradeState)(int)data["current_state"];
+        }
+    }
 }
 
 // ===== Data Classes =====

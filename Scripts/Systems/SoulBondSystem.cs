@@ -280,4 +280,111 @@ public class SoulBondSystem : BaseSystem
         TotalBondPointsEarned = 0;
         SaveSoulBondData();
     }
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 活跃的灵魂连接
+        var activeBondsData = new List<Dictionary>();
+        foreach (var bond in ActiveBonds)
+        {
+            var bondDict = new Dictionary();
+            bondDict["partner_id"] = bond.PartnerId;
+            bondDict["partner_name"] = bond.PartnerName;
+            bondDict["bond_level"] = bond.BondLevel;
+            bondDict["bond_points"] = bond.BondPoints;
+            bondDict["bond_time"] = bond.BondTime.ToString("o");
+            bondDict["last_interaction"] = bond.LastInteraction.ToString("o");
+            bondDict["total_interactions"] = bond.TotalInteractions;
+            activeBondsData.Add(bondDict);
+        }
+        data["active_bonds"] = activeBondsData;
+        
+        // 连接历史
+        var bondHistoryData = new List<Dictionary>();
+        foreach (var record in BondHistory)
+        {
+            var recordDict = new Dictionary();
+            recordDict["partner_id"] = record.PartnerId;
+            recordDict["partner_name"] = record.PartnerName;
+            recordDict["bond_level"] = record.BondLevel;
+            recordDict["ended_reason"] = record.EndedReason;
+            recordDict["start_time"] = record.StartTime.ToString("o");
+            recordDict["end_time"] = record.EndTime.ToString("o");
+            bondHistoryData.Add(recordDict);
+        }
+        data["bond_history"] = bondHistoryData;
+        
+        // 统计
+        data["total_bonds_formed"] = TotalBondsFormed;
+        data["highest_bond_level"] = HighestBondLevel;
+        data["total_bond_points_earned"] = TotalBondPointsEarned;
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 加载活跃的灵魂连接
+        if (data.Contains("active_bonds"))
+        {
+            ActiveBonds.Clear();
+            var bondsArray = (Array)data["active_bonds"];
+            foreach (Dictionary bondDict in bondsArray)
+            {
+                var bond = new SoulBond
+                {
+                    PartnerId = bondDict["partner_id"].ToString(),
+                    PartnerName = bondDict["partner_name"].ToString(),
+                    BondLevel = (int)bondDict["bond_level"],
+                    BondPoints = (int)bondDict["bond_points"],
+                    TotalInteractions = (int)bondDict["total_interactions"]
+                };
+                
+                if (bondDict.Contains("bond_time"))
+                    DateTime.TryParse(bondDict["bond_time"].ToString(), out bond.BondTime);
+                if (bondDict.Contains("last_interaction"))
+                    DateTime.TryParse(bondDict["last_interaction"].ToString(), out bond.LastInteraction);
+                
+                ActiveBonds.Add(bond);
+            }
+        }
+        
+        // 加载连接历史
+        if (data.Contains("bond_history"))
+        {
+            BondHistory.Clear();
+            var historyArray = (Array)data["bond_history"];
+            foreach (Dictionary recordDict in historyArray)
+            {
+                var record = new BondRecord
+                {
+                    PartnerId = recordDict["partner_id"].ToString(),
+                    PartnerName = recordDict["partner_name"].ToString(),
+                    BondLevel = (int)recordDict["bond_level"],
+                    EndedReason = recordDict["ended_reason"].ToString()
+                };
+                
+                if (recordDict.Contains("start_time"))
+                    DateTime.TryParse(recordDict["start_time"].ToString(), out record.StartTime);
+                if (recordDict.Contains("end_time"))
+                    DateTime.TryParse(recordDict["end_time"].ToString(), out record.EndTime);
+                
+                BondHistory.Add(record);
+            }
+        }
+        
+        // 加载统计
+        if (data.Contains("total_bonds_formed"))
+            TotalBondsFormed = (int)data["total_bonds_formed"];
+        if (data.Contains("highest_bond_level"))
+            HighestBondLevel = (int)data["highest_bond_level"];
+        if (data.Contains("total_bond_points_earned"))
+            TotalBondPointsEarned = (int)data["total_bond_points_earned"];
+    }
 }

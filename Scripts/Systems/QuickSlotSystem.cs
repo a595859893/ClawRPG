@@ -373,6 +373,52 @@ public partial class QuickSlotSystem : BaseSystem
             }
         }
     }
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 快捷栏数据
+        var slotsData = new List<Dictionary>();
+        for (int i = 0; i < 8; i++)
+        {
+            var slotDict = new Dictionary();
+            slotDict["item_id"] = _slots[i].ItemId;
+            slotDict["item_count"] = _slots[i].ItemCount;
+            slotDict["slot_type"] = (int)_slots[i].SlotType;
+            slotsData.Add(slotDict);
+        }
+        data["slots"] = slotsData;
+        
+        // 当前选中槽位
+        data["selected_slot"] = _selectedSlot;
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 加载快捷栏数据
+        if (data.Contains("slots"))
+        {
+            var slotsData = (Array)data["slots"];
+            for (int i = 0; i < Math.Min(8, slotsData.Count); i++)
+            {
+                var slotDict = (Dictionary)slotsData[i];
+                _slots[i].ItemId = slotDict.Contains("item_id") ? slotDict["item_id"].ToString() : "";
+                _slots[i].ItemCount = slotDict.Contains("item_count") ? (int)slotDict["item_count"] : 0;
+                _slots[i].SlotType = slotDict.Contains("slot_type") ? (QuickSlotType)(int)slotDict["slot_type"] : QuickSlotType.Item;
+            }
+        }
+        
+        // 加载选中槽位
+        if (data.Contains("selected_slot"))
+            _selectedSlot = (int)data["selected_slot"];
+    }
     
     #endregion
 }

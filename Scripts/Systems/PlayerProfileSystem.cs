@@ -344,6 +344,128 @@ public class PlayerProfileSystem : BaseSystem
         Profile.AchievementsUnlocked = saveData.GetValueOrDefault("achievements_unlocked", 0);
         Profile.TotalAchievementPoints = saveData.GetValueOrDefault("total_achievement_points", 0);
     }
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 玩家基本信息
+        data["player_name"] = Profile.PlayerName;
+        data["total_play_time"] = Profile.TotalPlayTime;
+        data["first_play_date"] = Profile.FirstPlayDate.ToString("o");
+        data["last_play_date"] = Profile.LastPlayDate.ToString("o");
+        data["current_level"] = Profile.CurrentLevel;
+        data["total_experience"] = Profile.TotalExperience;
+        
+        // 战斗统计
+        data["total_kills"] = Profile.TotalKills;
+        data["boss_kills"] = Profile.BossKills;
+        data["total_damage_dealt"] = Profile.TotalDamageDealt;
+        data["total_damage_taken"] = Profile.TotalDamageTaken;
+        data["total_healing_done"] = Profile.TotalHealingDone;
+        data["critical_hits"] = Profile.CriticalHits;
+        data["max_combo"] = Profile.MaxCombo;
+        
+        // 生存统计
+        data["deaths"] = Profile.Deaths;
+        data["total_gold_earned"] = Profile.TotalGoldEarned;
+        data["total_gold_spent"] = Profile.TotalGoldSpent;
+        data["items_collected"] = Profile.ItemsCollected;
+        data["items_crafted"] = Profile.ItemsCrafted;
+        
+        // 探索统计
+        data["regions_discovered"] = Profile.RegionsDiscovered;
+        data["dungeons_completed"] = Profile.DungeonsCompleted;
+        data["quests_completed"] = Profile.QuestsCompleted;
+        data["secrets_found"] = Profile.SecretsFound;
+        
+        // 社交统计
+        data["trades_completed"] = Profile.TradesCompleted;
+        data["pvp_wins"] = Profile.PvPWins;
+        data["pvp_losses"] = Profile.PvPLosses;
+        data["parties_joined"] = Profile.PartiesJoined;
+        
+        // 成就统计
+        data["achievements_unlocked"] = Profile.AchievementsUnlocked;
+        data["total_achievement_points"] = Profile.TotalAchievementPoints;
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 玩家基本信息
+        if (data.Contains("player_name"))
+            Profile.PlayerName = data["player_name"].ToString();
+        if (data.Contains("total_play_time"))
+            Profile.TotalPlayTime = (int)data["total_play_time"];
+        if (data.Contains("first_play_date"))
+            DateTime.TryParse(data["first_play_date"].ToString(), out Profile.FirstPlayDate);
+        if (data.Contains("last_play_date"))
+            DateTime.TryParse(data["last_play_date"].ToString(), out Profile.LastPlayDate);
+        if (data.Contains("current_level"))
+            Profile.CurrentLevel = (int)data["current_level"];
+        if (data.Contains("total_experience"))
+            Profile.TotalExperience = Convert.ToInt64(data["total_experience"]);
+        
+        // 战斗统计
+        if (data.Contains("total_kills"))
+            Profile.TotalKills = (int)data["total_kills"];
+        if (data.Contains("boss_kills"))
+            Profile.BossKills = (int)data["boss_kills"];
+        if (data.Contains("total_damage_dealt"))
+            Profile.TotalDamageDealt = (int)data["total_damage_dealt"];
+        if (data.Contains("total_damage_taken"))
+            Profile.TotalDamageTaken = (int)data["total_damage_taken"];
+        if (data.Contains("total_healing_done"))
+            Profile.TotalHealingDone = (int)data["total_healing_done"];
+        if (data.Contains("critical_hits"))
+            Profile.CriticalHits = (int)data["critical_hits"];
+        if (data.Contains("max_combo"))
+            Profile.MaxCombo = (int)data["max_combo"];
+        
+        // 生存统计
+        if (data.Contains("deaths"))
+            Profile.Deaths = (int)data["deaths"];
+        if (data.Contains("total_gold_earned"))
+            Profile.TotalGoldEarned = (int)data["total_gold_earned"];
+        if (data.Contains("total_gold_spent"))
+            Profile.TotalGoldSpent = (int)data["total_gold_spent"];
+        if (data.Contains("items_collected"))
+            Profile.ItemsCollected = (int)data["items_collected"];
+        if (data.Contains("items_crafted"))
+            Profile.ItemsCrafted = (int)data["items_crafted"];
+        
+        // 探索统计
+        if (data.Contains("regions_discovered"))
+            Profile.RegionsDiscovered = (int)data["regions_discovered"];
+        if (data.Contains("dungeons_completed"))
+            Profile.DungeonsCompleted = (int)data["dungeons_completed"];
+        if (data.Contains("quests_completed"))
+            Profile.QuestsCompleted = (int)data["quests_completed"];
+        if (data.Contains("secrets_found"))
+            Profile.SecretsFound = (int)data["secrets_found"];
+        
+        // 社交统计
+        if (data.Contains("trades_completed"))
+            Profile.TradesCompleted = (int)data["trades_completed"];
+        if (data.Contains("pvp_wins"))
+            Profile.PvPWins = (int)data["pvp_wins"];
+        if (data.Contains("pvp_losses"))
+            Profile.PvPLosses = (int)data["pvp_losses"];
+        if (data.Contains("parties_joined"))
+            Profile.PartiesJoined = (int)data["parties_joined"];
+        
+        // 成就统计
+        if (data.Contains("achievements_unlocked"))
+            Profile.AchievementsUnlocked = (int)data["achievements_unlocked"];
+        if (data.Contains("total_achievement_points"))
+            Profile.TotalAchievementPoints = (int)data["total_achievement_points"];
+    }
     
     #endregion
 }
