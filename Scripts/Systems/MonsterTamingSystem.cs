@@ -431,4 +431,23 @@ public partial class MonsterTamingSystem : BaseSystem
             }
         }
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return SaveData();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data != null)
+        {
+            LoadData(data);
+        }
+    }
 }

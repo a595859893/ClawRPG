@@ -333,4 +333,167 @@ public class PetTalentSystem : BaseSystem
             Instance = null;
         }
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 保存宠物天赋数据
+        var petTalentsData = new Godot.Collections.Array();
+        foreach (var kvp in PlayerData.PetTalents)
+        {
+            var petData = new Dictionary();
+            petData["pet_id"] = kvp.Key;
+            
+            var talentsArray = new Godot.Collections.Array();
+            foreach (var talent in kvp.Value)
+            {
+                var talentData = new Dictionary();
+                talentData["talent_id"] = talent.TalentId;
+                talentData["level"] = talent.Level;
+                talentData["is_unlocked"] = talent.IsUnlocked;
+                talentsArray.Add(talentData);
+            }
+            petData["talents"] = talentsArray;
+            
+            petTalentsData.Add(petData);
+        }
+        data["pet_talents"] = petTalentsData;
+        
+        // 保存天赋点数
+        var talentPointsData = new Dictionary();
+        foreach (var kvp in PlayerData.TalentPoints)
+        {
+            talentPointsData[kvp.Key] = kvp.Value;
+        }
+        data["talent_points"] = talentPointsData;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 导入宠物天赋数据
+        if (data.Contains("pet_talents"))
+        {
+            PlayerData.PetTalents.Clear();
+            var petTalentsArray = (Godot.Collections.Array)data["pet_talents"];
+            foreach (Dictionary petData in petTalentsArray)
+            {
+                string petId = (string)petData["pet_id"];
+                var talentsArray = (Godot.Collections.Array)petData["talents"];
+                var talents = new List<PetTalent>();
+                
+                foreach (Dictionary talentData in talentsArray)
+                {
+                    var talent = new PetTalent(
+                        (string)talentData["talent_id"],
+                        (int)talentData["level"]
+                    );
+                    talent.IsUnlocked = (bool)talentData["is_unlocked"];
+                    talents.Add(talent);
+                }
+                
+                PlayerData.PetTalents[petId] = talents;
+            }
+        }
+        
+        // 导入天赋点数
+        if (data.Contains("talent_points"))
+        {
+            var talentPointsDict = (Godot.Collections.Dictionary)data["talent_points"];
+            foreach (var kvp in talentPointsDict)
+            {
+                PlayerData.TalentPoints[(string)kvp.Key] = (int)kvp.Value;
+            }
+        }
+
+        // ===== 持久化方法 =====
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 宠物天赋数据
+            var petTalentsData = new List<Dictionary>();
+            foreach (var kvp in PlayerData.PetTalents)
+            {
+                var talentsList = new List<Dictionary>();
+                foreach (var talent in kvp.Value)
+                {
+                    var talentDict = new Dictionary();
+                    talentDict["talent_id"] = talent.Id;
+                    talentDict["level"] = talent.Level;
+                    talentDict["is_unlocked"] = talent.IsUnlocked;
+                    talentsList.Add(talentDict);
+                }
+                
+                var petDict = new Dictionary();
+                petDict["pet_id"] = kvp.Key;
+                petDict["talents"] = talentsList;
+                petTalentsData.Add(petDict);
+            }
+            data["pet_talents"] = petTalentsData;
+            
+            // 天赋点数
+            var talentPointsData = new Dictionary<string, int>();
+            foreach (var kvp in PlayerData.TalentPoints)
+            {
+                talentPointsData[kvp.Key] = kvp.Value;
+            }
+            data["talent_points"] = talentPointsData;
+            
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载宠物天赋数据
+            if (data.Contains("pet_talents"))
+            {
+                var petTalentsArray = (Array)data["pet_talents"];
+                PlayerData.PetTalents.Clear();
+                
+                foreach (Dictionary petData in petTalentsArray)
+                {
+                    string petId = petData["pet_id"].ToString();
+                    var talentsArray = (Array)petData["talents"];
+                    var talents = new List<PetTalent>();
+                    
+                    foreach (Dictionary talentData in talentsArray)
+                    {
+                        var talent = new PetTalent(
+                            talentData["talent_id"].ToString(),
+                            (int)talentData["level"]
+                        );
+                        talent.IsUnlocked = (bool)talentData["is_unlocked"];
+                        talents.Add(talent);
+                    }
+                    
+                    PlayerData.PetTalents[petId] = talents;
+                }
+            }
+            
+            // 加载天赋点数
+            if (data.Contains("talent_points"))
+            {
+                var talentPointsDict = (Dictionary<string, Variant>)data["talent_points"];
+                PlayerData.TalentPoints.Clear();
+                foreach (var kvp in talentPointsDict)
+                {
+                    PlayerData.TalentPoints[kvp.Key] = (int)kvp.Value;
+                }
+            }
+        }
+    }
 }

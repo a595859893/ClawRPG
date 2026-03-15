@@ -330,5 +330,65 @@ namespace ClawRPG.Scripts.Systems
                 }
             }
         }
+
+        // ===== 持久化方法 =====
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 统计数据
+            data["totalDiscovered"] = _totalDiscovered;
+            data["totalGoldEarned"] = _totalGoldEarned;
+            data["totalExpEarned"] = _totalExpEarned;
+            
+            // 玩家成就数据
+            var achievementsData = new Dictionary();
+            foreach (var kvp in _playerAchievements)
+            {
+                var achievementDict = new Dictionary();
+                achievementDict["isDiscovered"] = kvp.Value.IsDiscovered;
+                achievementDict["progress"] = kvp.Value.Progress;
+                achievementDict["discoveredAt"] = kvp.Value.DiscoveredAt.ToString("o");
+                achievementsData[kvp.Key] = achievementDict;
+            }
+            data["playerAchievements"] = achievementsData;
+            
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载统计数据
+            if (data.Contains("totalDiscovered"))
+                _totalDiscovered = (int)data["totalDiscovered"];
+            if (data.Contains("totalGoldEarned"))
+                _totalGoldEarned = (int)data["totalGoldEarned"];
+            if (data.Contains("totalExpEarned"))
+                _totalExpEarned = (int)data["totalExpEarned"];
+            
+            // 加载玩家成就数据
+            if (data.Contains("playerAchievements"))
+            {
+                var achievementsData = (Dictionary<string, Variant>)data["playerAchievements"];
+                foreach (var kvp in achievementsData)
+                {
+                    if (!_playerAchievements.ContainsKey(kvp.Key))
+                    {
+                        _playerAchievements[kvp.Key] = new PlayerSecretAchievementData();
+                    }
+                    
+                    var achievementDict = (Dictionary<string, Variant>)kvp.Value;
+                    if (achievementDict.Contains("isDiscovered"))
+                        _playerAchievements[kvp.Key].IsDiscovered = (bool)achievementDict["isDiscovered"];
+                    if (achievementDict.Contains("progress"))
+                        _playerAchievements[kvp.Key].Progress = (int)achievementDict["progress"];
+                    if (achievementDict.Contains("discoveredAt"))
+                        DateTime.TryParse(achievementDict["discoveredAt"].ToString(), out _playerAchievements[kvp.Key].DiscoveredAt);
+                }
+            }
+        }
     }
 }

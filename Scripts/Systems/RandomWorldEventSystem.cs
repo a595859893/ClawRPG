@@ -536,5 +536,94 @@ namespace ClawRPG.Scripts.Systems {
                 _playerData.LegendaryEventsWitnessed = (int)legendary;
             }
         }
+
+        // ===== 持久化方法 =====
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 玩家事件数据
+            data["event_trigger_count"] = _playerData.EventTriggerCount;
+            data["total_events_triggered"] = _playerData.TotalEventsTriggered;
+            data["legendary_events_witnessed"] = _playerData.LegendaryEventsWitnessed;
+            
+            // 最后事件时间
+            var lastEventTimeData = new Dictionary<string, string>();
+            foreach (var kvp in _playerData.LastEventTime)
+            {
+                lastEventTimeData[kvp.Key] = kvp.Value.ToString("o");
+            }
+            data["last_event_time"] = lastEventTimeData;
+            
+            // 活跃事件
+            var activeEventsData = new List<Dictionary>();
+            foreach (var kvp in _activeEvents)
+            {
+                var eventDict = new Dictionary();
+                eventDict["event_id"] = kvp.Key;
+                eventDict["config"] = kvp.Value;
+                activeEventsData.Add(eventDict);
+            }
+            data["active_events"] = activeEventsData;
+            
+            // 计时器
+            data["check_timer"] = _checkTimer;
+            
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载玩家事件数据
+            if (data.Contains("event_trigger_count"))
+            {
+                _playerData.EventTriggerCount = new Dictionary<string, int>();
+                var tcDict = (Dictionary<string, Variant>)data["event_trigger_count"];
+                foreach (var kvp in tcDict)
+                {
+                    _playerData.EventTriggerCount[kvp.Key] = (int)kvp.Value;
+                }
+            }
+            
+            if (data.Contains("total_events_triggered"))
+                _playerData.TotalEventsTriggered = (int)data["total_events_triggered"];
+            
+            if (data.Contains("legendary_events_witnessed"))
+                _playerData.LegendaryEventsWitnessed = (int)data["legendary_events_witnessed"];
+            
+            // 加载最后事件时间
+            if (data.Contains("last_event_time"))
+            {
+                _playerData.LastEventTime = new Dictionary<string, DateTime>();
+                var ltDict = (Dictionary<string, Variant>)data["last_event_time"];
+                foreach (var kvp in ltDict)
+                {
+                    if (DateTime.TryParse(kvp.Value.ToString(), out var dt))
+                    {
+                        _playerData.LastEventTime[kvp.Key] = dt;
+                    }
+                }
+            }
+            
+            // 加载活跃事件
+            if (data.Contains("active_events"))
+            {
+                _activeEvents.Clear();
+                var eventsArray = (Array)data["active_events"];
+                foreach (Dictionary eventDict in eventsArray)
+                {
+                    string eventId = eventDict["event_id"].ToString();
+                    // 需要根据event_id重新初始化事件配置
+                    // 这里简化处理，实际需要从数据库重新加载
+                }
+            }
+            
+            // 加载计时器
+            if (data.Contains("check_timer"))
+                _checkTimer = (float)data["check_timer"];
+        }
     }
 }

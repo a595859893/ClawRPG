@@ -492,6 +492,122 @@ namespace ClawRPG.Scripts.Systems {
         private void NotifyPlayers(string message) {
             GD.Print("[WorldBossSystem] " + message);
         }
+
+        // ===== 持久化方法 =====
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 统计数据
+            data["totalWorldBossEvents"] = totalWorldBossEvents;
+            data["successfulDefeats"] = successfulDefeats;
+            data["totalDamageDealt"] = totalDamageDealt;
+            data["totalPlayers参与"] = totalPlayers参与;
+            data["bossHistory"] = bossHistory;
+            
+            // 配置
+            data["spawnInterval"] = spawnInterval;
+            data["maxActiveBosses"] = maxActiveBosses;
+            data["globalDamageMultiplier"] = globalDamageMultiplier;
+            
+            // 活跃的世界BOSS实例
+            var activeBossesData = new List<Dictionary>();
+            foreach (var kvp in activeBosses)
+            {
+                var bossDict = new Dictionary();
+                bossDict["bossId"] = kvp.Key;
+                bossDict["currentHealth"] = kvp.Value.CurrentHealth;
+                bossDict["maxHealth"] = kvp.Value.MaxHealth;
+                bossDict["phase"] = kvp.Value.Phase;
+                bossDict["currentAttack"] = kvp.Value.CurrentAttack;
+                bossDict["spawnTime"] = kvp.Value.SpawnTime.ToString("o");
+                bossDict["status"] = (int)kvp.Value.Status;
+                
+                // 伤害贡献者
+                var contributors = new Dictionary<string, int>();
+                foreach (var contributor in kvp.Value.DamageContributors)
+                {
+                    contributors[contributor.Key] = contributor.Value;
+                }
+                bossDict["damageContributors"] = contributors;
+                
+                activeBossesData.Add(bossDict);
+            }
+            data["activeBosses"] = activeBossesData;
+            
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载统计数据
+            if (data.Contains("totalWorldBossEvents"))
+                totalWorldBossEvents = (int)data["totalWorldBossEvents"];
+            if (data.Contains("successfulDefeats"))
+                successfulDefeats = (int)data["successfulDefeats"];
+            if (data.Contains("totalDamageDealt"))
+                totalDamageDealt = (int)data["totalDamageDealt"];
+            if (data.Contains("totalPlayers参与"))
+                totalPlayers参与 = (int)data["totalPlayers参与"];
+            
+            // 加载boss历史
+            if (data.Contains("bossHistory"))
+            {
+                bossHistory.Clear();
+                var historyArray = (Array)data["bossHistory"];
+                foreach (var item in historyArray)
+                {
+                    bossHistory.Add(item.ToString());
+                }
+            }
+            
+            // 加载配置
+            if (data.Contains("spawnInterval"))
+                spawnInterval = (float)data["spawnInterval"];
+            if (data.Contains("maxActiveBosses"))
+                maxActiveBosses = (int)data["maxActiveBosses"];
+            if (data.Contains("globalDamageMultiplier"))
+                globalDamageMultiplier = (float)data["globalDamageMultiplier"];
+            
+            // 加载活跃BOSS
+            if (data.Contains("activeBosses"))
+            {
+                activeBosses.Clear();
+                var bossesData = (Array)data["activeBosses"];
+                foreach (Dictionary bossDict in bossesData)
+                {
+                    var bossId = bossDict["bossId"].ToString();
+                    if (!worldBosses.TryGetValue(bossId, out var bossData)) continue;
+                    
+                    var instance = new WorldBossInstance
+                    {
+                        Data = bossData,
+                        CurrentHealth = (long)bossDict["currentHealth"],
+                        MaxHealth = (long)bossDict["maxHealth"],
+                        Phase = (int)bossDict["phase"],
+                        CurrentAttack = (int)bossDict["currentAttack"],
+                        Status = (WorldBossStatus)(int)bossDict["status"]
+                    };
+                    
+                    DateTime.TryParse(bossDict["spawnTime"].ToString(), out instance.SpawnTime);
+                    
+                    instance.DamageContributors = new Dictionary<string, int>();
+                    if (bossDict.Contains("damageContributors"))
+                    {
+                        var contributors = (Dictionary<string, Variant>)bossDict["damageContributors"];
+                        foreach (var kvp in contributors)
+                        {
+                            instance.DamageContributors[kvp.Key] = (int)kvp.Value;
+                        }
+                    }
+                    
+                    activeBosses[bossId] = instance;
+                }
+            }
+        }
     }
     
     // Data classes

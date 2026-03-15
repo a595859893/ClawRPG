@@ -435,5 +435,24 @@ namespace ClawRPG.Systems
                 }
             }
         }
+
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return GetSaveData();
+        }
+
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data != null)
+            {
+                LoadSaveData(data);
+            }
+        }
     }
 }

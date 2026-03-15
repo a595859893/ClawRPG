@@ -341,5 +341,58 @@ namespace ClawRPG.Scripts.Systems
                 }
             }
         }
+
+        // ===== 持久化方法 =====
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 当前武器类型
+            data["currentWeapon"] = (int)CurrentWeaponType;
+            
+            // 所有武器专精数据
+            var masteriesData = new List<Dictionary>();
+            foreach (var kvp in Masteries)
+            {
+                var masteryDict = new Dictionary();
+                masteryDict["type"] = (int)kvp.Key;
+                masteryDict["level"] = kvp.Value.Level;
+                masteryDict["experience"] = kvp.Value.Experience;
+                masteriesData.Add(masteryDict);
+            }
+            data["masteries"] = masteriesData;
+            
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载当前武器类型
+            if (data.Contains("currentWeapon"))
+            {
+                CurrentWeaponType = (WeaponType)(int)data["currentWeapon"];
+            }
+            
+            // 加载专精数据
+            if (data.Contains("masteries"))
+            {
+                var masteryList = (Array)data["masteries"];
+                foreach (Dictionary masteryData in masteryList)
+                {
+                    var type = (WeaponType)(int)masteryData["type"];
+                    var level = (int)masteryData["level"];
+                    var experience = (int)masteryData["experience"];
+                    
+                    if (Masteries.ContainsKey(type))
+                    {
+                        Masteries[type].Level = level;
+                        Masteries[type].Experience = experience;
+                    }
+                }
+            }
+        }
     }
 }

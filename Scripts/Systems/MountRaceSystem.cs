@@ -442,4 +442,57 @@ public class MountRaceSystem : BaseSystem
 			saveSystem.RequestSave();
 		}
 	}
+
+	// ===== 持久化方法 =====
+
+	public override Dictionary ExportSaveData()
+	{
+		var data = new Dictionary();
+		
+		// 玩家竞速进度
+		data["best_times"] = _playerProgress.BestTimes;
+		data["total_races"] = _playerProgress.TotalRaces;
+		data["first_places"] = _playerProgress.FirstPlaces;
+		data["second_places"] = _playerProgress.SecondPlaces;
+		data["third_places"] = _playerProgress.ThirdPlaces;
+		data["total_earnings"] = _playerProgress.TotalEarnings;
+		
+		// 当前比赛状态
+		data["currentState"] = (int)_currentState;
+		
+		return data;
+	}
+
+	public override void ImportSaveData(Dictionary data)
+	{
+		if (data == null) return;
+		
+		// 加载最佳时间
+		if (data.Contains("best_times"))
+		{
+			var bestTimesArray = (Array)data["best_times"];
+			_playerProgress.BestTimes.Clear();
+			foreach (Dictionary entry in bestTimesArray)
+			{
+				string raceId = entry["race_id"].ToString();
+				float time = (float)entry["time"];
+				_playerProgress.BestTimes[raceId] = time;
+			}
+		}
+		
+		if (data.Contains("total_races"))
+			_playerProgress.TotalRaces = (int)data["total_races"];
+		if (data.Contains("first_places"))
+			_playerProgress.FirstPlaces = (int)data["first_places"];
+		if (data.Contains("second_places"))
+			_playerProgress.SecondPlaces = (int)data["second_places"];
+		if (data.Contains("third_places"))
+			_playerProgress.ThirdPlaces = (int)data["third_places"];
+		if (data.Contains("total_earnings"))
+			_playerProgress.TotalEarnings = (int)data["total_earnings"];
+		
+		// 加载当前状态
+		if (data.Contains("currentState"))
+			_currentState = (MountRaceData.RaceState)(int)data["currentState"];
+	}
 }

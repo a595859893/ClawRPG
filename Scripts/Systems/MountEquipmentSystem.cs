@@ -372,5 +372,24 @@ namespace GameSystems {
             
             GD.Print($"[MountEquipmentSystem] Loaded {ownedEquipment.Count} owned equipment");
         }
+
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return SaveData();
+        }
+
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data != null)
+            {
+                LoadData(new Dictionary<string, object>(data));
+            }
+        }
     }
 }

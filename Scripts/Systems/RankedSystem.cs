@@ -389,4 +389,119 @@ public partial class RankedSystem : BaseSystem
     {
         // Will be called from keybinding
     }
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 玩家排名数据
+        var ranksData = new List<Dictionary>();
+        foreach (var kvp in playerRanks)
+        {
+            var rankDict = new Dictionary();
+            rankDict["playerName"] = kvp.Key;
+            rankDict["tier"] = (int)kvp.Value.tier;
+            rankDict["division"] = (int)kvp.Value.division;
+            rankDict["points"] = kvp.Value.points;
+            rankDict["wins"] = kvp.Value.wins;
+            rankDict["losses"] = kvp.Value.losses;
+            rankDict["currentStreak"] = kvp.Value.currentStreak;
+            rankDict["bestStreak"] = kvp.Value.bestStreak;
+            rankDict["seasonWins"] = kvp.Value.seasonWins;
+            rankDict["seasonLosses"] = kvp.Value.seasonLosses;
+            rankDict["seasonPoints"] = kvp.Value.seasonPoints;
+            ranksData.Add(rankDict);
+        }
+        data["playerRanks"] = ranksData;
+        
+        // 比赛历史
+        var historyData = new List<Dictionary>();
+        foreach (var match in matchHistory)
+        {
+            var matchDict = new Dictionary();
+            matchDict["matchId"] = match.matchId;
+            matchDict["playerName"] = match.playerName;
+            matchDict["opponentName"] = match.opponentName;
+            matchDict["playerWon"] = match.playerWon;
+            matchDict["pointsChange"] = match.pointsChange;
+            matchDict["playerTierBefore"] = (int)match.playerTierBefore;
+            matchDict["playerTierAfter"] = (int)match.playerTierAfter;
+            historyData.Add(matchDict);
+        }
+        data["matchHistory"] = historyData;
+        
+        // 赛季信息
+        data["currentSeasonId"] = currentSeasonId;
+        data["seasonStartTime"] = seasonStartTime.ToString("o");
+        data["seasonEndTime"] = seasonEndTime.ToString("o");
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 加载玩家排名数据
+        if (data.Contains("playerRanks"))
+        {
+            var ranksData = (Array)data["playerRanks"];
+            playerRanks.Clear();
+            foreach (Dictionary rankDict in ranksData)
+            {
+                var rank = new RankData
+                {
+                    playerName = rankDict["playerName"].ToString(),
+                    tier = (RankTier)(int)rankDict["tier"],
+                    division = (RankDivision)(int)rankDict["division"],
+                    points = (int)rankDict["points"],
+                    wins = (int)rankDict["wins"],
+                    losses = (int)rankDict["losses"],
+                    currentStreak = (int)rankDict["currentStreak"],
+                    bestStreak = (int)rankDict["bestStreak"],
+                    seasonWins = (int)rankDict["seasonWins"],
+                    seasonLosses = (int)rankDict["seasonLosses"],
+                    seasonPoints = (int)rankDict["seasonPoints"]
+                };
+                playerRanks[rank.playerName] = rank;
+            }
+        }
+        
+        // 加载比赛历史
+        if (data.Contains("matchHistory"))
+        {
+            var historyData = (Array)data["matchHistory"];
+            matchHistory.Clear();
+            foreach (Dictionary matchDict in historyData)
+            {
+                var match = new RankMatch
+                {
+                    matchId = matchDict["matchId"].ToString(),
+                    playerName = matchDict["playerName"].ToString(),
+                    opponentName = matchDict["opponentName"].ToString(),
+                    playerWon = (bool)matchDict["playerWon"],
+                    pointsChange = (int)matchDict["pointsChange"],
+                    playerTierBefore = (RankTier)(int)matchDict["playerTierBefore"],
+                    playerTierAfter = (RankTier)(int)matchDict["playerTierAfter"]
+                };
+                matchHistory.Add(match);
+            }
+        }
+        
+        // 加载赛季信息
+        if (data.Contains("currentSeasonId"))
+        {
+            currentSeasonId = data["currentSeasonId"].ToString();
+        }
+        if (data.Contains("seasonStartTime"))
+        {
+            DateTime.TryParse(data["seasonStartTime"].ToString(), out seasonStartTime);
+        }
+        if (data.Contains("seasonEndTime"))
+        {
+            DateTime.TryParse(data["seasonEndTime"].ToString(), out seasonEndTime);
+        }
+    }
 }

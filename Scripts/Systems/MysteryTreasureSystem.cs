@@ -386,4 +386,93 @@ public class MysteryTreasureSystem : BaseSystem
         
         GD.Print("MysteryTreasureSystem loaded");
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 保存玩家数据
+        var rarityCount = new Godot.Collections.Dictionary();
+        foreach (var kvp in _playerData.RarityCount)
+        {
+            rarityCount[kvp.Key] = kvp.Value;
+        }
+        data["rarity_count"] = rarityCount;
+        
+        var typeCount = new Godot.Collections.Dictionary();
+        foreach (var kvp in _playerData.TypeCount)
+        {
+            typeCount[kvp.Key] = kvp.Value;
+        }
+        data["type_count"] = typeCount;
+        
+        data["discovered_ids"] = new Godot.Array(_playerData.DiscoveredTreasureIds);
+        
+        var history = new Godot.Collections.Dictionary();
+        foreach (var kvp in _playerData.TreasureHistory)
+        {
+            history[kvp.Key] = kvp.Value;
+        }
+        data["treasure_history"] = history;
+        
+        data["total_gold_earned"] = _playerData.TotalGoldEarned;
+        data["total_exp_earned"] = _playerData.TotalExpEarned;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("rarity_count"))
+        {
+            var rarityCount = (Godot.Collections.Dictionary)data["rarity_count"];
+            foreach (var key in rarityCount.Keys)
+            {
+                _playerData.RarityCount[key.ToString()] = Convert.ToInt32(rarityCount[key]);
+            }
+        }
+        
+        if (data.Contains("type_count"))
+        {
+            var typeCount = (Godot.Collections.Dictionary)data["type_count"];
+            foreach (var key in typeCount.Keys)
+            {
+                _playerData.TypeCount[key.ToString()] = Convert.ToInt32(typeCount[key]);
+            }
+        }
+        
+        if (data.Contains("discovered_ids"))
+        {
+            _playerData.DiscoveredTreasureIds = new List<string>();
+            var discoveredIds = (Godot.Array)data["discovered_ids"];
+            foreach (string id in discoveredIds)
+            {
+                _playerData.DiscoveredTreasureIds.Add(id);
+            }
+        }
+        
+        if (data.Contains("treasure_history"))
+        {
+            _playerData.TreasureHistory = new Dictionary<string, int>();
+            var history = (Godot.Collections.Dictionary)data["treasure_history"];
+            foreach (var key in history.Keys)
+            {
+                _playerData.TreasureHistory[key.ToString()] = Convert.ToInt32(history[key]);
+            }
+        }
+        
+        if (data.Contains("total_gold_earned"))
+            _playerData.TotalGoldEarned = Convert.ToInt32(data["total_gold_earned"]);
+        
+        if (data.Contains("total_exp_earned"))
+            _playerData.TotalExpEarned = Convert.ToInt32(data["total_exp_earned"]);
+    }
 }

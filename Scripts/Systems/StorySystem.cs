@@ -489,5 +489,57 @@ namespace ClawRPG.Scripts.Systems {
                 }
             }
         }
+
+        // ===== 持久化方法 =====
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 当前章节ID
+            data["currentChapterId"] = currentChapterId;
+            
+            // 目标进度
+            var objectivesData = new List<Dictionary>();
+            var chapters = database.GetAllChapters();
+            foreach (var chapter in chapters) {
+                foreach (var obj in chapter.Objectives) {
+                    objectivesData.Add(new Dictionary {
+                        ["objectiveId"] = obj.ObjectiveId,
+                        ["currentCount"] = obj.CurrentCount
+                    });
+                }
+            }
+            data["objectives"] = objectivesData;
+            
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("currentChapterId")) {
+                LoadProgress((int)data["currentChapterId"]);
+            }
+            
+            if (data.Contains("objectives")) {
+                var objectivesData = (Array)data["objectives"];
+                var chapters = database.GetAllChapters();
+                
+                foreach (Dictionary objData in objectivesData) {
+                    int objectiveId = (int)objData["objectiveId"];
+                    int currentCount = (int)objData["currentCount"];
+                    
+                    foreach (var chapter in chapters) {
+                        foreach (var objective in chapter.Objectives) {
+                            if (objective.ObjectiveId == objectiveId) {
+                                objective.CurrentCount = currentCount;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
