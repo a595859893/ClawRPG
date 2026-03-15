@@ -352,6 +352,10 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 更新游戏时间
+    /// </summary>
+    /// <param name="hours">游戏小时数</param>
     public void UpdatePlayTime(float hours)
     {
         _playTimeHours = hours;
@@ -362,6 +366,10 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 更新玩家等级
+    /// </summary>
+    /// <param name="level">当前等级</param>
     public void UpdateLevel(int level)
     {
         UpdateAchievementProgress("level_10", level);
@@ -371,6 +379,10 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 设置公会加入状态
+    /// </summary>
+    /// <param name="isLeader">是否为会长</param>
     public void SetGuildJoined(bool isLeader = false)
     {
         UpdateAchievementProgress("guild_join", 1);
@@ -381,6 +393,9 @@ public class AchievementSystem : BaseSystem
         SaveData();
     }
 
+    /// <summary>
+    /// 设置首次战斗
+    /// </summary>
     public void SetFirstBattle()
     {
         UpdateAchievementProgress("first_blood", 1);
@@ -517,11 +532,21 @@ public class AchievementSystem : BaseSystem
     }
 
     // Public getters
+
+    /// <summary>
+    /// 获取所有成就
+    /// </summary>
+    /// <returns>成就字典</returns>
     public Dictionary<string, AchievementData.Achievement> GetAllAchievements()
     {
         return _achievements;
     }
 
+    /// <summary>
+    /// 根据分类获取成就
+    /// </summary>
+    /// <param name="category">成就分类</param>
+    /// <returns>成就列表</returns>
     public List<AchievementData.Achievement> GetAchievementsByCategory(AchievementData.AchievementCategory category)
     {
         var result = new List<AchievementData.Achievement>();
@@ -535,6 +560,10 @@ public class AchievementSystem : BaseSystem
         return result;
     }
 
+    /// <summary>
+    /// 获取已解锁成就列表
+    /// </summary>
+    /// <returns>已解锁成就列表</returns>
     public List<AchievementData.Achievement> GetUnlockedAchievements()
     {
         var result = new List<AchievementData.Achievement>();
@@ -548,6 +577,10 @@ public class AchievementSystem : BaseSystem
         return result;
     }
 
+    /// <summary>
+    /// 获取已解锁成就数量
+    /// </summary>
+    /// <returns>已解锁成就数量</returns>
     public int GetUnlockedCount()
     {
         int count = 0;
@@ -558,11 +591,19 @@ public class AchievementSystem : BaseSystem
         return count;
     }
 
+    /// <summary>
+    /// 获取成就总数
+    /// </summary>
+    /// <returns>成就总数</returns>
     public int GetTotalAchievementCount()
     {
         return _achievements.Count;
     }
 
+    /// <summary>
+    /// 获取已解锁成就的总金币奖励
+    /// </summary>
+    /// <returns>总金币奖励</returns>
     public int GetTotalRewardGold()
     {
         int total = 0;
@@ -576,6 +617,10 @@ public class AchievementSystem : BaseSystem
         return total;
     }
 
+    /// <summary>
+    /// 获取已解锁成就的总经验奖励
+    /// </summary>
+    /// <returns>总经验奖励</returns>
     public int GetTotalRewardExp()
     {
         int total = 0;

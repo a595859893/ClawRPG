@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 元素试炼数据 - 存储试炼关卡配置
+/// </summary>
 public class ElementalTrialData
 {
     public enum TrialType

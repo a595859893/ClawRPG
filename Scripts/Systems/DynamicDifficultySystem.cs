@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using Framework;
 
+/// <summary>
+/// 动态难度系统 - 根据玩家水平调整游戏难度
+/// </summary>
 public class DynamicDifficultySystem : BaseSystem
 {
     // 单例

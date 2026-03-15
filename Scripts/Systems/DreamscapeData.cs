@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 梦境数据 - 存储梦境类型和配置
+/// </summary>
 public enum DreamscapeType
 {
     Nightmare,   // 噩梦 - 高难度敌人

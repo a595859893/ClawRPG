@@ -55,6 +55,10 @@ namespace ClawRPG.Scripts.Systems
             }
         }
         
+        /// <summary>
+        /// 追踪击杀数
+        /// </summary>
+        /// <param name="count">击杀数量</param>
         public void TrackKill(int count = 1)
         {
             _totalKills += count;
@@ -64,6 +68,9 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("kill_1000", _totalKills);
         }
         
+        /// <summary>
+        /// 追踪Boss击杀
+        /// </summary>
         public void TrackBossKill()
         {
             _totalBossesKilled++;
@@ -72,6 +79,10 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("boss_all", _totalBossesKilled);
         }
         
+        /// <summary>
+        /// 追踪获得金币
+        /// </summary>
+        /// <param name="amount">金币数量</param>
         public void TrackGoldEarned(int amount)
         {
             _totalGoldEarned += amount;
@@ -80,6 +91,9 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("gold_100000", _totalGoldEarned);
         }
         
+        /// <summary>
+        /// 追踪制造
+        /// </summary>
         public void TrackCraft()
         {
             _totalCrafts++;
@@ -88,6 +102,9 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("craft_50", _totalCrafts);
         }
         
+        /// <summary>
+        /// 追踪任务完成
+        /// </summary>
         public void TrackQuestComplete()
         {
             _totalQuestsCompleted++;
@@ -96,6 +113,10 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("quest_all", _totalQuestsCompleted);
         }
         
+        /// <summary>
+        /// 追踪连击数
+        /// </summary>
+        /// <param name="combo">连击数</param>
         public void TrackCombo(int combo)
         {
             if (combo > _maxCombo)
@@ -107,6 +128,10 @@ namespace ClawRPG.Scripts.Systems
             }
         }
         
+        /// <summary>
+        /// 追踪伤害
+        /// </summary>
+        /// <param name="damage">伤害值</param>
         public void TrackDamage(int damage)
         {
             if (damage > _maxDamage)
@@ -118,6 +143,10 @@ namespace ClawRPG.Scripts.Systems
             }
         }
         
+        /// <summary>
+        /// 追踪生存时间
+        /// </summary>
+        /// <param name="seconds">生存秒数</param>
         public void TrackSurvivalTime(float seconds)
         {
             _totalSurvivalTime += seconds;

@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 骰子大师UI - 骰子游戏界面
+/// </summary>
 public class DiceMasterUI : Control
 {
     private Label titleLabel;

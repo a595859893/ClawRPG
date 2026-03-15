@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using ElementalReactionData;
 
+/// <summary>
+/// 元素反应数据库 - 配置元素反应效果
+/// </summary>
 public class ElementalReactionDatabase
 {
     private static ElementalReactionDatabase _instance;

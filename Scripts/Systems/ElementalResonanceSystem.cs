@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 元素共鸣系统 - 管理元素共鸣加成
+/// </summary>
 public class ElementalResonanceSystem : Node
 {
     public static ElementalResonanceSystem Instance { get; private set; }

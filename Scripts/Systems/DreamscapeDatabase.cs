@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 梦境数据库 - 配置梦境世界数据
+/// </summary>
 public class DreamscapeDatabase
 {
     private static DreamscapeDatabase _instance;

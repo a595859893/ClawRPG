@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 星座数据 - 存储星座配置信息
+/// </summary>
 public class ConstellationData : Node
 {
     // Constellation types

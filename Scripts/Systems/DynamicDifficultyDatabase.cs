@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 动态难度数据库 - 配置难度等级数据
+/// </summary>
 public class DynamicDifficultyDatabase
 {
     // 单例

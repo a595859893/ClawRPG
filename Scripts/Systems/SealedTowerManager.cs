@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// 封印之塔管理器 - 管理封印之塔爬塔玩法
+/// </summary>
 public class SealedTowerManager : Node
 {
     public static SealedTowerManager Instance { get; private set; }

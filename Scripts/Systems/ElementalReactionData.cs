@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 元素反应数据 - 存储元素反应配置
+/// </summary>
 public class ElementalReactionData
 {
     // 元素类型
