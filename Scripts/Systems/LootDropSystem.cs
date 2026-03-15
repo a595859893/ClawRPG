@@ -2,9 +2,16 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 战利品掉落系统 - 管理战利品掉落、幸运系统和保底机制
+/// 支持多种战利品池、幸运加成、暴击掉落和保底机制
+/// </summary>
 public class LootDropSystem
 {
     private static LootDropSystem _instance;
+    /// <summary>
+    /// 获取系统单例实例
+    /// </summary>
     public static LootDropSystem Instance
     {
         get
@@ -16,26 +23,47 @@ public class LootDropSystem
 
     private LootDropData.PlayerLootData _playerData = new LootDropData.PlayerLootData();
     
-    // Lucky drop system - increases drop rate and quality
+    // 幸运系统 - 增加掉落率和品质
     private float _luckValue = 0f;
     private int _luckItems = 0;
     
-    // Pity system - guarantees better drops after many failed attempts
+    // 保底系统 - 多次未获得好奖励后保底掉落
     private Dictionary<string, int> _pityCounters = new Dictionary<string, int>();
     private Dictionary<string, LootDropData.LootRarity> _pityThresholds = new Dictionary<string, LootDropData.LootRarity>();
     
-    // Critical drop system - rare chance for double drops
+    // 暴击掉落系统 - 稀有几率获得双倍掉落
     private float _criticalDropRate = 0.05f;
     
+    /// <summary>
+    /// 当前幸运值
+    /// </summary>
     public float LuckValue => _luckValue;
+    /// <summary>
+    /// 使用的幸运道具数量
+    /// </summary>
     public int LuckItems => _luckItems;
     
     // Signals
+    /// <summary>
+    /// 战利品掉落信号 - 战利品、数量
+    /// </summary>
     public Action<LootDropData.LootEntry, int> OnLootDropped;
+    /// <summary>
+    /// 稀有度掉落信号
+    /// </summary>
     public Action<LootDropData.LootRarity> OnRarityDropped;
+    /// <summary>
+    /// 幸运掉落信号
+    /// </summary>
     public Action OnLuckyDrop;
+    /// <summary>
+    /// 暴击掉落信号
+    /// </summary>
     public Action OnCriticalDrop;
 
+    /// <summary>
+    /// 初始化掉落系统
+    /// </summary>
     public void Initialize()
     {
         LoadPlayerData();
@@ -43,6 +71,9 @@ public class LootDropSystem
         GD.Print("[LootDropSystem] Initialized");
     }
 
+    /// <summary>
+    /// 初始化保底系统
+    /// </summary>
     private void InitializePitySystem()
     {
         // Initialize pity counters for each pool
@@ -80,8 +111,11 @@ public class LootDropSystem
     }
 
     /// <summary>
-    /// Roll for loot from a specific pool
+    /// 从指定战利品池随机掉落
     /// </summary>
+    /// <param name="poolId">战利品池ID</param>
+    /// <param name="count">掉落数量</param>
+    /// <returns>掉落的战利品列表</returns>
     public List<LootDropData.LootEntry> RollLootFromPool(string poolId, int count = 1)
     {
         var results = new List<LootDropData.LootEntry>();
@@ -217,8 +251,9 @@ public class LootDropSystem
     }
 
     /// <summary>
-    /// Add luck value (from luck-boosting items/effects)
+    /// 添加幸运值（来自幸运加成道具/效果）
     /// </summary>
+    /// <param name="amount">幸运值增量</param>
     public void AddLuck(float amount)
     {
         _luckValue += amount;

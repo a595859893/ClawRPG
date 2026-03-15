@@ -3,9 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// 市场趋势系统 - 动态管理物品价格趋势和预测
+/// 定时更新市场数据，计算趋势方向和市场情绪
+/// </summary>
 public class MarketTrendSystem : Node
 {
     private static MarketTrendSystem _instance;
+    /// <summary>
+    /// 获取系统单例实例
+    /// </summary>
     public static MarketTrendSystem Instance
     {
         get
@@ -18,11 +25,11 @@ public class MarketTrendSystem : Node
     private MarketTrendData _data;
     private RandomNumberGenerator _rng = new RandomNumberGenerator();
     
-    // Update interval in seconds
+    // 更新间隔（秒）
     private const float UPDATE_INTERVAL = 300f; // 5 minutes
     private float _timer = 0f;
     
-    // History length to keep
+    // 历史记录长度
     private const int MAX_HISTORY = 100;
     
     public override void _Ready()

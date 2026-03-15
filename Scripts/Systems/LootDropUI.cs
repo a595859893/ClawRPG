@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 战利品掉落UI - 显示掉落统计和幸运值控制
+/// 允许玩家调整幸运加成并查看掉落统计信息
+/// </summary>
 public class LootDropUI : Control
 {
     private Label _titleLabel;

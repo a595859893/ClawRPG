@@ -2,8 +2,15 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 鉴定系统 - 为未鉴装备生成随机属性
+/// 支持多种鉴定方法（免费/标准/高级/ premium），不同方法产出不同数量和品质的属性的
+/// </summary>
 public class IdentificationSystem : Node
 {
+    /// <summary>
+    /// 获取系统单例实例
+    /// </summary>
     public static IdentificationSystem Instance { get; private set; }
     
     // 鉴定方法类型

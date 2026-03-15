@@ -2,8 +2,15 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 拍卖行系统 - 管理玩家间的物品拍卖
+/// 支持物品挂售、出价、一口价购买等功能
+/// </summary>
 public class AuctionHouseSystem : BaseSystem
 {
+    /// <summary>
+    /// 获取系统单例实例
+    /// </summary>
     public static AuctionHouseSystem Instance { get; private set; }
     
     [Signal]
@@ -41,12 +48,18 @@ public class AuctionHouseSystem : BaseSystem
     /// </summary>
     protected override string SystemName => "AuctionHouse";
     
+    /// <summary>
+    /// 初始化系统
+    /// </summary>
     public void Initialize(Player player)
     {
         _player = player;
         RefreshListings();
     }
     
+    /// <summary>
+    /// 刷新拍卖品列表
+    /// </summary>
     public void RefreshListings()
     {
         AuctionDatabase.ProcessExpiredAuctions();
@@ -61,6 +74,9 @@ public class AuctionHouseSystem : BaseSystem
         EmitSignal("auction_listing_updated");
     }
     
+    /// <summary>
+    /// 获取过滤后的拍卖品列表
+    /// </summary>
     public List<AuctionItem> GetFilteredListings()
     {
         var listings = new List<AuctionItem>();
@@ -84,12 +100,18 @@ public class AuctionHouseSystem : BaseSystem
         return listings;
     }
     
+    /// <summary>
+    /// 设置搜索关键词
+    /// </summary>
     public void SetSearchTerm(string term)
     {
         _searchTerm = term;
         EmitSignal("auction_listing_updated");
     }
     
+    /// <summary>
+    /// 设置稀有度过滤
+    /// </summary>
     public void SetRarityFilter(int rarity)
     {
         _filterRarity = rarity;
