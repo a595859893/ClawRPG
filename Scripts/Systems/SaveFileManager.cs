@@ -328,8 +328,10 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Load from backup (for recovery)
+        /// Loads the most recent backup for a slot (for recovery).
         /// </summary>
+        /// <param name="slot">Save slot index.</param>
+        /// <returns>Loaded SaveData from backup, or null if no backup exists.</returns>
         public SaveDataManager.SaveData LoadFromBackup(int slot)
         {
             try
@@ -360,8 +362,11 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Export save to external path
+        /// Exports a save to an external path.
         /// </summary>
+        /// <param name="slot">Save slot index to export.</param>
+        /// <param name="exportPath">External file path to export to.</param>
+        /// <returns>True if export was successful.</returns>
         public bool ExportSave(int slot, string exportPath)
         {
             string sourcePath = GetSavePath(slot);
@@ -381,8 +386,11 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Import save from external path
+        /// Imports a save from an external path.
         /// </summary>
+        /// <param name="importPath">External file path to import from.</param>
+        /// <param name="slot">Target save slot index.</param>
+        /// <returns>True if import was successful.</returns>
         public bool ImportSave(string importPath, int slot)
         {
             if (!File.Exists(importPath)) return false;
