@@ -3,6 +3,7 @@ using System;
 using ClawRPG.Scripts.Managers;
 using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.UI;
+using ClawRPG.Scripts.Events;
 
 namespace ClawRPG.Scripts
 {
@@ -257,7 +258,94 @@ namespace ClawRPG.Scripts
                 SoundEffectSystem.Instance?.PlayQuestComplete();
             };
 
+            // 通过 EventBus 订阅游戏事件（事件驱动架构）
+            ConnectEventBusSignals();
+
             GD.Print("Signals connected");
+        }
+        
+        /// <summary>
+        /// 连接事件总线信号
+        /// </summary>
+        private void ConnectEventBusSignals()
+        {
+            if (EventBusManager.Instance == null) return;
+
+            // 玩家死亡事件
+            EventBusManager.Instance.Subscribe<PlayerDiedEventData>(EventBusManager.Events.PlayerDied, OnPlayerDied);
+            
+            // 敌人击杀事件
+            EventBusManager.Instance.Subscribe<EnemyDiedEventData>(EventBusManager.Events.EnemyDied, OnEnemyDied);
+            
+            // 场景切换事件
+            EventBusManager.Instance.Subscribe<string>(EventBusManager.Events.SceneChanged, OnSceneChanged);
+            
+            // 游戏暂停/恢复事件
+            EventBusManager.Instance.Subscribe<GamePauseEventData>(EventBusManager.Events.GamePaused, OnGamePaused);
+            EventBusManager.Instance.Subscribe<GamePauseEventData>(EventBusManager.Events.GameResumed, OnGameResumed);
+            
+            // 游戏结束事件
+            EventBusManager.Instance.Subscribe<GameOverEventData>(EventBusManager.Events.GameOver, OnGameOver);
+            
+            GD.Print("[Main] EventBus signals connected");
+        }
+        
+        /// <summary>
+        /// 处理玩家死亡事件
+        /// </summary>
+        private void OnPlayerDied(PlayerDiedEventData data)
+        {
+            GD.Print($"[Main] Player died! Death count: {data.DeathCount}");
+            // 可以在这里添加玩家死亡后的全局逻辑，如：
+            // - 显示死亡界面
+            // - 更新统计
+            // - 触发成就等
+        }
+        
+        /// <summary>
+        /// 处理敌人击杀事件
+        /// </summary>
+        private void OnEnemyDied(EnemyDiedEventData data)
+        {
+            GD.Print($"[Main] Enemy killed! Total kills: {data.KillCount}");
+            // 可以在这里添加敌人死亡后的全局逻辑，如：
+            // - 更新击杀统计
+            // - 检查成就
+            // - 掉落物品处理等
+        }
+        
+        /// <summary>
+        /// 处理场景切换事件
+        /// </summary>
+        private void OnSceneChanged(string scenePath)
+        {
+            GD.Print($"[Main] Scene changed to: {scenePath}");
+            // 可以在这里添加场景切换后的全局逻辑
+        }
+        
+        /// <summary>
+        /// 处理游戏暂停事件
+        /// </summary>
+        private void OnGamePaused(GamePauseEventData data)
+        {
+            GD.Print($"[Main] Game paused at playtime: {data.PlayTime}");
+        }
+        
+        /// <summary>
+        /// 处理游戏恢复事件
+        /// </summary>
+        private void OnGameResumed(GamePauseEventData data)
+        {
+            GD.Print("[Main] Game resumed");
+        }
+        
+        /// <summary>
+        /// 处理游戏结束事件
+        /// </summary>
+        private void OnGameOver(GameOverEventData data)
+        {
+            GD.Print($"[Main] Game Over! Play time: {data.TotalPlayTime}s, Kills: {data.KillCount}, Deaths: {data.DeathCount}");
+            // 可以在这里添加游戏结束后的全局逻辑
         }
 
         /// <summary>
@@ -303,55 +391,10 @@ namespace ClawRPG.Scripts
             _mainGame?.UpdatePlayerUI();
             _mainNetwork?.ProcessNetwork(delta);
 
-            // 更新统计
-            StatisticsManager.Instance.AddPlayTime(dt);
-
-            // 自动保存
-            HandleAutoSave(dt);
-
-            // 更新玩家 UI
-            UpdatePlayerUI();
-
-            // 更新药水效果
-            if (_player != null)
-            {
-                PotionManager.Instance.UpdatePotionEffects(dt, _player);
-            }
-
-            // 处理输入
-            ProcessInput();
-        }
-
-        /// <summary>
-        /// 处理自动保存
-        /// </summary>
-        private float _autoSaveTimer = 0f;
-        private const float AutoSaveInterval = 300f;
-
-        private void HandleAutoSave(float dt)
-        {
-            _autoSaveTimer += dt;
-            if (_autoSaveTimer >= AutoSaveInterval)
-            {
-                _autoSaveTimer = 0f;
-                GD.Print("Auto save triggered...");
-            }
-        }
-
-        /// <summary>
-        /// 更新玩家 UI
-        /// </summary>
-        private void UpdatePlayerUI()
-        {
-            // 委托给 MainGame 处理
-        }
-
-        /// <summary>
-        /// 处理输入
-        /// </summary>
-        private void ProcessInput()
-        {
-            // 委托给 MainInput 处理
+            // 其他游戏逻辑已委托给各 Manager 和 MainGame 处理
+            // - 自动保存: SaveLoadManager.ManagerUpdate()
+            // - 统计更新: MainGame.ProcessGame()
+            // - 药水效果: MainGame.ProcessGame()
         }
 
         /// <summary>

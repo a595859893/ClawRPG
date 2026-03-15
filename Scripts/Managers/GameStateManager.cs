@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Events;
 
 namespace ClawRPG.Scripts.Managers
 {
@@ -10,6 +11,11 @@ namespace ClawRPG.Scripts.Managers
     public class GameStateManager : BaseSystem
     {
         public static GameStateManager Instance { get; private set; }
+        
+        /// <summary>
+        /// 优先级（数值越小越先初始化）
+        /// </summary>
+        public override int Priority => 10;
         
         // Game states
         public enum GameState
@@ -78,6 +84,13 @@ namespace ClawRPG.Scripts.Managers
             GD.Print("[GameStateManager] Game state changed: " + oldState + " -> " + newState);
             OnStateChanged?.Invoke(newState);
             OnStateTransition?.Invoke(oldState, newState);
+            
+            // 通过事件总线发布全局事件
+            if (EventBusManager.Instance != null)
+            {
+                var stateData = new GameStateEventData(oldState, newState);
+                EventBusManager.Instance.Emit(EventBusManager.Events.LevelChanged, stateData);
+            }
         }
         
         private void HandleStateChange(GameState newState)
@@ -116,6 +129,13 @@ namespace ClawRPG.Scripts.Managers
             
             GD.Print("[GameStateManager] Game paused");
             OnGamePaused?.Invoke();
+            
+            // 通过事件总线发布全局事件
+            if (EventBusManager.Instance != null)
+            {
+                var pauseData = new GamePauseEventData(true, _currentState, _totalPlayTime);
+                EventBusManager.Instance.Emit(EventBusManager.Events.GamePaused, pauseData);
+            }
         }
         
         /// <summary>
@@ -132,6 +152,13 @@ namespace ClawRPG.Scripts.Managers
             
             GD.Print("[GameStateManager] Game resumed");
             OnGameResumed?.Invoke();
+            
+            // 通过事件总线发布全局事件
+            if (EventBusManager.Instance != null)
+            {
+                var pauseData = new GamePauseEventData(false, _currentState, _totalPlayTime);
+                EventBusManager.Instance.Emit(EventBusManager.Events.GameResumed, pauseData);
+            }
         }
         
         /// <summary>
@@ -160,6 +187,20 @@ namespace ClawRPG.Scripts.Managers
             PauseGame();
             GD.Print("[GameStateManager] Game Over!");
             OnGameOver?.Invoke();
+            
+            // 通过事件总线发布全局事件
+            if (EventBusManager.Instance != null)
+            {
+                var killCount = EnemyLifecycleManager.Instance?.KillCount ?? 0;
+                var deathCount = PlayerLifecycleManager.Instance?.DeathCount ?? 0;
+                var gameOverData = new GameOverEventData(
+                    (int)_totalPlayTime, 
+                    killCount, 
+                    deathCount, 
+                    _currentDay
+                );
+                EventBusManager.Instance.Emit(EventBusManager.Events.GameOver, gameOverData);
+            }
         }
         
         /// <summary>
