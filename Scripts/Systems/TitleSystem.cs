@@ -56,6 +56,9 @@ public enum TitleRarity
 /// <summary>
 /// Title system - manages player titles, tracks progress and handles unlocking
 /// </summary>
+/// <summary>
+/// TitleSystem - 玩家称号系统，管理称号的解锁、条件检查和装备
+/// </summary>
 public class TitleSystem : Node
 {
     // Singleton
