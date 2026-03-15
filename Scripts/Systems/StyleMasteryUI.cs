@@ -1,4 +1,7 @@
 using Godot;
+/// <summary>
+/// 风格精通用户界面。
+/// </summary>
 using System;
 using System.Collections.Generic;
 

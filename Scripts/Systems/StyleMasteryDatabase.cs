@@ -1,4 +1,7 @@
 using Godot;
+/// <summary>
+/// 风格精通数据库。
+/// </summary>
 using System;
 using System.Collections.Generic;
 

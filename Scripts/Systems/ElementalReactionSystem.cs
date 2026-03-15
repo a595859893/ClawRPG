@@ -1,4 +1,7 @@
 using Godot;
+/// <summary>
+/// 元素反应系统。管理元素之间的相互作用和反应效果。
+/// </summary>
 using System;
 using System.Collections.Generic;
 using ElementalReactionData;

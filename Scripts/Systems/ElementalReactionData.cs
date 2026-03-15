@@ -1,4 +1,7 @@
 using Godot;
+/// <summary>
+/// 元素反应数据。
+/// </summary>
 using System;
 using System.Collections.Generic;
 

@@ -1,4 +1,7 @@
 using Godot;
+/// <summary>
+/// 元素试炼系统。
+/// </summary>
 using System;
 using System.Collections.Generic;
 
