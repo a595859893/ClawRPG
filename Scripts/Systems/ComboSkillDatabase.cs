@@ -1,292 +1,430 @@
-# Combo Skill Database - 连击技能配置数据库
-## 连击技能配置数据管理
+using Godot;
+using System;
+using System.Collections.Generic;
 
-extends Node
-class_name ComboSkillDatabase
+/// <summary>
+/// Combo Skill Database - 连击技能配置数据库
+/// </summary>
+public class ComboSkillDatabase : BaseSystem
+{
+    // 单例
+    private static ComboSkillDatabase instance;
 
-## 单例实例
-static var instance: ComboSkillDatabase
+    // 枚举定义 (与 ComboSkillSystem 共享)
+    public enum ComboType
+    {
+        Sequential,
+        Parallel,
+        Chain,
+        Conditional
+    }
 
-var _combos: Dictionary = {}
+    public enum TriggerCondition
+    {
+        OnHit,
+        OnCritical,
+        OnKill,
+        OnDamageTaken,
+        OnHealthBelow,
+        OnManaBelow,
+        OnEnemyType,
+        OnComboComplete,
+        Manual,
+        Cooldown
+    }
 
-func _ready():
-	instance = self
-	_init_combos()
+    public enum EffectType
+    {
+        Damage,
+        Heal,
+        Shield,
+        Buff,
+        Debuff,
+        Teleport,
+        Summon,
+        Transform,
+        ClearDebuffs,
+        GrantInvulnerability
+    }
 
-static func get_instance(): 
-	return instance
+    // 内部类定义 (与 ComboSkillSystem 共享)
+    public class ComboSkillEffect
+    {
+        public EffectType effectType;
+        public float value;
+        public float duration = 0f;
+        public string description = "";
+        public string target = "enemy";
+    }
 
-func get_combo(combo_id: String) -> ComboSkill:
-	return _combos.get(combo_id, null)
+    public class ComboStep
+    {
+        public string skillId = "";
+        public float delay = 0f;
+        public TriggerCondition condition = TriggerCondition.Manual;
+        public float conditionValue = 0f;
+        public List<ComboSkillEffect> effects = new List<ComboSkillEffect>();
+    }
 
-func get_all_combos() -> Array[ComboSkill]:
-	return _combos.values()
+    public class ComboSkill
+    {
+        public string id = "";
+        public string name = "";
+        public string description = "";
+        public ComboType comboType;
+        public List<ComboStep> steps = new List<ComboStep>();
+        public float totalTime = 0f;
+        public float cooldown = 0f;
+        public float manaCost = 0f;
+        public int levelRequired = 1;
+        public int rarity = 0;
+    }
 
-func get_combos_by_type(combo_type: ComboType) -> Array[ComboSkill]:
-	var result: Array[ComboSkill] = []
-	for combo in _combos.values():
-		if combo.combo_type == combo_type:
-			result.append(combo)
-	return result
+    // 数据库
+    private Dictionary<string, ComboSkill> combos = new Dictionary<string, ComboSkill>();
 
-func get_combos_by_rarity(rarity: int) -> Array[ComboSkill]:
-	var result: Array[ComboSkill] = []
-	for combo in _combos.values():
-		if combo.rarity == rarity:
-			result.append(combo)
-	return result
+    protected override void Initialize()
+    {
+        base.Initialize();
+        instance = this;
+        InitCombos();
+    }
 
-func get_available_combos(player_level: int) -> Array[ComboSkill]:
-	var result: Array[ComboSkill] = []
-	for combo in _combos.values():
-		if combo.level_required <= player_level:
-			result.append(combo)
-	return result
+    public static ComboSkillDatabase GetInstance()
+    {
+        return instance;
+    }
 
-func get_rarity_color(rarity: int) -> Color:
-	match rarity:
-		0: return Color.WHITE
-		1: return Color.GREEN
-		2: return Color(0.3, 0.5, 1.0)
-		3: return Color(0.6, 0.2, 0.8)
-		4: return Color(1.0, 0.6, 0.0)
-	return Color.WHITE
+    public ComboSkill GetCombo(string comboId)
+    {
+        return combos.ContainsKey(comboId) ? combos[comboId] : null;
+    }
 
-func get_rarity_name(rarity: int) -> String:
-	match rarity:
-		0: return "普通"
-		1: return "优秀"
-		2: return "稀有"
-		3: return "史诗"
-		4: return "传说"
-	return "未知"
+    public List<ComboSkill> GetAllCombos()
+    {
+        return new List<ComboSkill>(combos.Values);
+    }
 
-func _init_combos():
-	# === 顺序连击 ===
-	_init_sequential_combos()
-	# === 链式连击 ===
-	_init_chain_combos()
-	# === 并行连击 ===
-	_init_parallel_combos()
-	# === 条件连击 ===
-	_init_conditional_combos()
+    public List<ComboSkill> GetCombosByType(ComboType comboType)
+    {
+        var result = new List<ComboSkill>();
+        foreach (var combo in combos.Values)
+        {
+            if (combo.comboType == comboType)
+                result.Add(combo);
+        }
+        return result;
+    }
 
-func _init_sequential_combos():
-	# 闪电连击 - 顺序触发
-	var combo1 = ComboSkill.new()
-	combo1.id = "combo_lightning"
-	combo1.name = "闪电连击"
-	combo1.description = "召唤三道闪电依次打击敌人"
-	combo1.combo_type = ComboType.Sequential
-	combo1.cooldown = 8.0
-	combo1.mana_cost = 30.0
-	combo1.level_required = 5
-	combo1.rarity = 1
-	combo1.steps = [
-		_create_step("lightning_bolt", 0.0, [_create_effect(EffectType.Damage, 50.0, "闪电打击 50 伤害")]),
-		_create_step("lightning_bolt", 0.5, [create_effect(EffectType.Damage, 50.0, "闪电打击 50 伤害")]),
-		_create_step("lightning_bolt", 1.0, [create_effect(EffectType.Damage, 75.0, "终结闪电 75 伤害")])
-	]
-	combo1.total_time = 2.0
-	_combos[combo1.id] = combo1
+    public List<ComboSkill> GetCombosByRarity(int rarity)
+    {
+        var result = new List<ComboSkill>();
+        foreach (var combo in combos.Values)
+        {
+            if (combo.rarity == rarity)
+                result.Add(combo);
+        }
+        return result;
+    }
 
-	# 治疗链 - 顺序治疗
-	var combo2 = ComboSkill.new()
-	combo2.id = "combo_healing_chain"
-	combo2.name = "治疗链"
-	combo2.description = "依次治疗目标三次"
-	combo2.combo_type = ComboType.Sequential
-	combo2.cooldown = 12.0
-	combo2.mana_cost = 40.0
-	combo2.level_required = 8
-	combo2.rarity = 1
-	combo2.steps = [
-		_create_step("heal", 0.0, [create_effect(EffectType.Heal, 30.0, "治疗 30 HP")]),
-		_create_step("heal", 0.8, [create_effect(EffectType.Heal, 30.0, "治疗 30 HP")]),
-		_create_step("heal", 1.6, [create_effect(EffectType.Heal, 50.0, "强力治疗 50 HP")])
-	]
-	combo2.total_time = 2.5
-	_combos[combo2.id] = combo2
+    public List<ComboSkill> GetAvailableCombos(int playerLevel)
+    {
+        var result = new List<ComboSkill>();
+        foreach (var combo in combos.Values)
+        {
+            if (combo.levelRequired <= playerLevel)
+                result.Add(combo);
+        }
+        return result;
+    }
 
-	# 火焰风暴
-	var combo3 = ComboSkill.new()
-	combo3.id = "combo_fire_storm"
-	combo3.name = "火焰风暴"
-	combo3.description = "召唤火焰陨石轰炸区域"
-	combo3.combo_type = ComboType.Sequential
-	combo3.cooldown = 20.0
-	combo3.mana_cost = 80.0
-	combo3.level_required = 20
-	combo3.rarity = 3
-	combo3.steps = [
-		_create_step("fire_meteor", 0.0, [create_effect(EffectType.Damage, 100.0, "陨石 100 伤害")]),
-		_create_step("fire_meteor", 0.6, [create_effect(EffectType.Damage, 100.0, "陨石 100 伤害")]),
-		_create_step("fire_meteor", 1.2, [create_effect(EffectType.Damage, 100.0, "陨石 100 伤害")]),
-		_create_step("fire_explosion", 2.0, [create_effect(EffectType.Damage, 150.0, "爆炸 150 伤害")])
-	]
-	combo3.total_time = 3.0
-	_combos[combo3.id] = combo3
+    public Color GetRarityColor(int rarity)
+    {
+        switch (rarity)
+        {
+            case 0: return Colors.White;
+            case 1: return Colors.Green;
+            case 2: return new Color(0.3f, 0.5f, 1.0f);
+            case 3: return new Color(0.6f, 0.2f, 0.8f);
+            case 4: return new Color(1.0f, 0.6f, 0.0f);
+        }
+        return Colors.White;
+    }
 
-func _init_chain_combos():
-	# 暗影打击 - 链式触发
-	var combo1 = ComboSkill.new()
-	combo1.id = "combo_shadow_strike"
-	combo1.name = "暗影打击"
-	combo1.description = "穿梭于阴影中连续攻击"
-	combo1.combo_type = ComboType.Chain
-	combo1.cooldown = 10.0
-	combo1.mana_cost = 35.0
-	combo1.level_required = 12
-	combo1.rarity = 2
-	combo1.steps = [
-		_create_step("shadow_strike", 0.0, TriggerCondition.Manual, 0.0, 
-			[create_effect(EffectType.Damage, 40.0, "暗影斩 40 伤害")]),
-		_create_step("shadow_strike", 0.3, TriggerCondition.OnHit, 0.0, 
-			[create_effect(EffectType.Damage, 50.0, "穿刺 50 伤害")]),
-		_create_step("shadow_strike", 0.3, TriggerCondition.OnHit, 0.0, 
-			[create_effect(EffectType.Damage, 70.0, "终结 70 伤害")])
-	]
-	combo1.total_time = 2.0
-	_combos[combo1.id] = combo1
+    public string GetRarityName(int rarity)
+    {
+        switch (rarity)
+        {
+            case 0: return "普通";
+            case 1: return "优秀";
+            case 2: return "稀有";
+            case 3: return "史诗";
+            case 4: return "传说";
+        }
+        return "未知";
+    }
 
-	# 冰火两重天
-	var combo2 = ComboSkill.new()
-	combo2.id = "combo_fire_ice"
-	combo2.name = "冰火两重天"
-	combo2.description = "冰霜后接火焰，造成额外伤害"
-	combo2.combo_type = ComboType.Chain
-	combo2.cooldown = 15.0
-	combo2.mana_cost = 50.0
-	combo2.level_required = 15
-	combo2.rarity = 2
-	combo2.steps = [
-		_create_step("ice_burst", 0.0, TriggerCondition.Manual, 0.0,
-			[create_effect(EffectType.Damage, 60.0, "冰霜 60 伤害"), 
-			 create_effect(EffectType.Debuff, 30.0, "减速 30%", 3.0)]),
-		_create_step("fire_burst", 0.5, TriggerCondition.OnHit, 0.0,
-			[create_effect(EffectType.Damage, 80.0, "火焰 80 伤害")])
-	]
-	combo2.total_time = 1.5
-	_combos[combo2.id] = combo2
+    private void InitCombos()
+    {
+        InitSequentialCombos();
+        InitChainCombos();
+        InitParallelCombos();
+        InitConditionalCombos();
+    }
 
-func _init_parallel_combos():
-	# 全屏护盾 - 并行效果
-	var combo1 = ComboSkill.new()
-	combo1.id = "combo_shield_wall"
-	combo1.name = "护盾壁垒"
-	combo1.description = "同时施加多重护盾"
-	combo1.combo_type = ComboType.Parallel
-	combo1.cooldown = 25.0
-	combo1.mana_cost = 60.0
-	combo1.level_required = 10
-	combo1.rarity = 2
-	combo1.steps = [
-		_create_step("shield", 0.0, [create_effect(EffectType.Shield, 100.0, "护盾 100")]),
-		_create_step("buff", 0.0, [create_effect(EffectType.Buff, 20.0, "防御强化 20%", 10.0)]),
-		_create_step("cleanse", 0.0, [create_effect(EffectType.ClearDebuffs, 1.0, "清除减益")])
-	]
-	combo1.total_time = 0.5
-	_combos[combo1.id] = combo1
+    private void InitSequentialCombos()
+    {
+        // 闪电连击 - 顺序触发
+        var combo1 = new ComboSkill
+        {
+            id = "combo_lightning",
+            name = "闪电连击",
+            description = "召唤三道闪电依次打击敌人",
+            comboType = ComboType.Sequential,
+            cooldown = 8.0f,
+            manaCost = 30.0f,
+            levelRequired = 5,
+            rarity = 1,
+            steps = new List<ComboStep>
+            {
+                CreateStep("lightning_bolt", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 50.0f, "闪电打击 50 伤害") }),
+                CreateStep("lightning_bolt", 0.5f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 50.0f, "闪电打击 50 伤害") }),
+                CreateStep("lightning_bolt", 1.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 75.0f, "终结闪电 75 伤害") })
+            },
+            totalTime = 2.0f
+        };
+        combos[combo1.id] = combo1;
 
-	# 元素爆发
-	var combo2 = ComboSkill.new()
-	combo2.id = "combo_elemental_burst"
-	combo2.name = "元素爆发"
-	combo2.description = "同时触发所有元素之力"
-	combo2.combo_type = ComboType.Parallel
-	combo2.cooldown = 30.0
-	combo2.mana_cost = 100.0
-	combo2.level_required = 25
-	combo2.rarity = 4
-	combo2.steps = [
-		_create_step("fire", 0.0, [create_effect(EffectType.Damage, 120.0, "火 120 伤害")]),
-		_create_step("ice", 0.0, [create_effect(EffectType.Damage, 100.0, "冰 100 伤害")]),
-		_create_step("lightning", 0.0, [create_effect(EffectType.Damage, 80.0, "雷 80 伤害")])
-	]
-	combo2.total_time = 0.2
-	_combos[combo2.id] = combo2
+        // 治疗链 - 顺序治疗
+        var combo2 = new ComboSkill
+        {
+            id = "combo_healing_chain",
+            name = "治疗链",
+            description = "依次治疗目标三次",
+            comboType = ComboType.Sequential,
+            cooldown = 12.0f,
+            manaCost = 40.0f,
+            levelRequired = 8,
+            rarity = 1,
+            steps = new List<ComboStep>
+            {
+                CreateStep("heal", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Heal, 30.0f, "治疗 30 HP") }),
+                CreateStep("heal", 0.8f, new List<ComboSkillEffect> { CreateEffect(EffectType.Heal, 30.0f, "治疗 30 HP") }),
+                CreateStep("heal", 1.6f, new List<ComboSkillEffect> { CreateEffect(EffectType.Heal, 50.0f, "强力治疗 50 HP") })
+            },
+            totalTime = 2.5f
+        };
+        combos[combo2.id] = combo2;
 
-func _init_conditional_combos():
-	# 绝地反击 - 条件触发
-	var combo1 = ComboSkill.new()
-	combo1.id = "combo_desperation"
-	combo1.name = "绝地反击"
-	combo1.description = "生命低于30%时触发强力反击"
-	combo1.combo_type = ComboType.Conditional
-	combo1.cooldown = 45.0
-	combo1.mana_cost = 0.0
-	combo1.level_required = 8
-	combo1.rarity = 2
-	combo1.steps = [
-		_create_step("desperation_strike", 0.0, TriggerCondition.OnHealthBelow, 30.0,
-			[create_effect(EffectType.Damage, 150.0, "反击 150 伤害"),
-			 create_effect(EffectType.Heal, 50.0, "吸血 50 HP")])
-	]
-	combo1.total_time = 0.5
-	_combos[combo1.id] = combo1
+        // 火焰风暴
+        var combo3 = new ComboSkill
+        {
+            id = "combo_fire_storm",
+            name = "火焰风暴",
+            description = "召唤火焰陨石轰炸区域",
+            comboType = ComboType.Sequential,
+            cooldown = 20.0f,
+            manaCost = 80.0f,
+            levelRequired = 20,
+            rarity = 3,
+            steps = new List<ComboStep>
+            {
+                CreateStep("fire_meteor", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "陨石 100 伤害") }),
+                CreateStep("fire_meteor", 0.6f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "陨石 100 伤害") }),
+                CreateStep("fire_meteor", 1.2f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "陨石 100 伤害") }),
+                CreateStep("fire_explosion", 2.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 150.0f, "爆炸 150 伤害") })
+            },
+            totalTime = 3.0f
+        };
+        combos[combo3.id] = combo3;
+    }
 
-	# 暴击盛宴
-	var combo2 = ComboSkill.new()
-	combo2.id = "combo_critical_feast"
-	combo2.name = "暴击盛宴"
-	combo2.description = "暴击时触发连击"
-	combo2.combo_type = ComboType.Conditional
-	combo2.cooldown = 20.0
-	combo2.mana_cost = 25.0
-	combo2.level_required = 15
-	combo2.rarity = 3
-	combo2.steps = [
-		_create_step("critical_strike", 0.0, TriggerCondition.OnCritical, 0.0,
-			[create_effect(EffectType.Damage, 100.0, "暴击 100 伤害")]),
-		_create_step("follow_up", 0.2, TriggerCondition.OnHit, 0.0,
-			[create_effect(EffectType.Damage, 80.0, "追击 80 伤害")])
-	]
-	combo2.total_time = 1.0
-	_combos[combo2.id] = combo2
+    private void InitChainCombos()
+    {
+        // 暗影打击 - 链式触发
+        var combo1 = new ComboSkill
+        {
+            id = "combo_shadow_strike",
+            name = "暗影打击",
+            description = "穿梭于阴影中连续攻击",
+            comboType = ComboType.Chain,
+            cooldown = 10.0f,
+            manaCost = 35.0f,
+            levelRequired = 12,
+            rarity = 2,
+            steps = new List<ComboStep>
+            {
+                CreateStep("shadow_strike", 0.0f, TriggerCondition.Manual, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 40.0f, "暗影斩 40 伤害") }),
+                CreateStep("shadow_strike", 0.3f, TriggerCondition.OnHit, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 50.0f, "穿刺 50 伤害") }),
+                CreateStep("shadow_strike", 0.3f, TriggerCondition.OnHit, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 70.0f, "终结 70 伤害") })
+            },
+            totalTime = 2.0f
+        };
+        combos[combo1.id] = combo1;
 
-	# 凤凰涅槃
-	var combo3 = ComboSkill.new()
-	combo3.id = "combo_phoenix"
-	combo3.name = "凤凰涅槃"
-	combo3.description = "死亡时复活并造成巨额伤害"
-	combo3.combo_type = ComboType.Conditional
-	combo3.cooldown = 120.0
-	combo3.mana_cost = 0.0
-	combo3.level_required = 30
-	combo3.rarity = 4
-	combo3.steps = [
-		_create_step("resurrection", 0.0, TriggerCondition.OnHealthBelow, 0.0,
-			[create_effect(EffectType.Heal, 100.0, "复活并恢复 100 HP"),
-			 create_effect(EffectType.GrantInvulnerability, 1.0, "无敌 3秒", 3.0)]),
-		_create_step("rebirth_damage", 0.5, TriggerCondition.Manual, 0.0,
-			[create_effect(EffectType.Damage, 200.0, "涅槃之火 200 伤害")])
-	]
-	combo3.total_time = 2.0
-	_combos[combo3.id] = combo3
+        // 冰火两重天
+        var combo2 = new ComboSkill
+        {
+            id = "combo_fire_ice",
+            name = "冰火两重天",
+            description = "冰霜后接火焰，造成额外伤害",
+            comboType = ComboType.Chain,
+            cooldown = 15.0f,
+            manaCost = 50.0f,
+            levelRequired = 15,
+            rarity = 2,
+            steps = new List<ComboStep>
+            {
+                CreateStep("ice_burst", 0.0f, TriggerCondition.Manual, 0.0f, new List<ComboSkillEffect> { 
+                    CreateEffect(EffectType.Damage, 60.0f, "冰霜 60 伤害"),
+                    CreateEffect(EffectType.Debuff, 30.0f, "减速 30%", 3.0f)
+                }),
+                CreateStep("fire_burst", 0.5f, TriggerCondition.OnHit, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 80.0f, "火焰 80 伤害") })
+            },
+            totalTime = 1.5f
+        };
+        combos[combo2.id] = combo2;
+    }
 
-# 辅助函数
-func _create_step(skill_id: String, delay: float, effects: Array) -> ComboStep:
-	var step = ComboStep.new()
-	step.skill_id = skill_id
-	step.delay = delay
-	step.condition = TriggerCondition.Manual
-	step.condition_value = 0.0
-	step.effects = effects
-	return step
+    private void InitParallelCombos()
+    {
+        // 全屏护盾 - 并行效果
+        var combo1 = new ComboSkill
+        {
+            id = "combo_shield_wall",
+            name = "护盾壁垒",
+            description = "同时施加多重护盾",
+            comboType = ComboType.Parallel,
+            cooldown = 25.0f,
+            manaCost = 60.0f,
+            levelRequired = 10,
+            rarity = 2,
+            steps = new List<ComboStep>
+            {
+                CreateStep("shield", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Shield, 100.0f, "护盾 100") }),
+                CreateStep("buff", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Buff, 20.0f, "防御强化 20%", 10.0f) }),
+                CreateStep("cleanse", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.ClearDebuffs, 1.0f, "清除减益") })
+            },
+            totalTime = 0.5f
+        };
+        combos[combo1.id] = combo1;
 
-func _create_step(skill_id: String, delay: float, condition: TriggerCondition, cond_value: float, effects: Array) -> ComboStep:
-	var step = ComboStep.new()
-	step.skill_id = skill_id
-	step.delay = delay
-	step.condition = condition
-	step.condition_value = cond_value
-	step.effects = effects
-	return step
+        // 元素爆发
+        var combo2 = new ComboSkill
+        {
+            id = "combo_elemental_burst",
+            name = "元素爆发",
+            description = "同时触发所有元素之力",
+            comboType = ComboType.Parallel,
+            cooldown = 30.0f,
+            manaCost = 100.0f,
+            levelRequired = 25,
+            rarity = 4,
+            steps = new List<ComboStep>
+            {
+                CreateStep("fire", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 120.0f, "火 120 伤害") }),
+                CreateStep("ice", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "冰 100 伤害") }),
+                CreateStep("lightning", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 80.0f, "雷 80 伤害") })
+            },
+            totalTime = 0.2f
+        };
+        combos[combo2.id] = combo2;
+    }
 
-func create_effect(effect_type: EffectType, value: float, desc: String, duration: float = 0.0) -> ComboSkillEffect:
-	var effect = ComboSkillEffect.new()
-	effect.effect_type = effect_type
-	effect.value = value
-	effect.description = desc
-	effect.duration = duration
-	return effect
+    private void InitConditionalCombos()
+    {
+        // 绝地反击 - 条件触发
+        var combo1 = new ComboSkill
+        {
+            id = "combo_desperation",
+            name = "绝地反击",
+            description = "生命低于30%时触发强力反击",
+            comboType = ComboType.Conditional,
+            cooldown = 45.0f,
+            manaCost = 0.0f,
+            levelRequired = 8,
+            rarity = 2,
+            steps = new List<ComboStep>
+            {
+                CreateStep("desperation_strike", 0.0f, TriggerCondition.OnHealthBelow, 30.0f, new List<ComboSkillEffect> { 
+                    CreateEffect(EffectType.Damage, 150.0f, "反击 150 伤害"),
+                    CreateEffect(EffectType.Heal, 50.0f, "吸血 50 HP")
+                })
+            },
+            totalTime = 0.5f
+        };
+        combos[combo1.id] = combo1;
+
+        // 暴击盛宴
+        var combo2 = new ComboSkill
+        {
+            id = "combo_critical_feast",
+            name = "暴击盛宴",
+            description = "暴击时触发连击",
+            comboType = ComboType.Conditional,
+            cooldown = 20.0f,
+            manaCost = 25.0f,
+            levelRequired = 15,
+            rarity = 3,
+            steps = new List<ComboStep>
+            {
+                CreateStep("critical_strike", 0.0f, TriggerCondition.OnCritical, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "暴击 100 伤害") }),
+                CreateStep("follow_up", 0.2f, TriggerCondition.OnHit, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 80.0f, "追击 80 伤害") })
+            },
+            totalTime = 1.0f
+        };
+        combos[combo2.id] = combo2;
+
+        // 凤凰涅槃
+        var combo3 = new ComboSkill
+        {
+            id = "combo_phoenix",
+            name = "凤凰涅槃",
+            description = "死亡时复活并造成巨额伤害",
+            comboType = ComboType.Conditional,
+            cooldown = 120.0f,
+            manaCost = 0.0f,
+            levelRequired = 30,
+            rarity = 4,
+            steps = new List<ComboStep>
+            {
+                CreateStep("resurrection", 0.0f, TriggerCondition.OnHealthBelow, 0.0f, new List<ComboSkillEffect> { 
+                    CreateEffect(EffectType.Heal, 100.0f, "复活并恢复 100 HP"),
+                    CreateEffect(EffectType.GrantInvulnerability, 1.0f, "无敌 3秒", 3.0f)
+                }),
+                CreateStep("rebirth_damage", 0.5f, TriggerCondition.Manual, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 200.0f, "涅槃之火 200 伤害") })
+            },
+            totalTime = 2.0f
+        };
+        combos[combo3.id] = combo3;
+    }
+
+    // 辅助函数
+    private ComboStep CreateStep(string skillId, float delay, List<ComboSkillEffect> effects)
+    {
+        return CreateStep(skillId, delay, TriggerCondition.Manual, 0f, effects);
+    }
+
+    private ComboStep CreateStep(string skillId, float delay, TriggerCondition condition, float condValue, List<ComboSkillEffect> effects)
+    {
+        return new ComboStep
+        {
+            skillId = skillId,
+            delay = delay,
+            condition = condition,
+            conditionValue = condValue,
+            effects = effects
+        };
+    }
+
+    private ComboSkillEffect CreateEffect(EffectType effectType, float value, string desc, float duration = 0f)
+    {
+        return new ComboSkillEffect
+        {
+            effectType = effectType,
+            value = value,
+            description = desc,
+            duration = duration
+        };
+    }
+}
