@@ -413,4 +413,42 @@ public class AuctionHouseSystem : BaseSystem
             default: return "#FFFFFF";
         }
     }
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["search_term"] = _searchTerm;
+        data["filter_rarity"] = _filterRarity;
+        
+        // 玩家拍卖品
+        var playerListings = new Array();
+        foreach (var item in _playerListings)
+        {
+            playerListings.Add(item.ItemId);
+        }
+        data["player_listings"] = playerListings;
+        
+        // 玩家竞拍
+        var playerBids = new Array();
+        foreach (var item in _playerBids)
+        {
+            playerBids.Add(item.ItemId);
+        }
+        data["player_bids"] = playerBids;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        if (data.Contains("search_term")) _searchTerm = (string)data["search_term"];
+        if (data.Contains("filter_rarity")) _filterRarity = (int)data["filter_rarity"];
+    }
 }

@@ -269,4 +269,27 @@ public partial class AnimationEffectManager : BaseSystem
     /// 是否处于打击停顿中
     /// </summary>
     public bool IsInHitStop() => _hitStopTime > 0;
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["enable_attack_trail"] = _enableAttackTrail;
+        data["attack_trail_color"] = _attackTrailColor.ToHtml();
+        data["trail_width"] = _trailWidth;
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        if (data.Contains("enable_attack_trail")) _enableAttackTrail = (bool)data["enable_attack_trail"];
+        if (data.Contains("attack_trail_color")) _attackTrailColor = Color.FromHtml((string)data["attack_trail_color"]);
+        if (data.Contains("trail_width")) _trailWidth = (float)data["trail_width"];
+    }
 }

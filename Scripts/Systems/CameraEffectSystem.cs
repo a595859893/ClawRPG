@@ -242,5 +242,36 @@ namespace ClawRPG.Scripts.UI {
         public void EndSprintEffect() {
             currentTargetFOV = defaultFOV;
         }
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["default_fov"] = defaultFOV;
+            data["max_fov"] = maxFOV;
+            data["fov_transition_speed"] = fovTransitionSpeed;
+            data["shake_intensity"] = shakeIntensity;
+            data["shake_duration"] = shakeDuration;
+            data["vignette_color"] = vignetteColor.ToHtml();
+            data["vignette_intensity"] = vignetteIntensity;
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            if (data.Contains("default_fov")) defaultFOV = (float)data["default_fov"];
+            if (data.Contains("max_fov")) maxFOV = (float)data["max_fov"];
+            if (data.Contains("fov_transition_speed")) fovTransitionSpeed = (float)data["fov_transition_speed"];
+            if (data.Contains("shake_intensity")) shakeIntensity = (float)data["shake_intensity"];
+            if (data.Contains("shake_duration")) shakeDuration = (float)data["shake_duration"];
+            if (data.Contains("vignette_color")) vignetteColor = Color.FromHtml((string)data["vignette_color"]);
+            if (data.Contains("vignette_intensity")) vignetteIntensity = (float)data["vignette_intensity"];
+        }
     }
 }
