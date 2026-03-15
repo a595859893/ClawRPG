@@ -1128,6 +1128,11 @@ namespace ClawRPG.Scripts {
             // Initialize coop session system
             InitializeCoopSession();
 
+            // Initialize save/load system
+            var mainSaveLoad = new MainSaveLoad();
+            mainSaveLoad.Name = "MainSaveLoad";
+            AddChild(mainSaveLoad);
+
             // Load game data
             LoadGameData();
 
