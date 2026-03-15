@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 成就里程碑系统 - 追踪玩家成就进度里程碑
     /// </summary>
-    public class AchievementMilestoneSystem
+    public class AchievementMilestoneSystem : BaseSystem : BaseSystem
     {
         private static AchievementMilestoneSystem _instance;
         public static AchievementMilestoneSystem Instance => _instance ??= new AchievementMilestoneSystem();
@@ -24,9 +24,10 @@ namespace ClawRPG.Scripts.Systems
             Data = new AchievementMilestoneData();
         }
         
-        public void Initialize()
+        protected override void Initialize()
         {
             GD.Print("[AchievementMilestone] System initialized");
+            IsInitialized = true;
         }
         
         /// <summary>
@@ -268,6 +269,95 @@ namespace ClawRPG.Scripts.Systems
         {
             Data = new AchievementMilestoneData();
             GD.Print("[AchievementMilestone] Data reset");
+        }
+        
+        /// <summary>
+        /// 导出保存数据 (BaseSystem 接口)
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 保存里程碑
+            var milestones = new Dictionary();
+            foreach (var kvp in Data.Milestones)
+            {
+                milestones[kvp.Key] = kvp.Value;
+            }
+            data["milestones"] = milestones;
+            
+            // 保存历史
+            var history = new List<Dictionary<string, object>>();
+            foreach (var entry in Data.History)
+            {
+                history.Add(new Dictionary<string, object>
+                {
+                    ["achievement_id"] = entry.AchievementId,
+                    ["achievement_name"] = entry.AchievementName,
+                    ["milestone_level"] = entry.MilestoneLevel,
+                    ["timestamp"] = entry.Timestamp
+                });
+            }
+            data["history"] = history;
+            
+            data["total_milestones"] = Data.TotalMilestonesReached;
+            data["highest_level"] = Data.HighestMilestoneLevel;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据 (BaseSystem 接口)
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载里程碑
+            Data.Milestones = new Dictionary<string, int>();
+            if (data.Contains("milestones"))
+            {
+                var milestones = data["milestones"] as Dictionary;
+                if (milestones != null)
+                {
+                    foreach (var kvp in milestones)
+                    {
+                        Data.Milestones[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+                    }
+                }
+            }
+            
+            // 加载历史
+            Data.History = new List<MilestoneHistoryEntry>();
+            if (data.Contains("history"))
+            {
+                var history = data["history"] as Godot.Collections.Array;
+                if (history != null)
+                {
+                    foreach (var entry in history)
+                    {
+                        var dict = entry as Dictionary;
+                        if (dict != null)
+                        {
+                            Data.History.Add(new MilestoneHistoryEntry
+                            {
+                                AchievementId = dict["achievement_id"].ToString(),
+                                AchievementName = dict["achievement_name"].ToString(),
+                                MilestoneLevel = Convert.ToInt32(dict["milestone_level"]),
+                                Timestamp = Convert.ToInt32(dict["timestamp"])
+                            });
+                        }
+                    }
+                }
+            }
+            
+            if (data.Contains("total_milestones"))
+                Data.TotalMilestonesReached = Convert.ToInt32(data["total_milestones"]);
+            
+            if (data.Contains("highest_level"))
+                Data.HighestMilestoneLevel = Convert.ToInt32(data["highest_level"]);
+            
+            GD.Print($"[AchievementMilestone] Imported: {Data.Milestones.Count} milestones, {Data.History.Count} history entries");
         }
     }
 }
