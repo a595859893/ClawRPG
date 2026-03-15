@@ -1,321 +1,485 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Godot;
 
-namespace ClawRPG.Systems
+/// <summary>
+/// Rune data structure - individual rune definition
+/// </summary>
+public class RuneData
 {
-    /// <summary>
-    /// Core rune system - manages rune collection, equipment, and synthesis
-    /// </summary>
-    public class RuneSystem
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public RuneType Type { get; set; }
+    public RuneRarity Rarity { get; set; }
+    public RuneSlotType SlotType { get; set; }
+    
+    // Attribute bonuses
+    public int AttackBonus { get; set; }
+    public int DefenseBonus { get; set; }
+    public int HealthBonus { get; set; }
+    public int SpeedBonus { get; set; }
+    public float CritRateBonus { get; set; }
+    public float CritDamageBonus { get; set; }
+    public int LifeStealBonus { get; set; }
+    public int DodgeBonus { get; set; }
+    public int BlockBonus { get; set; }
+    
+    // Special effects
+    public string SpecialEffect { get; set; }
+    public float SpecialEffectValue { get; set; }
+    
+    // Requirements
+    public int RequiredLevel { get; set; }
+    
+    public string IconPath { get; set; }
+}
+
+public enum RuneType
+{
+    Offensive,    // Attack-focused
+    Defensive,    // Defense-focused  
+    Utility,      // Utility/economic
+    Special       // Special effects
+}
+
+public enum RuneRarity
+{
+    Common,
+    Uncommon,
+    Rare,
+    Epic,
+    Legendary
+}
+
+public enum RuneSlotType
+{
+    Helmet,
+    Chestplate,
+    Weapon,
+    Shield,
+    Boots,
+    Ring,
+    Amulet,
+    Any
+}
+
+/// <summary>
+/// Player's rune inventory and equipped runes
+/// </summary>
+public class PlayerRuneData
+{
+    public List<RuneData> OwnedRunes { get; set; } = new List<RuneData>();
+    public Dictionary<RuneSlotType, RuneData> EquippedRunes { get; set; } = new Dictionary<RuneSlotType, RuneData>();
+    public int TotalRuneSlots { get; set; } = 10; // Starting slots
+    
+    public PlayerRuneData()
     {
-        private PlayerRuneData _playerRuneData;
-        
-        // Rune slot configurations for equipment
-        private readonly Dictionary<RuneSlotType, List<RuneSlot>> _equipmentSlots = new Dictionary<RuneSlotType, List<RuneSlot>>
+        // Initialize empty slots for each slot type
+        foreach (RuneSlotType slot in Enum.GetValues(typeof(RuneSlotType)))
         {
-            { RuneSlotType.Weapon, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Weapon, SlotIndex = 0, IsUnlocked = true } } },
-            { RuneSlotType.Armor, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Armor, SlotIndex = 0, IsUnlocked = true } } },
-            { RuneSlotType.Helmet, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Helmet, SlotIndex = 0, IsUnlocked = true } } },
-            { RuneSlotType.Boots, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Boots, SlotIndex = 0, IsUnlocked = true } } },
-            { RuneSlotType.Gloves, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Gloves, SlotIndex = 0, IsUnlocked = true } } },
-            { RuneSlotType.Accessory, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Accessory, SlotIndex = 0, IsUnlocked = true } } }
+            if (slot != RuneSlotType.Any)
+            {
+                EquippedRunes[slot] = null;
+            }
+        }
+    }
+}
+
+/// <summary>
+/// Rune System - Equipment rune enhancement system
+/// </summary>
+public class RuneSystem
+{
+    private static RuneSystem _instance;
+    public static RuneSystem Instance => _instance ??= new RuneSystem();
+    
+    private PlayerRuneData _playerRuneData;
+    private RuneDatabase _runeDatabase;
+    
+    // Signals
+    public Signal1<RuneData> RuneEquipped { get; } = new Signal1<RuneData>();
+    public Signal1<RuneData> RuneUnequipped { get; } = new Signal1<RuneData>();
+    public Signal1<RuneData> RuneAcquired { get; } = new Signal1<RuneData>();
+    public Signal1<string> RuneSlotUnlocked { get; } = new Signal1<string>();
+    
+    public RuneSystem()
+    {
+        _runeDatabase = new RuneDatabase();
+        _playerRuneData = new PlayerRuneData();
+    }
+    
+    /// <summary>
+    /// Initialize system with save data
+    /// </summary>
+    public void Initialize(Dictionary<string, object> saveData)
+    {
+        if (saveData == null) return;
+        
+        if (saveData.ContainsKey("owned_runes"))
+        {
+            var runesList = saveData["owned_runes"] as List<object>;
+            if (runesList != null)
+            {
+                _playerRuneData.OwnedRunes.Clear();
+                foreach (var runeObj in runesList)
+                {
+                    var runeDict = runeObj as Dictionary<string, object>;
+                    if (runeDict != null)
+                    {
+                        var rune = _runeDatabase.GetRuneById(runeDict["id"] as string);
+                        if (rune != null)
+                        {
+                            _playerRuneData.OwnedRunes.Add(rune);
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (saveData.ContainsKey("equipped_runes"))
+        {
+            var equippedDict = saveData["equipped_runes"] as Dictionary<string, object>;
+            if (equippedDict != null)
+            {
+                foreach (var kvp in equippedDict)
+                {
+                    if (Enum.TryParse<RuneSlotType>(kvp.Key, out var slotType))
+                    {
+                        var runeId = kvp.Value as string;
+                        if (!string.IsNullOrEmpty(runeId))
+                        {
+                            var rune = _runeDatabase.GetRuneById(runeId);
+                            _playerRuneData.EquippedRunes[slotType] = rune;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (saveData.ContainsKey("total_rune_slots"))
+        {
+            _playerRuneData.TotalRuneSlots = Convert.ToInt32(saveData["total_rune_slots"]);
+        }
+    }
+    
+    /// <summary>
+    /// Get save data for persistence
+    /// </summary>
+    public Dictionary<string, object> GetSaveData()
+    {
+        var saveData = new Dictionary<string, object>();
+        
+        var ownedRunes = new List<Dictionary<string, object>>();
+        foreach (var rune in _playerRuneData.OwnedRunes)
+        {
+            ownedRunes.Add(new Dictionary<string, object> { ["id"] = rune.Id });
+        }
+        saveData["owned_runes"] = ownedRunes;
+        
+        var equippedRunes = new Dictionary<string, string>();
+        foreach (var kvp in _playerRuneData.EquippedRunes)
+        {
+            equippedRunes[kvp.Key.ToString()] = kvp.Value?.Id ?? "";
+        }
+        saveData["equipped_runes"] = equippedRunes;
+        
+        saveData["total_rune_slots"] = _playerRuneData.TotalRuneSlots;
+        
+        return saveData;
+    }
+    
+    /// <summary>
+    /// Get all available runes
+    /// </summary>
+    public List<RuneData> GetAllRunes()
+    {
+        return _runeDatabase.GetAllRunes();
+    }
+    
+    /// <summary>
+    /// Get runes by type
+    /// </summary>
+    public List<RuneData> GetRunesByType(RuneType type)
+    {
+        return _runeDatabase.GetRunesByType(type);
+    }
+    
+    /// <summary>
+    /// Get runes by rarity
+    /// </summary>
+    public List<RuneData> GetRunesByRarity(RuneRarity rarity)
+    {
+        return _runeDatabase.GetRunesByRarity(rarity);
+    }
+    
+    /// <summary>
+    /// Get player's owned runes
+    /// </summary>
+    public List<RuneData> GetOwnedRunes()
+    {
+        return _playerRuneData.OwnedRunes;
+    }
+    
+    /// <summary>
+    /// Get equipped rune for a slot
+    /// </summary>
+    public RuneData GetEquippedRune(RuneSlotType slotType)
+    {
+        if (_playerRuneData.EquippedRunes.ContainsKey(slotType))
+        {
+            return _playerRuneData.EquippedRunes[slotType];
+        }
+        return null;
+    }
+    
+    /// <summary>
+    /// Get all equipped runes
+    /// </summary>
+    public Dictionary<RuneSlotType, RuneData> GetAllEquippedRunes()
+    {
+        return _playerRuneData.EquippedRunes;
+    }
+    
+    /// <summary>
+    /// Equip a rune to a slot
+    /// </summary>
+    public bool EquipRune(RuneData rune, RuneSlotType slotType)
+    {
+        if (rune == null) return false;
+        
+        // Check level requirement
+        if (rune.RequiredLevel > GetPlayerLevel())
+        {
+            return false;
+        }
+        
+        // Check slot compatibility
+        if (rune.SlotType != RuneSlotType.Any && rune.SlotType != slotType)
+        {
+            return false;
+        }
+        
+        // Check if player owns the rune
+        if (!_playerRuneData.OwnedRunes.Contains(rune))
+        {
+            return false;
+        }
+        
+        // Unequip current rune if any
+        var currentRune = GetEquippedRune(slotType);
+        if (currentRune != null)
+        {
+            _playerRuneData.EquippedRunes[slotType] = rune;
+        }
+        else
+        {
+            _playerRuneData.EquippedRunes[slotType] = rune;
+        }
+        
+        RuneEquipped.Emit(rune);
+        return true;
+    }
+    
+    /// <summary>
+    /// Unequip a rune from a slot
+    /// </summary>
+    public bool UnequipRune(RuneSlotType slotType)
+    {
+        var currentRune = GetEquippedRune(slotType);
+        if (currentRune == null) return false;
+        
+        _playerRuneData.EquippedRunes[slotType] = null;
+        RuneUnequipped.Emit(currentRune);
+        return true;
+    }
+    
+    /// <summary>
+    /// Add a rune to player's inventory
+    /// </summary>
+    public void AddRune(RuneData rune)
+    {
+        if (rune == null) return;
+        
+        _playerRuneData.OwnedRunes.Add(rune);
+        RuneAcquired.Emit(rune);
+    }
+    
+    /// <summary>
+    /// Remove a rune from player's inventory
+    /// </summary>
+    public bool RemoveRune(RuneData rune)
+    {
+        if (rune == null) return false;
+        
+        // Can't remove if equipped
+        foreach (var kvp in _playerRuneData.EquippedRunes)
+        {
+            if (kvp.Value == rune)
+            {
+                return false;
+            }
+        }
+        
+        return _playerRuneData.OwnedRunes.Remove(rune);
+    }
+    
+    /// <summary>
+    /// Unlock additional rune slot
+    /// </summary>
+    public bool UnlockSlot(int cost = 1000)
+    {
+        var player = GetPlayer();
+        if (player == null) return false;
+        
+        if (player.Gold < cost) return false;
+        
+        player.Gold -= cost;
+        _playerRuneData.TotalRuneSlots++;
+        
+        RuneSlotUnlocked.Emit($"Slot #{_playerRuneData.TotalRuneSlots}");
+        return true;
+    }
+    
+    /// <summary>
+    /// Get total equipped rune slots
+    /// </summary>
+    public int GetTotalSlots()
+    {
+        return _playerRuneData.TotalRuneSlots;
+    }
+    
+    /// <summary>
+    /// Get used rune slots count
+    /// </summary>
+    public int GetUsedSlots()
+    {
+        int count = 0;
+        foreach (var kvp in _playerRuneData.EquippedRunes)
+        {
+            if (kvp.Value != null) count++;
+        }
+        return count;
+    }
+    
+    /// <summary>
+    /// Calculate total bonuses from equipped runes
+    /// </summary>
+    public Dictionary<string, object> GetTotalBonuses()
+    {
+        var bonuses = new Dictionary<string, object>
+        {
+            ["attack"] = 0,
+            ["defense"] = 0,
+            ["health"] = 0,
+            ["speed"] = 0,
+            ["crit_rate"] = 0f,
+            ["crit_damage"] = 0f,
+            ["lifesteal"] = 0,
+            ["dodge"] = 0,
+            ["block"] = 0
         };
         
-        public event Action<string> OnRuneEquipped;
-        public event Action<string> OnRuneUnequipped;
-        public event Action<string, bool> OnRuneCrafted;
-        
-        public RuneSystem()
+        foreach (var kvp in _playerRuneData.EquippedRunes)
         {
-            _playerRuneData = new PlayerRuneData();
-        }
-        
-        public void Initialize(PlayerRuneData saveData)
-        {
-            if (saveData != null)
-            {
-                _playerRuneData = saveData;
-            }
-        }
-        
-        // ========== Collection Management ==========
-        
-        public void AddRune(string runeId, int count = 1)
-        {
-            var rune = RuneDatabase.GetRune(runeId);
-            if (rune == null) return;
+            var rune = kvp.Value;
+            if (rune == null) continue;
             
-            var existing = _playerRuneData.OwnedRunes.FirstOrDefault(r => r.Id == runeId);
-            if (existing != null)
-            {
-                _playerRuneData.RuneCount[runeId] = _playerRuneData.RuneCount.GetValueOrDefault(runeId, 0) + count;
-            }
-            else
-            {
-                _playerRuneData.OwnedRunes.Add(new Rune
-                {
-                    Id = rune.Id,
-                    Name = rune.Name,
-                    Description = rune.Description,
-                    Type = rune.Type,
-                    Rarity = rune.Rarity,
-                    DamageBonus = rune.DamageBonus,
-                    DefenseBonus = rune.DefenseBonus,
-                    HealthBonus = rune.HealthBonus,
-                    ManaBonus = rune.ManaBonus,
-                    SpeedBonus = rune.SpeedBonus,
-                    CritChance = rune.CritChance,
-                    CritDamage = rune.CritDamage,
-                    LifeSteal = rune.LifeSteal,
-                    Regen = rune.Regen,
-                    OnHitEffect = rune.OnHitEffect,
-                    OnKillEffect = rune.OnKillEffect,
-                    OnDamagedEffect = rune.OnDamagedEffect,
-                    OnCriticalEffect = rune.OnCriticalEffect,
-                    LevelRequired = rune.LevelRequired,
-                    Power = rune.Power
-                });
-                _playerRuneData.RuneCount[runeId] = count;
-                _playerRuneData.TotalRunesDiscovered++;
-            }
+            bonuses["attack"] = (int)bonuses["attack"] + rune.AttackBonus;
+            bonuses["defense"] = (int)bonuses["defense"] + rune.DefenseBonus;
+            bonuses["health"] = (int)bonuses["health"] + rune.HealthBonus;
+            bonuses["speed"] = (int)bonuses["speed"] + rune.SpeedBonus;
+            bonuses["crit_rate"] = (float)bonuses["crit_rate"] + rune.CritRateBonus;
+            bonuses["crit_damage"] = (float)bonuses["crit_damage"] + rune.CritDamageBonus;
+            bonuses["lifesteal"] = (int)bonuses["lifesteal"] + rune.LifeStealBonus;
+            bonuses["dodge"] = (int)bonuses["dodge"] + rune.DodgeBonus;
+            bonuses["block"] = (int)bonuses["block"] + rune.BlockBonus;
         }
         
-        public bool RemoveRune(string runeId, int count = 1)
+        return bonuses;
+    }
+    
+    /// <summary>
+    /// Get player level (placeholder - should connect to actual player data)
+    /// </summary>
+    private int GetPlayerLevel()
+    {
+        // This should be connected to actual player level
+        return 1; // Default to level 1
+    }
+    
+    /// <summary>
+    /// Get player reference (placeholder)
+    /// </summary>
+    private Player GetPlayer()
+    {
+        // This should be connected to actual player
+        return null;
+    }
+    
+    /// <summary>
+    /// Get rarity color
+    /// </summary>
+    public static string GetRarityColor(RuneRarity rarity)
+    {
+        return rarity switch
         {
-            if (!_playerRuneData.RuneCount.ContainsKey(runeId) || _playerRuneData.RuneCount[runeId] < count)
-                return false;
-            
-            _playerRuneData.RuneCount[runeId] -= count;
-            if (_playerRuneData.RuneCount[runeId] <= 0)
-            {
-                _playerRuneData.OwnedRunes.RemoveAll(r => r.Id == runeId);
-                _playerRuneData.RuneCount.Remove(runeId);
-            }
-            return true;
-        }
-        
-        public int GetRuneCount(string runeId)
+            RuneRarity.Common => "#9E9E9E",      // Gray
+            RuneRarity.Uncommon => "#4CAF50",    // Green
+            RuneRarity.Rare => "#2196F3",        // Blue
+            RuneRarity.Epic => "#9C27B0",        // Purple
+            RuneRarity.Legendary => "#FF9800",   // Orange
+            _ => "#FFFFFF"
+        };
+    }
+    
+    /// <summary>
+    /// Get rarity display name
+    /// </summary>
+    public static string GetRarityName(RuneRarity rarity)
+    {
+        return rarity switch
         {
-            return _playerRuneData.RuneCount.GetValueOrDefault(runeId, 0);
-        }
-        
-        public List<Rune> GetOwnedRunes()
+            RuneRarity.Common => "普通",
+            RuneRarity.Uncommon => "优秀",
+            RuneRarity.Rare => "稀有",
+            RuneRarity.Epic => "史诗",
+            RuneRarity.Legendary => "传说",
+            _ => "未知"
+        };
+    }
+    
+    /// <summary>
+    /// Get type display name
+    /// </summary>
+    public static string GetTypeName(RuneType type)
+    {
+        return type switch
         {
-            return _playerRuneData.OwnedRunes.ToList();
-        }
-        
-        public List<Rune> GetEquippedRunes()
+            RuneType.Offensive => "攻击",
+            RuneType.Defensive => "防御",
+            RuneType.Utility => "工具",
+            RuneType.Special => "特殊",
+            _ => "未知"
+        };
+    }
+    
+    /// <summary>
+    /// Get slot type display name
+    /// </summary>
+    public static string GetSlotName(RuneSlotType slotType)
+    {
+        return slotType switch
         {
-            return _playerRuneData.EquippedRunes.ToList();
-        }
-        
-        // ========== Equipment Management ==========
-        
-        public bool EquipRune(string runeId, RuneSlotType slotType)
-        {
-            var rune = _playerRuneData.OwnedRunes.FirstOrDefault(r => r.Id == runeId);
-            if (rune == null) return false;
-            
-            // Check if slot exists
-            if (!_equipmentSlots.ContainsKey(slotType)) return false;
-            
-            // Check if rune already equipped
-            var alreadyEquipped = _playerRuneData.EquippedRunes.FirstOrDefault(r => r.Id == runeId);
-            if (alreadyEquipped != null)
-            {
-                _playerRuneData.EquippedRunes.Remove(alreadyEquipped);
-            }
-            
-            // Unequip current rune in slot
-            var currentInSlot = _playerRuneData.EquippedRunes.FirstOrDefault(r => 
-                _equipmentSlots[slotType].Any(s => s.Rune?.Id == r.Id));
-            if (currentInSlot != null)
-            {
-                _playerRuneData.EquippedRunes.Remove(currentInSlot);
-            }
-            
-            _playerRuneData.EquippedRunes.Add(rune);
-            OnRuneEquipped?.Invoke(runeId);
-            return true;
-        }
-        
-        public bool UnequipRune(string runeId)
-        {
-            var rune = _playerRuneData.EquippedRunes.FirstOrDefault(r => r.Id == runeId);
-            if (rune == null) return false;
-            
-            _playerRuneData.EquippedRunes.Remove(rune);
-            OnRuneUnequipped?.Invoke(runeId);
-            return true;
-        }
-        
-        // ========== Synthesis ==========
-        
-        public (bool success, Rune result) CraftRune(string resultRuneId)
-        {
-            // Simplified synthesis - craft higher rarity from 3 lower rarity runes
-            var resultRune = RuneDatabase.GetRune(resultRuneId);
-            if (resultRune == null) return (false, null);
-            
-            int rarityLevel = (int)resultRune.Rarity;
-            if (rarityLevel <= 0) return (false, null);
-            
-            // Find ingredients (same type, lower rarity)
-            var ingredientRarity = (RuneRarity)(rarityLevel - 1);
-            var ingredients = _playerRuneData.OwnedRunes
-                .Where(r => r.Type == resultRune.Type && r.Rarity == ingredientRarity)
-                .Take(3)
-                .ToList();
-            
-            if (ingredients.Count < 3) return (false, null);
-            
-            // Check if player has enough
-            foreach (var ing in ingredients)
-            {
-                if (GetRuneCount(ing.Id) < 1) return (false, null);
-            }
-            
-            // Remove ingredients
-            foreach (var ing in ingredients)
-            {
-                RemoveRune(ing.Id, 1);
-            }
-            
-            // Determine success (higher rarity = lower chance)
-            int baseSuccess = 80 - (rarityLevel * 10);
-            bool success = UnityEngine.Random.Range(0, 100) < baseSuccess;
-            
-            if (success)
-            {
-                AddRune(resultRuneId, 1);
-                _playerRuneData.TotalRunesCrafted++;
-                OnRuneCrafted?.Invoke(resultRuneId, true);
-                return (true, resultRune);
-            }
-            
-            OnRuneCrafted?.Invoke(resultRuneId, false);
-            return (false, null);
-        }
-        
-        // ========== Stat Calculation ==========
-        
-        public float GetTotalDamageBonus()
-        {
-            return _playerRuneData.EquippedRunes.Sum(r => r.DamageBonus);
-        }
-        
-        public float GetTotalDefenseBonus()
-        {
-            return _playerRuneData.EquippedRunes.Sum(r => r.DefenseBonus);
-        }
-        
-        public float GetTotalHealthBonus()
-        {
-            return _playerRuneData.EquippedRunes.Sum(r => r.HealthBonus);
-        }
-        
-        public float GetTotalManaBonus()
-        {
-            return _playerRuneData.EquippedRunes.Sum(r => r.ManaBonus);
-        }
-        
-        public float GetTotalSpeedBonus()
-        {
-            return _playerRuneData.EquippedRunes.Sum(r => r.SpeedBonus);
-        }
-        
-        public float GetTotalCritChance()
-        {
-            return _playerRuneData.EquippedRunes.Sum(r => r.CritChance);
-        }
-        
-        public float GetTotalCritDamage()
-        {
-            return _playerRuneData.EquippedRunes.Sum(r => r.CritDamage);
-        }
-        
-        public float GetTotalLifeSteal()
-        {
-            return _playerRuneData.EquippedRunes.Sum(r => r.LifeSteal);
-        }
-        
-        public float GetTotalRegen()
-        {
-            return _playerRuneData.EquippedRunes.Sum(r => r.Regen);
-        }
-        
-        // ========== Effect Triggers ==========
-        
-        public void OnAttackHit()
-        {
-            foreach (var rune in _playerRuneData.EquippedRunes.Where(r => r.OnHitEffect))
-            {
-                // Trigger on-hit effects
-            }
-        }
-        
-        public void OnEnemyKilled()
-        {
-            foreach (var rune in _playerRuneData.EquippedRunes.Where(r => r.OnKillEffect))
-            {
-                // Trigger on-kill effects
-            }
-        }
-        
-        public void OnPlayerDamaged()
-        {
-            foreach (var rune in _playerRuneData.EquippedRunes.Where(r => r.OnDamagedEffect))
-            {
-                // Trigger on-damaged effects
-            }
-        }
-        
-        public void OnCriticalHit()
-        {
-            foreach (var rune in _playerRuneData.EquippedRunes.Where(r => r.OnCriticalEffect))
-            {
-                // Trigger on-critical effects
-            }
-        }
-        
-        // ========== Statistics ==========
-        
-        public RuneStatistics GetStatistics()
-        {
-            var stats = new RuneStatistics
-            {
-                TotalRunesOwned = _playerRuneData.OwnedRunes.Sum(r => _playerRuneData.RuneCount.GetValueOrDefault(r.Id, 0)),
-                UniqueRunes = _playerRuneData.OwnedRunes.Count,
-                TotalCrafted = _playerRuneData.TotalRunesCrafted
-            };
-            
-            foreach (RuneRarity rarity in Enum.GetValues(typeof(RuneRarity)))
-            {
-                stats.RarityBreakdown[rarity] = _playerRuneData.OwnedRunes.Count(r => r.Rarity == rarity);
-            }
-            
-            foreach (RuneType type in Enum.GetValues(typeof(RuneType)))
-            {
-                stats.TypeBreakdown[type] = _playerRuneData.OwnedRunes.Count(r => r.Type == type);
-            }
-            
-            return stats;
-        }
-        
-        // ========== Save/Load ==========
-        
-        public PlayerRuneData ExportSaveData()
-        {
-            return _playerRuneData;
-        }
-        
-        public void ImportSaveData(PlayerRuneData data)
-        {
-            if (data != null)
-            {
-                _playerRuneData = data;
-            }
-        }
+            RuneSlotType.Helmet => "头盔",
+            RuneSlotType.Chestplate => "胸甲",
+            RuneSlotType.Weapon => "武器",
+            RuneSlotType.Shield => "盾牌",
+            RuneSlotType.Boots => "靴子",
+            RuneSlotType.Ring => "戒指",
+            RuneSlotType.Amulet => "护符",
+            RuneSlotType.Any => "通用",
+            _ => "未知"
+        };
     }
 }

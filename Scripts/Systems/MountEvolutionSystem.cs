@@ -2,431 +2,373 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MountEvolutionSystem
-{
-	private static MountEvolutionSystem _instance;
-	public static MountEvolutionSystem Instance
-	{
-		get
-		{
-			if (_instance == null)
-				_instance = new MountEvolutionSystem();
-			return _instance;
-		}
-		private set { _instance = value; }
-	}
-	
-	private MountEvolutionData.PlayerMountEvolutionData _playerData;
-	private Dictionary<int, MountEvolutionData.MountEvolutionInstance> _activeEvolutions;
-	
-	public static Signal<int, int> EvolutionStarted { get; } = new Signal<int, int>();
-	public static Signal<int, int> EvolutionCompleted { get; } = new Signal<int, int>();
-	public static Signal<int, int, int> ExpGained { get; } = new Signal<int, int, int>();
-	public static Signal<int, string> SkillUnlocked { get; } = new Signal<int, string>();
-	public static Signal<int, string> EvolutionFailed { get; } = new Signal<int, string>();
-	
-	public void Initialize()
-	{
-		_playerData = new MountEvolutionData.PlayerMountEvolutionData();
-		_activeEvolutions = new Dictionary<int, MountEvolutionData.MountEvolutionInstance>();
-		GD.Print("[MountEvolutionSystem] Initialized");
-	}
-	
-	public void SetPlayerData(MountEvolutionData.PlayerMountEvolutionData data)
-	{
-		_playerData = data;
-		_activeEvolutions = data.ActiveEvolutions;
-	}
-	
-	public MountEvolutionData.PlayerMountEvolutionData GetPlayerData()
-	{
-		return _playerData;
-	}
-	
-	public bool CanEvolve(int mountId, int configId)
-	{
-		var config = MountEvolutionDatabase.GetConfigById(configId);
-		if (config == null)
-		{
-			EvolutionFailed?.Emit(mountId, "Invalid evolution config");
-			return false;
-		}
-		
-		var player = GetPlayer();
-		if (player == null) return false;
-		
-		// Check level requirement
-		int mountLevel = GetMountLevel(mountId);
-		if (mountLevel < config.RequiredLevel)
-		{
-			EvolutionFailed?.Emit(mountId, $"Mount level {config.RequiredLevel} required");
-			return false;
-		}
-		
-		// Check gold
-		if (player.Gold < config.GoldCost)
-		{
-			EvolutionFailed?.Emit(mountId, $"Not enough gold. Need {config.GoldCost}");
-			return false;
-		}
-		
-		// Check items
-		if (config.RequiredItems != null && config.RequiredItems.Count > 0)
-		{
-			var inventory = GetPlayerInventory();
-			if (inventory != null)
-			{
-				foreach (var itemName in config.RequiredItems)
-				{
-					if (!HasItem(inventory, itemName))
-					{
-						EvolutionFailed?.Emit(mountId, $"Missing required item: {itemName}");
-						return false;
-					}
-				}
-			}
-		}
-		
-		return true;
-	}
-	
-	public bool TryEvolve(int mountId, int configId)
-	{
-		if (!CanEvolve(mountId, configId))
-			return false;
-			
-		var config = MountEvolutionDatabase.GetConfigById(configId);
-		var player = GetPlayer();
-		
-		// Deduct gold
-		player.Gold -= config.GoldCost;
-		
-		// Deduct items
-		if (config.RequiredItems != null && config.RequiredItems.Count > 0)
-		{
-			var inventory = GetPlayerInventory();
-			if (inventory != null)
-			{
-				foreach (var itemName in config.RequiredItems)
-				{
-					RemoveItem(inventory, itemName);
-				}
-			}
-		}
-		
-		// Create evolution instance
-		var instance = new MountEvolutionData.MountEvolutionInstance
-		{
-			MountId = mountId,
-			EvolutionConfigId = configId,
-			CurrentExp = 0,
-			IsEvolved = false,
-			LastExpGain = DateTime.Now
-		};
-		
-		_activeEvolutions[mountId] = instance;
-		
-		EvolutionStarted?.Emit(mountId, configId);
-		
-		// Apply initial bonuses
-		ApplyEvolutionBonuses(mountId, config);
-		
-		GD.Print($"[MountEvolutionSystem] Evolution started for mount {mountId} with config {configId}");
-		return true;
-	}
-	
-	public void AddExp(int mountId, int amount)
-	{
-		if (!_activeEvolutions.TryGetValue(mountId, out var instance))
-			return;
-			
-		var config = MountEvolutionDatabase.GetConfigById(instance.EvolutionConfigId);
-		if (config == null) return;
-		
-		instance.CurrentExp += amount;
-		instance.LastExpGain = DateTime.Now;
-		
-		_playerData.TotalExpGained += amount;
-		
-		ExpGained?.Emit(mountId, amount, instance.CurrentExp);
-		
-		// Check for evolution
-		if (!instance.IsEvolved && instance.CurrentExp >= config.RequiredExp)
-		{
-			CompleteEvolution(mountId);
-		}
-		
-		SaveData();
-	}
-	
-	private void CompleteEvolution(int mountId)
-	{
-		if (!_activeEvolutions.TryGetValue(mountId, out var instance))
-			return;
-			
-		var config = MountEvolutionDatabase.GetConfigById(instance.EvolutionConfigId);
-		if (config == null) return;
-		
-		instance.IsEvolved = true;
-		_playerData.TotalEvolutions++;
-		
-		EvolutionCompleted?.Emit(mountId, config.Id);
-		
-		// Check for skill unlock
-		if (!string.IsNullOrEmpty(config.SkillUnlocked))
-		{
-			SkillUnlocked?.Emit(mountId, config.SkillUnlocked);
-		}
-		
-		// Add to history
-		if (!_playerData.EvolutionHistory.ContainsKey(mountId))
-			_playerData.EvolutionHistory[mountId] = new List<int>();
-		_playerData.EvolutionHistory[mountId].Add(config.Id);
-		
-		GD.Print($"[MountEvolutionSystem] Evolution completed for mount {mountId}: {config.Name}");
-	}
-	
-	public void ApplyEvolutionBonuses(int mountId, MountEvolutionData.EvolutionConfig config)
-	{
-		var player = GetPlayer();
-		if (player == null) return;
-		
-		// Apply stat bonuses
-		player.AddHealthBonus(config.HealthBonus);
-		player.AddAttackBonus(config.AttackBonus);
-		player.AddDefenseBonus(config.DefenseBonus);
-		player.AddSpeedBonus(config.SpeedBonus);
-		player.AddCritRateBonus(config.CritRateBonus);
-		player.AddCritDamageBonus(config.CritDamageBonus);
-	}
-	
-	public int GetEvolutionProgress(int mountId)
-	{
-		if (!_activeEvolutions.TryGetValue(mountId, out var instance))
-			return 0;
-			
-		var config = MountEvolutionDatabase.GetConfigById(instance.EvolutionConfigId);
-		if (config == null || config.RequiredExp == 0)
-			return 100;
-			
-		return (int)((float)instance.CurrentExp / config.RequiredExp * 100);
-	}
-	
-	public MountEvolutionData.EvolutionConfig GetEvolutionConfig(int mountId)
-	{
-		if (!_activeEvolutions.TryGetValue(mountId, out var instance))
-			return null;
-			
-		return MountEvolutionDatabase.GetConfigById(instance.EvolutionConfigId);
-	}
-	
-	public MountEvolutionData.EvolutionConfig GetNextEvolutionConfig(int mountId)
-	{
-		if (!_activeEvolutions.TryGetValue(mountId, out var instance))
-			return null;
-			
-		return MountEvolutionDatabase.GetNextEvolution(instance.EvolutionConfigId);
-	}
-	
-	public bool HasActiveEvolution(int mountId)
-	{
-		return _activeEvolutions.ContainsKey(mountId);
-	}
-	
-	public bool IsEvolved(int mountId)
-	{
-		if (!_activeEvolutions.TryGetValue(mountId, out var instance))
-			return false;
-		return instance.IsEvolved;
-	}
-	
-	public Dictionary<int, int> GetEvolutionStatistics()
-	{
-		var stats = new Dictionary<int, int>();
-		stats["totalEvolutions"] = _playerData.TotalEvolutions;
-		stats["totalExpGained"] = _playerData.TotalExpGained;
-		stats["activeEvolutions"] = _activeEvolutions.Count;
-		
-		int legendaryCount = 0;
-		int epicCount = 0;
-		int eliteCount = 0;
-		
-		foreach (var instance in _activeEvolutions.Values)
-		{
-			var config = MountEvolutionDatabase.GetConfigById(instance.EvolutionConfigId);
-			if (config != null)
-			{
-				switch (config.Stage)
-				{
-					case MountEvolutionData.EvolutionStage.Legendary:
-						legendaryCount++;
-						break;
-					case MountEvolutionData.EvolutionStage.Epic:
-						epicCount++;
-						break;
-					case MountEvolutionData.EvolutionStage.Elite:
-						eliteCount++;
-						break;
-				}
-			}
-		}
-		
-		stats["legendaryEvolutions"] = legendaryCount;
-		stats["epicEvolutions"] = epicCount;
-		stats["eliteEvolutions"] = eliteCount;
-		
-		return stats;
-	}
-	
-	public List<MountEvolutionData.EvolutionConfig> GetAvailableEvolutions(MountEvolutionData.EvolutionChain chain)
-	{
-		return MountEvolutionDatabase.GetConfigsByChain(chain);
-	}
-	
-	public Dictionary<string, object> GetSaveData()
-	{
-		var data = new Dictionary<string, object>();
-		data["activeEvolutions"] = new List<Dictionary<string, object>>();
-		
-		foreach (var kvp in _activeEvolutions)
-		{
-			var instance = kvp.Value;
-			var instanceData = new Dictionary<string, object>();
-			instanceData["mountId"] = instance.MountId;
-			instanceData["configId"] = instance.EvolutionConfigId;
-			instanceData["currentExp"] = instance.CurrentExp;
-			instanceData["isEvolved"] = instance.IsEvolved;
-			instanceData["lastExpGain"] = instance.LastExpGain.ToString("o");
-			((List<Dictionary<string, object>>)data["activeEvolutions"]).Add(instanceData);
-		}
-		
-		data["totalEvolutions"] = _playerData.TotalEvolutions;
-		data["totalExpGained"] = _playerData.TotalExpGained;
-		
-		data["evolutionHistory"] = new Dictionary<string, List<int>>();
-		foreach (var kvp in _playerData.EvolutionHistory)
-		{
-			((Dictionary<string, List<int>>)data["evolutionHistory"])[kvp.Key.ToString()] = kvp.Value;
-		}
-		
-		return data;
-	}
-	
-	public void LoadSaveData(Dictionary<string, object> data)
-	{
-		if (data == null) return;
-		
-		_activeEvolutions.Clear();
-		
-		if (data.ContainsKey("activeEvolutions"))
-		{
-			var evolutionList = (List<Dictionary<string, object>>)data["activeEvolutions"];
-			foreach (var instanceData in evolutionList)
-			{
-				var instance = new MountEvolutionData.MountEvolutionInstance();
-				instance.MountId = Convert.ToInt32(instanceData["mountId"]);
-				instance.EvolutionConfigId = Convert.ToInt32(instanceData["configId"]);
-				instance.CurrentExp = Convert.ToInt32(instanceData["currentExp"]);
-				instance.IsEvolved = Convert.ToBoolean(instanceData["isEvolved"]);
-				
-				if (instanceData.ContainsKey("lastExpGain"))
-				{
-					DateTime.TryParse(instanceData["lastExpGain"].ToString(), out var lastExp);
-					instance.LastExpGain = lastExp;
-				}
-				
-				_activeEvolutions[instance.MountId] = instance;
-			}
-		}
-		
-		_playerData.TotalEvolutions = data.ContainsKey("totalEvolutions") ? Convert.ToInt32(data["totalEvolutions"]) : 0;
-		_playerData.TotalExpGained = data.ContainsKey("totalExpGained") ? Convert.ToInt32(data["totalExpGained"]) : 0;
-		
-		_playerData.EvolutionHistory.Clear();
-		if (data.ContainsKey("evolutionHistory"))
-		{
-			var history = (Dictionary<string, List<int>>)data["evolutionHistory"];
-			foreach (var kvp in history)
-			{
-				if (int.TryParse(kvp.Key, out int mountId))
-				{
-					_playerData.EvolutionHistory[mountId] = kvp.Value;
-				}
-			}
-		}
-		
-		GD.Print($"[MountEvolutionSystem] Loaded {_activeEvolutions.Count} active evolutions");
-	}
-	
-	private void SaveData()
-	{
-		// Trigger save through SaveSystem
-		if (HasMethod("SaveSystem", "SaveGame"))
-		{
-			// SaveSystem.SaveGame();
-		}
-	}
-	
-	// Helper methods to get player data
-	private Player GetPlayer()
-	{
-		var player = GetTree().GetFirstNodeInGroup("player");
-		if (player is Player p)
-			return p;
-			
-		// Try to find Player node
-		var nodes = GetTree().GetNodesInGroup("player");
-		if (nodes.Count > 0)
-			return nodes[0] as Player;
-			
-		return null;
-	}
-	
-	private List<InventorySlot> GetPlayerInventory()
-	{
-		var player = GetPlayer();
-		if (player is Player p && p.HasMethod("GetInventory"))
-		{
-			return p.GetInventory();
-		}
-		return null;
-	}
-	
-	private int GetMountLevel(int mountId)
-	{
-		// Placeholder - would integrate with MountManager
-		return 1;
-	}
-	
-	private bool HasItem(List<InventorySlot> inventory, string itemName)
-	{
-		if (inventory == null) return false;
-		foreach (var slot in inventory)
-		{
-			if (slot.Item != null && slot.Item.Name == itemName && slot.Quantity > 0)
-				return true;
-		}
-		return false;
-	}
-	
-	private void RemoveItem(List<InventorySlot> inventory, string itemName)
-	{
-		if (inventory == null) return;
-		foreach (var slot in inventory)
-		{
-			if (slot.Item != null && slot.Item.Name == itemName && slot.Quantity > 0)
-			{
-				slot.Quantity--;
-				if (slot.Quantity <= 0)
-					slot.Item = null;
-				break;
-			}
-		}
-	}
-	
-	private bool HasMethod(object obj, string methodName)
-	{
-		var type = obj.GetType();
-		return type.GetMethod(methodName) != null;
-	}
+namespace ClawRPG.Scripts.Mounts {
+    /// <summary>
+    /// 坐骑进化系统管理器
+    /// </summary>
+    public class MountEvolutionSystem : BaseSystem {
+        public static MountEvolutionSystem Instance { get; private set; }
+
+        private PlayerMountEvolutionData _playerData = new PlayerMountEvolutionData();
+
+        // 信号系统
+        [Signal] public delegate void OnEvolutionStarted(string mountId, MountEvolutionStage newStage);
+        [Signal] public delegate void OnEvolutionCompleted(string mountId, MountEvolutionStage newStage, MountEvolutionType newType);
+        [Signal] public delegate void OnEvolutionFailed(string mountId, EvolutionResult reason);
+        [Signal] public delegate void OnStageChanged(string mountId, MountEvolutionStage newStage);
+        [Signal] public delegate void OnTypeChanged(string mountId, MountEvolutionType newType);
+        [Signal] public delegate void OnBattleExpGained(string mountId, int exp);
+
+        public override void _Ready() {
+            Instance = this;
+            GD.Print("[MountEvolutionSystem] Initialized");
+        }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "MountEvolution";
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return GetSaveData();
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data != null)
+                LoadSaveData(data);
+        }
+
+        /// <summary>
+        /// 初始化坐骑进化数据
+        /// </summary>
+        public void InitializeMountEvolution(string mountId, MountEvolutionChain chain) {
+            if (!_playerData.MountEvolutions.ContainsKey(mountId)) {
+                var evolution = new MountEvolutionInstance {
+                    MountId = mountId,
+                    CurrentStage = MountEvolutionStage.Basic,
+                    CurrentType = MountEvolutionType.Nature,
+                    EvolutionChain = chain,
+                    TotalEvolutions = 0,
+                    BattleExp = 0
+                };
+                _playerData.MountEvolutions[mountId] = evolution;
+                GD.Print($"[MountEvolutionSystem] Initialized evolution for mount: {mountId}");
+            }
+        }
+
+        /// <summary>
+        /// 尝试进化坐骑
+        /// </summary>
+        public EvolutionResult TryEvolveMount(string mountId, MountEvolutionType targetType) {
+            if (!_playerData.MountEvolutions.ContainsKey(mountId)) {
+                GD.Warning($"[MountEvolutionSystem] Mount {mountId} not found in evolution data");
+                return EvolutionResult.Failed;
+            }
+
+            var evolution = _playerData.MountEvolutions[mountId];
+            var currentStageConfig = MountEvolutionDatabase.GetStageConfig(evolution.CurrentStage);
+            var nextStage = MountEvolutionDatabase.GetNextStage(evolution.CurrentStage);
+            var nextStageConfig = MountEvolutionDatabase.GetStageConfig(nextStage);
+
+            // 检查是否已达最大阶段
+            if (evolution.CurrentStage == MountEvolutionStage.Legendary) {
+                EmitSignal(nameof(OnEvolutionFailed), mountId, EvolutionResult.MaxStage);
+                return EvolutionResult.MaxStage;
+            }
+
+            // 检查等级要求
+            var mountManager = MountManager.Instance;
+            if (mountManager == null) {
+                GD.Warning("[MountEvolutionSystem] MountManager not found");
+                return EvolutionResult.Failed;
+            }
+
+            // 检查经验要求
+            if (evolution.BattleExp < nextStageConfig.RequiredExp) {
+                EmitSignal(nameof(OnEvolutionFailed), mountId, EvolutionResult.InsufficientExp);
+                return EvolutionResult.InsufficientExp;
+            }
+
+            // 检查材料
+            var materialName = MountEvolutionDatabase.GetEvolutionMaterialName(nextStage);
+            var inventoryManager = InventoryManager.Instance;
+            if (inventoryManager != null) {
+                var hasMaterial = inventoryManager.HasItem(materialName, nextStageConfig.RequiredItems);
+                if (!hasMaterial) {
+                    EmitSignal(nameof(OnEvolutionFailed), mountId, EvolutionResult.InsufficientItems);
+                    return EvolutionResult.InsufficientItems;
+                }
+                // 消耗材料
+                inventoryManager.RemoveItem(materialName, nextStageConfig.RequiredItems);
+            }
+
+            // 检查金币
+            var goldCost = MountEvolutionDatabase.GetEvolutionGoldCost(nextStage);
+            if (goldCost > 0) {
+                var player = GetTree().CurrentScene.GetNode<CharacterBody2D>("../Player");
+                if (player != null) {
+                    // 假设 Player 有 Gold 属性
+                    var playerScript = player.GetScript();
+                    if (playerScript != null) {
+                        var goldField = playerScript.GetType().GetField("Gold");
+                        if (goldField != null) {
+                            var currentGold = (int)goldField.GetValue(player);
+                            if (currentGold < goldCost) {
+                                EmitSignal(nameof(OnEvolutionFailed), mountId, EvolutionResult.InsufficientItems);
+                                return EvolutionResult.InsufficientItems;
+                            }
+                            goldField.SetValue(player, currentGold - goldCost);
+                        }
+                    }
+                }
+            }
+
+            // 执行进化
+            EmitSignal(nameof(OnEvolutionStarted), mountId, nextStage);
+
+            evolution.CurrentStage = nextStage;
+            evolution.CurrentType = targetType;
+            evolution.TotalEvolutions++;
+
+            // 应用属性加成
+            ApplyStageBonuses(evolution);
+
+            // 更新统计
+            _playerData.TotalEvolutions++;
+            if (_playerData.StageCount.ContainsKey(nextStage)) {
+                _playerData.StageCount[nextStage]++;
+            } else {
+                _playerData.StageCount[nextStage] = 1;
+            }
+
+            if (_playerData.TypeCount.ContainsKey(targetType)) {
+                _playerData.TypeCount[targetType]++;
+            } else {
+                _playerData.TypeCount[targetType] = 1;
+            }
+
+            EmitSignal(nameof(OnEvolutionCompleted), mountId, nextStage, targetType);
+            EmitSignal(nameof(OnStageChanged), mountId, nextStage);
+            EmitSignal(nameof(OnTypeChanged), mountId, targetType);
+
+            // 自动保存
+            SaveEvolutionData();
+
+            GD.Print($"[MountEvolutionSystem] Mount {mountId} evolved to {nextStage} ({targetType})");
+            return EvolutionResult.Success;
+        }
+
+        /// <summary>
+        /// 应用阶段属性加成
+        /// </summary>
+        private void ApplyStageBonuses(MountEvolutionInstance evolution) {
+            // 重置加成
+            evolution.TotalHealthBonus = 0;
+            evolution.TotalAttackBonus = 0;
+            evolution.TotalDefenseBonus = 0;
+            evolution.TotalSpeedBonus = 0;
+            evolution.TotalCritRateBonus = 0;
+            evolution.TotalCritDamageBonus = 0;
+
+            // 计算所有已解锁阶段的加成
+            var stages = new List<MountEvolutionStage> {
+                MountEvolutionStage.Basic,
+                MountEvolutionStage.Advanced,
+                MountEvolutionStage.Elite,
+                MountEvolutionStage.Epic,
+                MountEvolutionStage.Legendary
+            };
+
+            foreach (var stage in stages) {
+                if ((int)stage <= (int)evolution.CurrentStage) {
+                    var config = MountEvolutionDatabase.GetStageConfig(stage);
+                    if (config != null) {
+                        evolution.TotalHealthBonus += config.HealthBonus;
+                        evolution.TotalAttackBonus += config.AttackBonus;
+                        evolution.TotalDefenseBonus += config.DefenseBonus;
+                        evolution.TotalSpeedBonus += config.SpeedBonus;
+                        evolution.TotalCritRateBonus += config.CritRateBonus;
+                        evolution.TotalCritDamageBonus += config.CritDamageBonus;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取坐骑进化信息
+        /// </summary>
+        public MountEvolutionInstance GetMountEvolution(string mountId) {
+            return _playerData.MountEvolutions.ContainsKey(mountId) ? _playerData.MountEvolutions[mountId] : null;
+        }
+
+        /// <summary>
+        /// 获取坐骑进化属性加成
+        /// </summary>
+        public Dictionary<string, float> GetMountEvolutionBonuses(string mountId) {
+            var evolution = GetMountEvolution(mountId);
+            if (evolution == null) return new Dictionary<string, float>();
+
+            return new Dictionary<string, float> {
+                { "HealthBonus", evolution.TotalHealthBonus },
+                { "AttackBonus", evolution.TotalAttackBonus },
+                { "DefenseBonus", evolution.TotalDefenseBonus },
+                { "SpeedBonus", evolution.TotalSpeedBonus },
+                { "CritRateBonus", evolution.TotalCritRateBonus },
+                { "CritDamageBonus", evolution.TotalCritDamageBonus }
+            };
+        }
+
+        /// <summary>
+        /// 添加战斗经验
+        /// </summary>
+        public void AddBattleExp(string mountId, int exp) {
+            if (!_playerData.MountEvolutions.ContainsKey(mountId)) return;
+
+            var evolution = _playerData.MountEvolutions[mountId];
+            evolution.BattleExp += exp;
+            _playerData.TotalBattleExp += exp;
+
+            EmitSignal(nameof(OnBattleExpGained), mountId, exp);
+
+            // 检查是否可以自动进化（如果满足条件）
+            var nextStage = MountEvolutionDatabase.GetNextStage(evolution.CurrentStage);
+            var nextStageConfig = MountEvolutionDatabase.GetStageConfig(nextStage);
+            if (nextStageConfig != null && evolution.BattleExp >= nextStageConfig.RequiredExp) {
+                GD.Print($"[MountEvolutionSystem] Mount {mountId} is ready to evolve!");
+            }
+        }
+
+        /// <summary>
+        /// 检查是否可以进化
+        /// </summary>
+        public bool CanEvolve(string mountId) {
+            var evolution = GetMountEvolution(mountId);
+            if (evolution == null || evolution.CurrentStage == MountEvolutionStage.Legendary) {
+                return false;
+            }
+
+            var nextStage = MountEvolutionDatabase.GetNextStage(evolution.CurrentStage);
+            var nextStageConfig = MountEvolutionDatabase.GetStageConfig(nextStage);
+            return evolution.BattleExp >= nextStageConfig.RequiredExp;
+        }
+
+        /// <summary>
+        /// 获取进化进度 (0.0 - 1.0)
+        /// </summary>
+        public float GetEvolutionProgress(string mountId) {
+            var evolution = GetMountEvolution(mountId);
+            if (evolution == null) return 0f;
+
+            if (evolution.CurrentStage == MountEvolutionStage.Legendary) return 1f;
+
+            var nextStage = MountEvolutionDatabase.GetNextStage(evolution.CurrentStage);
+            var nextStageConfig = MountEvolutionDatabase.GetStageConfig(nextStage);
+            if (nextStageConfig == null || nextStageConfig.RequiredExp == 0) return 1f;
+
+            return Mathf.Clamp((float)evolution.BattleExp / nextStageConfig.RequiredExp, 0f, 1f);
+        }
+
+        /// <summary>
+        /// 获取进化统计
+        /// </summary>
+        public PlayerMountEvolutionData GetStatistics() {
+            return _playerData;
+        }
+
+        /// <summary>
+        /// 获取进化阶段名称
+        /// </summary>
+        public string GetStageName(MountEvolutionStage stage) {
+            var config = MountEvolutionDatabase.GetStageConfig(stage);
+            return config?.StageName ?? "未知";
+        }
+
+        /// <summary>
+        /// 获取进化类型名称
+        /// </summary>
+        public string GetTypeName(MountEvolutionType type) {
+            var config = MountEvolutionDatabase.GetTypeConfig(type);
+            return config?.TypeName ?? "未知";
+        }
+
+        /// <summary>
+        /// 保存进化数据
+        /// </summary>
+        public Dictionary<string, object> GetSaveData() {
+            var data = new Dictionary<string, object> {
+                { "MountEvolutions", new List<Dictionary<string, object>>() },
+                { "TotalEvolutions", _playerData.TotalEvolutions },
+                { "TotalBattleExp", _playerData.TotalBattleExp }
+            };
+
+            foreach (var kvp in _playerData.MountEvolutions) {
+                var evolution = kvp.Value;
+                var evolutionData = new Dictionary<string, object> {
+                    { "MountId", evolution.MountId },
+                    { "CurrentStage", (int)evolution.CurrentStage },
+                    { "CurrentType", (int)evolution.CurrentType },
+                    { "EvolutionChain", (int)evolution.EvolutionChain },
+                    { "TotalEvolutions", evolution.TotalEvolutions },
+                    { "BattleExp", evolution.BattleExp },
+                    { "TotalHealthBonus", evolution.TotalHealthBonus },
+                    { "TotalAttackBonus", evolution.TotalAttackBonus },
+                    { "TotalDefenseBonus", evolution.TotalDefenseBonus },
+                    { "TotalSpeedBonus", evolution.TotalSpeedBonus },
+                    { "TotalCritRateBonus", evolution.TotalCritRateBonus },
+                    { "TotalCritDamageBonus", evolution.TotalCritDamageBonus }
+                };
+                ((List<Dictionary<string, object>>)data["MountEvolutions"]).Add(evolutionData);
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// 加载进化数据
+        /// </summary>
+        public void LoadSaveData(Dictionary<string, object> data) {
+            if (data == null) return;
+
+            _playerData = new PlayerMountEvolutionData();
+
+            if (data.ContainsKey("TotalEvolutions")) {
+                _playerData.TotalEvolutions = Convert.ToInt32(data["TotalEvolutions"]);
+            }
+            if (data.ContainsKey("TotalBattleExp")) {
+                _playerData.TotalBattleExp = Convert.ToInt32(data["TotalBattleExp"]);
+            }
+
+            if (data.ContainsKey("MountEvolutions")) {
+                var evolutions = (List<object>)data["MountEvolutions"];
+                foreach (var evolutionData in evolutions) {
+                    var dict = (Dictionary<string, object>)evolutionData;
+                    var evolution = new MountEvolutionInstance {
+                        MountId = dict["MountId"].ToString(),
+                        CurrentStage = (MountEvolutionStage)Convert.ToInt32(dict["CurrentStage"]),
+                        CurrentType = (MountEvolutionType)Convert.ToInt32(dict["CurrentType"]),
+                        EvolutionChain = (MountEvolutionChain)Convert.ToInt32(dict["EvolutionChain"]),
+                        TotalEvolutions = Convert.ToInt32(dict["TotalEvolutions"]),
+                        BattleExp = Convert.ToInt32(dict["BattleExp"]),
+                        TotalHealthBonus = (float)Convert.ToDouble(dict["TotalHealthBonus"]),
+                        TotalAttackBonus = (float)Convert.ToDouble(dict["TotalAttackBonus"]),
+                        TotalDefenseBonus = (float)Convert.ToDouble(dict["TotalDefenseBonus"]),
+                        TotalSpeedBonus = (float)Convert.ToDouble(dict["TotalSpeedBonus"]),
+                        TotalCritRateBonus = (float)Convert.ToDouble(dict["TotalCritRateBonus"]),
+                        TotalCritDamageBonus = (float)Convert.ToDouble(dict["TotalCritDamageBonus"])
+                    };
+                    _playerData.MountEvolutions[evolution.MountId] = evolution;
+                }
+            }
+
+            GD.Print($"[MountEvolutionSystem] Loaded {_playerData.MountEvolutions.Count} mount evolutions");
+        }
+    }
 }

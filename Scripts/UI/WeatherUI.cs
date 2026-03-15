@@ -1,290 +1,370 @@
-using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.Systems;
+using UnityEngine;
+using UnityEngine.UI;
 
-namespace ClawRPG.Scripts.UI
+namespace ClawRPG.Scripts
 {
     /// <summary>
-    /// 天气显示UI组件
+    /// 天气系统UI管理器
     /// </summary>
-    public partial class WeatherUI : Control
+    public class WeatherUI : MonoBehaviour
     {
-        private Label _weatherIconLabel;
-        private Label _weatherNameLabel;
-        private Label _durationLabel;
-        private Label _multiplierLabel;
-        private ProgressBar _durationProgressBar;
-        private VBoxContainer _effectsContainer;
-        private Button _closeButton;
-        private Button _changeWeatherButton;
+        private static WeatherUI _instance;
+        public static WeatherUI Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = FindObjectOfType<WeatherUI>();
+                }
+                return _instance;
+            }
+        }
         
-        private WeatherSystem _weatherSystem;
-        private bool _isVisible = false; 
+        [Header("UI Components")]
+        public GameObject weatherPanel;
+        public Transform zoneListContainer;
+        public Transform effectListContainer;
         
-        // 效果显示标签
-        private Label _damageEffect;
-        private Label _defenseEffect;
-        private Label _expEffect;
-        private Label _dropEffect;
-        private Label _visibilityEffect;
-
-        public override void _Ready()
+        [Header("Prefabs")]
+        public GameObject zoneWeatherItemPrefab;
+        public GameObject weatherEffectItemPrefab;
+        
+        [Header("Current Weather Display")]
+        public Text currentZoneText;
+        public Text currentWeatherText;
+        public Text currentIntensityText;
+        public Text remainingTimeText;
+        public Image weatherIcon;
+        public Slider transitionSlider;
+        
+        [Header("Statistics Display")]
+        public Text totalEventsText;
+        public Text playerExposureText;
+        public Text currentSeasonText;
+        
+        private bool _isVisible;
+        private string _currentZoneId = "town";
+        
+        private void Awake()
         {
-            _weatherSystem = WeatherSystem.Instance;
-            
-            // 连接天气信号
-            _weatherSystem.WeatherChanged += OnWeatherChanged;
-            _weatherSystem.WeatherUpdated += OnWeatherUpdated;
-            
-            SetupUI();
-            Visible = false; 
+            _instance = this;
+            if (weatherPanel != null)
+                weatherPanel.SetActive(false);
         }
-
-        private void SetupUI()
+        
+        private void Start()
         {
-            // 主容器
-            var mainContainer = new VBoxContainer();
-            mainContainer.SetAnchorsPreset(Control.LayoutPreset.TopRight);
-            mainContainer.Position = new Vector2(-220, 60);
-            mainContainer.CustomMinimumSize = new Vector2(200, 0);
-            AddChild(mainContainer);
-
-            // 标题栏
-            var titleBar = new HBoxContainer();
-            mainContainer.AddChild(titleBar);
-
-            var titleLabel = new Label();
-            titleLabel.Text = "  天气状况";
-            titleLabel.HorizontalAlignment = HorizontalAlignment.Left;
-            titleLabel.AddThemeFontSizeOverride("font_size", 18);
-            titleBar.AddChild(titleLabel);
-
-            titleBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
-
-            _closeButton = new Button();
-            _closeButton.Text = "×";
-            _closeButton.CustomMinimumSize = new Vector2(30, 30);
-            _closeButton.Pressed += () => ToggleVisibility();
-            titleBar.AddChild(_closeButton);
-
-            // 天气显示面板
-            var panel = new PanelContainer();
-            panel.Modulate = new Color(1, 1, 1, 0.95f);
-            mainContainer.AddChild(panel);
-
-            var contentVBox = new VBoxContainer();
-            contentVBox.AddThemeConstantOverride("separation", 10);
-            panel.AddChild(contentVBox);
-
-            // 天气图标和名称
-            var weatherHeader = new HBoxContainer();
-            contentVBox.AddChild(weatherHeader);
-
-            _weatherIconLabel = new Label();
-            _weatherIconLabel.Text = "☀️";
-            _weatherIconLabel.AddThemeFontSizeOverride("font_size", 32);
-            weatherHeader.AddChild(_weatherIconLabel);
-
-            var weatherInfo = new VBoxContainer();
-            weatherHeader.AddChild(weatherInfo);
-
-            _weatherNameLabel = new Label();
-            _weatherNameLabel.Text = "晴朗";
-            _weatherNameLabel.AddThemeFontSizeOverride("font_size", 16);
-            _weatherNameLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            weatherInfo.AddChild(_weatherNameLabel);
-
-            // 持续时间
-            var durationContainer = new HBoxContainer();
-            contentVBox.AddChild(durationContainer);
-
-            var durationTitle = new Label();
-            durationTitle.Text = "持续: ";
-            durationTitle.AddThemeFontSizeOverride("font_size", 14);
-            durationContainer.AddChild(durationTitle);
-
-            _durationLabel = new Label();
-            _durationLabel.Text = "10:00";
-            _durationLabel.AddThemeFontSizeOverride("font_size", 14);
-            _durationLabel.Modulate = new Color(1, 1, 0);
-            durationContainer.AddChild(_durationLabel);
-
-            // 进度条
-            _durationProgressBar = new ProgressBar();
-            _durationProgressBar.CustomMinimumSize = new Vector2(180, 12);
-            _durationProgressBar.ShowPercentage = false; 
-            _durationProgressBar.Value = 100;
-            contentVBox.AddChild(_durationProgressBar);
-
-            // 效果标题
-            var effectsTitle = new Label();
-            effectsTitle.Text = "──────── 天气效果 ────────";
-            effectsTitle.HorizontalAlignment = HorizontalAlignment.Center;
-            effectsTitle.AddThemeFontSizeOverride("font_size", 12);
-            contentVBox.AddChild(effectsTitle);
-
-            // 效果容器
-            _effectsContainer = new VBoxContainer();
-            _effectsContainer.AddThemeConstantOverride("separation", 5);
-            contentVBox.AddChild(_effectsContainer);
-
-            // 创建效果标签
-            _damageEffect = CreateEffectLabel("伤害: +0%", contentVBox);
-            _defenseEffect = CreateEffectLabel("防御: +0%", contentVBox);
-            _expEffect = CreateEffectLabel("经验: +0%", contentVBox);
-            _dropEffect = CreateEffectLabel("掉落: +0%", contentVBox);
-            _visibilityEffect = CreateEffectLabel("视野: 100%", contentVBox);
-
-            // 按钮
-            _changeWeatherButton = new Button();
-            _changeWeatherButton.Text = "  切换天气  ";
-            _changeWeatherButton.Pressed += OnChangeWeatherPressed;
-            contentVBox.AddChild(_changeWeatherButton);
-
-            // 自动切换复选框
-            var autoCheckBox = new CheckBox();
-            autoCheckBox.Text = "自动切换天气";
-            autoCheckBox.ButtonPressed = true;
-            autoCheckBox.Toggled += OnAutoChangeToggled;
-            contentVBox.AddChild(autoCheckBox);
-
-            UpdateWeatherDisplay();
+            InitializeUI();
         }
-
-        private Label CreateEffectLabel(string text, VBoxContainer parent)
+        
+        private void InitializeUI()
         {
-            var label = new Label();
-            label.Text = text;
-            label.AddThemeFontSizeOverride("font_size", 13);
-            label.HorizontalAlignment = HorizontalAlignment.Center;
-            parent.AddChild(label);
-            return label;
+            // 注册天气变化事件
+            WeatherSystem.OnWeatherChanged += OnWeatherChanged;
+            WeatherSystem.OnTransitionProgress += OnTransitionProgress;
         }
-
-        private void OnWeatherChanged(WeatherData newWeather, WeatherData oldWeather)
-        {
-            UpdateWeatherDisplay();
-        }
-
-        private void OnWeatherUpdated(WeatherData currentWeather)
-        {
-            UpdateDuration();
-        }
-
-        private void UpdateWeatherDisplay()
-        {
-            var weather = _weatherSystem.CurrentWeather;
-            if (weather == null) return;
-
-            // 更新图标和名称
-            _weatherIconLabel.Text = WeatherSystem.GetWeatherIcon(weather.Type);
-            _weatherNameLabel.Text = WeatherSystem.GetWeatherName(weather.Type);
-
-            // 更新进度条
-            _durationProgressBar.MaxValue = weather.Duration;
-            _durationProgressBar.Value = weather.RemainingTime;
-
-            UpdateDuration();
-
-            // 更新效果显示
-            UpdateEffects(weather);
-        }
-
-        private void UpdateDuration()
-        {
-            var weather = _weatherSystem.CurrentWeather;
-            if (weather == null) return;
-
-            var minutes = (int)(weather.RemainingTime / 60);
-            var seconds = (int)(weather.RemainingTime % 60);
-            _durationLabel.Text = $"{minutes:D2}:{seconds:D2}";
-
-            // 根据剩余时间改变颜色
-            if (weather.RemainingTime < 60)
-                _durationLabel.Modulate = new Color(1, 0.3, 0.3);
-            else if (weather.RemainingTime < 180)
-                _durationLabel.Modulate = new Color(1, 1, 0.3);
-            else
-                _durationLabel.Modulate = new Color(1, 1, 0);
-        }
-
-        private void UpdateEffects(WeatherData weather)
-        {
-            // 伤害倍率
-            var damageText = weather.DamageMultiplier >= 1.0f 
-                ? $"伤害: +{(weather.DamageMultiplier - 1) * 100:F0}%" 
-                : $"伤害: {(weather.DamageMultiplier - 1) * 100:F0}%";
-            _damageEffect.Text = damageText;
-            _damageEffect.Modulate = weather.DamageMultiplier >= 1.0f 
-                ? new Color(0.3, 1, 0.3) : new Color(1, 0.3, 0.3);
-
-            // 防御倍率
-            var defenseText = weather.DefenseMultiplier >= 1.0f 
-                ? $"防御: +{(weather.DefenseMultiplier - 1) * 100:F0}%" 
-                : $"防御: {(weather.DefenseMultiplier - 1) * 100:F0}%";
-            _defenseEffect.Text = defenseText;
-            _defenseEffect.Modulate = weather.DefenseMultiplier >= 1.0f 
-                ? new Color(0.3, 1, 0.3) : new Color(1, 0.3, 0.3);
-
-            // 经验倍率
-            var expText = weather.ExperienceMultiplier >= 1.0f 
-                ? $"经验: +{(weather.ExperienceMultiplier - 1) * 100:F0}%" 
-                : $"经验: {(weather.ExperienceMultiplier - 1) * 100:F0}%";
-            _expEffect.Text = expText;
-            _expEffect.Modulate = weather.ExperienceMultiplier >= 1.0f 
-                ? new Color(0.3, 1, 0.3) : new Color(1, 0.3, 0.3);
-
-            // 掉落倍率
-            var dropText = weather.DropMultiplier >= 1.0f 
-                ? $"掉落: +{(weather.DropMultiplier - 1) * 100:F0}%" 
-                : $"掉落: {(weather.DropMultiplier - 1) * 100:F0}%";
-            _dropEffect.Text = dropText;
-            _dropEffect.Modulate = weather.DropMultiplier >= 1.0f 
-                ? new Color(0.3, 1, 0.3) : new Color(1, 0.3, 0.3);
-
-            // 视野
-            var baseVisibility = 500f;
-            var visibilityPercent = (weather.VisibilityRadius / baseVisibility) * 100;
-            _visibilityEffect.Text = $"视野: {visibilityPercent:F0}%";
-            _visibilityEffect.Modulate = visibilityPercent >= 100 
-                ? new Color(0.3, 1, 0.3) : new Color(1, 0.3, 0.3);
-        }
-
-        private void OnChangeWeatherPressed()
-        {
-            _weatherSystem.ChangeToRandomWeather();
-        }
-
-        private void OnAutoChangeToggled(bool toggledOn)
-        {
-            _weatherSystem.AutoChange = toggledOn;
-        }
-
+        
         /// <summary>
-        /// 切换可见性
+        /// 切换天气UI显示
         /// </summary>
-        public void ToggleVisibility()
+        public void ToggleWeatherUI()
         {
             _isVisible = !_isVisible;
-            Visible = _isVisible;
+            if (weatherPanel != null)
+                weatherPanel.SetActive(_isVisible);
             
             if (_isVisible)
             {
-                UpdateWeatherDisplay();
+                RefreshWeatherDisplay();
             }
         }
-
-        public override void _Input(InputEvent @event)
+        
+        /// <summary>
+        /// 显示天气UI
+        /// </summary>
+        public void ShowWeatherUI()
         {
-            if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+            _isVisible = true;
+            if (weatherPanel != null)
+                weatherPanel.SetActive(true);
+            RefreshWeatherDisplay();
+        }
+        
+        /// <summary>
+        /// 隐藏天气UI
+        /// </summary>
+        public void HideWeatherUI()
+        {
+            _isVisible = false;
+            if (weatherPanel != null)
+                weatherPanel.SetActive(false);
+        }
+        
+        /// <summary>
+        /// 刷新天气显示
+        /// </summary>
+        public void RefreshWeatherDisplay()
+        {
+            if (WeatherSystem.Instance == null) return;
+            
+            // 刷新区域列表
+            RefreshZoneList();
+            
+            // 刷新当前天气
+            RefreshCurrentWeather();
+            
+            // 刷新统计
+            RefreshStatistics();
+            
+            // 刷新效果列表
+            RefreshEffectList();
+        }
+        
+        /// <summary>
+        /// 刷新区域列表
+        /// </summary>
+        private void RefreshZoneList()
+        {
+            if (zoneListContainer == null || zoneWeatherItemPrefab == null) return;
+            
+            // 清除旧列表
+            foreach (Transform child in zoneListContainer)
             {
-                // V键切换天气UI
-                if (keyEvent.Keycode == Key.V)
+                Destroy(child.gameObject);
+            }
+            
+            // 获取所有区域
+            List<string> zoneIds = WeatherSystem.Instance.GetAllZoneIds();
+            foreach (string zoneId in zoneIds)
+            {
+                ZoneWeather zoneWeather = WeatherSystem.Instance.GetZoneWeather(zoneId);
+                if (zoneWeather == null) continue;
+                
+                GameObject item = Instantiate(zoneWeatherItemPrefab, zoneListContainer);
+                
+                // 设置区域信息
+                Text zoneNameText = item.transform.Find("ZoneName")?.GetComponent<Text>();
+                Text weatherText = item.transform.Find("WeatherName")?.GetComponent<Text>();
+                Text timeText = item.transform.Find("RemainingTime")?.GetComponent<Text>();
+                Image iconImage = item.transform.Find("WeatherIcon")?.GetComponent<Image>();
+                
+                if (zoneNameText != null)
+                    zoneNameText.text = zoneWeather.ZoneName;
+                
+                if (weatherText != null)
                 {
-                    ToggleVisibility();
-                    GetTree().SetInputAsHandled();
+                    WeatherConfig config = WeatherDatabase.GetWeatherConfig(zoneWeather.CurrentWeather);
+                    weatherText.text = config?.Name ?? "Unknown";
                 }
+                
+                if (timeText != null)
+                {
+                    TimeSpan time = TimeSpan.FromSeconds(zoneWeather.RemainingTime);
+                    timeText.text = time.ToString(@"mm\:ss");
+                }
+                
+                // 点击选择区域
+                Button btn = item.GetComponent<Button>();
+                if (btn != null)
+                {
+                    btn.onClick.AddListener(() => SelectZone(zoneId));
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 刷新当前天气显示
+        /// </summary>
+        private void RefreshCurrentWeather()
+        {
+            if (WeatherSystem.Instance == null) return;
+            
+            ZoneWeather zoneWeather = WeatherSystem.Instance.GetZoneWeather(_currentZoneId);
+            if (zoneWeather == null) return;
+            
+            WeatherConfig config = WeatherDatabase.GetWeatherConfig(zoneWeather.CurrentWeather);
+            
+            if (currentZoneText != null)
+                currentZoneText.text = zoneWeather.ZoneName;
+            
+            if (currentWeatherText != null)
+                currentWeatherText.text = config?.Name ?? "Unknown";
+            
+            if (currentIntensityText != null)
+                currentIntensityText.text = zoneWeather.Intensity.ToString();
+            
+            if (remainingTimeText != null)
+            {
+                TimeSpan time = TimeSpan.FromSeconds(zoneWeather.RemainingTime);
+                remainingTimeText.text = time.ToString(@"mm\:ss");
+            }
+            
+            if (transitionSlider != null)
+                transitionSlider.value = zoneWeather.TransitionProgress;
+        }
+        
+        /// <summary>
+        /// 刷新统计显示
+        /// </summary>
+        private void RefreshStatistics()
+        {
+            if (WeatherSystem.Instance == null) return;
+            
+            WeatherStatistics stats = WeatherSystem.Instance.GetStatistics();
+            
+            if (totalEventsText != null)
+                totalEventsText.text = $"总天气事件: {stats.TotalWeatherEvents}";
+            
+            if (playerExposureText != null)
+                playerExposureText.text = $"玩家暴露次数: {stats.PlayerWeatherEvents}";
+            
+            if (currentSeasonText != null)
+                currentSeasonText.text = $"当前季节: {WeatherSystem.Instance.GetCurrentSeason()}";
+        }
+        
+        /// <summary>
+        /// 刷新效果列表
+        /// </summary>
+        private void RefreshEffectList()
+        {
+            if (effectListContainer == null || weatherEffectItemPrefab == null) return;
+            
+            // 清除旧列表
+            foreach (Transform child in effectListContainer)
+            {
+                Destroy(child.gameObject);
+            }
+            
+            if (WeatherSystem.Instance == null) return;
+            
+            ZoneWeather zoneWeather = WeatherSystem.Instance.GetZoneWeather(_currentZoneId);
+            if (zoneWeather == null) return;
+            
+            List<WeatherEffect> effects = WeatherSystem.Instance.GetWeatherEffects(zoneWeather.CurrentWeather);
+            
+            foreach (var effect in effects)
+            {
+                GameObject item = Instantiate(weatherEffectItemPrefab, effectListContainer);
+                
+                Text effectText = item.transform.Find("EffectText")?.GetComponent<Text>();
+                Text valueText = item.transform.Find("ValueText")?.GetComponent<Text>();
+                
+                if (effectText != null)
+                    effectText.text = GetEffectTypeName(effect.Type);
+                
+                if (valueText != null)
+                {
+                    string sign = effect.Value >= 0 ? "+" : "";
+                    valueText.text = $"{sign}{effect.Value:F0}%";
+                    valueText.color = effect.Value >= 0 ? Color.green : Color.red;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 选择区域
+        /// </summary>
+        public void SelectZone(string zoneId)
+        {
+            _currentZoneId = zoneId;
+            RefreshCurrentWeather();
+            RefreshEffectList();
+        }
+        
+        /// <summary>
+        /// 天气变化回调
+        /// </summary>
+        private void OnWeatherChanged(string zoneId, WeatherType type, WeatherIntensity intensity)
+        {
+            if (_isVisible && zoneId == _currentZoneId)
+            {
+                RefreshCurrentWeather();
+                RefreshEffectList();
+            }
+        }
+        
+        /// <summary>
+        /// 过渡进度回调
+        /// </summary>
+        private void OnTransitionProgress(string zoneId, float progress)
+        {
+            if (_isVisible && zoneId == _currentZoneId && transitionSlider != null)
+            {
+                transitionSlider.value = progress;
+            }
+        }
+        
+        /// <summary>
+        /// 获取效果类型名称
+        /// </summary>
+        private string GetEffectTypeName(WeatherEffectType type)
+        {
+            switch (type)
+            {
+                case WeatherEffectType.VisionReduction: return "视野";
+                case WeatherEffectType.MovementSpeed: return "移动速度";
+                case WeatherEffectType.AttackSpeed: return "攻击速度";
+                case WeatherEffectType.Defense: return "防御力";
+                case WeatherEffectType.HealthRegen: return "生命恢复";
+                case WeatherEffectType.ManaRegen: return "法力恢复";
+                case WeatherEffectType.CriticalRate: return "暴击率";
+                case WeatherEffectType.DodgeRate: return "闪避率";
+                case WeatherEffectType.ExperienceGain: return "经验获取";
+                case WeatherEffectType.ItemDropRate: return "物品掉落";
+                default: return type.ToString();
+            }
+        }
+        
+        /// <summary>
+        /// 刷新按钮点击
+        /// </summary>
+        public void OnRefreshButtonClicked()
+        {
+            RefreshWeatherDisplay();
+        }
+        
+        /// <summary>
+        /// 强制刷新指定区域天气
+        /// </summary>
+        public void OnRefreshZoneButtonClicked()
+        {
+            if (WeatherSystem.Instance != null)
+            {
+                WeatherSystem.Instance.RefreshZoneWeather(_currentZoneId);
+            }
+        }
+        
+        /// <summary>
+        /// 切换到下一区域
+        /// </summary>
+        public void OnNextZoneButtonClicked()
+        {
+            List<string> zoneIds = WeatherSystem.Instance.GetAllZoneIds();
+            int currentIndex = zoneIds.IndexOf(_currentZoneId);
+            int nextIndex = (currentIndex + 1) % zoneIds.Count;
+            SelectZone(zoneIds[nextIndex]);
+        }
+        
+        /// <summary>
+        /// 切换到上一区域
+        /// </summary>
+        public void OnPreviousZoneButtonClicked()
+        {
+            List<string> zoneIds = WeatherSystem.Instance.GetAllZoneIds();
+            int currentIndex = zoneIds.IndexOf(_currentZoneId);
+            int prevIndex = (currentIndex - 1 + zoneIds.Count) % zoneIds.Count;
+            SelectZone(zoneIds[prevIndex]);
+        }
+        
+        private void OnDestroy()
+        {
+            if (WeatherSystem.Instance != null)
+            {
+                WeatherSystem.OnWeatherChanged -= OnWeatherChanged;
+                WeatherSystem.OnTransitionProgress -= OnTransitionProgress;
             }
         }
     }

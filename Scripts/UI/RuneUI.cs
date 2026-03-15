@@ -1,291 +1,628 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Godot;
 
-namespace ClawRPG.UI
+/// <summary>
+/// Rune UI - Interface for rune management
+/// </summary>
+public class RuneUI : Control
 {
-    /// <summary>
-    /// Rune System UI - Console-based interface
-    /// </summary>
-    public class RuneUI
+    private RuneSystem _runeSystem;
+    private VBoxContainer _mainContainer;
+    private TabContainer _tabContainer;
+    
+    // Rune list
+    private GridContainer _runeGrid;
+    private OptionButton _filterTypeButton;
+    private OptionButton _filterRarityButton;
+    private Label _runeCountLabel;
+    
+    // Equipped runes panel
+    private VBoxContainer _equippedContainer;
+    private Dictionary<RuneSlotType, Button> _equippedSlots = new Dictionary<RuneSlotType, Button>();
+    
+    // Details panel
+    private Panel _detailsPanel;
+    private Label _detailsName;
+    private Label _detailsDescription;
+    private Label _detailsType;
+    private Label _detailsRarity;
+    private Label _detailsSlot;
+    private Label _detailsLevel;
+    private VBoxContainer _bonusesContainer;
+    private Label _specialEffectLabel;
+    
+    // Stats panel
+    private VBoxContainer _statsContainer;
+    private Label _totalAttackLabel;
+    private Label _totalDefenseLabel;
+    private Label _totalHealthLabel;
+    private Label _totalSpeedLabel;
+    private Label _totalCritRateLabel;
+    private Label _totalCritDamageLabel;
+    private Label _totalLifestealLabel;
+    private Label _totalDodgeLabel;
+    private Label _totalBlockLabel;
+    
+    private RuneData _selectedRune;
+    
+    public override void _Ready()
     {
-        private RuneSystem _runeSystem;
-        private bool _isVisible;
-        private int _selectedTab;
-        private string _selectedRuneId;
-        private RuneSlotType _selectedSlot = RuneSlotType.Weapon;
+        _runeSystem = RuneSystem.Instance;
         
-        public RuneUI(RuneSystem runeSystem)
+        SetupUI();
+        ConnectSignals();
+        RefreshRuneList();
+        RefreshEquippedRunes();
+        RefreshStats();
+    }
+    
+    private void SetupUI()
+    {
+        // Main container
+        _mainContainer = new VBoxContainer();
+        _mainContainer.SetAnchorPreset(Control.LayoutPreset.FullRect);
+        _mainContainer.AddThemeConstantOverride("separation", 10);
+        AddChild(_mainContainer);
+        
+        // Header
+        var header = new HBoxContainer();
+        _mainContainer.AddChild(header);
+        
+        var titleLabel = new Label();
+        titleLabel.Text = "  ⚔️ 符文系统";
+        titleLabel.AddThemeFontSizeOverride("font_size", 24);
+        header.AddChild(titleLabel);
+        
+        header.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
+        
+        var slotsLabel = new Label();
+        slotsLabel.Name = "SlotsLabel";
+        header.AddChild(slotsLabel);
+        
+        // Tab container
+        _tabContainer = new TabContainer();
+        _tabContainer.SetVExpand(ExpandMode.Fill);
+        _mainContainer.AddChild(_tabContainer);
+        
+        // Tab 1: My Runes
+        var runesTab = new ScrollContainer();
+        runesTab.Name = "MyRunes";
+        _tabContainer.AddChild(runesTab);
+        
+        var runesContent = new VBoxContainer();
+        runesContent.SetAnchorPreset(Control.LayoutPreset.FullRect);
+        runesContent.AddThemeConstantOverride("separation", 10);
+        runesTab.AddChild(runesContent);
+        
+        // Filter bar
+        var filterBar = new HBoxContainer();
+        filterBar.AddThemeConstantOverride("separation", 10);
+        runesContent.AddChild(filterBar);
+        
+        var typeLabel = new Label();
+        typeLabel.Text = "类型:";
+        filterBar.AddChild(typeLabel);
+        
+        _filterTypeButton = new OptionButton();
+        _filterTypeButton.AddItem("全部", 0);
+        _filterTypeButton.AddItem("攻击", (int)RuneType.Offensive);
+        _filterTypeButton.AddItem("防御", (int)RuneType.Defensive);
+        _filterTypeButton.AddItem("工具", (int)RuneType.Utility);
+        _filterTypeButton.AddItem("特殊", (int)RuneType.Special);
+        _filterTypeButton.ItemSelected += OnFilterTypeChanged;
+        filterBar.AddChild(_filterTypeButton);
+        
+        var rarityLabel = new Label();
+        rarityLabel.Text = "  稀有度:";
+        filterBar.AddChild(rarityLabel);
+        
+        _filterRarityButton = new OptionButton();
+        _filterRarityButton.AddItem("全部", 0);
+        _filterRarityButton.AddItem("普通", (int)RuneRarity.Common);
+        _filterRarityButton.AddItem("优秀", (int)RuneRarity.Uncommon);
+        _filterRarityButton.AddItem("稀有", (int)RuneRarity.Rare);
+        _filterRarityButton.AddItem("史诗", (int)RuneRarity.Epic);
+        _filterRarityButton.AddItem("传说", (int)RuneRarity.Legendary);
+        _filterRarityButton.ItemSelected += OnFilterRarityChanged;
+        filterBar.AddChild(_filterRarityButton);
+        
+        filterBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
+        
+        _runeCountLabel = new Label();
+        _runeCountLabel.Text = "符文: 0/0";
+        filterBar.AddChild(_runeCountLabel);
+        
+        // Rune grid
+        _runeGrid = new GridContainer();
+        _runeGrid.Columns = 4;
+        _runeGrid.AddThemeConstantOverride("h_separation", 10);
+        _runeGrid.AddThemeConstantOverride("v_separation", 10);
+        _runeGrid.SetVExpand(ExpandMode.Fill);
+        runesContent.AddChild(_runeGrid);
+        
+        // Tab 2: Equipped
+        var equippedTab = new ScrollContainer();
+        equippedTab.Name = "Equipped";
+        _tabContainer.AddChild(equippedTab);
+        
+        _equippedContainer = new VBoxContainer();
+        _equippedContainer.SetAnchorPreset(Control.LayoutPreset.FullRect);
+        _equippedContainer.AddThemeConstantOverride("separation", 15);
+        equippedTab.AddChild(_equippedContainer);
+        
+        SetupEquippedSlots();
+        
+        // Tab 3: Stats
+        var statsTab = new ScrollContainer();
+        statsTab.Name = "Stats";
+        _tabContainer.AddChild(statsTab);
+        
+        _statsContainer = new VBoxContainer();
+        _statsContainer.SetAnchorPreset(Control.LayoutPreset.FullRect);
+        _statsContainer.AddThemeConstantOverride("separation", 10);
+        statsTab.AddChild(_statsContainer);
+        
+        SetupStatsPanel();
+        
+        // Details panel (overlay)
+        SetupDetailsPanel();
+        
+        // Update slots label
+        UpdateSlotsLabel();
+    }
+    
+    private void SetupEquippedSlots()
+    {
+        var slotsLabel = new Label();
+        slotsLabel.Text = "已装备的符文";
+        slotsLabel.AddThemeFontSizeOverride("font_size", 18);
+        _equippedContainer.AddChild(slotsLabel);
+        
+        var slotsGrid = new GridContainer();
+        slotsGrid.Columns = 4;
+        slotsGrid.AddThemeConstantOverride("h_separation", 10);
+        slotsGrid.AddThemeConstantOverride("v_separation", 10);
+        _equippedContainer.AddChild(slotsGrid);
+        
+        foreach (RuneSlotType slot in Enum.GetValues(typeof(RuneSlotType)))
         {
-            _runeSystem = runeSystem;
+            if (slot == RuneSlotType.Any) continue;
+            
+            var slotContainer = new VBoxContainer();
+            slotContainer.Alignment = BoxContainer.AlignmentMode.Center;
+            
+            var slotLabel = new Label();
+            slotLabel.Text = RuneSystem.GetSlotName(slot);
+            slotLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            slotContainer.AddChild(slotLabel);
+            
+            var slotButton = new Button();
+            slotButton.CustomMinimumSize = new Vector2(80, 80);
+            slotButton.Text = "空";
+            slotButton.Pressed += () => OnEquippedSlotPressed(slot);
+            _equippedSlots[slot] = slotButton;
+            slotContainer.AddChild(slotButton);
+            
+            slotsGrid.AddChild(slotContainer);
         }
         
-        public void Toggle()
+        // Unequip button
+        var unequipButton = new Button();
+        unequipButton.Text = "卸下选中符文";
+        unequipButton.Pressed += OnUnequipPressed;
+        _equippedContainer.AddChild(unequipButton);
+    }
+    
+    private void SetupStatsPanel()
+    {
+        var statsTitle = new Label();
+        statsTitle.Text = "符文总加成";
+        statsTitle.AddThemeFontSizeOverride("font_size", 20);
+        _statsContainer.AddChild(statsTitle);
+        
+        var statsGrid = new GridContainer();
+        statsGrid.Columns = 2;
+        statsGrid.AddThemeConstantOverride("h_separation", 20);
+        statsGrid.AddThemeConstantOverride("v_separation", 8);
+        _statsContainer.AddChild(statsGrid);
+        
+        _totalAttackLabel = new Label();
+        _totalAttackLabel.Text = "攻击力: +0";
+        statsGrid.AddChild(_totalAttackLabel);
+        
+        _totalDefenseLabel = new Label();
+        _totalDefenseLabel.Text = "防御力: +0";
+        statsGrid.AddChild(_totalDefenseLabel);
+        
+        _totalHealthLabel = new Label();
+        _totalHealthLabel.Text = "生命值: +0";
+        statsGrid.AddChild(_totalHealthLabel);
+        
+        _totalSpeedLabel = new Label();
+        _totalSpeedLabel.Text = "速度: +0";
+        statsGrid.AddChild(_totalSpeedLabel);
+        
+        _totalCritRateLabel = new Label();
+        _totalCritRateLabel.Text = "暴击率: +0%";
+        statsGrid.AddChild(_totalCritRateLabel);
+        
+        _totalCritDamageLabel = new Label();
+        _totalCritDamageLabel.Text = "暴击伤害: +0%";
+        statsGrid.AddChild(_totalCritDamageLabel);
+        
+        _totalLifestealLabel = new Label();
+        _totalLifestealLabel.Text = "生命偷取: +0%";
+        statsGrid.AddChild(_totalLifestealLabel);
+        
+        _totalDodgeLabel = new Label();
+        _totalDodgeLabel.Text = "闪避率: +0";
+        statsGrid.AddChild(_totalDodgeLabel);
+        
+        _totalBlockLabel = new Label();
+        _totalBlockLabel.Text = "格挡率: +0";
+        statsGrid.AddChild(_totalBlockLabel);
+    }
+    
+    private void SetupDetailsPanel()
+    {
+        _detailsPanel = new Panel();
+        _detailsPanel.Visible = false;
+        _detailsPanel.SetAnchorPreset(Control.LayoutPreset.RightWide);
+        _detailsPanel.OffsetLeft = -300;
+        _detailsPanel.CustomMinimumSize = new Vector2(280, 0);
+        AddChild(_detailsPanel);
+        
+        var detailsContainer = new VBoxContainer();
+        detailsContainer.SetAnchorPreset(Control.LayoutPreset.FullRect);
+        detailsContainer.AddThemeConstantOverride("separation", 10);
+        detailsContainer.AddThemeConstantOverride("margin_left", 10);
+        detailsContainer.AddThemeConstantOverride("margin_right", 10);
+        detailsContainer.AddThemeConstantOverride("margin_top", 10);
+        detailsContainer.AddThemeConstantOverride("margin_bottom", 10);
+        _detailsPanel.AddChild(detailsContainer);
+        
+        _detailsName = new Label();
+        _detailsName.AddThemeFontSizeOverride("font_size", 18);
+        detailsContainer.AddChild(_detailsName);
+        
+        _detailsDescription = new Label();
+        _detailsDescription.AutowrapMode = TextServer.AutowrapMode.Word;
+        detailsContainer.AddChild(_detailsDescription);
+        
+        var infoContainer = new VBoxContainer();
+        infoContainer.AddThemeConstantOverride("separation", 5);
+        detailsContainer.AddChild(infoContainer);
+        
+        _detailsType = new Label();
+        infoContainer.AddChild(_detailsType);
+        
+        _detailsRarity = new Label();
+        infoContainer.AddChild(_detailsRarity);
+        
+        _detailsSlot = new Label();
+        infoContainer.AddChild(_detailsSlot);
+        
+        _detailsLevel = new Label();
+        infoContainer.AddChild(_detailsLevel);
+        
+        var bonusesTitle = new Label();
+        bonusesTitle.Text = "属性加成:";
+        bonusesTitle.AddThemeFontSizeOverride("font_size", 14);
+        detailsContainer.AddChild(bonusesTitle);
+        
+        _bonusesContainer = new VBoxContainer();
+        detailsContainer.AddChild(_bonusesContainer);
+        
+        _specialEffectLabel = new Label();
+        _specialEffectLabel.Visible = false;
+        detailsContainer.AddChild(_specialEffectLabel);
+        
+        var buttonContainer = new HBoxContainer();
+        buttonContainer.Alignment = BoxContainer.AlignmentMode.Center;
+        buttonContainer.AddThemeConstantOverride("separation", 10);
+        detailsContainer.AddChild(buttonContainer);
+        
+        var equipButton = new Button();
+        equipButton.Text = "装备";
+        equipButton.Pressed += OnEquipPressed;
+        buttonContainer.AddChild(equipButton);
+        
+        var closeButton = new Button();
+        closeButton.Text = "关闭";
+        closeButton.Pressed += () => _detailsPanel.Visible = false;
+        buttonContainer.AddChild(closeButton);
+    }
+    
+    private void ConnectSignals()
+    {
+        // Connect rune system signals
+        // Note: In actual implementation, connect to RuneSystem signals
+    }
+    
+    private void OnFilterTypeChanged(long index)
+    {
+        RefreshRuneList();
+    }
+    
+    private void OnFilterRarityChanged(long index)
+    {
+        RefreshRuneList();
+    }
+    
+    private void RefreshRuneList()
+    {
+        // Clear existing
+        foreach (Node child in _runeGrid.GetChildren())
         {
-            _isVisible = !_isVisible;
-            if (_isVisible) Render();
+            child.QueueFree();
         }
         
-        public bool IsVisible() => _isVisible;
+        var allRunes = _runeSystem.GetOwnedRunes();
+        var typeFilter = (RuneType)_filterTypeButton.GetSelectedId();
+        var rarityFilter = (RuneRarity)_filterRarityButton.GetSelectedId();
         
-        public void Render()
+        var filteredRunes = allRunes;
+        
+        if (_filterTypeButton.Selected > 0)
         {
-            if (!_isVisible) return;
-            
-            Console.Clear();
-            PrintHeader();
-            PrintTabs();
-            
-            switch (_selectedTab)
+            filteredRunes = filteredRunes.FindAll(r => r.Type == typeFilter);
+        }
+        
+        if (_filterRarityButton.Selected > 0)
+        {
+            filteredRunes = filteredRunes.FindAll(r => r.Rarity == rarityFilter);
+        }
+        
+        _runeCountLabel.Text = $"符文: {filteredRunes.Count}/{allRunes.Count}";
+        
+        // Create rune cards
+        foreach (var rune in filteredRunes)
+        {
+            var runeCard = CreateRuneCard(rune);
+            _runeGrid.AddChild(runeCard);
+        }
+        
+        if (filteredRunes.Count == 0)
+        {
+            var emptyLabel = new Label();
+            emptyLabel.Text = "暂无符文";
+            emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _runeGrid.AddChild(emptyLabel);
+        }
+    }
+    
+    private Control CreateRuneCard(RuneData rune)
+    {
+        var card = new PanelContainer();
+        card.CustomMinimumSize = new Vector2(100, 100);
+        
+        var container = new VBoxContainer();
+        container.Alignment = BoxContainer.AlignmentMode.Center;
+        container.AddThemeConstantOverride("separation", 5);
+        card.AddChild(container);
+        
+        var iconLabel = new Label();
+        iconLabel.Text = GetRuneIcon(rune.Type);
+        iconLabel.AddThemeFontSizeOverride("font_size", 32);
+        iconLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        container.AddChild(iconLabel);
+        
+        var nameLabel = new Label();
+        nameLabel.Text = rune.Name;
+        nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        nameLabel.AutowrapMode = TextServer.AutowrapMode.Word;
+        nameLabel.CustomMinimumSize = new Vector2(90, 0);
+        container.AddChild(nameLabel);
+        
+        var rarityLabel = new Label();
+        rarityLabel.Text = RuneSystem.GetRarityName(rune.Rarity);
+        rarityLabel.AddThemeColorOverride("font_color", Color.FromHtml(RuneSystem.GetRarityColor(rune.Rarity)));
+        rarityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        rarityLabel.AddThemeFontSizeOverride("font_size", 10);
+        container.AddChild(rarityLabel);
+        
+        // Make clickable
+        var button = new Button();
+        button.Visible = false;
+        button.Pressed += () => OnRuneSelected(rune);
+        card.AddChild(button);
+        
+        // Also connect card input
+        card.GuiInput += (InputEvent @event) => {
+            if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
             {
-                case 0: RenderCollection(); break;
-                case 1: RenderEquipment(); break;
-                case 2: RenderCrafting(); break;
-                case 3: RenderStatistics(); break;
+                OnRuneSelected(rune);
             }
-            
-            PrintFooter();
+        };
+        
+        return card;
+    }
+    
+    private string GetRuneIcon(RuneType type)
+    {
+        return type switch
+        {
+            RuneType.Offensive => "⚔️",
+            RuneType.Defensive => "🛡️",
+            RuneType.Utility => "⚡",
+            RuneType.Special => "✨",
+            _ => "💎"
+        };
+    }
+    
+    private void OnRuneSelected(RuneData rune)
+    {
+        _selectedRune = rune;
+        ShowRuneDetails(rune);
+    }
+    
+    private void ShowRuneDetails(RuneData rune)
+    {
+        _detailsPanel.Visible = true;
+        
+        _detailsName.Text = rune.Name;
+        _detailsName.AddThemeColorOverride("font_color", Color.FromHtml(RuneSystem.GetRarityColor(rune.Rarity)));
+        
+        _detailsDescription.Text = rune.Description;
+        
+        _detailsType.Text = $"类型: {RuneSystem.GetTypeName(rune.Type)}";
+        _detailsRarity.Text = $"稀有度: {RuneSystem.GetRarityName(rune.Rarity)}";
+        _detailsRarity.AddThemeColorOverride("font_color", Color.FromHtml(RuneSystem.GetRarityColor(rune.Rarity)));
+        
+        _detailsSlot.Text = $"槽位: {RuneSystem.GetSlotName(rune.SlotType)}";
+        _detailsLevel.Text = $"需求等级: {rune.RequiredLevel}";
+        
+        // Clear and populate bonuses
+        foreach (Node child in _bonusesContainer.GetChildren())
+        {
+            child.QueueFree();
         }
         
-        private void PrintHeader()
-        {
-            Console.WriteLine("╔══════════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║                    ⚡ RUNE SYSTEM ⚡                          ║");
-            Console.WriteLine("╚══════════════════════════════════════════════════════════════╝");
-            Console.WriteLine();
-        }
+        if (rune.AttackBonus > 0) AddBonusLabel($"攻击力 +{rune.AttackBonus}");
+        if (rune.DefenseBonus > 0) AddBonusLabel($"防御力 +{rune.DefenseBonus}");
+        if (rune.HealthBonus > 0) AddBonusLabel($"生命值 +{rune.HealthBonus}");
+        if (rune.SpeedBonus > 0) AddBonusLabel($"速度 +{rune.SpeedBonus}");
+        if (rune.CritRateBonus > 0) AddBonusLabel($"暴击率 +{rune.CritRateBonus}%");
+        if (rune.CritDamageBonus > 0) AddBonusLabel($"暴击伤害 +{rune.CritDamageBonus}%");
+        if (rune.LifeStealBonus > 0) AddBonusLabel($"生命偷取 +{rune.LifeStealBonus}%");
+        if (rune.DodgeBonus > 0) AddBonusLabel($"闪避率 +{rune.DodgeBonus}");
+        if (rune.BlockBonus > 0) AddBonusLabel($"格挡率 +{rune.BlockBonus}");
         
-        private void PrintTabs()
+        // Special effect
+        if (!string.IsNullOrEmpty(rune.SpecialEffect))
         {
-            string[] tabs = { "[C]ollection", "[E]quipment", "[C]rafting", "[S]tatistics" };
-            string[] tabNames = { "Collection", "Equipment", "Crafting", "Statistics" };
+            _specialEffectLabel.Text = $"特殊效果: {rune.SpecialEffect} (+{rune.SpecialEffectValue}%)";
+            _specialEffectLabel.Visible = true;
+        }
+        else
+        {
+            _specialEffectLabel.Visible = false;
+        }
+    }
+    
+    private void AddBonusLabel(string text)
+    {
+        var label = new Label();
+        label.Text = "• " + text;
+        _bonusesContainer.AddChild(label);
+    }
+    
+    private void RefreshEquippedRunes()
+    {
+        foreach (var kvp in _equippedSlots)
+        {
+            var slotType = kvp.Key;
+            var button = kvp.Value;
             
-            for (int i = 0; i < tabs.Length; i++)
+            var equippedRune = _runeSystem.GetEquippedRune(slotType);
+            if (equippedRune != null)
             {
-                if (i == _selectedTab)
-                    Console.Write($"▶ {tabNames[i]} ◀");
-                else
-                    Console.Write($"  {tabs[i]}  ");
+                button.Text = equippedRune.Name;
+                button.AddThemeColorOverride("font_color", Color.FromHtml(RuneSystem.GetRarityColor(equippedRune.Rarity)));
             }
-            Console.WriteLine();
-            Console.WriteLine(new string('─', 70));
+            else
+            {
+                button.Text = "空";
+                button.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+            }
         }
         
-        private void RenderCollection()
+        UpdateSlotsLabel();
+    }
+    
+    private void UpdateSlotsLabel()
+    {
+        var usedSlots = _runeSystem.GetUsedSlots();
+        var totalSlots = _runeSystem.GetTotalSlots();
+        
+        var header = _mainContainer.GetChild<HBoxContainer>(0);
+        var slotsLabel = header.GetNode<Label>("SlotsLabel");
+        slotsLabel.Text = $"已装备: {usedSlots}/{totalSlots}";
+    }
+    
+    private void RefreshStats()
+    {
+        var bonuses = _runeSystem.GetTotalBonuses();
+        
+        _totalAttackLabel.Text = $"攻击力: +{bonuses["attack"]}";
+        _totalDefenseLabel.Text = $"防御力: +{bonuses["defense"]}";
+        _totalHealthLabel.Text = $"生命值: +{bonuses["health"]}";
+        _totalSpeedLabel.Text = $"速度: +{bonuses["speed"]}";
+        _totalCritRateLabel.Text = $"暴击率: +{bonuses["crit_rate"]}%";
+        _totalCritDamageLabel.Text = $"暴击伤害: +{bonuses["crit_damage"]}%";
+        _totalLifestealLabel.Text = $"生命偷取: +{bonuses["lifesteal"]}%";
+        _totalDodgeLabel.Text = $"闪避率: +{bonuses["dodge"]}";
+        _totalBlockLabel.Text = $"格挡率: +{bonuses["block"]}";
+    }
+    
+    private void OnEquippedSlotPressed(RuneSlotType slotType)
+    {
+        // Show unequip option or show available runes for this slot
+        var equippedRune = _runeSystem.GetEquippedRune(slotType);
+        if (equippedRune != null)
         {
-            Console.WriteLine("📜 YOUR RUNE COLLECTION");
-            Console.WriteLine();
-            
-            var runes = _runeSystem.GetOwnedRunes();
-            if (!runes.Any())
+            ShowRuneDetails(equippedRune);
+        }
+    }
+    
+    private void OnUnequipPressed()
+    {
+        if (_selectedRune == null) return;
+        
+        // Find which slot this rune is in and unequip
+        foreach (var kvp in _runeSystem.GetAllEquippedRunes())
+        {
+            if (kvp.Value == _selectedRune)
             {
-                Console.WriteLine("  No runes yet. Visit a merchant or craft some!");
-                return;
+                _runeSystem.UnequipRune(kvp.Key);
+                RefreshEquippedRunes();
+                RefreshStats();
+                RefreshRuneList();
+                _detailsPanel.Visible = false;
+                break;
             }
-            
-            // Group by type
-            var grouped = runes.GroupBy(r => r.Type).OrderBy(g => g.Key);
-            
-            foreach (var group in grouped)
+        }
+    }
+    
+    private void OnEquipPressed()
+    {
+        if (_selectedRune == null) return;
+        
+        // Try to equip to appropriate slot
+        RuneSlotType targetSlot = _selectedRune.SlotType;
+        
+        // If Any slot, ask user which slot to equip to
+        if (targetSlot == RuneSlotType.Any)
+        {
+            // For now, just try to find an empty slot
+            foreach (RuneSlotType slot in Enum.GetValues(typeof(RuneSlotType)))
             {
-                Console.WriteLine($"\n═══ {group.Key} ═══");
-                foreach (var rune in group.OrderBy(r => r.Rarity))
+                if (slot == RuneSlotType.Any) continue;
+                if (_runeSystem.GetEquippedRune(slot) == null)
                 {
-                    int count = _runeSystem.GetRuneCount(rune.Id);
-                    string rarityColor = GetRarityColor(r.Rarity);
-                    string equipped = _runeSystem.GetEquippedRunes().Any(e => e.Id == rune.Id) ? " [EQUIPPED]" : "";
-                    Console.WriteLine($"  {rarityColor}{rune.Name}{GetRarityReset()} x{count}{equipped}");
-                    Console.WriteLine($"      {rune.Description}");
-                    Console.WriteLine($"      └─ {rune.Power} Power | Lv.{rune.LevelRequired}");
-                }
-            }
-        }
-        
-        private void RenderEquipment()
-        {
-            Console.WriteLine("⚔️ EQUIPPED RUNES");
-            Console.WriteLine();
-            
-            var equipped = _runeSystem.GetEquippedRunes();
-            if (!equipped.Any())
-            {
-                Console.WriteLine("  No runes equipped. Go to Collection to equip!");
-                return;
-            }
-            
-            foreach (var rune in equipped)
-            {
-                string rarityColor = GetRarityColor(rune.Rarity);
-                Console.WriteLine($"  {rarityColor}{rune.Name}{GetRarityReset()}");
-                Console.WriteLine($"      {rune.Description}");
-                
-                // Print stats
-                var stats = new List<string>();
-                if (rune.DamageBonus > 0) stats.Add($"+{rune.DamageBonus}% Damage");
-                if (rune.DefenseBonus > 0) stats.Add($"+{rune.DefenseBonus} Defense");
-                if (rune.HealthBonus > 0) stats.Add($"+{rune.HealthBonus} Health");
-                if (rune.ManaBonus > 0) stats.Add($"+{rune.ManaBonus} Mana");
-                if (rune.SpeedBonus != 0) stats.Add($"{(rune.SpeedBonus > 0 ? "+" : "")}{rune.SpeedBonus}% Speed");
-                if (rune.CritChance > 0) stats.Add($"+{rune.CritChance}% Crit");
-                if (rune.CritDamage > 0) stats.Add($"+{rune.CritDamage}% Crit Damage");
-                if (rune.LifeSteal > 0) stats.Add($"+{rune.LifeSteal}% Life Steal");
-                if (rune.Regen > 0) stats.Add($"+{rune.Regen}/s Regen");
-                
-                if (stats.Any())
-                {
-                    Console.WriteLine($"      Stats: {string.Join(", ", stats)}");
-                }
-                
-                // Print effects
-                var effects = new List<string>();
-                if (rune.OnHitEffect) effects.Add("On Hit");
-                if (rune.OnKillEffect) effects.Add("On Kill");
-                if (rune.OnDamagedEffect) effects.Add("On Damaged");
-                if (rune.OnCriticalEffect) effects.Add("On Critical");
-                
-                if (effects.Any())
-                {
-                    Console.WriteLine($"      Effects: {string.Join(", ", effects)}");
-                }
-                
-                Console.WriteLine();
-            }
-            
-            // Print total bonuses
-            Console.WriteLine("═══ TOTAL BONUSES ═══");
-            Console.WriteLine($"  +{_runeSystem.GetTotalDamageBonus()}% Damage");
-            Console.WriteLine($"  +{_runeSystem.GetTotalDefenseBonus()} Defense");
-            Console.WriteLine($"  +{_runeSystem.GetTotalHealthBonus()} Health");
-            Console.WriteLine($"  +{_runeSystem.GetTotalManaBonus()} Mana");
-            Console.WriteLine($"  +{_runeSystem.GetTotalSpeedBonus()}% Speed");
-            Console.WriteLine($"  +{_runeSystem.GetTotalCritChance()}% Crit Chance");
-            Console.WriteLine($"  +{_runeSystem.GetTotalCritDamage()}% Crit Damage");
-            Console.WriteLine($"  +{_runeSystem.GetTotalLifeSteal()}% Life Steal");
-            Console.WriteLine($"  +{_runeSystem.GetTotalRegen()}/s Regen");
-        }
-        
-        private void RenderCrafting()
-        {
-            Console.WriteLine("🔨 RUNE SYNTHESIS");
-            Console.WriteLine();
-            Console.WriteLine("Combine 3 runes of the same type and lower rarity to craft:");
-            Console.WriteLine();
-            
-            var runeTypes = Enum.GetValues(typeof(RuneType)) as RuneType[];
-            
-            for (int i = 0; i < runeTypes.Length; i++)
-            {
-                var type = runeTypes[i];
-                var runes = Systems.RuneDatabase.GetRunesByType(type);
-                if (!runes.Any()) continue;
-                
-                Console.WriteLine($"\n═══ {type} ═══");
-                for (int j = 1; j < runes.Count; j++)
-                {
-                    var rune = runes[j];
-                    var prevRune = runes[j - 1];
-                    
-                    string canCraft = CanCraft(rune) ? "✓" : "✗";
-                    string rarityColor = GetRarityColor(rune.Rarity);
-                    
-                    Console.WriteLine($"  {canCraft} {rarityColor}{rune.Name}{GetRarityReset()}");
-                    Console.WriteLine($"      Requires: 3x {prevRune.Name}");
-                    Console.WriteLine($"      Power: {rune.Power} (+{rune.Power - prevRune.Power})");
-                }
-            }
-        }
-        
-        private void RenderStatistics()
-        {
-            Console.WriteLine("📊 RUNE STATISTICS");
-            Console.WriteLine();
-            
-            var stats = _runeSystem.GetStatistics();
-            
-            Console.WriteLine($"  Total Runes Owned: {stats.TotalRunesOwned}");
-            Console.WriteLine($"  Unique Rune Types: {stats.UniqueRunes}");
-            Console.WriteLine($"  Total Crafted: {stats.TotalCrafted}");
-            Console.WriteLine();
-            
-            Console.WriteLine("═══ BY RARITY ═══");
-            foreach (var kvp in stats.RarityBreakdown.OrderBy(k => k.Key))
-            {
-                string rarityColor = GetRarityColor(kvp.Key);
-                Console.WriteLine($"  {rarityColor}{kvp.Key}{GetRarityReset()}: {kvp.Value}");
-            }
-            
-            Console.WriteLine();
-            Console.WriteLine("═══ BY TYPE ═══");
-            foreach (var kvp in stats.TypeBreakdown.OrderBy(k => k.Key))
-            {
-                Console.WriteLine($"  {kvp.Key}: {kvp.Value}");
-            }
-        }
-        
-        private bool CanCraft(Rune rune)
-        {
-            int rarityLevel = (int)rune.Rarity;
-            if (rarityLevel <= 0) return false;
-            
-            var ingredientRarity = (RuneRarity)(rarityLevel - 1);
-            return _runeSystem.GetOwnedRunes()
-                .Any(r => r.Type == rune.Type && r.Rarity == ingredientRarity && _runeSystem.GetRuneCount(r.Id) >= 1);
-        }
-        
-        private void PrintFooter()
-        {
-            Console.WriteLine();
-            Console.WriteLine(new string('─', 70));
-            Console.WriteLine("[1-4] Switch Tab  [E] Equip  [U] Unequip  [C] Craft  [Q] Quit  [R] Refresh");
-        }
-        
-        private string GetRarityColor(RuneRarity rarity)
-        {
-            return rarity switch
-            {
-                RuneRarity.Common => "§7",
-                RuneRarity.Uncommon => "§a",
-                RuneRarity.Rare => "§9",
-                RuneRarity.Epic => "§5",
-                RuneRarity.Legendary => "§6",
-                RuneRarity.Mythic => "§d",
-                _ => "§f"
-            };
-        }
-        
-        private string GetRarityReset()
-        {
-            return "§r";
-        }
-        
-        public void HandleInput(string input)
-        {
-            switch (input.ToLower())
-            {
-                case "1": _selectedTab = 0; break;
-                case "2": _selectedTab = 1; break;
-                case "3": _selectedTab = 2; break;
-                case "4": _selectedTab = 3; break;
-                case "c":
-                    if (_selectedTab == 2) TryCraft();
+                    targetSlot = slot;
                     break;
-                case "r":
-                case "refresh":
-                    Render();
-                    break;
-                case "q":
-                case "quit":
-                    _isVisible = false;
-                    break;
+                }
             }
-            Render();
         }
         
-        private void TryCraft()
+        if (_runeSystem.EquipRune(_selectedRune, targetSlot))
         {
-            // Simplified crafting - just show it works
-            Console.WriteLine("\nEnter rune ID to craft (or 'back'): ");
-            // In real implementation, would handle input
+            RefreshEquippedRunes();
+            RefreshStats();
+            RefreshRuneList();
+        }
+    }
+    
+    public override void _GuiInput(InputEvent @event)
+    {
+        if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+        {
+            if (keyEvent.Keycode == Key.Escape)
+            {
+                QueueFree();
+            }
         }
     }
 }
