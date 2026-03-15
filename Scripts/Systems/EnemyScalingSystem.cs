@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 敌人属性缩放系统，负责根据各种因素（楼层、玩家等级、击杀数、时间等）
 /// 动态计算敌人的属性缩放值，支持线性、指数、对数和 plateau 等多种增长模式。
 /// </summary>
-public class EnemyScalingSystem
+public class EnemyScalingSystem : BaseSystem
 {
     // 单例
     private static EnemyScalingSystem _instance;
@@ -245,5 +245,27 @@ public class EnemyScalingSystem
             case EnemyScalingData.ScalingType.Plateau: return "Plateau";
             default: return "Unknown";
         }
+    }
+
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "currentFloor", _data.CurrentFloor },
+            { "totalKills", _data.TotalKills },
+            { "playerLevel", _data.PlayerLevel }
+        };
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || _data == null) return;
+
+        if (data.ContainsKey("currentFloor"))
+            _data.CurrentFloor = Convert.ToInt32(data["currentFloor"]);
+        if (data.ContainsKey("totalKills"))
+            _data.TotalKills = Convert.ToInt32(data["totalKills"]);
+        if (data.ContainsKey("playerLevel"))
+            _data.PlayerLevel = Convert.ToInt32(data["playerLevel"]);
     }
 }
