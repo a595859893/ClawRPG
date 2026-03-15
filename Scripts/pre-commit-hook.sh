@@ -22,27 +22,30 @@ fi
 
 echo "Checking $CS_FILES"
 
-# Check for missing parentheses after 'new Type'
-echo "Checking for missing parentheses..."
-for file in $CS_FILES; do
-    # Check for "new [A-Z][a-zA-Z]*;" pattern (likely missing parens)
-    MISSING_PARENS=$(grep -n "new [A-Z][a-zA-Z]*;" "$file" | grep -v "//" | grep -v "=>" | head -5)
-    if [ -n "$MISSING_PARENS" ]; then
-        echo -e "${RED}ERROR: Possible missing parentheses in $file:${NC}"
-        echo "$MISSING_PARENS"
-        ERRORS=$((ERRORS + 1))
-    fi
-    
-    # Check for double semicolons
-    DOUBLE_SEMI=$(grep -n ";;\|,\s*;" "$file" | head -5)
-    if [ -n "$DOUBLE_SEMI" ]; then
-        echo -e "${RED}ERROR: Double semicolon in $file:${NC}"
-        echo "$DOUBLE_SEMI"
-        ERRORS=$((ERRORS + 1))
-    fi
-done
+# Primary: dotnet build check
+echo "Running dotnet build..."
+export DOTNET_ROOT=/root/.dotnet
+export PATH="$DOTNET_ROOT:$PATH"
 
-# Check for TODO without assignee
+# Copy files to temp directory for build check
+TEMP_DIR=$(mktemp -d)
+cp $CS_FILES "$TEMP_DIR/" 2>/dev/null
+cd "$TEMP_DIR"
+
+if dotnet build 2>&1 | grep -E "CS[0-9]{4}|error"; then
+    echo -e "${RED}ERROR: Syntax errors found:${NC}"
+    dotnet build 2>&1 | grep -E "CS[0-9]{4}|error" | head -10
+    ERRORS=$((ERRORS + 1))
+    cd /project/ClawRPG
+    rm -rf "$TEMP_DIR"
+    echo -e "${RED}Pre-commit check failed${NC}"
+    exit 1
+fi
+
+cd /project/ClawRPG
+rm -rf "$TEMP_DIR"
+
+# Check for TODO without assignee (warning only)
 echo "Checking for unassigned TODOs..."
 for file in $CS_FILES; do
     UNASSIGNED_TODO=$(grep -n "TODO" "$file" | grep -v "TODO(" | head -5)
