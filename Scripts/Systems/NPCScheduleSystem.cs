@@ -251,6 +251,31 @@ namespace ClawRPG.Systems {
             if (data.ContainsKey("is_paused"))
                 _isPaused = Convert.ToBoolean(data["is_paused"]);
         }
+        
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary
+            {
+                { "game_time", _gameTime },
+                { "time_scale", _timeScale },
+                { "is_paused", _isPaused }
+            };
+        }
+        
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("game_time")) _gameTime = (float)data["game_time"];
+            if (data.Contains("time_scale")) _timeScale = (float)data["time_scale"];
+            if (data.Contains("is_paused")) _isPaused = (bool)data["is_paused"];
+        }
     }
 
     public class NPCSchedule

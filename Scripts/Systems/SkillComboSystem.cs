@@ -295,4 +295,82 @@ public partial class SkillComboSystem : BaseSystem
         if (data.ContainsKey("discoveredCombos"))
             _playerData.DiscoveredCombos = (List<string>)data["discoveredCombos"];
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // Combo usage count
+        var usageCount = new Dictionary();
+        foreach (var kvp in _playerData.ComboUsageCount)
+        {
+            usageCount[kvp.Key] = kvp.Value;
+        }
+        data["combo_usage_count"] = usageCount;
+        
+        // Combo streak best
+        var streakBest = new Dictionary();
+        foreach (var kvp in _playerData.ComboStreakBest)
+        {
+            streakBest[kvp.Key] = kvp.Value;
+        }
+        data["combo_streak_best"] = streakBest;
+        
+        data["total_combo_damage"] = _playerData.TotalComboDamage;
+        data["total_combos_triggered"] = _playerData.TotalCombosTriggered;
+        
+        // Discovered combos
+        var discoveredCombos = new Array();
+        foreach (var combo in _playerData.DiscoveredCombos)
+        {
+            discoveredCombos.Add(combo);
+        }
+        data["discovered_combos"] = discoveredCombos;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("combo_usage_count"))
+        {
+            var usageCount = (Dictionary)data["combo_usage_count"];
+            _playerData.ComboUsageCount = new Dictionary<string, int>();
+            foreach (var kvp in usageCount)
+            {
+                _playerData.ComboUsageCount[kvp.Key] = (int)kvp.Value;
+            }
+        }
+        
+        if (data.Contains("combo_streak_best"))
+        {
+            var streakBest = (Dictionary)data["combo_streak_best"];
+            _playerData.ComboStreakBest = new Dictionary<string, int>();
+            foreach (var kvp in streakBest)
+            {
+                _playerData.ComboStreakBest[kvp.Key] = (int)kvp.Value;
+            }
+        }
+        
+        if (data.Contains("total_combo_damage")) _playerData.TotalComboDamage = (float)data["total_combo_damage"];
+        if (data.Contains("total_combos_triggered")) _playerData.TotalCombosTriggered = (int)data["total_combos_triggered"];
+        
+        if (data.Contains("discovered_combos"))
+        {
+            var discoveredCombos = (Array)data["discovered_combos"];
+            _playerData.DiscoveredCombos = new List<string>();
+            foreach (string combo in discoveredCombos)
+            {
+                _playerData.DiscoveredCombos.Add(combo);
+            }
+        }
+    }
 }

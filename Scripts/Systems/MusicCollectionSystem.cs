@@ -421,6 +421,97 @@ namespace ClawRPG.Scripts.Systems {
                 _instance = null;
             }
         }
+        
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 已解锁曲目
+            var unlocked = new Array();
+            foreach (var trackId in _unlockedTracks.Keys) {
+                unlocked.Add(trackId);
+            }
+            data["unlocked"] = unlocked;
+            
+            // 收藏
+            var favorites = new Array();
+            foreach (var trackId in _favoriteTracks) {
+                favorites.Add(trackId);
+            }
+            data["favorites"] = favorites;
+            
+            // 统计
+            data["total_play_time"] = _totalPlayTime;
+            data["times_played"] = _timesPlayed;
+            
+            // 曲目数据
+            var trackData = new Dictionary();
+            foreach (var track in _unlockedTracks.Values) {
+                var trackInfo = new Dictionary
+                {
+                    { "play_count", track.PlayCount },
+                    { "total_play_time", track.TotalPlayTime }
+                };
+                trackData[track.Id] = trackInfo;
+            }
+            data["track_data"] = trackData;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // Load unlocked tracks
+            if (data.Contains("unlocked")) {
+                var unlocked = (Array)data["unlocked"];
+                foreach (string trackId in unlocked) {
+                    if (_trackDatabase.TryGetValue(trackId, out var track)) {
+                        _unlockedTracks[trackId] = track;
+                        track.IsUnlocked = true;
+                    }
+                }
+            }
+            
+            // Load favorites
+            if (data.Contains("favorites")) {
+                var favorites = (Array)data["favorites"];
+                foreach (string trackId in favorites) {
+                    _favoriteTracks.Add(trackId);
+                }
+            }
+            
+            // Load stats
+            if (data.Contains("total_play_time")) {
+                _totalPlayTime = (int)data["total_play_time"];
+            }
+            if (data.Contains("times_played")) {
+                _timesPlayed = (int)data["times_played"];
+            }
+            
+            // Load track-specific data
+            if (data.Contains("track_data")) {
+                var trackData = (Dictionary)data["track_data"];
+                foreach (string trackId in trackData.Keys) {
+                    if (_unlockedTracks.TryGetValue(trackId, out var track)) {
+                        var trackInfo = (Dictionary)trackData[trackId];
+                        if (trackInfo.Contains("play_count")) {
+                            track.PlayCount = (int)trackInfo["play_count"];
+                        }
+                        if (trackInfo.Contains("total_play_time")) {
+                            track.TotalPlayTime = (int)trackInfo["total_play_time"];
+                        }
+                    }
+                }
+            }
+        }
     }
     
     #region Data Classes

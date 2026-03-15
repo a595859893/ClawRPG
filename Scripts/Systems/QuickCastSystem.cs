@@ -502,4 +502,80 @@ public partial class QuickCastSystem : BaseSystem
             LoadData(data);
         }
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        var slots = new Array();
+        foreach (var slot in _quickSlots)
+        {
+            var slotData = new Dictionary
+            {
+                { "item_id", slot.ItemId },
+                { "item_name", slot.ItemName },
+                { "is_assigned", slot.IsAssigned },
+                { "cooldown_time", slot.CooldownTime }
+            };
+            slots.Add(slotData);
+        }
+        
+        data["slots"] = slots;
+        data["total_casts"] = _totalCasts;
+        data["successful_casts"] = _successfulCasts;
+        
+        // Item usage count
+        var usageCount = new Dictionary();
+        foreach (var kvp in _itemUsageCount)
+        {
+            usageCount[kvp.Key] = kvp.Value;
+        }
+        data["item_usage_count"] = usageCount;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("slots"))
+        {
+            var slots = (Array)data["slots"];
+            for (int i = 0; i < Mathf.Min(slots.Count, MaxSlots); i++)
+            {
+                var slotData = (Dictionary)slots[i];
+                var slot = _quickSlots[i];
+                
+                if (slotData.Contains("item_id"))
+                    slot.ItemId = slotData["item_id"].ToString();
+                if (slotData.Contains("item_name"))
+                    slot.ItemName = slotData["item_name"].ToString();
+                if (slotData.Contains("is_assigned"))
+                    slot.IsAssigned = (bool)slotData["is_assigned"];
+                if (slotData.Contains("cooldown_time"))
+                    slot.CooldownTime = (float)slotData["cooldown_time"];
+            }
+        }
+        
+        if (data.Contains("total_casts"))
+            _totalCasts = (int)data["total_casts"];
+        if (data.Contains("successful_casts"))
+            _successfulCasts = (int)data["successful_casts"];
+        if (data.Contains("item_usage_count"))
+        {
+            var usageCount = (Dictionary)data["item_usage_count"];
+            _itemUsageCount = new Dictionary<string, int>();
+            foreach (var kvp in usageCount)
+            {
+                _itemUsageCount[kvp.Key] = (int)kvp.Value;
+            }
+        }
+    }
 }
