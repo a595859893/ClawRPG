@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class TitleCollectionSystem : Node
+public partial class TitleCollectionSystem : BaseSystem
 {
     public static TitleCollectionSystem Instance { get; private set; }
     
@@ -25,6 +25,11 @@ public partial class TitleCollectionSystem : Node
         Instance = this;
         InitializeCustomConditions();
     }
+    
+    /// <summary>
+    /// 系统名称
+    /// </summary>
+    protected override string SystemName => "TitleCollection";
     
     private void InitializeCustomConditions()
     {
