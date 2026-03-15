@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 每日仪式系统 - 管理每日仪式任务
+/// </summary>
 public class DailyRitualSystem : Node
 {
     public static DailyRitualSystem Instance { get; private set; }

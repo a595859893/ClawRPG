@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Game
 {
+    /// <summary>
+    /// 神器UI - 显示神器界面
+    /// </summary>
     public class ArtifactUI : Control
     {
         private Control container;

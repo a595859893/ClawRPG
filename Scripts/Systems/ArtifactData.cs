@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Game
 {
+    /// <summary>
+    /// 神器稀有度枚举
+    /// </summary>
     public enum ArtifactRarity
     {
         Common = 0,

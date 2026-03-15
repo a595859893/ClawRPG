@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 顿帧UI - 显示战斗顿帧效果
+/// </summary>
 public partial class HitStopUI : Control
 {
 	private VBoxContainer _mainContainer;

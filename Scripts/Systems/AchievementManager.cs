@@ -155,6 +155,10 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("survive_1hour", (int)_totalSurvivalTime);
         }
         
+        /// <summary>
+        /// 追踪等级
+        /// </summary>
+        /// <param name="level">等级</param>
         public void TrackLevel(int level)
         {
             UpdateAchievement("level_5", level);
@@ -163,6 +167,10 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("level_50", level);
         }
         
+        /// <summary>
+        /// 追踪区域探索
+        /// </summary>
+        /// <param name="regionCount">已探索区域数</param>
         public void TrackRegionExplore(int regionCount)
         {
             _regionsExplored = regionCount;
@@ -170,6 +178,10 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("explore_all", _regionsExplored);
         }
         
+        /// <summary>
+        /// 追踪技能学习
+        /// </summary>
+        /// <param name="skillCount">已学习技能数</param>
         public void TrackSkillLearn(int skillCount)
         {
             _skillsLearned = skillCount;
@@ -177,6 +189,9 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("skill_learn_15", _skillsLearned);
         }
         
+        /// <summary>
+        /// 追踪愤怒击杀
+        /// </summary>
         public void TrackEnrageKill()
         {
             _enrageKills++;
@@ -185,6 +200,10 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("enrage_kill_10", _enrageKills);
         }
         
+        /// <summary>
+        /// 追踪完美格挡
+        /// </summary>
+        /// <param name="count">完美格挡次数</param>
         public void TrackPerfectBlock(int count = 1)
         {
             _perfectBlocks += count;
@@ -193,6 +212,10 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("perfect_block_100", _perfectBlocks);
         }
         
+        /// <summary>
+        /// 追踪反击
+        /// </summary>
+        /// <param name="count">反击次数</param>
         public void TrackCounterAttack(int count = 1)
         {
             _counterAttacks += count;
@@ -201,6 +224,10 @@ namespace ClawRPG.Scripts.Systems
             UpdateAchievement("counter_50", _counterAttacks);
         }
         
+        /// <summary>
+        /// 追踪无伤Boss战
+        /// </summary>
+        /// <param name="success">是否成功</param>
         public void TrackNoHitBoss(bool success)
         {
             if (success)
@@ -282,26 +309,48 @@ namespace ClawRPG.Scripts.Systems
             return Engine.GetMainLoop() as Tree;
         }
         
+        /// <summary>
+        /// 获取已解锁成就列表
+        /// </summary>
+        /// <returns>已解锁成就列表</returns>
         public List<Achievement> GetUnlockedAchievements()
         {
             return new List<Achievement>(_unlockedAchievements);
         }
         
+        /// <summary>
+        /// 获取所有追踪的成就
+        /// </summary>
+        /// <returns>成就列表</returns>
         public List<Achievement> GetAllTrackedAchievements()
         {
             return AchievementDatabase.Instance.GetAllAchievements();
         }
         
+        /// <summary>
+        /// 获取指定成就
+        /// </summary>
+        /// <param name="id">成就ID</param>
+        /// <returns>成就对象</returns>
         public Achievement GetAchievement(string id)
         {
             return _trackedAchievements.TryGetValue(id, out var achievement) ? achievement : null;
         }
         
+        /// <summary>
+        /// 检查成就是否已解锁
+        /// </summary>
+        /// <param name="id">成就ID</param>
+        /// <returns>是否已解锁</returns>
         public bool IsAchievementUnlocked(string id)
         {
             return _trackedAchievements.TryGetValue(id, out var achievement) && achievement.IsUnlocked;
         }
         
+        /// <summary>
+        /// 获取总体进度百分比
+        /// </summary>
+        /// <returns>进度百分比</returns>
         public float GetOverallProgress()
         {
             var all = GetAllTrackedAchievements();
@@ -316,6 +365,10 @@ namespace ClawRPG.Scripts.Systems
             return (float)unlocked / all.Count;
         }
         
+        /// <summary>
+        /// 获取统计数据
+        /// </summary>
+        /// <returns>统计数据字典</returns>
         public Dictionary<string, int> GetStatistics()
         {
             return new Dictionary<string, int>

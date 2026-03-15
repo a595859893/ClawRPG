@@ -1,6 +1,9 @@
 using Godot;
 using System.Collections.Generic;
 
+/// <summary>
+/// 每日仪式数据 - 存储仪式类型配置
+/// </summary>
 public enum RitualType
 {
     MorningPrayer,

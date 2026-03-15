@@ -1,6 +1,9 @@
 using Godot;
 using System.Collections.Generic;
 
+/// <summary>
+/// 每日仪式数据库 - 配置仪式数据
+/// </summary>
 public class DailyRitualDatabase
 {
     private static DailyRitualDatabase _instance;

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Game
 {
+    /// <summary>
+    /// 神器数据库 - 配置神器数据
+    /// </summary>
     public static class ArtifactDatabase
     {
         private static Dictionary<string, Artifact> artifacts = new Dictionary<string, Artifact>();

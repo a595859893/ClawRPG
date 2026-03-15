@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Scripts.Systems {
+    /// <summary>
+    /// 故事系统 - 管理游戏剧情和章节
+    /// </summary>
     public class StoryChapter {
         public int ChapterId;
         public string Title;

@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 神器系统 - 管理神器获取和强化
+/// </summary>
 public class ArtifactSystem : BaseSystem
 {
     // 神器数据存储

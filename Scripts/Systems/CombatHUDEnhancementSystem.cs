@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 战斗HUD增强系统 - 增强战斗界面显示效果
+/// </summary>
 public class CombatHUDEnhancementData
 {
 	public enum StatType
