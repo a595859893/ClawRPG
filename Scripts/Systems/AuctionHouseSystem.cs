@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AuctionHouseSystem : Node
+public class AuctionHouseSystem : BaseSystem
 {
     public static AuctionHouseSystem Instance { get; private set; }
     
@@ -35,6 +35,11 @@ public class AuctionHouseSystem : Node
         Instance = this;
         AddToGroup("AuctionHouseSystem");
     }
+    
+    /// <summary>
+    /// 系统名称
+    /// </summary>
+    protected override string SystemName => "AuctionHouse";
     
     public void Initialize(Player player)
     {

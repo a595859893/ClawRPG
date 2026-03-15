@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BossMechanicsSystem : Node
+public class BossMechanicsSystem : BaseSystem
 {
     public static BossMechanicsSystem Instance { get; private set; }
     
@@ -25,6 +25,11 @@ public class BossMechanicsSystem : Node
         Instance = this;
         _database = BossMechanicsDatabase.Instance;
     }
+    
+    /// <summary>
+    /// 系统名称
+    /// </summary>
+    protected override string SystemName => "BossMechanics";
     
     public void StartBossBattle(string bossId)
     {

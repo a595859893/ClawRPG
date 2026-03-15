@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 游戏平衡管理器 - 加载和应用游戏平衡配置
     /// </summary>
-    public partial class BalanceManager : Node {
+    public partial class BalanceManager : BaseSystem {
         public static BalanceManager Instance { get; private set; }
 
         private BalanceConfig _config;
@@ -25,6 +25,11 @@ namespace ClawRPG.Scripts.Systems {
             Instance = this;
             LoadConfig();
         }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "Balance";
 
         /// <summary>
         /// 加载平衡配置文件
