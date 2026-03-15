@@ -310,4 +310,7 @@ public partial class MomentumSystem : BaseSystem
             }
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

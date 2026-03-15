@@ -343,4 +343,7 @@ public class PetEquipmentEnhancementSystem : BaseSystem
     {
         SaveSystem.SaveGame();
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

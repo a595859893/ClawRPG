@@ -286,4 +286,7 @@ namespace ClawRPG.Scripts.Systems.PetMood {
             }
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

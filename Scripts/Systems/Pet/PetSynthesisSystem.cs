@@ -313,4 +313,7 @@ public class PetSynthesisSystem : BaseSystem
     }
     
     #endregion
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

@@ -168,4 +168,7 @@ public class GeneTemplate
         BaseLuck = luck;
         SpecialEffect = effect;
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

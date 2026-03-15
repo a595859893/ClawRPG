@@ -294,4 +294,7 @@ namespace ClawRPG.Scripts.Systems {
             GD.Print("[PetRecycleSystem] Data loaded");
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

@@ -55,4 +55,7 @@ namespace ClawRPG.Scripts.Systems.PetRecycle {
         public int Quantity { get; set; } = 0;
         public int Value { get; set; } = 0;
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

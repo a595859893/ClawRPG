@@ -132,4 +132,7 @@ public class LifeExtensionItem
         Cost = cost;
         DaysExtended = daysExtended;
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

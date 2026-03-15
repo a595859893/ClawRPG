@@ -522,4 +522,7 @@ namespace ClawRPG.Systems.Meditation
             }
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

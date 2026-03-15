@@ -47,4 +47,7 @@ public class LifeCycleHistoryEntry
     public bool WasExtended;
     public int LifeExtensions;
     public long Timestamp;
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

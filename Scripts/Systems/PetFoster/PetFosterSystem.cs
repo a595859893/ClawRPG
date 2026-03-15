@@ -310,4 +310,7 @@ namespace ClawRPG.Scripts.Systems.PetFoster
             saveSystem?.Set("pet_foster_data", _playerData);
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

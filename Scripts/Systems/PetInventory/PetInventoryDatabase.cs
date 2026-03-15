@@ -133,4 +133,7 @@ public class PetInventoryDatabase : BaseSystem {
     public float GetRarityMultiplier(string rarity) {
         return RarityValueMultiplier.ContainsKey(rarity) ? RarityValueMultiplier[rarity] : 1.0f;
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

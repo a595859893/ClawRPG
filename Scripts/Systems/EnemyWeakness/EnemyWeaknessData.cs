@@ -89,4 +89,7 @@ public class EnemyWeaknessData : BaseSystem
     {
         // 保存数据到 JSON
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

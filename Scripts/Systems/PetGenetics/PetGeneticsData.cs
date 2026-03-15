@@ -92,4 +92,7 @@ public class GeneModificationRecord
     public string ModificationType; // Add/Remove/Upgrade
     public int Timestamp;
     public bool Success;
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

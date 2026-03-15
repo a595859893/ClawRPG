@@ -47,4 +47,7 @@ public class PetInventoryData : BaseSystem {
             TotalSlots = 50;
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

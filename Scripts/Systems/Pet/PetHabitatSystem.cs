@@ -388,4 +388,7 @@ namespace GameSystems
             GD.Print($"Pet Habitat data loaded: {PlayerData.CurrentHabitatId}, {PlayerData.PlacedDecorations.Count} decorations");
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

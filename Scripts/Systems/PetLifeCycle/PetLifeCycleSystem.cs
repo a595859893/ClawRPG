@@ -355,4 +355,7 @@ public class PetLifeCycleSystem : BaseSystem
             }
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

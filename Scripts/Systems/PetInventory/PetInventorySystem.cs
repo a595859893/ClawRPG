@@ -259,4 +259,7 @@ public class PetInventorySystem : BaseSystem {
     public Dictionary<string, List<string>> GetCategories() {
         return _database.CategoryItems;
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

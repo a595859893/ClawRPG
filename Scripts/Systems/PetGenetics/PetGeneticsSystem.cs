@@ -228,4 +228,7 @@ public class PetGeneticsSystem : BaseSystem
     {
         return _data.ModificationHistory;
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

@@ -486,4 +486,7 @@ public class PetBattleArenaSystem : BaseSystem
             Load(data);
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

@@ -155,4 +155,7 @@ public enum SynthesisType
     ShadowFusion,
     CelestialFusion,
     ChaosFusion
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

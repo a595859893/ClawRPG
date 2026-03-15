@@ -358,4 +358,7 @@ public class EnemyWeaknessDatabase : BaseSystem
         }
         return weaknesses;
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }

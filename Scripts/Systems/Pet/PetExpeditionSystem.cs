@@ -451,4 +451,7 @@ namespace GameSystems
             }
         }
     }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
 }
