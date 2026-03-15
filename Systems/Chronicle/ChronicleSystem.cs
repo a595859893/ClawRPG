@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ChronicleSystem : Node
+public class ChronicleSystem : BaseSystem
 {
     public static ChronicleSystem Instance { get; private set; }
     
@@ -36,6 +36,11 @@ public class ChronicleSystem : Node
     public override void _Ready()
     {
         Instance = this;
+        base._Ready();
+    }
+    
+    protected override void Initialize()
+    {
         InitializeChronicle();
     }
     
@@ -142,26 +147,26 @@ public class ChronicleSystem : Node
     public List<LoreEntry> GetDiscoveredLore() => discoveredLore;
     public Dictionary<string, bool> GetStoryFlags() => storyFlags;
     
-    public void SaveData()
+    public override Dictionary ExportSaveData()
     {
-        var data = new Dictionary<string, object>
+        return new Dictionary<string, object>
         {
             {"currentChapter", currentChapter},
             {"chronicles", chronicles},
             {"discoveredLore", discoveredLore},
             {"storyFlags", storyFlags}
         };
-        SaveManager.Save("chronicle", data);
     }
     
-    public void LoadData()
+    public override void ImportSaveData(Dictionary data)
     {
-        var data = SaveManager.Load("chronicle");
-        if (data != null)
-        {
-            if (data.ContainsKey("currentChapter")) currentChapter = (string)data["currentChapter"];
-            // Load other data as needed
-        }
+        base.ImportSaveData(data);
+        if (data == null) return;
+        
+        if (data.ContainsKey("currentChapter")) currentChapter = (string)data["currentChapter"];
+        if (data.ContainsKey("chronicles")) chronicles = (Dictionary<string, ChronicleEntry>)data["chronicles"];
+        if (data.ContainsKey("discoveredLore")) discoveredLore = (List<LoreEntry>)data["discoveredLore"];
+        if (data.ContainsKey("storyFlags")) storyFlags = (Dictionary<string, bool>)data["storyFlags"];
     }
 }
 
