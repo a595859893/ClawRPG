@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts
     /// <summary>
     /// 成就里程碑系统 - 核心系统
     /// </summary>
-    public partial class AchievementMilestoneSystem : Node
+    public partial class AchievementMilestoneSystem : BaseSystem
     {
         public static AchievementMilestoneSystem Instance { get; private set; }
         
@@ -37,6 +37,11 @@ namespace ClawRPG.Scripts
             InitializePlayerData();
             LoadSaveData();
         }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "AchievementMilestone";
         
         private void InitializePlayerData()
         {
