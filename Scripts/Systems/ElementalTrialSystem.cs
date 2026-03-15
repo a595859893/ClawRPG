@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 元素试炼系统 - 管理元素试炼关卡
 /// </summary>
-public class ElementalTrialSystem
+public class ElementalTrialSystem : BaseSystem
 {
     private static ElementalTrialSystem _instance;
     public static ElementalTrialSystem Instance
@@ -379,6 +379,34 @@ public class PlayerTrialProgress
     }
 
     public void Load(Dictionary<string, object> data)
+    {
+        if (data == null) return;
+
+        if (data.ContainsKey("completedTrials"))
+        {
+            CompletedTrials = new List<string>((System.Collections.IEnumerable)data["completedTrials"]);
+        }
+
+        if (data.ContainsKey("bestWaves"))
+        {
+            var wavesData = data["bestWaves"] as Dictionary<string, object>;
+            foreach (var kvp in wavesData)
+            {
+                BestWaves[kvp.Key] = Convert.ToInt32(kvp.Value);
+            }
+        }
+    }
+
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "completedTrials", CompletedTrials },
+            { "bestWaves", BestWaves }
+        };
+    }
+
+    public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
 
