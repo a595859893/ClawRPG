@@ -130,5 +130,60 @@ namespace ClawRPG.Systems {
             }
             return result;
         }
+
+        // 解锁状态
+        private HashSet<string> _unlockedBadges = new HashSet<string>();
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            var unlocked = new Array();
+            foreach (var badgeId in _unlockedBadges)
+            {
+                unlocked.Add(badgeId);
+            }
+            data["unlocked_badges"] = unlocked;
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            if (data.Contains("unlocked_badges"))
+            {
+                _unlockedBadges.Clear();
+                var unlocked = (Array)data["unlocked_badges"];
+                foreach (var badgeId in unlocked)
+                {
+                    _unlockedBadges.Add((string)badgeId);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 解锁徽章
+        /// </summary>
+        public void UnlockBadge(string badgeId)
+        {
+            if (_badges.ContainsKey(badgeId) && !_unlockedBadges.Contains(badgeId))
+            {
+                _unlockedBadges.Add(badgeId);
+                GD.Print($"[AchievementBadgeSystem] Badge unlocked: {badgeId}");
+            }
+        }
+
+        /// <summary>
+        /// 检查徽章是否已解锁
+        /// </summary>
+        public bool IsBadgeUnlocked(string badgeId)
+        {
+            return _unlockedBadges.Contains(badgeId);
+        }
     }
 }

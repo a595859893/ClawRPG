@@ -56,11 +56,8 @@ public class BossRushSystem : BaseSystem
         rng.Randomize();
     }
     
-    public void SaveData()
+    public override Dictionary ExportSaveData()
     {
-        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
-        var gameData = saveSystem.LoadGame();
-        
         var dict = new Godot.Dictionary();
         dict["CurrentStage"] = data.CurrentStage;
         dict["CurrentBossIndex"] = data.CurrentBossIndex;
@@ -81,7 +78,32 @@ public class BossRushSystem : BaseSystem
         dict["TotalGoldEarned"] = data.TotalGoldEarned;
         dict["TotalExpEarned"] = data.TotalExpEarned;
         
-        gameData["BossRushData"] = dict;
+        return dict;
+    }
+    
+    public override void ImportSaveData(Dictionary saveData)
+    {
+        if (saveData == null) return;
+        
+        if (saveData.Contains("CurrentStage")) data.CurrentStage = (int)saveData["CurrentStage"];
+        if (saveData.Contains("CurrentBossIndex")) data.CurrentBossIndex = (int)saveData["CurrentBossIndex"];
+        if (saveData.Contains("IsInRush")) data.IsInRush = (bool)saveData["IsInRush"];
+        if (saveData.Contains("CurrentStreak")) data.CurrentStreak = (int)saveData["CurrentStreak"];
+        if (saveData.Contains("BestStreak")) data.BestStreak = (int)saveData["BestStreak"];
+        if (saveData.Contains("StartingHealth")) data.StartingHealth = (int)saveData["StartingHealth"];
+        if (saveData.Contains("StartingAttack")) data.StartingAttack = (int)saveData["StartingAttack"];
+        if (saveData.Contains("StartingDefense")) data.StartingDefense = (int)saveData["StartingDefense"];
+        if (saveData.Contains("CurrentHealth")) data.CurrentHealth = (int)saveData["CurrentHealth"];
+        if (saveData.Contains("GoldEarned")) data.GoldEarned = (int)saveData["GoldEarned"];
+        if (saveData.Contains("ExpEarned")) data.ExpEarned = (int)saveData["ExpEarned"];
+        if (saveData.Contains("BossesDefeated")) data.BossesDefeated = (int)saveData["BossesDefeated"];
+        if (saveData.Contains("TotalRushAttempts")) data.TotalRushAttempts = (int)saveData["TotalRushAttempts"];
+        if (saveData.Contains("TotalVictories")) data.TotalVictories = (int)saveData["TotalVictories"];
+        if (saveData.Contains("TotalBossesDefeated")) data.TotalBossesDefeated = (int)saveData["TotalBossesDefeated"];
+        if (saveData.Contains("HighestStageReached")) data.HighestStageReached = (int)saveData["HighestStageReached"];
+        if (saveData.Contains("TotalGoldEarned")) data.TotalGoldEarned = (int)saveData["TotalGoldEarned"];
+        if (saveData.Contains("TotalExpEarned")) data.TotalExpEarned = (int)saveData["TotalExpEarned"];
+    }
         saveSystem.SaveGame(gameData);
     }
     
