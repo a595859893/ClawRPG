@@ -295,5 +295,41 @@ namespace ClawRPG.Scripts.Systems {
             _data = new ConnectionRecoveryData();
             GD.Print("[ConnectionRecovery] System reset");
         }
+
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            data["is_connected"] = _data.IsConnected;
+            data["connection_attempts"] = _data.ConnectionAttempts;
+            data["offline_mode_enabled"] = _data.OfflineModeEnabled;
+            data["last_ping"] = _data.LastPing;
+            data["average_ping"] = _data.AveragePing;
+            data["state"] = (int)_data.State;
+            return data;
+        }
+
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            
+            if (data.ContainsKey("is_connected"))
+                _data.IsConnected = (bool)data["is_connected"];
+            if (data.ContainsKey("connection_attempts"))
+                _data.ConnectionAttempts = (int)data["connection_attempts"];
+            if (data.ContainsKey("offline_mode_enabled"))
+                _data.OfflineModeEnabled = (int)data["offline_mode_enabled"];
+            if (data.ContainsKey("last_ping"))
+                _data.LastPing = Convert.ToSingle(data["last_ping"]);
+            if (data.ContainsKey("average_ping"))
+                _data.AveragePing = Convert.ToSingle(data["average_ping"]);
+            if (data.ContainsKey("state"))
+                _data.State = (ConnectionState)(int)data["state"];
+        }
     }
 }

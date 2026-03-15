@@ -354,5 +354,60 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
                    $"金币: {_data.totalGoldEarned} | 经验: {_data.totalExpEarned} | " +
                    $"当前连胜: {_data.currentStreak} | 最高连胜: {_data.bestStreak}";
         }
+
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            data["total_completed"] = _data.totalCompleted;
+            data["total_failed"] = _data.totalFailed;
+            data["total_gold_earned"] = _data.totalGoldEarned;
+            data["total_exp_earned"] = _data.totalExpEarned;
+            data["current_streak"] = _data.currentStreak;
+            data["best_streak"] = _data.bestStreak;
+            
+            // Serialize completion counts
+            var completionCounts = new Dictionary<string, int>();
+            foreach (var kvp in _data.contractCompletionCount)
+            {
+                completionCounts[kvp.Key] = kvp.Value;
+            }
+            data["contract_completion_count"] = completionCounts;
+            
+            return data;
+        }
+
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            
+            if (data.ContainsKey("total_completed"))
+                _data.totalCompleted = Convert.ToInt32(data["total_completed"]);
+            if (data.ContainsKey("total_failed"))
+                _data.totalFailed = Convert.ToInt32(data["total_failed"]);
+            if (data.ContainsKey("total_gold_earned"))
+                _data.totalGoldEarned = Convert.ToInt32(data["total_gold_earned"]);
+            if (data.ContainsKey("total_exp_earned"))
+                _data.totalExpEarned = Convert.ToInt32(data["total_exp_earned"]);
+            if (data.ContainsKey("current_streak"))
+                _data.currentStreak = Convert.ToInt32(data["current_streak"]);
+            if (data.ContainsKey("best_streak"))
+                _data.bestStreak = Convert.ToInt32(data["best_streak"]);
+            
+            if (data.ContainsKey("contract_completion_count"))
+            {
+                var counts = (Dictionary<object, object>)data["contract_completion_count"];
+                _data.contractCompletionCount.Clear();
+                foreach (var kvp in counts)
+                {
+                    _data.contractCompletionCount[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+                }
+            }
+        }
     }
 }

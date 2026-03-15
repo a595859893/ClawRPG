@@ -426,4 +426,28 @@ public class CrossServerBattleSystem : BaseSystem
 
         GD.Print("[CrossServerBattle] Data loaded");
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return SaveData();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // Reuse the existing SaveData/LoadData pattern
+        var stringKeyData = new Dictionary<string, object>();
+        foreach (var kvp in data)
+        {
+            stringKeyData[kvp.Key.ToString()] = kvp.Value;
+        }
+        LoadData(stringKeyData);
+    }
 }

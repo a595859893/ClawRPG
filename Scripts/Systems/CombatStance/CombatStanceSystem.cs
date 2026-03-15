@@ -336,6 +336,27 @@ public partial class CombatStanceSystem : BaseSystem
         if (data.ContainsKey("stanceLevel"))
             stanceLevel = (int)data["stanceLevel"];
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return SaveData();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("currentStance"))
+            currentStance = (StanceType)(int)data["currentStance"];
+        if (data.Contains("stanceLevel"))
+            stanceLevel = (int)data["stanceLevel"];
+    }
 }
 
 // 姿态配置类

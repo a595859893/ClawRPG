@@ -348,4 +348,38 @@ public class ComboChainSystem : BaseSystem
         _data.ChainDamageBonus = 0;
         _data.ChainHistory.Clear();
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["total_chains"] = _data != null ? _data.TotalChains : 0;
+        data["total_chain_hits"] = _data != null ? _data.TotalChainHits : 0;
+        data["max_chain_ever"] = _data != null ? _data.MaxChainEver : 0;
+        data["chain_10_count"] = _data != null ? _data.Chain10Count : 0;
+        data["chain_25_count"] = _data != null ? _data.Chain25Count : 0;
+        data["chain_50_count"] = _data != null ? _data.Chain50Count : 0;
+        data["chain_100_count"] = _data != null ? _data.Chain100Count : 0;
+        data["total_chain_damage"] = _data != null ? _data.TotalChainDamage : 0;
+        return data;
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || _data == null) return;
+        
+        if (data.Contains("total_chains")) _data.TotalChains = (int)data["total_chains"];
+        if (data.Contains("total_chain_hits")) _data.TotalChainHits = (int)data["total_chain_hits"];
+        if (data.Contains("max_chain_ever")) _data.MaxChainEver = (int)data["max_chain_ever"];
+        if (data.Contains("chain_10_count")) _data.Chain10Count = (int)data["chain_10_count"];
+        if (data.Contains("chain_25_count")) _data.Chain25Count = (int)data["chain_25_count"];
+        if (data.Contains("chain_50_count")) _data.Chain50Count = (int)data["chain_50_count"];
+        if (data.Contains("chain_100_count")) _data.Chain100Count = (int)data["chain_100_count"];
+        if (data.Contains("total_chain_damage")) _data.TotalChainDamage = (float)data["total_chain_damage"];
+    }
 }

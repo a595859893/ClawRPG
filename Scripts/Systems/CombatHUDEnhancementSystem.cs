@@ -319,6 +319,30 @@ public class CombatHUDEnhancementSystem : BaseSystem
 		return _currentSession?.IsActive ?? false;
 	}
 	
+	/// <summary>
+	/// Export save data for persistence
+	/// </summary>
+	public override Dictionary ExportSaveData()
+	{
+		var data = new Dictionary();
+		data["session_start_time"] = _sessionStartTime;
+		// Note: Current session data is runtime state, not persisted
+		return data;
+	}
+
+	/// <summary>
+	/// Import save data from persistence
+	/// </summary>
+	public override void ImportSaveData(Dictionary data)
+	{
+		if (data == null) return;
+		
+		if (data.Contains("session_start_time"))
+		{
+			_sessionStartTime = Convert.ToSingle(data["session_start_time"]);
+		}
+	}
+	
 	public Dictionary<string, object> GetSaveData()
 	{
 		var data = new Dictionary<string, object>();
