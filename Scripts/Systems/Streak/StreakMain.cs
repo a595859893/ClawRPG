@@ -125,4 +125,8 @@ public class StreakMain : BaseSystem
             _streakSystem.OnPetInteraction();
         }
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }

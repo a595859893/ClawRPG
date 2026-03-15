@@ -276,4 +276,8 @@ public partial class WeeklyChallengeSystem : BaseSystem
     
     [Signal]
     public delegate void RewardsClaimedEventHandler(int gold, int exp);
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }

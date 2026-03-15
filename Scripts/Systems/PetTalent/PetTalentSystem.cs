@@ -221,4 +221,8 @@ public class PetTalentSystem : BaseSystem
             PetTalents[kvp.Key] = petData;
         }
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }

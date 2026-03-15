@@ -117,4 +117,8 @@ public class SkillSynergyData : BaseSystem
         if (data.ContainsKey("total_bonus_healing"))
             TotalBonusHealing = (float)data["total_bonus_healing"];
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }

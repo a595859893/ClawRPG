@@ -400,4 +400,8 @@ namespace ClawRPG.Scripts.Systems.Pets
             GD.Print($"宠物训练数据已加载: {_playerData.TrainingPoints} 点训练点数, {_playerData.ActiveSessions.Count} 个活跃训练");
         }
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }

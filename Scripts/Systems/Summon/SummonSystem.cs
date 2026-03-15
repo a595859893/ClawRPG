@@ -17,6 +17,10 @@ public class SummonData
 	public int Cooldown { get; set; }
 	public string IconPath { get; set; }
 	public List<string> Abilities { get; set; }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }
 
 public enum SummonType

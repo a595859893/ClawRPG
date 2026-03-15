@@ -456,4 +456,8 @@ public class SkillSynergySystem : BaseSystem
     {
         // 通知 UI 刷新
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }

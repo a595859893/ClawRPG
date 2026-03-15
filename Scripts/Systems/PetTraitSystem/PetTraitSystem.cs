@@ -511,4 +511,8 @@ namespace ClawRPG.Scripts.Systems
         
         #endregion
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }

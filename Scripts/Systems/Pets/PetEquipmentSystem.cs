@@ -314,4 +314,8 @@ namespace Game.Systems.Pets
             GD.Print("[PetEquipmentSystem] Data loaded");
         }
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }

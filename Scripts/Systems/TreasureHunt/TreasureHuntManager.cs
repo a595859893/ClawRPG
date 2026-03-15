@@ -429,4 +429,8 @@ public class TreasureHuntManager : BaseSystem
             InitializePlayerData(playerId);
         }
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }

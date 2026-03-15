@@ -14,6 +14,10 @@ public enum WeatherType
     Hail,
     Blizzard,
     Storm
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }
 
 public enum WeatherIntensity

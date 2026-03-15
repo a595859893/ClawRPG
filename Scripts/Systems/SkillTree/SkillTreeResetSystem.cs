@@ -43,6 +43,10 @@ public class SkillTreeResetData
         MaxPointsInSingleReset = 0;
         LastResetTime = DateTime.MinValue;
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+
 }
 
 public class SkillTreeResetRecord
