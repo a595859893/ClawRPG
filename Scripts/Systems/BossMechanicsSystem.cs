@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Boss机制系统 - 管理Boss战斗机制
+/// 包含Boss阶段切换、技能使用、狂暴机制、召唤小怪等
+/// </summary>
 public class BossMechanicsSystem : BaseSystem
 {
     public static BossMechanicsSystem Instance { get; private set; }

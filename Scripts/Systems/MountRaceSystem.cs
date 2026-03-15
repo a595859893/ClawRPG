@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 坐骑竞速系统 - 坐骑竞速比赛管理
+/// 支持计时赛、障碍赛等多种模式
+/// </summary>
 public class MountRaceSystem : Node
 {
 	private static MountRaceSystem _instance;

@@ -2,6 +2,10 @@ using Godot;
 using Godot.Collections;
 using System;
 
+/// <summary>
+/// 怪物驯化系统 - 野生怪物驯化为坐骑/宠物
+/// 支持多种驯化方式和亲密度机制
+/// </summary>
 public partial class MonsterTamingSystem : Node
 {
     public static MonsterTamingSystem Instance { get; private set; }

@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Boss机制数据结构
+/// 包含Boss阶段数据、技能数据、属性和状态定义
+/// </summary>
 public class BossPhaseData
 {
     public string PhaseName { get; set; }

@@ -2,31 +2,34 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 战斗统计数据 - 存储玩家战斗相关统计信息
+/// </summary>
 public class BattleStatsData
 {
-    // Total Statistics
+    // 总战斗统计
     public int TotalBattles { get; set; } = 0;
     public int TotalVictories { get; set; } = 0;
     public int TotalDefeats { get; set; } = 0;
     public float TotalBattleTime { get; set; } = 0f;
     
-    // Damage Statistics
+    // 伤害统计
     public int TotalDamageDealt { get; set; } = 0;
     public int TotalDamageTaken { get; set; } = 0;
     public int TotalCriticalDamage { get; set; } = 0;
     public int TotalHealing { get; set; } = 0;
     
-    // Kill Statistics
+    // 击杀统计
     public int TotalEnemiesKilled { get; set; } = 0;
     public int TotalBossesKilled { get; set; } = 0;
     public int TotalEliteKilled { get; set; } = 0;
     
-    // Skill Usage
+    // 技能使用统计
     public int TotalSkillsUsed { get; set; } = 0;
     public int TotalSkillsHit { get; set; } = 0;
     public int TotalSkillsMissed { get; set; } = 0;
     
-    // Elemental Damage
+    // 元素伤害统计
     public int FireDamage { get; set; } = 0;
     public int IceDamage { get; set; } = 0;
     public int LightningDamage { get; set; } = 0;
@@ -34,18 +37,21 @@ public class BattleStatsData
     public int HolyDamage { get; set; } = 0;
     public int PhysicalDamage { get; set; } = 0;
     
-    // Enemy Type Kills
+    // 敌人生物类型击杀统计
     public Dictionary<string, int> EnemyKillsByType { get; set; } = new Dictionary<string, int>();
     
-    // Recent Battles (last 10)
+    // 最近战斗记录（最后10场）
     public List<BattleRecord> RecentBattles { get; set; } = new List<BattleRecord>();
     
-    // Session Stats
+    // 会话统计
     public int SessionBattles { get; set; } = 0;
     public int SessionVictories { get; set; } = 0;
     public DateTime SessionStart { get; set; } = DateTime.Now;
 }
 
+/// <summary>
+/// 单场战斗记录 - 存储单场战斗的详细信息
+/// </summary>
 public class BattleRecord
 {
     public DateTime Timestamp { get; set; }
@@ -57,6 +63,10 @@ public class BattleRecord
     public string BattleType { get; set; } = "";
 }
 
+/// <summary>
+/// 战斗统计系统 - 追踪和管理玩家战斗相关统计数据
+/// 继承自 BaseSystem，实现数据持久化
+/// </summary>
 public class BattleStatisticsSystem : BaseSystem
 {
     private BattleStatsData _stats = new BattleStatsData();

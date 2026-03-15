@@ -2,9 +2,16 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 装备强化系统 - 管理装备的强化操作和属性加成
+/// 支持多种强化类型（攻击、防御、生命等），包含成功/暴击/失败机制
+/// </summary>
 public class EquipmentEnhancementSystem
 {
     private static EquipmentEnhancementSystem _instance;
+    /// <summary>
+    /// 获取系统单例实例
+    /// </summary>
     public static EquipmentEnhancementSystem Instance
     {
         get
@@ -14,10 +21,19 @@ public class EquipmentEnhancementSystem
         }
     }
 
+    /// <summary>
+    /// 玩家强化数据
+    /// </summary>
     public EquipmentEnhancementData.PlayerEnhancementData PlayerData { get; private set; }
 
     // Signals
+    /// <summary>
+    /// 强化尝试结果信号 - 结果、强化等级、强化类型、加成值
+    /// </summary>
     public Action<EquipmentEnhancementData.EnhancementResult, int, EquipmentEnhancementData.EnhancementType, int> OnEnhancementAttempt;
+    /// <summary>
+    /// 强化数据变更信号
+    /// </summary>
     public Action OnEnhancementDataChanged;
 
     public EquipmentEnhancementSystem()
@@ -25,11 +41,20 @@ public class EquipmentEnhancementSystem
         PlayerData = new EquipmentEnhancementData.PlayerEnhancementData();
     }
 
+    /// <summary>
+    /// 初始化强化系统
+    /// </summary>
     public void Initialize()
     {
         GD.Print("[EquipmentEnhancementSystem] Initialized");
     }
 
+    /// <summary>
+    /// 检查是否可以进行强化
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>是否可以强化</returns>
     public bool CanEnhance(EquipmentEnhancementData.EnhancementType type, int level)
     {
         var recipe = EquipmentEnhancementDatabase.Instance.GetRecipe(type, level);
@@ -50,6 +75,12 @@ public class EquipmentEnhancementSystem
         return true;
     }
 
+    /// <summary>
+    /// 尝试进行装备强化
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>强化结果</returns>
     public EquipmentEnhancementData.EnhancementResult TryEnhance(EquipmentEnhancementData.EnhancementType type, int level)
     {
         var recipe = EquipmentEnhancementDatabase.Instance.GetRecipe(type, level);

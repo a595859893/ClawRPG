@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 宠物战斗竞技场系统 - 宠物对战比赛管理
+/// 支持排位赛、练习赛等多种模式
+/// </summary>
 public class PetBattleArenaSystem : Node
 {
     // Singleton
