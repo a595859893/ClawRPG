@@ -3,15 +3,17 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// 战利品掉落系统 - 管理战利品掉落、幸运系统和保底机制
-/// 支持多种战利品池、幸运加成、暴击掉落和保底机制
+/// Loot drop system that manages loot drops, luck bonuses, and pity mechanics.
+/// Supports multiple loot pools, luck bonuses, critical drops, and guaranteed drop thresholds.
 /// </summary>
 public class LootDropSystem
 {
     private static LootDropSystem _instance;
+    
     /// <summary>
-    /// 获取系统单例实例
+    /// Gets the singleton instance of the LootDropSystem.
     /// </summary>
+    /// <value>The global instance for loot drop operations.</value>
     public static LootDropSystem Instance
     {
         get
@@ -23,46 +25,53 @@ public class LootDropSystem
 
     private LootDropData.PlayerLootData _playerData = new LootDropData.PlayerLootData();
     
-    // 幸运系统 - 增加掉落率和品质
+    // Luck system - increases drop rate and quality
     private float _luckValue = 0f;
     private int _luckItems = 0;
     
-    // 保底系统 - 多次未获得好奖励后保底掉落
+    // Pity system - guarantees better drops after multiple attempts without good rewards
     private Dictionary<string, int> _pityCounters = new Dictionary<string, int>();
     private Dictionary<string, LootDropData.LootRarity> _pityThresholds = new Dictionary<string, LootDropData.LootRarity>();
     
-    // 暴击掉落系统 - 稀有几率获得双倍掉落
+    // Critical drop system - rare chance for double loot
     private float _criticalDropRate = 0.05f;
     
     /// <summary>
-    /// 当前幸运值
+    /// Gets the current luck value affecting drop rates.
     /// </summary>
+    /// <value>Current luck value from 0 upwards.</value>
     public float LuckValue => _luckValue;
+    
     /// <summary>
-    /// 使用的幸运道具数量
+    /// Gets the number of luck-boosting items used.
     /// </summary>
+    /// <value>Count of luck items consumed.</value>
     public int LuckItems => _luckItems;
     
     // Signals
+    
     /// <summary>
-    /// 战利品掉落信号 - 战利品、数量
+    /// Fired when loot is dropped: parameters are the loot entry and quantity.
     /// </summary>
     public Action<LootDropData.LootEntry, int> OnLootDropped;
+    
     /// <summary>
-    /// 稀有度掉落信号
+    /// Fired when a rarity tier is dropped.
     /// </summary>
     public Action<LootDropData.LootRarity> OnRarityDropped;
+    
     /// <summary>
-    /// 幸运掉落信号
+    /// Fired when a lucky drop occurs (rare or better).
     /// </summary>
     public Action OnLuckyDrop;
+    
     /// <summary>
-    /// 暴击掉落信号
+    /// Fired when a critical (double) drop occurs.
     /// </summary>
     public Action OnCriticalDrop;
 
     /// <summary>
-    /// 初始化掉落系统
+    /// Initializes the loot drop system.
     /// </summary>
     public void Initialize()
     {
@@ -72,7 +81,7 @@ public class LootDropSystem
     }
 
     /// <summary>
-    /// 初始化保底系统
+    /// Initializes the pity system with default thresholds.
     /// </summary>
     private void InitializePitySystem()
     {
@@ -90,6 +99,9 @@ public class LootDropSystem
         }
     }
 
+    /// <summary>
+    /// Saves player loot data to the save system.
+    /// </summary>
     public void SavePlayerData()
     {
         if (SaveSystem.Instance != null)
@@ -98,6 +110,9 @@ public class LootDropSystem
         }
     }
 
+    /// <summary>
+    /// Loads player loot data from the save system.
+    /// </summary>
     public void LoadPlayerData()
     {
         if (SaveSystem.Instance != null)
@@ -111,11 +126,11 @@ public class LootDropSystem
     }
 
     /// <summary>
-    /// 从指定战利品池随机掉落
+    /// Rolls for loot from a specific loot pool.
     /// </summary>
-    /// <param name="poolId">战利品池ID</param>
-    /// <param name="count">掉落数量</param>
-    /// <returns>掉落的战利品列表</returns>
+    /// <param name="poolId">The loot pool ID to roll from.</param>
+    /// <param name="count">Number of times to roll (default 1).</param>
+    /// <returns>List of dropped loot entries.</returns>
     public List<LootDropData.LootEntry> RollLootFromPool(string poolId, int count = 1)
     {
         var results = new List<LootDropData.LootEntry>();
@@ -251,9 +266,9 @@ public class LootDropSystem
     }
 
     /// <summary>
-    /// 添加幸运值（来自幸运加成道具/效果）
+    /// Adds luck value from luck-boosting items or effects.
     /// </summary>
-    /// <param name="amount">幸运值增量</param>
+    /// <param name="amount">Amount of luck to add.</param>
     public void AddLuck(float amount)
     {
         _luckValue += amount;
@@ -267,7 +282,7 @@ public class LootDropSystem
     }
 
     /// <summary>
-    /// Clear all luck effects
+    /// Clears all active luck effects.
     /// </summary>
     public void ResetLuck()
     {
@@ -275,32 +290,36 @@ public class LootDropSystem
     }
 
     /// <summary>
-    /// Get drop rate multiplier based on luck
+    /// Gets the drop rate multiplier based on current luck.
     /// </summary>
+    /// <returns>Multiplier applied to base drop rates.</returns>
     public float GetDropRateMultiplier()
     {
         return 1.0f + _luckValue * 0.1f;
     }
 
     /// <summary>
-    /// Get drop quality bonus based on luck
+    /// Gets the quality bonus based on current luck.
     /// </summary>
+    /// <returns>Bonus applied to loot quality rolls.</returns>
     public float GetQualityBonus()
     {
         return _luckValue * 0.2f;
     }
 
     /// <summary>
-    /// Get player loot statistics
+    /// Gets player loot statistics.
     /// </summary>
+    /// <returns>PlayerLootData containing drop statistics.</returns>
     public LootDropData.PlayerLootData GetStatistics()
     {
         return _playerData;
     }
 
     /// <summary>
-    /// Get rarity distribution as percentages
+    /// Gets the rarity distribution as percentages.
     /// </summary>
+    /// <returns>Dictionary mapping rarity names to percentages.</returns>
     public Dictionary<string, float> GetRarityDistribution()
     {
         var distribution = new Dictionary<string, float>();
@@ -316,8 +335,11 @@ public class LootDropSystem
     }
 
     /// <summary>
-    /// Check if a drop is guaranteed (for special events)
+    /// Forces a drop from a pool with minimum rarity (for special events).
     /// </summary>
+    /// <param name="poolId">The loot pool ID.</param>
+    /// <param name="minRarity">Minimum rarity to drop.</param>
+    /// <returns>The forced loot entry, or null if not possible.</returns>
     public LootDropData.LootEntry ForceDrop(string poolId, LootDropData.LootRarity minRarity)
     {
         var pool = LootDropDatabase.Instance.GetPool(poolId);
@@ -344,8 +366,10 @@ public class LootDropSystem
     }
 
     /// <summary>
-    /// Get the number of drops until next pity threshold
+    /// Gets the number of drops until the next pity threshold is reached.
     /// </summary>
+    /// <param name="poolId">The loot pool ID.</param>
+    /// <returns>Number of drops until pity triggers, or -1 if pool not found.</returns>
     public int GetDropsUntilPity(string poolId)
     {
         if (!_pityCounters.ContainsKey(poolId)) return -1;

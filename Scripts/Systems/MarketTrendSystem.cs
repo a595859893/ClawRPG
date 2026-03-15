@@ -4,15 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// 市场趋势系统 - 动态管理物品价格趋势和预测
-/// 定时更新市场数据，计算趋势方向和市场情绪
+/// Market trend system that dynamically manages item price trends and predictions.
+/// Updates market data periodically, calculates trend directions, and generates market sentiment.
 /// </summary>
 public class MarketTrendSystem : Node
 {
     private static MarketTrendSystem _instance;
+    
     /// <summary>
-    /// 获取系统单例实例
+    /// Gets the singleton instance of the MarketTrendSystem.
     /// </summary>
+    /// <value>The global instance for market trend operations.</value>
     public static MarketTrendSystem Instance
     {
         get
@@ -25,11 +27,11 @@ public class MarketTrendSystem : Node
     private MarketTrendData _data;
     private RandomNumberGenerator _rng = new RandomNumberGenerator();
     
-    // 更新间隔（秒）
-    private const float UPDATE_INTERVAL = 300f; // 5 minutes
+    // Update interval in seconds (5 minutes)
+    private const float UPDATE_INTERVAL = 300f;
     private float _timer = 0f;
     
-    // 历史记录长度
+    // Maximum history records to keep per category
     private const int MAX_HISTORY = 100;
     
     public override void _Ready()
@@ -241,6 +243,11 @@ public class MarketTrendSystem : Node
     
     // Public API
     
+    /// <summary>
+    /// Gets the current market trend for a specific category.
+    /// </summary>
+    /// <param name="category">The item category to look up.</param>
+    /// <returns>The market trend for the category, or null if not found.</returns>
     public MarketTrend GetTrend(string category)
     {
         if (_data.CurrentTrends.ContainsKey(category))
@@ -248,6 +255,11 @@ public class MarketTrendSystem : Node
         return null;
     }
     
+    /// <summary>
+    /// Gets the market prediction for a specific category.
+    /// </summary>
+    /// <param name="category">The item category to look up.</param>
+    /// <returns>The market prediction for the category, or null if not found.</returns>
     public MarketPrediction GetPrediction(string category)
     {
         if (_data.Predictions.ContainsKey(category))
@@ -255,6 +267,12 @@ public class MarketTrendSystem : Node
         return null;
     }
     
+    /// <summary>
+    /// Gets the price history for a specific category.
+    /// </summary>
+    /// <param name="category">The item category to look up.</param>
+    /// <param name="count">Maximum number of records to return (default 30).</param>
+    /// <returns>List of price records ordered by timestamp.</returns>
     public List<PriceRecord> GetPriceHistory(string category, int count = 30)
     {
         if (!_data.PriceHistory.ContainsKey(category))
@@ -263,11 +281,19 @@ public class MarketTrendSystem : Node
         return _data.PriceHistory[category].TakeLast(count).ToList();
     }
     
+    /// <summary>
+    /// Gets the current market sentiment value.
+    /// </summary>
+    /// <returns>Market sentiment ranging from -100 to 100.</returns>
     public int GetMarketSentiment()
     {
         return _data.MarketSentiment;
     }
     
+    /// <summary>
+    /// Gets a text description of the current market sentiment.
+    /// </summary>
+    /// <returns>Localized text describing market sentiment.</returns>
     public string GetSentimentText()
     {
         if (_data.MarketSentiment > 50)
@@ -282,11 +308,20 @@ public class MarketTrendSystem : Node
             return "极度悲观";
     }
     
+    /// <summary>
+    /// Gets all current market trends.
+    /// </summary>
+    /// <returns>Dictionary of all category trends.</returns>
     public Dictionary<string, MarketTrend> GetAllTrends()
     {
         return new Dictionary<string, MarketTrend>(_data.CurrentTrends);
     }
     
+    /// <summary>
+    /// Gets the hottest categories based on trend strength.
+    /// </summary>
+    /// <param name="count">Number of categories to return (default 3).</param>
+    /// <returns>List of category names with the strongest trends.</returns>
     public List<string> GetHotCategories(int count = 3)
     {
         return _data.CurrentTrends
@@ -296,6 +331,11 @@ public class MarketTrendSystem : Node
             .ToList();
     }
     
+    /// <summary>
+    /// Gets potential investment opportunities (categories with low prices likely to rise).
+    /// </summary>
+    /// <param name="count">Number of opportunities to return (default 3).</param>
+    /// <returns>List of category names that may be good investments.</returns>
     public List<string> GetInvestmentOpportunities(int count = 3)
     {
         // Categories with falling prices that are likely to rise
@@ -307,6 +347,10 @@ public class MarketTrendSystem : Node
             .ToList();
     }
     
+    /// <summary>
+    /// Gets market statistics including prediction accuracy.
+    /// </summary>
+    /// <returns>Dictionary containing various market statistics.</returns>
     public Dictionary<string, float> GetStatistics()
     {
         return new Dictionary<string, float>
@@ -320,6 +364,11 @@ public class MarketTrendSystem : Node
     }
     
     // Save/Load support
+    
+    /// <summary>
+    /// Saves market trend data for persistence.
+    /// </summary>
+    /// <returns>Dictionary containing serialized market data.</returns>
     public Dictionary<string, object> SaveData()
     {
         return new Dictionary<string, object>
@@ -332,6 +381,10 @@ public class MarketTrendSystem : Node
         };
     }
     
+    /// <summary>
+    /// Loads market trend data from persistence.
+    /// </summary>
+    /// <param name="data">Dictionary containing serialized market data.</param>
     public void LoadData(Dictionary<string, object> data)
     {
         if (data.ContainsKey("MarketSentiment"))

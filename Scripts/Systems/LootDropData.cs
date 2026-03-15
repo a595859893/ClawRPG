@@ -3,97 +3,168 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// 战利品掉落数据 - 定义掉落相关的枚举和数据结构
+/// Loot drop data definitions including enums and data structures.
 /// </summary>
 public class LootDropData
 {
     /// <summary>
-    /// 掉落稀有度枚举
+    /// Defines the rarity tier of loot.
     /// </summary>
     public enum LootRarity
     {
-        Common = 0,    // 普通
-        Uncommon = 1,  // 优秀
-        Rare = 2,      // 稀有
-        Epic = 3,      // 史诗
-        Legendary = 4  // 传说
+        /// <summary>Common tier - most frequent drops.</summary>
+        Common = 0,
+        
+        /// <summary>Uncommon tier - less frequent than common.</summary>
+        Uncommon = 1,
+        
+        /// <summary>Rare tier - infrequent drops with better stats.</summary>
+        Rare = 2,
+        
+        /// <summary>Epic tier - very rare drops with excellent stats.</summary>
+        Epic = 3,
+        
+        /// <summary>Legendary tier - extremely rare, best possible drops.</summary>
+        Legendary = 4
     }
 
     /// <summary>
-    /// 战利品类型枚举
+    /// Defines the type of loot that can be dropped.
     /// </summary>
     public enum LootType
     {
-        Gold,       // 金币
-        Item,       // 物品
-        Equipment,  // 装备
-        Material,   // 材料
-        Pet,        // 宠物
-        Mount,      // 坐骑
-        Currency    // 货币
+        /// <summary>Gold currency.</summary>
+        Gold,
+        
+        /// <summary>Regular item.</summary>
+        Item,
+        
+        /// <summary>Equipment piece.</summary>
+        Equipment,
+        
+        /// <summary>Crafting or enhancement material.</summary>
+        Material,
+        
+        /// <summary>Pet companion.</summary>
+        Pet,
+        
+        /// <summary>Mount or vehicle.</summary>
+        Mount,
+        
+        /// <summary>Special currency (gems, tokens, etc.).</summary>
+        Currency
     }
 
-    [Serializable]
     /// <summary>
-    /// 战利品条目定义
+    /// Defines a single loot entry in a loot pool.
     /// </summary>
+    [Serializable]
     public class LootEntry
     {
-        public string Id;             // 唯一标识
-        public string Name;           // 名称
-        public string Description;    // 描述
-        public LootType Type;         // 类型
-        public LootRarity Rarity;     // 稀有度
-        public int BaseWeight;        // 基础权重
-        public int MinDropLevel;      // 最低掉落等级
-        public int MaxDropLevel;      // 最高掉落等级
-        public string IconPath;       // 图标路径
+        /// <summary>Unique identifier for this loot entry.</summary>
+        public string Id;
+        
+        /// <summary>Display name of the loot.</summary>
+        public string Name;
+        
+        /// <summary>Description of the loot item.</summary>
+        public string Description;
+        
+        /// <summary>Type of loot (Gold, Item, Equipment, etc.).</summary>
+        public LootType Type;
+        
+        /// <summary>Rarity tier of this loot.</summary>
+        public LootRarity Rarity;
+        
+        /// <summary>Base weight for random selection.</summary>
+        public int BaseWeight;
+        
+        /// <summary>Minimum player level required for this drop.</summary>
+        public int MinDropLevel;
+        
+        /// <summary>Maximum player level for this drop.</summary>
+        public int MaxDropLevel;
+        
+        /// <summary>Path to the icon resource.</summary>
+        public string IconPath;
         
         // For items/equipment
-        public string ItemId;         // 物品ID
-        public int MinQuantity;       // 最小数量
-        public int MaxQuantity;       // 最大数量
+        
+        /// <summary>Item database ID for this loot.</summary>
+        public string ItemId;
+        
+        /// <summary>Minimum quantity when dropped.</summary>
+        public int MinQuantity;
+        
+        /// <summary>Maximum quantity when dropped.</summary>
+        public int MaxQuantity;
     }
 
-    [Serializable]
     /// <summary>
-    /// 战利品池定义
+    /// Defines a collection of loot entries that can be rolled from.
     /// </summary>
+    [Serializable]
     public class LootPool
     {
-        public string Id;                     // 池ID
-        public string Name;                   // 池名称
-        public string Description;            // 描述
-        public List<LootEntry> Entries;       // 条目列表
-        public int TotalWeight;               // 总权重
-        public float DropRate = 1.0f;         // 掉落率
+        /// <summary>Unique identifier for this loot pool.</summary>
+        public string Id;
+        
+        /// <summary>Display name of the pool.</summary>
+        public string Name;
+        
+        /// <summary>Description of what this pool contains.</summary>
+        public string Description;
+        
+        /// <summary>List of loot entries in this pool.</summary>
+        public List<LootEntry> Entries;
+        
+        /// <summary>Total weight of all entries combined.</summary>
+        public int TotalWeight;
+        
+        /// <summary>Base drop rate multiplier (default 1.0).</summary>
+        public float DropRate = 1.0f;
     }
 
-    [Serializable]
     /// <summary>
-    /// 玩家战利品数据
+    /// Stores player-specific loot drop statistics.
     /// </summary>
+    [Serializable]
     public class PlayerLootData
     {
-        public int TotalDrops;                                    // 总掉落次数
-        public Dictionary<string, int> RarityDrops = new Dictionary<string, int>();    // 按稀有度统计
-        public Dictionary<string, int> TypeDrops = new Dictionary<string, int>();      // 按类型统计
-        public Dictionary<string, int> DropHistory = new Dictionary<string, int>();    // 掉落历史
-        public int LuckyDrops;                                    // 幸运掉落次数
-        public int CriticalDrops;                                 // 暴击掉落次数
-        public float TotalLuckValue;                              // 总幸运值
+        /// <summary>Total number of drops received.</summary>
+        public int TotalDrops;
+        
+        /// <summary>Drop counts keyed by rarity name.</summary>
+        public Dictionary<string, int> RarityDrops = new Dictionary<string, int>();
+        
+        /// <summary>Drop counts keyed by loot type.</summary>
+        public Dictionary<string, int> TypeDrops = new Dictionary<string, int>();
+        
+        /// <summary>Drop counts keyed by loot item ID.</summary>
+        public Dictionary<string, int> DropHistory = new Dictionary<string, int>();
+        
+        /// <summary>Number of drops that were considered lucky (rare or better).</summary>
+        public int LuckyDrops;
+        
+        /// <summary>Number of critical (double) drops that occurred.</summary>
+        public int CriticalDrops;
+        
+        /// <summary>Total accumulated luck value from items and effects.</summary>
+        public float TotalLuckValue;
     }
 }
 
 /// <summary>
-/// 战利品掉落数据库 - 管理所有战利品池和掉落规则
+/// Loot drop database that manages all loot pools and drop rules.
 /// </summary>
 public class LootDropDatabase
 {
     private static LootDropDatabase _instance;
+    
     /// <summary>
-    /// 获取数据库单例实例
+    /// Gets the singleton instance of the LootDropDatabase.
     /// </summary>
+    /// <value>The global instance for loot database operations.</value>
     public static LootDropDatabase Instance
     {
         get
@@ -104,11 +175,11 @@ public class LootDropDatabase
     }
 
     /// <summary>
-    /// 所有战利品池列表
+    /// List of all defined loot pools.
     /// </summary>
     public List<LootDropData.LootPool> Pools = new List<LootDropData.LootPool>();
     
-    // 稀有度权重: 普通50%, 优秀30%, 稀有15%, 史诗4%, 传说1%
+    // Default rarity weights: Common 50%, Uncommon 30%, Rare 15%, Epic 4%, Legendary 1%
     private readonly int[] RarityWeights = { 50, 30, 15, 4, 1 };
     private readonly int TotalRarityWeight = 100;
 
@@ -118,7 +189,7 @@ public class LootDropDatabase
     }
 
     /// <summary>
-    /// 初始化所有战利品池
+    /// Initializes all loot pools with their entries.
     /// </summary>
     private void InitializePools()
     {
@@ -213,8 +284,9 @@ public class LootDropDatabase
     }
 
     /// <summary>
-    /// 计算战利品池权重
+    /// Calculates total weight for a loot pool based on its entries.
     /// </summary>
+    /// <param name="pool">The loot pool to calculate weights for.</param>
     private void CalculatePoolWeights(LootDropData.LootPool pool)
     {
         pool.TotalWeight = 0;
@@ -225,8 +297,10 @@ public class LootDropDatabase
     }
 
     /// <summary>
-    /// 获取指定ID的战利品池
+    /// Gets a loot pool by its ID.
     /// </summary>
+    /// <param name="poolId">The pool identifier.</param>
+    /// <returns>The matching LootPool, or null if not found.</returns>
     public LootDropData.LootPool GetPool(string poolId)
     {
         foreach (var pool in Pools)
@@ -237,10 +311,10 @@ public class LootDropDatabase
     }
 
     /// <summary>
-    /// 随机掉落稀有度
+    /// Rolls for a random rarity based on luck bonus.
     /// </summary>
-    /// <param name="luckBonus">幸运加成</param>
-    /// <returns>掉落的稀有度</returns>
+    /// <param name="luckBonus">Additional luck value affecting the roll.</param>
+    /// <returns>The rolled rarity tier.</returns>
     public LootDropData.LootRarity RollRarity(float luckBonus = 0f)
     {
         // Apply luck bonus to improve drop rarity

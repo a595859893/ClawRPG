@@ -3,36 +3,83 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// 交易系统 - 处理玩家之间的物品交易
-/// 支持交易提议、物品交换、交易历史记录
+/// Trade system that handles player-to-player item trading.
+/// Supports trade offers, item exchange, and trade history tracking.
 /// </summary>
 public partial class TradeSystem : Node {
+    /// <summary>
+    /// Gets the singleton instance of the TradeSystem.
+    /// </summary>
     public static TradeSystem Instance { get; private set; }
 
-    // 交易状态
+    /// <summary>
+    /// Defines the current state of a trade.
+    /// </summary>
     public enum TradeState {
+        /// <summary>No active trade in progress.</summary>
         Idle,
+        
+        /// <summary>Trade offer is being prepared.</summary>
         Offering,
+        
+        /// <summary>Trade is actively being negotiated.</summary>
         Trading,
+        
+        /// <summary>Trade has been completed successfully.</summary>
         Completed,
+        
+        /// <summary>Trade was cancelled.</summary>
         Cancelled
     }
 
-    // 当前交易状态
+    /// <summary>
+    /// Gets the current state of the trade system.
+    /// </summary>
+    /// <value>The current TradeState.</value>
     public TradeState CurrentState { get; private set; } = TradeState.Idle;
 
-    // 玩家交易提议
+    /// <summary>
+    /// Gets the current trade offer if one exists.
+    /// </summary>
+    /// <value>The current TradeOffer, or null if no offer exists.</value>
     public TradeOffer CurrentOffer { get; private set; }
 
-    // 交易历史
+    /// <summary>
+    /// Gets the history of completed trades.
+    /// </summary>
+    /// <value>List of TradeRecord entries.</value>
     public List<TradeRecord> TradeHistory { get; private set; } = new List<TradeRecord>();
 
-    // 信号
+    // Signals
+    
+    /// <summary>
+    /// Emitted when a new trade is started.
+    /// </summary>
     [Signal] public delegate void TradeStartedEventHandler();
+    
+    /// <summary>
+    /// Emitted when a trade offer is updated.
+    /// </summary>
     [Signal] public delegate void OfferUpdatedEventHandler(TradeOffer offer);
+    
+    /// <summary>
+    /// Emitted when a trade is accepted by both parties.
+    /// </summary>
     [Signal] public delegate void TradeAcceptedEventHandler();
+    
+    /// <summary>
+    /// Emitted when a trade is completed successfully.
+    /// </summary>
     [Signal] public delegate void TradeCompletedEventHandler(TradeRecord record);
+    
+    /// <summary>
+    /// Emitted when a trade is cancelled.
+    /// </summary>
     [Signal] public delegate void TradeCancelledEventHandler();
+    
+    /// <summary>
+    /// Emitted when a trade fails.
+    /// </summary>
     [Signal] public delegate void TradeFailedEventHandler(string reason);
 
     public override void _Ready() {
@@ -40,7 +87,14 @@ public partial class TradeSystem : Node {
         LoadTradeHistory();
     }
 
-    // 开始交易
+    // ===== Public Methods =====
+
+    /// <summary>
+    /// Starts a new trade with the specified player.
+    /// </summary>
+    /// <param name="targetPlayerId">Unique identifier of the target player.</param>
+    /// <param name="targetPlayerName">Display name of the target player.</param>
+    /// <returns>True if trade was started successfully, false otherwise.</returns>
     public bool StartTrade(string targetPlayerId, string targetPlayerName) {
         if (CurrentState != TradeState.Idle) {
             GD.PrintErr("当前已有进行中的交易");
@@ -67,7 +121,12 @@ public partial class TradeSystem : Node {
         return true;
     }
 
-    // 添加物品到交易
+    /// <summary>
+    /// Adds an item to the current trade offer.
+    /// </summary>
+    /// <param name="item">The item to add to the trade.</param>
+    /// <param name="isPlayer1">True if adding for player 1, false for player 2.</param>
+    /// <returns>True if item was added successfully, false otherwise.</returns>
     public bool AddItemToTrade(ItemData item, bool isPlayer1) {
         if (CurrentState != TradeState.Offering) {
             GD.PrintErr("当前不是报价状态");
@@ -88,7 +147,12 @@ public partial class TradeSystem : Node {
         return true;
     }
 
-    // 移除物品从交易
+    /// <summary>
+    /// Removes an item from the current trade offer.
+    /// </summary>
+    /// <param name="item">The item to remove from the trade.</param>
+    /// <param name="isPlayer1">True if removing for player 1, false for player 2.</param>
+    /// <returns>True if item was removed successfully, false otherwise.</returns>
     public bool RemoveItemFromTrade(ItemData item, bool isPlayer1) {
         if (CurrentState != TradeState.Offering) {
             return false;
@@ -104,7 +168,12 @@ public partial class TradeSystem : Node {
         return false;
     }
 
-    // 设置交易金币
+    /// <summary>
+    /// Sets the gold amount for a player in the current trade.
+    /// </summary>
+    /// <param name="gold">Amount of gold to set.</param>
+    /// <param name="isPlayer1">True if setting for player 1, false for player 2.</param>
+    /// <returns>True if gold was set successfully, false otherwise.</returns>
     public bool SetGold(int gold, bool isPlayer1) {
         if (CurrentState != TradeState.Offering) {
             return false;
@@ -122,7 +191,11 @@ public partial class TradeSystem : Node {
         return true;
     }
 
-    // 接受交易提议
+    /// <summary>
+    /// Accepts the current trade offer.
+    /// </summary>
+    /// <param name="isPlayer1">True if player 1 is accepting, false if player 2.</param>
+    /// <returns>True if acceptance was recorded, false if not in offering state.</returns>
     public bool AcceptTrade(bool isPlayer1) {
         if (CurrentState != TradeState.Offering) {
             return false;
@@ -144,7 +217,10 @@ public partial class TradeSystem : Node {
         return true;
     }
 
-    // 完成交易
+    /// <summary>
+    /// Completes the trade, executing the item and gold exchange.
+    /// </summary>
+    /// <returns>True if trade was completed successfully, false otherwise.</returns>
     private bool CompleteTrade() {
         if (CurrentOffer == null) {
             return false;
@@ -200,7 +276,9 @@ public partial class TradeSystem : Node {
         return true;
     }
 
-    // 取消交易
+    /// <summary>
+    /// Cancels the current trade, resetting the trade state.
+    /// </summary>
     public void CancelTrade() {
         if (CurrentState == TradeState.Idle) {
             return;
@@ -213,7 +291,11 @@ public partial class TradeSystem : Node {
         EmitSignal(SignalName.TradeCancelled);
     }
 
-    // 获取交易历史
+    /// <summary>
+    /// Gets the trade history.
+    /// </summary>
+    /// <param name="count">Maximum number of records to return (default 20).</param>
+    /// <returns>List of recent trade records.</returns>
     public List<TradeRecord> GetTradeHistory(int count = 20) {
         var result = new List<TradeRecord>();
         var start = Math.Max(0, TradeHistory.Count - count);
@@ -274,21 +356,53 @@ public partial class TradeSystem : Node {
     }
 }
 
-// 交易提议
+// ===== Data Classes =====
+
+/// <summary>
+/// Represents a trade offer between two players.
+/// </summary>
 public class TradeOffer {
+    /// <summary>Unique identifier for this trade offer.</summary>
     public string OfferId { get; set; } = "";
+    
+    /// <summary>ID of the first player in the trade.</summary>
     public string Player1Id { get; set; } = "";
+    
+    /// <summary>Name of the first player.</summary>
     public string Player1Name { get; set; } = "";
+    
+    /// <summary>ID of the second player in the trade.</summary>
     public string Player2Id { get; set; } = "";
+    
+    /// <summary>Name of the second player.</summary>
     public string Player2Name { get; set; } = "";
+    
+    /// <summary>List of items offered by player 1.</summary>
     public List<ItemData> Player1Items { get; set; } = new List<ItemData>();
+    
+    /// <summary>List of items offered by player 2.</summary>
     public List<ItemData> Player2Items { get; set; } = new List<ItemData>();
+    
+    /// <summary>Gold amount offered by player 1.</summary>
     public int Player1Gold { get; set; }
+    
+    /// <summary>Gold amount offered by player 2.</summary>
     public int Player2Gold { get; set; }
+    
+    /// <summary>Whether player 1 has accepted the current offer.</summary>
     public bool Player1Accepted { get; set; }
+    
+    /// <summary>Whether player 2 has accepted the current offer.</summary>
     public bool Player2Accepted { get; set; }
+    
+    /// <summary>Timestamp when this offer was created.</summary>
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    /// <summary>
+    /// Calculates the total value of items and gold for a player.
+    /// </summary>
+    /// <param name="isPlayer1">True to calculate for player 1, false for player 2.</param>
+    /// <returns>Total value in gold.</returns>
     public int GetTotalValue(bool isPlayer1) {
         var value = isPlayer1 ? Player1Gold : Player2Gold;
         var items = isPlayer1 ? Player1Items : Player2Items;
@@ -299,9 +413,16 @@ public class TradeOffer {
     }
 }
 
-// 交易记录
+/// <summary>
+/// Represents a completed trade record for history tracking.
+/// </summary>
 public class TradeRecord {
+    /// <summary>Unique identifier for this trade record.</summary>
     public string RecordId { get; set; } = "";
+    
+    /// <summary>The completed trade offer.</summary>
     public TradeOffer TradeOffer { get; set; }
+    
+    /// <summary>Timestamp when the trade was completed.</summary>
     public DateTime CompletedAt { get; set; } = DateTime.Now;
 }

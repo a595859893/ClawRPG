@@ -4,29 +4,51 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// 市场趋势数据 - 记录物品价格历史和统计
-/// 用于市场分析和价格预测
+/// Market trend data container that tracks item price history and statistics.
+/// Used for market analysis and price prediction systems.
 /// </summary>
 public class MarketTrendData : Node
 {
-    // Price history for each item category
+    /// <summary>
+    /// Price history for each item category, keyed by category name.
+    /// Each list contains PriceRecord entries ordered by timestamp.
+    /// </summary>
     public Dictionary<string, List<PriceRecord>> PriceHistory = new Dictionary<string, List<PriceRecord>>();
     
-    // Current market trends
+    /// <summary>
+    /// Current market trends for each category, tracking direction and strength.
+    /// </summary>
     public Dictionary<string, MarketTrend> CurrentTrends = new Dictionary<string, MarketTrend>();
     
-    // Market predictions
+    /// <summary>
+    /// Market predictions for each category based on trend analysis.
+    /// </summary>
     public Dictionary<string, MarketPrediction> Predictions = new Dictionary<string, MarketPrediction>();
     
-    // Global market sentiment (-100 to 100)
+    /// <summary>
+    /// Global market sentiment indicator ranging from -100 (extremely bearish) to 100 (extremely bullish).
+    /// </summary>
     public int MarketSentiment = 0;
     
-    // Last update time
+    /// <summary>
+    /// Unix timestamp of the last market data update.
+    /// </summary>
     public double LastUpdateTime = 0;
     
-    // Statistics
+    /// <summary>
+    /// Total number of market trend updates performed.
+    /// </summary>
     public int TotalTrendUpdates = 0;
+    
+    /// <summary>
+    /// Total number of predictions made by the system.
+    /// </summary>
     public int TotalPredictionsMade = 0;
+    
+    /// <summary>
+    /// Number of predictions that proved to be correct.
+    /// Used for measuring prediction accuracy.
+    /// </summary>
     public int CorrectPredictions = 0;
     
     public override void _Ready()
@@ -35,13 +57,33 @@ public class MarketTrendData : Node
     }
 }
 
+/// <summary>
+/// Represents a single price record at a specific point in time.
+/// </summary>
 [System.Serializable]
 public class PriceRecord
 {
+    /// <summary>
+    /// Unix timestamp when this price was recorded.
+    /// </summary>
     public double Timestamp;
-    public float Price;
-    public int Volume; // Trading volume
     
+    /// <summary>
+    /// The recorded price value.
+    /// </summary>
+    public float Price;
+    
+    /// <summary>
+    /// Trading volume at this price point.
+    /// </summary>
+    public int Volume;
+    
+    /// <summary>
+    /// Creates a new price record with the specified values.
+    /// </summary>
+    /// <param name="timestamp">Unix timestamp of the record.</param>
+    /// <param name="price">The price value.</param>
+    /// <param name="volume">Trading volume at this price.</param>
     public PriceRecord(double timestamp, float price, int volume)
     {
         Timestamp = timestamp;
@@ -50,16 +92,46 @@ public class PriceRecord
     }
 }
 
+/// <summary>
+/// Represents the current market trend for a specific category.
+/// </summary>
 [System.Serializable]
 public class MarketTrend
 {
+    /// <summary>
+    /// The item category this trend represents.
+    /// </summary>
     public string Category;
-    public TrendDirection Direction; // Rising/Falling/Stable/Volatile
-    public float ChangePercent; // Percentage change
-    public float Volatility; // How stable the trend is
-    public double TrendStrength; // 0-100
-    public int Duration; // How long the trend has been active
     
+    /// <summary>
+    /// Current direction of the trend (Rising, Falling, Stable, or Volatile).
+    /// </summary>
+    public TrendDirection Direction;
+    
+    /// <summary>
+    /// Percentage change in price over the tracking period.
+    /// </summary>
+    public float ChangePercent;
+    
+    /// <summary>
+    /// Volatility indicator showing how unstable the price is.
+    /// </summary>
+    public float Volatility;
+    
+    /// <summary>
+    /// Strength of the trend from 0 to 100.
+    /// </summary>
+    public double TrendStrength;
+    
+    /// <summary>
+    /// Duration in update cycles that this trend has been active.
+    /// </summary>
+    public int Duration;
+    
+    /// <summary>
+    /// Creates a new market trend for the specified category.
+    /// </summary>
+    /// <param name="category">The item category to track.</param>
     public MarketTrend(string category)
     {
         Category = category;
@@ -71,16 +143,49 @@ public class MarketTrend
     }
 }
 
+/// <summary>
+/// Represents a market prediction for a specific category.
+/// </summary>
 [System.Serializable]
 public class MarketPrediction
 {
+    /// <summary>
+    /// The item category this prediction is for.
+    /// </summary>
     public string Category;
-    public TrendDirection PredictedDirection;
-    public float PredictedChange;
-    public double PredictionTime;
-    public bool IsCorrect;
-    public double Confidence; // 0-100
     
+    /// <summary>
+    /// Predicted direction of price movement.
+    /// </summary>
+    public TrendDirection PredictedDirection;
+    
+    /// <summary>
+    /// Predicted percentage change in price.
+    /// </summary>
+    public float PredictedChange;
+    
+    /// <summary>
+    /// Unix timestamp when this prediction was made.
+    /// </summary>
+    public double PredictionTime;
+    
+    /// <summary>
+    /// Whether the prediction was correct (updated after the prediction period).
+    /// </summary>
+    public bool IsCorrect;
+    
+    /// <summary>
+    /// Confidence level of the prediction from 0 to 100.
+    /// </summary>
+    public double Confidence;
+    
+    /// <summary>
+    /// Creates a new market prediction.
+    /// </summary>
+    /// <param name="category">The item category being predicted.</param>
+    /// <param name="direction">Predicted trend direction.</param>
+    /// <param name="change">Predicted percentage change.</param>
+    /// <param name="confidence">Confidence level from 0 to 100.</param>
     public MarketPrediction(string category, TrendDirection direction, float change, double confidence)
     {
         Category = category;
@@ -92,10 +197,28 @@ public class MarketPrediction
     }
 }
 
+/// <summary>
+/// Defines the possible directions for market trends.
+/// </summary>
 public enum TrendDirection
 {
+    /// <summary>
+    /// Price is trending upward.
+    /// </summary>
     Rising,
+    
+    /// <summary>
+    /// Price is trending downward.
+    /// </summary>
     Falling,
+    
+    /// <summary>
+    /// Price is relatively stable with minimal change.
+    /// </summary>
     Stable,
+    
+    /// <summary>
+    /// Price is highly volatile with significant fluctuations.
+    /// </summary>
     Volatile
 }
