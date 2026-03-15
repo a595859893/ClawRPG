@@ -571,5 +571,25 @@ namespace ClawRPG.Scripts.UI {
         public bool HasAbilityVisual(string abilityId) {
             return _abilityVisuals.ContainsKey(abilityId);
         }
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData() {
+            var data = new Dictionary();
+            data["maxConcurrentVisuals"] = _maxConcurrentVisuals;
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data) {
+            if (data == null) return;
+            
+            if (data.Contains("maxConcurrentVisuals")) {
+                _maxConcurrentVisuals = (int)data["maxConcurrentVisuals"];
+            }
+        }
     }
 }

@@ -505,4 +505,53 @@ public partial class DialogueSystem : BaseSystem {
         
         GD.Print($"[DialogueSystem] Loaded {_dialogueTrees.Count} dialogue trees");
     }
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 对话树通常从数据库加载，不需要保存
+        // 只保存当前对话状态
+        data["is_active"] = _isActive;
+        
+        if (_currentTree != null)
+        {
+            data["current_tree_id"] = _currentTree.Id;
+        }
+        
+        if (_currentNode != null)
+        {
+            data["current_node_id"] = _currentNode.Id;
+        }
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        _isActive = (bool)(data.GetValueOrDefault("is_active", false));
+        
+        // 恢复对话树和节点
+        if (data.Contains("current_tree_id"))
+        {
+            var treeId = data["current_tree_id"].ToString();
+            if (_dialogueTrees.ContainsKey(treeId))
+            {
+                _currentTree = _dialogueTrees[treeId];
+            }
+        }
+        
+        if (data.Contains("current_node_id") && _currentTree != null)
+        {
+            var nodeId = data["current_node_id"].ToString();
+            if (_currentTree.Nodes.ContainsKey(nodeId))
+            {
+                _currentNode = _currentTree.Nodes[nodeId];
+            }
+        }
+    }
 }

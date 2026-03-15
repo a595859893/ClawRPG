@@ -39,8 +39,10 @@ public class ComboChainData : BaseSystem
         SaveSystem.Instance.RegisterSaveData(this);
     }
     
-    public Dictionary Save()
-    {
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData() {
         var data = new Dictionary();
         data["currentChain"] = CurrentChain;
         data["maxChain"] = MaxChain;
@@ -74,8 +76,13 @@ public class ComboChainData : BaseSystem
         return data;
     }
     
-    public void Load(Dictionary data)
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
     {
+        if (data == null) return;
+        
         if (data.Contains("currentChain")) CurrentChain = (int)data["currentChain"];
         if (data.Contains("maxChain")) MaxChain = (int)data["maxChain"];
         if (data.Contains("isChainActive")) IsChainActive = (bool)data["isChainActive"];

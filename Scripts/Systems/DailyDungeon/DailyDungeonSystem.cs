@@ -348,6 +348,80 @@ public class DailyDungeonSystem : BaseSystem
         }
         return available;
     }
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        data["current_floor"] = _currentFloor;
+        data["enemies_defeated"] = _enemiesDefeated;
+        data["time_remaining"] = _timeRemaining;
+        data["is_in_dungeon"] = _isInDungeon;
+        data["dungeon_start_time"] = _dungeonStartTime.ToString("o");
+        data["last_daily_reset"] = _lastDailyReset.ToString("o");
+        data["daily_challenge_count"] = _dailyChallengeCount;
+        data["daily_completed"] = _dailyCompleted;
+        
+        // 玩家地下城数据
+        var playerDataList = new List<Dictionary>();
+        foreach (var kvp in PlayerDungeonData)
+        {
+            var pd = new Dictionary();
+            pd["dungeon_id"] = kvp.Key;
+            pd["best_floor"] = kvp.Value.BestFloor;
+            pd["times_completed"] = kvp.Value.TimesCompleted;
+            pd["total_gold_earned"] = kvp.Value.TotalGoldEarned;
+            pd["total_exp_earned"] = kvp.Value.TotalExpEarned;
+            pd["last_played_date"] = kvp.Value.LastPlayedDate.ToString("o");
+            playerDataList.Add(pd);
+        }
+        data["player_dungeon_data"] = playerDataList;
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        _currentFloor = (int)(data.GetValueOrDefault("current_floor", 0));
+        _enemiesDefeated = (int)(data.GetValueOrDefault("enemies_defeated", 0));
+        _timeRemaining = (float)(data.GetValueOrDefault("time_remaining", 0f));
+        _isInDungeon = (bool)(data.GetValueOrDefault("is_in_dungeon", false));
+        
+        if (data.Contains("dungeon_start_time"))
+            _dungeonStartTime = DateTime.Parse(data["dungeon_start_time"].ToString());
+        if (data.Contains("last_daily_reset"))
+            _lastDailyReset = DateTime.Parse(data["last_daily_reset"].ToString());
+        
+        _dailyChallengeCount = (int)(data.GetValueOrDefault("daily_challenge_count", 0));
+        _dailyCompleted = (bool)(data.GetValueOrDefault("daily_completed", false));
+        
+        // 恢复玩家地下城数据
+        PlayerDungeonData.Clear();
+        if (data.Contains("player_dungeon_data"))
+        {
+            var playerDataList = data["player_dungeon_data"] as List<Dictionary>;
+            if (playerDataList != null)
+            {
+                foreach (var pd in playerDataList)
+                {
+                    var pdata = new PlayerDungeonData();
+                    pdata.BestFloor = (int)(pd.GetValueOrDefault("best_floor", 0));
+                    pdata.TimesCompleted = (int)(pd.GetValueOrDefault("times_completed", 0));
+                    pdata.TotalGoldEarned = (int)(pd.GetValueOrDefault("total_gold_earned", 0));
+                    pdata.TotalExpEarned = (int)(pd.GetValueOrDefault("total_exp_earned", 0));
+                    if (pd.Contains("last_played_date"))
+                        pdata.LastPlayedDate = DateTime.Parse(pd["last_played_date"].ToString());
+                    
+                    var dungeonId = pd["dungeon_id"].ToString();
+                    PlayerDungeonData[dungeonId] = pdata;
+                }
+            }
+        }
+    }
 }
 
 public class PlayerDungeonData

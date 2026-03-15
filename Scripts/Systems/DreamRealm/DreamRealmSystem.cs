@@ -490,4 +490,87 @@ public partial class DreamRealmSystem : BaseSystem
     public bool IsInDream => _currentState == DreamState.Active;
     public Dictionary<RealmType, bool> UnlockedRealms => _unlockedRealms;
     public Dictionary<RealmType, RealmStats> RealmStats => _realmStats;
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        data["current_realm"] = (int)_currentRealm;
+        data["current_state"] = (int)_currentState;
+        data["dream_level"] = _dreamLevel;
+        data["enemies_defeated"] = _enemiesDefeated;
+        data["treasures_found"] = _treasuresFound;
+        data["time_in_dream"] = _timeInDream;
+        data["dream_power_multiplier"] = _dreamPowerMultiplier;
+        
+        // 解锁的领域
+        var unlockedList = new List<int>();
+        foreach (var kvp in _unlockedRealms)
+        {
+            if (kvp.Value) unlockedList.Add((int)kvp.Key);
+        }
+        data["unlocked_realms"] = unlockedList;
+        
+        // 领域统计数据
+        var statsData = new List<Dictionary>();
+        foreach (var kvp in _realmStats)
+        {
+            var sd = new Dictionary();
+            sd["realm_type"] = (int)kvp.Key;
+            sd["times_entered"] = kvp.Value.TimesEntered;
+            sd["best_score"] = kvp.Value.BestScore;
+            sd["total_rewards"] = kvp.Value.TotalRewards;
+            statsData.Add(sd);
+        }
+        data["realm_stats"] = statsData;
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        _currentRealm = (RealmType)(data.GetValueOrDefault("current_realm", 0));
+        _currentState = (DreamState)(data.GetValueOrDefault("current_state", 0));
+        _dreamLevel = (int)(data.GetValueOrDefault("dream_level", 1));
+        _enemiesDefeated = (int)(data.GetValueOrDefault("enemies_defeated", 0));
+        _treasuresFound = (int)(data.GetValueOrDefault("treasures_found", 0));
+        _timeInDream = (float)(data.GetValueOrDefault("time_in_dream", 0f));
+        _dreamPowerMultiplier = (float)(data.GetValueOrDefault("dream_power_multiplier", 1.0f));
+        
+        // 恢复解锁的领域
+        _unlockedRealms.Clear();
+        if (data.Contains("unlocked_realms"))
+        {
+            var unlockedList = data["unlocked_realms"] as List<int>;
+            if (unlockedList != null)
+            {
+                foreach (var realmType in unlockedList)
+                {
+                    _unlockedRealms[(RealmType)realmType] = true;
+                }
+            }
+        }
+        
+        // 恢复领域统计数据
+        _realmStats.Clear();
+        if (data.Contains("realm_stats"))
+        {
+            var statsData = data["realm_stats"] as List<Dictionary>;
+            if (statsData != null)
+            {
+                foreach (var sd in statsData)
+                {
+                    var rs = new RealmStats();
+                    rs.TimesEntered = (int)(sd.GetValueOrDefault("times_entered", 0));
+                    rs.BestScore = (int)(sd.GetValueOrDefault("best_score", 0));
+                    rs.TotalRewards = (int)(sd.GetValueOrDefault("total_rewards", 0));
+                    _realmStats[(RealmType)(int)sd["realm_type"]] = rs;
+                }
+            }
+        }
+    }
 }

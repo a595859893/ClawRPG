@@ -212,5 +212,29 @@ namespace ClawRPG.Scripts.Systems.Combat
                 { "activeCount", _activeNumbers.Count }
             };
         }
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData() {
+            var data = new Dictionary();
+            data["totalDamageNumbers"] = TotalDamageNumbers;
+            data["criticalHits"] = CriticalHits;
+            data["totalDamage"] = TotalDamage;
+            data["totalHealing"] = TotalHealing;
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data) {
+            if (data == null) return;
+            
+            if (data.Contains("totalDamageNumbers")) TotalDamageNumbers = (int)data["totalDamageNumbers"];
+            if (data.Contains("criticalHits")) CriticalHits = (int)data["criticalHits"];
+            if (data.Contains("totalDamage")) TotalDamage = (int)data["totalDamage"];
+            if (data.Contains("totalHealing")) TotalHealing = (int)data["totalHealing"];
+        }
     }
 }
