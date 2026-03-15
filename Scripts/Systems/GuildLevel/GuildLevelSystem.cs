@@ -420,4 +420,70 @@ public class GuildLevelSystem : BaseSystem
     }
     
     #endregion
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData() {
+        var data = new Dictionary();
+        
+        var guildLevelsList = new List<Dictionary>();
+        foreach (var kvp in _guildLevels) {
+            var guildData = new Dictionary();
+            guildData["guildId"] = kvp.Key;
+            guildData["level"] = kvp.Value.Level;
+            guildData["experience"] = kvp.Value.Experience;
+            guildData["totalExperience"] = kvp.Value.TotalExperience;
+            guildData["maxMembers"] = kvp.Value.MaxMembers;
+            guildData["unlockedPerks"] = new Godot.Array(kvp.Value.UnlockedPerks);
+            guildData["totalQuestsCompleted"] = kvp.Value.TotalQuestsCompleted;
+            guildData["totalWarsWon"] = kvp.Value.TotalWarsWon;
+            guildData["totalWarsLost"] = kvp.Value.TotalWarsLost;
+            guildData["totalTechnologyResearched"] = kvp.Value.TotalTechnologyResearched;
+            guildData["dailyContributions"] = kvp.Value.DailyContributions;
+            guildData["weeklyContributions"] = kvp.Value.WeeklyContributions;
+            guildData["dailyQuestsCompleted"] = kvp.Value.DailyQuestsCompleted;
+            guildData["weeklyQuestsCompleted"] = kvp.Value.WeeklyQuestsCompleted;
+            guildData["lastDailyReset"] = kvp.Value.LastDailyReset;
+            guildData["lastWeeklyReset"] = kvp.Value.LastWeeklyReset;
+            guildLevelsList.Add(guildData);
+        }
+        data["guildLevels"] = guildLevelsList;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data) {
+        if (data == null) return;
+        
+        _guildLevels.Clear();
+        
+        if (data.Contains("guildLevels")) {
+            var guildLevelsList = (Godot.Array)data["guildLevels"];
+            foreach (Dictionary guildData in guildLevelsList) {
+                var levelData = new GuildLevelData();
+                levelData.GuildId = (int)guildData["guildId"];
+                levelData.Level = (int)guildData["level"];
+                levelData.Experience = (int)guildData["experience"];
+                levelData.TotalExperience = (int)guildData["totalExperience"];
+                levelData.MaxMembers = (int)guildData["maxMembers"];
+                levelData.UnlockedPerks = ((Godot.Array)guildData["unlockedPerks"]).Select(v => (string)v).ToList();
+                levelData.TotalQuestsCompleted = (int)guildData["totalQuestsCompleted"];
+                levelData.TotalWarsWon = (int)guildData["totalWarsWon"];
+                levelData.TotalWarsLost = (int)guildData["totalWarsLost"];
+                levelData.TotalTechnologyResearched = (int)guildData["totalTechnologyResearched"];
+                levelData.DailyContributions = (int)guildData["dailyContributions"];
+                levelData.WeeklyContributions = (int)guildData["weeklyContributions"];
+                levelData.DailyQuestsCompleted = (int)guildData["dailyQuestsCompleted"];
+                levelData.WeeklyQuestsCompleted = (int)guildData["weeklyQuestsCompleted"];
+                levelData.LastDailyReset = (long)guildData["lastDailyReset"];
+                levelData.LastWeeklyReset = (long)guildData["lastWeeklyReset"];
+                
+                _guildLevels[levelData.GuildId] = levelData;
+            }
+        }
+    }
 }

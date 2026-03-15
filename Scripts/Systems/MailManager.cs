@@ -159,18 +159,76 @@ namespace ClawRPG.Systems {
         }
 
         /// <summary>
-        /// 保存邮件数据
+        /// 导出保存数据
         /// </summary>
-        public Dictionary<string, List<MailData>> SaveData() {
-            return _mailBox;
+        public override Dictionary ExportSaveData() {
+            var data = new Dictionary();
+            
+            var mailBoxList = new List<Dictionary>();
+            foreach (var kvp in _mailBox)
+            {
+                var playerMails = new List<Dictionary>();
+                foreach (var mail in kvp.Value)
+                {
+                    var mailDict = new Dictionary();
+                    mailDict["id"] = mail.Id;
+                    mailDict["sender"] = mail.Sender;
+                    mailDict["receiver"] = mail.Receiver;
+                    mailDict["title"] = mail.Title;
+                    mailDict["content"] = mail.Content;
+                    mailDict["gold"] = mail.Gold;
+                    mailDict["attachedItems"] = mail.AttachedItems;
+                    mailDict["sendTime"] = mail.SendTime.ToString("yyyy-MM-dd HH:mm:ss");
+                    mailDict["isRead"] = mail.IsRead;
+                    mailDict["isSystemMail"] = mail.IsSystemMail;
+                    mailDict["isDeleted"] = mail.IsDeleted;
+                    playerMails.Add(mailDict);
+                }
+                var playerEntry = new Dictionary();
+                playerEntry["playerId"] = kvp.Key;
+                playerEntry["mails"] = playerMails;
+                mailBoxList.Add(playerEntry);
+            }
+            data["mailBox"] = mailBoxList;
+            
+            return data;
         }
 
         /// <summary>
-        /// 加载邮件数据
+        /// 导入保存数据
         /// </summary>
-        public void LoadData(Dictionary<string, List<MailData>> data) {
-            if (data != null) {
-                _mailBox = data;
+        public override void ImportSaveData(Dictionary data) {
+            if (data == null) return;
+            
+            _mailBox.Clear();
+            
+            if (data.Contains("mailBox")) {
+                var mailBoxList = (Godot.Array)data["mailBox"];
+                foreach (Dictionary playerEntry in mailBoxList)
+                {
+                    string playerId = (string)playerEntry["playerId"];
+                    var playerMails = (Godot.Array)playerEntry["mails"];
+                    var mails = new List<MailData>();
+                    
+                    foreach (Dictionary mailDict in playerMails)
+                    {
+                        var mail = new MailData();
+                        mail.Id = (string)mailDict["id"];
+                        mail.Sender = (string)mailDict["sender"];
+                        mail.Receiver = (string)mailDict["receiver"];
+                        mail.Title = (string)mailDict["title"];
+                        mail.Content = (string)mailDict["content"];
+                        mail.Gold = (int)mailDict["gold"];
+                        mail.AttachedItems = ((Godot.Array)mailDict["attachedItems"]).Select(v => (string)v).ToList();
+                        mail.SendTime = DateTime.Parse((string)mailDict["sendTime"]);
+                        mail.IsRead = (bool)mailDict["isRead"];
+                        mail.IsSystemMail = (bool)mailDict["isSystemMail"];
+                        mail.IsDeleted = (bool)mailDict["isDeleted"];
+                        mails.Add(mail);
+                    }
+                    
+                    _mailBox[playerId] = mails;
+                }
             }
         }
     }

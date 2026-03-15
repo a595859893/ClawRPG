@@ -190,4 +190,58 @@ public class TitleCollectionSystem : BaseSystem
             }
         }
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData() {
+        var data = new Dictionary();
+        
+        var titlesDict = new Dictionary();
+        foreach (var kvp in _data.CollectedTitles) {
+            titlesDict[kvp.Key] = kvp.Value;
+        }
+        data["collectedTitles"] = titlesDict;
+        data["currentDisplayTitle"] = _data.CurrentDisplayTitle;
+        data["titleHistory"] = _data.TitleHistory;
+        data["totalTitlesCollected"] = _data.TotalTitlesCollected;
+        data["legendaryTitles"] = _data.LegendaryTitles;
+        data["epicTitles"] = _data.EpicTitles;
+        data["rareTitles"] = _data.RareTitles;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data) {
+        if (data == null) return;
+        
+        if (data.Contains("collectedTitles")) {
+            var titlesDict = (Dictionary)data["collectedTitles"];
+            _data.CollectedTitles = new Dictionary<string, string>();
+            foreach (var kvp in titlesDict) {
+                _data.CollectedTitles[kvp.Key] = (string)kvp.Value;
+            }
+        }
+        if (data.Contains("currentDisplayTitle")) {
+            _data.CurrentDisplayTitle = (string)data["currentDisplayTitle"];
+        }
+        if (data.Contains("titleHistory")) {
+            _data.TitleHistory = (Godot.Array)data["titleHistory"];
+        }
+        if (data.Contains("totalTitlesCollected")) {
+            _data.TotalTitlesCollected = (int)data["totalTitlesCollected"];
+        }
+        if (data.Contains("legendaryTitles")) {
+            _data.LegendaryTitles = (int)data["legendaryTitles"];
+        }
+        if (data.Contains("epicTitles")) {
+            _data.EpicTitles = (int)data["epicTitles"];
+        }
+        if (data.Contains("rareTitles")) {
+            _data.RareTitles = (int)data["rareTitles"];
+        }
+    }
 }

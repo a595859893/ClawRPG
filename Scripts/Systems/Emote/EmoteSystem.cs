@@ -135,6 +135,50 @@ namespace ClawRPG.Systems.Emote {
                 .First().Key;
         }
 
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData() {
+            var data = new Dictionary();
+            data["emote_unlocked"] = new Godot.Array(playerData.UnlockedEmotes);
+            data["emote_favorites"] = new Godot.Array(playerData.FavoriteEmotes);
+            
+            var usageDict = new Dictionary();
+            foreach (var kvp in playerData.EmoteUsageCount) {
+                usageDict[kvp.Key] = kvp.Value;
+            }
+            data["emote_usage"] = usageDict;
+            data["emote_last_used"] = playerData.LastUsedEmote;
+            
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data) {
+            if (data == null) return;
+            
+            if (data.Contains("emote_unlocked")) {
+                playerData.UnlockedEmotes = ((Godot.Array)data["emote_unlocked"])
+                    .Select(v => (string)v).ToList();
+            }
+            if (data.Contains("emote_favorites")) {
+                playerData.FavoriteEmotes = ((Godot.Array)data["emote_favorites"])
+                    .Select(v => (string)v).ToList();
+            }
+            if (data.Contains("emote_usage")) {
+                var usageDict = (Dictionary)data["emote_usage"];
+                playerData.EmoteUsageCount = new Dictionary<string, int>();
+                foreach (var kvp in usageDict) {
+                    playerData.EmoteUsageCount[kvp.Key] = (int)(long)kvp.Value;
+                }
+            }
+            if (data.Contains("emote_last_used")) {
+                playerData.LastUsedEmote = (string)data["emote_last_used"];
+            }
+        }
+
         public void SaveData(Dictionary<string, object> data) {
             data["emote_unlocked"] = playerData.UnlockedEmotes;
             data["emote_favorites"] = playerData.FavoriteEmotes;
