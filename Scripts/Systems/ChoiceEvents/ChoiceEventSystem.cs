@@ -367,5 +367,19 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
             
             GD.Print("ChoiceEventSystem save data loaded");
         }
+
+        #region BaseSystem 持久化接口
+
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            return GetSaveData();
+        }
+
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            LoadSaveData(data);
+        }
+
+        #endregion
     }
 }

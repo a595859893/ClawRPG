@@ -394,6 +394,18 @@ public class AuctionHouseSystem : BaseSystem
             { "nextListingId", _data.NextListingId }
         };
     }
+
+    // ==================== BaseSystem 持久化接口 ====================
+    public override Dictionary<string, object> ExportSaveData()
+    {
+        return GetSaveData();
+    }
+
+    public override void ImportSaveData(Dictionary<string, object> data)
+    {
+        LoadSaveData(data);
+    }
+    // ==================== 持久化接口结束 ====================
     
     public void LoadSaveData(Dictionary<string, object> data)
     {

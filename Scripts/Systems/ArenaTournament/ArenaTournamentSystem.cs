@@ -797,5 +797,97 @@ namespace ClawRPG.Scripts.Systems
         }
 
         #endregion
+
+        #region BaseSystem 持久化接口
+
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var tournamentsData = new List<Dictionary<string, object>>();
+            foreach (var kvp in _tournaments)
+            {
+                tournamentsData.Add(new Dictionary<string, object>
+                {
+                    { "tournamentId", kvp.Value.tournamentId },
+                    { "tournamentName", kvp.Value.tournamentName },
+                    { "description", kvp.Value.description },
+                    { "format", (int)kvp.Value.format },
+                    { "status", (int)kvp.Value.status },
+                    { "currentStage", (int)kvp.Value.currentStage },
+                    { "maxPlayers", kvp.Value.maxPlayers },
+                    { "minPlayers", kvp.Value.minPlayers },
+                    { "currentPlayerCount", kvp.Value.currentPlayerCount },
+                    { "currentRound", kvp.Value.currentRound },
+                    { "prizePool", kvp.Value.prizePool },
+                    { "entryFee", kvp.Value.entryFee }
+                });
+            }
+
+            var progressData = new List<Dictionary<string, object>>();
+            foreach (var kvp in _playerProgress)
+            {
+                progressData.Add(new Dictionary<string, object>
+                {
+                    { "playerId", kvp.Key },
+                    { "tournamentsJoined", kvp.Value.tournamentsJoined },
+                    { "wins", kvp.Value.wins },
+                    { "losses", kvp.Value.losses },
+                    { "totalPoints", kvp.Value.totalPoints }
+                });
+            }
+
+            return new Dictionary<string, object>
+            {
+                { "tournaments", tournamentsData },
+                { "playerProgress", progressData }
+            };
+        }
+
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data.ContainsKey("tournaments"))
+            {
+                var tournamentsData = data["tournaments"] as List<Dictionary<string, object>>;
+                foreach (var tData in tournamentsData)
+                {
+                    var tournament = new Tournament
+                    {
+                        tournamentId = tData["tournamentId"].ToString(),
+                        tournamentName = tData["tournamentName"].ToString(),
+                        description = tData["description"].ToString(),
+                        format = (TournamentFormat)Convert.ToInt32(tData["format"]),
+                        status = (TournamentStatus)Convert.ToInt32(tData["status"]),
+                        currentStage = (TournamentStage)Convert.ToInt32(tData["currentStage"]),
+                        maxPlayers = Convert.ToInt32(tData["maxPlayers"]),
+                        minPlayers = Convert.ToInt32(tData["minPlayers"]),
+                        currentPlayerCount = Convert.ToInt32(tData["currentPlayerCount"]),
+                        currentRound = Convert.ToInt32(tData["currentRound"]),
+                        prizePool = Convert.ToInt32(tData["prizePool"]),
+                        entryFee = Convert.ToInt32(tData["entryFee"])
+                    };
+                    _tournaments[tournament.tournamentId] = tournament;
+                }
+            }
+
+            if (data.ContainsKey("playerProgress"))
+            {
+                var progressData = data["playerProgress"] as List<Dictionary<string, object>>;
+                foreach (var pData in progressData)
+                {
+                    var progress = new TournamentProgress
+                    {
+                        playerId = pData["playerId"].ToString(),
+                        tournamentsJoined = Convert.ToInt32(pData["tournamentsJoined"]),
+                        wins = Convert.ToInt32(pData["wins"]),
+                        losses = Convert.ToInt32(pData["losses"]),
+                        totalPoints = Convert.ToInt32(pData["totalPoints"])
+                    };
+                    _playerProgress[progress.playerId] = progress;
+                }
+            }
+
+            GD.Print("[ArenaTournamentSystem] 数据已加载");
+        }
+
+        #endregion
     }
 }
