@@ -1196,7 +1196,43 @@ namespace ClawRPG.Scripts {
             _initializationManager.Name = "GameInitializationManager";
             AddChild(_initializationManager);
             
+            // Initialize new managers from ManagerBase framework
+            InitializeNewManagers();
+            
             GD.Print("Managers initialized");
+        }
+        
+        /// <summary>
+        /// Initialize new managers from ManagerBase framework
+        /// </summary>
+        private void InitializeNewManagers()
+        {
+            // Initialize SceneManager
+            var sceneManager = new SceneManager();
+            sceneManager.Name = "SceneManager";
+            AddChild(sceneManager);
+            
+            // Initialize SaveLoadManager
+            var saveLoadManager = new SaveLoadManager();
+            saveLoadManager.Name = "SaveLoadManager";
+            AddChild(saveLoadManager);
+            
+            // Initialize EventBusManager
+            var eventBusManager = new EventBusManager();
+            eventBusManager.Name = "EventBusManager";
+            AddChild(eventBusManager);
+            
+            // Initialize PlayerLifecycleManager
+            var playerLifecycleManager = new PlayerLifecycleManager();
+            playerLifecycleManager.Name = "PlayerLifecycleManager";
+            AddChild(playerLifecycleManager);
+            
+            // Initialize EnemyLifecycleManager
+            var enemyLifecycleManager = new EnemyLifecycleManager();
+            enemyLifecycleManager.Name = "EnemyLifecycleManager";
+            AddChild(enemyLifecycleManager);
+            
+            GD.Print("New managers (SceneManager, SaveLoadManager, EventBusManager, PlayerLifecycleManager, EnemyLifecycleManager) initialized");
         }
 
         /// <summary>
