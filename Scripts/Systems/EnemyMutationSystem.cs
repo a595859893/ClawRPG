@@ -425,6 +425,45 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
 
+        #region Data Persistence
+        
+        /// <summary>
+        /// 导出保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary
+            {
+                { "mutation_enabled", _mutationEnabled },
+                { "mutation_chance", _mutationChance },
+                { "max_rarity", (int)_maxRarity },
+                { "discovered_count", _discoveredMutations.Count },
+                { "total_encountered", _statistics.TotalMutationsEncountered },
+                { "total_killed", _statistics.TotalMutationsKilled }
+            };
+        }
+        
+        /// <summary>
+        /// 导入保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.ContainsKey("mutation_enabled"))
+                _mutationEnabled = Convert.ToBoolean(data["mutation_enabled"]);
+            if (data.ContainsKey("mutation_chance"))
+                _mutationChance = Convert.ToSingle(data["mutation_chance"]);
+            if (data.ContainsKey("max_rarity"))
+                _maxRarity = (EnemyMutationData.MutationRarity)Convert.ToInt32(data["max_rarity"]);
+            if (data.ContainsKey("total_encountered"))
+                _statistics.TotalMutationsEncountered = Convert.ToInt32(data["total_encountered"]);
+            if (data.ContainsKey("total_killed"))
+                _statistics.TotalMutationsKilled = Convert.ToInt32(data["total_killed"]);
+        }
+        
+        #endregion
+        
         /// <summary>
         /// 读档数据
         /// </summary>
