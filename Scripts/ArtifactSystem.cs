@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ArtifactSystem : Node
+public class ArtifactSystem : BaseSystem
 {
     // 神器数据存储
     private Dictionary<string, ArtifactData> _artifacts = new Dictionary<string, ArtifactData>();
@@ -21,6 +21,53 @@ public class ArtifactSystem : Node
     {
         InitializeArtifacts();
         LoadData();
+    }
+    
+    /// <summary>
+    /// 系统名称
+    /// </summary>
+    protected override string SystemName => "Artifact";
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        var unlocked = new Array();
+        foreach (var artifact in _unlockedArtifacts)
+        {
+            unlocked.Add(artifact);
+        }
+        
+        data["unlocked_artifacts"] = unlocked;
+        data["equipped_artifact"] = _equippedArtifact;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("unlocked_artifacts"))
+        {
+            var unlocked = (Array)data["unlocked_artifacts"];
+            _unlockedArtifacts.Clear();
+            foreach (var artifact in unlocked)
+            {
+                _unlockedArtifacts.Add((string)artifact);
+            }
+        }
+        
+        if (data.Contains("equipped_artifact"))
+        {
+            _equippedArtifact = (string)data["equipped_artifact"];
+        }
     }
     
     private void InitializeArtifacts()
