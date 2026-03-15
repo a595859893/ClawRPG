@@ -75,12 +75,6 @@ namespace ClawRPG.Scripts.Systems
             };
         }
 
-        public override void _Ready()
-        {
-            base._Ready();
-            Initialize();
-        }
-
         protected override void Initialize()
         {
             GD.Print("[GuildTournamentSystem] initialized");
