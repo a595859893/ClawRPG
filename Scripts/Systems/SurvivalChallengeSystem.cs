@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// 生存挑战系统 - 管理生存挑战模式
     /// 支持：无尽波次、限时击杀、Boss Rush、竞技场生存、无尽地下城
     /// </summary>
-    public class SurvivalChallengeSystem
+    public partial class SurvivalChallengeSystem : BaseSystem
     {
         // 单例
         private static SurvivalChallengeSystem _instance;
@@ -40,14 +40,18 @@ namespace ClawRPG.Scripts.Systems
             _currentChallenge.State == SurvivalChallengeData.ChallengeState.InProgress;
         
         public SurvivalChallengeData.ActiveChallenge CurrentChallenge => _currentChallenge;
-        
-        /// <summary>
-        /// 初始化系统
-        /// </summary>
-        public void Initialize()
+
+        public override void _Ready()
+        {
+            base._Ready();
+            Initialize();
+        }
+
+        protected override void Initialize()
         {
             _instance = this;
             LoadData();
+            IsInitialized = true;
             GD.Print("生存挑战系统已初始化");
         }
         
@@ -523,10 +527,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 保存数据
         /// </summary>
-        public void SaveData()
+        protected override Dictionary ExportSaveData()
         {
-            // JSON序列化
-            var saveDict = new Godot.Collections.Dictionary();
+            var saveDict = new Dictionary();
             
             var bestWaves = new Godot.Collections.Dictionary();
             foreach (var kvp in _playerData.BestWaves)
@@ -558,92 +561,95 @@ namespace ClawRPG.Scripts.Systems
                 totalGold[kvp.Key] = kvp.Value;
             saveDict["total_gold"] = totalGold;
             
-            // 保存到PlayerPrefs
-            var json = Json.Stringify(saveDict);
-            PlayerPrefs.SetString(_saveKey, json);
+            return saveDict;
         }
         
         /// <summary>
         /// 加载数据
         /// </summary>
-        public void LoadData()
+        protected override void ImportSaveData(Dictionary data)
         {
-            var json = PlayerPrefs.GetString(_saveKey, "");
-            if (string.IsNullOrEmpty(json)) return;
+            if (data == null) return;
             
-            try
+            // 加载最佳波次
+            if (data.ContainsKey("best_waves"))
             {
-                var parseResult = Json.ParseString(json);
-                if (parseResult == null) return;
-                
-                var saveDict = parseResult.AsGodotDictionary();
-                
-                // 加载最佳波次
-                if (saveDict.Contains("best_waves"))
+                var bestWaves = data["best_waves"] as Godot.Collections.Dictionary;
+                if (bestWaves != null)
                 {
-                    var bestWaves = saveDict["best_waves"].AsGodotDictionary();
                     foreach (var key in bestWaves.Keys)
                     {
-                        _playerData.BestWaves[key.ToString()] = (int)bestWaves[key];
+                        _playerData.BestWaves[key.ToString()] = Convert.ToInt32(bestWaves[key]);
                     }
                 }
-                
-                // 加载最高分
-                if (saveDict.Contains("best_scores"))
+            }
+            
+            // 加载最高分
+            if (data.ContainsKey("best_scores"))
+            {
+                var bestScores = data["best_scores"] as Godot.Collections.Dictionary;
+                if (bestScores != null)
                 {
-                    var bestScores = saveDict["best_scores"].AsGodotDictionary();
                     foreach (var key in bestScores.Keys)
                     {
-                        _playerData.BestScores[key.ToString()] = (int)bestScores[key];
+                        _playerData.BestScores[key.ToString()] = Convert.ToInt32(bestScores[key]);
                     }
                 }
-                
-                // 加载最佳时间
-                if (saveDict.Contains("best_times"))
+            }
+            
+            // 加载最佳时间
+            if (data.ContainsKey("best_times"))
+            {
+                var bestTimes = data["best_times"] as Godot.Collections.Dictionary;
+                if (bestTimes != null)
                 {
-                    var bestTimes = saveDict["best_times"].AsGodotDictionary();
                     foreach (var key in bestTimes.Keys)
                     {
-                        _playerData.BestTimes[key.ToString()] = (float)bestTimes[key];
+                        _playerData.BestTimes[key.ToString()] = Convert.ToSingle(bestTimes[key]);
                     }
                 }
-                
-                // 加载完成次数
-                if (saveDict.Contains("completion_count"))
+            }
+            
+            // 加载完成次数
+            if (data.ContainsKey("completion_count"))
+            {
+                var completionCount = data["completion_count"] as Godot.Collections.Dictionary;
+                if (completionCount != null)
                 {
-                    var completionCount = saveDict["completion_count"].AsGodotDictionary();
                     foreach (var key in completionCount.Keys)
                     {
-                        _playerData.CompletionCount[key.ToString()] = (int)completionCount[key];
+                        _playerData.CompletionCount[key.ToString()] = Convert.ToInt32(completionCount[key]);
                     }
                 }
-                
-                // 加载总击杀
-                if (saveDict.Contains("total_kills"))
+            }
+            
+            // 加载总击杀数
+            if (data.ContainsKey("total_kills"))
+            {
+                var totalKills = data["total_kills"] as Godot.Collections.Dictionary;
+                if (totalKills != null)
                 {
-                    var totalKills = saveDict["total_kills"].AsGodotDictionary();
                     foreach (var key in totalKills.Keys)
                     {
-                        _playerData.TotalKills[key.ToString()] = (int)totalKills[key];
+                        _playerData.TotalKills[key.ToString()] = Convert.ToInt32(totalKills[key]);
                     }
                 }
-                
-                // 加载总金币
-                if (saveDict.Contains("total_gold"))
+            }
+            
+            // 加载总金币
+            if (data.ContainsKey("total_gold"))
+            {
+                var totalGold = data["total_gold"] as Godot.Collections.Dictionary;
+                if (totalGold != null)
                 {
-                    var totalGold = saveDict["total_gold"].AsGodotDictionary();
                     foreach (var key in totalGold.Keys)
                     {
-                        _playerData.TotalGoldEarned[key.ToString()] = (int)totalGold[key];
+                        _playerData.TotalGoldEarned[key.ToString()] = Convert.ToInt32(totalGold[key]);
                     }
                 }
-                
-                GD.Print("生存挑战数据已加载");
             }
-            catch (Exception e)
-            {
-                GD.PrintErr("加载生存挑战数据失败: " + e.Message);
-            }
+            
+            GD.Print("[SurvivalChallengeSystem] Save data imported");
         }
     }
 }

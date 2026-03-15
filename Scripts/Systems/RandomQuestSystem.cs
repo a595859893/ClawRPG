@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 随机任务系统 - 生成和管理随机任务
 /// </summary>
-public class RandomQuestSystem
+public partial class RandomQuestSystem : BaseSystem
 {
     private static RandomQuestSystem _instance;
     public static RandomQuestSystem Instance => _instance ??= new RandomQuestSystem();
@@ -28,6 +28,30 @@ public class RandomQuestSystem
     public RandomQuestSystem()
     {
         _database = RandomQuestDatabase.Instance;
+    }
+
+    public override void _Ready()
+    {
+        base._Ready();
+        Initialize(new RandomQuestData());
+    }
+
+    protected override void Initialize()
+    {
+        if (_data == null)
+            _data = new RandomQuestData();
+        
+        if (_data.ActiveQuests == null)
+            _data.ActiveQuests = new List<RandomQuestData.ActiveQuest>();
+        if (_data.CompletedQuestIds == null)
+            _data.CompletedQuestIds = new List<string>();
+        if (_data.FailedQuestIds == null)
+            _data.FailedQuestIds = new List<string>();
+        if (_data.QuestCompletionCount == null)
+            _data.QuestCompletionCount = new Dictionary<string, int>();
+        
+        IsInitialized = true;
+        GD.Print("[RandomQuestSystem] initialized");
     }
     
     public void Initialize(RandomQuestData data, Node timerParent = null)
@@ -277,5 +301,99 @@ public class RandomQuestSystem
     {
         if (_data == null || _data.TotalQuestsGenerated == 0) return 0f;
         return (float)_data.TotalQuestsCompleted / _data.TotalQuestsGenerated;
+    }
+
+    protected override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        if (_data != null)
+        {
+            data["total_quests_generated"] = _data.TotalQuestsGenerated;
+            data["total_quests_completed"] = _data.TotalQuestsCompleted;
+            data["total_quests_failed"] = _data.TotalQuestsFailed;
+            data["total_quest_rewards"] = _data.TotalQuestRewards;
+            
+            // Save completed quest IDs
+            if (_data.CompletedQuestIds != null)
+            {
+                var completedIds = new Godot.Collections.Array();
+                foreach (var id in _data.CompletedQuestIds)
+                    completedIds.Add(id);
+                data["completed_quest_ids"] = completedIds;
+            }
+            
+            // Save failed quest IDs
+            if (_data.FailedQuestIds != null)
+            {
+                var failedIds = new Godot.Collections.Array();
+                foreach (var id in _data.FailedQuestIds)
+                    failedIds.Add(id);
+                data["failed_quest_ids"] = failedIds;
+            }
+            
+            // Save quest completion counts
+            if (_data.QuestCompletionCount != null)
+            {
+                var counts = new Godot.Collections.Dictionary();
+                foreach (var kvp in _data.QuestCompletionCount)
+                    counts[kvp.Key] = kvp.Value;
+                data["quest_completion_count"] = counts;
+            }
+        }
+        
+        return data;
+    }
+
+    protected override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || _data == null) return;
+        
+        if (data.ContainsKey("total_quests_generated"))
+            _data.TotalQuestsGenerated = Convert.ToInt32(data["total_quests_generated"]);
+        if (data.ContainsKey("total_quests_completed"))
+            _data.TotalQuestsCompleted = Convert.ToInt32(data["total_quests_completed"]);
+        if (data.ContainsKey("total_quests_failed"))
+            _data.TotalQuestsFailed = Convert.ToInt32(data["total_quests_failed"]);
+        if (data.ContainsKey("total_quest_rewards"))
+            _data.TotalQuestRewards = Convert.ToInt32(data["total_quest_rewards"]);
+        
+        // Load completed quest IDs
+        if (data.ContainsKey("completed_quest_ids"))
+        {
+            _data.CompletedQuestIds = new List<string>();
+            var ids = data["completed_quest_ids"] as Godot.Collections.Array;
+            if (ids != null)
+            {
+                foreach (var id in ids)
+                    _data.CompletedQuestIds.Add(id.ToString());
+            }
+        }
+        
+        // Load failed quest IDs
+        if (data.ContainsKey("failed_quest_ids"))
+        {
+            _data.FailedQuestIds = new List<string>();
+            var ids = data["failed_quest_ids"] as Godot.Collections.Array;
+            if (ids != null)
+            {
+                foreach (var id in ids)
+                    _data.FailedQuestIds.Add(id.ToString());
+            }
+        }
+        
+        // Load quest completion counts
+        if (data.ContainsKey("quest_completion_count"))
+        {
+            _data.QuestCompletionCount = new Dictionary<string, int>();
+            var counts = data["quest_completion_count"] as Godot.Collections.Dictionary;
+            if (counts != null)
+            {
+                foreach (var kvp in counts)
+                    _data.QuestCompletionCount[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+            }
+        }
+        
+        GD.Print("[RandomQuestSystem] Save data imported");
     }
 }

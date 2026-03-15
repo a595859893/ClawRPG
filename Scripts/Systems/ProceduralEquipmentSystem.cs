@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Procedural Equipment Generation System - generates random affixes for equipment
     /// </summary>
-    public class ProceduralEquipmentSystem
+    public partial class ProceduralEquipmentSystem : BaseSystem
     {
         private static ProceduralEquipmentSystem _instance;
         public static ProceduralEquipmentSystem Instance
@@ -39,6 +39,18 @@ namespace ClawRPG.Scripts.Systems
         public ProceduralEquipmentSystem()
         {
             EquipmentAffixDatabase.Initialize();
+        }
+
+        public override void _Ready()
+        {
+            base._Ready();
+            Initialize();
+        }
+
+        protected override void Initialize()
+        {
+            IsInitialized = true;
+            GD.Print("[ProceduralEquipmentSystem] initialized");
         }
         
         /// <summary>
@@ -268,20 +280,20 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Save affix data
         /// </summary>
-        public Dictionary<string, object> Save()
+        protected override Dictionary ExportSaveData()
         {
-            Dictionary<string, object> data = new Dictionary<string, object>();
-            List<object> equipmentList = new List<object>();
+            Dictionary data = new Dictionary();
+            Godot.Collections.Array equipmentList = new Godot.Collections.Array();
             
             foreach (var kvp in _playerAffixData.EquipmentAffixes)
             {
-                Dictionary<string, object> itemData = new Dictionary<string, object>
+                Godot.Collections.Dictionary itemData = new Godot.Collections.Dictionary
                 {
                     { "item_id", kvp.Key },
                     { "score", kvp.Value.TotalScore }
                 };
                 
-                List<string> affixIds = new List<string>();
+                Godot.Collections.Array affixIds = new Godot.Collections.Array();
                 foreach (var affix in kvp.Value.Affixes)
                 {
                     affixIds.Add(affix.Id);
@@ -298,14 +310,14 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Load affix data
         /// </summary>
-        public void Load(Dictionary<string, object> data)
+        protected override void ImportSaveData(Dictionary data)
         {
             _playerAffixData = new PlayerAffixData();
             
             if (data == null || !data.ContainsKey("equipment_affixes"))
                 return;
             
-            var equipmentList = data["equipment_affixes"] as List<object>;
+            var equipmentList = data["equipment_affixes"] as Godot.Collections.Array;
             if (equipmentList == null) return;
             
             // Get all affixes for lookup
@@ -313,13 +325,13 @@ namespace ClawRPG.Scripts.Systems
             
             foreach (var itemData in equipmentList)
             {
-                var dict = itemData as Dictionary<string, object>;
+                var dict = itemData as Godot.Collections.Dictionary;
                 if (dict == null) continue;
                 
-                int itemId = dict.ContainsKey("item_id") ? (int)(long)dict["item_id"] : 0;
-                float score = dict.ContainsKey("score") ? (float)(double)dict["score"] : 0;
+                int itemId = dict.ContainsKey("item_id") ? Convert.ToInt32(dict["item_id"]) : 0;
+                float score = dict.ContainsKey("score") ? Convert.ToSingle(dict["score"]) : 0;
                 
-                var affixIds = dict["affix_ids"] as List<object>;
+                var affixIds = dict["affix_ids"] as Godot.Collections.Array;
                 if (affixIds == null) continue;
                 
                 EquipmentAffixData affixData = new EquipmentAffixData
