@@ -401,5 +401,27 @@ namespace ClawRPG.Scripts.Systems {
             _activeEnemies.Clear();
             GD.Print("[EnemySpawner] Cleared all enemies");
         }
+        
+        // === 数据持久化接口 ===
+        
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, object>
+            {
+                ["current_wave"] = _currentWave,
+                ["wave_timer"] = _waveTimer
+            };
+            return new Dictionary(data);
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.ContainsKey("current_wave"))
+                _currentWave = Convert.ToInt32(data["current_wave"]);
+            if (data.ContainsKey("wave_timer"))
+                _waveTimer = Convert.ToSingle(data["wave_timer"]);
+        }
     }
 }

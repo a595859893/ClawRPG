@@ -277,6 +277,32 @@ public class MountTrainingSystem : BaseSystem
         return required > 0 ? (int)((float)data.CurrentBondPoints / required * 100) : 100;
     }
     
+    // === 数据持久化接口 ===
+    
+    public override Dictionary ExportSaveData()
+    {
+        var saveData = GetSaveData();
+        var data = new Dictionary<string, object>
+        {
+            ["mount_trainings"] = saveData.MountTrainings,
+            ["total_sessions"] = saveData.TotalTrainingSessions,
+            ["total_exp"] = saveData.TotalExperienceGained
+        };
+        return new Dictionary(data);
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.ContainsKey("mount_trainings"))
+            mountTrainings = new Dictionary<string, MountTrainingData>((Dictionary)data["mount_trainings"]);
+        if (data.ContainsKey("total_sessions"))
+            totalTrainingSessions = Convert.ToInt32(data["total_sessions"]);
+        if (data.ContainsKey("total_exp"))
+            totalExperienceGained = Convert.ToInt32(data["total_exp"]);
+    }
+    
     public MountTrainingSaveData GetSaveData()
     {
         var saveData = new MountTrainingSaveData

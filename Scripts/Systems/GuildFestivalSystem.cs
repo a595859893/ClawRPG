@@ -206,6 +206,31 @@ public class GuildFestivalSystem : BaseSystem
             }
         }
     }
+    
+    // === 数据持久化接口 ===
+    
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary<string, object>
+        {
+            ["next_festival_id"] = _nextFestivalId,
+            ["current_festival_id"] = _currentFestivalId,
+            ["festivals"] = _festivals
+        };
+        return new Dictionary(data);
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.ContainsKey("next_festival_id"))
+            _nextFestivalId = Convert.ToInt32(data["next_festival_id"]);
+        if (data.ContainsKey("current_festival_id"))
+            _currentFestivalId = Convert.ToInt32(data["current_festival_id"]);
+        if (data.ContainsKey("festivals"))
+            _festivals = new Dictionary<int, FestivalData>((Dictionary)data["festivals"]);
+    }
 }
 
 public class FestivalData

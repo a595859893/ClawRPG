@@ -337,7 +337,37 @@ namespace ClawRPG.Scripts.Systems {
             }
         }
         
+        // === 数据持久化接口 ===
+        
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary(GetSaveData());
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            LoadSaveData(new Dictionary<string, object>(data));
+        }
+        
         // === 存档支持 ===
+        
+        /// <summary>
+        /// 导出保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary(GetSaveData());
+        }
+        
+        /// <summary>
+        /// 导入保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            LoadSaveData(new Dictionary<string, object>(data));
+        }
         
         public Dictionary<string, object> GetSaveData() {
             return new Dictionary<string, object> {
