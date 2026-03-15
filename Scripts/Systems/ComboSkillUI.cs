@@ -1,351 +1,460 @@
-# Combo Skill UI - 连击技能系统界面
-## 连击技能系统用户界面
+// Combo Skill UI - 连击技能系统界面
+// 连击技能系统用户界面
 
-extends Control
-class_name ComboSkillUI
+using Godot;
+using System;
 
-## 关联的连击系统
-var combo_system: ComboSkillSystem
+#pragma warning disable CS8618 // Non-nullable field is uninitialized
 
-var combo_list: GridContainer
-var detail_panel: VBoxContainer
-var equipped_panel: HBoxContainer
-var selected_combo_id: String = ""
+public partial class ComboSkillUI : Control
+{
+	// 关联的连击系统
+	[Export] public ComboSkillSystem ComboSystem { get; set; }
 
-var toggle_key: Key = Key.J
+	private GridContainer _comboList = null!;
+	private VBoxContainer _detailPanel = null!;
+	private HBoxContainer _equippedPanel = null!;
+	private string _selectedComboId = "";
+	
+	private Key _toggleKey = Key.J;
 
-func _ready():
-	combo_system = ComboSkillSystem.get_instance()
-	if combo_system:
-		combo_system.combo_unlocked.connect(_on_combo_unlocked)
-		combo_system.combo_executed.connect(_on_combo_executed)
-		combo_system.cooldown_updated.connect(_on_cooldown_updated)
-	
-	visible = false
-	_setup_ui()
-
-func _input(event):
-	if event is InputEventKey and event.pressed:
-		if event.keycode == toggle_key:
-			toggle()
-		elif event.keycode == Key.ESCAPE and visible:
-			visible = false
-
-func toggle():
-	visible = not visible
-	if visible:
-		refresh()
-
-func refresh():
-	if combo_system == null:
-		return
-	_update_combo_list()
-	_update_equipped_panel()
-	_update_detail_panel()
-
-# ============ UI构建 ============
-
-func _setup_ui():
-	# 主容器
-	var main_vbox = VBoxContainer.new()
-	main_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	main_vbox.add_theme_constant_override("separation", 10)
-	add_child(main_vbox)
-	
-	# 标题栏
-	var title_bar = HBoxContainer.new()
-	main_vbox.add_child(title_bar)
-	
-	var title = Label.new()
-	title.text = "连击技能系统"
-	title.add_theme_font_size_override("font_size", 24)
-	title_bar.add_child(title)
-	
-	title_bar.add_child(Control.new())
-	
-	var close_btn = Button.new()
-	close_btn.text = "×"
-	close_btn.pressed.connect(func(): visible = false)
-	title_bar.add_child(close_btn)
-	
-	# 装备栏
-	var equipped_label = Label.new()
-	equipped_label.text = "已装备连击 (按快捷键触发)"
-	equipped_label.add_theme_font_size_override("font_size", 16)
-	main_vbox.add_child(equipped_label)
-	
-	equipped_panel = HBoxContainer.new()
-	equipped_panel.add_theme_constant_override("separation", 10)
-	main_vbox.add_child(equipped_panel)
-	
-	# 内容区域
-	var content_hbox = HBoxContainer.new()
-	content_hbox.set_v_size_flags(Control.SIZE_EXPAND_FILL)
-	main_vbox.add_child(content_hbox)
-	
-	# 左侧：连击列表
-	var list_panel = PanelContainer.new()
-	list_panel.custom_minimum_size.x = 350
-	content_hbox.add_child(list_panel)
-	
-	var list_scroll = ScrollContainer.new()
-	list_panel.add_child(list_scroll)
-	
-	combo_list = GridContainer.new()
-	combo_list.columns = 2
-	combo_list.add_theme_constant_override("hseparation", 5)
-	combo_list.add_theme_constant_override("vseparation", 5)
-	list_scroll.add_child(combo_list)
-	
-	# 右侧：详情面板
-	detail_panel = VBoxContainer.new()
-	detail_panel.set_h_size_flags(Control.SIZE_EXPAND_FILL)
-	content_hbox.add_child(detail_panel)
-	_setup_detail_panel()
-
-func _setup_detail_panel():
-	var title = Label.new()
-	title.text = "连击详情"
-	title.add_theme_font_size_override("font_size", 18)
-	detail_panel.add_child(title)
-	
-	var name_label = Label.new()
-	name_label.name = "name_label"
-	name_label.add_theme_font_size_override("font_size", 20)
-	detail_panel.add_child(name_label)
-	
-	var type_label = Label.new()
-	type_label.name = "type_label"
-	detail_panel.add_child(type_label)
-	
-	var desc_label = Label.new()
-	desc_label.name = "desc_label"
-	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-	detail_panel.add_child(desc_label)
-	
-	var stats_label = Label.new()
-	stats_label.name = "stats_label"
-	detail_panel.add_child(stats_label)
-	
-	var steps_label = Label.new()
-	steps_label.name = "steps_label"
-	steps_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-	detail_panel.add_child(steps_label)
-	
-	var button_hbox = HBoxContainer.new()
-	detail_panel.add_child(button_hbox)
-	
-	var equip_btn = Button.new()
-	equip_btn.name = "equip_btn"
-	equip_btn.text = "装备"
-	equip_btn.pressed.connect(_on_equip_pressed)
-	button_hbox.add_child(equip_btn)
-	
-	var execute_btn = Button.new()
-	execute_btn.name = "execute_btn"
-	execute_btn.text = "执行"
-	execute_btn.pressed.connect(_on_execute_pressed)
-	button_hbox.add_child(execute_btn)
-
-# ============ 数据更新 ============
-
-func _update_combo_list():
-	# 清除旧项目
-	for child in combo_list.get_children():
-		child.queue_free()
-	
-	var unlocked = combo_system.get_unlocked_combos()
-	
-	for combo_id in unlocked:
-		var combo = ComboSkillDatabase.get_instance().get_combo(combo_id)
-		if combo == null:
-			continue
+	public override void _Ready()
+	{
+		// ComboSystem = ComboSkillSystem.GetInstance();
+		// Note: 上面的连接需要在外部设置，因为是单例模式
+		// if (ComboSystem != null)
+		// {
+		//     ComboSystem.ComboUnlocked += OnComboUnlocked;
+		//     ComboSystem.ComboExecuted += OnComboExecuted;
+		//     ComboSystem.CooldownUpdated += OnCooldownUpdated;
+		// }
 		
-		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(160, 50)
-		btn.text = combo.name
-		btn.tooltip_text = "%s\n%s" % [combo.description, _get_combo_type_name(combo.combo_type)]
-		
-		# 稀有度颜色
-		var color = ComboSkillDatabase.get_instance().get_rarity_color(combo.rarity)
-		var style = StyleBoxFlat.new()
-		style.bg_color = color.darkened(0.7)
-		style.border_color = color
-		style.border_width_left = 2
-		style.border_width_top = 2
-		style.border_width_right = 2
-		style.border_width_bottom = 2
-		btn.add_theme_stylebox_override("normal", style)
-		
-		# 选中状态
-		if combo_id == selected_combo_id:
-			btn.modulate = Color.YELLOW
-		
-		# 冷却状态
-		if combo_system.is_on_cooldown(combo_id):
-			btn.disabled = true
-		
-		btn.pressed.connect(func():
-			selected_combo_id = combo_id
-			_update_combo_list()
-			_update_detail_panel()
-		)
-		
-		combo_list.add_child(btn)
-	
-	# 显示未解锁提示
-	if unlocked.size() == 0:
-		var empty_label = Label.new()
-		empty_label.text = "暂无解锁的连击技能\n通过升级或完成任务解锁"
-		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		combo_list.add_child(empty_label)
+		Visible = false;
+		SetupUi();
+	}
 
-func _update_equipped_panel():
-	for child in equipped_panel.get_children():
-		child.queue_free()
-	
-	var equipped = combo_system.get_equipped_combos()
-	
-	for i in range(5):
-		var slot = VBoxContainer.new()
-		slot.custom_minimum_size = Vector2(80, 80)
+	public override void _Input(InputEvent @event)
+	{
+		if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+		{
+			if (keyEvent.Keycode == _toggleKey)
+			{
+				Toggle();
+			}
+			else if (keyEvent.Keycode == Key.Escape && Visible)
+			{
+				Visible = false;
+			}
+		}
+	}
+
+	public void Toggle()
+	{
+		Visible = !Visible;
+		if (Visible)
+		{
+			Refresh();
+		}
+	}
+
+	public void Refresh()
+	{
+		if (ComboSystem == null)
+		{
+			return;
+		}
+		UpdateComboList();
+		UpdateEquippedPanel();
+		UpdateDetailPanel();
+	}
+
+	// ============ UI构建 ============
+
+	private void SetupUi()
+	{
+		// 主容器
+		var mainVbox = new VBoxContainer();
+		mainVbox.SetAnchorsPreset(Control.Preset.FullRect);
+		mainVbox.AddThemeConstantOverride("separation", 10);
+		AddChild(mainVbox);
 		
-		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(70, 70)
-		btn.text = ""
+		// 标题栏
+		var titleBar = new HBoxContainer();
+		mainVbox.AddChild(titleBar);
 		
-		if i < equipped.size():
-			var combo_id = equipped[i].combo_id
-			var combo = ComboSkillDatabase.get_instance().get_combo(combo_id)
-			if combo != null:
-				btn.text = combo.name.substr(0, 2)
-				btn.tooltip_text = "%s\n冷却: %.1fs" % [combo.name, combo_system.get_cooldown(combo_id)]
-				
-				# 冷却显示
-				var cooldown = combo_system.get_cooldown(combo_id)
-				if cooldown > 0:
-					var progress = StyleBoxFlat.new()
-					progress.bg_color = Color(0, 0, 0, 0.5)
-					var height = 70 * (cooldown / combo.cooldown)
-					progress.content_margin_top = 70 - height
-					btn.add_theme_stylebox_override("normal", progress)
-				
-				# 快捷键提示
-				btn.shortcut_in_tooltip = false
+		var title = new Label();
+		title.Text = "连击技能系统";
+		title.AddThemeFontSizeOverride("font_size", 24);
+		titleBar.AddChild(title);
+		
+		titleBar.AddChild(new Control());
+		
+		var closeBtn = new Button();
+		closeBtn.Text = "×";
+		closeBtn.Pressed += () => Visible = false;
+		titleBar.AddChild(closeBtn);
+		
+		// 装备栏
+		var equippedLabel = new Label();
+		equippedLabel.Text = "已装备连击 (按快捷键触发)";
+		equippedLabel.AddThemeFontSizeOverride("font_size", 16);
+		mainVbox.AddChild(equippedLabel);
+		
+		_equippedPanel = new HBoxContainer();
+		_equippedPanel.AddThemeConstantOverride("separation", 10);
+		mainVbox.AddChild(_equippedPanel);
+		
+		// 内容区域
+		var contentHbox = new HBoxContainer();
+		contentHbox.SetVSizeFlags(Control.SizeFlags.ExpandFill);
+		mainVbox.AddChild(contentHbox);
+		
+		// 左侧：连击列表
+		var listPanel = new PanelContainer();
+		listPanel.CustomMinimumSize = new Vector2(350, 0);
+		contentHbox.AddChild(listPanel);
+		
+		var listScroll = new ScrollContainer();
+		listPanel.AddChild(listScroll);
+		
+		_comboList = new GridContainer();
+		_comboList.Columns = 2;
+		_comboList.AddThemeConstantOverride("hseparation", 5);
+		_comboList.AddThemeConstantOverride("vseparation", 5);
+		listScroll.AddChild(_comboList);
+		
+		// 右侧：详情面板
+		_detailPanel = new VBoxContainer();
+		_detailPanel.SetHSizeFlags(Control.SizeFlags.ExpandFill);
+		contentHbox.AddChild(_detailPanel);
+		SetupDetailPanel();
+	}
+
+	private void SetupDetailPanel()
+	{
+		var title = new Label();
+		title.Text = "连击详情";
+		title.AddThemeFontSizeOverride("font_size", 18);
+		_detailPanel.AddChild(title);
+		
+		var nameLabel = new Label();
+		nameLabel.Name = "name_label";
+		nameLabel.AddThemeFontSizeOverride("font_size", 20);
+		_detailPanel.AddChild(nameLabel);
+		
+		var typeLabel = new Label();
+		typeLabel.Name = "type_label";
+		_detailPanel.AddChild(typeLabel);
+		
+		var descLabel = new Label();
+		descLabel.Name = "desc_label";
+		descLabel.AutowrapMode = TextServer.Autowrap.Word;
+		_detailPanel.AddChild(descLabel);
+		
+		var statsLabel = new Label();
+		statsLabel.Name = "stats_label";
+		_detailPanel.AddChild(statsLabel);
+		
+		var stepsLabel = new Label();
+		stepsLabel.Name = "steps_label";
+		stepsLabel.AutowrapMode = TextServer.Autowrap.Word;
+		_detailPanel.AddChild(stepsLabel);
+		
+		var buttonHbox = new HBoxContainer();
+		_detailPanel.AddChild(buttonHbox);
+		
+		var equipBtn = new Button();
+		equipBtn.Name = "equip_btn";
+		equipBtn.Text = "装备";
+		equipBtn.Pressed += OnEquipPressed;
+		buttonHbox.AddChild(equipBtn);
+		
+		var executeBtn = new Button();
+		executeBtn.Name = "execute_btn";
+		executeBtn.Text = "执行";
+		executeBtn.Pressed += OnExecutePressed;
+		buttonHbox.AddChild(executeBtn);
+	}
+
+	// ============ 数据更新 ============
+
+	private void UpdateComboList()
+	{
+		// 清除旧项目
+		foreach (var child in _comboList.GetChildren())
+		{
+			child.QueueFree();
+		}
+		
+		var unlocked = ComboSystem.GetUnlockedCombos();
+		
+		foreach (var comboId in unlocked)
+		{
+			var combo = ComboSkillDatabase.Instance().GetCombo(comboId);
+			if (combo == null)
+			{
+				continue;
+			}
 			
-			btn.pressed.connect(func(): _execute_combo_index(i))
-		else:
-			btn.text = "+"
-			btn.disabled = true
+			var btn = new Button();
+			btn.CustomMinimumSize = new Vector2(160, 50);
+			btn.Text = combo.Name;
+			btn.TooltipText = $"{combo.Description}\n{GetComboTypeName(combo.ComboType)}";
+			
+			// 稀有度颜色
+			var color = ComboSkillDatabase.Instance().GetRarityColor(combo.Rarity);
+			var style = new StyleBoxFlat();
+			style.BgColor = color.Darkened(0.7f);
+			style.BorderColor = color;
+			style.BorderWidthLeft = 2;
+			style.BorderWidthTop = 2;
+			style.BorderWidthRight = 2;
+			style.BorderWidthBottom = 2;
+			btn.AddThemeStyleboxOverride("normal", style);
+			
+			// 选中状态
+			if (comboId == _selectedComboId)
+			{
+				btn.Modulate = Color.Yellow;
+			}
+			
+			// 冷却状态
+			if (ComboSystem.IsOnCooldown(comboId))
+			{
+				btn.Disabled = true;
+			}
+			
+			var comboIdCopy = comboId; // 闭包捕获
+			btn.Pressed += () =>
+			{
+				_selectedComboId = comboIdCopy;
+				UpdateComboList();
+				UpdateDetailPanel();
+			};
+			
+			_comboList.AddChild(btn);
+		}
 		
-		slot.add_child(btn)
+		// 显示未解锁提示
+		if (unlocked.Count == 0)
+		{
+			var emptyLabel = new Label();
+			emptyLabel.Text = "暂无解锁的连击技能\n通过升级或完成任务解锁";
+			emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
+			_comboList.AddChild(emptyLabel);
+		}
+	}
+
+	private void UpdateEquippedPanel()
+	{
+		foreach (var child in _equippedPanel.GetChildren())
+		{
+			child.QueueFree();
+		}
 		
-		var key_label = Label.new()
-		key_label.text = "J+%d" % (i + 1)
-		key_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		slot.add_child(key_label)
+		var equipped = ComboSystem.GetEquippedCombos();
 		
-		equipped_panel.add_child(slot)
+		for (int i = 0; i < 5; i++)
+		{
+			var slot = new VBoxContainer();
+			slot.CustomMinimumSize = new Vector2(80, 80);
+			
+			var btn = new Button();
+			btn.CustomMinimumSize = new Vector2(70, 70);
+			btn.Text = "";
+			
+			if (i < equipped.Count)
+			{
+				var comboId = equipped[i].ComboId;
+				var combo = ComboSkillDatabase.Instance().GetCombo(comboId);
+				if (combo != null)
+				{
+					btn.Text = combo.Name.Substring(0, Math.Min(2, combo.Name.Length));
+					btn.TooltipText = $"{combo.Name}\n冷却: {ComboSystem.GetCooldown(comboId):F1}s";
+					
+					// 冷却显示
+					var cooldown = ComboSystem.GetCooldown(comboId);
+					if (cooldown > 0)
+					{
+						var progress = new StyleBoxFlat();
+						progress.BgColor = new Color(0, 0, 0, 0.5f);
+						var height = 70 * (cooldown / combo.Cooldown);
+						progress.ContentMarginTop = 70 - height;
+						btn.AddThemeStyleboxOverride("normal", progress);
+					}
+				}
+				
+				var index = i;
+				btn.Pressed += () => ExecuteComboIndex(index);
+			}
+			else
+			{
+				btn.Text = "+";
+				btn.Disabled = true;
+			}
+			
+			slot.AddChild(btn);
+			
+			var keyLabel = new Label();
+			keyLabel.Text = $"J+{i + 1}";
+			keyLabel.HorizontalAlignment = HorizontalAlignment.Center;
+			slot.AddChild(keyLabel);
+			
+			_equippedPanel.AddChild(slot);
+		}
+	}
 
-func _update_detail_panel():
-	if selected_combo_id == "":
-		_clear_detail_panel()
-		return
-	
-	var combo = ComboSkillDatabase.get_instance().get_combo(selected_combo_id)
-	if combo == null:
-		_clear_detail_panel()
-		return
-	
-	var name_label = detail_panel.find_child("name_label", true, false)
-	var type_label = detail_panel.find_child("type_label", true, false)
-	var desc_label = detail_panel.find_child("desc_label", true, false)
-	var stats_label = detail_panel.find_child("stats_label", true, false)
-	var steps_label = detail_panel.find_child("steps_label", true, false)
-	var equip_btn = detail_panel.find_child("equip_btn", true, false)
-	var execute_btn = detail_panel.find_child("execute_btn", true, false)
-	
-	if name_label:
-		name_label.text = combo.name
-		name_label.add_theme_color_override("font_color", ComboSkillDatabase.get_instance().get_rarity_color(combo.rarity))
-	
-	if type_label:
-		type_label.text = "类型: %s | 稀有度: %s" % [_get_combo_type_name(combo.combo_type), ComboSkillDatabase.get_instance().get_rarity_name(combo.rarity)]
-	
-	if desc_label:
-		desc_label.text = combo.description
-	
-	if stats_label:
-		var cooldown = combo_system.get_cooldown(selected_combo_id)
-		var is_equipped = combo_system.is_equipped(selected_combo_id)
-		stats_label.text = "冷却: %.1fs | 法力: %.0f\n等级需求: %d\n已装备: %s\n执行次数: %d" % [
-			combo.cooldown - cooldown if cooldown > 0 else combo.cooldown,
-			combo.mana_cost,
-			combo.level_required,
-			"是" if is_equipped else "否",
-			0  # use_count from player combo
-		]
-	
-	if steps_label:
-		var steps_text = "连击步骤 (%d 步):\n" % combo.steps.size()
-		for i in range(combo.steps.size()):
-			var step = combo.steps[i]
-			steps_text += "%d. %s - 延迟: %.1fs\n" % [i + 1, step.skill_id, step.delay]
-			for effect in step.effects:
-				steps_text += "   → %s\n" % effect.description
-		steps_label.text = steps_text
-	
-	if equip_btn:
-		equip_btn.text = "卸下" if combo_system.is_equipped(selected_combo_id) else "装备"
-		equip_btn.disabled = combo_system.is_on_cooldown(selected_combo_id)
-	
-	if execute_btn:
-		execute_btn.disabled = combo_system.is_on_cooldown(selected_combo_id)
+	private void UpdateDetailPanel()
+	{
+		if (_selectedComboId == "")
+		{
+			ClearDetailPanel();
+			return;
+		}
+		
+		var combo = ComboSkillDatabase.Instance().GetCombo(_selectedComboId);
+		if (combo == null)
+		{
+			ClearDetailPanel();
+			return;
+		}
+		
+		var nameLabel = _detailPanel.FindChild("name_label", true, false) as Label;
+		var typeLabel = _detailPanel.FindChild("type_label", true, false) as Label;
+		var descLabel = _detailPanel.FindChild("desc_label", true, false) as Label;
+		var statsLabel = _detailPanel.FindChild("stats_label", true, false) as Label;
+		var stepsLabel = _detailPanel.FindChild("steps_label", true, false) as Label;
+		var equipBtn = _detailPanel.FindChild("equip_btn", true, false) as Button;
+		var executeBtn = _detailPanel.FindChild("execute_btn", true, false) as Button;
+		
+		if (nameLabel != null)
+		{
+			nameLabel.Text = combo.Name;
+			nameLabel.AddThemeColorOverride("font_color", ComboSkillDatabase.Instance().GetRarityColor(combo.Rarity));
+		}
+		
+		if (typeLabel != null)
+		{
+			typeLabel.Text = $"类型: {GetComboTypeName(combo.ComboType)} | 稀有度: {ComboSkillDatabase.Instance().GetRarityName(combo.Rarity)}";
+		}
+		
+		if (descLabel != null)
+		{
+			descLabel.Text = combo.Description;
+		}
+		
+		if (statsLabel != null)
+		{
+			var cooldown = ComboSystem.GetCooldown(_selectedComboId);
+			var isEquipped = ComboSystem.IsEquipped(_selectedComboId);
+			var cooldownDisplay = cooldown > 0 ? combo.Cooldown - cooldown : combo.Cooldown;
+			statsLabel.Text = $"冷却: {cooldownDisplay:F1}s | 法力: {combo.ManaCost:F0}\n等级需求: {combo.LevelRequired}\n已装备: {(isEquipped ? "是" : "否")}\n执行次数: 0";
+		}
+		
+		if (stepsLabel != null)
+		{
+			var stepsText = $"连击步骤 ({combo.Steps.Count} 步):\n";
+			for (int i = 0; i < combo.Steps.Count; i++)
+			{
+				var step = combo.Steps[i];
+				stepsText += $"{i + 1}. {step.SkillId} - 延迟: {step.Delay:F1}s\n";
+				foreach (var effect in step.Effects)
+				{
+					stepsText += $"   → {effect.Description}\n";
+				}
+			}
+			stepsLabel.Text = stepsText;
+		}
+		
+		if (equipBtn != null)
+		{
+			equipBtn.Text = ComboSystem.IsEquipped(_selectedComboId) ? "卸下" : "装备";
+			equipBtn.Disabled = ComboSystem.IsOnCooldown(_selectedComboId);
+		}
+		
+		if (executeBtn != null)
+		{
+			executeBtn.Disabled = ComboSystem.IsOnCooldown(_selectedComboId);
+		}
+	}
 
-func _clear_detail_panel():
-	var labels = ["name_label", "type_label", "desc_label", "stats_label", "steps_label"]
-	for label_name in labels:
-		var label = detail_panel.find_child(label_name, true, false)
-		if label:
-			label.text = ""
+	private void ClearDetailPanel()
+	{
+		var labels = new string[] { "name_label", "type_label", "desc_label", "stats_label", "steps_label" };
+		foreach (var labelName in labels)
+		{
+			var label = _detailPanel.FindChild(labelName, true, false) as Label;
+			if (label != null)
+			{
+				label.Text = "";
+			}
+		}
+	}
 
-func _get_combo_type_name(type: ComboType) -> String:
-	match type:
-		ComboType.Sequential: return "顺序"
-		ComboType.Parallel: return "并行"
-		ComboType.Chain: return "链式"
-		ComboType.Conditional: return "条件"
-	return "未知"
+	private string GetComboTypeName(ComboType type)
+	{
+		return type switch
+		{
+			ComboType.Sequential => "顺序",
+			ComboType.Parallel => "并行",
+			ComboType.Chain => "链式",
+			ComboType.Conditional => "条件",
+			_ => "未知"
+		};
+	}
 
-# ============ 信号处理 ============
+	// ============ 信号处理 ============
 
-func _on_combo_unlocked(combo_id: String):
-	refresh()
+	private void OnComboUnlocked(string comboId)
+	{
+		Refresh();
+	}
 
-func _on_combo_executed(combo_id: String):
-	refresh()
+	private void OnComboExecuted(string comboId)
+	{
+		Refresh();
+	}
 
-func _on_cooldown_updated(combo_id: String, remaining: float):
-	refresh()
+	private void OnCooldownUpdated(string comboId, float remaining)
+	{
+		Refresh();
+	}
 
-func _on_equip_pressed():
-	if selected_combo_id == "":
-		return
-	
-	if combo_system.is_equipped(selected_combo_id):
-		combo_system.unequip_combo(selected_combo_id)
-	else:
-		combo_system.equip_combo(selected_combo_id)
-	
-	refresh()
+	private void OnEquipPressed()
+	{
+		if (_selectedComboId == "")
+		{
+			return;
+		}
+		
+		if (ComboSystem.IsEquipped(_selectedComboId))
+		{
+			ComboSystem.UnequipCombo(_selectedComboId);
+		}
+		else
+		{
+			ComboSystem.EquipCombo(_selectedComboId);
+		}
+		
+		Refresh();
+	}
 
-func _on_execute_pressed():
-	if selected_combo_id == "":
-		return
-	
-	combo_system.execute_combo(selected_combo_id)
+	private void OnExecutePressed()
+	{
+		if (_selectedComboId == "")
+		{
+			return;
+		}
+		
+		ComboSystem.ExecuteCombo(_selectedComboId);
+	}
 
-func _execute_combo_index(index: int):
-	var equipped = combo_system.get_equipped_combos()
-	if index < equipped.size():
-		combo_system.execute_combo(equipped[index].combo_id)
+	private void ExecuteComboIndex(int index)
+	{
+		var equipped = ComboSystem.GetEquippedCombos();
+		if (index < equipped.Count)
+		{
+			ComboSystem.ExecuteCombo(equipped[index].ComboId);
+		}
+	}
+}

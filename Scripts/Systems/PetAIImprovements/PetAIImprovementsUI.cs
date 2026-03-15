@@ -1,308 +1,364 @@
-# Pet AI Improvements UI
-# Display pet AI personality, learning, emotions and stats
+// Pet AI Improvements UI
+// Display pet AI personality, learning, emotions and stats
 
-const AI_UI_TOGGLED = "ai_ui_toggled"
+using Godot;
+using System;
 
-class_name PetAIImprovementsUI extends Control
+#pragma warning disable CS8618 // Non-nullable field is uninitialized
 
-# UI Elements
-var main_panel: PanelContainer
-var tab_container: TabContainer
-var personality_panel: VBoxContainer
-var behavior_panel: VBoxContainer
-var learning_panel: VBoxContainer
-var emotion_panel: VBoxContainer
-var stats_panel: VBoxContainer
-
-# Labels
-var ai_level_label: Label
-var personality_label: Label
-var emotion_label: Label
-var state_label: Label
-var adaptation_label: Label
-var win_rate_label: Label
-
-# System reference
-var ai_system: PetAIImprovementsSystem = null
-
-func _ready():
-	_setup_ui()
-	visible = false
-
-func _setup_ui():
-	# Main panel
-	main_panel = PanelContainer.new()
-	main_panel.anchor_right = 1.0
-	main_panel.anchor_bottom = 1.0
-	main_panel.offset_left = 200
-	main_panel.offset_top = 100
-	main_panel.offset_right = -200
-	main_panel.offset_bottom = -100
-	main_panel.set_meta("ui_type", "pet_ai_improvements")
-	add_child(main_panel)
+public class PetAIImprovementsUI : Control
+{
+	// Signal
+	public const string AiUiToggled = "ai_ui_toggled";
 	
-	# Style
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.1, 0.1, 0.15, 0.95)
-	style.border_color = Color(0.3, 0.6, 0.9, 1.0)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(8)
-	main_panel.add_theme_stylebox_override("panel", style)
+	// UI Elements
+	private PanelContainer mainPanel;
+	private TabContainer tabContainer;
+	private VBoxContainer personalityPanel;
+	private VBoxContainer behaviorPanel;
+	private VBoxContainer learningPanel;
+	private VBoxContainer emotionPanel;
+	private VBoxContainer statsPanel;
 	
-	# VBox container
-	var vbox = VBoxContainer.new()
-	main_panel.add_child(vbox)
-	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	vbox.add_theme_constant_override("separation", 10)
+	// Labels
+	private Label aiLevelLabel;
+	private Label personalityLabel;
+	private Label emotionLabel;
+	private Label stateLabel;
+	private Label adaptationLabel;
+	private Label winRateLabel;
 	
-	# Title
-	var title_label = Label.new()
-	title_label.text = "🐾 Pet AI Companion"
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 24)
-	vbox.add_child(title_label)
+	// System reference
+	private PetAIImprovementsSystem aiSystem = null;
 	
-	# AI Level display
-	ai_level_label = Label.new()
-	ai_level_label.text = "AI Level: 1"
-	ai_level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ai_level_label.add_theme_font_size_override("font_size", 18)
-	vbox.add_child(ai_level_label)
+	public override void _Ready()
+	{
+		SetupUI();
+		Visible = false;
+	}
 	
-	# Tab container
-	tab_container = TabContainer.new()
-	tab_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.add_child(tab_container)
+	private void SetupUI()
+	{
+		// Main panel
+		mainPanel = new PanelContainer();
+		mainPanel.AnchorRight = 1.0f;
+		mainPanel.AnchorBottom = 1.0f;
+		mainPanel.OffsetLeft = 200;
+		mainPanel.OffsetTop = 100;
+		mainPanel.OffsetRight = -200;
+		mainPanel.OffsetBottom = -100;
+		mainPanel.SetMeta("ui_type", "pet_ai_improvements");
+		AddChild(mainPanel);
+		
+		// Style
+		var style = new StyleBoxFlat();
+		style.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.95f);
+		style.BorderColor = new Color(0.3f, 0.6f, 0.9f, 1.0f);
+		style.SetBorderWidthAll(2);
+		style.SetCornerRadiusAll(8);
+		mainPanel.AddThemeStyleboxOverride("panel", style);
+		
+		// VBox container
+		var vbox = new VBoxContainer();
+		mainPanel.AddChild(vbox);
+		vbox.SetAnchorsPreset(Control.Preset.FullRect);
+		vbox.AddThemeConstantOverride("separation", 10);
+		
+		// Title
+		var titleLabel = new Label();
+		titleLabel.Text = "🐾 Pet AI Companion";
+		titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+		titleLabel.AddThemeFontSizeOverride("font_size", 24);
+		vbox.AddChild(titleLabel);
+		
+		// AI Level display
+		aiLevelLabel = new Label();
+		aiLevelLabel.Text = "AI Level: 1";
+		aiLevelLabel.HorizontalAlignment = HorizontalAlignment.Center;
+		aiLevelLabel.AddThemeFontSizeOverride("font_size", 18);
+		vbox.AddChild(aiLevelLabel);
+		
+		// Tab container
+		tabContainer = new TabContainer();
+		tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+		vbox.AddChild(tabContainer);
+		
+		// Create tabs
+		SetupPersonalityTab();
+		SetupBehaviorTab();
+		SetupLearningTab();
+		SetupEmotionTab();
+		SetupStatsTab();
+		
+		// Close button
+		var closeButton = new Button();
+		closeButton.Text = "Close";
+		closeButton.Pressed += OnClosePressed;
+		vbox.AddChild(closeButton);
+	}
 	
-	# Create tabs
-	_setup_personality_tab()
-	_setup_behavior_tab()
-	_setup_learning_tab()
-	_setup_emotion_tab()
-	_setup_stats_tab()
+	private void SetupPersonalityTab()
+	{
+		personalityPanel = new VBoxContainer();
+		personalityPanel.Name = "Personality";
+		tabContainer.AddChild(personalityPanel);
+		
+		var title = new Label();
+		title.Text = "🐶 Personality Traits";
+		title.AddThemeFontSizeOverride("font_size", 18);
+		personalityPanel.AddChild(title);
+		
+		personalityLabel = new Label();
+		personalityLabel.Text = "Type: Aggressive";
+		personalityPanel.AddChild(personalityLabel);
+		
+		var curiosityLabel = new Label();
+		curiosityLabel.Name = "curiosity";
+		curiosityLabel.Text = "Curiosity: 50%";
+		personalityPanel.AddChild(curiosityLabel);
+		
+		var energyLabel = new Label();
+		energyLabel.Name = "energy";
+		energyLabel.Text = "Energy: 100%";
+		personalityPanel.AddChild(energyLabel);
+		
+		var loyaltyLabel = new Label();
+		loyaltyLabel.Name = "loyalty";
+		loyaltyLabel.Text = "Loyalty: 50%";
+		personalityPanel.AddChild(loyaltyLabel);
+		
+		// Personality type selector
+		var selectorLabel = new Label();
+		selectorLabel.Text = "\nChange Personality:";
+		personalityPanel.AddChild(selectorLabel);
+		
+		var typeNames = new string[] { "Aggressive", "Defensive", "Supportive", "Curious", "Lazy" };
+		for (int i = 0; i < typeNames.Length; i++)
+		{
+			int index = i;
+			var btn = new Button();
+			btn.Text = typeNames[i];
+			btn.Pressed += () => OnPersonalitySelected(index);
+			personalityPanel.AddChild(btn);
+		}
+	}
 	
-	# Close button
-	var close_button = Button.new()
-	close_button.text = "Close"
-	close_button.pressed.connect(_on_close_pressed)
-	vbox.add_child(close_button)
-
-func _setup_personality_tab():
-	personality_panel = VBoxContainer.new()
-	personality_panel.name = "Personality"
-	tab_container.add_child(personality_panel)
+	private void SetupBehaviorTab()
+	{
+		behaviorPanel = new VBoxContainer();
+		behaviorPanel.Name = "Behavior";
+		tabContainer.AddChild(behaviorPanel);
+		
+		var title = new Label();
+		title.Text = "🎯 Current Behavior";
+		title.AddThemeFontSizeOverride("font_size", 18);
+		behaviorPanel.AddChild(title);
+		
+		stateLabel = new Label();
+		stateLabel.Text = "State: Idle";
+		behaviorPanel.AddChild(stateLabel);
+		
+		var priorityLabel = new Label();
+		priorityLabel.Name = "priority";
+		priorityLabel.Text = "Priority: 0";
+		behaviorPanel.AddChild(priorityLabel);
+		
+		var targetLabel = new Label();
+		targetLabel.Name = "target";
+		targetLabel.Text = "Target: None";
+		behaviorPanel.AddChild(targetLabel);
+	}
 	
-	var title = Label.new()
-	title.text = "🐶 Personality Traits"
-	title.add_theme_font_size_override("font_size", 18)
-	personality_panel.add_child(title)
+	private void SetupLearningTab()
+	{
+		learningPanel = new VBoxContainer();
+		learningPanel.Name = "Learning";
+		tabContainer.AddChild(learningPanel);
+		
+		var title = new Label();
+		title.Text = "📚 Learning Progress";
+		title.AddThemeFontSizeOverride("font_size", 18);
+		learningPanel.AddChild(title);
+		
+		adaptationLabel = new Label();
+		adaptationLabel.Text = "Adaptation: 0%";
+		learningPanel.AddChild(adaptationLabel);
+		
+		winRateLabel = new Label();
+		winRateLabel.Text = "Win Rate: 0%";
+		learningPanel.AddChild(winRateLabel);
+		
+		var battlesLabel = new Label();
+		battlesLabel.Name = "battles";
+		battlesLabel.Text = "Total Battles: 0";
+		learningPanel.AddChild(battlesLabel);
+		
+		var bestComboLabel = new Label();
+		bestComboLabel.Name = "best_combo";
+		bestComboLabel.Text = "Best Combo: 0";
+		learningPanel.AddChild(bestComboLabel);
+		
+		var enemyLabel = new Label();
+		enemyLabel.Name = "enemy";
+		enemyLabel.Text = "Most Killed: None";
+		learningPanel.AddChild(enemyLabel);
+	}
 	
-	personality_label = Label.new()
-	personality_label.text = "Type: Aggressive"
-	personality_panel.add_child(personality_label)
+	private void SetupEmotionTab()
+	{
+		emotionPanel = new VBoxContainer();
+		emotionPanel.Name = "Emotion";
+		tabContainer.AddChild(emotionPanel);
+		
+		var title = new Label();
+		title.Text = "😊 Emotional State";
+		title.AddThemeFontSizeOverride("font_size", 18);
+		emotionPanel.AddChild(title);
+		
+		emotionLabel = new Label();
+		emotionLabel.Text = "Current: Happy";
+		emotionPanel.AddChild(emotionLabel);
+		
+		var intensityLabel = new Label();
+		intensityLabel.Name = "intensity";
+		intensityLabel.Text = "Intensity: 50%";
+		emotionPanel.AddChild(intensityLabel);
+		
+		var historyLabel = new Label();
+		historyLabel.Name = "history";
+		historyLabel.Text = "Recent Emotions: None";
+		emotionPanel.AddChild(historyLabel);
+	}
 	
-	var curiosity_label = Label.new()
-	curiosity_label.name = "curiosity"
-	curiosity_label.text = "Curiosity: 50%"
-	personality_panel.add_child(curiosity_label)
+	private void SetupStatsTab()
+	{
+		statsPanel = new VBoxContainer();
+		statsPanel.Name = "Combat Stats";
+		tabContainer.AddChild(statsPanel);
+		
+		var title = new Label();
+		title.Text = "⚔️ Combat Statistics";
+		title.AddThemeFontSizeOverride("font_size", 18);
+		statsPanel.AddChild(title);
+		
+		var damageLabel = new Label();
+		damageLabel.Name = "damage";
+		damageLabel.Text = "Damage Dealt: 0";
+		statsPanel.AddChild(damageLabel);
+		
+		var preventedLabel = new Label();
+		preventedLabel.Name = "prevented";
+		preventedLabel.Text = "Damage Prevented: 0";
+		statsPanel.AddChild(preventedLabel);
+		
+		var healingLabel = new Label();
+		healingLabel.Name = "healing";
+		healingLabel.Text = "Healing Done: 0";
+		statsPanel.AddChild(healingLabel);
+		
+		var critLabel = new Label();
+		critLabel.Name = "crits";
+		critLabel.Text = "Critical Hits: 0";
+		statsPanel.AddChild(critLabel);
+		
+		var dodgeLabel = new Label();
+		dodgeLabel.Name = "dodges";
+		dodgeLabel.Text = "Perfect Dodges: 0";
+		statsPanel.AddChild(dodgeLabel);
+	}
 	
-	var energy_label = Label.new()
-	energy_label.name = "energy"
-	energy_label.text = "Energy: 100%"
-	personality_panel.add_child(energy_label)
+	public void SetAiSystem(PetAIImprovementsSystem system)
+	{
+		aiSystem = system;
+		UpdateDisplay();
+	}
 	
-	var loyalty_label = Label.new()
-	loyalty_label.name = "loyalty"
-	loyalty_label.text = "Loyalty: 50%"
-	personality_panel.add_child(loyalty_label)
+	public void UpdateDisplay()
+	{
+		if (aiSystem == null)
+		{
+			return;
+		}
+		
+		// Update personality
+		if (aiSystem.Data != null && aiSystem.Data.Personality != null)
+		{
+			personalityLabel.Text = "Type: " + aiSystem.GetPersonalityType();
+		}
+		
+		// Update AI level
+		aiLevelLabel.Text = "AI Level: " + aiSystem.GetAiLevel().ToString();
+		
+		// Update behavior state
+		stateLabel.Text = "State: " + aiSystem.GetAiState();
+		
+		// Update emotion
+		emotionLabel.Text = "Current: " + aiSystem.GetCurrentEmotion();
+		
+		// Update learning stats
+		var learningStats = aiSystem.GetLearningStats();
+		adaptationLabel.Text = $"Adaptation: {Mathf.Round((float)learningStats["adaptation_level"] * 100)}%";
+		winRateLabel.Text = $"Win Rate: {Mathf.Round((float)learningStats["win_rate"] * 100)}%";
+		
+		// Update combat stats
+		var combatStats = aiSystem.GetCombatStats();
+		var damageLabel = statsPanel.GetNode("damage") as Label;
+		if (damageLabel != null)
+		{
+			damageLabel.Text = $"Damage Dealt: {Mathf.Round((float)combatStats["total_damage_dealt"])}";
+		}
+		var preventedLabel = statsPanel.GetNode("prevented") as Label;
+		if (preventedLabel != null)
+		{
+			preventedLabel.Text = $"Damage Prevented: {Mathf.Round((float)combatStats["total_damage_prevented"])}";
+		}
+		var healingLabel = statsPanel.GetNode("healing") as Label;
+		if (healingLabel != null)
+		{
+			healingLabel.Text = $"Healing Done: {Mathf.Round((float)combatStats["total_healing_done"])}";
+		}
+		var critLabel = statsPanel.GetNode("crits") as Label;
+		if (critLabel != null)
+		{
+			critLabel.Text = $"Critical Hits: {combatStats["critical_hits"]}";
+		}
+		var dodgeLabel = statsPanel.GetNode("dodges") as Label;
+		if (dodgeLabel != null)
+		{
+			dodgeLabel.Text = $"Perfect Dodges: {combatStats["perfect_dodges"]}";
+		}
+	}
 	
-	# Personality type selector
-	var selector_label = Label.new()
-	selector_label.text = "\nChange Personality:"
-	personality_panel.add_child(selector_label)
+	public override void _Input(InputEvent @event)
+	{
+		if (@event.IsActionPressed("pet_ai_toggle"))
+		{
+			Toggle();
+			GetViewport().SetInputAsHandled();
+		}
+	}
 	
-	var type_names = ["Aggressive", "Defensive", "Supportive", "Curious", "Lazy"]
-	for i in range(type_names.size()):
-		var btn = Button.new()
-		btn.text = type_names[i]
-		btn.pressed.connect(_on_personality_selected.bind(i))
-		personality_panel.add_child(btn)
-
-func _setup_behavior_tab():
-	behavior_panel = VBoxContainer.new()
-	behavior_panel.name = "Behavior"
-	tab_container.add_child(behavior_panel)
+	public void Toggle()
+	{
+		Visible = !Visible;
+		EmitSignal(AiUiToggled, Visible);
+		if (Visible && aiSystem != null)
+		{
+			UpdateDisplay();
+		}
+	}
 	
-	var title = Label.new()
-	title.text = "🎯 Current Behavior"
-	title.add_theme_font_size_override("font_size", 18)
-	behavior_panel.add_child(title)
+	private void OnClosePressed()
+	{
+		Visible = false;
+	}
 	
-	state_label = Label.new()
-	state_label.text = "State: Idle"
-	behavior_panel.add_child(state_label)
-	
-	var priority_label = Label.new()
-	priority_label.name = "priority"
-	priority_label.text = "Priority: 0"
-	behavior_panel.add_child(priority_label)
-	
-	var target_label = Label.new()
-	target_label.name = "target"
-	target_label.text = "Target: None"
-	behavior_panel.add_child(target_label)
-
-func _setup_learning_tab():
-	learning_panel = VBoxContainer.new()
-	learning_panel.name = "Learning"
-	tab_container.add_child(learning_panel)
-	
-	var title = Label.new()
-	title.text = "📚 Learning Progress"
-	title.add_theme_font_size_override("font_size", 18)
-	learning_panel.add_child(title)
-	
-	adaptation_label = Label.new()
-	adaptation_label.text = "Adaptation: 0%"
-	learning_panel.add_child(adaptation_label)
-	
-	win_rate_label = Label.new()
-	win_rate_label.text = "Win Rate: 0%"
-	learning_panel.add_child(win_rate_label)
-	
-	var battles_label = Label.new()
-	battles_label.name = "battles"
-	battles_label.text = "Total Battles: 0"
-	learning_panel.add_child(battles_label)
-	
-	var best_combo_label = Label.new()
-	best_combo_label.name = "best_combo"
-	best_combo_label.text = "Best Combo: 0"
-	learning_panel.add_child(best_combo_label)
-	
-	var enemy_label = Label.new()
-	enemy_label.name = "enemy"
-	enemy_label.text = "Most Killed: None"
-	learning_panel.add_child(enemy_label)
-
-func _setup_emotion_tab():
-	emotion_panel = VBoxContainer.new()
-	emotion_panel.name = "Emotion"
-	tab_container.add_child(emotion_panel)
-	
-	var title = Label.new()
-	title.text = "😊 Emotional State"
-	title.add_theme_font_size_override("font_size", 18)
-	emotion_panel.add_child(title)
-	
-	emotion_label = Label.new()
-	emotion_label.text = "Current: Happy"
-	emotion_panel.add_child(emotion_label)
-	
-	var intensity_label = Label.new()
-	intensity_label.name = "intensity"
-	intensity_label.text = "Intensity: 50%"
-	emotion_panel.add_child(intensity_label)
-	
-	var history_label = Label.new()
-	history_label.name = "history"
-	history_label.text = "Recent Emotions: None"
-	emotion_panel.add_child(history_label)
-
-func _setup_stats_tab():
-	stats_panel = VBoxContainer.new()
-	stats_panel.name = "Combat Stats"
-	tab_container.add_child(stats_panel)
-	
-	var title = Label.new()
-	title.text = "⚔️ Combat Statistics"
-	title.add_theme_font_size_override("font_size", 18)
-	stats_panel.add_child(title)
-	
-	var damage_label = Label.new()
-	damage_label.name = "damage"
-	damage_label.text = "Damage Dealt: 0"
-	stats_panel.add_child(damage_label)
-	
-	var prevented_label = Label.new()
-	prevented_label.name = "prevented"
-	prevented_label.text = "Damage Prevented: 0"
-	stats_panel.add_child(prevented_label)
-	
-	var healing_label = Label.new()
-	healing_label.name = "healing"
-	healing_label.text = "Healing Done: 0"
-	stats_panel.add_child(healing_label)
-	
-	var crit_label = Label.new()
-	crit_label.name = "crits"
-	crit_label.text = "Critical Hits: 0"
-	stats_panel.add_child(crit_label)
-	
-	var dodge_label = Label.new()
-	dodge_label.name = "dodges"
-	dodge_label.text = "Perfect Dodges: 0"
-	stats_panel.add_child(dodge_label)
-
-func set_ai_system(system: PetAIImprovementsSystem):
-	ai_system = system
-	update_display()
-
-func update_display():
-	if ai_system == null:
-		return
-	
-	# Update personality
-	if ai_system.data and ai_system.data.personality:
-		personality_label.text = "Type: " + ai_system.get_personality_type()
-	
-	# Update AI level
-	ai_level_label.text = "AI Level: " + str(ai_system.get_ai_level())
-	
-	# Update behavior state
-	state_label.text = "State: " + ai_system.get_ai_state()
-	
-	# Update emotion
-	emotion_label.text = "Current: " + ai_system.get_current_emotion()
-	
-	# Update learning stats
-	var learning_stats = ai_system.get_learning_stats()
-	adaptation_label.text = "Adaptation: " + str(round(learning_stats["adaptation_level"] * 100)) + "%"
-	win_rate_label.text = "Win Rate: " + str(round(learning_stats["win_rate"] * 100)) + "%"
-	
-	# Update combat stats
-	var combat_stats = ai_system.get_combat_stats()
-	var damage_label = stats_panel.get_node("damage")
-	if damage_label:
-		damage_label.text = "Damage Dealt: " + str(round(combat_stats["total_damage_dealt"]))
-	var prevented_label = stats_panel.get_node("prevented")
-	if prevented_label:
-		prevented_label.text = "Damage Prevented: " + str(round(combat_stats["total_damage_prevented"]))
-	var healing_label = stats_panel.get_node("healing")
-	if healing_label:
-		healing_label.text = "Healing Done: " + str(round(combat_stats["total_healing_done"]))
-	var crit_label = stats_panel.get_node("crits")
-	if crit_label:
-		crit_label.text = "Critical Hits: " + str(combat_stats["critical_hits"])
-	var dodge_label = stats_panel.get_node("dodges")
-	if dodge_label:
-		dodge_label.text = "Perfect Dodges: " + str(combat_stats["perfect_dodges"])
-
-func _input(event):
-	if event.is_action_pressed("pet_ai_toggle"):
-		toggle()
-		get_viewport().set_input_as_handled()
-
-func toggle():
-	visible = not visible
-	emit_signal(AI_UI_TOGGLED, visible)
-	if visible and ai_system:
-		update_display()
-
-func _on_close_pressed():
-	visible = false
-
-func _on_personality_selected(type: int):
-	if ai_system:
-		ai_system.set_personality_type(type)
-		personality_label.text = "Type: " + ai_system.get_personality_type()
+	private void OnPersonalitySelected(int type)
+	{
+		if (aiSystem != null)
+		{
+			aiSystem.SetPersonalityType(type);
+			personalityLabel.Text = "Type: " + aiSystem.GetPersonalityType();
+		}
+	}
+}
