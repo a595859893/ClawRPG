@@ -285,36 +285,61 @@ public class BattleStatisticsSystem : BaseSystem
         }
     }
     
+    /// <summary>
+    /// 记录治疗量
+    /// </summary>
+    /// <param name="amount">治疗量</param>
     public void RecordHealing(int amount)
     {
         _stats.TotalHealing += amount;
     }
     
     // Statistics Accessors
+    
+    /// <summary>
+    /// 获取胜率
+    /// </summary>
+    /// <returns>胜率百分比</returns>
     public float GetWinRate()
     {
         if (_stats.TotalBattles == 0) return 0f;
         return (float)_stats.TotalVictories / _stats.TotalBattles * 100f;
     }
     
+    /// <summary>
+    /// 获取平均每场战斗伤害
+    /// </summary>
+    /// <returns>平均伤害</returns>
     public float GetAverageDamagePerBattle()
     {
         if (_stats.TotalBattles == 0) return 0f;
         return (float)_stats.TotalDamageDealt / _stats.TotalBattles;
     }
     
+    /// <summary>
+    /// 获取平均战斗时长
+    /// </summary>
+    /// <returns>平均时长（秒）</returns>
     public float GetAverageBattleDuration()
     {
         if (_stats.TotalBattles == 0) return 0f;
         return _stats.TotalBattleTime / _stats.TotalBattles;
     }
     
+    /// <summary>
+    /// 获取技能命中率
+    /// </summary>
+    /// <returns>命中率百分比</returns>
     public float GetSkillAccuracy()
     {
         if (_stats.TotalSkillsUsed == 0) return 0f;
         return (float)_stats.TotalSkillsHit / _stats.TotalSkillsUsed * 100f;
     }
     
+    /// <summary>
+    /// 获取击杀最多的敌人类型
+    /// </summary>
+    /// <returns>敌人类型名称</returns>
     public string GetMostKilledEnemy()
     {
         string mostKilled = "";
@@ -332,6 +357,10 @@ public class BattleStatisticsSystem : BaseSystem
         return mostKilled;
     }
     
+    /// <summary>
+    /// 获取主要使用的元素伤害类型
+    /// </summary>
+    /// <returns>元素类型名称</returns>
     public string GetDominantElement()
     {
         int maxDamage = 0;
@@ -347,8 +376,14 @@ public class BattleStatisticsSystem : BaseSystem
         return dominantElement;
     }
     
+    /// <summary>
+    /// 获取统计数据
+    /// </summary>
     public BattleStatsData GetStats() => _stats;
     
+    /// <summary>
+    /// 检查当前是否处于战斗中
+    /// </summary>
     public bool IsBattleActive() => _battleActive;
     
     // Data Persistence

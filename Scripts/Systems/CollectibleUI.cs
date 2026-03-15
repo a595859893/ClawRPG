@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Collectible UI - displays collectible collection, details and progress
+/// </summary>
 public class CollectibleUI : Control
 {
 	private Label _titleLabel;

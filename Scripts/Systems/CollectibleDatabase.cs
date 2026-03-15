@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Collectible database - stores all collectible templates and provides lookup functionality
+/// </summary>
 public class CollectibleDatabase
 {
 	private static CollectibleDatabase _instance;

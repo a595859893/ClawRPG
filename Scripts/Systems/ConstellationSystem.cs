@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using Framework;
 
+/// <summary>
+/// 星座系统 - 玩家星座激活和加成管理
+/// 支持星座图激活、星辰之力加成
+/// </summary>
 public class ConstellationSystem : BaseSystem
 {
     private ConstellationData _data;

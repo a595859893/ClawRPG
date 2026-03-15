@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Collectible system - manages player collectibles, discovery and category completion
+/// </summary>
 public class CollectibleSystem
 {
 	private static CollectibleSystem _instance;

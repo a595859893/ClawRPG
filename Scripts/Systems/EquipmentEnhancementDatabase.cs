@@ -265,6 +265,11 @@ public class EquipmentEnhancementDatabase
         }
     }
 
+    /// <summary>
+    /// 获取强化类型的颜色（用于UI显示）
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <returns>颜色值</returns>
     public Godot.Color GetEnhancementTypeColor(EquipmentEnhancementData.EnhancementType type)
     {
         switch (type)

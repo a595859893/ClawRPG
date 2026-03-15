@@ -50,6 +50,9 @@ public class TitleDefinition
     }
 }
 
+/// <summary>
+/// Player title data - tracks unlock status and progress for a single title
+/// </summary>
 [System.Serializable]
 public class PlayerTitleData
 {
@@ -69,6 +72,9 @@ public class PlayerTitleData
     }
 }
 
+/// <summary>
+/// Player title collection - tracks all titles owned by the player
+/// </summary>
 [System.Serializable]
 public class PlayerTitleCollection
 {

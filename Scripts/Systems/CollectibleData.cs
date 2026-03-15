@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Collectible data definitions - contains collectible structures, categories and rarity enums
+/// </summary>
 public class CollectibleData
 {
 	public enum CollectibleCategory

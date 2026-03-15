@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Title database - stores all title templates and provides lookup functionality
+/// </summary>
 public class TitleDatabase
 {
     private static TitleDatabase _instance;

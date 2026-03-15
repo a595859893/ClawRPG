@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Title collection system - manages player title collection, unlocking and equipping
+/// </summary>
 public partial class TitleCollectionSystem : BaseSystem
 {
     public static TitleCollectionSystem Instance { get; private set; }
