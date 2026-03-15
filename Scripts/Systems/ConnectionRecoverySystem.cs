@@ -34,7 +34,7 @@ namespace ClawRPG.Scripts.Systems {
         OfflineMode
     }
 
-    public class ConnectionRecoverySystem {
+    public class ConnectionRecoverySystem : BaseSystem {
         private static ConnectionRecoveryData _data;
         private static ConnectionRecoverySystem _instance;
         
