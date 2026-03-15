@@ -1,400 +1,321 @@
-namespace ClawRPG.Scripts.Systems
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using ClawRPG.Scripts.Data;
-    using ClawRPG.Scripts.Database;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace ClawRPG.Systems
+{
     /// <summary>
-    /// 符文系统管理器
+    /// Core rune system - manages rune collection, equipment, and synthesis
     /// </summary>
     public class RuneSystem
     {
-        public static RuneSystem Instance { get; private set; }
-
-        // 信号系统
-        public Action<Rune> OnRuneAdded;
-        public Action<Rune> OnRuneRemoved;
-        public Action<Rune> OnRuneEquipped;
-        public Action<Rune> OnRuneUnequipped;
-        public Action<RuneSet, int> OnSetBonusActivated;
-
-        private PlayerRuneData _playerData = new PlayerRuneData();
-        private readonly int _maxRuneSlots = 6;
-
+        private PlayerRuneData _playerRuneData;
+        
+        // Rune slot configurations for equipment
+        private readonly Dictionary<RuneSlotType, List<RuneSlot>> _equipmentSlots = new Dictionary<RuneSlotType, List<RuneSlot>>
+        {
+            { RuneSlotType.Weapon, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Weapon, SlotIndex = 0, IsUnlocked = true } } },
+            { RuneSlotType.Armor, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Armor, SlotIndex = 0, IsUnlocked = true } } },
+            { RuneSlotType.Helmet, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Helmet, SlotIndex = 0, IsUnlocked = true } } },
+            { RuneSlotType.Boots, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Boots, SlotIndex = 0, IsUnlocked = true } } },
+            { RuneSlotType.Gloves, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Gloves, SlotIndex = 0, IsUnlocked = true } } },
+            { RuneSlotType.Accessory, new List<RuneSlot> { new RuneSlot { SlotType = RuneSlotType.Accessory, SlotIndex = 0, IsUnlocked = true } } }
+        };
+        
+        public event Action<string> OnRuneEquipped;
+        public event Action<string> OnRuneUnequipped;
+        public event Action<string, bool> OnRuneCrafted;
+        
         public RuneSystem()
         {
-            Instance = this;
+            _playerRuneData = new PlayerRuneData();
         }
-
-        /// <summary>
-        /// 初始化符文系统
-        /// </summary>
-        public void Initialize()
+        
+        public void Initialize(PlayerRuneData saveData)
         {
-            Instance = this;
-        }
-
-        /// <summary>
-        /// 添加符文
-        /// </summary>
-        public RuneInstance AddRune(Rune rune)
-        {
-            if (rune == null) return null;
-
-            var instance = new RuneInstance
+            if (saveData != null)
             {
-                UniqueId = Guid.NewGuid().ToString(),
-                RuneId = rune.Id,
-                SlotIndex = -1,
-                IsLocked = false
-            };
-
-            _playerData.OwnedRunes.Add(instance);
-            _playerData.TotalRunesFound++;
-            _playerData.DiscoveredRunes.Add(rune.Id);
-
-            OnRuneAdded?.Invoke(rune);
-            return instance;
-        }
-
-        /// <summary>
-        /// 随机添加符文
-        /// </summary>
-        public RuneInstance AddRandomRune()
-        {
-            var rune = RuneDatabase.GetRandomRune();
-            return AddRune(rune);
-        }
-
-        /// <summary>
-        /// 移除符文
-        /// </summary>
-        public bool RemoveRune(string uniqueId)
-        {
-            var instance = _playerData.OwnedRunes.FirstOrDefault(r => r.UniqueId == uniqueId);
-            if (instance == null) return false;
-
-            // 如果装备则卸下
-            if (instance.SlotIndex >= 0)
-            {
-                UnequipRune(uniqueId);
+                _playerRuneData = saveData;
             }
-
-            var rune = GetRuneData(instance.RuneId);
-            _playerData.OwnedRunes.Remove(instance);
-            OnRuneRemoved?.Invoke(rune);
-            return true;
         }
-
-        /// <summary>
-        /// 装备符文
-        /// </summary>
-        public bool EquipRune(string uniqueId, int slotIndex)
+        
+        // ========== Collection Management ==========
+        
+        public void AddRune(string runeId, int count = 1)
         {
-            if (slotIndex < 0 || slotIndex >= _maxRuneSlots) return false;
-
-            var instance = _playerData.OwnedRunes.FirstOrDefault(r => r.UniqueId == uniqueId);
-            if (instance == null) return false;
-
-            var rune = GetRuneData(instance.RuneId);
-            if (rune == null) return false;
-
-            // 检查槽位是否已有符文
-            var existingInSlot = _playerData.OwnedRunes.FirstOrDefault(r => r.SlotIndex == slotIndex);
-            if (existingInSlot != null)
+            var rune = RuneDatabase.GetRune(runeId);
+            if (rune == null) return;
+            
+            var existing = _playerRuneData.OwnedRunes.FirstOrDefault(r => r.Id == runeId);
+            if (existing != null)
             {
-                // 卸下现有符文
-                UnequipRune(existingInSlot.UniqueId);
+                _playerRuneData.RuneCount[runeId] = _playerRuneData.RuneCount.GetValueOrDefault(runeId, 0) + count;
             }
-
-            instance.SlotIndex = slotIndex;
-            rune.IsEquipped = true;
-            OnRuneEquipped?.Invoke(rune);
-
-            // 检查套装效果
-            CheckSetBonus();
-
-            return true;
+            else
+            {
+                _playerRuneData.OwnedRunes.Add(new Rune
+                {
+                    Id = rune.Id,
+                    Name = rune.Name,
+                    Description = rune.Description,
+                    Type = rune.Type,
+                    Rarity = rune.Rarity,
+                    DamageBonus = rune.DamageBonus,
+                    DefenseBonus = rune.DefenseBonus,
+                    HealthBonus = rune.HealthBonus,
+                    ManaBonus = rune.ManaBonus,
+                    SpeedBonus = rune.SpeedBonus,
+                    CritChance = rune.CritChance,
+                    CritDamage = rune.CritDamage,
+                    LifeSteal = rune.LifeSteal,
+                    Regen = rune.Regen,
+                    OnHitEffect = rune.OnHitEffect,
+                    OnKillEffect = rune.OnKillEffect,
+                    OnDamagedEffect = rune.OnDamagedEffect,
+                    OnCriticalEffect = rune.OnCriticalEffect,
+                    LevelRequired = rune.LevelRequired,
+                    Power = rune.Power
+                });
+                _playerRuneData.RuneCount[runeId] = count;
+                _playerRuneData.TotalRunesDiscovered++;
+            }
         }
-
-        /// <summary>
-        /// 卸下符文
-        /// </summary>
-        public bool UnequipRune(string uniqueId)
+        
+        public bool RemoveRune(string runeId, int count = 1)
         {
-            var instance = _playerData.OwnedRunes.FirstOrDefault(r => r.UniqueId == uniqueId);
-            if (instance == null || instance.SlotIndex < 0) return false;
-
-            var rune = GetRuneData(instance.RuneId);
-            instance.SlotIndex = -1;
-            if (rune != null) rune.IsEquipped = false;
-
-            OnRuneUnequipped?.Invoke(rune);
+            if (!_playerRuneData.RuneCount.ContainsKey(runeId) || _playerRuneData.RuneCount[runeId] < count)
+                return false;
+            
+            _playerRuneData.RuneCount[runeId] -= count;
+            if (_playerRuneData.RuneCount[runeId] <= 0)
+            {
+                _playerRuneData.OwnedRunes.RemoveAll(r => r.Id == runeId);
+                _playerRuneData.RuneCount.Remove(runeId);
+            }
             return true;
         }
-
-        /// <summary>
-        /// 获取已装备的符文
-        /// </summary>
+        
+        public int GetRuneCount(string runeId)
+        {
+            return _playerRuneData.RuneCount.GetValueOrDefault(runeId, 0);
+        }
+        
+        public List<Rune> GetOwnedRunes()
+        {
+            return _playerRuneData.OwnedRunes.ToList();
+        }
+        
         public List<Rune> GetEquippedRunes()
         {
-            var equipped = new List<Rune>();
-            foreach (var instance in _playerData.OwnedRunes)
+            return _playerRuneData.EquippedRunes.ToList();
+        }
+        
+        // ========== Equipment Management ==========
+        
+        public bool EquipRune(string runeId, RuneSlotType slotType)
+        {
+            var rune = _playerRuneData.OwnedRunes.FirstOrDefault(r => r.Id == runeId);
+            if (rune == null) return false;
+            
+            // Check if slot exists
+            if (!_equipmentSlots.ContainsKey(slotType)) return false;
+            
+            // Check if rune already equipped
+            var alreadyEquipped = _playerRuneData.EquippedRunes.FirstOrDefault(r => r.Id == runeId);
+            if (alreadyEquipped != null)
             {
-                if (instance.SlotIndex >= 0)
-                {
-                    var rune = GetRuneData(instance.RuneId);
-                    if (rune != null) equipped.Add(rune);
-                }
+                _playerRuneData.EquippedRunes.Remove(alreadyEquipped);
             }
-            return equipped;
-        }
-
-        /// <summary>
-        /// 获取玩家拥有的所有符文
-        /// </summary>
-        public List<Rune> GetAllOwnedRunes()
-        {
-            var runes = new List<Rune>();
-            foreach (var instance in _playerData.OwnedRunes)
+            
+            // Unequip current rune in slot
+            var currentInSlot = _playerRuneData.EquippedRunes.FirstOrDefault(r => 
+                _equipmentSlots[slotType].Any(s => s.Rune?.Id == r.Id));
+            if (currentInSlot != null)
             {
-                var rune = GetRuneData(instance.RuneId);
-                if (rune != null)
-                {
-                    rune.IsEquipped = instance.SlotIndex >= 0;
-                    runes.Add(rune);
-                }
+                _playerRuneData.EquippedRunes.Remove(currentInSlot);
             }
-            return runes;
+            
+            _playerRuneData.EquippedRunes.Add(rune);
+            OnRuneEquipped?.Invoke(runeId);
+            return true;
         }
-
-        /// <summary>
-        /// 获取符文数据
-        /// </summary>
-        public Rune GetRuneData(string runeId)
+        
+        public bool UnequipRune(string runeId)
         {
-            return RuneDatabase.Runes.ContainsKey(runeId) ? RuneDatabase.Runes[runeId] : null;
+            var rune = _playerRuneData.EquippedRunes.FirstOrDefault(r => r.Id == runeId);
+            if (rune == null) return false;
+            
+            _playerRuneData.EquippedRunes.Remove(rune);
+            OnRuneUnequipped?.Invoke(runeId);
+            return true;
         }
-
-        /// <summary>
-        /// 获取符文实例
-        /// </summary>
-        public RuneInstance GetRuneInstance(string uniqueId)
+        
+        // ========== Synthesis ==========
+        
+        public (bool success, Rune result) CraftRune(string resultRuneId)
         {
-            return _playerData.OwnedRunes.FirstOrDefault(r => r.UniqueId == uniqueId);
-        }
-
-        /// <summary>
-        /// 获取属性加成
-        /// </summary>
-        public Dictionary<RuneType, float> GetAttributeBonuses()
-        {
-            var bonuses = new Dictionary<RuneType, float>();
-            foreach (RuneType type in Enum.GetValues(typeof(RuneType)))
+            // Simplified synthesis - craft higher rarity from 3 lower rarity runes
+            var resultRune = RuneDatabase.GetRune(resultRuneId);
+            if (resultRune == null) return (false, null);
+            
+            int rarityLevel = (int)resultRune.Rarity;
+            if (rarityLevel <= 0) return (false, null);
+            
+            // Find ingredients (same type, lower rarity)
+            var ingredientRarity = (RuneRarity)(rarityLevel - 1);
+            var ingredients = _playerRuneData.OwnedRunes
+                .Where(r => r.Type == resultRune.Type && r.Rarity == ingredientRarity)
+                .Take(3)
+                .ToList();
+            
+            if (ingredients.Count < 3) return (false, null);
+            
+            // Check if player has enough
+            foreach (var ing in ingredients)
             {
-                bonuses[type] = 0f;
+                if (GetRuneCount(ing.Id) < 1) return (false, null);
             }
-
-            foreach (var instance in _playerData.OwnedRunes)
+            
+            // Remove ingredients
+            foreach (var ing in ingredients)
             {
-                if (instance.SlotIndex >= 0)
-                {
-                    var rune = GetRuneData(instance.RuneId);
-                    if (rune != null && bonuses.ContainsKey(rune.Type))
-                    {
-                        bonuses[rune.Type] += rune.AttributeValue;
-                    }
-                }
+                RemoveRune(ing.Id, 1);
             }
-
-            return bonuses;
+            
+            // Determine success (higher rarity = lower chance)
+            int baseSuccess = 80 - (rarityLevel * 10);
+            bool success = UnityEngine.Random.Range(0, 100) < baseSuccess;
+            
+            if (success)
+            {
+                AddRune(resultRuneId, 1);
+                _playerRuneData.TotalRunesCrafted++;
+                OnRuneCrafted?.Invoke(resultRuneId, true);
+                return (true, resultRune);
+            }
+            
+            OnRuneCrafted?.Invoke(resultRuneId, false);
+            return (false, null);
         }
-
-        /// <summary>
-        /// 获取总攻击加成
-        /// </summary>
-        public float GetTotalAttackBonus()
+        
+        // ========== Stat Calculation ==========
+        
+        public float GetTotalDamageBonus()
         {
-            var bonuses = GetAttributeBonuses();
-            return bonuses[RuneType.Attack] + bonuses[RuneType.Magic];
+            return _playerRuneData.EquippedRunes.Sum(r => r.DamageBonus);
         }
-
-        /// <summary>
-        /// 获取总防御加成
-        /// </summary>
+        
         public float GetTotalDefenseBonus()
         {
-            return GetAttributeBonuses()[RuneType.Defense];
+            return _playerRuneData.EquippedRunes.Sum(r => r.DefenseBonus);
         }
-
-        /// <summary>
-        /// 获取总生命加成
-        /// </summary>
+        
         public float GetTotalHealthBonus()
         {
-            return GetAttributeBonuses()[RuneType.Health];
+            return _playerRuneData.EquippedRunes.Sum(r => r.HealthBonus);
         }
-
-        /// <summary>
-        /// 获取总速度加成
-        /// </summary>
+        
+        public float GetTotalManaBonus()
+        {
+            return _playerRuneData.EquippedRunes.Sum(r => r.ManaBonus);
+        }
+        
         public float GetTotalSpeedBonus()
         {
-            return GetAttributeBonuses()[RuneType.Speed];
+            return _playerRuneData.EquippedRunes.Sum(r => r.SpeedBonus);
         }
-
-        /// <summary>
-        /// 获取总暴击加成
-        /// </summary>
-        public float GetTotalCriticalBonus()
+        
+        public float GetTotalCritChance()
         {
-            return GetAttributeBonuses()[RuneType.Critical];
+            return _playerRuneData.EquippedRunes.Sum(r => r.CritChance);
         }
-
-        /// <summary>
-        /// 获取总生命偷取加成
-        /// </summary>
-        public float GetTotalLifeStealBonus()
+        
+        public float GetTotalCritDamage()
         {
-            return GetAttributeBonuses()[RuneType.LifeSteal];
+            return _playerRuneData.EquippedRunes.Sum(r => r.CritDamage);
         }
-
-        /// <summary>
-        /// 获取总闪避加成
-        /// </summary>
-        public float GetTotalDodgeBonus()
+        
+        public float GetTotalLifeSteal()
         {
-            return GetAttributeBonuses()[RuneType.Dodge];
+            return _playerRuneData.EquippedRunes.Sum(r => r.LifeSteal);
         }
-
-        /// <summary>
-        /// 检查套装效果
-        /// </summary>
-        private void CheckSetBonus()
+        
+        public float GetTotalRegen()
         {
-            var equipped = GetEquippedRunes();
-            var typeCounts = new Dictionary<RuneType, int>();
-            foreach (RuneType type in Enum.GetValues(typeof(RuneType)))
+            return _playerRuneData.EquippedRunes.Sum(r => r.Regen);
+        }
+        
+        // ========== Effect Triggers ==========
+        
+        public void OnAttackHit()
+        {
+            foreach (var rune in _playerRuneData.EquippedRunes.Where(r => r.OnHitEffect))
             {
-                typeCounts[type] = 0;
-            }
-
-            foreach (var rune in equipped)
-            {
-                typeCounts[rune.Type]++;
-            }
-
-            // 检查每个套装
-            foreach (var set in RuneDatabase.RuneSets.Values)
-            {
-                int matchCount = 0;
-                for (int i = 0; i < 8; i++)
-                {
-                    var type = (RuneType)i;
-                    matchCount += Math.Min(typeCounts[type], set.RuneTypeCounts[i]);
-                }
-
-                int setLevel = 0;
-                if (matchCount >= 6) setLevel = 3;
-                else if (matchCount >= 4) setLevel = 2;
-                else if (matchCount >= 2) setLevel = 1;
-
-                if (setLevel > 0)
-                {
-                    OnSetBonusActivated?.Invoke(set, setLevel);
-                }
+                // Trigger on-hit effects
             }
         }
-
-        /// <summary>
-        /// 获取套装加成
-        /// </summary>
-        public (string SetName, int Level, float Bonus) GetActiveSetBonus()
+        
+        public void OnEnemyKilled()
         {
-            var equipped = GetEquippedRunes();
-            var typeCounts = new Dictionary<RuneType, int>();
-            foreach (RuneType type in Enum.GetValues(typeof(RuneType)))
+            foreach (var rune in _playerRuneData.EquippedRunes.Where(r => r.OnKillEffect))
             {
-                typeCounts[type] = 0;
+                // Trigger on-kill effects
             }
-
-            foreach (var rune in equipped)
-            {
-                typeCounts[rune.Type]++;
-            }
-
-            RuneSet bestSet = null;
-            int bestLevel = 0;
-
-            foreach (var set in RuneDatabase.RuneSets.Values)
-            {
-                int matchCount = 0;
-                for (int i = 0; i < 8; i++)
-                {
-                    var type = (RuneType)i;
-                    matchCount += Math.Min(typeCounts[type], set.RuneTypeCounts[i]);
-                }
-
-                int setLevel = 0;
-                if (matchCount >= 6) setLevel = 3;
-                else if (matchCount >= 4) setLevel = 2;
-                else if (matchCount >= 2) setLevel = 1;
-
-                if (setLevel > bestLevel)
-                {
-                    bestLevel = setLevel;
-                    bestSet = set;
-                }
-            }
-
-            if (bestSet != null && bestLevel > 0)
-            {
-                return (bestSet.Name, bestLevel, bestSet.BonusAttributes[bestLevel - 1]);
-            }
-
-            return ("无", 0, 0f);
         }
-
-        /// <summary>
-        /// 获取统计数据
-        /// </summary>
-        public Dictionary<string, object> GetStatistics()
+        
+        public void OnPlayerDamaged()
         {
-            return new Dictionary<string, object>
+            foreach (var rune in _playerRuneData.EquippedRunes.Where(r => r.OnDamagedEffect))
             {
-                { "TotalRunesFound", _playerData.TotalRunesFound },
-                { "TotalRuneUpgrades", _playerData.TotalRuneUpgrades },
-                { "OwnedRunesCount", _playerData.OwnedRunes.Count },
-                { "EquippedRunesCount", _playerData.OwnedRunes.Count(r => r.SlotIndex >= 0) },
-                { "DiscoveredRunesCount", _playerData.DiscoveredRunes.Count },
-                { "TotalRuneTypes", RuneDatabase.Runes.Count }
+                // Trigger on-damaged effects
+            }
+        }
+        
+        public void OnCriticalHit()
+        {
+            foreach (var rune in _playerRuneData.EquippedRunes.Where(r => r.OnCriticalEffect))
+            {
+                // Trigger on-critical effects
+            }
+        }
+        
+        // ========== Statistics ==========
+        
+        public RuneStatistics GetStatistics()
+        {
+            var stats = new RuneStatistics
+            {
+                TotalRunesOwned = _playerRuneData.OwnedRunes.Sum(r => _playerRuneData.RuneCount.GetValueOrDefault(r.Id, 0)),
+                UniqueRunes = _playerRuneData.OwnedRunes.Count,
+                TotalCrafted = _playerRuneData.TotalRunesCrafted
             };
+            
+            foreach (RuneRarity rarity in Enum.GetValues(typeof(RuneRarity)))
+            {
+                stats.RarityBreakdown[rarity] = _playerRuneData.OwnedRunes.Count(r => r.Rarity == rarity);
+            }
+            
+            foreach (RuneType type in Enum.GetValues(typeof(RuneType)))
+            {
+                stats.TypeBreakdown[type] = _playerRuneData.OwnedRunes.Count(r => r.Type == type);
+            }
+            
+            return stats;
         }
-
-        /// <summary>
-        /// 获取玩家数据
-        /// </summary>
-        public PlayerRuneData GetPlayerData()
+        
+        // ========== Save/Load ==========
+        
+        public PlayerRuneData ExportSaveData()
         {
-            return _playerData;
+            return _playerRuneData;
         }
-
-        /// <summary>
-        /// 加载玩家数据
-        /// </summary>
-        public void LoadData(PlayerRuneData data)
+        
+        public void ImportSaveData(PlayerRuneData data)
         {
-            _playerData = data ?? new PlayerRuneData();
-        }
-
-        /// <summary>
-        /// 保存玩家数据
-        /// </summary>
-        public PlayerRuneData SaveData()
-        {
-            return _playerData;
+            if (data != null)
+            {
+                _playerRuneData = data;
+            }
         }
     }
 }
