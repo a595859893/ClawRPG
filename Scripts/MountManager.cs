@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Mounts {
     /// <summary>
     /// 坐骑管理器 - 管理玩家拥有的坐骑
     /// </summary>
-    public class MountManager : Node {
+    public class MountManager : BaseSystem {
         public static MountManager Instance { get; private set; }
 
         private Dictionary<string, MountInstance> _ownedMounts = new Dictionary<string, MountInstance>();
@@ -27,6 +27,38 @@ namespace ClawRPG.Scripts.Mounts {
         public override void _Ready() {
             Instance = this;
             InitializeMountTrailEffect();
+        }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "Mount";
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            var mounts = new Array();
+            foreach (var kvp in _ownedMounts)
+            {
+                mounts.Add(kvp.Key);
+            }
+            data["owned_mounts"] = mounts;
+            data["active_mount_id"] = _activeMountId ?? "";
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            // TODO: 实现数据导入
         }
 
         /// <summary>
