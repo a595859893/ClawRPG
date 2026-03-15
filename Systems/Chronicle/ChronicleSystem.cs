@@ -33,15 +33,11 @@ public class ChronicleSystem : BaseSystem
     // Story flags
     public Dictionary<string, bool> storyFlags = new Dictionary<string, bool>();
     
-    public override void _Ready()
-    {
-        Instance = this;
-        base._Ready();
-    }
-    
     protected override void Initialize()
     {
+        Instance = this;
         InitializeChronicle();
+        base.Initialize();
     }
     
     private void InitializeChronicle()
