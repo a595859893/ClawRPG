@@ -192,6 +192,123 @@ namespace ClawRPG.Systems.GuildHall {
             
             GD.Print("[GuildHall] Data loaded from save");
         }
+        
+        /// <summary>
+        /// 导出保存数据 (BaseSystem 接口)
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["guild_id"] = _data.GuildId;
+            data["guild_name"] = _data.GuildName;
+            data["hall_level"] = _data.HallLevel;
+            data["experience"] = _data.Experience;
+            data["required_experience"] = _data.RequiredExperience;
+            data["gold_deposited"] = _data.GoldDeposited;
+            
+            // 解锁的房间
+            var unlockedRooms = new Godot.Collections.Array();
+            foreach (var room in _data.UnlockedRooms) unlockedRooms.Add(room);
+            data["unlocked_rooms"] = unlockedRooms;
+            
+            // 家具
+            var furniture = new Godot.Collections.Array();
+            foreach (var item in _data.Furniture) furniture.Add(item);
+            data["furniture"] = furniture;
+            
+            // 访客
+            var visitors = new Godot.Collections.Array();
+            foreach (var v in _data.Visitors) visitors.Add(v);
+            data["visitors"] = visitors;
+            
+            // 装饰品库存
+            var decorationInventory = new Godot.Collections.Array();
+            foreach (var d in _data.DecorationInventory) decorationInventory.Add(d);
+            data["decoration_inventory"] = decorationInventory;
+            
+            // 房间等级
+            var roomLevels = new Godot.Collections.Dictionary();
+            foreach (var kvp in _data.RoomLevels) roomLevels[kvp.Key] = kvp.Value;
+            data["room_levels"] = roomLevels;
+            
+            // 统计
+            var statistics = new Godot.Collections.Dictionary();
+            foreach (var kvp in _data.Statistics) statistics[kvp.Key] = kvp.Value;
+            data["statistics"] = statistics;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据 (BaseSystem 接口)
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            _data.GuildId = data.Contains("guild_id") ? Convert.ToInt32(data["guild_id"]) : 1;
+            _data.GuildName = data.Contains("guild_name") ? data["guild_name"].ToString() : "My Guild";
+            _data.HallLevel = data.Contains("hall_level") ? Convert.ToInt32(data["hall_level"]) : 1;
+            _data.Experience = data.Contains("experience") ? Convert.ToInt32(data["experience"]) : 0;
+            _data.RequiredExperience = data.Contains("required_experience") ? Convert.ToInt32(data["required_experience"]) : 1000;
+            _data.GoldDeposited = data.Contains("gold_deposited") ? Convert.ToInt32(data["gold_deposited"]) : 0;
+            
+            // 解锁的房间
+            _data.UnlockedRooms.Clear();
+            if (data.Contains("unlocked_rooms")) {
+                var rooms = data["unlocked_rooms"] as Godot.Collections.Array;
+                if (rooms != null) {
+                    foreach (var room in rooms) _data.UnlockedRooms.Add(room.ToString());
+                }
+            }
+            
+            // 家具
+            _data.Furniture.Clear();
+            if (data.Contains("furniture")) {
+                var furniture = data["furniture"] as Godot.Collections.Array;
+                if (furniture != null) {
+                    foreach (var item in furniture) _data.Furniture.Add(item.ToString());
+                }
+            }
+            
+            // 访客
+            _data.Visitors.Clear();
+            if (data.Contains("visitors")) {
+                var visitors = data["visitors"] as Godot.Collections.Array;
+                if (visitors != null) {
+                    foreach (var v in visitors) _data.Visitors.Add(v.ToString());
+                }
+            }
+            
+            // 装饰品库存
+            _data.DecorationInventory.Clear();
+            if (data.Contains("decoration_inventory")) {
+                var inventory = data["decoration_inventory"] as Godot.Collections.Array;
+                if (inventory != null) {
+                    foreach (var d in inventory) _data.DecorationInventory.Add(d.ToString());
+                }
+            }
+            
+            // 房间等级
+            _data.RoomLevels.Clear();
+            if (data.Contains("room_levels")) {
+                var levels = data["room_levels"] as Godot.Collections.Dictionary;
+                if (levels != null) {
+                    foreach (var kvp in levels) _data.RoomLevels[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+                }
+            }
+            
+            // 统计
+            _data.Statistics.Clear();
+            if (data.Contains("statistics")) {
+                var stats = data["statistics"] as Godot.Collections.Dictionary;
+                if (stats != null) {
+                    foreach (var kvp in stats) _data.Statistics[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+                }
+            }
+            
+            GD.Print($"[GuildHall] Imported: level {_data.HallLevel}, {_data.UnlockedRooms.Count} rooms");
+        }
     }
     
     public static class JsonHelper {
