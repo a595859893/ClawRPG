@@ -2,149 +2,238 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ClawRPG.Scripts.Systems {
-    /// <summary>
-    /// 地牢事件效果 - 处理事件的结果和效果
-    /// </summary>
-    public partial class DungeonEventEffects : BaseSystem {
+/// <summary>
+/// 地牢事件效果处理器。负责处理各类事件的具体效果实现。
+/// </summary>
+public partial class DungeonEventEffects
+{
+    private RandomDungeonEventData _data;
+    private Random _rand = new Random();
+    
+    public DungeonEventEffects(RandomDungeonEventData data)
+    {
+        _data = data;
+    }
+    
+    public void SetData(RandomDungeonEventData data)
+    {
+        _data = data;
+    }
+    
+    public Dictionary<string, object> ProcessCombatEvent(Dictionary eventData)
+    {
+        var result = new Dictionary<string, object>();
         
-        /// <summary>
-        /// 事件结果类型
-        /// </summary>
-        public enum EventResultType {
-            Success,
-            Failure,
-            Neutral
+        int enemyCount = eventData.Contains("enemy_count") ? Convert.ToInt32(eventData["enemy_count"]) : 1;
+        float difficulty = eventData.Contains("difficulty") ? Convert.ToSingle(eventData["difficulty"]) : 1.0f;
+        int goldReward = eventData.Contains("reward_gold") ? Convert.ToInt32(eventData["reward_gold"]) : 0;
+        int expReward = eventData.Contains("reward_exp") ? Convert.ToInt32(eventData["reward_exp"]) : 0;
+        
+        // Calculate actual rewards based on difficulty
+        goldReward = (int)(goldReward * difficulty);
+        expReward = (int)(expReward * difficulty);
+        
+        _data.GoldGainedFromEvents += goldReward;
+        _data.ExpGainedFromEvents += expReward;
+        
+        result["combat"] = true;
+        result["enemy_count"] = enemyCount;
+        result["difficulty"] = difficulty;
+        result["gold_reward"] = goldReward;
+        result["exp_reward"] = expReward;
+        result["message"] = $"Combat encounter! {enemyCount} enemies (difficulty {difficulty:F1}x).";
+        
+        _data.EnemiesDefeatedInRoom = 0; // Reset for combat
+        
+        return result;
+    }
+    
+    public Dictionary<string, object> ProcessTreasureEvent(Dictionary eventData)
+    {
+        var result = new Dictionary<string, object>();
+        
+        int goldMin = eventData.Contains("gold_min") ? Convert.ToInt32(eventData["gold_min"]) : 0;
+        int goldMax = eventData.Contains("gold_max") ? Convert.ToInt32(eventData["gold_max"]) : 10;
+        int gold = _rand.Next(goldMin, goldMax + 1);
+        bool hasItem = eventData.Contains("item_chance") && (float)_rand.NextDouble() < Convert.ToSingle(eventData["item_chance"]);
+        
+        _data.GoldGainedFromEvents += gold;
+        _data.HasTreasure = true;
+        
+        result["gold_found"] = gold;
+        result["has_item"] = hasItem;
+        
+        if (hasItem)
+        {
+            _data.ItemsGained++;
+            result["item_rarity"] = GetRandomItemRarity();
         }
         
-        public override void _Ready() {
-            base._Ready();
-        }
+        string message = gold > 0 ? $"Found {gold} gold!" : "Found nothing...";
+        if (hasItem) message += " Also found an item!";
         
-        /// <summary>
-        /// 应用事件效果
-        /// </summary>
-        public EventResultType ApplyEventEffect(string eventId, Dictionary eventData) {
-            switch (eventId) {
-                case "combat_encounter":
-                    return HandleCombatEncounter(eventData);
-                case "treasure_chest":
-                    return HandleTreasureChest(eventData);
-                case "blessing_shrine":
-                    return HandleBlessingShrine(eventData);
-                case "curse_trap":
-                    return HandleCurseTrap(eventData);
-                case "merchant_encounter":
-                    return HandleMerchantEncounter(eventData);
-                case "rest_zone":
-                    return HandleRestZone(eventData);
-                default:
-                    return EventResultType.Neutral;
-            }
-        }
+        result["message"] = message;
+        result["success"] = true;
         
-        /// <summary>
-        /// 处理战斗遭遇
-        /// </summary>
-        private EventResultType HandleCombatEncounter(Dictionary eventData) {
-            GD.Print("[DungeonEventEffects] Combat encounter triggered");
-            // 战斗逻辑
-            return EventResultType.Neutral;
-        }
+        return result;
+    }
+    
+    public Dictionary<string, object> ProcessHealingEvent(Dictionary eventData)
+    {
+        var result = new Dictionary<string, object>();
         
-        /// <summary>
-        /// 处理宝箱
-        /// </summary>
-        private EventResultType HandleTreasureChest(Dictionary eventData) {
-            GD.Print("[DungeonEventEffects] Treasure chest opened");
-            // 宝藏逻辑
-            return EventResultType.Success;
-        }
+        int healAmount = eventData.Contains("heal_amount") ? Convert.ToInt32(eventData["heal_amount"]) : 20;
         
-        /// <summary>
-        /// 处理祝福祭坛
-        /// </summary>
-        private EventResultType HandleBlessingShrine(Dictionary eventData) {
-            GD.Print("[DungeonEventEffects] Blessing shrine visited");
-            // 祝福逻辑
-            return EventResultType.Success;
-        }
+        _data.PlayerHealth = Math.Min(_data.PlayerHealth + healAmount, 100);
+        _data.IsInjured = _data.PlayerHealth < 50;
+        _data.IsFullHealth = _data.PlayerHealth >= 100;
         
-        /// <summary>
-        /// 处理诅咒陷阱
-        /// </summary>
-        private EventResultType HandleCurseTrap(Dictionary eventData) {
-            GD.Print("[DungeonEventEffects] Curse trap triggered");
-            // 诅咒逻辑
-            return EventResultType.Failure;
-        }
+        result["healed"] = healAmount;
+        result["current_health"] = _data.PlayerHealth;
+        result["message"] = $"Restored {healAmount} health!";
+        result["success"] = true;
         
-        /// <summary>
-        /// 处理商人遭遇
-        /// </summary>
-        private EventResultType HandleMerchantEncounter(Dictionary eventData) {
-            GD.Print("[DungeonEventEffects] Merchant encountered");
-            // 商人逻辑
-            return EventResultType.Neutral;
-        }
+        return result;
+    }
+    
+    public Dictionary<string, object> ProcessBuffEvent(Dictionary eventData)
+    {
+        var result = new Dictionary<string, object>();
         
-        /// <summary>
-        /// 处理休息区
-        /// </summary>
-        private EventResultType HandleRestZone(Dictionary eventData) {
-            GD.Print("[DungeonEventEffects] Rest zone activated");
-            // 休息逻辑
-            return EventResultType.Success;
-        }
+        string buffId = "buff_" + Guid.NewGuid().ToString().Substring(0, 8);
+        int duration = eventData.Contains("buff_duration") ? Convert.ToInt32(eventData["buff_duration"]) : 60;
         
-        /// <summary>
-        /// 计算事件奖励
-        /// </summary>
-        public Dictionary CalculateRewards(string eventId, int playerLevel) {
-            var rewards = new Dictionary();
+        _data.AppliedBuffs.Add(buffId);
+        
+        result["buff_id"] = buffId;
+        result["duration"] = duration;
+        
+        if (eventData.Contains("attack_bonus"))
+            result["attack_bonus"] = eventData["attack_bonus"];
+        if (eventData.Contains("defense_bonus"))
+            result["defense_bonus"] = eventData["defense_bonus"];
+        if (eventData.Contains("gold_multiplier"))
+            result["gold_multiplier"] = eventData["gold_multiplier"];
             
-            switch (eventId) {
-                case "treasure_chest":
-                    rewards["gold"] = 50 * playerLevel;
-                    rewards["exp"] = 10 * playerLevel;
-                    break;
-                case "blessing_shrine":
-                    rewards["health"] = 20;
-                    break;
-                case "combat_encounter":
-                    rewards["exp"] = 30 * playerLevel;
-                    rewards["gold"] = 10 * playerLevel;
-                    break;
-            }
+        result["message"] = "You received a blessing!";
+        result["success"] = true;
+        
+        return result;
+    }
+    
+    public Dictionary<string, object> ProcessDebuffEvent(Dictionary eventData)
+    {
+        var result = new Dictionary<string, object>();
+        
+        string debuffId = "debuff_" + Guid.NewGuid().ToString().Substring(0, 8);
+        int duration = eventData.Contains("debuff_duration") ? Convert.ToInt32(eventData["debuff_duration"]) : 60;
+        
+        _data.AppliedDebuffs.Add(debuffId);
+        
+        result["debuff_id"] = debuffId;
+        result["duration"] = duration;
+        
+        if (eventData.Contains("attack_penalty"))
+            result["attack_penalty"] = eventData["attack_penalty"];
+        if (eventData.Contains("defense_penalty"))
+            result["defense_penalty"] = eventData["defense_penalty"];
             
-            return rewards;
+        result["message"] = "You are cursed!";
+        result["success"] = true;
+        
+        return result;
+    }
+    
+    public Dictionary<string, object> ProcessPoisonEvent(Dictionary eventData)
+    {
+        var result = new Dictionary<string, object>();
+        
+        int damage = eventData.Contains("damage") ? Convert.ToInt32(eventData["damage"]) : 10;
+        int dotDuration = eventData.Contains("dot_duration") ? Convert.ToInt32(eventData["dot_duration"]) : 10;
+        
+        _data.PlayerHealth = Math.Max(_data.PlayerHealth - damage, 0);
+        _data.IsInjured = _data.PlayerHealth < 50;
+        
+        result["immediate_damage"] = damage;
+        result["dot_duration"] = dotDuration;
+        result["current_health"] = _data.PlayerHealth;
+        result["message"] = $"Poison deals {damage} damage!";
+        result["success"] = true;
+        
+        return result;
+    }
+    
+    public Dictionary<string, object> ProcessDamageEvent(Dictionary eventData)
+    {
+        var result = new Dictionary<string, object>();
+        
+        int damageMin = eventData.Contains("damage_min") ? Convert.ToInt32(eventData["damage_min"]) : 5;
+        int damageMax = eventData.Contains("damage_max") ? Convert.ToInt32(eventData["damage_max"]) : 15;
+        int damage = _rand.Next(damageMin, damageMax + 1);
+        
+        _data.PlayerHealth = Math.Max(_data.PlayerHealth - damage, 0);
+        _data.IsInjured = _data.PlayerHealth < 50;
+        
+        result["damage"] = damage;
+        result["current_health"] = _data.PlayerHealth;
+        result["message"] = $"Trap deals {damage} damage!";
+        result["success"] = true;
+        
+        return result;
+    }
+    
+    public Dictionary<string, object> ProcessChoiceEvent(Dictionary eventData)
+    {
+        var result = new Dictionary<string, object>();
+        
+        string choiceA = eventData.Contains("choice_a") ? eventData["choice_a"].ToString() : "Option A";
+        string choiceB = eventData.Contains("choice_b") ? eventData["choice_b"].ToString() : "Option B";
+        
+        result["choice_a"] = choiceA;
+        result["choice_b"] = choiceB;
+        result["requires_choice"] = true;
+        result["message"] = $"A choice appears: {choiceA} or {choiceB}?";
+        
+        return result;
+    }
+    
+    public Dictionary<string, object> ProcessRewardEvent(Dictionary eventData)
+    {
+        var result = new Dictionary<string, object>();
+        
+        int gold = eventData.Contains("gold") ? Convert.ToInt32(eventData["gold"]) : 0;
+        int exp = eventData.Contains("exp") ? Convert.ToInt32(eventData["exp"]) : 0;
+        
+        _data.GoldGainedFromEvents += gold;
+        _data.ExpGainedFromEvents += exp;
+        
+        result["gold_reward"] = gold;
+        result["exp_reward"] = exp;
+        
+        if (eventData.Contains("item_rarity"))
+        {
+            result["item_rarity"] = eventData["item_rarity"].ToString();
+            _data.ItemsGained++;
         }
         
-        /// <summary>
-        /// 计算事件惩罚
-        /// </summary>
-        public Dictionary CalculatePenalties(string eventId, int playerLevel) {
-            var penalties = new Dictionary();
-            
-            switch (eventId) {
-                case "curse_trap":
-                    penalties["health"] = -30;
-                    break;
-                case "combat_encounter":
-                    penalties["health"] = -20 * playerLevel;
-                    break;
-            }
-            
-            return penalties;
-        }
+        string message = "";
+        if (gold > 0) message += $" +{gold} gold";
+        if (exp > 0) message += $" +{exp} exp";
         
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
-            return data;
-        }
+        result["message"] = message.Length > 0 ? message : "You received a reward!";
+        result["success"] = true;
         
-        public override void ImportSaveData(Dictionary data) {
-            // 加载数据
-        }
+        return result;
+    }
+    
+    public string GetRandomItemRarity()
+    {
+        float roll = (float)_rand.NextDouble() * 100f;
+        
+        if (roll < 50) return "Common";
+        if (roll < 80) return "Uncommon";
+        if (roll < 95) return "Rare";
+        if (roll < 99) return "Epic";
+        return "Legendary";
     }
 }
