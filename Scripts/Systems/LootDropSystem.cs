@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Loot drop system that manages loot drops, luck bonuses, and pity mechanics.
 /// Supports multiple loot pools, luck bonuses, critical drops, and guaranteed drop thresholds.
 /// </summary>
-public class LootDropSystem
+public partial class LootDropSystem : BaseSystem
 {
     private static LootDropSystem _instance;
     
@@ -70,11 +70,17 @@ public class LootDropSystem
     /// </summary>
     public Action OnCriticalDrop;
 
+    public override void _Ready()
+    {
+        base._Ready();
+    }
+
     /// <summary>
     /// Initializes the loot drop system.
     /// </summary>
-    public void Initialize()
+    protected override void Initialize()
     {
+        _instance = this;
         LoadPlayerData();
         InitializePitySystem();
         GD.Print("[LootDropSystem] Initialized");
@@ -379,5 +385,66 @@ public class LootDropSystem
         int targetCount = threshold == LootDropData.LootRarity.Rare ? 20 : 30;
         
         return Math.Max(0, targetCount - _pityCounters[poolId]);
+    }
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary
+        {
+            { "totalDrops", _playerData.TotalDrops },
+            { "luckyDrops", _playerData.LuckyDrops },
+            { "criticalDrops", _playerData.CriticalDrops },
+            { "totalLuckValue", _playerData.TotalLuckValue }
+        };
+        
+        // Export rarity drops
+        var rarityDrops = new Dictionary();
+        foreach (var kvp in _playerData.RarityDrops)
+        {
+            rarityDrops[kvp.Key] = kvp.Value;
+        }
+        data["rarityDrops"] = rarityDrops;
+        
+        // Export pity counters
+        var pityData = new Dictionary();
+        foreach (var kvp in _pityCounters)
+        {
+            pityData[kvp.Key] = kvp.Value;
+        }
+        data["pityCounters"] = pityData;
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("totalDrops")) _playerData.TotalDrops = Convert.ToInt32(data["totalDrops"]);
+        if (data.Contains("luckyDrops")) _playerData.LuckyDrops = Convert.ToInt32(data["luckyDrops"]);
+        if (data.Contains("criticalDrops")) _playerData.CriticalDrops = Convert.ToInt32(data["criticalDrops"]);
+        if (data.Contains("totalLuckValue")) _playerData.TotalLuckValue = Convert.ToSingle(data["totalLuckValue"]);
+        
+        // Import rarity drops
+        if (data.Contains("rarityDrops") && data["rarityDrops"] is Dictionary rarityData)
+        {
+            _playerData.RarityDrops.Clear();
+            foreach (var key in rarityData.Keys)
+            {
+                _playerData.RarityDrops[key.ToString()] = Convert.ToInt32(rarityData[key]);
+            }
+        }
+        
+        // Import pity counters
+        if (data.Contains("pityCounters") && data["pityCounters"] is Dictionary pityData)
+        {
+            _pityCounters.Clear();
+            foreach (var key in pityData.Keys)
+            {
+                _pityCounters[key.ToString()] = Convert.ToInt32(pityData[key]);
+            }
+        }
+        
+        GD.Print("[LootDropSystem] Data loaded");
     }
 }

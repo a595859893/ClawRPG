@@ -1,3 +1,4 @@
+using Godot;
 using System;
 using System.Collections.Generic;
 
@@ -5,7 +6,7 @@ using System.Collections.Generic;
 /// 团本Boss系统 - 管理团队副本玩法
 /// 包含团队创建、Boss战斗、阶段管理、奖励分配等
 /// </summary>
-public class RaidBossSystem
+public partial class RaidBossSystem : BaseSystem
 {
     private static RaidBossSystem instance;
     public static RaidBossSystem Instance => instance ?? (instance = new RaidBossSystem());
@@ -13,14 +14,15 @@ public class RaidBossSystem
     private RaidBossData data;
     private int nextRaidId = 1;
     
-    public RaidBossSystem()
+    public override void _Ready()
     {
-        data = new RaidBossData();
+        base._Ready();
     }
     
-    public void Initialize()
+    protected override void Initialize()
     {
-        // Load data from save if exists
+        instance = this;
+        data = new RaidBossData();
         GD.Print("[RaidBossSystem] Initialized - Raid Boss System ready");
     }
     
@@ -372,10 +374,9 @@ public class RaidBossSystem
         };
     }
     
-    // Save data
-    public Dictionary<string, object> SaveData()
+    public override Dictionary ExportSaveData()
     {
-        return new Dictionary<string, object>
+        return new Dictionary
         {
             { "totalRaidsJoined", data.TotalRaidsJoined },
             { "totalRaidsCompleted", data.TotalRaidsCompleted },
@@ -388,18 +389,17 @@ public class RaidBossSystem
         };
     }
     
-    // Load data
-    public void LoadData(Dictionary<string, object> saveData)
+    public override void ImportSaveData(Dictionary data)
     {
-        if (saveData == null) return;
+        if (data == null) return;
         
-        if (saveData.ContainsKey("totalRaidsJoined")) data.TotalRaidsJoined = Convert.ToInt32(saveData["totalRaidsJoined"]);
-        if (saveData.ContainsKey("totalRaidsCompleted")) data.TotalRaidsCompleted = Convert.ToInt32(saveData["totalRaidsCompleted"]);
-        if (saveData.ContainsKey("totalRaidsFailed")) data.TotalRaidsFailed = Convert.ToInt32(saveData["totalRaidsFailed"]);
-        if (saveData.ContainsKey("totalBossKills")) data.TotalBossKills = Convert.ToInt32(saveData["totalBossKills"]);
-        if (saveData.ContainsKey("totalDamageDealt")) data.TotalDamageDealt = Convert.ToInt32(saveData["totalDamageDealt"]);
-        if (saveData.ContainsKey("totalHealingDone")) data.TotalHealingDone = Convert.ToInt32(saveData["totalHealingDone"]);
-        if (saveData.ContainsKey("bestClearTime")) data.BestClearTime = Convert.ToInt32(saveData["bestClearTime"]);
+        if (data.Contains("totalRaidsJoined")) this.data.TotalRaidsJoined = Convert.ToInt32(data["totalRaidsJoined"]);
+        if (data.Contains("totalRaidsCompleted")) this.data.TotalRaidsCompleted = Convert.ToInt32(data["totalRaidsCompleted"]);
+        if (data.Contains("totalRaidsFailed")) this.data.TotalRaidsFailed = Convert.ToInt32(data["totalRaidsFailed"]);
+        if (data.Contains("totalBossKills")) this.data.TotalBossKills = Convert.ToInt32(data["totalBossKills"]);
+        if (data.Contains("totalDamageDealt")) this.data.TotalDamageDealt = Convert.ToInt32(data["totalDamageDealt"]);
+        if (data.Contains("totalHealingDone")) this.data.TotalHealingDone = Convert.ToInt32(data["totalHealingDone"]);
+        if (data.Contains("bestClearTime")) this.data.BestClearTime = Convert.ToInt32(data["bestClearTime"]);
         
         GD.Print("[RaidBossSystem] Data loaded");
     }
