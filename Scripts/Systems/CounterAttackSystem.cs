@@ -375,5 +375,33 @@ namespace ClawRPG.Scripts.Systems
             IsCounterAttacking = false; 
             EmitSignal(SignalName.CounterAttack窗口, false);
         }
+        
+        // ===== 持久化 =====
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["has_triggered_first_counter"] = _hasTriggeredFirstCounter;
+            data["current_counter_type"] = (int)CurrentCounterType;
+            data["counter_cooldown_timer"] = CounterCooldownTimer;
+            data["execution_window_timer"] = ExecutionWindowTimer;
+            data["can_counter"] = CanCounter;
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.ContainsKey("has_triggered_first_counter"))
+                _hasTriggeredFirstCounter = Convert.ToBoolean(data["has_triggered_first_counter"]);
+            if (data.ContainsKey("current_counter_type"))
+                CurrentCounterType = (CounterType)Convert.ToInt32(data["current_counter_type"]);
+            if (data.ContainsKey("counter_cooldown_timer"))
+                CounterCooldownTimer = Convert.ToSingle(data["counter_cooldown_timer"]);
+            if (data.ContainsKey("execution_window_timer"))
+                ExecutionWindowTimer = Convert.ToSingle(data["execution_window_timer"]);
+            if (data.ContainsKey("can_counter"))
+                CanCounter = Convert.ToBoolean(data["can_counter"]);
+        }
     }
 }

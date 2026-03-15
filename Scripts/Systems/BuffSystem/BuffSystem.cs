@@ -482,4 +482,69 @@ public class BuffSystem : BaseSystem
 		}
 		return uniqueIds.Count;
 	}
+	
+	// ===== 持久化 =====
+	public override Dictionary ExportSaveData()
+	{
+		var data = new Dictionary();
+		
+		// 保存统计数据
+		data["total_buffs_applied"] = _playerBuffData.TotalBuffsApplied;
+		data["total_debuffs_applied"] = _playerBuffData.TotalDebuffsApplied;
+		data["total_buff_time"] = _playerBuffData.TotalBuffTime;
+		data["buff_stacks"] = _playerBuffData.BuffStacks;
+		data["buff_source_count"] = _playerBuffData.BuffSourceCount;
+		
+		// 保存活跃buff（只保存ID和剩余时间，buff信息从数据库读取）
+		var activeBuffsData = new Array();
+		foreach (var buff in _activeBuffs)
+		{
+			var buffData = new Dictionary();
+			buffData["id"] = buff.Info.Id;
+			buffData["time_remaining"] = buff.TimeRemaining;
+			buffData["stack_count"] = buff.StackCount;
+			buffData["current_value"] = buff.CurrentValue;
+			activeBuffsData.Add(buffData);
+		}
+		data["active_buffs"] = activeBuffsData;
+		
+		return data;
+	}
+	
+	public override void ImportSaveData(Dictionary data)
+	{
+		if (data == null) return;
+		
+		// 恢复统计数据
+		if (data.ContainsKey("total_buffs_applied"))
+			_playerBuffData.TotalBuffsApplied = Convert.ToInt32(data["total_buffs_applied"]);
+		if (data.ContainsKey("total_debuffs_applied"))
+			_playerBuffData.TotalDebuffsApplied = Convert.ToInt32(data["total_debuffs_applied"]);
+		if (data.ContainsKey("total_buff_time"))
+			_playerBuffData.TotalBuffTime = Convert.ToInt32(data["total_buff_time"]);
+		if (data.ContainsKey("buff_stacks"))
+			_playerBuffData.BuffStacks = (Dictionary<string, int>)data["buff_stacks"];
+		if (data.ContainsKey("buff_source_count"))
+			_playerBuffData.BuffSourceCount = (Dictionary<string, int>)data["buff_source_count"];
+		
+		// 恢复活跃buff
+		_activeBuffs.Clear();
+		if (data.ContainsKey("active_buffs"))
+		{
+			var activeBuffsData = (Array)data["active_buffs"];
+			foreach (Dictionary buffData in activeBuffsData)
+			{
+				string buffId = (string)buffData["id"];
+				BuffInfo buffInfo = BuffDatabase.Instance.GetBuff(buffId);
+				if (buffInfo != null)
+				{
+					var newBuff = new ActiveBuff(buffInfo);
+					newBuff.TimeRemaining = Convert.ToSingle(buffData["time_remaining"]);
+					newBuff.StackCount = Convert.ToInt32(buffData["stack_count"]);
+					newBuff.CurrentValue = Convert.ToSingle(buffData["current_value"]);
+					_activeBuffs.Add(newBuff);
+				}
+			}
+		}
+	}
 }
