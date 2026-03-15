@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Mounts {
     /// <summary>
     /// 坐骑进化系统管理器
     /// </summary>
-    public class MountEvolutionSystem : Node {
+    public class MountEvolutionSystem : BaseSystem {
         public static MountEvolutionSystem Instance { get; private set; }
 
         private PlayerMountEvolutionData _playerData = new PlayerMountEvolutionData();
@@ -22,6 +22,28 @@ namespace ClawRPG.Scripts.Mounts {
         public override void _Ready() {
             Instance = this;
             GD.Print("[MountEvolutionSystem] Initialized");
+        }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "MountEvolution";
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return GetSaveData();
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data != null)
+                LoadSaveData(data);
         }
 
         /// <summary>
