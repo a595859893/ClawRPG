@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class DynamicQuestSystem : Node
+public partial class DynamicQuestSystem : BaseSystem
 {
     public static DynamicQuestSystem Instance { get; private set; }
     
@@ -110,7 +110,36 @@ public partial class DynamicQuestSystem : Node
     public override void _Ready()
     {
         Instance = this;
+        base._Ready();
+    }
+    
+    protected override void Initialize()
+    {
         GenerateDailyQuests();
+    }
+    
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary<string, object>
+        {
+            {"availableQuests", _availableQuests},
+            {"activeQuests", _activeQuests},
+            {"completedQuests", _completedQuests},
+            {"failedQuests", _failedQuests},
+            {"questCounter", _questCounter}
+        };
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        base.ImportSaveData(data);
+        if (data == null) return;
+        
+        if (data.ContainsKey("availableQuests")) _availableQuests = (List<Quest>)data["availableQuests"];
+        if (data.ContainsKey("activeQuests")) _activeQuests = (List<Quest>)data["activeQuests"];
+        if (data.ContainsKey("completedQuests")) _completedQuests = (List<Quest>)data["completedQuests"];
+        if (data.ContainsKey("failedQuests")) _failedQuests = (List<Quest>)data["failedQuests"];
+        if (data.ContainsKey("questCounter")) _questCounter = (int)data["questCounter"];
     }
     
     public override void _Process(double delta)
