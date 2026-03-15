@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AlchemyLaboratorySystem : Node
+public class AlchemyLaboratorySystem : BaseSystem
 {
     public static AlchemyLaboratorySystem Instance { get; private set; }
 
@@ -187,6 +187,71 @@ public class AlchemyLaboratorySystem : Node
         }
     }
 
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["is_unlocked"] = IsUnlocked;
+        data["laboratory_level"] = LaboratoryLevel;
+        data["total_researches_completed"] = TotalResearchesCompleted;
+        data["total_formulas_discovered"] = TotalFormulasDiscovered;
+        data["total_gold_invested"] = TotalGoldInvested;
+        
+        var researchList = new List<Dictionary<string, object>>();
+        foreach (var kvp in Researches)
+        {
+            var r = new Dictionary<string, object>();
+            r["id"] = kvp.Value.Id;
+            r["is_completed"] = kvp.Value.IsCompleted;
+            researchList.Add(r);
+        }
+        data["researches"] = researchList;
+        data["discovered_formulas"] = DiscoveredFormulas;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("is_unlocked")) IsUnlocked = Convert.ToBoolean(data["is_unlocked"]);
+        if (data.Contains("laboratory_level")) LaboratoryLevel = Convert.ToInt32(data["laboratory_level"]);
+        if (data.Contains("total_researches_completed")) TotalResearchesCompleted = Convert.ToInt32(data["total_researches_completed"]);
+        if (data.Contains("total_formulas_discovered")) TotalFormulasDiscovered = Convert.ToInt32(data["total_formulas_discovered"]);
+        if (data.Contains("total_gold_invested")) TotalGoldInvested = Convert.ToInt32(data["total_gold_invested"]);
+        
+        if (data.Contains("discovered_formulas"))
+        {
+            DiscoveredFormulas = new List<string>((System.Collections.Generic.IEnumerable<string>)data["discovered_formulas"]);
+        }
+        
+        // Generate researches
+        GenerateNewResearches();
+        
+        // Load completed researches
+        if (data.Contains("researches"))
+        {
+            foreach (Dictionary r in (System.Collections.ArrayList)data["researches"])
+            {
+                string id = Convert.ToString(r["id"]);
+                bool completed = Convert.ToBoolean(r["is_completed"]);
+                if (Researches.ContainsKey(id))
+                {
+                    Researches[id].IsCompleted = completed;
+                    if (completed)
+                        Researches[id].Progress = Researches[id].MaxProgress;
+                }
+            }
+        }
+    }
+    
+    // 兼容性方法（保留旧名称供外部调用）
     public Dictionary<string, object> GetSaveData()
     {
         var data = new Dictionary<string, object>();
@@ -210,38 +275,9 @@ public class AlchemyLaboratorySystem : Node
         return data;
     }
 
+    // 兼容性方法 - 调用 ImportSaveData
     public void LoadFromData(Dictionary<string, object> data)
     {
-        if (data == null) return;
-        
-        IsUnlocked = (bool)data.GetValueOrDefault("is_unlocked", false);
-        LaboratoryLevel = (int)data.GetValueOrDefault("laboratory_level", 1);
-        TotalResearchesCompleted = (int)data.GetValueOrDefault("total_researches_completed", 0);
-        TotalFormulasDiscovered = (int)data.GetValueOrDefault("total_formulas_discovered", 0);
-        TotalGoldInvested = (int)data.GetValueOrDefault("total_gold_invested", 0);
-        
-        if (data.ContainsKey("discovered_formulas"))
-        {
-            DiscoveredFormulas = new List<string>((System.Collections.Generic.IEnumerable<string>)data["discovered_formulas"]);
-        }
-        
-        // Generate researches
-        GenerateNewResearches();
-        
-        // Load completed researches
-        if (data.ContainsKey("researches"))
-        {
-            foreach (Dictionary<string, object> r in (System.Collections.ArrayList)data["researches"])
-            {
-                string id = (string)r["id"];
-                bool completed = (bool)r["is_completed"];
-                if (Researches.ContainsKey(id))
-                {
-                    Researches[id].IsCompleted = completed;
-                    if (completed)
-                        Researches[id].Progress = Researches[id].MaxProgress;
-                }
-            }
-        }
+        ImportSaveData(new Dictionary(data));
     }
 }
