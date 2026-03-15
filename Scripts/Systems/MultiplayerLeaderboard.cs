@@ -328,5 +328,78 @@ namespace ClawRPG.Scripts.Systems
                 }
             }
         }
+        
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            foreach (var kvp in _leaderboards)
+            {
+                var entries = new Array();
+                foreach (var entry in kvp.Value)
+                {
+                    var entryData = new Dictionary
+                    {
+                        { "player_id", entry.PlayerId },
+                        { "player_name", entry.PlayerName },
+                        { "value", entry.Value },
+                        { "last_updated", entry.LastUpdated.ToString("o") }
+                    };
+                    entries.Add(entryData);
+                }
+                data[kvp.Key.ToString()] = entries;
+            }
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            InitializeLeaderboards();
+            
+            foreach (var kvp in data)
+            {
+                if (Enum.TryParse<LeaderboardCategory>(kvp.Key, out var category))
+                {
+                    var entriesList = kvp.Value as Array;
+                    if (entriesList != null)
+                    {
+                        foreach (var entryObj in entriesList)
+                        {
+                            var entryDict = entryObj as Dictionary;
+                            if (entryDict != null)
+                            {
+                                var entry = new LeaderboardEntry
+                                {
+                                    PlayerId = entryDict.Get("player_id", "").ToString(),
+                                    PlayerName = entryDict.Get("player_name", "").ToString(),
+                                    Value = (int)entryDict.Get("value", 0),
+                                    LastUpdated = DateTime.TryParse(
+                                        entryDict.Get("last_updated", "").ToString(), 
+                                        out var dt) ? dt : DateTime.Now
+                                };
+                                _leaderboards[category].Add(entry);
+                            }
+                        }
+                        
+                        // Sort and rank
+                        var entries = _leaderboards[category];
+                        entries.Sort((a, b) => b.Value.CompareTo(a.Value));
+                        for (int i = 0; i < entries.Count; i++)
+                        {
+                            entries[i].Rank = i + 1;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

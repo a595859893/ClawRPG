@@ -642,7 +642,7 @@ namespace ClawRPG.Modules.MultiplayerVote
 
         #region Save/Load
 
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
             var saveData = new Dictionary<string, object>();
             
@@ -716,14 +716,14 @@ namespace ClawRPG.Modules.MultiplayerVote
             return saveData;
         }
 
-        public void ImportSaveData(Dictionary<string, object> saveData)
+        public override void ImportSaveData(Dictionary data)
         {
-            if (saveData == null) return;
+            if (data == null) return;
 
             _data = new MultiplayerVoteData();
 
             // Import parties
-            if (saveData.ContainsKey("parties"))
+            if (data.Contains("parties"))
             {
                 var partiesData = saveData["parties"] as List<object>;
                 if (partiesData != null)
@@ -775,7 +775,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             }
 
             // Import player data
-            if (saveData.ContainsKey("player_data"))
+            if (data.Contains("player_data"))
             {
                 var playerDataList = saveData["player_data"] as List<object>;
                 if (playerDataList != null)
@@ -810,7 +810,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             }
 
             // Import statistics
-            if (saveData.ContainsKey("statistics"))
+            if (data.Contains("statistics"))
             {
                 var statsDataList = saveData["statistics"] as List<object>;
                 if (statsDataList != null)
