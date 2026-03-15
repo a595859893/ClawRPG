@@ -1,9 +1,11 @@
 using Godot;
 using System;
 using System.Threading.Tasks;
+using ClawRPG.Scripts.Managers;
 
 /// <summary>
 /// 场景管理器 - 负责游戏场景的加载、切换和过渡
+/// 使用 EventBusManager 进行事件通信，减少系统耦合
 /// </summary>
 public class SceneManager : ManagerBase
 {
@@ -78,7 +80,15 @@ public class SceneManager : ManagerBase
         if (IsLoading) return;
         
         GD.Print($"[SceneManager] Changing scene to: {scenePath}");
+        
+        // 触发本地事件
         OnSceneChanging?.Invoke(scenePath);
+        
+        // 通过事件总线发布全局事件
+        if (EventBusManager.Instance != null)
+        {
+            EventBusManager.Instance.Emit(EventBusManager.Events.SceneLoading, scenePath);
+        }
         
         TargetScenePath = scenePath;
         IsLoading = true;
@@ -190,7 +200,15 @@ public class SceneManager : ManagerBase
         LoadingProgress = 1f;
         
         GD.Print($"[SceneManager] Scene loaded: {CurrentScenePath}");
+        
+        // 触发本地事件
         OnSceneChanged?.Invoke(CurrentScenePath);
+        
+        // 通过事件总线发布全局事件
+        if (EventBusManager.Instance != null)
+        {
+            EventBusManager.Instance.Emit(EventBusManager.Events.SceneChanged, CurrentScenePath);
+        }
     }
     
     /// <summary>

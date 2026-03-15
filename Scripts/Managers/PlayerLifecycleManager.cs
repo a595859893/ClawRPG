@@ -1,8 +1,10 @@
 using Godot;
 using System;
+using ClawRPG.Scripts.Managers;
 
 /// <summary>
 /// 玩家生命周期管理器 - 负责玩家的生成、死亡、重生和状态管理
+/// 使用 EventBusManager 进行事件通信，减少系统耦合
 /// </summary>
 public class PlayerLifecycleManager : ManagerBase
 {
@@ -134,7 +136,15 @@ public class PlayerLifecycleManager : ManagerBase
         IsRespawning = false;
         
         GD.Print($"[PlayerLifecycleManager] Player spawned at {spawnPos}");
+        
+        // 触发本地事件
         OnPlayerSpawned?.Invoke(player);
+        
+        // 通过事件总线发布全局事件
+        if (EventBusManager.Instance != null)
+        {
+            EventBusManager.Instance.Emit(EventBusManager.Events.PlayerSpawned, player);
+        }
         
         return player;
     }
@@ -150,7 +160,15 @@ public class PlayerLifecycleManager : ManagerBase
         DeathCount++;
         
         GD.Print($"[PlayerLifecycleManager] Player died! Death count: {DeathCount}");
+        
+        // 触发本地事件
         OnPlayerDied?.Invoke(CurrentPlayer);
+        
+        // 通过事件总线发布全局事件
+        if (EventBusManager.Instance != null)
+        {
+            EventBusManager.Instance.Emit(EventBusManager.Events.PlayerDied, CurrentPlayer);
+        }
         
         // 开始重生计时
         StartRespawn();
@@ -180,7 +198,15 @@ public class PlayerLifecycleManager : ManagerBase
         SpawnPlayer(RespawnPoint);
         
         GD.Print("[PlayerLifecycleManager] Player respawned!");
+        
+        // 触发本地事件
         OnPlayerRespawned?.Invoke(CurrentPlayer);
+        
+        // 通过事件总线发布全局事件
+        if (EventBusManager.Instance != null)
+        {
+            EventBusManager.Instance.Emit(EventBusManager.Events.PlayerRespawned, CurrentPlayer);
+        }
     }
     
     /// <summary>
