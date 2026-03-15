@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Godot.Collections;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Database;
 
@@ -372,89 +373,45 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Save player's alchemy data.
-        /// </summary>
-        /// <returns>Dictionary containing alchemy data for persistence.</returns>
-        public Dictionary<string, object> SaveData()
-        {
-            return new Dictionary<string, object>
-            {
-                { "alchemy_level", _playerData.AlchemyLevel },
-                { "current_experience", _playerData.CurrentExperience },
-                { "unlocked_recipe_ids", _playerData.UnlockedRecipeIds },
-                { "total_crafted", _playerData.TotalCrafted },
-                { "recipe_usage_count", _playerData.RecipeUsageCount }
-            };
-        }
-
-        /// <summary>
-        /// Load player's alchemy data.
-        /// </summary>
-        /// <param name="data">Dictionary containing alchemy data.</param>
-        public void LoadData(Dictionary<string, object> data)
-        {
-            if (data == null) return;
-
-            if (data.ContainsKey("alchemy_level"))
-                _playerData.AlchemyLevel = Convert.ToInt32(data["alchemy_level"]);
-            if (data.ContainsKey("current_experience"))
-                _playerData.CurrentExperience = Convert.ToInt32(data["current_experience"]);
-            if (data.ContainsKey("unlocked_recipe_ids"))
-                _playerData.UnlockedRecipeIds = new List<int>((List<object>)data["unlocked_recipe_ids"]).ConvertAll(x => Convert.ToInt32(x));
-            if (data.ContainsKey("total_crafted"))
-                _playerData.TotalCrafted = Convert.ToInt32(data["total_crafted"]);
-            if (data.ContainsKey("recipe_usage_count"))
-            {
-                var dict = (Dictionary<object, object>)data["recipe_usage_count"];
-                _playerData.RecipeUsageCount = new Dictionary<int, int>();
-                foreach (var kvp in dict)
-                {
-                    _playerData.RecipeUsageCount[Convert.ToInt32(kvp.Key)] = Convert.ToInt32(kvp.Value);
-                }
-            }
-
-            GD.Print("[AlchemySystem] Data Loaded - Level: " + _playerData.AlchemyLevel);
-        }
-
-        /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            return new Dictionary<string, object>
-            {
-                { "alchemy_level", _playerData.AlchemyLevel },
-                { "current_experience", _playerData.CurrentExperience },
-                { "unlocked_recipe_ids", _playerData.UnlockedRecipeIds },
-                { "total_crafted", _playerData.TotalCrafted },
-                { "recipe_usage_count", _playerData.RecipeUsageCount }
-            };
+            var data = new Dictionary();
+            data["alchemy_level"] = _playerData.AlchemyLevel;
+            data["current_experience"] = _playerData.CurrentExperience;
+            data["unlocked_recipe_ids"] = _playerData.UnlockedRecipeIds;
+            data["total_crafted"] = _playerData.TotalCrafted;
+            data["recipe_usage_count"] = _playerData.RecipeUsageCount;
+            return data;
         }
 
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
 
-            if (data.ContainsKey("alchemy_level"))
-                _playerData.AlchemyLevel = Convert.ToInt32(data["alchemy_level"]);
-            if (data.ContainsKey("current_experience"))
-                _playerData.CurrentExperience = Convert.ToInt32(data["current_experience"]);
-            if (data.ContainsKey("unlocked_recipe_ids"))
-                _playerData.UnlockedRecipeIds = new List<int>((List<object>)data["unlocked_recipe_ids"]).ConvertAll(x => Convert.ToInt32(x));
-            if (data.ContainsKey("total_crafted"))
-                _playerData.TotalCrafted = Convert.ToInt32(data["total_crafted"]);
-            if (data.ContainsKey("recipe_usage_count"))
+            if (data.Contains("alchemy_level"))
+                _playerData.AlchemyLevel = (int)data["alchemy_level"];
+            if (data.Contains("current_experience"))
+                _playerData.CurrentExperience = (int)data["current_experience"];
+            if (data.Contains("unlocked_recipe_ids"))
+                _playerData.UnlockedRecipeIds = new List<int>((Godot.Collections.Array)data["unlocked_recipe_ids"]).ConvertAll(x => (int)x);
+            if (data.Contains("total_crafted"))
+                _playerData.TotalCrafted = (int)data["total_crafted"];
+            if (data.Contains("recipe_usage_count"))
             {
-                var dict = (Dictionary<object, object>)data["recipe_usage_count"];
+                var dict = (Dictionary)data["recipe_usage_count"];
                 _playerData.RecipeUsageCount = new Dictionary<int, int>();
                 foreach (var kvp in dict)
                 {
-                    _playerData.RecipeUsageCount[Convert.ToInt32(kvp.Key)] = Convert.ToInt32(kvp.Value);
+                    _playerData.RecipeUsageCount[(int)kvp.Key] = (int)kvp.Value;
                 }
             }
+            
+            GD.Print("[AlchemySystem] Data Loaded - Level: " + _playerData.AlchemyLevel);
         }
     }
 }
