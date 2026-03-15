@@ -99,6 +99,10 @@ public class BattleStatisticsSystem : BaseSystem
         base._Ready();
     }
     
+    /// <summary>
+    /// 开始一场战斗
+    /// </summary>
+    /// <param name="battleType">战斗类型</param>
     public void StartBattle(string battleType = "Normal")
     {
         _battleActive = true;
@@ -118,6 +122,10 @@ public class BattleStatisticsSystem : BaseSystem
         _currentPhysicalDamage = 0;
     }
     
+    /// <summary>
+    /// 结束一场战斗
+    /// </summary>
+    /// <param name="victory">是否胜利</param>
     public void EndBattle(bool victory)
     {
         if (!_battleActive) return;
@@ -175,6 +183,12 @@ public class BattleStatisticsSystem : BaseSystem
         SaveData();
     }
     
+    /// <summary>
+    /// 记录造成的伤害
+    /// </param>
+    /// <param name="damage">伤害值</param>
+    /// <param name="element">元素类型</param>
+    /// <param name="isCritical">是否暴击</param>
     public void RecordDamageDealt(int damage, string element = "Physical", bool isCritical = false)
     {
         if (!_battleActive) return;
@@ -210,12 +224,22 @@ public class BattleStatisticsSystem : BaseSystem
         }
     }
     
+    /// <summary>
+    /// 记录受到的伤害
+    /// </summary>
+    /// <param name="damage">伤害值</param>
     public void RecordDamageTaken(int damage)
     {
         if (!_battleActive) return;
         _currentBattleDamageTaken += damage;
     }
     
+    /// <summary>
+    /// 记录击杀敌人
+    /// </summary>
+    /// <param name="enemyType">敌人类型</param>
+    /// <param name="isBoss">是否Boss</param>
+    /// <param name="isElite">是否精英怪</param>
     public void RecordEnemyKilled(string enemyType, bool isBoss = false, bool isElite = false)
     {
         if (!_battleActive) return;
@@ -240,6 +264,10 @@ public class BattleStatisticsSystem : BaseSystem
         _stats.EnemyKillsByType[enemyType]++;
     }
     
+    /// <summary>
+    /// 记录技能使用
+    /// </summary>
+    /// <param name="hit">是否命中</param>
     public void RecordSkillUsed(bool hit)
     {
         if (!_battleActive) return;

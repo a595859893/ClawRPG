@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 竞技场锦标赛数据结构
+/// 包含赛事信息、参赛者状态、比赛结果等
+/// </summary>
 public class ArenaTournamentData
 {
     public enum TournamentState

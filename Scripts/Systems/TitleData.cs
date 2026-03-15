@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Title data definitions - contains title structures, categories and rarity enums
+/// </summary>
 public enum TitleCategory
 {
     Combat,      // 战斗称号
@@ -19,6 +22,9 @@ public enum TitleRarity
     Legendary // 传说
 }
 
+/// <summary>
+/// Title definition - template for a title with name, description, category and requirements
+/// </summary>
 [System.Serializable]
 public class TitleDefinition
 {

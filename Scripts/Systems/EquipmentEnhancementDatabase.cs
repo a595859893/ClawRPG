@@ -2,9 +2,15 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 装备强化数据库 - 管理所有强化配方和加成计算
+/// </summary>
 public class EquipmentEnhancementDatabase
 {
     private static EquipmentEnhancementDatabase _instance;
+    /// <summary>
+    /// 获取数据库单例实例
+    /// </summary>
     public static EquipmentEnhancementDatabase Instance
     {
         get
@@ -14,6 +20,9 @@ public class EquipmentEnhancementDatabase
         }
     }
 
+    /// <summary>
+    /// 所有强化配方列表
+    /// </summary>
     public List<EquipmentEnhancementData.EnhancementRecipe> Recipes = new List<EquipmentEnhancementData.EnhancementRecipe>();
 
     public EquipmentEnhancementDatabase()
@@ -21,6 +30,9 @@ public class EquipmentEnhancementDatabase
         InitializeRecipes();
     }
 
+    /// <summary>
+    /// 初始化所有强化配方
+    /// </summary>
     private void InitializeRecipes()
     {
         // Attack enhancements (10 levels)
@@ -84,6 +96,12 @@ public class EquipmentEnhancementDatabase
         }
     }
 
+    /// <summary>
+    /// 创建强化配方
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>强化配方</returns>
     private EquipmentEnhancementData.EnhancementRecipe CreateRecipe(EquipmentEnhancementData.EnhancementType type, int level)
     {
         var recipe = new EquipmentEnhancementData.EnhancementRecipe
@@ -116,6 +134,11 @@ public class EquipmentEnhancementDatabase
         return recipe;
     }
 
+    /// <summary>
+    /// 获取强化类型对应的材料ID
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <returns>材料ID</returns>
     private int GetMaterialIdForType(EquipmentEnhancementData.EnhancementType type)
     {
         switch (type)
@@ -145,6 +168,12 @@ public class EquipmentEnhancementDatabase
         }
     }
 
+    /// <summary>
+    /// 获取指定类型和等级的强化配方
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>强化配方，不存在则返回null</returns>
     public EquipmentEnhancementData.EnhancementRecipe GetRecipe(EquipmentEnhancementData.EnhancementType type, int level)
     {
         foreach (var recipe in Recipes)
@@ -155,6 +184,12 @@ public class EquipmentEnhancementDatabase
         return null;
     }
 
+    /// <summary>
+    /// 获取强化加成值
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>加成值（百分比）</returns>
     public float GetEnhancementBonus(EquipmentEnhancementData.EnhancementType type, int level)
     {
         float baseBonus = level * 0.05f; // 5% per level
@@ -162,6 +197,11 @@ public class EquipmentEnhancementDatabase
         return baseBonus * multiplier;
     }
 
+    /// <summary>
+    /// 获取强化类型的中文名称
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <returns>类型名称</returns>
     public string GetEnhancementTypeName(EquipmentEnhancementData.EnhancementType type)
     {
         switch (type)
@@ -191,6 +231,11 @@ public class EquipmentEnhancementDatabase
         }
     }
 
+    /// <summary>
+    /// 获取强化类型的描述
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <returns>类型描述</returns>
     public string GetEnhancementTypeDescription(EquipmentEnhancementData.EnhancementType type)
     {
         switch (type)

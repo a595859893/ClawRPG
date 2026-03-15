@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 竞技场锦标赛数据库 - 存储和管理锦标赛配置数据
+/// 包含赛事模板、奖励配置、规则定义等
+/// </summary>
 public class ArenaTournamentDatabase
 {
     private static ArenaTournamentDatabase _instance;

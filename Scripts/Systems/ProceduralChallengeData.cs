@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 随机挑战数据结构
+/// 包含挑战模板、稀有度、活跃挑战等
+/// </summary>
 public class ProceduralChallengeData
 {
     public enum ChallengeType

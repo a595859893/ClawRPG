@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Boss机制数据库 - 存储和管理所有Boss配置数据
+/// 包含Boss属性、技能、阶段转换规则等
+/// </summary>
 public class BossMechanicsDatabase
 {
     private static BossMechanicsDatabase _instance;

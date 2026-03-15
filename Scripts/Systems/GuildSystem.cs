@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 公会系统 - 玩家公会管理
+/// 支持创建、加入、升级、公会活动等功能
+/// </summary>
 public partial class GuildSystem : Node {
     public static GuildSystem Instance { get; private set; }
 

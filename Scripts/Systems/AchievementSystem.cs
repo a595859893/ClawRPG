@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using Godot.Collections;
 
+/// <summary>
+/// Achievement system - manages player achievements, tracks statistics, and handles unlocking
+/// </summary>
 public class AchievementSystem : BaseSystem
 {
     public static AchievementSystem Instance { get; private set; }

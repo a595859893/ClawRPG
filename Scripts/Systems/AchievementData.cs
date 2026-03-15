@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Achievement data definitions - contains achievement structures, categories and rarity enums
+/// </summary>
 public class AchievementData
 {
     public enum AchievementCategory

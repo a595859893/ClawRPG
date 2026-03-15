@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 团本数据库 - 存储和管理团本配置数据
+/// 包含Boss配置、角色需求、掉落表等
+/// </summary>
 public class RaidBossDatabase
 {
     // Raid Boss Configurations

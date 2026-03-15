@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Systems {
+    /// <summary>
+    /// Achievement badge resource - represents a visual badge reward for achievements
+    /// </summary>
     [GlobalClass]
     public partial class AchievementBadge : Resource
     {
@@ -16,6 +19,9 @@ namespace ClawRPG.Systems {
         [Export] public Vector2 Position { get; set; } = Vector2.Zero;
     }
 
+    /// <summary>
+    /// Achievement badge system - manages achievement badge rewards and display
+    /// </summary>
     public partial class AchievementBadgeSystem : BaseSystem
     {
         public static AchievementBadgeSystem Instance { get; private set; }

@@ -48,6 +48,9 @@ public enum TitleRarity
     Legendary    // 传说
 }
 
+/// <summary>
+/// Title system - manages player titles, tracks progress and handles unlocking
+/// </summary>
 public class TitleSystem : Node
 {
     // Singleton

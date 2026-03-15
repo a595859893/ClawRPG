@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 团本数据结构
+/// 包含团队副本数据、参与者信息、战斗状态等
+/// </summary>
 public class RaidBossData
 {
     // Raid Instance Data

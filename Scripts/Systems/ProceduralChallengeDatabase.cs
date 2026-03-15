@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 随机挑战数据库 - 存储和管理程序生成挑战的模板
+/// 包含挑战类型定义、奖励配置等
+/// </summary>
 public class ProceduralChallengeDatabase
 {
     private static ProceduralChallengeData.ChallengeTemplate[] _templates;

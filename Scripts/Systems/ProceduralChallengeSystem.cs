@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 随机挑战系统 - 管理程序生成的挑战内容
+/// 包含挑战生成、进度追踪、奖励发放等
+/// </summary>
 public class ProceduralChallengeSystem : Node
 {
     public static ProceduralChallengeSystem Instance { get; private set; }

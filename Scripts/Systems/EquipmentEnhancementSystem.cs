@@ -151,11 +151,22 @@ public class EquipmentEnhancementSystem
         return result;
     }
 
+    /// <summary>
+    /// 获取指定强化等级的加成值
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>加成百分比</returns>
     public float GetEnhancementBonus(EquipmentEnhancementData.EnhancementType type, int level)
     {
         return EquipmentEnhancementDatabase.Instance.GetEnhancementBonus(type, level);
     }
 
+    /// <summary>
+    /// 获取指定类型的总装备加成
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <returns>总加成值</returns>
     public float GetTotalEquipmentBonus(EquipmentEnhancementData.EnhancementType type)
     {
         float total = 0f;
@@ -170,6 +181,10 @@ public class EquipmentEnhancementSystem
         return total;
     }
 
+    /// <summary>
+    /// 获取玩家攻击加成
+    /// </summary>
+    /// <returns>攻击加成值</returns>
     public float GetPlayerAttackBonus()
     {
         if (PlayerData.EquipmentEnhancementLevels == null) return 0f;
@@ -181,6 +196,10 @@ public class EquipmentEnhancementSystem
         return total;
     }
 
+    /// <summary>
+    /// 获取玩家防御加成
+    /// </summary>
+    /// <returns>防御加成值</returns>
     public float GetPlayerDefenseBonus()
     {
         if (PlayerData.EquipmentEnhancementLevels == null) return 0f;
@@ -192,6 +211,10 @@ public class EquipmentEnhancementSystem
         return total;
     }
 
+    /// <summary>
+    /// 获取玩家生命加成
+    /// </summary>
+    /// <returns>生命加成值</returns>
     public float GetPlayerHealthBonus()
     {
         if (PlayerData.EquipmentEnhancementLevels == null) return 0f;
@@ -203,6 +226,10 @@ public class EquipmentEnhancementSystem
         return total;
     }
 
+    /// <summary>
+    /// 获取所有加成（用于UI显示）
+    /// </summary>
+    /// <returns>加成字典</returns>
     public Dictionary<string, float> GetAllBonuses()
     {
         var bonuses = new Dictionary<string, float>
@@ -214,24 +241,48 @@ public class EquipmentEnhancementSystem
         return bonuses;
     }
 
+    /// <summary>
+    /// 获取强化成功率
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>成功率（百分比）</returns>
     public float GetSuccessRate(EquipmentEnhancementData.EnhancementType type, int level)
     {
         var recipe = EquipmentEnhancementDatabase.Instance.GetRecipe(type, level);
         return recipe != null ? recipe.SuccessRate : 0;
     }
 
+    /// <summary>
+    /// 获取暴击率
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>暴击率（百分比）</returns>
     public float GetCriticalRate(EquipmentEnhancementData.EnhancementType type, int level)
     {
         var recipe = EquipmentEnhancementDatabase.Instance.GetRecipe(type, level);
         return recipe != null ? recipe.CriticalRate : 0;
     }
 
+    /// <summary>
+    /// 获取金币花费
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>金币花费</returns>
     public int GetGoldCost(EquipmentEnhancementData.EnhancementType type, int level)
     {
         var recipe = EquipmentEnhancementDatabase.Instance.GetRecipe(type, level);
         return recipe != null ? recipe.GoldCost : 0;
     }
 
+    /// <summary>
+    /// 获取材料花费
+    /// </summary>
+    /// <param name="type">强化类型</param>
+    /// <param name="level">强化等级</param>
+    /// <returns>材料列表（物品ID，数量）</returns>
     public List<(int materialId, int count)> GetMaterialCost(EquipmentEnhancementData.EnhancementType type, int level)
     {
         var recipe = EquipmentEnhancementDatabase.Instance.GetRecipe(type, level);
@@ -245,11 +296,19 @@ public class EquipmentEnhancementSystem
         return materials;
     }
 
+    /// <summary>
+    /// 获取玩家强化数据
+    /// </summary>
+    /// <returns>玩家强化数据</returns>
     public EquipmentEnhancementData.PlayerEnhancementData GetPlayerData()
     {
         return PlayerData;
     }
 
+    /// <summary>
+    /// 获取强化统计信息
+    /// </summary>
+    /// <returns>统计字典</returns>
     public Dictionary<string, int> GetStatistics()
     {
         return new Dictionary<string, int>
@@ -262,12 +321,20 @@ public class EquipmentEnhancementSystem
         };
     }
 
+    /// <summary>
+    /// 获取总体成功率
+    /// </summary>
+    /// <returns>成功率（百分比）</returns>
     public float GetSuccessRate()
     {
         if (PlayerData.TotalEnhancements == 0) return 0f;
         return (float)PlayerData.SuccessfulEnhancements / PlayerData.TotalEnhancements * 100f;
     }
 
+    /// <summary>
+    /// 保存强化数据
+    /// </summary>
+    /// <param name="node">数据节点</param>
     public void Save(DataNode node)
     {
         var enhancementNode = new DataNode("EquipmentEnhancement");
@@ -291,6 +358,10 @@ public class EquipmentEnhancementSystem
         node.AddChild(enhancementNode);
     }
 
+    /// <summary>
+    /// 加载强化数据
+    /// </summary>
+    /// <param name="node">数据节点</param>
     public void Load(DataNode node)
     {
         var enhancementNode = node.GetNode("EquipmentEnhancement");

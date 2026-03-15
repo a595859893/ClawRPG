@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 团本Boss系统 - 管理团队副本玩法
+/// 包含团队创建、Boss战斗、阶段管理、奖励分配等
+/// </summary>
 public class RaidBossSystem
 {
     private static RaidBossSystem instance;
