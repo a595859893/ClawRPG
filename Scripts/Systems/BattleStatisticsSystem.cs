@@ -57,7 +57,7 @@ public class BattleRecord
     public string BattleType { get; set; } = "";
 }
 
-public class BattleStatisticsSystem : Node
+public class BattleStatisticsSystem : BaseSystem
 {
     private BattleStatsData _stats = new BattleStatsData();
     private bool _battleActive = false;
@@ -79,9 +79,14 @@ public class BattleStatisticsSystem : Node
     // Settings
     private int _maxRecentBattles = 10;
     
-    public override void _Ready()
+    protected override void Initialize()
     {
         LoadData();
+    }
+
+    public override void _Ready()
+    {
+        base._Ready();
     }
     
     public void StartBattle(string battleType = "Normal")
