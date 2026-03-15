@@ -1,8 +1,10 @@
 # Combo Skill UI - 连击技能系统界面
+## 连击技能系统用户界面
 
 extends Control
 class_name ComboSkillUI
 
+## 关联的连击系统
 var combo_system: ComboSkillSystem
 
 var combo_list: GridContainer

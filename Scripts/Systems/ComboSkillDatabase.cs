@@ -1,8 +1,10 @@
 # Combo Skill Database - 连击技能配置数据库
+## 连击技能配置数据管理
 
 extends Node
 class_name ComboSkillDatabase
 
+## 单例实例
 static var instance: ComboSkillDatabase
 
 var _combos: Dictionary = {}

@@ -1,12 +1,22 @@
 # Combo Skill System - 连击技能系统核心
+## 连击技能系统核心逻辑
 
 extends Node
 class_name ComboSkillSystem
 
+## 连击执行信号
 signal combo_executed(combo_id: String)
+
+## 连击完成信号
 signal combo_completed(combo_id: String)
+
+## 连击步骤触发信号
 signal combo_step_triggered(combo_id: String, step: int)
+
+## 连击取消信号
 signal combo_cancelled(combo_id: String)
+
+## 冷却更新信号
 signal cooldown_updated(combo_id: String, remaining: float)
 signal combo_unlocked(combo_id: String)
 

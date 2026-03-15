@@ -1,4 +1,5 @@
 # Combo Skill Data - 连击技能系统数据结构
+## 连击技能数据结构定义
 
 extends Resource
 class_name ComboSkillData
