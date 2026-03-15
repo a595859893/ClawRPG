@@ -4,22 +4,32 @@ using System;
 namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
-    /// 游戏模式管理器
-    /// 提供快速模式切换和相关配置访问
+    /// Game mode manager that provides quick mode switching and configuration access.
+    /// Coordinates with GameModeConfig to manage game mode settings.
     /// </summary>
     public class GameModeManager : Node
     {
         private static GameModeManager _instance;
+        
+        /// <summary>
+        /// Gets the singleton instance of GameModeManager.
+        /// </summary>
         public static GameModeManager Instance => _instance;
 
-        // 游戏配置
+        /// <summary>
+        /// Gets the current game mode configuration.
+        /// </summary>
+        /// <value>GameModeConfig instance for accessing mode settings.</value>
         public GameModeConfig Config { get; private set; }
 
-        // 游戏模式变更信号
+        // Game mode change signals
         public static Signal ModeChanged => new("mode_changed");
         public static Signal QuickModeEnabled => new("quick_mode_enabled");
         public static Signal QuickModeDisabled => new("quick_mode_disabled");
 
+        /// <summary>
+        /// Creates a new GameModeManager instance.
+        /// </summary>
         public GameModeManager()
         {
             _instance = this;
@@ -32,15 +42,16 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 当前是否为快速模式
+        /// Checks if quick mode is currently active.
         /// </summary>
+        /// <returns>True if quick mode is enabled.</returns>
         public bool IsQuickMode()
         {
             return Config.IsQuickMode;
         }
 
         /// <summary>
-        /// 启用快速模式
+        /// Enables quick mode.
         /// </summary>
         public void EnableQuickMode()
         {
@@ -51,7 +62,7 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 禁用快速模式
+        /// Disables quick mode.
         /// </summary>
         public void DisableQuickMode()
         {
@@ -62,7 +73,7 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 切换快速模式
+        /// Toggles quick mode on or off.
         /// </summary>
         public void ToggleQuickMode()
         {
@@ -83,8 +94,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 设置游戏模式
+        /// Sets the game mode to a specific type.
         /// </summary>
+        /// <param name="mode">The game mode to set.</param>
         public void SetGameMode(GameModeType mode)
         {
             Config.SetGameMode(mode);
@@ -93,8 +105,11 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取房间范围（用于快速模式减少房间数）
+        /// Gets the room range adjusted for the current game mode.
         /// </summary>
+        /// <param name="originalMin">Original minimum room count.</param>
+        /// <param name="originalMax">Original maximum room count.</param>
+        /// <returns>Tuple of (min, max) adjusted room counts.</returns>
         public (int min, int max) GetRoomRange(int originalMin, int originalMax)
         {
             float multiplier = Config.GetRoomCountMultiplier();
@@ -104,72 +119,84 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取敌人数量（用于快速模式减少敌人）
+        /// Gets the enemy count adjusted for the current game mode.
         /// </summary>
+        /// <param name="originalCount">Original enemy count.</param>
+        /// <returns>Adjusted enemy count.</returns>
         public int GetEnemyCount(int originalCount)
         {
             return (int)(originalCount * Config.GetEnemyCountMultiplier());
         }
 
         /// <summary>
-        /// 获取敌人强度乘数
+        /// Gets the enemy strength multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for enemy stats.</returns>
         public float GetEnemyStrengthMultiplier()
         {
             return Config.GetEnemyStrengthMultiplier();
         }
 
         /// <summary>
-        /// 获取敌人生成间隔
+        /// Gets the spawn interval adjusted for the current game mode.
         /// </summary>
+        /// <param name="originalInterval">Original spawn interval.</param>
+        /// <returns>Adjusted spawn interval.</returns>
         public float GetSpawnInterval(float originalInterval)
         {
             return originalInterval * Config.GetSpawnIntervalMultiplier();
         }
 
         /// <summary>
-        /// 获取最大敌人数量
+        /// Gets the max enemies count adjusted for the current game mode.
         /// </summary>
+        /// <param name="originalMax">Original max enemy count.</param>
+        /// <returns>Adjusted max enemy count.</returns>
         public int GetMaxEnemies(int originalMax)
         {
             return (int)(originalMax * Config.GetMaxEnemiesMultiplier());
         }
 
         /// <summary>
-        /// 获取宝藏价值乘数
+        /// Gets the treasure value multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for treasure values.</returns>
         public float GetTreasureMultiplier()
         {
             return Config.GetTreasureValueMultiplier();
         }
 
         /// <summary>
-        /// 获取经验值乘数
+        /// Gets the XP multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for experience points.</returns>
         public float GetXPMultiplier()
         {
             return Config.GetXPBonusMultiplier();
         }
 
         /// <summary>
-        /// 获取金币掉落乘数
+        /// Gets the gold drop multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for gold drops.</returns>
         public float GetGoldMultiplier()
         {
             return Config.GetGoldDropMultiplier();
         }
 
         /// <summary>
-        /// 获取当前模式名称
+        /// Gets the name of the current game mode.
         /// </summary>
+        /// <returns>String representation of the current mode.</returns>
         public string GetCurrentModeName()
         {
             return Config.CurrentMode.ToString();
         }
 
         /// <summary>
-        /// 获取目标游戏时长（分钟）
+        /// Gets the target game duration in minutes for the current mode.
         /// </summary>
+        /// <returns>Target duration in minutes.</returns>
         public int GetTargetDurationMinutes()
         {
             return Config.CurrentMode switch

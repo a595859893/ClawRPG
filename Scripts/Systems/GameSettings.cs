@@ -5,40 +5,43 @@ using System.Collections.Generic;
 namespace ClawRPG.Scripts.Systems;
 
 /// <summary>
-/// 游戏设置系统 - 管理游戏的各种配置选项
-/// 应用单例模式：全局唯一访问点
+/// Game settings system that manages all game configuration options.
+/// Implements singleton pattern for global access.
 /// </summary>
 public partial class GameSettings : Node
 {
+    /// <summary>
+    /// Gets the singleton instance of GameSettings.
+    /// </summary>
     public static GameSettings Instance { get; private set; }
 
-    // 音量设置
+    // Audio settings
     [Export] private float _masterVolume = 1.0f;
     [Export] private float _musicVolume = 0.8f;
     [Export] private float _sfxVolume = 1.0f;
     [Export] private float _voiceVolume = 1.0f;
 
-    // 画面设置
+    // Graphics settings
     [Export] private bool _fullscreen = false; 
     [Export] private bool _vsync = true;
-    [Export] private int _qualityLevel = 2; // 0=低, 1=中, 2=高
+    [Export] private int _qualityLevel = 2; // 0=Low, 1=Medium, 2=High
     [Export] private bool _showFps = false; 
     [Export] private bool _showDamageNumbers = true;
 
-    // 游戏设置
-    [Export] private int _difficulty = 1; // 0=简单, 1=普通, 2=困难
+    // Game settings
+    [Export] private int _difficulty = 1; // 0=Easy, 1=Normal, 2=Hard
     [Export] private bool _autoSave = true;
-    [Export] private int _autoSaveInterval = 300; // 秒
+    [Export] private int _autoSaveInterval = 300; // seconds
     [Export] private bool _showTutorials = true;
     [Export] private bool _showDamageNumbersOnUi = true;
     [Export] private float _uiScale = 1.0f;
 
-    // 辅助功能
+    // Accessibility settings
     [Export] private bool _screenShake = true;
     [Export] private bool _hitStop = true;
     [Export] private bool _controllerVibration = true;
 
-    // 按键设置
+    // Key bindings
     [Export] private Dictionary<string, string> _keyBindings = new Dictionary<string, string>()
     {
         { "move_up", "Key.W" },
@@ -64,7 +67,7 @@ public partial class GameSettings : Node
     {
         Instance = this;
         Name = "GameSettings";
-        Priority = 100; // 早期加载
+        Priority = 100; // Early loading
         
         LoadSettings();
     }
@@ -74,26 +77,38 @@ public partial class GameSettings : Node
         Instance = null;
     }
 
-    #region 音量控制
+    #region Audio Control
 
+    /// <summary>
+    /// Master volume control (0.0 to 1.0).
+    /// </summary>
     public float MasterVolume
     {
         get => _masterVolume;
         set { _masterVolume = Mathf.Clamp(value, 0f, 1f); }
     }
 
+    /// <summary>
+    /// Music volume control (0.0 to 1.0).
+    /// </summary>
     public float MusicVolume
     {
         get => _musicVolume;
         set { _musicVolume = Mathf.Clamp(value, 0f, 1f); }
     }
 
+    /// <summary>
+    /// Sound effects volume control (0.0 to 1.0).
+    /// </summary>
     public float SfxVolume
     {
         get => _sfxVolume;
         set { _sfxVolume = Mathf.Clamp(value, 0f, 1f); }
     }
 
+    /// <summary>
+    /// Voice volume control (0.0 to 1.0).
+    /// </summary>
     public float VoiceVolume
     {
         get => _voiceVolume;
@@ -101,8 +116,10 @@ public partial class GameSettings : Node
     }
 
     /// <summary>
-    /// 获取实际音量（考虑主音量）
+    /// Gets the effective volume for a specific audio type considering master volume.
     /// </summary>
+    /// <param name="volumeType">The volume level of the specific audio type.</param>
+    /// <returns>The effective volume after applying master volume.</returns>
     public float GetEffectiveVolume(float volumeType)
     {
         return volumeType * _masterVolume;
@@ -110,8 +127,11 @@ public partial class GameSettings : Node
 
     #endregion
 
-    #region 画面设置
+    #region Graphics Settings
 
+    /// <summary>
+    /// Fullscreen mode toggle.
+    /// </summary>
     public bool Fullscreen
     {
         get => _fullscreen;
@@ -122,6 +142,9 @@ public partial class GameSettings : Node
         }
     }
 
+    /// <summary>
+    /// Vertical sync toggle.
+    /// </summary>
     public bool Vsync
     {
         get => _vsync;
@@ -132,18 +155,27 @@ public partial class GameSettings : Node
         }
     }
 
+    /// <summary>
+    /// Graphics quality level (0=Low, 1=Medium, 2=High).
+    /// </summary>
     public int QualityLevel
     {
         get => _qualityLevel;
         set => _qualityLevel = Mathf.Clamp(value, 0, 2);
     }
 
+    /// <summary>
+    /// Show FPS counter toggle.
+    /// </summary>
     public bool ShowFps
     {
         get => _showFps;
         set => _showFps = value;
     }
 
+    /// <summary>
+    /// Show damage numbers toggle.
+    /// </summary>
     public bool ShowDamageNumbers
     {
         get => _showDamageNumbers;
@@ -159,14 +191,21 @@ public partial class GameSettings : Node
 
     #endregion
 
-    #region 游戏设置
+    #region Game Settings
 
+    /// <summary>
+    /// Game difficulty level (0=Easy, 1=Normal, 2=Hard).
+    /// </summary>
     public int Difficulty
     {
         get => _difficulty;
         set => _difficulty = Mathf.Clamp(value, 0, 2);
     }
 
+    /// <summary>
+    /// Gets the difficulty name as a localized string.
+    /// </summary>
+    /// <value>Easy, Normal, or Hard based on difficulty setting.</value>
     public string DifficultyName => _difficulty switch
     {
         0 => "简单",
@@ -175,6 +214,10 @@ public partial class GameSettings : Node
         _ => "普通"
     };
 
+    /// <summary>
+    /// Gets the damage multiplier based on difficulty.
+    /// </summary>
+    /// <value>Multiplier applied to damage calculations.</value>
     public float DifficultyMultiplier => _difficulty switch
     {
         0 => 0.8f,
@@ -183,24 +226,36 @@ public partial class GameSettings : Node
         _ => 1.0f
     };
 
+    /// <summary>
+    /// Auto-save toggle.
+    /// </summary>
     public bool AutoSave
     {
         get => _autoSave;
         set => _autoSave = value;
     }
 
+    /// <summary>
+    /// Auto-save interval in seconds.
+    /// </summary>
     public int AutoSaveInterval
     {
         get => _autoSaveInterval;
         set => _autoSaveInterval = Mathf.Max(value, 60);
     }
 
+    /// <summary>
+    /// Show tutorials toggle.
+    /// </summary>
     public bool ShowTutorials
     {
         get => _showTutorials;
         set => _showTutorials = value;
     }
 
+    /// <summary>
+    /// UI scale factor (0.5 to 2.0).
+    /// </summary>
     public float UiScale
     {
         get => _uiScale;
@@ -209,20 +264,29 @@ public partial class GameSettings : Node
 
     #endregion
 
-    #region 辅助功能
+    #region Accessibility
 
+    /// <summary>
+    /// Screen shake effect toggle.
+    /// </summary>
     public bool ScreenShake
     {
         get => _screenShake;
         set => _screenShake = value;
     }
 
+    /// <summary>
+    /// Hit stop effect toggle.
+    /// </summary>
     public bool HitStop
     {
         get => _hitStop;
         set => _hitStop = value;
     }
 
+    /// <summary>
+    /// Controller vibration toggle.
+    /// </summary>
     public bool ControllerVibration
     {
         get => _controllerVibration;
@@ -231,19 +295,32 @@ public partial class GameSettings : Node
 
     #endregion
 
-    #region 按键设置
+    #region Key Bindings
 
+    /// <summary>
+    /// Dictionary of key bindings (action -> key code).
+    /// </summary>
     public Dictionary<string, string> KeyBindings
     {
         get => _keyBindings;
         set => _keyBindings = value;
     }
 
+    /// <summary>
+    /// Gets the key binding for a specific action.
+    /// </summary>
+    /// <param name="action">The action to look up.</param>
+    /// <returns>The key code bound to the action, or empty string if not found.</returns>
     public string GetKeyBinding(string action)
     {
         return _keyBindings.ContainsKey(action) ? _keyBindings[action] : "";
     }
 
+    /// <summary>
+    /// Sets a key binding for a specific action.
+    /// </summary>
+    /// <param name="action">The action to bind.</param>
+    /// <param name="key">The key code to bind.</param>
     public void SetKeyBinding(string action, string key)
     {
         _keyBindings[action] = key;
@@ -251,10 +328,10 @@ public partial class GameSettings : Node
 
     #endregion
 
-    #region 存档
+    #region Save/Load
 
     /// <summary>
-    /// 保存游戏设置到配置文件
+    /// Saves game settings to the configuration file.
     /// </summary>
     public void SaveSettings()
     {
@@ -296,7 +373,7 @@ public partial class GameSettings : Node
     }
 
     /// <summary>
-    /// 从配置文件加载游戏设置
+    /// Loads game settings from the configuration file.
     /// </summary>
     public void LoadSettings()
     {
@@ -347,7 +424,7 @@ public partial class GameSettings : Node
     }
 
     /// <summary>
-    /// 重置所有设置到默认值
+    /// Resets all settings to their default values.
     /// </summary>
     public void ResetToDefaults()
     {
@@ -400,11 +477,13 @@ public partial class GameSettings : Node
 
     #endregion
 
-    #region 难度相关
+    #region Difficulty Related
 
     /// <summary>
-    /// 获取难度对伤害的加成
+    /// Gets the damage multiplier based on difficulty setting.
     /// </summary>
+    /// <param name="isPlayerDamage">True for player damage, false for enemy damage.</param>
+    /// <returns>Damage multiplier based on difficulty.</returns>
     public float GetDamageMultiplier(bool isPlayerDamage)
     {
         if (isPlayerDamage)
@@ -432,8 +511,9 @@ public partial class GameSettings : Node
     }
 
     /// <summary>
-    /// 获取难度对经验的加成
+    /// Gets the experience multiplier based on difficulty.
     /// </summary>
+    /// <returns>Experience multiplier (higher for easier difficulties).</returns>
     public float GetExpMultiplier()
     {
         return _difficulty switch
@@ -446,8 +526,9 @@ public partial class GameSettings : Node
     }
 
     /// <summary>
-    /// 获取难度对掉落的加成
+    /// Gets the drop rate multiplier based on difficulty.
     /// </summary>
+    /// <returns>Drop rate multiplier (higher for easier difficulties).</returns>
     public float GetDropMultiplier()
     {
         return _difficulty switch

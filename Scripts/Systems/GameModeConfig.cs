@@ -3,46 +3,67 @@ using System;
 namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
-    /// 游戏模式类型
+    /// Defines the available game mode types.
     /// </summary>
     public enum GameModeType
     {
-        Normal,     // 普通模式
-        Quick,      // 快速模式
-        Challenge,  // 挑战模式
-        BossRush    // Boss rush模式
+        /// <summary>Standard gameplay mode.</summary>
+        Normal,
+        
+        /// <summary>Quick mode with reduced duration and content.</summary>
+        Quick,
+        
+        /// <summary>Challenge mode with increased difficulty and rewards.</summary>
+        Challenge,
+        
+        /// <summary>Boss rush mode focusing on boss battles.</summary>
+        BossRush
     }
 
     /// <summary>
-    /// 游戏模式配置
+    /// Game mode configuration that manages settings for different game modes.
     /// </summary>
     [Serializable]
     public class GameModeConfig
     {
-        // 单例实例
+        // Singleton instance
         private static GameModeConfig _instance;
+        
+        /// <summary>
+        /// Gets the singleton instance of GameModeConfig.
+        /// </summary>
         public static GameModeConfig Instance => _instance ??= new GameModeConfig();
 
-        // 当前游戏模式
+        /// <summary>
+        /// Gets or sets the current game mode.
+        /// </summary>
         public GameModeType CurrentMode { get; set; } = GameModeType.Normal;
 
-        // 快速模式配置
+        /// <summary>
+        /// Quick mode configuration settings.
+        /// </summary>
         public QuickModeConfig QuickMode { get; set; } = new QuickModeConfig();
 
-        // 普通模式配置
+        /// <summary>
+        /// Normal mode configuration settings.
+        /// </summary>
         public NormalModeConfig NormalMode { get; set; } = new NormalModeConfig();
 
-        // 挑战模式配置
+        /// <summary>
+        /// Challenge mode configuration settings.
+        /// </summary>
         public ChallengeModeConfig ChallengeMode { get; set; } = new ChallengeModeConfig();
 
         /// <summary>
-        /// 快速模式是否启用
+        /// Gets whether quick mode is currently active.
         /// </summary>
+        /// <value>True if current mode is Quick.</value>
         public bool IsQuickMode => CurrentMode == GameModeType.Quick;
 
         /// <summary>
-        /// 获取当前模式的地下城房间数量乘数
+        /// Gets the room count multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for dungeon room count.</returns>
         public float GetRoomCountMultiplier()
         {
             return CurrentMode switch
@@ -55,8 +76,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取当前模式的楼层数乘数
+        /// Gets the floor count multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for dungeon floor count.</returns>
         public float GetFloorCountMultiplier()
         {
             return CurrentMode switch
@@ -69,8 +91,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取当前模式的敌人数量乘数
+        /// Gets the enemy count multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for enemy spawn count.</returns>
         public float GetEnemyCountMultiplier()
         {
             return CurrentMode switch
@@ -83,8 +106,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取当前模式的敌人强度乘数
+        /// Gets the enemy strength multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for enemy stats.</returns>
         public float GetEnemyStrengthMultiplier()
         {
             return CurrentMode switch
@@ -97,8 +121,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取当前模式的敌人刷新间隔乘数
+        /// Gets the spawn interval multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for enemy spawn timing.</returns>
         public float GetSpawnIntervalMultiplier()
         {
             return CurrentMode switch
@@ -110,8 +135,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取当前模式的最大敌人数量乘数
+        /// Gets the max enemies multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for maximum enemy count.</returns>
         public float GetMaxEnemiesMultiplier()
         {
             return CurrentMode switch
@@ -124,8 +150,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取当前模式的宝藏价值乘数
+        /// Gets the treasure value multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for treasure values.</returns>
         public float GetTreasureValueMultiplier()
         {
             return CurrentMode switch
@@ -138,8 +165,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取当前模式的经验值乘数
+        /// Gets the XP bonus multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for experience points.</returns>
         public float GetXPBonusMultiplier()
         {
             return CurrentMode switch
@@ -152,8 +180,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 获取当前模式的金币掉落乘数
+        /// Gets the gold drop multiplier for the current mode.
         /// </summary>
+        /// <returns>Multiplier for gold drops.</returns>
         public float GetGoldDropMultiplier()
         {
             return CurrentMode switch
@@ -166,8 +195,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 设置游戏模式
+        /// Sets the current game mode.
         /// </summary>
+        /// <param name="mode">The game mode to set.</param>
         public void SetGameMode(GameModeType mode)
         {
             CurrentMode = mode;
@@ -175,7 +205,7 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 启用快速模式
+        /// Enables quick mode.
         /// </summary>
         public void EnableQuickMode()
         {
@@ -183,7 +213,7 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 禁用快速模式（切换回普通模式）
+        /// Disables quick mode and returns to normal mode.
         /// </summary>
         public void DisableQuickMode()
         {
@@ -191,7 +221,7 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 切换快速模式
+        /// Toggles quick mode on or off.
         /// </summary>
         public void ToggleQuickMode()
         {
@@ -203,131 +233,131 @@ namespace ClawRPG.Scripts.Systems
     }
 
     /// <summary>
-    /// 快速模式配置
+    /// Configuration settings for Quick mode.
     /// </summary>
     [Serializable]
     public class QuickModeConfig
     {
-        // 是否启用快速模式
+        /// <summary>Whether quick mode is enabled.</summary>
         public bool Enabled { get; set; } = false;
 
-        // 目标单局时长（分钟）
+        /// <summary>Target duration for a quick mode session in minutes.</summary>
         public int TargetDurationMinutes { get; set; } = 15;
 
-        // 房间数量乘数（减少房间）
+        /// <summary>Multiplier for room count (reduces rooms).</summary>
         public float RoomCountMultiplier { get; set; } = 0.6f;
 
-        // 楼层数量乘数（减少楼层）
+        /// <summary>Multiplier for floor count (reduces floors).</summary>
         public float FloorCountMultiplier { get; set; } = 0.6f;
 
-        // 敌人数量乘数（减少敌人）
+        /// <summary>Multiplier for enemy count (reduces enemies).</summary>
         public float EnemyCountMultiplier { get; set; } = 0.5f;
 
-        // 敌人强度乘数（削弱敌人）
+        /// <summary>Multiplier for enemy strength (weakens enemies).</summary>
         public float EnemyStrengthMultiplier { get; set; } = 0.7f;
 
-        // 敌人生成间隔乘数（加快生成）
+        /// <summary>Multiplier for spawn interval (faster spawns).</summary>
         public float SpawnIntervalMultiplier { get; set; } = 0.8f;
 
-        // 最大敌人数量乘数
+        /// <summary>Multiplier for max enemies.</summary>
         public float MaxEnemiesMultiplier { get; set; } = 0.6f;
 
-        // 宝藏价值乘数
+        /// <summary>Multiplier for treasure value.</summary>
         public float TreasureValueMultiplier { get; set; } = 1.2f;
 
-        // 经验值加成乘数
+        /// <summary>Bonus multiplier for XP.</summary>
         public float XPBonusMultiplier { get; set; } = 1.3f;
 
-        // 金币掉落加成乘数
+        /// <summary>Bonus multiplier for gold drops.</summary>
         public float GoldDropMultiplier { get; set; } = 1.3f;
 
-        // 是否跳过普通敌人战斗（直接遭遇精英/Boss）
+        /// <summary>Whether to skip normal enemy encounters.</summary>
         public bool SkipNormalEncounters { get; set; } = false;
 
-        // 是否减少陷阱和谜题房间
+        /// <summary>Whether to reduce special rooms.</summary>
         public bool ReduceSpecialRooms { get; set; } = true;
     }
 
     /// <summary>
-    /// 普通模式配置
+    /// Configuration settings for Normal mode.
     /// </summary>
     [Serializable]
     public class NormalModeConfig
     {
-        // 目标单局时长（分钟）
+        /// <summary>Target duration for a normal mode session in minutes.</summary>
         public int TargetDurationMinutes { get; set; } = 45;
 
-        // 房间数量乘数
+        /// <summary>Multiplier for room count.</summary>
         public float RoomCountMultiplier { get; set; } = 1.0f;
 
-        // 楼层数量乘数
+        /// <summary>Multiplier for floor count.</summary>
         public float FloorCountMultiplier { get; set; } = 1.0f;
 
-        // 敌人数量乘数
+        /// <summary>Multiplier for enemy count.</summary>
         public float EnemyCountMultiplier { get; set; } = 1.0f;
 
-        // 敌人强度乘数
+        /// <summary>Multiplier for enemy strength.</summary>
         public float EnemyStrengthMultiplier { get; set; } = 1.0f;
 
-        // 敌人生成间隔乘数
+        /// <summary>Multiplier for spawn interval.</summary>
         public float SpawnIntervalMultiplier { get; set; } = 1.0f;
 
-        // 最大敌人数量乘数
+        /// <summary>Multiplier for max enemies.</summary>
         public float MaxEnemiesMultiplier { get; set; } = 1.0f;
 
-        // 宝藏价值乘数
+        /// <summary>Multiplier for treasure value.</summary>
         public float TreasureValueMultiplier { get; set; } = 1.0f;
 
-        // 经验值乘数
+        /// <summary>Multiplier for XP.</summary>
         public float XPBonusMultiplier { get; set; } = 1.0f;
 
-        // 金币掉落乘数
+        /// <summary>Multiplier for gold drops.</summary>
         public float GoldDropMultiplier { get; set; } = 1.0f;
     }
 
     /// <summary>
-    /// 挑战模式配置
+    /// Configuration settings for Challenge mode.
     /// </summary>
     [Serializable]
     public class ChallengeModeConfig
     {
-        // 是否启用挑战模式
+        /// <summary>Whether challenge mode is enabled.</summary>
         public bool Enabled { get; set; } = false;
 
-        // 目标单局时长（分钟）
+        /// <summary>Target duration for a challenge mode session in minutes.</summary>
         public int TargetDurationMinutes { get; set; } = 30;
 
-        // 房间数量乘数
+        /// <summary>Multiplier for room count.</summary>
         public float RoomCountMultiplier { get; set; } = 1.2f;
 
-        // 楼层数量乘数
+        /// <summary>Multiplier for floor count.</summary>
         public float FloorCountMultiplier { get; set; } = 1.0f;
 
-        // 敌人数量乘数
+        /// <summary>Multiplier for enemy count.</summary>
         public float EnemyCountMultiplier { get; set; } = 1.5f;
 
-        // 敌人强度乘数
+        /// <summary>Multiplier for enemy strength.</summary>
         public float EnemyStrengthMultiplier { get; set; } = 1.5f;
 
-        // 敌人生成间隔乘数
+        /// <summary>Multiplier for spawn interval.</summary>
         public float SpawnIntervalMultiplier { get; set; } = 0.7f;
 
-        // 最大敌人数量乘数
+        /// <summary>Multiplier for max enemies.</summary>
         public float MaxEnemiesMultiplier { get; set; } = 1.5f;
 
-        // 宝藏价值乘数
+        /// <summary>Multiplier for treasure value.</summary>
         public float TreasureValueMultiplier { get; set; } = 1.5f;
 
-        // 经验值加成乘数
+        /// <summary>Bonus multiplier for XP.</summary>
         public float XPBonusMultiplier { get; set; } = 2.0f;
 
-        // 金币掉落加成乘数
+        /// <summary>Bonus multiplier for gold drops.</summary>
         public float GoldDropMultiplier { get; set; } = 2.0f;
 
-        // 是否禁止使用技能
+        /// <summary>Whether skills are disabled in challenge mode.</summary>
         public bool DisableSkills { get; set; } = false;
 
-        // 是否禁止使用药水
+        /// <summary>Whether potions are disabled in challenge mode.</summary>
         public bool DisablePotions { get; set; } = false;
     }
 }
