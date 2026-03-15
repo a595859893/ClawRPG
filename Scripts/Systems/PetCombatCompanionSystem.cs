@@ -466,5 +466,65 @@ namespace ClawRPG.Scripts.Systems
         {
             return Time.GetTicksMsec() / 1000.0;
         }
+        
+        // ===== 持久化 =====
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            data["active_pet_id"] = _companionData.ActivePetId ?? "";
+            data["current_role"] = _companionData.CurrentRole ?? "";
+            data["sync_level"] = _companionData.SyncLevel;
+            data["combo_count"] = _companionData.ComboCount;
+            data["max_combo_count"] = _companionData.MaxComboCount;
+            data["total_combos_executed"] = _companionData.TotalCombosExecuted;
+            data["total_attacks_assisted"] = _companionData.TotalAttacksAssisted;
+            data["total_damage_dealt"] = _companionData.TotalDamageDealt;
+            data["total_enemies_defeated"] = _companionData.TotalEnemiesDefeated;
+            
+            // 保存学习技能
+            var learnedSkillsData = new Array();
+            foreach (var skill in _companionData.LearnedSkills)
+            {
+                learnedSkillsData.Add(skill);
+            }
+            data["learned_skills"] = learnedSkillsData;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.ContainsKey("active_pet_id"))
+                _companionData.ActivePetId = data["active_pet_id"].ToString();
+            if (data.ContainsKey("current_role"))
+                _companionData.CurrentRole = data["current_role"].ToString();
+            if (data.ContainsKey("sync_level"))
+                _companionData.SyncLevel = Convert.ToSingle(data["sync_level"]);
+            if (data.ContainsKey("combo_count"))
+                _companionData.ComboCount = Convert.ToInt32(data["combo_count"]);
+            if (data.ContainsKey("max_combo_count"))
+                _companionData.MaxComboCount = Convert.ToInt32(data["max_combo_count"]);
+            if (data.ContainsKey("total_combos_executed"))
+                _companionData.TotalCombosExecuted = Convert.ToInt32(data["total_combos_executed"]);
+            if (data.ContainsKey("total_attacks_assisted"))
+                _companionData.TotalAttacksAssisted = Convert.ToInt32(data["total_attacks_assisted"]);
+            if (data.ContainsKey("total_damage_dealt"))
+                _companionData.TotalDamageDealt = Convert.ToInt32(data["total_damage_dealt"]);
+            if (data.ContainsKey("total_enemies_defeated"))
+                _companionData.TotalEnemiesDefeated = Convert.ToInt32(data["total_enemies_defeated"]);
+            
+            if (data.ContainsKey("learned_skills"))
+            {
+                _companionData.LearnedSkills.Clear();
+                var skills = (Array)data["learned_skills"];
+                foreach (string skill in skills)
+                {
+                    _companionData.LearnedSkills.Add(skill);
+                }
+            }
+        }
     }
 }

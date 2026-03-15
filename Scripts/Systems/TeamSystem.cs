@@ -391,4 +391,101 @@ public class TeamSystem : BaseSystem
         }
         return total;
     }
+    
+    // ===== 持久化 =====
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 保存队伍状态
+        data["is_in_team"] = _isInTeam;
+        data["local_player_id"] = _localPlayerId;
+        
+        // 保存队伍信息
+        if (_currentTeam != null)
+        {
+            data["team_id"] = _currentTeam.TeamId;
+            data["team_name"] = _currentTeam.TeamName;
+            data["team_is_public"] = _currentTeam.IsPublic;
+            data["share_range"] = _currentTeam.ShareRange;
+            data["share_loot"] = _currentTeam.ShareLoot;
+            data["share_exp"] = _currentTeam.ShareExp;
+            
+            // 保存成员信息
+            var membersData = new Array();
+            foreach (var member in _currentTeam.Members)
+            {
+                var memberData = new Dictionary();
+                memberData["player_id"] = member.PlayerId;
+                memberData["player_name"] = member.PlayerName;
+                memberData["is_ready"] = member.IsReady;
+                memberData["is_host"] = member.IsHost;
+                memberData["position_x"] = member.Position.x;
+                memberData["position_y"] = member.Position.y;
+                memberData["health"] = member.Health;
+                memberData["max_health"] = member.MaxHealth;
+                memberData["damage_dealt"] = member.DamageDealt;
+                memberData["healing_done"] = member.HealingDone;
+                memberData["enemies_killed"] = member.EnemiesKilled;
+                membersData.Add(memberData);
+            }
+            data["members"] = membersData;
+        }
+        
+        return data;
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 恢复队伍状态
+        if (data.ContainsKey("is_in_team"))
+            _isInTeam = Convert.ToBoolean(data["is_in_team"]);
+        if (data.ContainsKey("local_player_id"))
+            _localPlayerId = Convert.ToInt32(data["local_player_id"]);
+        
+        // 恢复队伍信息
+        if (data.ContainsKey("team_id") && data.ContainsKey("team_name"))
+        {
+            _currentTeam = new TeamInfo(
+                data["team_id"].ToString(),
+                data["team_name"].ToString()
+            );
+            
+            if (data.ContainsKey("team_is_public"))
+                _currentTeam.IsPublic = Convert.ToBoolean(data["team_is_public"]);
+            if (data.ContainsKey("share_range"))
+                _currentTeam.ShareRange = Convert.ToSingle(data["share_range"]);
+            if (data.ContainsKey("share_loot"))
+                _currentTeam.ShareLoot = Convert.ToBoolean(data["share_loot"]);
+            if (data.ContainsKey("share_exp"))
+                _currentTeam.ShareExp = Convert.ToBoolean(data["share_exp"]);
+            
+            // 恢复成员信息
+            if (data.ContainsKey("members"))
+            {
+                var membersData = (Array)data["members"];
+                foreach (Dictionary memberData in membersData)
+                {
+                    var member = new TeamMember(
+                        Convert.ToInt32(memberData["player_id"]),
+                        memberData["player_name"].ToString(),
+                        Convert.ToBoolean(memberData["is_host"])
+                    );
+                    member.IsReady = Convert.ToBoolean(memberData["is_ready"]);
+                    member.Position = new Vector2(
+                        Convert.ToSingle(memberData["position_x"]),
+                        Convert.ToSingle(memberData["position_y"])
+                    );
+                    member.Health = Convert.ToInt32(memberData["health"]);
+                    member.MaxHealth = Convert.ToInt32(memberData["max_health"]);
+                    member.DamageDealt = Convert.ToSingle(memberData["damage_dealt"]);
+                    member.HealingDone = Convert.ToSingle(memberData["healing_done"]);
+                    member.EnemiesKilled = Convert.ToInt32(memberData["enemies_killed"]);
+                    _currentTeam.Members.Add(member);
+                }
+            }
+        }
+    }
 }

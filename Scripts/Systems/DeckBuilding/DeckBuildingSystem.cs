@@ -269,6 +269,52 @@ namespace ClawRPG.Systems
         /// </summary>
         public DeckBuildingDatabase GetDatabase() => _database;
         
+        // ===== 持久化 =====
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 保存当前套牌
+            data["current_deck"] = new Array(_data.CurrentDeck);
+            
+            // 保存统计数据
+            data["total_cards_played"] = _data.TotalCardsPlayed;
+            data["total_cards_drawn"] = _data.TotalCardsDrawn;
+            data["total_damage_dealt"] = _data.TotalDamageDealt;
+            data["deck_wins"] = _data.DeckWins;
+            data["deck_losses"] = _data.DeckLosses;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 恢复套牌
+            if (data.ContainsKey("current_deck"))
+            {
+                _data.CurrentDeck.Clear();
+                var deck = (Array)data["current_deck"];
+                foreach (string cardId in deck)
+                {
+                    _data.CurrentDeck.Add(cardId);
+                }
+            }
+            
+            // 恢复统计数据
+            if (data.ContainsKey("total_cards_played"))
+                _data.TotalCardsPlayed = Convert.ToInt32(data["total_cards_played"]);
+            if (data.ContainsKey("total_cards_drawn"))
+                _data.TotalCardsDrawn = Convert.ToInt32(data["total_cards_drawn"]);
+            if (data.ContainsKey("total_damage_dealt"))
+                _data.TotalDamageDealt = Convert.ToInt32(data["total_damage_dealt"]);
+            if (data.ContainsKey("deck_wins"))
+                _data.DeckWins = Convert.ToInt32(data["deck_wins"]);
+            if (data.ContainsKey("deck_losses"))
+                _data.DeckLosses = Convert.ToInt32(data["deck_losses"]);
+        }
+        
         /// <summary>
         /// 获取统计数据
         /// </summary>

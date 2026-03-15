@@ -399,6 +399,52 @@ public class EquipmentSetSystem : BaseSystem
             EquippedPieces = new Dictionary<string, int>((Dictionary<string, object>)data["equipped_pieces"]);
         }
     }
+    
+    // ===== 持久化 =====
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 保存已解锁套装
+        data["unlocked_sets"] = new Array(UnlockedSets);
+        
+        // 保存已装备部件
+        var equippedData = new Dictionary();
+        foreach (var kvp in EquippedPieces)
+        {
+            equippedData[kvp.Key] = kvp.Value;
+        }
+        data["equipped_pieces"] = equippedData;
+        
+        return data;
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 恢复已解锁套装
+        if (data.ContainsKey("unlocked_sets"))
+        {
+            UnlockedSets.Clear();
+            var unlockedList = (Array)data["unlocked_sets"];
+            foreach (string setId in unlockedList)
+            {
+                UnlockedSets.Add(setId);
+            }
+        }
+        
+        // 恢复已装备部件
+        if (data.ContainsKey("equipped_pieces"))
+        {
+            EquippedPieces.Clear();
+            var equippedData = (Dictionary)data["equipped_pieces"];
+            foreach (var kvp in equippedData)
+            {
+                EquippedPieces[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+            }
+        }
+    }
 }
 
 // Equipment Set data class

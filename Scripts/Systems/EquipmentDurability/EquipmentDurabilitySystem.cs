@@ -349,4 +349,59 @@ public class EquipmentDurabilitySystem : BaseSystem
     
     [Signal]
     public delegate void EquipmentRepairedEventHandler(string itemId, int cost);
+    
+    // ===== 持久化 =====
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 保存装备耐久度
+        var durabilityList = new Array();
+        foreach (var kvp in _playerData.EquippedDurability)
+        {
+            var itemData = new Dictionary();
+            itemData["item_id"] = kvp.Key;
+            itemData["current"] = kvp.Value.CurrentDurability;
+            itemData["max"] = kvp.Value.MaxDurability;
+            durabilityList.Add(itemData);
+        }
+        data["equipped_durability"] = durabilityList;
+        
+        // 保存统计数据
+        data["total_repairs"] = _playerData.TotalRepairs;
+        data["total_repair_cost"] = _playerData.TotalRepairCost;
+        data["times_used_repair_kit"] = _playerData.TimesUsedRepairKit;
+        
+        return data;
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 恢复装备耐久度
+        _playerData.EquippedDurability.Clear();
+        if (data.ContainsKey("equipped_durability"))
+        {
+            var durabilityList = (Array)data["equipped_durability"];
+            foreach (Dictionary itemData in durabilityList)
+            {
+                var durability = new EquipmentDurabilityData.EquipmentDurability
+                {
+                    ItemId = (string)itemData["item_id"],
+                    CurrentDurability = Convert.ToInt32(itemData["current"]),
+                    MaxDurability = Convert.ToInt32(itemData["max"])
+                };
+                _playerData.EquippedDurability[durability.ItemId] = durability;
+            }
+        }
+        
+        // 恢复统计数据
+        if (data.ContainsKey("total_repairs"))
+            _playerData.TotalRepairs = Convert.ToInt32(data["total_repairs"]);
+        if (data.ContainsKey("total_repair_cost"))
+            _playerData.TotalRepairCost = Convert.ToInt32(data["total_repair_cost"]);
+        if (data.ContainsKey("times_used_repair_kit"))
+            _playerData.TimesUsedRepairKit = Convert.ToInt32(data["times_used_repair_kit"]);
+    }
 }

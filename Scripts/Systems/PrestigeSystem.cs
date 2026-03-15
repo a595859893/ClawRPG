@@ -252,5 +252,30 @@ namespace ClawRPG.Scripts.Systems
             
             GD.Print($"Prestige data loaded: Level {PrestigeLevel}, Points {PrestigePoints}");
         }
+        
+        // ===== 持久化 =====
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["prestige_level"] = PrestigeLevel;
+            data["prestige_points"] = PrestigePoints;
+            data["total_prestige_points_earned"] = TotalPrestigePointsEarned;
+            data["times_prestiged"] = TimesPrestiged;
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.ContainsKey("prestige_level"))
+                PrestigeLevel = Convert.ToInt32(data["prestige_level"]);
+            if (data.ContainsKey("prestige_points"))
+                PrestigePoints = Convert.ToInt32(data["prestige_points"]);
+            if (data.ContainsKey("total_prestige_points_earned"))
+                TotalPrestigePointsEarned = Convert.ToInt32(data["total_prestige_points_earned"]);
+            if (data.ContainsKey("times_prestiged"))
+                TimesPrestiged = Convert.ToInt32(data["times_prestiged"]);
+        }
     }
 }

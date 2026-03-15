@@ -433,5 +433,87 @@ namespace ClawRPG.Scripts.Systems
             SaveData();
             GD.Print("[PetEmotion] All emotion data reset");
         }
+        
+        // ===== 持久化 =====
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 保存宠物情绪数据
+            var emotionsData = new Dictionary();
+            foreach (var kvp in _petEmotions)
+            {
+                var petData = new Dictionary();
+                petData["pet_id"] = kvp.Key;
+                petData["happiness"] = kvp.Value.Happiness;
+                petData["energy"] = kvp.Value.Energy;
+                petData["affection"] = kvp.Value.Affection;
+                petData["stress"] = kvp.Value.Stress;
+                petData["dominant_emotion"] = (int)kvp.Value.DominantEmotion;
+                
+                // 保存情绪值字典
+                var emotionValues = new Dictionary();
+                foreach (var emotion in kvp.Value.CurrentEmotions)
+                {
+                    emotionValues[(int)emotion.Key] = emotion.Value;
+                }
+                petData["emotion_values"] = emotionValues;
+                
+                emotionsData[kvp.Key] = petData;
+            }
+            data["pet_emotions"] = emotionsData;
+            
+            // 保存统计数据
+            var stats = new Dictionary();
+            stats["total_changes"] = TotalEmotionChanges;
+            stats["dominant_counts"] = DominantEmotionCounts;
+            data["pet_emotion_stats"] = stats;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 恢复宠物情绪数据
+            _petEmotions.Clear();
+            if (data.ContainsKey("pet_emotions"))
+            {
+                var emotionsData = (Dictionary)data["pet_emotions"];
+                foreach (var kvp in emotionsData)
+                {
+                    var petData = new Data.PetEmotionData();
+                    var petDict = (Dictionary)kvp.Value;
+                    
+                    petData.PetId = petDict["pet_id"].ToString();
+                    petData.Happiness = Convert.ToSingle(petDict["happiness"]);
+                    petData.Energy = Convert.ToSingle(petDict["energy"]);
+                    petData.Affection = Convert.ToSingle(petDict["affection"]);
+                    petData.Stress = Convert.ToSingle(petDict["stress"]);
+                    petData.DominantEmotion = (Data.PetEmotionData.EmotionType)Convert.ToInt32(petDict["dominant_emotion"]);
+                    
+                    // 恢复情绪值字典
+                    if (petDict.ContainsKey("emotion_values"))
+                    {
+                        var emotionValues = (Dictionary)petDict["emotion_values"];
+                        foreach (var key in emotionValues.Keys)
+                        {
+                            petData.CurrentEmotions[(Data.PetEmotionData.EmotionType)(int)key] = Convert.ToSingle(emotionValues[key]);
+                        }
+                    }
+                    
+                    _petEmotions[petData.PetId] = petData;
+                }
+            }
+            
+            // 恢复统计数据
+            if (data.ContainsKey("pet_emotion_stats"))
+            {
+                var stats = (Dictionary)data["pet_emotion_stats"];
+                TotalEmotionChanges = Convert.ToInt32(stats["total_changes"]);
+                DominantEmotionCounts = Convert.ToInt32(stats["dominant_counts"]);
+            }
+        }
     }
 }

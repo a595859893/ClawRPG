@@ -526,4 +526,55 @@ public class TitleSystem : BaseSystem
             _equippedTitle = titleId;
         }
     }
+    
+    // ===== 持久化 =====
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 保存已解锁称号
+        data["unlocked_titles"] = new Array(_unlockedTitles);
+        
+        // 保存已装备称号
+        data["equipped_title"] = _equippedTitle;
+        
+        // 保存统计数据
+        data["total_titles_unlocked"] = _totalTitlesUnlocked;
+        
+        return data;
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 恢复已解锁称号
+        if (data.ContainsKey("unlocked_titles"))
+        {
+            _unlockedTitles.Clear();
+            var unlockedList = (Array)data["unlocked_titles"];
+            foreach (string titleId in unlockedList)
+            {
+                _unlockedTitles.Add(titleId);
+                if (_titleDatabase.ContainsKey(titleId))
+                {
+                    _titleDatabase[titleId].IsUnlocked = true;
+                }
+            }
+        }
+        
+        // 恢复已装备称号
+        if (data.ContainsKey("equipped_title"))
+        {
+            string titleId = data["equipped_title"].ToString();
+            if (!string.IsNullOrEmpty(titleId) && _unlockedTitles.Contains(titleId))
+            {
+                _equippedTitle = titleId;
+            }
+        }
+        
+        // 恢复统计数据
+        if (data.ContainsKey("total_titles_unlocked"))
+            _totalTitlesUnlocked = Convert.ToInt32(data["total_titles_unlocked"]);
+    }
 }

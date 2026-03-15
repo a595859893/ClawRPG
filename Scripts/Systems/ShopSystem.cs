@@ -557,5 +557,82 @@ namespace GameSystems
                 _ => "商店"
             };
         }
+        
+        // ===== 持久化 =====
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 保存玩家商店数据
+            var playerShopData = new Dictionary();
+            foreach (var kvp in _playerShopData)
+            {
+                var shopData = new Dictionary();
+                shopData["shop_id"] = kvp.Key;
+                shopData["unlock_time"] = kvp.Value.UnlockTime.ToString("o");
+                shopData["total_purchases"] = kvp.Value.TotalPurchases;
+                shopData["total_spent"] = kvp.Value.TotalSpent;
+                
+                // 保存物品购买记录
+                var itemRecords = new Array();
+                foreach (var record in kvp.Value.PurchaseRecords)
+                {
+                    var recordData = new Dictionary();
+                    recordData["item_id"] = record.Key;
+                    recordData["count"] = record.Value;
+                    itemRecords.Add(recordData);
+                }
+                shopData["purchase_records"] = itemRecords;
+                
+                playerShopData[kvp.Key] = shopData;
+            }
+            data["player_shop_data"] = playerShopData;
+            
+            // 保存每日重置时间
+            data["last_daily_reset"] = _lastDailyReset.ToString("o");
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 恢复玩家商店数据
+            if (data.ContainsKey("player_shop_data"))
+            {
+                _playerShopData.Clear();
+                var playerShopData = (Dictionary)data["player_shop_data"];
+                foreach (var kvp in playerShopData)
+                {
+                    var shopData = (Dictionary)kvp.Value;
+                    var playerData = new PlayerShopData
+                    {
+                        ShopId = shopData["shop_id"].ToString(),
+                        UnlockTime = DateTime.Parse(shopData["unlock_time"].ToString()),
+                        TotalPurchases = Convert.ToInt32(shopData["total_purchases"]),
+                        TotalSpent = Convert.ToInt32(shopData["total_spent"])
+                    };
+                    
+                    // 恢复物品购买记录
+                    if (shopData.ContainsKey("purchase_records"))
+                    {
+                        var itemRecords = (Array)shopData["purchase_records"];
+                        foreach (Dictionary recordData in itemRecords)
+                        {
+                            string itemId = recordData["item_id"].ToString();
+                            int count = Convert.ToInt32(recordData["count"]);
+                            playerData.PurchaseRecords[itemId] = count;
+                        }
+                    }
+                    
+                    _playerShopData[kvp.Key.ToString()] = playerData;
+                }
+            }
+            
+            // 恢复每日重置时间
+            if (data.ContainsKey("last_daily_reset"))
+                _lastDailyReset = DateTime.Parse(data["last_daily_reset"].ToString());
+        }
     }
 }

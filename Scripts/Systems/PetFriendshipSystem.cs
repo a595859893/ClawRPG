@@ -288,5 +288,98 @@ public class PetFriendshipSystem : BaseSystem
                 equippedSkills[Convert.ToInt32(kvp.Key)] = (string)kvp.Value;
             }
         }
+        
+        // ===== 持久化 =====
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 保存友谊数据
+            var friendshipsData = new Dictionary();
+            foreach (var outerKvp in friendships)
+            {
+                var innerDict = new Dictionary();
+                foreach (var innerKvp in outerKvp.Value)
+                {
+                    var friendship = new Dictionary();
+                    friendship["pet_id"] = innerKvp.Value.PetId;
+                    friendship["friend_pet_id"] = innerKvp.Value.FriendPetId;
+                    friendship["level"] = innerKvp.Value.FriendshipLevel;
+                    friendship["exp"] = innerKvp.Value.Experience;
+                    friendship["last_interaction"] = innerKvp.Value.LastInteraction.ToString("o");
+                    friendship["bonds_of_war"] = innerKvp.Value.IsBondsOfWar;
+                    innerDict[innerKvp.Key.ToString()] = friendship;
+                }
+                friendshipsData[outerKvp.Key.ToString()] = innerDict;
+            }
+            data["friendships"] = friendshipsData;
+            
+            // 保存已装备技能
+            var skillsData = new Dictionary();
+            foreach (var kvp in equippedSkills)
+            {
+                skillsData[kvp.Key.ToString()] = kvp.Value;
+            }
+            data["equipped_skills"] = skillsData;
+            
+            // 保存统计数据
+            data["total_bonds"] = TotalBonds;
+            data["max_level_bonds"] = MaxLevelBonds;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 恢复友谊数据
+            friendships.Clear();
+            if (data.ContainsKey("friendships"))
+            {
+                var friendshipsData = (Dictionary)data["friendships"];
+                foreach (var outerKvp in friendshipsData)
+                {
+                    int smallerId = Convert.ToInt32(outerKvp.Key);
+                    friendships[smallerId] = new Dictionary<int, PetFriendshipData>();
+                    
+                    var innerDict = (Dictionary)outerKvp.Value;
+                    foreach (var innerKvp in innerDict)
+                    {
+                        int largerId = Convert.ToInt32(innerKvp.Key);
+                        var friendshipDict = (Dictionary)innerKvp.Value;
+                        
+                        var friendship = new PetFriendshipData
+                        {
+                            PetId = Convert.ToInt32(friendshipDict["pet_id"]),
+                            FriendPetId = Convert.ToInt32(friendshipDict["friend_pet_id"]),
+                            FriendshipLevel = Convert.ToInt32(friendshipDict["level"]),
+                            Experience = Convert.ToInt32(friendshipDict["exp"]),
+                            LastInteraction = DateTime.Parse(friendshipDict["last_interaction"].ToString()),
+                            IsBondsOfWar = Convert.ToBoolean(friendshipDict["bonds_of_war"])
+                        };
+                        
+                        friendships[smallerId][largerId] = friendship;
+                    }
+                }
+            }
+            
+            // 恢复已装备技能
+            if (data.ContainsKey("equipped_skills"))
+            {
+                equippedSkills.Clear();
+                var skillsData = (Dictionary)data["equipped_skills"];
+                foreach (var kvp in skillsData)
+                {
+                    equippedSkills[Convert.ToInt32(kvp.Key)] = kvp.Value.ToString();
+                }
+            }
+            
+            // 恢复统计数据
+            if (data.ContainsKey("total_bonds"))
+                TotalBonds = Convert.ToInt32(data["total_bonds"]);
+            if (data.ContainsKey("max_level_bonds"))
+                MaxLevelBonds = Convert.ToInt32(data["max_level_bonds"]);
+        }
     }
 }
