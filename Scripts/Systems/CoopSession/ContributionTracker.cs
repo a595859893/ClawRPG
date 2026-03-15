@@ -25,61 +25,8 @@ public partial class ContributionTracker : BaseSystem
     
     #endregion
 
-    #region 数据结构
-
-    /// <summary>玩家贡献数据</summary>
-    public class PlayerContribution
-    {
-        public int PlayerId { get; set; }
-        public string PlayerName { get; set; } = "";
-        
-        // 各类贡献值
-        public float TotalDamage { get; set; }        // 总伤害
-        public float TotalHealing { get; set; }       // 总治疗量
-        public float TotalTank { get; set; }           // 承受伤害
-        public int KillCount { get; set; }            // 击杀数
-        public int AssistCount { get; set; }          // 助攻数
-        public int BuffsApplied { get; set; }         // 施加Buff数
-        public float SurvivalTime { get; set; }        // 存活时间(秒)
-        public int ObjectivesCompleted { get; set; }   // 完成目标数
-        
-        // 综合贡献分（用于分配收益）
-        public float ContributionScore => CalculateScore();
-        
-        private float CalculateScore()
-        {
-            // 贡献分计算公式
-            // 伤害权重: 1.0, 治疗权重: 1.5, 坦克权重: 1.2, 击杀权重: 10, 助攻权重: 5, Buff权重: 2, 存活权重: 0.5, 目标权重: 20
-            return TotalDamage * 1.0f +
-                   TotalHealing * 1.5f +
-                   TotalTank * 1.2f +
-                   KillCount * 10f +
-                   AssistCount * 5f +
-                   BuffsApplied * 2f +
-                   SurvivalTime * 0.5f +
-                   ObjectivesCompleted * 20f;
-        }
-    }
-
-    /// <summary>收益包定义</summary>
-    public class RewardPackage
-    {
-        public int Experience { get; set; }       // 经验
-        public int Gold { get; set; }             // 金币
-        public List<string> Items { get; set; } = new List<string>();  // 物品列表
-        public List<int> ItemIds { get; set; } = new List<int>();       // 物品ID列表
-    }
-
-    /// <summary>收益分配结果</summary>
-    public class DistributionResult
-    {
-        public int PlayerId { get; set; }
-        public string PlayerName { get; set; } = "";
-        public float ContributionPercent { get; set; }  // 贡献占比
-        public RewardPackage Rewards { get; set; } = new RewardPackage();
-    }
-
-    #endregion
+    // 使用共享的数据结构 (from ContributionData.cs)
+    // PlayerContribution, RewardPackage, DistributionResult now in ContributionData.cs
 
     #region 信号定义
     
@@ -102,12 +49,8 @@ public partial class ContributionTracker : BaseSystem
     private string _currentSessionId = "";
     private readonly object _lock = new object();
     
-    // 收益分配配置
-    private float _baseExpShare = 100f;      // 基础经验分享
-    private float _baseGoldShare = 50f;      // 基础金币分享
-    private float _killBonusExp = 20f;       // 击杀经验奖励
-    private float _assistBonusExp = 10f;     // 助攻经验奖励
-    private float _survivalBonusExp = 5f;    // 每10秒存活经验
+    // 收益分配器
+    private readonly RewardDistributor _rewardDistributor = new();
     
     #endregion
 
@@ -305,7 +248,7 @@ public partial class ContributionTracker : BaseSystem
     /// <summary>
     /// 记录完成目标
     /// </summary>
-    public void RecordObjective(int playerId)
+    public void RecordObjectiveCompleted(int playerId)
     {
         lock (_lock)
         {
@@ -318,36 +261,31 @@ public partial class ContributionTracker : BaseSystem
     }
 
     /// <summary>
-    /// 记录综合贡献（从外部系统调用）
+    /// 批量记录贡献（用于离线结算）
     /// </summary>
-    public void RecordContribution(int playerId, ContributionType type, float value = 0, int count = 0)
+    public void BatchRecordContributions(int playerId, float damage, float healing, float tank, int kills, int assists, int buffs, float survivalTime, int objectives)
     {
-        switch (type)
+        lock (_lock)
         {
-            case ContributionType.Damage:
-                RecordDamage(playerId, value);
-                break;
-            case ContributionType.Healing:
-                RecordHealing(playerId, value);
-                break;
-            case ContributionType.Tank:
-                RecordTank(playerId, value);
-                break;
-            case ContributionType.Kill:
-                for (int i = 0; i < count; i++) RecordKill(playerId);
-                break;
-            case ContributionType.Support:
-                for (int i = 0; i < count; i++) RecordBuffApplied(playerId);
-                break;
-            case ContributionType.Objective:
-                for (int i = 0; i < count; i++) RecordObjective(playerId);
-                break;
+            if (_playerContributions.TryGetValue(playerId, out var contribution))
+            {
+                contribution.TotalDamage += damage;
+                contribution.TotalHealing += healing;
+                contribution.TotalTank += tank;
+                contribution.KillCount += kills;
+                contribution.AssistCount += assists;
+                contribution.BuffsApplied += buffs;
+                contribution.SurvivalTime += survivalTime;
+                contribution.ObjectivesCompleted += objectives;
+                
+                EmitSignal(SignalName.ContributionUpdated, playerId, contribution);
+            }
         }
     }
 
     #endregion
 
-    #region 贡献查询
+    #region 查询
 
     /// <summary>
     /// 获取玩家贡献数据
@@ -361,7 +299,7 @@ public partial class ContributionTracker : BaseSystem
     }
 
     /// <summary>
-    /// 获取所有玩家贡献
+    /// 获取所有贡献数据
     /// </summary>
     public List<PlayerContribution> GetAllContributions()
     {
@@ -410,91 +348,14 @@ public partial class ContributionTracker : BaseSystem
     {
         lock (_lock)
         {
-            var results = new List<DistributionResult>();
+            var results = _rewardDistributor.DistributeRewards(_playerContributions, baseExp, baseGold, bonusItems);
             
-            if (_playerContributions.Count == 0)
-            {
-                GD.PrintWarn("[ContributionTracker] No players to distribute rewards");
-                return results;
-            }
-
-            float totalScore = GetTotalContributionScore();
-            
-            // 避免除零
-            if (totalScore <= 0) totalScore = 1f;
-
-            // 按贡献比例分配
-            foreach (var contribution in _playerContributions.Values)
-            {
-                float percent = contribution.ContributionScore / totalScore;
-                
-                var result = new DistributionResult
-                {
-                    PlayerId = contribution.PlayerId,
-                    PlayerName = contribution.PlayerName,
-                    ContributionPercent = percent,
-                    Rewards = new RewardPackage
-                    {
-                        Experience = (int)(baseExp * percent),
-                        Gold = (int)(baseGold * percent),
-                        Items = new List<string>(),
-                        ItemIds = new List<int>()
-                    }
-                };
-
-                // 添加额外经验奖励（击杀、助攻、存活）
-                result.Rewards.Experience += (int)GetBonusExp(contribution);
-                
-                results.Add(result);
-            }
-
-            // 处理额外物品（按贡献排名分配）
-            if (bonusItems != null && bonusItems.Count > 0)
-            {
-                DistributeBonusItems(results, bonusItems);
-            }
-
             GD.Print($"[ContributionTracker] Rewards distributed: {results.Count} players");
             
             // 发出信号
             EmitSignal(SignalName.RewardsDistributed, results.ToArray());
             
             return results;
-        }
-    }
-
-    /// <summary>
-    /// 计算额外经验奖励
-    /// </summary>
-    private float GetBonusExp(PlayerContribution contribution)
-    {
-        float bonus = 0;
-        
-        // 击杀奖励
-        bonus += contribution.KillCount * _killBonusExp;
-        
-        // 助攻奖励
-        bonus += contribution.AssistCount * _assistBonusExp;
-        
-        // 存活奖励（每10秒）
-        bonus += (contribution.SurvivalTime / 10f) * _survivalBonusExp;
-        
-        return bonus;
-    }
-
-    /// <summary>
-    /// 分配额外物品（按排名）
-    /// </summary>
-    private void DistributeBonusItems(List<DistributionResult> results, List<int> bonusItems)
-    {
-        // 按贡献排序
-        var sortedResults = results.OrderByDescending(r => r.ContributionPercent).ToList();
-        
-        // 轮流分配
-        for (int i = 0; i < bonusItems.Count; i++)
-        {
-            int playerIndex = i % sortedResults.Count;
-            sortedResults[playerIndex].Rewards.ItemIds.Add(bonusItems[i]);
         }
     }
 
@@ -557,12 +418,7 @@ public partial class ContributionTracker : BaseSystem
     /// </summary>
     public void SetDistributionParams(float baseExpShare, float baseGoldShare, float killBonus, float assistBonus, float survivalBonus)
     {
-        _baseExpShare = baseExpShare;
-        _baseGoldShare = baseGoldShare;
-        _killBonusExp = killBonus;
-        _assistBonusExp = assistBonus;
-        _survivalBonusExp = survivalBonus;
-        
+        _rewardDistributor.SetDistributionParams(baseExpShare, baseGoldShare, killBonus, assistBonus, survivalBonus);
         GD.Print($"[ContributionTracker] Distribution params updated");
     }
 
@@ -574,65 +430,15 @@ public partial class ContributionTracker : BaseSystem
     {
         lock (_lock)
         {
-            var data = new Dictionary();
-            data["session_id"] = _currentSessionId;
-            
-            var contributions = new Array();
-            foreach (var kvp in _playerContributions)
-            {
-                var c = kvp.Value;
-                contributions.Add(new Dictionary
-                {
-                    { "player_id", c.PlayerId },
-                    { "player_name", c.PlayerName },
-                    { "total_damage", c.TotalDamage },
-                    { "total_healing", c.TotalHealing },
-                    { "total_tank", c.TotalTank },
-                    { "kill_count", c.KillCount },
-                    { "assist_count", c.AssistCount },
-                    { "buffs_applied", c.BuffsApplied },
-                    { "survival_time", c.SurvivalTime },
-                    { "objectives_completed", c.ObjectivesCompleted }
-                });
-            }
-            data["contributions"] = contributions;
-            
-            return data;
+            return _rewardDistributor.ExportSaveData(_playerContributions, _currentSessionId);
         }
     }
 
     public override void ImportSaveData(Dictionary data)
     {
-        if (data == null) return;
-
         lock (_lock)
         {
-            if (data.ContainsKey("session_id"))
-            {
-                _currentSessionId = data["session_id"]?.ToString() ?? "";
-            }
-
-            if (data.ContainsKey("contributions") && data["contributions"] is Array contributionsList)
-            {
-                _playerContributions.Clear();
-                foreach (Dictionary cData in contributionsList)
-                {
-                    var contribution = new PlayerContribution
-                    {
-                        PlayerId = Convert.ToInt32(cData["player_id"]),
-                        PlayerName = cData["player_name"]?.ToString() ?? "",
-                        TotalDamage = Convert.ToSingle(cData["total_damage"]),
-                        TotalHealing = Convert.ToSingle(cData["total_healing"]),
-                        TotalTank = Convert.ToSingle(cData["total_tank"]),
-                        KillCount = Convert.ToInt32(cData["kill_count"]),
-                        AssistCount = Convert.ToInt32(cData["assist_count"]),
-                        BuffsApplied = Convert.ToInt32(cData["buffs_applied"]),
-                        SurvivalTime = Convert.ToSingle(cData["survival_time"]),
-                        ObjectivesCompleted = Convert.ToInt32(cData["objectives_completed"])
-                    };
-                    _playerContributions[contribution.PlayerId] = contribution;
-                }
-            }
+            _rewardDistributor.ImportSaveData(data, out _currentSessionId, out _playerContributions);
         }
     }
 

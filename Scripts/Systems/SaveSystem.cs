@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Collections.Generic;
 using GameSystems;
 
 namespace ClawRPG.Scripts.Systems {
@@ -165,6 +166,22 @@ namespace ClawRPG.Scripts.Systems {
             
             // Player data (legacy support)
             public object PlayerData { get; set; }
+            
+            // ===== 组合数据类 (新版 - 推荐使用) =====
+            // 基础属性
+            public PlayerBasicData BasicData { get; set; } = new();
+            // 背包装备
+            public PlayerInventoryData InventoryData { get; set; } = new();
+            // 任务进度
+            public PlayerQuestData QuestData { get; set; } = new();
+            // 统计数据
+            public PlayerStatisticsData StatisticsData { get; set; } = new();
+            // 宠物数据
+            public PlayerPetData PetData { get; set; } = new();
+            // 技能数据
+            public PlayerSkillData SkillData { get; set; } = new();
+            // 系统数据
+            public PlayerSystemData SystemData { get; set; } = new();
         }
         
         // Save slot metadata (stored separately for quick loading)
