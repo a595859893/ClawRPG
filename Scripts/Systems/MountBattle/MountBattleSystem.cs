@@ -502,5 +502,116 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
                 OnManaChange?.Invoke(_currentMountMana, _maxMountMana);
             }
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 坐骑战斗属性
+            data["is_mount_battle_enabled"] = _data.IsMountBattleEnabled;
+            data["current_mount_combat_level"] = _data.CurrentMountCombatLevel;
+            data["total_mount_kills"] = _data.TotalMountKills;
+            data["total_mount_damage_dealt"] = _data.TotalMountDamageDealt;
+            data["total_mount_damage_taken"] = _data.TotalMountDamageTaken;
+            
+            // 坐骑战斗统计
+            data["wins"] = _data.Wins;
+            data["losses"] = _data.Losses;
+            data["current_streak"] = _data.CurrentStreak;
+            data["best_streak"] = _data.BestStreak;
+            
+            // 激活的坐骑战斗技能
+            data["unlocked_mount_skills"] = new Array(_data.UnlockedMountSkills);
+            
+            // 技能等级
+            var skillLevels = new Dictionary();
+            foreach (var kvp in _data.SkillLevels)
+            {
+                skillLevels[kvp.Key] = kvp.Value;
+            }
+            data["skill_levels"] = skillLevels;
+            
+            // 坐骑装备
+            data["equipped_mount_weapon"] = _data.EquippedMountWeapon;
+            data["equipped_mount_armor"] = _data.EquippedMountArmor;
+            data["equipped_mount_accessory"] = _data.EquippedMountAccessory;
+            
+            // 每日挑战
+            data["daily_battles_completed"] = _data.DailyBattlesCompleted;
+            data["daily_wins"] = _data.DailyWins;
+            data["last_daily_reset"] = _data.LastDailyReset;
+            
+            // 赛季数据
+            data["season_number"] = _data.SeasonNumber;
+            data["season_wins"] = _data.SeasonWins;
+            data["season_points"] = _data.SeasonPoints;
+            data["season_rank"] = _data.SeasonRank;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 坐骑战斗属性
+            _data.IsMountBattleEnabled = (bool)data.GetValueOrDefault("is_mount_battle_enabled", false);
+            _data.CurrentMountCombatLevel = (int)data.GetValueOrDefault("current_mount_combat_level", 1);
+            _data.TotalMountKills = (int)data.GetValueOrDefault("total_mount_kills", 0);
+            _data.TotalMountDamageDealt = (int)data.GetValueOrDefault("total_mount_damage_dealt", 0);
+            _data.TotalMountDamageTaken = (int)data.GetValueOrDefault("total_mount_damage_taken", 0);
+            
+            // 坐骑战斗统计
+            _data.Wins = (int)data.GetValueOrDefault("wins", 0);
+            _data.Losses = (int)data.GetValueOrDefault("losses", 0);
+            _data.CurrentStreak = (int)data.GetValueOrDefault("current_streak", 0);
+            _data.BestStreak = (int)data.GetValueOrDefault("best_streak", 0);
+            
+            // 激活的坐骑战斗技能
+            if (data.Contains("unlocked_mount_skills"))
+            {
+                var skills = (Array)data["unlocked_mount_skills"];
+                _data.UnlockedMountSkills = new List<string>();
+                foreach (string skill in skills)
+                {
+                    _data.UnlockedMountSkills.Add(skill);
+                }
+            }
+            
+            // 技能等级
+            if (data.Contains("skill_levels"))
+            {
+                var skillLevels = (Dictionary)data["skill_levels"];
+                _data.SkillLevels = new Dictionary<string, int>();
+                foreach (var kvp in skillLevels)
+                {
+                    _data.SkillLevels[kvp.Key] = (int)kvp.Value;
+                }
+            }
+            
+            // 坐骑装备
+            _data.EquippedMountWeapon = (string)data.GetValueOrDefault("equipped_mount_weapon", "");
+            _data.EquippedMountArmor = (string)data.GetValueOrDefault("equipped_mount_armor", "");
+            _data.EquippedMountAccessory = (string)data.GetValueOrDefault("equipped_mount_accessory", "");
+            
+            // 每日挑战
+            _data.DailyBattlesCompleted = (int)data.GetValueOrDefault("daily_battles_completed", 0);
+            _data.DailyWins = (int)data.GetValueOrDefault("daily_wins", 0);
+            _data.LastDailyReset = (string)data.GetValueOrDefault("last_daily_reset", "");
+            
+            // 赛季数据
+            _data.SeasonNumber = (int)data.GetValueOrDefault("season_number", 1);
+            _data.SeasonWins = (int)data.GetValueOrDefault("season_wins", 0);
+            _data.SeasonPoints = (int)data.GetValueOrDefault("season_points", 0);
+            _data.SeasonRank = (string)data.GetValueOrDefault("season_rank", "Bronze");
+            
+            GD.Print("[MountBattleSystem] Save data imported");
+        }
     }
 }

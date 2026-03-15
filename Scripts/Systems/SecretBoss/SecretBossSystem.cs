@@ -445,5 +445,98 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             // 实际应该从存档加载
             // 暂时跳过
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 玩家击杀统计
+            var killCountDict = new Dictionary();
+            foreach (var kvp in _killCount)
+            {
+                killCountDict[kvp.Key] = kvp.Value;
+            }
+            data["kill_count"] = killCountDict;
+            
+            // 玩家连击数
+            data["current_combo"] = _currentCombo;
+            
+            // Boss出现冷却
+            var bossCooldowns = new Dictionary();
+            foreach (var kvp in _bossCooldowns)
+            {
+                bossCooldowns[kvp.Key] = kvp.Value;
+            }
+            data["boss_cooldowns"] = bossCooldowns;
+            
+            // 世界状态标志
+            var worldFlags = new Dictionary();
+            foreach (var kvp in _worldFlags)
+            {
+                worldFlags[kvp.Key] = kvp.Value;
+            }
+            data["world_flags"] = worldFlags;
+            
+            // 统计
+            data["total_boss_spawns"] = _totalBossSpawns;
+            data["total_boss_defeats"] = _totalBossDefeats;
+            data["total_drops_collected"] = _totalDropsCollected;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 玩家击杀统计
+            if (data.Contains("kill_count"))
+            {
+                var killCountDict = (Dictionary)data["kill_count"];
+                _killCount = new Dictionary<string, int>();
+                foreach (var kvp in killCountDict)
+                {
+                    _killCount[kvp.Key] = (int)kvp.Value;
+                }
+            }
+            
+            // 玩家连击数
+            _currentCombo = (int)data.GetValueOrDefault("current_combo", 0);
+            
+            // Boss出现冷却
+            if (data.Contains("boss_cooldowns"))
+            {
+                var bossCooldowns = (Dictionary)data["boss_cooldowns"];
+                _bossCooldowns = new Dictionary<string, float>();
+                foreach (var kvp in bossCooldowns)
+                {
+                    _bossCooldowns[kvp.Key] = Convert.ToSingle(kvp.Value);
+                }
+            }
+            
+            // 世界状态标志
+            if (data.Contains("world_flags"))
+            {
+                var worldFlags = (Dictionary)data["world_flags"];
+                _worldFlags = new Dictionary<string, bool>();
+                foreach (var kvp in worldFlags)
+                {
+                    _worldFlags[kvp.Key] = (bool)kvp.Value;
+                }
+            }
+            
+            // 统计
+            _totalBossSpawns = (int)data.GetValueOrDefault("total_boss_spawns", 0);
+            _totalBossDefeats = (int)data.GetValueOrDefault("total_boss_defeats", 0);
+            _totalDropsCollected = (int)data.GetValueOrDefault("total_drops_collected", 0);
+            
+            GD.Print("[SecretBossSystem] Save data imported");
+        }
     }
 }

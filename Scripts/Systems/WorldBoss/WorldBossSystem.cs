@@ -555,5 +555,138 @@ namespace ClawRPG.Scripts.Systems
                 }
             }
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 保存生成计时器
+            var timers = new Dictionary();
+            foreach (var kvp in _nextSpawnTime)
+            {
+                timers[kvp.Key] = kvp.Value.ToString("o");
+            }
+            data["spawn_timers"] = timers;
+            
+            // 保存击杀历史
+            var history = new Array();
+            foreach (var record in _killHistory)
+            {
+                var recordDict = new Dictionary
+                {
+                    { "boss_id", record.BossId },
+                    { "boss_name", record.BossName },
+                    { "rarity", (int)record.Rarity },
+                    { "kill_time", record.KillTime.ToString("o") },
+                    { "total_damage", record.TotalDamage },
+                    { "killer_count", record.KillerCount },
+                    { "total_gold", record.TotalGoldReward },
+                    { "total_exp", record.TotalExpReward }
+                };
+                history.Add(recordDict);
+            }
+            data["kill_history"] = history;
+            
+            // 保存玩家统计
+            var stats = new Dictionary();
+            foreach (var kvp in _playerStats)
+            {
+                var statsDict = new Dictionary
+                {
+                    { "total_killed", kvp.Value.TotalBossesKilled },
+                    { "total_damage", kvp.Value.TotalDamageDealt },
+                    { "total_gold", kvp.Value.TotalGoldEarned },
+                    { "total_exp", kvp.Value.TotalExpEarned }
+                };
+                stats[kvp.Key] = statsDict;
+            }
+            data["player_stats"] = stats;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载生成计时器
+            if (data.Contains("spawn_timers"))
+            {
+                var timers = data["spawn_timers"] as Dictionary;
+                if (timers != null)
+                {
+                    _nextSpawnTime.Clear();
+                    foreach (var kvp in timers)
+                    {
+                        if (DateTime.TryParse(kvp.Value?.ToString(), out DateTime dt))
+                        {
+                            _nextSpawnTime[kvp.Key] = dt;
+                        }
+                    }
+                }
+            }
+            
+            // 加载击杀历史
+            if (data.Contains("kill_history"))
+            {
+                var history = data["kill_history"] as Array;
+                if (history != null)
+                {
+                    _killHistory.Clear();
+                    foreach (var item in history)
+                    {
+                        var dict = item as Dictionary;
+                        if (dict != null)
+                        {
+                            var record = new WorldBossData.BossKillRecord
+                            {
+                                BossId = (string)dict.GetValueOrDefault("boss_id", ""),
+                                BossName = (string)dict.GetValueOrDefault("boss_name", ""),
+                                Rarity = (WorldBossData.BossRarity)(dict.GetValueOrDefault("rarity", 0)),
+                                KillTime = DateTime.TryParse(dict.GetValueOrDefault("kill_time", "")?.ToString(), out DateTime kt) ? kt : DateTime.Now,
+                                TotalDamage = Convert.ToInt32(dict.GetValueOrDefault("total_damage", 0)),
+                                KillerCount = Convert.ToInt32(dict.GetValueOrDefault("killer_count", 0)),
+                                TotalGoldReward = Convert.ToInt32(dict.GetValueOrDefault("total_gold", 0)),
+                                TotalExpReward = Convert.ToInt32(dict.GetValueOrDefault("total_exp", 0))
+                            };
+                            _killHistory.Add(record);
+                        }
+                    }
+                }
+            }
+            
+            // 加载玩家统计
+            if (data.Contains("player_stats"))
+            {
+                var stats = data["player_stats"] as Dictionary;
+                if (stats != null)
+                {
+                    _playerStats.Clear();
+                    foreach (var kvp in stats)
+                    {
+                        var dict = kvp.Value as Dictionary;
+                        if (dict != null)
+                        {
+                            _playerStats[kvp.Key] = new WorldBossData.PlayerWorldBossStats
+                            {
+                                PlayerId = kvp.Key,
+                                TotalBossesKilled = Convert.ToInt32(dict.GetValueOrDefault("total_killed", 0)),
+                                TotalDamageDealt = Convert.ToInt32(dict.GetValueOrDefault("total_damage", 0)),
+                                TotalGoldEarned = Convert.ToInt32(dict.GetValueOrDefault("total_gold", 0)),
+                                TotalExpEarned = Convert.ToInt32(dict.GetValueOrDefault("total_exp", 0))
+                            };
+                        }
+                    }
+                }
+            }
+            
+            GD.Print("[WorldBossSystem] Save data imported");
+        }
     }
 }
