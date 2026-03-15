@@ -346,6 +346,9 @@ public partial class GameSettings : Node
         GD.Print("Settings loaded");
     }
 
+    /// <summary>
+    /// 重置所有设置到默认值
+    /// </summary>
     public void ResetToDefaults()
     {
         _masterVolume = 1.0f;
