@@ -880,4 +880,123 @@ public class PartySystem : BaseSystem
         LeaveParty();
         Instance = null;
     }
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        data["party_id"] = _partyId;
+        data["is_leader"] = _isLeader;
+        data["local_player_id"] = _localPlayerId;
+        data["current_role"] = (int)_currentRole;
+        data["share_exp"] = _shareExp;
+        data["share_loot"] = _shareLoot;
+        data["auto_accept"] = _autoAccept;
+        data["exp_mode"] = (int)_expMode;
+        
+        // 队伍成员
+        var members = new Array();
+        lock (_membersLock)
+        {
+            foreach (var kvp in _members)
+            {
+                var member = new Dictionary();
+                member["player_id"] = kvp.Value.PlayerId;
+                member["player_name"] = kvp.Value.PlayerName;
+                member["level"] = kvp.Value.Level;
+                member["health"] = kvp.Value.Health;
+                member["max_health"] = kvp.Value.MaxHealth;
+                member["role"] = (int)kvp.Value.Role;
+                member["is_online"] = kvp.Value.IsOnline;
+                members.Add(member);
+            }
+        }
+        data["members"] = members;
+        
+        // 队伍Buff
+        var buffs = new Array();
+        lock (_buffsLock)
+        {
+            foreach (var buff in _activeBuffs)
+            {
+                var b = new Dictionary();
+                b["type"] = (int)buff.Type;
+                b["value"] = buff.Value;
+                b["duration"] = buff.Duration;
+                b["remaining_time"] = buff.RemainingTime;
+                b["provider_id"] = buff.ProviderId;
+                buffs.Add(b);
+            }
+        }
+        data["active_buffs"] = buffs;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("party_id")) _partyId = (int)data["party_id"];
+        if (data.Contains("is_leader")) _isLeader = (bool)data["is_leader"];
+        if (data.Contains("local_player_id")) _localPlayerId = (int)data["local_player_id"];
+        if (data.Contains("current_role")) _currentRole = (PartyRole)(int)data["current_role"];
+        if (data.Contains("share_exp")) _shareExp = (bool)data["share_exp"];
+        if (data.Contains("share_loot")) _shareLoot = (bool)data["share_loot"];
+        if (data.Contains("auto_accept")) _autoAccept = (bool)data["auto_accept"];
+        if (data.Contains("exp_mode")) _expMode = (ExpDistributionMode)(int)data["exp_mode"];
+        
+        // 队伍成员
+        if (data.Contains("members"))
+        {
+            lock (_membersLock)
+            {
+                _members.Clear();
+                var members = (Array)data["members"];
+                foreach (Dictionary member in members)
+                {
+                    var pm = new PartyMember
+                    {
+                        PlayerId = (int)member["player_id"],
+                        PlayerName = (string)member["player_name"],
+                        Level = (int)member["level"],
+                        Health = (int)member["health"],
+                        MaxHealth = (int)member["max_health"],
+                        Role = (PartyRole)(int)member["role"],
+                        IsOnline = (bool)member["is_online"],
+                        LastUpdate = OS.GetTicksMsec() / 1000f
+                    };
+                    _members[pm.PlayerId] = pm;
+                }
+            }
+        }
+        
+        // 队伍Buff
+        if (data.Contains("active_buffs"))
+        {
+            lock (_buffsLock)
+            {
+                _activeBuffs.Clear();
+                var buffs = (Array)data["active_buffs"];
+                foreach (Dictionary b in buffs)
+                {
+                    var buff = new PartyBuff
+                    {
+                        Type = (PartyBuffType)(int)b["type"],
+                        Value = (float)b["value"],
+                        Duration = (float)b["duration"],
+                        RemainingTime = (float)b["remaining_time"],
+                        ProviderId = (int)b["provider_id"]
+                    };
+                    _activeBuffs.Add(buff);
+                }
+            }
+        }
+    }
 }
