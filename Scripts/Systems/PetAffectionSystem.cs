@@ -6,7 +6,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// Manages pet affection system - tracks and increases player-pet relationship
     /// </summary>
-    public class PetAffectionSystem {
+    public partial class PetAffectionSystem : BaseSystem {
         public static PetAffectionSystem Instance { get; private set; }
         
         private PlayerAffectionData _playerAffectionData = new PlayerAffectionData();
@@ -30,8 +30,15 @@ namespace ClawRPG.Systems {
         public PetAffectionSystem() {
             Instance = this;
         }
+
+        public override void _Ready()
+        {
+            base._Ready();
+            Initialize();
+        }
         
-        public void Initialize() {
+        protected override void Initialize() {
+            IsInitialized = true;
             GD.Print("[PetAffectionSystem] Initialized");
         }
         
@@ -222,12 +229,12 @@ namespace ClawRPG.Systems {
         /// <summary>
         /// Save affection data
         /// </summary>
-        public Dictionary<string, object> Save() {
-            var data = new Dictionary<string, object>();
-            var petData = new List<Dictionary<string, object>>();
+        protected override Dictionary ExportSaveData() {
+            var data = new Dictionary();
+            var petData = new Godot.Collections.Array();
             
             foreach (var kvp in _petAffection) {
-                petData.Add(new Dictionary<string, object> {
+                petData.Add(new Godot.Collections.Dictionary {
                     { "petId", kvp.Value.PetId },
                     { "currentAffection", kvp.Value.CurrentAffection },
                     { "totalInteractionCount", kvp.Value.TotalInteractionCount },
@@ -245,20 +252,23 @@ namespace ClawRPG.Systems {
         /// <summary>
         /// Load affection data
         /// </summary>
-        public void Load(Dictionary<string, object> data) {
+        protected override void ImportSaveData(Dictionary data) {
             if (data == null) return;
             
             if (data.ContainsKey("petAffection")) {
-                var petDataList = (Godot.Collections.Array)data["petAffection"];
-                foreach (Dictionary<string, object> petData in petDataList) {
+                var petDataList = data["petAffection"] as Godot.Collections.Array;
+                foreach (var petData in petDataList) {
+                    var dict = petData as Godot.Collections.Dictionary;
+                    if (dict == null) continue;
+                    
                     var affection = new PetAffectionData {
-                        PetId = (string)petData["petId"],
-                        CurrentAffection = (int)petData["currentAffection"],
-                        TotalInteractionCount = (int)petData["totalInteractionCount"],
-                        FeedCount = (int)petData["feedCount"],
-                        PlayCount = (int)petData["playCount"],
-                        BattleCount = (int)petData["battleCount"],
-                        LastInteractionTime = (int)petData["lastInteractionTime"]
+                        PetId = dict["petId"].ToString(),
+                        CurrentAffection = Convert.ToInt32(dict["currentAffection"]),
+                        TotalInteractionCount = Convert.ToInt32(dict["totalInteractionCount"]),
+                        FeedCount = Convert.ToInt32(dict["feedCount"]),
+                        PlayCount = Convert.ToInt32(dict["playCount"]),
+                        BattleCount = Convert.ToInt32(dict["battleCount"]),
+                        LastInteractionTime = Convert.ToInt32(dict["lastInteractionTime"])
                     };
                     _petAffection[affection.PetId] = affection;
                 }

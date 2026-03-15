@@ -5,7 +5,7 @@ using Godot;
 /// <summary>
 /// 坐骑战斗竞技场系统
 /// </summary>
-public class MountBattleArenaSystem
+public partial class MountBattleArenaSystem : BaseSystem
 {
     private static MountBattleArenaSystem _instance;
     public static MountBattleArenaSystem Instance
@@ -41,10 +41,18 @@ public class MountBattleArenaSystem
         _arenas = MountBattleArenaDatabase.GetAllArenas();
         _playerData = new MountBattleArenaData.PlayerMountArenaData();
     }
-    
-    public void Initialize()
+
+    public override void _Ready()
+    {
+        base._Ready();
+        Initialize();
+    }
+
+    protected override void Initialize()
     {
         _arenas = MountBattleArenaDatabase.GetAllArenas();
+        IsInitialized = true;
+        GD.Print("[MountBattleArenaSystem] initialized");
     }
     
     public List<MountBattleArenaData.MountArena> GetAllArenas()
@@ -323,9 +331,9 @@ public class MountBattleArenaSystem
         return null;
     }
     
-    public Dictionary<string, object> GetSaveData()
+    protected override Dictionary ExportSaveData()
     {
-        var data = new Dictionary<string, object>();
+        var data = new Dictionary();
         
         // Save player data
         data["total_battles"] = _playerData.TotalBattles;
@@ -336,24 +344,24 @@ public class MountBattleArenaSystem
         data["total_exp_earned"] = _playerData.TotalExpEarned;
         
         // Save best waves
-        var bestWavesList = new List<Dictionary<string, int>>();
+        var bestWavesList = new Godot.Collections.Array();
         foreach (var kvp in _playerData.BestWaves)
         {
-            bestWavesList.Add(new Dictionary<string, int>
+            bestWavesList.Add(new Godot.Collections.Dictionary
             {
-                { "arena_id", kvp.Value },
+                { "arena_id", kvp.Key },
                 { "waves", kvp.Value }
             });
         }
         data["best_waves"] = bestWavesList;
         
         // Save battle counts
-        var battleCountList = new List<Dictionary<string, int>>();
+        var battleCountList = new Godot.Collections.Array();
         foreach (var kvp in _playerData.BattleCount)
         {
-            battleCountList.Add(new Dictionary<string, int>
+            battleCountList.Add(new Godot.Collections.Dictionary
             {
-                { "arena_id", kvp.Value },
+                { "arena_id", kvp.Key },
                 { "count", kvp.Value }
             });
         }
@@ -362,7 +370,7 @@ public class MountBattleArenaSystem
         return data;
     }
     
-    public void LoadSaveData(Dictionary<string, object> data)
+    protected override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         
@@ -382,12 +390,12 @@ public class MountBattleArenaSystem
         // Load best waves
         if (data.ContainsKey("best_waves"))
         {
-            var bestWavesList = data["best_waves"] as List<object>;
+            var bestWavesList = data["best_waves"] as Godot.Collections.Array;
             if (bestWavesList != null)
             {
                 foreach (var item in bestWavesList)
                 {
-                    var dict = item as Dictionary<string, object>;
+                    var dict = item as Godot.Collections.Dictionary;
                     if (dict != null && dict.ContainsKey("arena_id") && dict.ContainsKey("waves"))
                     {
                         string arenaId = dict["arena_id"].ToString();
@@ -401,12 +409,12 @@ public class MountBattleArenaSystem
         // Load battle counts
         if (data.ContainsKey("battle_counts"))
         {
-            var battleCountList = data["battle_counts"] as List<object>;
+            var battleCountList = data["battle_counts"] as Godot.Collections.Array;
             if (battleCountList != null)
             {
                 foreach (var item in battleCountList)
                 {
-                    var dict = item as Dictionary<string, object>;
+                    var dict = item as Godot.Collections.Dictionary;
                     if (dict != null && dict.ContainsKey("arena_id") && dict.ContainsKey("count"))
                     {
                         string arenaId = dict["arena_id"].ToString();
