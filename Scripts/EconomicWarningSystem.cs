@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class EconomicWarningSystem : Node
+public class EconomicWarningSystem : BaseSystem
 {
     private EconomicWarningData _data;
     private EconomicWarningDatabase _database;
@@ -19,7 +19,46 @@ public class EconomicWarningSystem : Node
         LoadData();
         UpdateIndicatorValues();
     }
-
+    
+    /// <summary>
+    /// 系统名称
+    /// </summary>
+    protected override string SystemName => "EconomicWarning";
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        if (_data != null)
+        {
+            data["enabled"] = _isEnabled;
+            data["check_interval"] = _checkInterval;
+        }
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("enabled"))
+        {
+            _isEnabled = (bool)data["enabled"];
+        }
+        
+        if (data.Contains("check_interval"))
+        {
+            _checkInterval = (float)data["check_interval"];
+        }
+    }
+    
     public void LoadData()
     {
         var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
