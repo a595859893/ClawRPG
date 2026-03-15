@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 灵魂绑定类型枚举。
+/// </summary>
 public enum BondType
 {
     Weapon,

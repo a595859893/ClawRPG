@@ -2,8 +2,14 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 灵魂绑定数据库。存储所有灵魂绑定配置信息。
+/// </summary>
 public class SoulBondDatabase
 {
+    /// <summary>
+    /// 获取数据库单例实例。
+    /// </summary>
     private static SoulBondDatabase _instance;
     public static SoulBondDatabase Instance => _instance ??= new SoulBondDatabase();
 

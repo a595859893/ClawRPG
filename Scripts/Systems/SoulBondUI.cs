@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 灵魂绑定用户界面。显示和管理灵魂绑定面板。
+/// </summary>
 public class SoulBondUI : Control
 {
     private TabContainer _tabContainer;

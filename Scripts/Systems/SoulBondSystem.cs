@@ -2,8 +2,14 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 灵魂绑定系统。管理装备与玩家之间的灵魂绑定关系和属性加成。
+/// </summary>
 public class SoulBondSystem : Node
 {
+    /// <summary>
+    /// 获取系统单例实例。
+    /// </summary>
     private static SoulBondSystem _instance;
     public static SoulBondSystem Instance => _instance;
 
