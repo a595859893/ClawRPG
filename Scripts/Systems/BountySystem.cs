@@ -180,7 +180,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 赏金任务管理器
     /// </summary>
-    public class BountyManager
+    public class BountyManager : BaseSystem
     {
         private static BountyManager _instance;
         public static BountyManager Instance => _instance ??= new BountyManager();
