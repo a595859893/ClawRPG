@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BattlePassManager : Node
+public class BattlePassManager : BaseSystem
 {
     public static BattlePassManager Instance { get; private set; }
     
@@ -53,6 +53,28 @@ public class BattlePassManager : Node
     {
         Instance = this;
         InitializeSeasons();
+    }
+    
+    /// <summary>
+    /// 系统名称
+    /// </summary>
+    protected override string SystemName => "BattlePass";
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return GetSaveData();
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data != null)
+            LoadSaveData(data);
     }
     
     private void InitializeSeasons()
