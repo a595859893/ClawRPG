@@ -135,11 +135,6 @@ public class PartySystem : BaseSystem
         Instance = this;
     }
 
-    public override void _Ready()
-    {
-        base._Ready();
-    }
-
     public override void _Process(float delta)
     {
         if (!IsInParty) return;
