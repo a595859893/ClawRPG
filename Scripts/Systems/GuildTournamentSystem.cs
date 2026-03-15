@@ -7,17 +7,26 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Guild Tournament System - Competitive guild tournaments
     /// </summary>
-    public class GuildTournamentSystem
+    public partial class GuildTournamentSystem : BaseSystem
     {
-        private static GuildTournamentSystem _instance;
-        public static GuildTournamentSystem Instance
+        public static GuildTournamentSystem Instance { get; private set; }
+
+        public override void _Ready()
         {
-            get
+            base._Ready();
+            Instance = this;
+            Initialize();
+        }
+
+        protected override void Initialize()
+        {
+            GD.Print("GuildTournamentSystem initialized");
+            _currentTournament = new TournamentData
             {
-                if (_instance == null)
-                    _instance = new GuildTournamentSystem();
-                return _instance;
-            }
+                State = TournamentState.Registration,
+                RegisteredGuilds = new List<int>()
+            };
+            IsInitialized = true;
         }
 
         // Tournament states
@@ -64,6 +73,18 @@ namespace ClawRPG.Scripts.Systems
                 State = TournamentState.Registration,
                 RegisteredGuilds = new List<int>()
             };
+        }
+
+        public override void _Ready()
+        {
+            base._Ready();
+            Initialize();
+        }
+
+        protected override void Initialize()
+        {
+            GD.Print("[GuildTournamentSystem] initialized");
+            IsInitialized = true;
         }
         
         /// <summary>
@@ -367,14 +388,14 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Save tournament data
         /// </summary>
-        public Dictionary<string, object> Save()
+        protected override Dictionary ExportSaveData()
         {
-            Dictionary<string, object> data = new Dictionary<string, object>();
+            Dictionary data = new Dictionary();
             
             // Save current tournament
             if (_currentTournament != null)
             {
-                data["current_tournament"] = new Dictionary<string, object>
+                data["current_tournament"] = new Dictionary
                 {
                     { "id", _currentTournament.Id },
                     { "name", _currentTournament.Name },
@@ -386,10 +407,10 @@ namespace ClawRPG.Scripts.Systems
             }
             
             // Save guild scores
-            List<object> scoresList = new List<object>();
+            Godot.Collections.Array scoresList = new Godot.Collections.Array();
             foreach (var kvp in _guildScores)
             {
-                scoresList.Add(new Dictionary<string, object>
+                scoresList.Add(new Godot.Collections.Dictionary
                 {
                     { "guild_id", kvp.Key },
                     { "guild_name", kvp.Value.GuildName },
@@ -403,10 +424,10 @@ namespace ClawRPG.Scripts.Systems
             data["guild_scores"] = scoresList;
             
             // Save history
-            List<object> historyList = new List<object>();
+            Godot.Collections.Array historyList = new Godot.Collections.Array();
             foreach (var tournament in _tournamentHistory)
             {
-                historyList.Add(new Dictionary<string, object>
+                historyList.Add(new Godot.Collections.Dictionary
                 {
                     { "id", tournament.Id },
                     { "name", tournament.Name },
@@ -423,7 +444,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Load tournament data
         /// </summary>
-        public void Load(Dictionary<string, object> data)
+        protected override void ImportSaveData(Dictionary data)
         {
             if (data == null)
                 return;
@@ -433,23 +454,23 @@ namespace ClawRPG.Scripts.Systems
             // Load scores
             if (data.ContainsKey("guild_scores"))
             {
-                var scoresList = data["guild_scores"] as List<object>;
+                var scoresList = data["guild_scores"] as Godot.Collections.Array;
                 if (scoresList != null)
                 {
                     foreach (var scoreData in scoresList)
                     {
-                        var dict = scoreData as Dictionary<string, object>;
+                        var dict = scoreData as Godot.Collections.Dictionary;
                         if (dict == null) continue;
                         
                         var score = new GuildTournamentScore
                         {
-                            GuildId = (int)(long)dict["guild_id"],
+                            GuildId = Convert.ToInt32(dict["guild_id"]),
                             GuildName = dict["guild_name"].ToString(),
-                            Kills = (int)(long)dict["kills"],
-                            Deaths = (int)(long)dict["deaths"],
-                            Damage = (float)(double)dict["damage"],
-                            Healing = (float)(double)dict["healing"],
-                            Score = (int)(long)dict["score"]
+                            Kills = Convert.ToInt32(dict["kills"]),
+                            Deaths = Convert.ToInt32(dict["deaths"]),
+                            Damage = Convert.ToSingle(dict["damage"]),
+                            Healing = Convert.ToSingle(dict["healing"]),
+                            Score = Convert.ToInt32(dict["score"])
                         };
                         _guildScores[score.GuildId] = score;
                     }

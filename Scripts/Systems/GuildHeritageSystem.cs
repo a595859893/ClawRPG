@@ -5,10 +5,9 @@ using Godot;
 /// <summary>
 /// 公会传承系统 - 管理公会遗产和永久加成
 /// </summary>
-public class GuildHeritageSystem
+public partial class GuildHeritageSystem : BaseSystem
 {
-    private static GuildHeritageSystem _instance;
-    public static GuildHeritageSystem Instance => _instance ?? (_instance = new GuildHeritageSystem());
+    public static GuildHeritageSystem Instance { get; private set; }
 
     public Dictionary<string, GuildHeritage> GuildHeritages { get; private set; }
     public Dictionary<string, PlayerHeritageData> PlayerData { get; private set; }
@@ -26,9 +25,17 @@ public class GuildHeritageSystem
         HeritageSignal = new SignalContainer<GuildHeritageSignal>();
     }
 
-    public void Initialize()
+    public override void _Ready()
+    {
+        base._Ready();
+        Instance = this;
+        Initialize();
+    }
+
+    protected override void Initialize()
     {
         GD.Print("GuildHeritageSystem initialized");
+        IsInitialized = true;
     }
 
     public GuildHeritage CreateGuildHeritage(string guildId, string guildName)
@@ -327,9 +334,9 @@ public class GuildHeritageSystem
         return result;
     }
 
-    public Dictionary<string, int> ExportSaveData()
+    protected override Dictionary ExportSaveData()
     {
-        var data = new Dictionary<string, int>();
+        var data = new Dictionary();
         
         foreach (var kvp in GuildHeritages)
         {
@@ -346,28 +353,28 @@ public class GuildHeritageSystem
         return data;
     }
 
-    public void ImportSaveData(Dictionary<string, int> data)
+    protected override void ImportSaveData(Dictionary data)
     {
         GuildHeritages.Clear();
         
         foreach (var kvp in data)
         {
-            if (kvp.Key.StartsWith("guild_") && kvp.Key.Contains("_points"))
+            if (kvp.Key.ToString().StartsWith("guild_") && kvp.Key.ToString().Contains("_points"))
             {
-                var guildId = kvp.Key.Replace("guild_", "").Replace("_points", "");
+                var guildId = kvp.Key.ToString().Replace("guild_", "").Replace("_points", "");
                 if (!GuildHeritages.ContainsKey(guildId))
                 {
                     CreateGuildHeritage(guildId, "Imported Guild");
                 }
-                GuildHeritages[guildId].TotalHeritagePoints = kvp.Value;
+                GuildHeritages[guildId].TotalHeritagePoints = Convert.ToInt32(kvp.Value);
             }
         }
         
         foreach (var kvp in data)
         {
-            if (kvp.Key.StartsWith("guild_") && kvp.Key.Contains("_heritage_"))
+            if (kvp.Key.ToString().StartsWith("guild_") && kvp.Key.ToString().Contains("_heritage_"))
             {
-                var parts = kvp.Key.Split('_');
+                var parts = kvp.Key.ToString().Split('_');
                 if (parts.Length >= 3)
                 {
                     var guildId = parts[1];
@@ -375,7 +382,7 @@ public class GuildHeritageSystem
                     {
                         foreach (var heritage in GuildHeritageDatabase.Instance.Heritages.Values)
                         {
-                            if (heritage.Id.GetHashCode() == kvp.Value)
+                            if (heritage.Id.GetHashCode() == Convert.ToInt32(kvp.Value))
                             {
                                 GuildHeritages[guildId].UnlockedHeritages[heritage.Id] = 1;
                                 GuildHeritages[guildId].ActiveEffects.Add(heritage.Id);
