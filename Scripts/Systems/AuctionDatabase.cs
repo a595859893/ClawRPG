@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 拍卖品数据 - 定义拍卖物品的数据结构
+/// </summary>
 public class AuctionItem
 {
     public int Id { get; set; }
@@ -19,54 +22,66 @@ public class AuctionItem
     public AuctionItemStatus Status { get; set; }
 }
 
+/// <summary>
+/// 拍卖品状态枚举
+/// </summary>
 public enum AuctionItemStatus
 {
-    Active,
-    Sold,
-    Expired,
-    Cancelled
+    Active,     // 活跃
+    Sold,       // 已售出
+    Expired,    // 已过期
+    Cancelled   // 已取消
 }
 
+/// <summary>
+/// 玩家拍卖数据
+/// </summary>
 public class PlayerAuctionData
 {
     public string PlayerName { get; set; }
-    public int TotalSales { get; set; }
-    public int TotalPurchases { get; set; }
-    public int TotalSpent { get; set; }
-    public int TotalEarned { get; set; }
-    public List<int> ActiveListings { get; set; } = new List<int>();
-    public List<int> WonAuctions { get; set; } = new List<int>();
+    public int TotalSales { get; set; }         // 总售出次数
+    public int TotalPurchases { get; set; }      // 总购买次数
+    public int TotalSpent { get; set; }         // 总花费
+    public int TotalEarned { get; set; }         // 总收入
+    public List<int> ActiveListings { get; set; } = new List<int>();  // 活跃挂单
+    public List<int> WonAuctions { get; set; } = new List<int>();     // 赢得的拍卖
 }
 
+/// <summary>
+/// 拍卖数据库 - 管理所有拍卖品和玩家数据
+/// </summary>
 public static class AuctionDatabase
 {
-    private static readonly Dictionary<int, AuctionItem> _auctions = new Dictionary<int>();
+    private static readonly Dictionary<int, AuctionItem> _auctions = new Dictionary<int, AuctionItem>();
     private static int _nextAuctionId = 1;
     private static readonly Dictionary<string, PlayerAuctionData> _playerData = new Dictionary<string, PlayerAuctionData>();
     
-    // Auction duration in hours
+    // 拍卖持续时间（小时）
     public const int AUCTION_DURATION_HOURS = 24;
     
-    // Fee percentages
-    public const float LISTING_FEE_PERCENT = 0.02f; // 2% listing fee
-    public const float SALE_FEE_PERCENT = 0.05f; // 5% sale fee
+    // 费用百分比
+    public const float LISTING_FEE_PERCENT = 0.02f; // 2% 挂单费
+    public const float SALE_FEE_PERCENT = 0.05f;    // 5% 销售费
     
-    // Max listings per player
+    // 每个玩家最大挂单数
     public const int MAX_ACTIVE_LISTINGS = 10;
     
-    // Price ranges
+    // 价格范围
     public const int MIN_AUCTION_PRICE = 10;
     public const int MAX_AUCTION_PRICE = 999999999;
     
     static AuctionDatabase()
     {
-        // Initialize with sample auctions
+        // 初始化示例拍卖品
         InitializeSampleAuctions();
     }
     
+    /// <summary>
+    /// 初始化示例拍卖品数据
+    /// </summary>
     private static void InitializeSampleAuctions()
     {
-        // Sample auction items for demonstration
+        // 示例拍卖物品
         var sampleAuctions = new[]
         {
             new AuctionItem
@@ -125,23 +140,38 @@ public static class AuctionDatabase
         }
     }
     
+    /// <summary>
+    /// 获取下一个拍卖ID
+    /// </summary>
     public static int GetNextAuctionId() => _nextAuctionId++;
     
+    /// <summary>
+    /// 添加拍卖品
+    /// </summary>
     public static void AddAuction(AuctionItem auction)
     {
         _auctions[auction.Id] = auction;
     }
     
+    /// <summary>
+    /// 获取指定ID的拍卖品
+    /// </summary>
     public static AuctionItem GetAuction(int id)
     {
         return _auctions.ContainsKey(id) ? _auctions[id] : null;
     }
     
+    /// <summary>
+    /// 获取所有拍卖品
+    /// </summary>
     public static List<AuctionItem> GetAllAuctions()
     {
         return new List<AuctionItem>(_auctions.Values);
     }
     
+    /// <summary>
+    /// 获取所有活跃的拍卖品
+    /// </summary>
     public static List<AuctionItem> GetActiveAuctions()
     {
         var active = new List<AuctionItem>();
@@ -155,6 +185,9 @@ public static class AuctionDatabase
         return active;
     }
     
+    /// <summary>
+    /// 按稀有度获取拍卖品
+    /// </summary>
     public static List<AuctionItem> GetAuctionsByRarity(int rarity)
     {
         var result = new List<AuctionItem>();
@@ -168,6 +201,9 @@ public static class AuctionDatabase
         return result;
     }
     
+    /// <summary>
+    /// 按搜索词获取拍卖品
+    /// </summary>
     public static List<AuctionItem> GetAuctionsBySearch(string searchTerm)
     {
         var result = new List<AuctionItem>();
@@ -181,6 +217,9 @@ public static class AuctionDatabase
         return result;
     }
     
+    /// <summary>
+    /// 获取玩家的挂单
+    /// </summary>
     public static List<AuctionItem> GetPlayerListings(string playerName)
     {
         var result = new List<AuctionItem>();
@@ -194,6 +233,9 @@ public static class AuctionDatabase
         return result;
     }
     
+    /// <summary>
+    /// 获取玩家的竞拍
+    /// </summary>
     public static List<AuctionItem> GetPlayerBids(string playerName)
     {
         var result = new List<AuctionItem>();
@@ -207,6 +249,9 @@ public static class AuctionDatabase
         return result;
     }
     
+    /// <summary>
+    /// 获取玩家拍卖数据
+    /// </summary>
     public static PlayerAuctionData GetPlayerData(string playerName)
     {
         if (!_playerData.ContainsKey(playerName))
@@ -223,11 +268,17 @@ public static class AuctionDatabase
         return _playerData[playerName];
     }
     
+    /// <summary>
+    /// 更新玩家数据
+    /// </summary>
     public static void UpdatePlayerData(PlayerAuctionData data)
     {
         _playerData[data.PlayerName] = data;
     }
     
+    /// <summary>
+    /// 更新拍卖品信息
+    /// </summary>
     public static void UpdateAuction(AuctionItem auction)
     {
         if (_auctions.ContainsKey(auction.Id))
@@ -236,6 +287,9 @@ public static class AuctionDatabase
         }
     }
     
+    /// <summary>
+    /// 处理过期的拍卖品
+    /// </summary>
     public static void ProcessExpiredAuctions()
     {
         var now = DateTime.UtcNow;
@@ -243,21 +297,21 @@ public static class AuctionDatabase
         {
             if (auction.IsActive && auction.Status == AuctionItemStatus.Active && auction.EndTime <= now)
             {
-                // Auction ended
+                // 拍卖结束
                 if (!string.IsNullOrEmpty(auction.HighestBidder))
                 {
-                    // Item sold to highest bidder
+                    // 物品出售给出价最高者
                     auction.Status = AuctionItemStatus.Sold;
                     auction.IsActive = false; 
                     
-                    // Update seller data
+                    // 更新卖家数据
                     var sellerData = GetPlayerData(auction.SellerName);
                     int netEarnings = (int)(auction.CurrentBid * (1 - SALE_FEE_PERCENT));
                     sellerData.TotalSales++;
                     sellerData.TotalEarned += netEarnings;
                     UpdatePlayerData(sellerData);
                     
-                    // Update buyer data
+                    // 更新买家数据
                     var buyerData = GetPlayerData(auction.HighestBidder);
                     buyerData.TotalPurchases++;
                     buyerData.TotalSpent += auction.CurrentBid;
@@ -266,7 +320,7 @@ public static class AuctionDatabase
                 }
                 else
                 {
-                    // No bids, auction expired
+                    // 无人出价，拍卖过期
                     auction.Status = AuctionItemStatus.Expired;
                     auction.IsActive = false; 
                 }
@@ -274,6 +328,9 @@ public static class AuctionDatabase
         }
     }
     
+    /// <summary>
+    /// 获取已过期的拍卖品
+    /// </summary>
     public static List<AuctionItem> GetExpiredAuctions()
     {
         var result = new List<AuctionItem>();
@@ -287,11 +344,17 @@ public static class AuctionDatabase
         return result;
     }
     
+    /// <summary>
+    /// 计算挂单费用
+    /// </summary>
     public static int CalculateListingFee(int price)
     {
         return (int)(price * LISTING_FEE_PERCENT);
     }
     
+    /// <summary>
+    /// 计算销售费用
+    /// </summary>
     public static int CalculateSaleFee(int price)
     {
         return (int)(price * SALE_FEE_PERCENT);
