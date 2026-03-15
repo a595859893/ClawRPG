@@ -6,20 +6,42 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// Core system for procedural name generation
     /// </summary>
-    public class ProceduralNameSystem {
+    public class ProceduralNameSystem : BaseSystem
+    {
+        private static ProceduralNameSystem _instance;
+        public static ProceduralNameSystem Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = GetNode<ProceduralNameSystem>("/root/ProceduralNameSystem");
+                    if (_instance == null)
+                    {
+                        var node = new ProceduralNameSystem();
+                        node.Name = "ProceduralNameSystem";
+                        Engine.GetMainLoop().Root.AddChild(node);
+                    }
+                }
+                return _instance;
+            }
+        }
+        
         private ProceduralNameData _data;
         private Random _random;
         private int? _seed;
         
-        public ProceduralNameSystem() {
+        protected override void Initialize()
+        {
+            base.Initialize();
+            
             _data = new ProceduralNameData();
             _random = new Random();
-        }
-        
-        public ProceduralNameSystem(int seed) {
-            _data = new ProceduralNameData();
-            _seed = seed;
-            _random = new Random(seed);
+            
+            // 注册到保存系统
+            SaveSystem.Instance?.Register(this);
+            
+            GD.Print("[ProceduralNameSystem] Initialized");
         }
         
         /// <summary>
@@ -30,13 +52,17 @@ namespace ClawRPG.Systems {
             
             // Use defaults if not specified
             if (string.IsNullOrEmpty(type)) {
-                type = ProceduralNameDatabase.GetAllTypes()[rng.Next(ProceduralNameDatabase.GetAllTypes().Length)];
+                var types = ProceduralNameDatabase.GetAllTypes();
+                if (types.Length > 0)
+                    type = types[rng.Next(types.Length)];
             }
             if (string.IsNullOrEmpty(rarity)) {
                 rarity = GetRandomRarity(rng);
             }
             if (string.IsNullOrEmpty(style)) {
-                style = ProceduralNameDatabase.GetAllStyles()[rng.Next(ProceduralNameDatabase.GetAllStyles().Length)];
+                var styles = ProceduralNameDatabase.GetAllStyles();
+                if (styles.Length > 0)
+                    style = styles[rng.Next(styles.Length)];
             }
             
             // Build name components
@@ -46,7 +72,9 @@ namespace ClawRPG.Systems {
             
             // 50% chance to use middle part
             if (rng.Next(2) == 0) {
-                middle = ProceduralNameDatabase.MiddleParts[rng.Next(ProceduralNameDatabase.MiddleParts.Length)];
+                var middles = ProceduralNameDatabase.MiddleParts;
+                if (middles.Length > 0)
+                    middle = middles[rng.Next(middles.Length)];
             }
             
             // Build final name
@@ -73,7 +101,7 @@ namespace ClawRPG.Systems {
         /// </summary>
         private string GetPrefix(string rarity, Random rng) {
             var prefixes = ProceduralNameDatabase.GetPrefixesByRarity(rarity);
-            return prefixes[rng.Next(prefixes.Length)];
+            return prefixes.Length > 0 ? prefixes[rng.Next(prefixes.Length)] : "Mysterious";
         }
         
         /// <summary>
@@ -88,7 +116,7 @@ namespace ClawRPG.Systems {
             
             // Otherwise use rarity-based suffix
             var suffixes = ProceduralNameDatabase.GetSuffixesByRarity(rarity);
-            return suffixes[rng.Next(suffixes.Length)];
+            return suffixes.Length > 0 ? suffixes[rng.Next(suffixes.Length)] : "Unknown";
         }
         
         /// <summary>
@@ -127,14 +155,20 @@ namespace ClawRPG.Systems {
             
             if (_data.TypeUsageCount.ContainsKey(type)) {
                 _data.TypeUsageCount[type]++;
+            } else {
+                _data.TypeUsageCount[type] = 1;
             }
             
             if (_data.RarityUsageCount.ContainsKey(rarity)) {
                 _data.RarityUsageCount[rarity]++;
+            } else {
+                _data.RarityUsageCount[rarity] = 1;
             }
             
             if (_data.StyleUsageCount.ContainsKey(style)) {
                 _data.StyleUsageCount[style]++;
+            } else {
+                _data.StyleUsageCount[style] = 1;
             }
             
             // Update style-specific counts
@@ -185,10 +219,41 @@ namespace ClawRPG.Systems {
         }
         
         /// <summary>
-        /// Load data from save
+        /// 导出保存数据
         /// </summary>
-        public void LoadData(ProceduralNameData data) {
-            _data = data ?? new ProceduralNameData();
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            data["total_generated"] = _data.TotalGenerated;
+            data["fantasy_style_count"] = _data.FantasyStyleCount;
+            data["modern_style_count"] = _data.ModernStyleCount;
+            data["mythical_style_count"] = _data.MythicalStyleCount;
+            data["ancient_style_count"] = _data.AncientStyleCount;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            _data.TotalGenerated = data.Contains("total_generated") ? (int)data["total_generated"] : 0;
+            _data.FantasyStyleCount = data.Contains("fantasy_style_count") ? (int)data["fantasy_style_count"] : 0;
+            _data.ModernStyleCount = data.Contains("modern_style_count") ? (int)data["modern_style_count"] : 0;
+            _data.MythicalStyleCount = data.Contains("mythical_style_count") ? (int)data["mythical_style_count"] : 0;
+            _data.AncientStyleCount = data.Contains("ancient_style_count") ? (int)data["ancient_style_count"] : 0;
+        }
+        
+        /// <summary>
+        /// 获取系统ID
+        /// </summary>
+        public override string GetId()
+        {
+            return "ProceduralNameSystem";
         }
         
         /// <summary>

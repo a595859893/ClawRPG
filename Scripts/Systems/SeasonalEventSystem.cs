@@ -288,26 +288,17 @@ public class SeasonalEventDatabase
     }
 }
 
-public class SeasonalEventSystem
+public partial class SeasonalEventSystem : BaseSystem
 {
     /// <summary>
     /// 获取系统单例实例。
     /// </summary>
-    private static SeasonalEventSystem _instance;
+    private static SeasonalEventSystem instance;
 
     /// <summary>
     /// 获取单例实例。
     /// </summary>
-    public static SeasonalEventSystem Instance
-    {
-        get
-        {
-            if (_instance == null)
-                _instance = new SeasonalEventSystem();
-            return _instance;
-        }
-        private set => _instance = value;
-    }
+    public static SeasonalEventSystem Instance => instance ??= new SeasonalEventSystem();
 
     private Dictionary<string, SeasonalEventData.PlayerEventData> _playerEventData = new Dictionary<string, SeasonalEventData.PlayerEventData>();
     private Dictionary<string, int> _eventEntries = new Dictionary<string, int>();
@@ -324,7 +315,15 @@ public class SeasonalEventSystem
 
     public SeasonalEventSystem()
     {
-        Instance = this;
+    }
+
+    public override void _Ready() {
+        base._Ready();
+        Initialize();
+    }
+
+    protected override void Initialize() {
+        GD.Print("[SeasonalEventSystem] Initialized");
     }
 
     public void Initialize()
@@ -480,5 +479,34 @@ public class SeasonalEventSystem
                 _eventEntries[kvp.Key] = Convert.ToInt32(kvp.Value);
             }
         }
+    }
+    
+    /// <summary>
+    /// Export save data
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["event_entries"] = _eventEntries;
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("event_entries") && data["event_entries"] is Dictionary entries)
+        {
+            _eventEntries.Clear();
+            foreach (var kvp in entries)
+            {
+                _eventEntries[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+            }
+        }
+        
+        IsInitialized = true;
     }
 }

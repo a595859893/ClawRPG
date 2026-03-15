@@ -1,13 +1,13 @@
+using Godot;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace ClawRPG.Scripts
+namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
     /// 天气系统核心管理器
     /// </summary>
-    public class WeatherSystem : MonoBehaviour
+    public class WeatherSystem : BaseSystem
     {
         private static WeatherSystem _instance;
         public static WeatherSystem Instance
@@ -16,9 +16,13 @@ namespace ClawRPG.Scripts
             {
                 if (_instance == null)
                 {
-                    GameObject go = new GameObject("WeatherSystem");
-                    _instance = go.AddComponent<WeatherSystem>();
-                    DontDestroyOnLoad(go);
+                    _instance = GetNode<WeatherSystem>("/root/WeatherSystem");
+                    if (_instance == null)
+                    {
+                        var node = new WeatherSystem();
+                        node.Name = "WeatherSystem";
+                        Engine.GetMainLoop().Root.AddChild(node);
+                    }
                 }
                 return _instance;
             }
@@ -28,29 +32,30 @@ namespace ClawRPG.Scripts
         private Dictionary<string, PlayerWeatherState> _playerStates;
         private List<WeatherEvent> _weatherEvents;
         private WeatherStatistics _statistics;
-        private System.Random _random;
+        private Random _random;
         
         // 事件
-        public static Action<string, WeatherType, WeatherIntensity> OnWeatherChanged;
-        public static Action<string, WeatherEffectType, float> OnWeatherEffectApplied;
-        public static Action<string, float> OnTransitionProgress;
+        public Action<string, WeatherType, WeatherIntensity> OnWeatherChanged;
+        public Action<string, WeatherEffectType, float> OnWeatherEffectApplied;
+        public Action<string, float> OnTransitionProgress;
         
-        private void Awake()
+        protected override void Initialize()
         {
-            _instance = this;
+            base.Initialize();
+            
             _zoneWeathers = new Dictionary<string, ZoneWeather>();
             _playerStates = new Dictionary<string, PlayerWeatherState>();
             _weatherEvents = new List<WeatherEvent>();
             _statistics = new WeatherStatistics();
-            _random = new System.Random();
+            _random = new Random();
             
-            WeatherDatabase.Initialize();
-        }
-        
-        private void Start()
-        {
+            // 注册到保存系统
+            SaveSystem.Instance?.Register(this);
+            
             InitializeDefaultZones();
             LoadWeatherData();
+            
+            GD.Print("[WeatherSystem] Initialized");
         }
         
         private void InitializeDefaultZones()
@@ -65,29 +70,7 @@ namespace ClawRPG.Scripts
         
         private void LoadWeatherData()
         {
-            // 从存档加载天气数据
-            if (SaveSystem.IsLoaded)
-            {
-                var data = SaveSystem.CurrentSave.WeatherData;
-                if (data != null)
-                {
-                    if (data.ZoneWeathers != null)
-                    {
-                        foreach (var zw in data.ZoneWeathers)
-                        {
-                            _zoneWeathers[zw.ZoneId] = zw;
-                        }
-                    }
-                    if (data.WeatherEvents != null)
-                    {
-                        _weatherEvents = new List<WeatherEvent>(data.WeatherEvents);
-                    }
-                    if (data.Statistics != null)
-                    {
-                        _statistics = data.Statistics;
-                    }
-                }
-            }
+            // 天气数据现在通过 ImportSaveData 加载
         }
         
         /// <summary>
@@ -100,6 +83,8 @@ namespace ClawRPG.Scripts
             
             // 随机选择初始天气
             List<WeatherType> weatherTypes = WeatherDatabase.GetZoneWeatherTypes(zoneId);
+            if (weatherTypes.Count == 0) return;
+            
             WeatherType initialWeather = weatherTypes[_random.Next(weatherTypes.Count)];
             WeatherConfig config = WeatherDatabase.GetWeatherConfig(initialWeather);
             
@@ -108,8 +93,8 @@ namespace ClawRPG.Scripts
                 ZoneId = zoneId,
                 ZoneName = zoneName,
                 CurrentWeather = initialWeather,
-                Intensity = config.DefaultIntensity,
-                RemainingTime = config.Duration * 60f, // 转换为秒
+                Intensity = config?.DefaultIntensity ?? WeatherIntensity.Moderate,
+                RemainingTime = (config?.Duration ?? 30f) * 60f, // 转换为秒
                 TransitionProgress = 1f,
                 IsTransitioning = false,
                 LastUpdate = DateTime.Now
@@ -150,7 +135,7 @@ namespace ClawRPG.Scripts
                 Weather = weatherType,
                 Intensity = intensity,
                 StartTime = DateTime.Now,
-                EndTime = DateTime.Now.AddMinutes(config.Duration),
+                EndTime = DateTime.Now.AddMinutes(config?.Duration ?? 30),
                 AffectedPlayers = 0
             };
             _weatherEvents.Add(weatherEvent);
@@ -169,7 +154,7 @@ namespace ClawRPG.Scripts
             // 更新天气
             zoneWeather.CurrentWeather = weatherType;
             zoneWeather.Intensity = intensity;
-            zoneWeather.RemainingTime = config.Duration * 60f;
+            zoneWeather.RemainingTime = (config?.Duration ?? 30f) * 60f;
             
             _zoneWeathers[zoneId] = zoneWeather;
         }
@@ -177,16 +162,16 @@ namespace ClawRPG.Scripts
         /// <summary>
         /// 更新天气（每帧调用）
         /// </summary>
-        private void Update()
+        public override void _Process(float delta)
         {
-            float deltaTime = Time.deltaTime;
+            base._Process(delta);
             
             foreach (var zoneWeather in _zoneWeathers.Values)
             {
                 // 处理过渡
                 if (zoneWeather.IsTransitioning)
                 {
-                    zoneWeather.TransitionProgress += deltaTime / 30f; // 默认30秒过渡
+                    zoneWeather.TransitionProgress += delta / 30f; // 默认30秒过渡
                     if (zoneWeather.TransitionProgress >= 1f)
                     {
                         zoneWeather.TransitionProgress = 1f;
@@ -196,7 +181,7 @@ namespace ClawRPG.Scripts
                 }
                 
                 // 处理持续时间
-                zoneWeather.RemainingTime -= deltaTime;
+                zoneWeather.RemainingTime -= delta;
                 if (zoneWeather.RemainingTime <= 0)
                 {
                     // 切换到下一个天气
@@ -217,6 +202,8 @@ namespace ClawRPG.Scripts
             
             ZoneWeather zoneWeather = _zoneWeathers[zoneId];
             List<WeatherType> weatherTypes = WeatherDatabase.GetZoneWeatherTypes(zoneId);
+            
+            if (weatherTypes.Count == 0) return;
             
             // 随机选择下一个天气（避免重复）
             WeatherType nextWeather;
@@ -408,21 +395,6 @@ namespace ClawRPG.Scripts
         }
         
         /// <summary>
-        /// 保存天气数据
-        /// </summary>
-        public void SaveWeatherData()
-        {
-            if (!SaveSystem.IsLoaded) return;
-            
-            SaveSystem.CurrentSave.WeatherData = new WeatherSaveData
-            {
-                ZoneWeathers = new List<ZoneWeather>(_zoneWeathers.Values),
-                WeatherEvents = _weatherEvents,
-                Statistics = _statistics
-            };
-        }
-        
-        /// <summary>
         /// 获取所有区域ID
         /// </summary>
         public List<string> GetAllZoneIds()
@@ -457,6 +429,142 @@ namespace ClawRPG.Scripts
         {
             WeatherConfig config = WeatherDatabase.GetWeatherConfig(type);
             return config?.TransitionTime ?? 10f;
+        }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            var zoneWeathersList = new List<Dictionary>();
+            foreach (var zw in _zoneWeathers.Values)
+            {
+                zoneWeathersList.Add(new Dictionary
+                {
+                    ["zone_id"] = zw.ZoneId,
+                    ["zone_name"] = zw.ZoneName,
+                    ["current_weather"] = (int)zw.CurrentWeather,
+                    ["intensity"] = (int)zw.Intensity,
+                    ["remaining_time"] = zw.RemainingTime,
+                    ["transition_progress"] = zw.TransitionProgress,
+                    ["is_transitioning"] = zw.IsTransitioning
+                });
+            }
+            data["zone_weathers"] = zoneWeathersList;
+            
+            var weatherEventsList = new List<Dictionary>();
+            foreach (var we in _weatherEvents)
+            {
+                weatherEventsList.Add(new Dictionary
+                {
+                    ["event_id"] = we.EventId,
+                    ["zone_id"] = we.ZoneId,
+                    ["weather"] = (int)we.Weather,
+                    ["intensity"] = (int)we.Intensity,
+                    ["start_time"] = we.StartTime.ToString("o"),
+                    ["affected_players"] = we.AffectedPlayers
+                });
+            }
+            data["weather_events"] = weatherEventsList;
+            
+            var weatherCounts = new Dictionary();
+            foreach (var kvp in _statistics.WeatherCounts)
+            {
+                weatherCounts[(int)kvp.Key] = kvp.Value;
+            }
+            data["weather_counts"] = weatherCounts;
+            data["total_weather_events"] = _statistics.TotalWeatherEvents;
+            data["player_weather_events"] = _statistics.PlayerWeatherEvents;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("zone_weathers"))
+            {
+                var zoneList = data["zone_weathers"] as List<object>;
+                if (zoneList != null)
+                {
+                    _zoneWeathers.Clear();
+                    foreach (var item in zoneList)
+                    {
+                        var dict = item as Dictionary;
+                        if (dict != null)
+                        {
+                            var zw = new ZoneWeather
+                            {
+                                ZoneId = dict["zone_id"] as string,
+                                ZoneName = dict["zone_name"] as string,
+                                CurrentWeather = (WeatherType)(int)dict["current_weather"],
+                                Intensity = (WeatherIntensity)(int)dict["intensity"],
+                                RemainingTime = (float)dict["remaining_time"],
+                                TransitionProgress = (float)dict["transition_progress"],
+                                IsTransitioning = (bool)dict["is_transitioning"],
+                                LastUpdate = DateTime.Now
+                            };
+                            _zoneWeathers[zw.ZoneId] = zw;
+                        }
+                    }
+                }
+            }
+            
+            if (data.Contains("weather_events"))
+            {
+                var eventsList = data["weather_events"] as List<object>;
+                if (eventsList != null)
+                {
+                    _weatherEvents.Clear();
+                    foreach (var item in eventsList)
+                    {
+                        var dict = item as Dictionary;
+                        if (dict != null)
+                        {
+                            var we = new WeatherEvent
+                            {
+                                EventId = dict["event_id"] as string,
+                                ZoneId = dict["zone_id"] as string,
+                                Weather = (WeatherType)(int)dict["weather"],
+                                Intensity = (WeatherIntensity)(int)dict["intensity"],
+                                StartTime = DateTime.Parse(dict["start_time"] as string),
+                                AffectedPlayers = (int)dict["affected_players"]
+                            };
+                            _weatherEvents.Add(we);
+                        }
+                    }
+                }
+            }
+            
+            if (data.Contains("weather_counts"))
+            {
+                var counts = data["weather_counts"] as Dictionary;
+                if (counts != null)
+                {
+                    _statistics.WeatherCounts.Clear();
+                    foreach (var kvp in counts)
+                    {
+                        _statistics.WeatherCounts[(WeatherType)(int)kvp.Key] = (int)kvp.Value;
+                    }
+                }
+            }
+            
+            _statistics.TotalWeatherEvents = data.Contains("total_weather_events") ? (int)data["total_weather_events"] : 0;
+            _statistics.PlayerWeatherEvents = data.Contains("player_weather_events") ? (int)data["player_weather_events"] : 0;
+        }
+        
+        /// <summary>
+        /// 获取系统ID
+        /// </summary>
+        public override string GetId()
+        {
+            return "WeatherSystem";
         }
     }
     

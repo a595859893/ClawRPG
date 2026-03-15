@@ -89,104 +89,47 @@ public class PlayerRuneData
 /// <summary>
 /// Rune System - Equipment rune enhancement system
 /// </summary>
-public class RuneSystem
+public class RuneSystem : BaseSystem
 {
     private static RuneSystem _instance;
-    public static RuneSystem Instance => _instance ??= new RuneSystem();
+    public static RuneSystem Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = GetNode<RuneSystem>("/root/RuneSystem");
+                if (_instance == null)
+                {
+                    var node = new RuneSystem();
+                    node.Name = "RuneSystem";
+                    Engine.GetMainLoop().Root.AddChild(node);
+                }
+            }
+            return _instance;
+        }
+    }
     
     private PlayerRuneData _playerRuneData;
     private RuneDatabase _runeDatabase;
     
     // Signals
-    public Signal1<RuneData> RuneEquipped { get; } = new Signal1<RuneData>();
-    public Signal1<RuneData> RuneUnequipped { get; } = new Signal1<RuneData>();
-    public Signal1<RuneData> RuneAcquired { get; } = new Signal1<RuneData>();
-    public Signal1<string> RuneSlotUnlocked { get; } = new Signal1<string>();
+    public Action<RuneData> RuneEquipped;
+    public Action<RuneData> RuneUnequipped;
+    public Action<RuneData> RuneAcquired;
+    public Action<string> RuneSlotUnlocked;
     
-    public RuneSystem()
+    protected override void Initialize()
     {
+        base.Initialize();
+        
         _runeDatabase = new RuneDatabase();
         _playerRuneData = new PlayerRuneData();
-    }
-    
-    /// <summary>
-    /// Initialize system with save data
-    /// </summary>
-    public void Initialize(Dictionary<string, object> saveData)
-    {
-        if (saveData == null) return;
         
-        if (saveData.ContainsKey("owned_runes"))
-        {
-            var runesList = saveData["owned_runes"] as List<object>;
-            if (runesList != null)
-            {
-                _playerRuneData.OwnedRunes.Clear();
-                foreach (var runeObj in runesList)
-                {
-                    var runeDict = runeObj as Dictionary<string, object>;
-                    if (runeDict != null)
-                    {
-                        var rune = _runeDatabase.GetRuneById(runeDict["id"] as string);
-                        if (rune != null)
-                        {
-                            _playerRuneData.OwnedRunes.Add(rune);
-                        }
-                    }
-                }
-            }
-        }
+        // 注册到保存系统
+        SaveSystem.Instance?.Register(this);
         
-        if (saveData.ContainsKey("equipped_runes"))
-        {
-            var equippedDict = saveData["equipped_runes"] as Dictionary<string, object>;
-            if (equippedDict != null)
-            {
-                foreach (var kvp in equippedDict)
-                {
-                    if (Enum.TryParse<RuneSlotType>(kvp.Key, out var slotType))
-                    {
-                        var runeId = kvp.Value as string;
-                        if (!string.IsNullOrEmpty(runeId))
-                        {
-                            var rune = _runeDatabase.GetRuneById(runeId);
-                            _playerRuneData.EquippedRunes[slotType] = rune;
-                        }
-                    }
-                }
-            }
-        }
-        
-        if (saveData.ContainsKey("total_rune_slots"))
-        {
-            _playerRuneData.TotalRuneSlots = Convert.ToInt32(saveData["total_rune_slots"]);
-        }
-    }
-    
-    /// <summary>
-    /// Get save data for persistence
-    /// </summary>
-    public Dictionary<string, object> GetSaveData()
-    {
-        var saveData = new Dictionary<string, object>();
-        
-        var ownedRunes = new List<Dictionary<string, object>>();
-        foreach (var rune in _playerRuneData.OwnedRunes)
-        {
-            ownedRunes.Add(new Dictionary<string, object> { ["id"] = rune.Id });
-        }
-        saveData["owned_runes"] = ownedRunes;
-        
-        var equippedRunes = new Dictionary<string, string>();
-        foreach (var kvp in _playerRuneData.EquippedRunes)
-        {
-            equippedRunes[kvp.Key.ToString()] = kvp.Value?.Id ?? "";
-        }
-        saveData["equipped_runes"] = equippedRunes;
-        
-        saveData["total_rune_slots"] = _playerRuneData.TotalRuneSlots;
-        
-        return saveData;
+        GD.Print("[RuneSystem] Initialized");
     }
     
     /// <summary>
@@ -277,7 +220,7 @@ public class RuneSystem
             _playerRuneData.EquippedRunes[slotType] = rune;
         }
         
-        RuneEquipped.Emit(rune);
+        RuneEquipped?.Invoke(rune);
         return true;
     }
     
@@ -290,7 +233,7 @@ public class RuneSystem
         if (currentRune == null) return false;
         
         _playerRuneData.EquippedRunes[slotType] = null;
-        RuneUnequipped.Emit(currentRune);
+        RuneUnequipped?.Invoke(currentRune);
         return true;
     }
     
@@ -302,7 +245,7 @@ public class RuneSystem
         if (rune == null) return;
         
         _playerRuneData.OwnedRunes.Add(rune);
-        RuneAcquired.Emit(rune);
+        RuneAcquired?.Invoke(rune);
     }
     
     /// <summary>
@@ -332,12 +275,13 @@ public class RuneSystem
         var player = GetPlayer();
         if (player == null) return false;
         
-        if (player.Gold < cost) return false;
+        int playerGold = (int)player.Get("gold", 0);
+        if (playerGold < cost) return false;
         
-        player.Gold -= cost;
+        player.Set("gold", playerGold - cost);
         _playerRuneData.TotalRuneSlots++;
         
-        RuneSlotUnlocked.Emit($"Slot #{_playerRuneData.TotalRuneSlots}");
+        RuneSlotUnlocked?.Invoke($"Slot #{_playerRuneData.TotalRuneSlots}");
         return true;
     }
     
@@ -411,9 +355,13 @@ public class RuneSystem
     /// <summary>
     /// Get player reference (placeholder)
     /// </summary>
-    private Player GetPlayer()
+    private Node GetPlayer()
     {
-        // This should be connected to actual player
+        var tree = Engine.GetMainLoop();
+        if (tree is SceneTree sceneTree) {
+            var nodes = sceneTree.GetNodesInGroup("player");
+            if (nodes.Count > 0) return nodes[0];
+        }
         return null;
     }
     
@@ -481,5 +429,95 @@ public class RuneSystem
             RuneSlotType.Any => "通用",
             _ => "未知"
         };
+    }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var saveData = new Dictionary();
+        
+        var ownedRunes = new List<Dictionary>();
+        foreach (var rune in _playerRuneData.OwnedRunes)
+        {
+            ownedRunes.Add(new Dictionary { ["id"] = rune.Id });
+        }
+        saveData["owned_runes"] = ownedRunes;
+        
+        var equippedRunes = new Dictionary<string, string>();
+        foreach (var kvp in _playerRuneData.EquippedRunes)
+        {
+            equippedRunes[kvp.Key.ToString()] = kvp.Value?.Id ?? "";
+        }
+        saveData["equipped_runes"] = equippedRunes;
+        
+        saveData["total_rune_slots"] = _playerRuneData.TotalRuneSlots;
+        
+        return saveData;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("owned_runes"))
+        {
+            var runesList = data["owned_runes"] as List<object>;
+            if (runesList != null)
+            {
+                _playerRuneData.OwnedRunes.Clear();
+                foreach (var runeObj in runesList)
+                {
+                    var runeDict = runeObj as Dictionary;
+                    if (runeDict != null)
+                    {
+                        var rune = _runeDatabase.GetRuneById(runeDict["id"] as string);
+                        if (rune != null)
+                        {
+                            _playerRuneData.OwnedRunes.Add(rune);
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (data.Contains("equipped_runes"))
+        {
+            var equippedDict = data["equipped_runes"] as Dictionary;
+            if (equippedDict != null)
+            {
+                foreach (var kvp in equippedDict)
+                {
+                    if (Enum.TryParse<RuneSlotType>(kvp.Key.ToString(), out var slotType))
+                    {
+                        var runeId = kvp.Value as string;
+                        if (!string.IsNullOrEmpty(runeId))
+                        {
+                            var rune = _runeDatabase.GetRuneById(runeId);
+                            _playerRuneData.EquippedRunes[slotType] = rune;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (data.Contains("total_rune_slots"))
+        {
+            _playerRuneData.TotalRuneSlots = (int)data["total_rune_slots"];
+        }
+        
+        GD.Print("[RuneSystem] Data loaded");
+    }
+    
+    /// <summary>
+    /// 获取系统ID
+    /// </summary>
+    public override string GetId()
+    {
+        return "RuneSystem";
     }
 }

@@ -67,21 +67,33 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 声望系统 - 管理玩家与阵营的声望关系
     /// </summary>
-    public class ReputationSystem {
+    public class ReputationSystem : BaseSystem
+    {
         private static ReputationSystem _instance;
-        public static ReputationSystem Instance {
-            get {
-                if (_instance == null) _instance = new ReputationSystem();
+        public static ReputationSystem Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = GetNode<ReputationSystem>("/root/ReputationSystem");
+                    if (_instance == null)
+                    {
+                        var node = new ReputationSystem();
+                        node.Name = "ReputationSystem";
+                        Engine.GetMainLoop().Root.AddChild(node);
+                    }
+                }
                 return _instance;
             }
         }
 
         // 信号系统
-        public Signal1<string> ReputationChanged { get; }
-        public Signal2<string, ReputationTier> TierChanged { get; }
-        public Signal2<string, FactionReward> RewardAvailable { get; }
-        public Signal1<string> FactionJoined { get; }
-        public Signal1<string> FactionLeft { get; }
+        public Action<string> ReputationChanged;
+        public Action<string, ReputationTier> TierChanged;
+        public Action<string, FactionReward> RewardAvailable;
+        public Action<string> FactionJoined;
+        public Action<string> FactionLeft;
 
         private Dictionary<string, Faction> _factions;
         private Dictionary<string, PlayerFactionData> _playerFactions;
@@ -89,21 +101,15 @@ namespace ClawRPG.Scripts.Systems {
 
         public bool IsInitialized => _isInitialized;
 
-        public ReputationSystem() {
-            ReputationChanged = new Signal1<string>();
-            TierChanged = new Signal2<string, ReputationTier>();
-            RewardAvailable = new Signal2<string, FactionReward>();
-            FactionJoined = new Signal1<string>();
-            FactionLeft = new Signal1<string>();
-            _factions = new Dictionary<string, PlayerFactionData>();
+        protected override void Initialize()
+        {
+            base.Initialize();
+            
+            _factions = new Dictionary<string, Faction>();
             _playerFactions = new Dictionary<string, PlayerFactionData>();
-        }
-
-        /// <summary>
-        /// 初始化声望系统
-        /// </summary>
-        public void Initialize() {
-            if (_isInitialized) return;
+            
+            // 注册到保存系统
+            SaveSystem.Instance?.Register(this);
             
             InitializeFactions();
             _isInitialized = true;
@@ -114,8 +120,6 @@ namespace ClawRPG.Scripts.Systems {
         /// 初始化所有阵营
         /// </summary>
         private void InitializeFactions() {
-            _factions = new Dictionary<string, Faction>();
-            
             // 战士公会
             var warriors = new Faction {
                 Id = "warriors",
@@ -124,12 +128,12 @@ namespace ClawRPG.Scripts.Systems {
                 StartingReputation = 0,
                 EnemyFactions = new Dictionary<string, int> {
                     { "bandits", 10 }
-                },
-                Rewards = new List<FactionReward> {
-                    new FactionReward { RequiredTier = ReputationTier.Friendly, Gold = 100, Title = "战士之友" },
-                    new FactionReward { RequiredTier = ReputationTier.Honored, Experience = 500, ItemId = "steel_sword", ItemAmount = 1 },
-                    new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "warrior_badge", ItemAmount = 1, Title = "传奇战士" }
                 }
+            };
+            warriors.Rewards = new List<FactionReward> {
+                new FactionReward { RequiredTier = ReputationTier.Friendly, Gold = 100, Title = "战士之友" },
+                new FactionReward { RequiredTier = ReputationTier.Honored, Experience = 500, ItemId = "steel_sword", ItemAmount = 1 },
+                new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "warrior_badge", ItemAmount = 1, Title = "传奇战士" }
             };
             _factions["warriors"] = warriors;
 
@@ -141,12 +145,12 @@ namespace ClawRPG.Scripts.Systems {
                 StartingReputation = 0,
                 EnemyFactions = new Dictionary<string, int> {
                     { "cultists", 15 }
-                },
-                Rewards = new List<FactionReward> {
-                    new FactionReward { RequiredTier = ReputationTier.Friendly, Experience = 200, Title = "法师之友" },
-                    new FactionReward { RequiredTier = ReputationTier.Honored, ItemId = "magic_staff", ItemAmount = 1 },
-                    new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "archmage_robe", ItemAmount = 1, Title = "大法师" }
                 }
+            };
+            mages.Rewards = new List<FactionReward> {
+                new FactionReward { RequiredTier = ReputationTier.Friendly, Experience = 200, Title = "法师之友" },
+                new FactionReward { RequiredTier = ReputationTier.Honored, ItemId = "magic_staff", ItemAmount = 1 },
+                new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "archmage_robe", ItemAmount = 1, Title = "大法师" }
             };
             _factions["mages"] = mages;
 
@@ -158,12 +162,12 @@ namespace ClawRPG.Scripts.Systems {
                 StartingReputation = -1000,
                 EnemyFactions = new Dictionary<string, int> {
                     { "guards", 5 }
-                },
-                Rewards = new List<FactionReward> {
-                    new FactionReward { RequiredTier = ReputationTier.Friendly, ItemId = "lockpick", ItemAmount = 5 },
-                    new FactionReward { RequiredTier = ReputationTier.Honored, ItemId = "shadow_cloak", ItemAmount = 1 },
-                    new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "master_key", ItemAmount = 1, Title = "影子之手" }
                 }
+            };
+            thieves.Rewards = new List<FactionReward> {
+                new FactionReward { RequiredTier = ReputationTier.Friendly, ItemId = "lockpick", ItemAmount = 5 },
+                new FactionReward { RequiredTier = ReputationTier.Honored, ItemId = "shadow_cloak", ItemAmount = 1 },
+                new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "master_key", ItemAmount = 1, Title = "影子之手" }
             };
             _factions["thieves"] = thieves;
 
@@ -172,12 +176,12 @@ namespace ClawRPG.Scripts.Systems {
                 Id = "merchants",
                 Name = "商人联盟",
                 Description = "掌握大陆贸易的富商组织",
-                StartingReputation = 0,
-                Rewards = new List<FactionReward> {
-                    new FactionReward { RequiredTier = ReputationTier.Friendly, Gold = 50, Title = "贵宾" },
-                    new FactionReward { RequiredTier = ReputationTier.Honored, Gold = 200, Experience = 100 },
-                    new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "trade_permit", ItemAmount = 1, Title = "商业大亨" }
-                }
+                StartingReputation = 0
+            };
+            merchants.Rewards = new List<FactionReward> {
+                new FactionReward { RequiredTier = ReputationTier.Friendly, Gold = 50, Title = "贵宾" },
+                new FactionReward { RequiredTier = ReputationTier.Honored, Gold = 200, Experience = 100 },
+                new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "trade_permit", ItemAmount = 1, Title = "商业大亨" }
             };
             _factions["merchants"] = merchants;
 
@@ -190,12 +194,12 @@ namespace ClawRPG.Scripts.Systems {
                 EnemyFactions = new Dictionary<string, int> {
                     { "demons", 20 },
                     { "cultists", 10 }
-                },
-                Rewards = new List<FactionReward> {
-                    new FactionReward { RequiredTier = ReputationTier.Friendly, Experience = 150, Title = "信徒" },
-                    new FactionReward { RequiredTier = ReputationTier.Honored, ItemId = "holy_symbol", ItemAmount = 1 },
-                    new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "divine_blade", ItemAmount = 1, Title = "圣殿骑士" }
                 }
+            };
+            church.Rewards = new List<FactionReward> {
+                new FactionReward { RequiredTier = ReputationTier.Friendly, Experience = 150, Title = "信徒" },
+                new FactionReward { RequiredTier = ReputationTier.Honored, ItemId = "holy_symbol", ItemAmount = 1 },
+                new FactionReward { RequiredTier = ReputationTier.Exalted, ItemId = "divine_blade", ItemAmount = 1, Title = "圣殿骑士" }
             };
             _factions["church"] = church;
 
@@ -246,7 +250,7 @@ namespace ClawRPG.Scripts.Systems {
             data.Reputation += amount;
             data.Tier = GetTierFromReputation(data.Reputation);
             
-            ReputationChanged.Call(factionId);
+            ReputationChanged?.Invoke(factionId);
             
             // 检查阵营敌对关系
             var faction = _factions[factionId];
@@ -258,7 +262,7 @@ namespace ClawRPG.Scripts.Systems {
             
             // 检查是否升级
             if (data.Tier != oldTier) {
-                TierChanged.Call(factionId, data.Tier);
+                TierChanged?.Invoke(factionId, data.Tier);
                 GD.Print($"[ReputationSystem] Player faction tier changed to {data.Tier} for {factionId}");
             }
             
@@ -291,7 +295,7 @@ namespace ClawRPG.Scripts.Systems {
             
             foreach (var reward in faction.Rewards) {
                 if (data.Tier >= reward.RequiredTier && !data.RewardClaimed) {
-                    RewardAvailable.Call(factionId, reward);
+                    RewardAvailable?.Invoke(factionId, reward);
                     break;
                 }
             }
@@ -312,19 +316,15 @@ namespace ClawRPG.Scripts.Systems {
                     var player = GetPlayer();
                     if (player != null) {
                         if (reward.Gold > 0) {
-                            player.Call("AddGold", reward.Gold);
+                            player.Set("gold", (int)player.Get("gold") + reward.Gold);
                         }
                         if (reward.Experience > 0) {
-                            player.Call("AddExperience", reward.Experience);
+                            player.Set("experience", (int)player.Get("experience") + reward.Experience);
                         }
                         if (!string.IsNullOrEmpty(reward.ItemId)) {
                             var inventory = InventoryManager.Instance;
-                            inventory.AddItem(reward.ItemId, reward.ItemAmount);
-                        }
-                        if (!string.IsNullOrEmpty(reward.Title)) {
-                            var titleSystem = TitleSystem.Instance;
-                            if (titleSystem != null && titleSystem.HasMethod("AddTitle")) {
-                                titleSystem.Call("AddTitle", reward.Title);
+                            if (inventory != null) {
+                                inventory.AddItem(reward.ItemId, reward.ItemAmount);
                             }
                         }
                     }
@@ -387,54 +387,84 @@ namespace ClawRPG.Scripts.Systems {
         private Node GetPlayer() {
             var tree = Engine.GetMainLoop();
             if (tree is SceneTree sceneTree) {
-                return sceneTree.GetFirstNodeInGroup("player");
+                var nodes = sceneTree.GetNodesInGroup("player");
+                if nodes.Count > 0) return nodes[0];
             }
             return null;
         }
-
+        
         /// <summary>
-        /// 重置声望数据
+        /// 导出保存数据
         /// </summary>
-        public void Reset() {
-            _playerFactions.Clear();
-            _isInitialized = false; 
-        }
-
-        /// <summary>
-        /// 加载声望数据
-        /// </summary>
-        public void LoadData(Dictionary<string, object> data) {
-            if (data == null) return;
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
             
-            foreach (var kvp in data) {
-                if (kvp.Value is Dictionary<string, object> factionData) {
-                    var playerData = new PlayerFactionData {
-                        FactionId = kvp.Key,
-                        Reputation = factionData.ContainsKey("reputation") ? Convert.ToInt32(factionData["reputation"]) : 0,
-                        Tier = factionData.ContainsKey("tier") ? (ReputationTier)Convert.ToInt32(factionData["tier"]) : ReputationTier.Neutral,
-                        RewardClaimed = factionData.ContainsKey("reward_claimed") && Convert.ToBoolean(factionData["reward_claimed"])
-                    };
-                    _playerFactions[kvp.Key] = playerData;
-                }
-            }
-            _isInitialized = true;
-        }
-
-        /// <summary>
-        /// 保存声望数据
-        /// </summary>
-        public Dictionary<string, object> SaveData() {
-            var data = new Dictionary<string, object>();
-            
-            foreach (var kvp in _playerFactions) {
-                data[kvp.Key] = new Dictionary<string, object> {
-                    { "reputation", kvp.Value.Reputation },
-                    { "tier", (int)kvp.Value.Tier },
-                    { "reward_claimed", kvp.Value.RewardClaimed }
+            var factionsData = new Dictionary();
+            foreach (var kvp in _playerFactions)
+            {
+                factionsData[kvp.Key] = new Dictionary
+                {
+                    ["reputation"] = kvp.Value.Reputation,
+                    ["tier"] = (int)kvp.Value.Tier,
+                    ["reward_claimed"] = kvp.Value.RewardClaimed
                 };
             }
+            data["player_factions"] = factionsData;
             
             return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("player_factions"))
+            {
+                var factionsData = data["player_factions"] as Dictionary;
+                if (factionsData != null)
+                {
+                    foreach (var kvp in factionsData)
+                    {
+                        var factionDict = kvp.Value as Dictionary;
+                        if (factionDict != null)
+                        {
+                            var playerData = new PlayerFactionData
+                            {
+                                FactionId = kvp.Key.ToString(),
+                                Reputation = factionDict.Contains("reputation") ? (int)factionDict["reputation"] : 0,
+                                Tier = factionDict.Contains("tier") ? (ReputationTier)(int)factionDict["tier"] : ReputationTier.Neutral,
+                                RewardClaimed = factionDict.Contains("reward_claimed") && (bool)factionDict["reward_claimed"]
+                            };
+                            _playerFactions[kvp.Key.ToString()] = playerData;
+                        }
+                    }
+                }
+            }
+            
+            _isInitialized = true;
+            GD.Print("[ReputationSystem] Data loaded");
+        }
+        
+        /// <summary>
+        /// 获取系统ID
+        /// </summary>
+        public override string GetId()
+        {
+            return "ReputationSystem";
+        }
+        
+        /// <summary>
+        /// 重置系统
+        /// </summary>
+        public override void Reset()
+        {
+            base.Reset();
+            _playerFactions.Clear();
+            _isInitialized = false;
         }
     }
 }

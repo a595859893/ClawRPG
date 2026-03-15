@@ -211,10 +211,10 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Statistics Manager - singleton to track player statistics
     /// </summary>
-    public class StatisticsManager
+    public partial class StatisticsManager : BaseSystem
     {
-        private static StatisticsManager _instance;
-        public static StatisticsManager Instance => _instance ??= new StatisticsManager();
+        private static StatisticsManager instance;
+        public static StatisticsManager Instance => instance ??= new StatisticsManager();
         
         public PlayerStatistics Stats { get; private set; } = new PlayerStatistics();
         
@@ -222,6 +222,15 @@ namespace ClawRPG.Scripts.Systems {
         public Action OnStatisticsUpdated { get; set; }
         
         private StatisticsManager() { }
+
+        public override void _Ready() {
+            base._Ready();
+            Initialize();
+        }
+
+        protected override void Initialize() {
+            GD.Print("[StatisticsManager] Initialized");
+        }
         
         public void ResetStatistics()
         {
@@ -265,5 +274,34 @@ namespace ClawRPG.Scripts.Systems {
         public void UpdateHighestCombo(int combo) { Stats.UpdateHighestCombo(combo); OnStatisticsUpdated?.Invoke(); }
         public void RecordAchievementUnlocked() { Stats.RecordAchievementUnlocked(); OnStatisticsUpdated?.Invoke(); }
         public void AddPlayTime(float seconds) { Stats.AddPlayTime(seconds); }
+        
+        /// <summary>
+        /// Export save data
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            if (Stats != null)
+            {
+                data["stats"] = Stats.ToDictionary();
+            }
+            return data;
+        }
+        
+        /// <summary>
+        /// Import save data
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("stats") && data["stats"] is Dictionary statsDict)
+            {
+                Stats.FromDictionary(statsDict);
+            }
+            
+            IsInitialized = true;
+            OnStatisticsUpdated?.Invoke();
+        }
     }
 }
