@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Scripts.Skills.Optimizer {
     /// <summary>
@@ -51,7 +52,7 @@ namespace ClawRPG.Scripts.Skills.Optimizer {
     /// <summary>
     /// Skill tree optimizer system
     /// </summary>
-    public class SkillTreeOptimizer : Node {
+    public class SkillTreeOptimizer : BaseSystem {
         public static SkillTreeOptimizer Instance { get; private set; }
 
         private Dictionary<string, SkillTreePreset> _presets;

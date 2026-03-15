@@ -1,12 +1,13 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 装备外观管理器 - 允许玩家自定义装备外观
     /// </summary>
-    public class EquipmentVisuals : Node {
+    public class EquipmentVisuals : BaseSystem {
         public static EquipmentVisuals Instance { get; private set; }
 
         // 武器外观
