@@ -104,8 +104,6 @@ public class BossRushSystem : BaseSystem
         if (saveData.Contains("TotalGoldEarned")) data.TotalGoldEarned = (int)saveData["TotalGoldEarned"];
         if (saveData.Contains("TotalExpEarned")) data.TotalExpEarned = (int)saveData["TotalExpEarned"];
     }
-        saveSystem.SaveGame(gameData);
-    }
     
     // Start a new boss rush
     public bool StartRush(string difficulty)
