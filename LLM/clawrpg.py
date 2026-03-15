@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
 """
-ClawRPG - LLM 可玩版本
-纯文本交互，让 LLM 可以通过对话来玩RPG
+ClawRPG - LLM 可玩版本 (简化版)
+
+本版本是 Godot 版本的简化映射，用于：
+1. LLM 可以"玩"游戏进行测试
+2. design_review 阶段验证游戏设计
+3. 确保 LLM 体验 ≈ 玩家体验
+
+核心逻辑与 Godot 版本保持一致：
+- 战斗系统 → Scripts/Systems/Combat/
+- 物品系统 → Scripts/Systems/Items/
+- 任务系统 → Scripts/Systems/Quests/
+- 升级系统 → 经验/等级机制
+
+注意：本版本是简化版，完整功能请参考 Godot 版本
 """
 
 import json
