@@ -3,6 +3,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 季节性事件数据类。存储玩家参与季节性活动的数据和进度。
+/// </summary>
 public class SeasonalEventData
 {
     public enum EventType
@@ -287,7 +290,14 @@ public class SeasonalEventDatabase
 
 public class SeasonalEventSystem
 {
+    /// <summary>
+    /// 获取系统单例实例。
+    /// </summary>
     private static SeasonalEventSystem _instance;
+
+    /// <summary>
+    /// 获取单例实例。
+    /// </summary>
     public static SeasonalEventSystem Instance
     {
         get

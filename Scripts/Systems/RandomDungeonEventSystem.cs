@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// 随机地牢事件系统。管理地牢中的随机事件触发，包括战斗、宝藏、祝福、诅咒等多种类型的事件。
+/// 支持事件稀有度权重、玩家状态影响和事件结果计算。
+/// </summary>
 public partial class RandomDungeonEventData : Node
 {
     // Event tracking
@@ -73,6 +77,9 @@ public enum DungeonEventOutcome
 }
 
 [GlobalClass]
+/// <summary>
+/// 随机地牢事件系统核心类。负责事件数据库初始化、事件触发、事件处理和结果计算。
+/// </summary>
 public partial class RandomDungeonEventSystem : Node
 {
     private RandomDungeonEventData _data;
