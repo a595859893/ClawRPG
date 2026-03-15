@@ -588,4 +588,7 @@ public class SummonSystem : BaseSystem
 		
 		return stats;
 	}
+	
+	public override Dictionary ExportSaveData() => new();
+	public override void ImportSaveData(Dictionary data) { }
 }

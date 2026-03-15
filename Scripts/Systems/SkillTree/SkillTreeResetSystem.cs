@@ -381,3 +381,9 @@ public class SkillTreeResetStatistics
     public int AveragePointsPerReset { get; set; }
     public float RefundPercentage { get; set; }
 }
+
+public partial class SkillTreeResetSystem
+{
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+}

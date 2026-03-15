@@ -528,4 +528,7 @@ public class WeatherSystem : BaseSystem
         
         UpdateWeatherEffects();
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
 }
