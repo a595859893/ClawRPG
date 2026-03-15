@@ -747,6 +747,9 @@ namespace ClawRPG.Scripts.Systems.Pets
         public Vector2 GetPetPosition() => GlobalPosition;
     }
     
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
+    
     /// <summary>
     /// 宠物性格 - 决定AI行为模式
     /// </summary>
