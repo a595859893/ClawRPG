@@ -424,8 +424,10 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Get save file size in bytes
+        /// Gets the save file size in bytes.
         /// </summary>
+        /// <param name="slot">Save slot index.</param>
+        /// <returns>File size in bytes, or 0 if save doesn't exist.</returns>
         public long GetSaveFileSize(int slot)
         {
             string path = GetSavePath(slot);
@@ -437,8 +439,10 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Check if save is corrupted
+        /// Checks if a save file is corrupted.
         /// </summary>
+        /// <param name="slot">Save slot index.</param>
+        /// <returns>True if the save is corrupted or doesn't exist.</returns>
         public bool IsSaveCorrupted(int slot)
         {
             string path = GetSavePath(slot);
@@ -457,8 +461,11 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Generic save data to a specific file path
+        /// Generic method to save data to a specific file path.
         /// </summary>
+        /// <typeparam name="T">Type of data to save.</typeparam>
+        /// <param name="path">File path to save to.</param>
+        /// <param name="data">Data to serialize and save.</param>
         public void SaveToFile<T>(string path, T data)
         {
             try
@@ -474,8 +481,11 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Generic load data from a specific file path
+        /// Generic method to load data from a specific file path.
         /// </summary>
+        /// <typeparam name="T">Type of data to load.</typeparam>
+        /// <param name="path">File path to load from.</param>
+        /// <returns>Loaded data, or new instance if file doesn't exist.</returns>
         public T LoadFromFile<T>(string path) where T : new()
         {
             try
