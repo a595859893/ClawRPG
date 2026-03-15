@@ -16,17 +16,22 @@ namespace ClawRPG.Systems {
         [Export] public Vector2 Position { get; set; } = Vector2.Zero;
     }
 
-    public partial class AchievementBadgeSystem : Node
+    public partial class AchievementBadgeSystem : BaseSystem
     {
         public static AchievementBadgeSystem Instance { get; private set; }
 
         private Dictionary<string, AchievementBadge> _badges = new();
         private Dictionary<string, string> _achievementToBadgeMap = new();
 
-        public override void _Ready()
+        protected override void Initialize()
         {
             Instance = this;
             InitializeBadges();
+        }
+
+        public override void _Ready()
+        {
+            base._Ready();
         }
 
         private void InitializeBadges()
