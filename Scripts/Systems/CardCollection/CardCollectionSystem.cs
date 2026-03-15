@@ -267,4 +267,92 @@ public class CardCollectionSystem : BaseSystem
         
         return distribution;
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // Owned cards
+        var ownedCardsArray = new Godot.Array();
+        foreach (var kvp in _data.OwnedCards)
+        {
+            var cardData = new Dictionary();
+            cardData["card_id"] = kvp.Key;
+            cardData["count"] = kvp.Value;
+            ownedCardsArray.Add(cardData);
+        }
+        data["owned_cards"] = ownedCardsArray;
+        
+        // Favorite cards
+        data["favorite_cards"] = new Godot.Array(_data.FavoriteCards);
+        
+        // Unlocked categories
+        var categoriesArray = new Godot.Array();
+        foreach (var kvp in _data.UnlockedCategories)
+        {
+            if (kvp.Value)
+            {
+                categoriesArray.Add(kvp.Key);
+            }
+        }
+        data["unlocked_categories"] = categoriesArray;
+        
+        // Statistics
+        data["total_unique_cards"] = _data.TotalUniqueCards;
+        data["total_cards_obtained"] = _data.TotalCardsObtained;
+        data["total_duplicates"] = _data.TotalDuplicates;
+        data["packs_opened"] = _data.PacksOpened;
+        data["total_gold_spent"] = _data.TotalGoldSpent;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("owned_cards"))
+        {
+            _data.OwnedCards.Clear();
+            var cardsArray = (Godot.Array)data["owned_cards"];
+            foreach (Dictionary cardData in cardsArray)
+            {
+                string cardId = (string)cardData["card_id"];
+                int count = (int)cardData["count"];
+                _data.OwnedCards[cardId] = count;
+            }
+        }
+        
+        if (data.Contains("favorite_cards"))
+        {
+            _data.FavoriteCards.Clear();
+            var favArray = (Godot.Array)data["favorite_cards"];
+            foreach (string cardId in favArray)
+            {
+                _data.FavoriteCards.Add(cardId);
+            }
+        }
+        
+        if (data.Contains("unlocked_categories"))
+        {
+            _data.UnlockedCategories.Clear();
+            var catArray = (Godot.Array)data["unlocked_categories"];
+            foreach (string category in catArray)
+            {
+                _data.UnlockedCategories[category] = true;
+            }
+        }
+        
+        if (data.Contains("total_unique_cards")) _data.TotalUniqueCards = (int)data["total_unique_cards"];
+        if (data.Contains("total_cards_obtained")) _data.TotalCardsObtained = (int)data["total_cards_obtained"];
+        if (data.Contains("total_duplicates")) _data.TotalDuplicates = (int)data["total_duplicates"];
+        if (data.Contains("packs_opened")) _data.PacksOpened = (int)data["packs_opened"];
+        if (data.Contains("total_gold_spent")) _data.TotalGoldSpent = (int)data["total_gold_spent"];
+    }
 }

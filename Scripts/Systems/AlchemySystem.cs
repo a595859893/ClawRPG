@@ -415,5 +415,46 @@ namespace ClawRPG.Scripts.Systems
 
             GD.Print("[AlchemySystem] Data Loaded - Level: " + _playerData.AlchemyLevel);
         }
+
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public Dictionary<string, object> ExportSaveData()
+        {
+            return new Dictionary<string, object>
+            {
+                { "alchemy_level", _playerData.AlchemyLevel },
+                { "current_experience", _playerData.CurrentExperience },
+                { "unlocked_recipe_ids", _playerData.UnlockedRecipeIds },
+                { "total_crafted", _playerData.TotalCrafted },
+                { "recipe_usage_count", _playerData.RecipeUsageCount }
+            };
+        }
+
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+
+            if (data.ContainsKey("alchemy_level"))
+                _playerData.AlchemyLevel = Convert.ToInt32(data["alchemy_level"]);
+            if (data.ContainsKey("current_experience"))
+                _playerData.CurrentExperience = Convert.ToInt32(data["current_experience"]);
+            if (data.ContainsKey("unlocked_recipe_ids"))
+                _playerData.UnlockedRecipeIds = new List<int>((List<object>)data["unlocked_recipe_ids"]).ConvertAll(x => Convert.ToInt32(x));
+            if (data.ContainsKey("total_crafted"))
+                _playerData.TotalCrafted = Convert.ToInt32(data["total_crafted"]);
+            if (data.ContainsKey("recipe_usage_count"))
+            {
+                var dict = (Dictionary<object, object>)data["recipe_usage_count"];
+                _playerData.RecipeUsageCount = new Dictionary<int, int>();
+                foreach (var kvp in dict)
+                {
+                    _playerData.RecipeUsageCount[Convert.ToInt32(kvp.Key)] = Convert.ToInt32(kvp.Value);
+                }
+            }
+        }
     }
 }

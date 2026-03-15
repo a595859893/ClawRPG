@@ -233,6 +233,59 @@ public class ArtifactFusionSystem : BaseSystem
             }
         }
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["total_fusions"] = Data.TotalFusions;
+        data["successful_fusions"] = Data.SuccessfulFusions;
+        data["legendary_fusions"] = Data.LegendaryFusions;
+        data["total_gold_spent"] = Data.TotalGoldSpent;
+        data["unlocked_recipes"] = new Godot.Array(Data.UnlockedRecipes);
+        
+        // Serialize fusion history
+        var historyArray = new Godot.Array();
+        foreach (var record in Data.FusionHistory)
+        {
+            var recordDict = new Dictionary();
+            recordDict["artifact1"] = record.Artifact1;
+            recordDict["artifact2"] = record.Artifact2;
+            recordDict["result_artifact"] = record.ResultArtifact;
+            recordDict["success"] = record.Success;
+            recordDict["gold_spent"] = record.GoldSpent;
+            recordDict["timestamp"] = record.Timestamp;
+            historyArray.Add(recordDict);
+        }
+        data["fusion_history"] = historyArray;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("total_fusions")) Data.TotalFusions = (int)data["total_fusions"];
+        if (data.Contains("successful_fusions")) Data.SuccessfulFusions = (int)data["successful_fusions"];
+        if (data.Contains("legendary_fusions")) Data.LegendaryFusions = (int)data["legendary_fusions"];
+        if (data.Contains("total_gold_spent")) Data.TotalGoldSpent = (int)data["total_gold_spent"];
+        
+        if (data.Contains("unlocked_recipes"))
+        {
+            Data.UnlockedRecipes.Clear();
+            var recipes = (Godot.Array)data["unlocked_recipes"];
+            foreach (string recipe in recipes)
+            {
+                Data.UnlockedRecipes.Add(recipe);
+            }
+        }
+    }
     
     public void ResetStatistics()
     {

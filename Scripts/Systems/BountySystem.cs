@@ -439,5 +439,21 @@ namespace ClawRPG.Scripts.Systems
                 _lastRefreshTime = DateTime.Parse(refreshObj.ToString());
             }
         }
+
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public Dictionary<string, object> ExportSaveData()
+        {
+            return Serialize();
+        }
+
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public void ImportSaveData(Dictionary<string, object> data)
+        {
+            Deserialize(data);
+        }
     }
 }

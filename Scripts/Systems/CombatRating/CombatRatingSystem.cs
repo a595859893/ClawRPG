@@ -352,4 +352,96 @@ public class CombatRatingSystem : BaseSystem
 			}
 		}
 	}
+	
+	// ===== 持久化 =====
+	public override Dictionary ExportSaveData()
+	{
+		var exportData = new Dictionary();
+		exportData["total_battles"] = data.totalBattles;
+		exportData["total_score"] = data.totalScore;
+		exportData["highest_score"] = data.highestScore;
+		exportData["highest_grade"] = (int)data.highestGrade;
+		exportData["total_stars"] = data.totalStars;
+		exportData["sss_count"] = data.sssCount;
+		exportData["no_damage_count"] = data.noDamageCount;
+		exportData["average_grade"] = data.averageGrade;
+		exportData["session_battles"] = data.sessionBattles;
+		exportData["session_score"] = data.sessionScore;
+		exportData["session_stars"] = data.sessionStars;
+		
+		// 保存历史记录（限制最近50条）
+		var history = new Array();
+		int count = 0;
+		foreach (var record in data.ratingHistory)
+		{
+			if (count >= 50) break;
+			var recordData = new Dictionary();
+			recordData["battle_id"] = record.battleId;
+			recordData["grade"] = (int)record.grade;
+			recordData["score"] = record.score;
+			recordData["stars"] = record.stars;
+			recordData["time_taken"] = record.timeTaken;
+			recordData["damage_dealt"] = record.damageDealt;
+			recordData["damage_taken"] = record.damageTaken;
+			recordData["enemies_defeated"] = record.enemiesDefeated;
+			recordData["critical_hits"] = record.criticalHits;
+			recordData["perfect_dodges"] = record.perfectDodges;
+			recordData["no_damage"] = record.noDamage;
+			recordData["no_hits_taken"] = record.noHitsTaken;
+			recordData["combo_count"] = record.comboCount;
+			recordData["gold_reward"] = record.goldReward;
+			recordData["exp_reward"] = record.expReward;
+			recordData["timestamp"] = record.timestamp;
+			history.Add(recordData);
+			count++;
+		}
+		exportData["rating_history"] = history;
+		
+		return exportData;
+	}
+	
+	public override void ImportSaveData(Dictionary data)
+	{
+		if (data == null) return;
+		
+		if (data.ContainsKey("total_battles")) this.data.totalBattles = Convert.ToInt32(data["total_battles"]);
+		if (data.ContainsKey("total_score")) this.data.totalScore = Convert.ToInt32(data["total_score"]);
+		if (data.ContainsKey("highest_score")) this.data.highestScore = Convert.ToInt32(data["highest_score"]);
+		if (data.ContainsKey("highest_grade")) this.data.highestGrade = (CombatRatingData.RatingGrade)Convert.ToInt32(data["highest_grade"]);
+		if (data.ContainsKey("total_stars")) this.data.totalStars = Convert.ToInt32(data["total_stars"]);
+		if (data.ContainsKey("sss_count")) this.data.sssCount = Convert.ToInt32(data["sss_count"]);
+		if (data.ContainsKey("no_damage_count")) this.data.noDamageCount = Convert.ToInt32(data["no_damage_count"]);
+		if (data.ContainsKey("average_grade")) this.data.averageGrade = Convert.ToSingle(data["average_grade"]);
+		if (data.ContainsKey("session_battles")) this.data.sessionBattles = Convert.ToInt32(data["session_battles"]);
+		if (data.ContainsKey("session_score")) this.data.sessionScore = Convert.ToInt32(data["session_score"]);
+		if (data.ContainsKey("session_stars")) this.data.sessionStars = Convert.ToInt32(data["session_stars"]);
+		
+		// 恢复历史记录
+		this.data.ratingHistory.Clear();
+		if (data.ContainsKey("rating_history"))
+		{
+			var history = (Array)data["rating_history"];
+			foreach (Dictionary recordData in history)
+			{
+				var record = new CombatRatingData.CombatRatingRecord();
+				record.battleId = Convert.ToInt32(recordData["battle_id"]);
+				record.grade = (CombatRatingData.RatingGrade)Convert.ToInt32(recordData["grade"]);
+				record.score = Convert.ToInt32(recordData["score"]);
+				record.stars = Convert.ToInt32(recordData["stars"]);
+				record.timeTaken = Convert.ToSingle(recordData["time_taken"]);
+				record.damageDealt = Convert.ToInt32(recordData["damage_dealt"]);
+				record.damageTaken = Convert.ToInt32(recordData["damage_taken"]);
+				record.enemiesDefeated = Convert.ToInt32(recordData["enemies_defeated"]);
+				record.criticalHits = Convert.ToInt32(recordData["critical_hits"]);
+				record.perfectDodges = Convert.ToInt32(recordData["perfect_dodges"]);
+				record.noDamage = Convert.ToBoolean(recordData["no_damage"]);
+				record.noHitsTaken = Convert.ToBoolean(recordData["no_hits_taken"]);
+				record.comboCount = Convert.ToInt32(recordData["combo_count"]);
+				record.goldReward = Convert.ToInt32(recordData["gold_reward"]);
+				record.expReward = Convert.ToInt32(recordData["exp_reward"]);
+				record.timestamp = Convert.ToInt64(recordData["timestamp"]);
+				this.data.ratingHistory.Add(record);
+			}
+		}
+	}
 }

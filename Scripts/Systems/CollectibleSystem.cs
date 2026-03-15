@@ -264,4 +264,20 @@ public class CollectibleSystem
 
 		GD.Print($"[CollectibleSystem] Loaded {Data.TotalDiscovered} discovered collectibles");
 	}
+
+	/// <summary>
+	/// Export save data for persistence
+	/// </summary>
+	public Dictionary<string, object> ExportSaveData()
+	{
+		return GetSaveData();
+	}
+
+	/// <summary>
+	/// Import save data from persistence
+	/// </summary>
+	public void ImportSaveData(Dictionary<string, object> data)
+	{
+		LoadSaveData(data);
+	}
 }

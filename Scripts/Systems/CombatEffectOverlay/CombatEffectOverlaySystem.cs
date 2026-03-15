@@ -566,4 +566,32 @@ public class CombatEffectOverlaySystem : BaseSystem
     }
     
     #endregion
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["total_screen_flashes"] = _data.TotalScreenFlashes;
+        data["total_camera_shakes"] = _data.TotalCameraShakes;
+        data["total_slow_motions"] = _data.TotalSlowMotions;
+        data["total_floating_texts"] = _data.TotalFloatingTexts;
+        data["total_shake_intensity"] = _data.TotalShakeIntensity;
+        return data;
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("total_screen_flashes")) _data.TotalScreenFlashes = (int)data["total_screen_flashes"];
+        if (data.Contains("total_camera_shakes")) _data.TotalCameraShakes = (int)data["total_camera_shakes"];
+        if (data.Contains("total_slow_motions")) _data.TotalSlowMotions = (int)data["total_slow_motions"];
+        if (data.Contains("total_floating_texts")) _data.TotalFloatingTexts = (int)data["total_floating_texts"];
+        if (data.Contains("total_shake_intensity")) _data.TotalShakeIntensity = (float)data["total_shake_intensity"];
+    }
 }
