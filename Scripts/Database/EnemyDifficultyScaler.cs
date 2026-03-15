@@ -1,134 +1,145 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Project;
 
-namespace ClawRPG.Scripts.Database
-{
+namespace ClawRPG.Scripts.Database {
     /// <summary>
-    /// 难度缩放类
-    /// 负责根据玩家等级、游戏进度等动态调整敌人属性
+    /// 敌人难度缩放类 - 根据玩家等级和游戏进度调整敌人属性
     /// </summary>
-    public class EnemyDifficultyScaler : BaseSystem
-    {
-        private Dictionary<string, ScalingConfig> _scalingConfigs;
-        private float _currentDifficultyMultiplier;
+    public partial class EnemyDifficultyScaler : BaseSystem {
         
-        public override void _Ready()
-        {
+        /// <summary>
+        /// 难度等级
+        /// </summary>
+        public enum DifficultyLevel {
+            Easy = 1,
+            Normal = 2,
+            Hard = 3,
+            Nightmare = 4
+        }
+        
+        private DifficultyLevel _currentDifficulty = DifficultyLevel.Normal;
+        private int _playerLevel = 1;
+        private float _difficultyMultiplier = 1.0f;
+        
+        public override void _Ready() {
             base._Ready();
-            Initialize();
-        }
-        
-        protected override void Initialize()
-        {
-            base.Initialize();
-            _scalingConfigs = new Dictionary<string, ScalingConfig>();
-            _currentDifficultyMultiplier = 1.0f;
-            LoadScalingConfigs();
         }
         
         /// <summary>
-        /// 加载缩放配置
+        /// 缩放敌人属性
         /// </summary>
-        private void LoadScalingConfigs()
-        {
-            GD.Print("[EnemyDifficultyScaler] Loading scaling configurations...");
-        }
-        
-        /// <summary>
-        /// 获取缩放后的敌人属性
-        /// </summary>
-        public EnemyType ScaleEnemy(EnemyType baseEnemy, int playerLevel, float progressMultiplier = 1.0f)
-        {
-            if (baseEnemy == null) return null;
+        public EnemyType ScaleDifficulty(EnemyType baseEnemy) {
+            var scaled = new EnemyType(
+                baseEnemy.Id,
+                baseEnemy.Name,
+                (int)(baseEnemy.MaxHealth * _difficultyMultiplier),
+                baseEnemy.MoveSpeed * (1.0f + (_difficultyMultiplier - 1.0f) * 0.5f),
+                baseEnemy.AttackDamage * _difficultyMultiplier
+            );
             
-            var scaledEnemy = new EnemyType
-            {
-                Id = baseEnemy.Id,
-                Name = baseEnemy.Name,
-                Description = baseEnemy.Description,
-                SpritePath = baseEnemy.SpritePath,
-                SpriteModulate = baseEnemy.SpriteModulate,
-                MaxHealth = (int)(baseEnemy.MaxHealth * _currentDifficultyMultiplier * progressMultiplier),
-                MoveSpeed = baseEnemy.MoveSpeed,
-                AttackDamage = (int)(baseEnemy.AttackDamage * _currentDifficultyMultiplier * progressMultiplier),
-                AttackRange = baseEnemy.AttackRange,
-                AttackCooldown = baseEnemy.AttackCooldown,
-                ChaseRange = baseEnemy.ChaseRange,
-                DetectionRange = baseEnemy.DetectionRange,
-                CriticalChance = baseEnemy.CriticalChance,
-                CriticalDamage = baseEnemy.CriticalDamage,
-                ExperienceReward = (int)(baseEnemy.ExperienceReward * _currentDifficultyMultiplier * progressMultiplier),
-                GoldReward = (int)(baseEnemy.GoldReward * _currentDifficultyMultiplier * progressMultiplier),
-                DropTable = new Dictionary<string, float>(baseEnemy.DropTable),
-                CanChase = baseEnemy.CanChase,
-                CanAttack = baseEnemy.CanAttack,
-                IsAggressive = baseEnemy.IsAggressive,
-                StatusEffectVulnerability = new Dictionary<string, float>(baseEnemy.StatusEffectVulnerability)
+            scaled.Description = baseEnemy.Description;
+            scaled.ExperienceReward = (int)(baseEnemy.ExperienceReward * _difficultyMultiplier);
+            scaled.GoldReward = (int)(baseEnemy.GoldReward * _difficultyMultiplier);
+            
+            return scaled;
+        }
+        
+        /// <summary>
+        /// 获取缩放后的属性
+        /// </summary>
+        public (int health, float damage, float speed) GetScaledStats(int baseHealth, float baseDamage, float baseSpeed) {
+            var health = (int)(baseHealth * _difficultyMultiplier);
+            var damage = baseDamage * _difficultyMultiplier;
+            var speed = baseSpeed * (1.0f + (_difficultyMultiplier - 1.0f) * 0.5f);
+            
+            return (health, damage, speed);
+        }
+        
+        /// <summary>
+        /// 计算等级乘数
+        /// </summary>
+        public float CalculateLevelMultiplier(int enemyLevel, int playerLevel) {
+            if (playerLevel <= enemyLevel) {
+                return 1.0f;
+            }
+            
+            var levelDiff = playerLevel - enemyLevel;
+            return 1.0f + levelDiff * 0.1f;
+        }
+        
+        /// <summary>
+        /// 设置难度等级
+        /// </summary>
+        public void SetDifficulty(DifficultyLevel level) {
+            _currentDifficulty = level;
+            _difficultyMultiplier = level switch {
+                DifficultyLevel.Easy => 0.7f,
+                DifficultyLevel.Normal => 1.0f,
+                DifficultyLevel.Hard => 1.5f,
+                DifficultyLevel.Nightmare => 2.0f,
+                _ => 1.0f
             };
             
-            return scaledEnemy;
+            GD.Print($"[EnemyDifficultyScaler] Difficulty set to {level} ({_difficultyMultiplier}x)");
         }
         
         /// <summary>
-        /// 设置难度倍数
+        /// 获取当前难度等级
         /// </summary>
-        public void SetDifficultyMultiplier(float multiplier)
-        {
-            _currentDifficultyMultiplier = Mathf.Max(0.1f, multiplier);
+        public DifficultyLevel GetCurrentDifficulty() {
+            return _currentDifficulty;
         }
         
         /// <summary>
-        /// 获取当前难度倍数
+        /// 设置玩家等级
         /// </summary>
-        public float GetDifficultyMultiplier()
-        {
-            return _currentDifficultyMultiplier;
+        public void SetPlayerLevel(int level) {
+            _playerLevel = Mathf.Max(1, level);
+            UpdateDifficultyMultiplier();
         }
         
         /// <summary>
-        /// 计算玩家等级对应的缩放值
+        /// 更新难度乘数
         /// </summary>
-        public float CalculateLevelScaling(int playerLevel, int baseLevel = 1)
-        {
-            if (playerLevel <= baseLevel) return 1.0f;
-            return 1.0f + (playerLevel - baseLevel) * 0.1f;
+        private void UpdateDifficultyMultiplier() {
+            var baseMultiplier = _currentDifficulty switch {
+                DifficultyLevel.Easy => 0.7f,
+                DifficultyLevel.Normal => 1.0f,
+                DifficultyLevel.Hard => 1.5f,
+                DifficultyLevel.Nightmare => 2.0f,
+                _ => 1.0f
+            };
+            
+            var levelBonus = (_playerLevel - 1) * 0.05f;
+            _difficultyMultiplier = baseMultiplier + levelBonus;
         }
         
         /// <summary>
-        /// 注册缩放配置
+        /// 获取难度乘数
         /// </summary>
-        public void RegisterScalingConfig(string enemyId, ScalingConfig config)
-        {
-            _scalingConfigs[enemyId] = config;
+        public float GetDifficultyMultiplier() {
+            return _difficultyMultiplier;
         }
         
-        /// <summary>
-        /// 获取缩放配置
-        /// </summary>
-        public ScalingConfig GetScalingConfig(string enemyId)
-        {
-            if (_scalingConfigs.TryGetValue(enemyId, out var config))
-            {
-                return config;
+        public override Dictionary ExportSaveData() {
+            var data = new Dictionary();
+            data["difficulty"] = (int)_currentDifficulty;
+            data["playerLevel"] = _playerLevel;
+            data["multiplier"] = _difficultyMultiplier;
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data) {
+            if (data == null) return;
+            
+            if (data.Contains("difficulty")) {
+                SetDifficulty((DifficultyLevel)(int)data["difficulty"]);
             }
-            return null;
-        }
-        
-        /// <summary>
-        /// 难度缩放配置
-        /// </summary>
-        public class ScalingConfig
-        {
-            public string EnemyId;
-            public float HealthScaling = 1.0f;
-            public float AttackScaling = 1.0f;
-            public float SpeedScaling = 1.0f;
-            public float ExpScaling = 1.0f;
-            public float DropScaling = 1.0f;
-            public int MinPlayerLevel;
-            public int MaxPlayerLevel;
+            
+            if (data.Contains("playerLevel")) {
+                SetPlayerLevel((int)data["playerLevel"]);
+            }
         }
     }
 }
