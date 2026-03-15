@@ -133,8 +133,10 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Load game data from a slot
+        /// Loads game data from a save slot.
         /// </summary>
+        /// <param name="slot">Save slot index to load from.</param>
+        /// <returns>Loaded SaveData, or null if load failed.</returns>
         public SaveDataManager.SaveData LoadGame(int slot)
         {
             if (slot < 0 || slot >= MaxSaveSlots)
@@ -167,8 +169,9 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Load all saves
+        /// Loads all saves from all slots.
         /// </summary>
+        /// <returns>Array of SaveData for each slot (null if empty).</returns>
         public SaveDataManager.SaveData[] GetAllSaves()
         {
             var saves = new SaveDataManager.SaveData[MaxSaveSlots];
@@ -185,8 +188,9 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Get info for all save slots
+        /// Gets info for all save slots.
         /// </summary>
+        /// <returns>Array of SaveSlotInfo for each slot.</returns>
         public SaveDataManager.SaveSlotInfo[] GetAllSlotInfo()
         {
             var infos = new SaveDataManager.SaveSlotInfo[MaxSaveSlots];
@@ -200,8 +204,10 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Get info for a specific slot
+        /// Gets info for a specific slot.
         /// </summary>
+        /// <param name="slot">Save slot index.</param>
+        /// <returns>SaveSlotInfo for the slot.</returns>
         public SaveDataManager.SaveSlotInfo GetSlotInfo(int slot)
         {
             string infoPath = GetSlotInfoPath(slot);
@@ -223,8 +229,10 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Update slot metadata
+        /// Updates slot metadata with current save data.
         /// </summary>
+        /// <param name="slot">Save slot index.</param>
+        /// <param name="data">Save data to extract metadata from.</param>
         public void UpdateSlotInfo(int slot, SaveDataManager.SaveData data)
         {
             var info = new SaveDataManager.SaveSlotInfo
@@ -242,8 +250,9 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Delete a save slot
+        /// Deletes a save slot and its metadata.
         /// </summary>
+        /// <param name="slot">Save slot index to delete.</param>
         public void DeleteSave(int slot)
         {
             if (slot < 0 || slot >= MaxSaveSlots) return;
@@ -266,8 +275,9 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Create a backup for a slot
+        /// Creates a backup of a save slot.
         /// </summary>
+        /// <param name="slot">Save slot index to backup.</param>
         public void CreateBackup(int slot)
         {
             string sourcePath = GetSavePath(slot);
@@ -292,8 +302,9 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Clean old backups, keeping only MaxBackups
+        /// Cleans old backups, keeping only the most recent MaxBackups.
         /// </summary>
+        /// <param name="slot">Save slot index.</param>
         public void CleanOldBackups(int slot)
         {
             try

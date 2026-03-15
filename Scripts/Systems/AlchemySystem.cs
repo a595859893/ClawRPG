@@ -23,8 +23,14 @@ namespace ClawRPG.Scripts.Systems
         public static event Action<AlchemyRecipe> OnRecipeUnlocked; // 解锁配方
         public static event Action<AlchemyMaterial, int> OnMaterialObtained; // 获得材料
 
+        /// <summary>
+        /// 获取玩家炼金数据
+        /// </summary>
         public PlayerAlchemyData PlayerData => _playerData;
 
+        /// <summary>
+        /// 初始化炼金系统，解锁基础配方
+        /// </summary>
         public void Initialize()
         {
             if (_isInitialized) return;
@@ -40,6 +46,11 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 解锁配方
+        /// <summary>
+        /// 解锁指定的炼金配方
+        /// </summary>
+        /// <param name="recipeId">配方ID</param>
+        /// <returns>是否成功解锁</returns>
         public bool UnlockRecipe(int recipeId)
         {
             if (_playerData.UnlockedRecipeIds.Contains(recipeId))
@@ -55,12 +66,21 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 检查是否已解锁配方
+        /// <summary>
+        /// 检查指定配方是否已解锁
+        /// </summary>
+        /// <param name="recipeId">配方ID</param>
+        /// <returns>是否已解锁</returns>
         public bool IsRecipeUnlocked(int recipeId)
         {
             return _playerData.UnlockedRecipeIds.Contains(recipeId);
         }
 
         // 获取已解锁的配方列表
+        /// <summary>
+        /// 获取玩家已解锁的所有炼金配方列表
+        /// </summary>
+        /// <returns>已解锁的配方列表</returns>
         public List<AlchemyRecipe> GetUnlockedRecipes()
         {
             List<AlchemyRecipe> unlocked = new List<AlchemyRecipe>();
@@ -74,6 +94,14 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 尝试制作
+        /// <summary>
+        /// 尝试制作指定配方
+        /// </summary>
+        /// <param name="recipeId">配方ID</param>
+        /// <param name="itemId">输出：制作产物的物品ID</param>
+        /// <param name="quantity">输出：制作产物的数量</param>
+        /// <param name="message">输出：结果消息</param>
+        /// <returns>是否成功制作</returns>
         public bool TryCraft(int recipeId, out int itemId, out int quantity, out string message)
         {
             itemId = 0;
@@ -161,6 +189,12 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 快速制作（自动选择最佳配方）
+        /// <summary>
+        /// 快速制作指定目标物品，自动选择可用配方
+        /// </summary>
+        /// <param name="targetItemId">目标物品ID</param>
+        /// <param name="message">输出：结果消息</param>
+        /// <returns>是否成功制作</returns>
         public bool QuickCraft(int targetItemId, out string message)
         {
             var recipes = GetUnlockedRecipes();
@@ -178,6 +212,11 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 检查是否能制作指定配方
+        /// <summary>
+        /// 检查指定配方是否可以制作（材料是否足够）
+        /// </summary>
+        /// <param name="recipeId">配方ID</param>
+        /// <returns>是否能够制作</returns>
         public bool CanCraft(int recipeId)
         {
             var recipe = AlchemyDatabase.Instance.GetRecipe(recipeId);
@@ -199,6 +238,10 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 添加经验
+        /// <summary>
+        /// 添加炼金经验值，处理升级逻辑
+        /// </summary>
+        /// <param name="amount">经验值数量</param>
         public void AddExperience(int amount)
         {
             _playerData.CurrentExperience += amount;
@@ -213,6 +256,11 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 获得材料（采集/掉落）
+        /// <summary>
+        /// 获得炼金材料，添加到玩家背包
+        /// </summary>
+        /// <param name="materialId">材料ID</param>
+        /// <param name="quantity">数量，默认为1</param>
         public void ObtainMaterial(int materialId, int quantity = 1)
         {
             var material = AlchemyDatabase.Instance.GetMaterial(materialId);
@@ -240,6 +288,10 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 随机获得材料（基于稀有度权重）
+        /// <summary>
+        /// 随机获得指定稀有度的炼金材料
+        /// </summary>
+        /// <param name="rarity">目标稀有度</param>
         public void ObtainRandomMaterial(AlchemyMaterialRarity rarity)
         {
             var material = AlchemyDatabase.Instance.GetRandomMaterialByRarity(rarity);
@@ -250,6 +302,11 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 获取制作所需的材料数量
+        /// <summary>
+        /// 获取指定配方所需的材料数量
+        /// </summary>
+        /// <param name="recipeId">配方ID</param>
+        /// <returns>材料ID到数量的字典</returns>
         public Dictionary<int, int> GetRequiredMaterials(int recipeId)
         {
             var requirements = new Dictionary<int, int>();
@@ -267,6 +324,11 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 检查材料是否足够
+        /// <summary>
+        /// 获取指定配方缺少的材料数量
+        /// </summary>
+        /// <param name="recipeId">配方ID</param>
+        /// <returns>缺少的材料ID到数量的字典</returns>
         public Dictionary<int, int> GetMissingMaterials(int recipeId)
         {
             var missing = new Dictionary<int, int>();
