@@ -6,49 +6,50 @@ using System;
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized
 
-public class PetAIImprovementsUI : Control
+public partial class PetAIImprovementsUI : Control
 {
-	// Signal
-	public const string AiUiToggled = "ai_ui_toggled";
-	
+	// 信号定义
+	[Signal]
+	public event Action<bool> AiUiToggled;
+
 	// UI Elements
-	private PanelContainer mainPanel;
-	private TabContainer tabContainer;
-	private VBoxContainer personalityPanel;
-	private VBoxContainer behaviorPanel;
-	private VBoxContainer learningPanel;
-	private VBoxContainer emotionPanel;
-	private VBoxContainer statsPanel;
-	
+	private PanelContainer _mainPanel = null!;
+	private TabContainer _tabContainer = null!;
+	private VBoxContainer _personalityPanel = null!;
+	private VBoxContainer _behaviorPanel = null!;
+	private VBoxContainer _learningPanel = null!;
+	private VBoxContainer _emotionPanel = null!;
+	private VBoxContainer _statsPanel = null!;
+
 	// Labels
-	private Label aiLevelLabel;
-	private Label personalityLabel;
-	private Label emotionLabel;
-	private Label stateLabel;
-	private Label adaptationLabel;
-	private Label winRateLabel;
-	
+	private Label _aiLevelLabel = null!;
+	private Label _personalityLabel = null!;
+	private Label _emotionLabel = null!;
+	private Label _stateLabel = null!;
+	private Label _adaptationLabel = null!;
+	private Label _winRateLabel = null!;
+
 	// System reference
-	private PetAIImprovementsSystem aiSystem = null;
-	
+	[Export] public PetAIImprovementsSystem? AiSystem { get; set; }
+
 	public override void _Ready()
 	{
-		SetupUI();
+		SetupUi();
 		Visible = false;
 	}
-	
-	private void SetupUI()
+
+	private void SetupUi()
 	{
 		// Main panel
-		mainPanel = new PanelContainer();
-		mainPanel.AnchorRight = 1.0f;
-		mainPanel.AnchorBottom = 1.0f;
-		mainPanel.OffsetLeft = 200;
-		mainPanel.OffsetTop = 100;
-		mainPanel.OffsetRight = -200;
-		mainPanel.OffsetBottom = -100;
-		mainPanel.SetMeta("ui_type", "pet_ai_improvements");
-		AddChild(mainPanel);
+		_mainPanel = new PanelContainer();
+		_mainPanel.AnchorRight = 1.0f;
+		_mainPanel.AnchorBottom = 1.0f;
+		_mainPanel.OffsetLeft = 200;
+		_mainPanel.OffsetTop = 100;
+		_mainPanel.OffsetRight = -200;
+		_mainPanel.OffsetBottom = -100;
+		_mainPanel.SetMeta("ui_type", "pet_ai_improvements");
+		AddChild(_mainPanel);
 		
 		// Style
 		var style = new StyleBoxFlat();
@@ -56,11 +57,11 @@ public class PetAIImprovementsUI : Control
 		style.BorderColor = new Color(0.3f, 0.6f, 0.9f, 1.0f);
 		style.SetBorderWidthAll(2);
 		style.SetCornerRadiusAll(8);
-		mainPanel.AddThemeStyleboxOverride("panel", style);
+		_mainPanel.AddThemeStyleboxOverride("panel", style);
 		
 		// VBox container
 		var vbox = new VBoxContainer();
-		mainPanel.AddChild(vbox);
+		_mainPanel.AddChild(vbox);
 		vbox.SetAnchorsPreset(Control.Preset.FullRect);
 		vbox.AddThemeConstantOverride("separation", 10);
 		
@@ -72,16 +73,16 @@ public class PetAIImprovementsUI : Control
 		vbox.AddChild(titleLabel);
 		
 		// AI Level display
-		aiLevelLabel = new Label();
-		aiLevelLabel.Text = "AI Level: 1";
-		aiLevelLabel.HorizontalAlignment = HorizontalAlignment.Center;
-		aiLevelLabel.AddThemeFontSizeOverride("font_size", 18);
-		vbox.AddChild(aiLevelLabel);
+		_aiLevelLabel = new Label();
+		_aiLevelLabel.Text = "AI Level: 1";
+		_aiLevelLabel.HorizontalAlignment = HorizontalAlignment.Center;
+		_aiLevelLabel.AddThemeFontSizeOverride("font_size", 18);
+		vbox.AddChild(_aiLevelLabel);
 		
 		// Tab container
-		tabContainer = new TabContainer();
-		tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-		vbox.AddChild(tabContainer);
+		_tabContainer = new TabContainer();
+		_tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+		vbox.AddChild(_tabContainer);
 		
 		// Create tabs
 		SetupPersonalityTab();
@@ -96,239 +97,239 @@ public class PetAIImprovementsUI : Control
 		closeButton.Pressed += OnClosePressed;
 		vbox.AddChild(closeButton);
 	}
-	
+
 	private void SetupPersonalityTab()
 	{
-		personalityPanel = new VBoxContainer();
-		personalityPanel.Name = "Personality";
-		tabContainer.AddChild(personalityPanel);
+		_personalityPanel = new VBoxContainer();
+		_personalityPanel.Name = "Personality";
+		_tabContainer.AddChild(_personalityPanel);
 		
 		var title = new Label();
 		title.Text = "🐶 Personality Traits";
 		title.AddThemeFontSizeOverride("font_size", 18);
-		personalityPanel.AddChild(title);
+		_personalityPanel.AddChild(title);
 		
-		personalityLabel = new Label();
-		personalityLabel.Text = "Type: Aggressive";
-		personalityPanel.AddChild(personalityLabel);
+		_personalityLabel = new Label();
+		_personalityLabel.Text = "Type: Aggressive";
+		_personalityPanel.AddChild(_personalityLabel);
 		
 		var curiosityLabel = new Label();
 		curiosityLabel.Name = "curiosity";
 		curiosityLabel.Text = "Curiosity: 50%";
-		personalityPanel.AddChild(curiosityLabel);
+		_personalityPanel.AddChild(curiosityLabel);
 		
 		var energyLabel = new Label();
 		energyLabel.Name = "energy";
 		energyLabel.Text = "Energy: 100%";
-		personalityPanel.AddChild(energyLabel);
+		_personalityPanel.AddChild(energyLabel);
 		
 		var loyaltyLabel = new Label();
 		loyaltyLabel.Name = "loyalty";
 		loyaltyLabel.Text = "Loyalty: 50%";
-		personalityPanel.AddChild(loyaltyLabel);
+		_personalityPanel.AddChild(loyaltyLabel);
 		
 		// Personality type selector
 		var selectorLabel = new Label();
 		selectorLabel.Text = "\nChange Personality:";
-		personalityPanel.AddChild(selectorLabel);
+		_personalityPanel.AddChild(selectorLabel);
 		
 		var typeNames = new string[] { "Aggressive", "Defensive", "Supportive", "Curious", "Lazy" };
 		for (int i = 0; i < typeNames.Length; i++)
 		{
-			int index = i;
 			var btn = new Button();
 			btn.Text = typeNames[i];
+			var index = i;
 			btn.Pressed += () => OnPersonalitySelected(index);
-			personalityPanel.AddChild(btn);
+			_personalityPanel.AddChild(btn);
 		}
 	}
-	
+
 	private void SetupBehaviorTab()
 	{
-		behaviorPanel = new VBoxContainer();
-		behaviorPanel.Name = "Behavior";
-		tabContainer.AddChild(behaviorPanel);
+		_behaviorPanel = new VBoxContainer();
+		_behaviorPanel.Name = "Behavior";
+		_tabContainer.AddChild(_behaviorPanel);
 		
 		var title = new Label();
 		title.Text = "🎯 Current Behavior";
 		title.AddThemeFontSizeOverride("font_size", 18);
-		behaviorPanel.AddChild(title);
+		_behaviorPanel.AddChild(title);
 		
-		stateLabel = new Label();
-		stateLabel.Text = "State: Idle";
-		behaviorPanel.AddChild(stateLabel);
+		_stateLabel = new Label();
+		_stateLabel.Text = "State: Idle";
+		_behaviorPanel.AddChild(_stateLabel);
 		
 		var priorityLabel = new Label();
 		priorityLabel.Name = "priority";
 		priorityLabel.Text = "Priority: 0";
-		behaviorPanel.AddChild(priorityLabel);
+		_behaviorPanel.AddChild(priorityLabel);
 		
 		var targetLabel = new Label();
 		targetLabel.Name = "target";
 		targetLabel.Text = "Target: None";
-		behaviorPanel.AddChild(targetLabel);
+		_behaviorPanel.AddChild(targetLabel);
 	}
-	
+
 	private void SetupLearningTab()
 	{
-		learningPanel = new VBoxContainer();
-		learningPanel.Name = "Learning";
-		tabContainer.AddChild(learningPanel);
+		_learningPanel = new VBoxContainer();
+		_learningPanel.Name = "Learning";
+		_tabContainer.AddChild(_learningPanel);
 		
 		var title = new Label();
 		title.Text = "📚 Learning Progress";
 		title.AddThemeFontSizeOverride("font_size", 18);
-		learningPanel.AddChild(title);
+		_learningPanel.AddChild(title);
 		
-		adaptationLabel = new Label();
-		adaptationLabel.Text = "Adaptation: 0%";
-		learningPanel.AddChild(adaptationLabel);
+		_adaptationLabel = new Label();
+		_adaptationLabel.Text = "Adaptation: 0%";
+		_learningPanel.AddChild(_adaptationLabel);
 		
-		winRateLabel = new Label();
-		winRateLabel.Text = "Win Rate: 0%";
-		learningPanel.AddChild(winRateLabel);
+		_winRateLabel = new Label();
+		_winRateLabel.Text = "Win Rate: 0%";
+		_learningPanel.AddChild(_winRateLabel);
 		
 		var battlesLabel = new Label();
 		battlesLabel.Name = "battles";
 		battlesLabel.Text = "Total Battles: 0";
-		learningPanel.AddChild(battlesLabel);
+		_learningPanel.AddChild(battlesLabel);
 		
 		var bestComboLabel = new Label();
 		bestComboLabel.Name = "best_combo";
 		bestComboLabel.Text = "Best Combo: 0";
-		learningPanel.AddChild(bestComboLabel);
+		_learningPanel.AddChild(bestComboLabel);
 		
 		var enemyLabel = new Label();
 		enemyLabel.Name = "enemy";
 		enemyLabel.Text = "Most Killed: None";
-		learningPanel.AddChild(enemyLabel);
+		_learningPanel.AddChild(enemyLabel);
 	}
-	
+
 	private void SetupEmotionTab()
 	{
-		emotionPanel = new VBoxContainer();
-		emotionPanel.Name = "Emotion";
-		tabContainer.AddChild(emotionPanel);
+		_emotionPanel = new VBoxContainer();
+		_emotionPanel.Name = "Emotion";
+		_tabContainer.AddChild(_emotionPanel);
 		
 		var title = new Label();
 		title.Text = "😊 Emotional State";
 		title.AddThemeFontSizeOverride("font_size", 18);
-		emotionPanel.AddChild(title);
+		_emotionPanel.AddChild(title);
 		
-		emotionLabel = new Label();
-		emotionLabel.Text = "Current: Happy";
-		emotionPanel.AddChild(emotionLabel);
+		_emotionLabel = new Label();
+		_emotionLabel.Text = "Current: Happy";
+		_emotionPanel.AddChild(_emotionLabel);
 		
 		var intensityLabel = new Label();
 		intensityLabel.Name = "intensity";
 		intensityLabel.Text = "Intensity: 50%";
-		emotionPanel.AddChild(intensityLabel);
+		_emotionPanel.AddChild(intensityLabel);
 		
 		var historyLabel = new Label();
 		historyLabel.Name = "history";
 		historyLabel.Text = "Recent Emotions: None";
-		emotionPanel.AddChild(historyLabel);
+		_emotionPanel.AddChild(historyLabel);
 	}
-	
+
 	private void SetupStatsTab()
 	{
-		statsPanel = new VBoxContainer();
-		statsPanel.Name = "Combat Stats";
-		tabContainer.AddChild(statsPanel);
+		_statsPanel = new VBoxContainer();
+		_statsPanel.Name = "Combat Stats";
+		_tabContainer.AddChild(_statsPanel);
 		
 		var title = new Label();
 		title.Text = "⚔️ Combat Statistics";
 		title.AddThemeFontSizeOverride("font_size", 18);
-		statsPanel.AddChild(title);
+		_statsPanel.AddChild(title);
 		
 		var damageLabel = new Label();
 		damageLabel.Name = "damage";
 		damageLabel.Text = "Damage Dealt: 0";
-		statsPanel.AddChild(damageLabel);
+		_statsPanel.AddChild(damageLabel);
 		
 		var preventedLabel = new Label();
 		preventedLabel.Name = "prevented";
 		preventedLabel.Text = "Damage Prevented: 0";
-		statsPanel.AddChild(preventedLabel);
+		_statsPanel.AddChild(preventedLabel);
 		
 		var healingLabel = new Label();
 		healingLabel.Name = "healing";
 		healingLabel.Text = "Healing Done: 0";
-		statsPanel.AddChild(healingLabel);
+		_statsPanel.AddChild(healingLabel);
 		
 		var critLabel = new Label();
 		critLabel.Name = "crits";
 		critLabel.Text = "Critical Hits: 0";
-		statsPanel.AddChild(critLabel);
+		_statsPanel.AddChild(critLabel);
 		
 		var dodgeLabel = new Label();
 		dodgeLabel.Name = "dodges";
 		dodgeLabel.Text = "Perfect Dodges: 0";
-		statsPanel.AddChild(dodgeLabel);
+		_statsPanel.AddChild(dodgeLabel);
 	}
-	
+
 	public void SetAiSystem(PetAIImprovementsSystem system)
 	{
-		aiSystem = system;
+		AiSystem = system;
 		UpdateDisplay();
 	}
-	
+
 	public void UpdateDisplay()
 	{
-		if (aiSystem == null)
+		if (AiSystem == null)
 		{
 			return;
 		}
 		
 		// Update personality
-		if (aiSystem.Data != null && aiSystem.Data.Personality != null)
+		if (AiSystem.Data != null && AiSystem.Data.Personality != null)
 		{
-			personalityLabel.Text = "Type: " + aiSystem.GetPersonalityType();
+			_personalityLabel.Text = "Type: " + AiSystem.GetPersonalityType();
 		}
 		
 		// Update AI level
-		aiLevelLabel.Text = "AI Level: " + aiSystem.GetAiLevel().ToString();
+		_aiLevelLabel.Text = "AI Level: " + AiSystem.GetAiLevel();
 		
 		// Update behavior state
-		stateLabel.Text = "State: " + aiSystem.GetAiState();
+		_stateLabel.Text = "State: " + AiSystem.GetAiState();
 		
 		// Update emotion
-		emotionLabel.Text = "Current: " + aiSystem.GetCurrentEmotion();
+		_emotionLabel.Text = "Current: " + AiSystem.GetCurrentEmotion();
 		
 		// Update learning stats
-		var learningStats = aiSystem.GetLearningStats();
-		adaptationLabel.Text = $"Adaptation: {Mathf.Round((float)learningStats["adaptation_level"] * 100)}%";
-		winRateLabel.Text = $"Win Rate: {Mathf.Round((float)learningStats["win_rate"] * 100)}%";
+		var learningStats = AiSystem.GetLearningStats();
+		_adaptationLabel.Text = "Adaptation: " + Mathf.Round((float)learningStats["adaptation_level"] * 100) + "%";
+		_winRateLabel.Text = "Win Rate: " + Mathf.Round((float)learningStats["win_rate"] * 100) + "%";
 		
 		// Update combat stats
-		var combatStats = aiSystem.GetCombatStats();
-		var damageLabel = statsPanel.GetNode("damage") as Label;
+		var combatStats = AiSystem.GetCombatStats();
+		var damageLabel = _statsPanel.GetNode("damage");
 		if (damageLabel != null)
 		{
-			damageLabel.Text = $"Damage Dealt: {Mathf.Round((float)combatStats["total_damage_dealt"])}";
+			(damageLabel as Label)!.Text = "Damage Dealt: " + Mathf.Round((float)combatStats["total_damage_dealt"]);
 		}
-		var preventedLabel = statsPanel.GetNode("prevented") as Label;
+		var preventedLabel = _statsPanel.GetNode("prevented");
 		if (preventedLabel != null)
 		{
-			preventedLabel.Text = $"Damage Prevented: {Mathf.Round((float)combatStats["total_damage_prevented"])}";
+			(preventedLabel as Label)!.Text = "Damage Prevented: " + Mathf.Round((float)combatStats["total_damage_prevented"]);
 		}
-		var healingLabel = statsPanel.GetNode("healing") as Label;
+		var healingLabel = _statsPanel.GetNode("healing");
 		if (healingLabel != null)
 		{
-			healingLabel.Text = $"Healing Done: {Mathf.Round((float)combatStats["total_healing_done"])}";
+			(healingLabel as Label)!.Text = "Healing Done: " + Mathf.Round((float)combatStats["total_healing_done"]);
 		}
-		var critLabel = statsPanel.GetNode("crits") as Label;
+		var critLabel = _statsPanel.GetNode("crits");
 		if (critLabel != null)
 		{
-			critLabel.Text = $"Critical Hits: {combatStats["critical_hits"]}";
+			(critLabel as Label)!.Text = "Critical Hits: " + combatStats["critical_hits"];
 		}
-		var dodgeLabel = statsPanel.GetNode("dodges") as Label;
+		var dodgeLabel = _statsPanel.GetNode("dodges");
 		if (dodgeLabel != null)
 		{
-			dodgeLabel.Text = $"Perfect Dodges: {combatStats["perfect_dodges"]}";
+			(dodgeLabel as Label)!.Text = "Perfect Dodges: " + combatStats["perfect_dodges"];
 		}
 	}
-	
+
 	public override void _Input(InputEvent @event)
 	{
 		if (@event.IsActionPressed("pet_ai_toggle"))
@@ -337,28 +338,28 @@ public class PetAIImprovementsUI : Control
 			GetViewport().SetInputAsHandled();
 		}
 	}
-	
+
 	public void Toggle()
 	{
 		Visible = !Visible;
-		EmitSignal(AiUiToggled, Visible);
-		if (Visible && aiSystem != null)
+		AiUiToggled?.Invoke(Visible);
+		if (Visible && AiSystem != null)
 		{
 			UpdateDisplay();
 		}
 	}
-	
+
 	private void OnClosePressed()
 	{
 		Visible = false;
 	}
-	
+
 	private void OnPersonalitySelected(int type)
 	{
-		if (aiSystem != null)
+		if (AiSystem != null)
 		{
-			aiSystem.SetPersonalityType(type);
-			personalityLabel.Text = "Type: " + aiSystem.GetPersonalityType();
+			AiSystem.SetPersonalityType(type);
+			_personalityLabel.Text = "Type: " + AiSystem.GetPersonalityType();
 		}
 	}
 }
