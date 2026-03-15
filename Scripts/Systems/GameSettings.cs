@@ -253,6 +253,9 @@ public partial class GameSettings : Node
 
     #region 存档
 
+    /// <summary>
+    /// 保存游戏设置到配置文件
+    /// </summary>
     public void SaveSettings()
     {
         var config = new ConfigFile();
@@ -292,6 +295,9 @@ public partial class GameSettings : Node
         GD.Print("Settings saved");
     }
 
+    /// <summary>
+    /// 从配置文件加载游戏设置
+    /// </summary>
     public void LoadSettings()
     {
         var config = new ConfigFile();

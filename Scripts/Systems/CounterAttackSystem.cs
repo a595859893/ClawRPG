@@ -5,26 +5,61 @@ using System.Collections.Generic;
 namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
-    /// Counter attack system - allows players to perform counter attacks after perfect blocks
+    /// 反击系统 - 允许玩家在完美格挡后进行反击
     /// </summary>
     public partial class CounterAttackSystem : Node
     {
+        /// <summary>
+        /// 单例实例
+        /// </summary>
         public static CounterAttackSystem Instance { get; private set; }
         
         // Counter attack data
+        
+        /// <summary>
+        /// 反击数据 - 定义一种反击方式的配置
+        /// </summary>
         public class CounterAttackData
         {
+            /// <summary>
+            /// 反击名称
+            /// </summary>
             public string Name { get; set; }
+            /// <summary>
+            /// 反击描述
+            /// </summary>
             public string Description { get; set; }
+            /// <summary>
+            /// 伤害倍率
+            /// </summary>
             public float DamageMultiplier { get; set; }
+            /// <summary>
+            /// 体力消耗
+            /// </summary>
             public float StaminaCost { get; set; }
+            /// <summary>
+            /// 冷却时间（秒）
+            /// </summary>
             public float Cooldown { get; set; }
-            public float ExecutionWindow { get; set; } // Time window after perfect block to counter
+            /// <summary>
+            /// 反击时间窗口（秒）- 完美格挡后可以进行反击的时间
+            /// </summary>
+            public float ExecutionWindow { get; set; }
+            /// <summary>
+            /// 附加的状态效果
+            /// </summary>
             public StatusEffectType? ApplyStatus { get; set; }
+            /// <summary>
+            /// 状态效果触发几率
+            /// </summary>
             public float StatusChance { get; set; }
         }
         
         // Counter attack types
+        
+        /// <summary>
+        /// 反击类型枚举
+        /// </summary>
         public enum CounterType
         {
             Riposte,           // Basic counter - quick counter after perfect block
@@ -36,10 +71,30 @@ namespace ClawRPG.Scripts.Systems
         }
         
         // Player counter attack state
+        
+        /// <summary>
+        /// 是否正在进行反击
+        /// </summary>
         public bool IsCounterAttacking { get; private set; }
+        
+        /// <summary>
+        /// 当前选择的反击类型
+        /// </summary>
         public CounterType CurrentCounterType { get; private set; }
+        
+        /// <summary>
+        /// 反击冷却计时器
+        /// </summary>
         public float CounterCooldownTimer { get; private set; }
+        
+        /// <summary>
+        /// 反击时间窗口计时器
+        /// </summary>
         public float ExecutionWindowTimer { get; private set; }
+        
+        /// <summary>
+        /// 是否可以进行反击
+        /// </summary>
         public bool CanCounter { get; private set; }
         
         // Counter attack database

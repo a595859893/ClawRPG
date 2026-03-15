@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 交易系统 - 处理玩家之间的物品交易
+/// 支持交易提议、物品交换、交易历史记录
+/// </summary>
 public partial class TradeSystem : Node {
     public static TradeSystem Instance { get; private set; }
 

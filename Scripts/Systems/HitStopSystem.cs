@@ -120,6 +120,11 @@ public partial class HitStopSystem : Node
 		TriggerHitStop(effect);
 	}
 	
+	/// <summary>
+	/// 触发轻击打击效果
+	/// </summary>
+	/// <param name="baseDuration">基础持续时间</param>
+	/// <param name="intensity">效果强度</param>
 	public void TriggerLightHit(float baseDuration = 0.05f, float intensity = 0.5f)
 	{
 		var effect = new HitStopEffectData
@@ -187,6 +192,13 @@ public partial class HitStopSystem : Node
 		}
 	}
 	
+	/// <summary>
+	/// 当前是否处于打击停顿状态
+	/// </summary>
 	public bool IsActive => _currentDuration > 0;
+	
+	/// <summary>
+	/// 当前震动强度
+	/// </summary>
 	public float CurrentIntensity => _shakeIntensity;
 }

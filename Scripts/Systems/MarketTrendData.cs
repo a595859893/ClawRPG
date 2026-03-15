@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// 市场趋势数据 - 记录物品价格历史和统计
+/// 用于市场分析和价格预测
+/// </summary>
 public class MarketTrendData : Node
 {
     // Price history for each item category

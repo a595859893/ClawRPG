@@ -4,17 +4,33 @@ using System.Collections.Generic;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
-    /// Generic object pool for reusing nodes to improve performance
-    /// Applies knowledge from 2D game performance optimization
+    /// 对象池系统 - 用于复用节点以提升性能
+    /// 应用2D游戏性能优化知识
     /// </summary>
     public partial class ObjectPool : Node
     {
         // Pool configuration
+        
+        /// <summary>
+        /// 初始池大小
+        /// </summary>
         [Export] public int InitialPoolSize = 10;
+        
+        /// <summary>
+        /// 最大池大小
+        /// </summary>
         [Export] public int MaxPoolSize = 50;
+        
+        /// <summary>
+        /// 是否自动扩展
+        /// </summary>
         [Export] public bool AutoExpand = true;
         
         // The scene to pool
+        
+        /// <summary>
+        /// 要池化的场景
+        /// </summary>
         [Export] public PackedScene PooledScene;
         
         // Pool storage
@@ -43,6 +59,7 @@ namespace ClawRPG.Scripts.Systems {
         /// <summary>
         /// Get an object from the pool, creating new if needed
         /// </summary>
+        /// <returns>池化的节点对象，如果池已满且不允许自动扩展则返回null</returns>
         public Node2D GetObject()
         {
             Node2D obj;
@@ -67,8 +84,9 @@ namespace ClawRPG.Scripts.Systems {
         }
         
         /// <summary>
-        /// Return an object to the pool
+        /// 返还对象到池中
         /// </summary>
+        /// <param name="obj">要返还的节点</param>
         public void ReturnObject(Node2D obj)
         {
             if (obj == null) return;
