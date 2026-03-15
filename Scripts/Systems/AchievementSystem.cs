@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Godot.Collections;
 
-public class AchievementSystem : Node
+public class AchievementSystem : BaseSystem
 {
     public static AchievementSystem Instance { get; private set; }
 
@@ -38,6 +38,11 @@ public class AchievementSystem : Node
         InitializeAchievements();
         LoadData();
     }
+    
+    /// <summary>
+    /// 系统名称
+    /// </summary>
+    protected override string SystemName => "Achievement";
 
     private void InitializeAchievements()
     {

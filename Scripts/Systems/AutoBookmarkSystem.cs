@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems {
     /// Auto bookmark system - automatically adds bookmarks for game content
     /// Listens to game events and adds bookmarks automatically
     /// </summary>
-    public partial class AutoBookmarkSystem : Node {
+    public partial class AutoBookmarkSystem : BaseSystem {
         public static AutoBookmarkSystem Instance { get; private set; }
         
         // Signals
@@ -28,6 +28,11 @@ namespace ClawRPG.Scripts.Systems {
             ConnectSignals();
             GD.Print("[AutoBookmarkSystem] Initialized");
         }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "AutoBookmark";
         
         private void ConnectSignals() {
             // Connect to BossManager for boss defeat events

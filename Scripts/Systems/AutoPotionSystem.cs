@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 自动使用药水系统 - 根据阈值自动使用背包中的药水
     /// </summary>
-    public partial class AutoPotionSystem : Node
+    public partial class AutoPotionSystem : BaseSystem
     {
         public static AutoPotionSystem Instance { get; private set; }
 
@@ -43,6 +43,11 @@ namespace ClawRPG.Scripts.Systems
         {
             Instance = this;
         }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "AutoPotion";
 
         public override void _Process(float delta)
         {
