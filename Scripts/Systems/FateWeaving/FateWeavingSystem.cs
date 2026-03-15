@@ -311,5 +311,91 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
                 }
             }
         }
+        
+        /// <summary>
+        /// 导出保存数据 (BaseSystem 接口)
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 保存玩家属性
+            var playerStats = new Godot.Collections.Dictionary();
+            foreach (var kvp in Data.PlayerStats)
+            {
+                playerStats[kvp.Key] = kvp.Value;
+            }
+            data["player_stats"] = playerStats;
+            
+            // 保存已做选择
+            var madeChoices = new Godot.Collections.Array();
+            foreach (var choice in Data.MadeChoices)
+            {
+                madeChoices.Add(choice);
+            }
+            data["made_choices"] = madeChoices;
+            
+            data["dominant_path"] = Data.DominantPath.ToString();
+            data["weave_level"] = Data.WeaveLevel;
+            data["total_weaves"] = Data.TotalWeaves;
+            
+            // 保存选择类型计数
+            var choiceTypeCount = new Godot.Collections.Dictionary();
+            foreach (var kvp in Data.ChoiceTypeCount)
+            {
+                choiceTypeCount[kvp.Key] = kvp.Value;
+            }
+            data["choice_type_count"] = choiceTypeCount;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据 (BaseSystem 接口)
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("player_stats")) {
+                var playerStats = data["player_stats"] as Godot.Collections.Dictionary;
+                Data.PlayerStats.Clear();
+                foreach (var key in playerStats.Keys) {
+                    Data.PlayerStats[key.ToString()] = Convert.ToSingle(playerStats[key]);
+                }
+            }
+            
+            if (data.Contains("made_choices")) {
+                var madeChoices = data["made_choices"] as Godot.Array;
+                Data.MadeChoices.Clear();
+                foreach (var choice in madeChoices) {
+                    Data.MadeChoices.Add(choice.ToString());
+                }
+            }
+            
+            if (data.Contains("dominant_path")) {
+                if (Enum.TryParse<FatePathType>(data["dominant_path"].ToString(), out var path)) {
+                    Data.DominantPath = path;
+                }
+            }
+            
+            if (data.Contains("weave_level")) {
+                Data.WeaveLevel = Convert.ToInt32(data["weave_level"]);
+            }
+            
+            if (data.Contains("total_weaves")) {
+                Data.TotalWeaves = Convert.ToInt32(data["total_weaves"]);
+            }
+            
+            if (data.Contains("choice_type_count")) {
+                var choiceTypeCount = data["choice_type_count"] as Godot.Collections.Dictionary;
+                Data.ChoiceTypeCount.Clear();
+                foreach (var key in choiceTypeCount.Keys) {
+                    Data.ChoiceTypeCount[key.ToString()] = Convert.ToInt32(choiceTypeCount[key]);
+                }
+            }
+            
+            GD.Print($"[FateWeaving] Imported: {Data.MadeChoices.Count} choices, level {Data.WeaveLevel}");
+        }
     }
 }
