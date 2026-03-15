@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems.AI.Flocking
     /// 应用 Advanced Game AI Patterns 学习成果
     /// 实现分离(Seperation)、对齐(Alignment)、凝聚(Cohesion)三种行为
     /// </summary>
-    public partial class EnemyFlockingSystem : Node
+    public partial class EnemyFlockingSystem : BaseSystem
     {
         // 单例
         private static EnemyFlockingSystem _instance;
@@ -246,6 +246,37 @@ namespace ClawRPG.Scripts.Systems.AI.Flocking
             public Vector2 Velocity { get; set; }
             public bool IsActive { get; set; }
             public long JoinedTime { get; set; }
+        }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary()
+            {
+                ["separation_weight"] = _separationWeight,
+                ["alignment_weight"] = _alignmentWeight,
+                ["cohesion_weight"] = _cohesionWeight,
+                ["perception_radius"] = _perceptionRadius,
+                ["max_speed"] = _maxSpeed,
+                ["max_force"] = _maxForce,
+                ["next_flock_id"] = _nextFlockId
+            };
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data.Contains("separation_weight")) _separationWeight = Convert.ToSingle(data["separation_weight"]);
+            if (data.Contains("alignment_weight")) _alignmentWeight = Convert.ToSingle(data["alignment_weight"]);
+            if (data.Contains("cohesion_weight")) _cohesionWeight = Convert.ToSingle(data["cohesion_weight"]);
+            if (data.Contains("perception_radius")) _perceptionRadius = Convert.ToSingle(data["perception_radius"]);
+            if (data.Contains("max_speed")) _maxSpeed = Convert.ToSingle(data["max_speed"]);
+            if (data.Contains("max_force")) _maxForce = Convert.ToSingle(data["max_force"]);
+            if (data.Contains("next_flock_id")) _nextFlockId = Convert.ToInt32(data["next_flock_id"]);
         }
     }
 }
