@@ -238,6 +238,23 @@ namespace ClawRPG.Systems {
         }
 
         /// <summary>
+        /// 导出保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            return Serialize();
+        }
+
+        /// <summary>
+        /// 导入保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            Deserialize(new Dictionary<string, object>(data));
+        }
+
+        /// <summary>
         /// 序列化设置数据
         /// </summary>
         public Dictionary<string, object> Serialize()

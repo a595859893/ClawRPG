@@ -399,6 +399,37 @@ namespace ClawRPG.Scripts.Systems {
         }
 
         /// <summary>
+        /// 导出保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            if (_config != null)
+            {
+                data["config_json"] = ExportConfigAsJson();
+            }
+            data["config_loaded"] = _configLoaded;
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            if (data.ContainsKey("config_json"))
+            {
+                ImportConfigFromJson(data["config_json"].ToString());
+            }
+            if (data.ContainsKey("config_loaded"))
+            {
+                _configLoaded = Convert.ToBoolean(data["config_loaded"]);
+            }
+        }
+
+        /// <summary>
         /// 导出配置为JSON字符串
         /// </summary>
         public string ExportConfigAsJson() {
