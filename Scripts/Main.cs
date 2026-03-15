@@ -59,6 +59,13 @@ namespace ClawRPG.Scripts {
 
         private bool _shiftEToggleCooldown = false;
 
+        // Modular components (refactored)
+        private MainInput _mainInput;
+        private MainUI _mainUI;
+        private MainGame _mainGame;
+        private MainMenu _mainMenu;
+        private MainLobby _mainLobby;
+
         // Backward compatibility - delegate to GameStateManager
         public static bool IsPaused => GameStateManager.IsPaused;
         public static int CurrentDay => GameStateManager.Instance?.GetCurrentDay() ?? 1;
@@ -94,6 +101,9 @@ namespace ClawRPG.Scripts {
 
             // Initialize managers - these handle core game functionality
             InitializeManagers();
+
+            // Initialize modular components
+            InitializeModules();
 
             // Initialize weapon mastery system
             var weaponMasterySystem = new WeaponMasterySystem();
@@ -1183,6 +1193,46 @@ namespace ClawRPG.Scripts {
             GD.Print("Managers initialized");
         }
 
+        /// <summary>
+        /// Initialize modular components (MainInput, MainUI, MainGame, MainMenu, MainLobby)
+        /// </summary>
+        private void InitializeModules()
+        {
+            // Initialize MainInput for input handling
+            _mainInput = new MainInput();
+            _mainInput.Name = "MainInput";
+            _mainInput.Initialize(this);
+            AddChild(_mainInput);
+
+            // Initialize MainUI for UI toggles
+            _mainUI = new MainUI();
+            _mainUI.Name = "MainUI";
+            _mainUI.Initialize(this);
+            AddChild(_mainUI);
+
+            // Initialize MainGame for game loop
+            _mainGame = new MainGame();
+            _mainGame.Name = "MainGame";
+            _mainGame.Initialize(this);
+            _mainGame.SetPlayerSpawnManager(_playerSpawnManager);
+            _mainGame.SetEnemySpawnManager(_enemySpawnManager);
+            AddChild(_mainGame);
+
+            // Initialize MainMenu for title screen
+            _mainMenu = new MainMenu();
+            _mainMenu.Name = "MainMenu";
+            _mainMenu.Initialize(this);
+            AddChild(_mainMenu);
+
+            // Initialize MainLobby for multiplayer
+            _mainLobby = new MainLobby();
+            _mainLobby.Name = "MainLobby";
+            _mainLobby.Initialize(this);
+            AddChild(_mainLobby);
+
+            GD.Print("Modular components initialized");
+        }
+
         private void SpawnPlayer()
         {
             // Use PlayerSpawnManager if available
@@ -2188,6 +2238,11 @@ namespace ClawRPG.Scripts {
         public override void _Process(double delta)
         {
             float dt = (float)delta;
+
+            // Process modular components
+            _mainInput?.ProcessInput(dt);
+            _mainGame?.ProcessGame(delta);
+            _mainGame?.UpdatePlayerUI();
 
             // Update boss mechanics system
             var bossMechanicsSystem = GetNode<Systems.BossMechanics.BossMechanicsSystem>("BossMechanicsSystem");
