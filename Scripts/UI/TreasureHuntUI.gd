@@ -1,6 +1,9 @@
 extends Control
+class_name TreasureHuntUI
 
 # Treasure Hunt UI
+# 提供寻宝系统的图形界面
+
 onready var region_list = $VBoxContainer/RegionList
 onready var info_panel = $VBoxContainer/HBoxContainer/InfoPanel
 onready var stats_panel = $VBoxContainer/HBoxContainer/StatsPanel
@@ -10,6 +13,14 @@ onready var hunt_button = $VBoxContainer/HBoxContainer/InfoPanel/HuntButton
 onready var close_button = $VBoxContainer/CloseButton
 
 var selected_region = null
+
+# 导出保存数据
+func export_save_data() -> Dictionary:
+	return {}
+
+# 导入保存数据
+func import_save_data(data: Dictionary):
+	pass
 
 func _ready():
 	# Connect signals

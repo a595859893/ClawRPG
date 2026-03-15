@@ -1,4 +1,4 @@
-extends Node
+extends BaseSystem
 
 # DynamicQuestChallengeSystem - 动态任务挑战系统
 # 基于玩家状态动态生成个性化挑战任务
@@ -8,12 +8,39 @@ var data: DynamicQuestChallengeData
 var database: DynamicQuestChallengeDatabase
 
 func _ready():
+	super._ready()
+	system_name = "DynamicQuestChallengeSystem"
 	data = DynamicQuestChallengeData.new()
 	database = DynamicQuestChallengeDatabase.new()
 	load_data()
 
 func _exit_tree():
 	save_data()
+	shutdown()
+
+func initialize():
+	super.initialize()
+	is_initialized = true
+
+func shutdown():
+	save_data()
+	super.shutdown()
+
+func export_save_data() -> Dictionary:
+	if data:
+		return {
+			"data": data.to_dict(),
+			"system_name": system_name
+		}
+	return {
+		"data": {},
+		"system_name": system_name
+	}
+
+func import_save_data(save_data: Dictionary):
+	super.import_save_data(save_data)
+	if save_data.has("data") and save_data["data"] is Dictionary:
+		data.from_dict(save_data["data"])
 
 # 生成挑战任务
 func generate_challenge(player_level: int, player_class: String, current_quests: Array) -> Dictionary:

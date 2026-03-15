@@ -1,4 +1,22 @@
+extends BaseSystem
+
 # DynamicQuestChallengeDatabase - 动态任务挑战数据库
+# 提供挑战模板和生成逻辑
+
+func _ready():
+	super._ready()
+	system_name = "DynamicQuestChallengeDatabase"
+
+func initialize():
+	super.initialize()
+
+func export_save_data() -> Dictionary:
+	# 数据库类通常不需要保存数据，返回空字典
+	return {}
+
+func import_save_data(data: Dictionary):
+	# 数据库类通常不需要加载数据
+	pass
 
 var challenge_templates = {
 	"Combat": [
