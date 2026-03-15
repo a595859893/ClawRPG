@@ -43,7 +43,7 @@ public class QuickCastItem
 /// <summary>
 /// 快速施法系统。允许玩家通过数字键快速使用物品和技能。
 /// </summary>
-public partial class QuickCastSystem : Node
+public partial class QuickCastSystem : BaseSystem
 {
     /// <summary>
     /// 获取系统单例实例。

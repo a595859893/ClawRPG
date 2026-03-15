@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CardCollectionData : Node
+public class CardCollectionData : BaseSystem
 {
     // Card collection entries: card_id -> count
     public Dictionary<string, int> OwnedCards = new Dictionary<string, int>();

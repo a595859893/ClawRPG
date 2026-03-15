@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MysteryTreasureSystem : Node
+public class MysteryTreasureSystem : BaseSystem
 {
     private static MysteryTreasureSystem _instance;
     public static MysteryTreasureSystem Instance

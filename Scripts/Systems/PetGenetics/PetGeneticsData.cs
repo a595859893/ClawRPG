@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetGeneticsData : Node
+public class PetGeneticsData : BaseSystem
 {
     // Gene pool for each pet type
     public Dictionary<string, List<PetGene>> ActiveGenes = new Dictionary<string, List<PetGene>>();

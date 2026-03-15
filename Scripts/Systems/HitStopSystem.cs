@@ -20,7 +20,7 @@ public partial class HitStopEffectData : Resource
 /// 包括时间减缓、屏幕震动、画面闪烁效果
 /// </summary>
 [GlobalClass]
-public partial class HitStopSystem : Node
+public partial class HitStopSystem : BaseSystem
 {
 	public static HitStopSystem Instance { get; private set; }
 	

@@ -31,7 +31,7 @@ public enum QuickSlotType
 /// 快速栏系统 - 管理玩家的快捷栏槽位
 /// 支持 1-8 数字键快速使用物品
 /// </summary>
-public partial class QuickSlotSystem : Node
+public partial class QuickSlotSystem : BaseSystem
 {
     public static QuickSlotSystem Instance { get; private set; }
     

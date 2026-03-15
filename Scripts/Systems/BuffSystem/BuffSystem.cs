@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BuffSystem : Node
+public class BuffSystem : BaseSystem
 {
 	private static BuffSystem _instance;
 	public static BuffSystem Instance

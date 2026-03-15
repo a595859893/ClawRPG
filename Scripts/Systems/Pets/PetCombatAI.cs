@@ -12,7 +12,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// - 主动buff：主动为玩家提供增益
     /// - 队形跟随：更好的跟随位置
     /// </summary>
-    public class PetCombatAI : Node
+    public class PetCombatAI : BaseSystem
     {
         // 单例
         private static PetCombatAI _instance;

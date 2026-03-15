@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems;
 /// Game settings system that manages all game configuration options.
 /// Implements singleton pattern for global access.
 /// </summary>
-public partial class GameSettings : Node
+public partial class GameSettings : BaseSystem
 {
     /// <summary>
     /// Gets the singleton instance of GameSettings.

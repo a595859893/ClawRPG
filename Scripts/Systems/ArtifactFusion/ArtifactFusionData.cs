@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ArtifactFusionData : Node
+public class ArtifactFusionData : BaseSystem
 {
     // 融合记录
     public List<FusionRecord> FusionHistory { get; set; } = new List<FusionRecord>();

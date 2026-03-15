@@ -3,7 +3,7 @@ using Godot.Collections;
 using System;
 using System.Text.Json;
 
-public partial class GatheringSystem : Node
+public partial class GatheringSystem : BaseSystem
 {
     public static GatheringSystem Instance;
     

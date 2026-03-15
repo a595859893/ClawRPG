@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildTowerDefenseSystem : Node
+public class GuildTowerDefenseSystem : BaseSystem
 {
     // Tower types
     public enum TowerType { Arrow, Cannon, Ice, Fire, Lightning, Poison, Support, Ultimate }

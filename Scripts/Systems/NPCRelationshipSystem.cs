@@ -7,7 +7,7 @@ namespace ClawRPG.Systems {
     /// NPC好感度关系系统 - 管理玩家与NPC之间的关系
     /// 应用Game Narrative Design学习成果
     /// </summary>
-    public class NPCRelationshipSystem : Node
+    public class NPCRelationshipSystem : BaseSystem
     {
         public static NPCRelationshipSystem Instance { get; private set; }
 

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CharacterCreationSystem : Node
+public class CharacterCreationSystem : BaseSystem
 {
     private CharacterCreationData _data;
     private CharacterCreationDatabase _database;

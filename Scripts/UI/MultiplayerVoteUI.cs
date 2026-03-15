@@ -158,7 +158,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             _partyTab.AddChild(_partyInfoLabel);
 
             // Members list
-            _membersContainer = new VBoxContainer;
+            _membersContainer = new VBoxContainer()
             _membersContainer.AddThemeConstantOverride("separation", 5);
             _partyTab.AddChild(_membersContainer);
 
@@ -172,7 +172,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             _partyTab.AddChild(createButton);
 
             // Action buttons
-            var buttonContainer = new HBoxContainer;
+            var buttonContainer = new HBoxContainer()
             _partyTab.AddChild(buttonContainer);
 
             _readyButton = new Button
@@ -193,7 +193,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             _inviteButton.Pressed += OnInvitePressed;
             buttonContainer.AddChild(_inviteButton);
 
-            var buttonContainer2 = new HBoxContainer;
+            var buttonContainer2 = new HBoxContainer()
             _partyTab.AddChild(buttonContainer2);
 
             _settingsButton = new Button
@@ -227,11 +227,11 @@ namespace ClawRPG.Modules.MultiplayerVote
             _voteTab.AddChild(votesHeader);
 
             // Active votes list
-            _activeVotesContainer = new VBoxContainer;
+            _activeVotesContainer = new VBoxContainer()
             _voteTab.AddChild(_activeVotesContainer);
 
             // Separator
-            var separator = new HSeparator;
+            var separator = new HSeparator()
             _voteTab.AddChild(separator);
 
             // Initiate vote section
@@ -247,7 +247,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             var typeLabel = new Label { Text = "Vote Type:" };
             _voteTab.AddChild(typeLabel);
 
-            _voteTypeSelector = new OptionButton;
+            _voteTypeSelector = new OptionButton()
             PopulateVoteTypes();
             _voteTab.AddChild(_voteTypeSelector);
 
@@ -302,7 +302,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             _browseTab.AddChild(_refreshButton);
 
             // Party list
-            _partyListContainer = new VBoxContainer;
+            _partyListContainer = new VBoxContainer()
             _browseTab.AddChild(_partyListContainer);
 
             // Join section
@@ -430,7 +430,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             {
                 foreach (var member in party.Members)
                 {
-                    var memberPanel = new PanelContainer;
+                    var memberPanel = new PanelContainer()
                     var memberLabel = new Label
                     {
                         Text = $"{(member.IsLeader ? "👑 " : "👤 ")}{member.PlayerName} " +
@@ -487,8 +487,8 @@ namespace ClawRPG.Modules.MultiplayerVote
 
         private Control CreateVotePanel(ActiveVote vote)
         {
-            var panel = new PanelContainer;
-            var vbox = new VBoxContainer;
+            var panel = new PanelContainer()
+            var vbox = new VBoxContainer()
             panel.AddChild(vbox);
 
             var voteLabel = new Label
@@ -506,7 +506,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             var hasVoted = vote.Votes.Any(v => v.PlayerId == _currentPlayerId);
             if (!hasVoted)
             {
-                var buttonContainer = new HBoxContainer;
+                var buttonContainer = new HBoxContainer()
                 vbox.AddChild(buttonContainer);
 
                 var yesButton = new Button
@@ -559,7 +559,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             {
                 foreach (var party in publicParties)
                 {
-                    var partyPanel = new PanelContainer;
+                    var partyPanel = new PanelContainer()
                     var partyLabel = new Label
                     {
                         Text = $"📢 {party.PartyName}\n" +

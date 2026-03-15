@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// Elite Monster System - transforms regular enemies into elite variants with enhanced stats and abilities
     /// Based on roguelike game design patterns and enemy scaling mechanics
     /// </summary>
-    public partial class EliteMonsterData : Node
+    public partial class EliteMonsterData : BaseSystem
     {
         // Elite monster types
         public enum EliteType

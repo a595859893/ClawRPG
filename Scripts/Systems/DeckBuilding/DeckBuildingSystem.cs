@@ -7,7 +7,7 @@ namespace ClawRPG.Systems
     /// <summary>
     /// 卡牌构建系统
     /// </summary>
-    public partial class DeckBuildingSystem : Node
+    public partial class DeckBuildingSystem : BaseSystem
     {
         private DeckBuildingData _data;
         private DeckBuildingDatabase _database;

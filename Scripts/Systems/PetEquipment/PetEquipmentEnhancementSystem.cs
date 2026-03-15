@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public class PetEquipmentEnhancementSystem : Node
+public class PetEquipmentEnhancementSystem : BaseSystem
 {
     public static PetEquipmentEnhancementSystem Instance { get; private set; }
 

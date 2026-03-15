@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RandomBoonSystem : Node
+public class RandomBoonSystem : BaseSystem
 {
     public static RandomBoonSystem Instance { get; private set; }
     

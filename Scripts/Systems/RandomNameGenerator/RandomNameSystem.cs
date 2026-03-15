@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RandomNameSystem : Node
+public class RandomNameSystem : BaseSystem
 {
     private RandomNameData _data;
     private Random _random = new Random();

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class EnemyWeaknessDatabase : Node
+public class EnemyWeaknessDatabase : BaseSystem
 {
     // 弱点类型
     public enum WeaknessType

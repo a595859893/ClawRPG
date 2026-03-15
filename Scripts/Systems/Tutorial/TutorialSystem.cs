@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TutorialSystem : Node
+public class TutorialSystem : BaseSystem
 {
     private TutorialData _data;
     private TutorialDatabase _database;

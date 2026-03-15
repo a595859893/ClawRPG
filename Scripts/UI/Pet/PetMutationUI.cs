@@ -78,7 +78,7 @@ public class PetMutationUI : Control
         var selectorLabel = new Label { Text = "选择宠物:", RectMinSize = new Vector2(80, 0) };
         selectorContainer.AddChild(selectorLabel);
         
-        _petSelector = new OptionButton;
+        _petSelector = new OptionButton()
         _petSelector.Connect("item_selected", this, nameof(OnPetSelected));
         selectorContainer.AddChild(_petSelector);
         
@@ -110,7 +110,7 @@ public class PetMutationUI : Control
         var statsPanel = new PanelContainer { RectMinSize = new Vector2(0, 120) };
         rightPanel.AddChild(statsPanel);
         
-        var statsVBox = new VBoxContainer;
+        var statsVBox = new VBoxContainer()
         statsPanel.AddChild(statsVBox);
         
         var statsTitle = new Label { Text = "变异统计" };
@@ -398,7 +398,7 @@ public class PetMutationDetails : PanelContainer
         var scroll = new ScrollContainer { SizeFlagsHorizontal = SizeFlags.Expand, SizeFlagsVertical = SizeFlags.Expand };
         AddChild(scroll);
         
-        _content = new VBoxContainer;
+        _content = new VBoxContainer()
         scroll.AddChild(_content);
         
         var title = new Label { Text = "属性加成" };

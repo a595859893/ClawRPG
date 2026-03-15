@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// Elite Monster System - Core logic for spawning and managing elite monsters
     /// Based on roguelike game design patterns and enemy scaling mechanics
     /// </summary>
-    public partial class EliteMonsterSystem : Node
+    public partial class EliteMonsterSystem : BaseSystem
     {
         public static EliteMonsterSystem Instance { get; private set; }
         

@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems
     /// 宠物守护系统
     /// 宠物在玩家周围巡逻守护，自动攻击靠近的敌人
     /// </summary>
-    public partial class PetGuardianSystem : Node
+    public partial class PetGuardianSystem : BaseSystem
     {
         private static PetGuardianSystem _instance;
         public static PetGuardianSystem Instance => _instance ??= new PetGuardianSystem();

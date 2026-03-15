@@ -51,7 +51,7 @@ public class RankMatch
     public DateTime matchTime;
 }
 
-public partial class RankedSystem : Node
+public partial class RankedSystem : BaseSystem
 {
     private static RankedSystem instance;
     public static RankedSystem Instance => instance;

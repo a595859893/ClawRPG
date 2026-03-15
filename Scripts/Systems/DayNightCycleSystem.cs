@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Day/Night Cycle System - Manages time progression and environmental effects
     /// </summary>
-    public class DayNightCycleSystem : Node {
+    public class DayNightCycleSystem : BaseSystem {
         // Time configuration
         private float _dayDuration = 600f; // 10 minutes real time = 24 in-game hours
         private float _currentTime = 0f; // 0-1 representing 0-24 hours

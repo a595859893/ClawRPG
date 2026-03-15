@@ -8,7 +8,7 @@ namespace ClawRPG.Systems
     /// 多人游戏大厅数据
     /// 房间信息、会话管理、玩家状态追踪
     /// </summary>
-    public class MultiplayerLobbyData : Node
+    public class MultiplayerLobbyData : BaseSystem
     {
         // 房间状态
         public enum RoomState { Waiting, Starting, InProgress, Finished }

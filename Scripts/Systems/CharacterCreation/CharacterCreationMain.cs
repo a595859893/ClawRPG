@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CharacterCreationMain : Node
+public class CharacterCreationMain : BaseSystem
 {
     private CharacterCreationSystem _system;
     private CharacterCreationUI _ui;

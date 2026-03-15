@@ -6,7 +6,7 @@ using ClawRPG.Scripts.Systems.RandomEvent;
 /// <summary>
 /// Core random event system that manages event generation and effects
 /// </summary>
-public partial class RandomEventSystem : Node
+public partial class RandomEventSystem : BaseSystem
 {
     public static RandomEventSystem Instance { get; private set; }
     

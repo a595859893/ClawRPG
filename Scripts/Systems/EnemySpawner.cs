@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems {
     /// Manages enemy spawning using the EnemyDatabase
     /// Supports Quick Mode with reduced enemy count and strength
     /// </summary>
-    public partial class EnemySpawner : Node
+    public partial class EnemySpawner : BaseSystem
     {
         [Export] public bool AutoSpawn = true;
         [Export] public int MaxEnemies = 10;

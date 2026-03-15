@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Boss技能视觉特效系统 - 为Boss技能提供可视化效果
     /// </summary>
-    public partial class BossAbilityVisualizer : Node {
+    public partial class BossAbilityVisualizer : BaseSystem {
         public static BossAbilityVisualizer Instance { get; private set; }
 
         // 技能视觉类型

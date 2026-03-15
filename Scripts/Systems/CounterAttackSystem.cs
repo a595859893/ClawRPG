@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 反击系统 - 允许玩家在完美格挡后进行反击
     /// </summary>
-    public partial class CounterAttackSystem : Node
+    public partial class CounterAttackSystem : BaseSystem
     {
         /// <summary>
         /// 单例实例

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Systems.Dialogue;
 
-public partial class DialogueSystem : Node {
+public partial class DialogueSystem : BaseSystem {
     public static DialogueSystem Instance { get; private set; }
     
     // All dialogue trees indexed by NPC ID

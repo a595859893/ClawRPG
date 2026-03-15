@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems {
     /// 对象池系统 - 用于复用节点以提升性能
     /// 应用2D游戏性能优化知识
     /// </summary>
-    public partial class ObjectPool : Node
+    public partial class ObjectPool : BaseSystem
     {
         // Pool configuration
         

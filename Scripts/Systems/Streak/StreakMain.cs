@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class StreakMain : Node
+public class StreakMain : BaseSystem
 {
     private static StreakSystem _streakSystem;
     private static StreakUI _streakUI;

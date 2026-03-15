@@ -62,7 +62,7 @@ namespace ClawRPG.Scripts.Systems.Combat
         }
     }
 
-    public partial class DamageNumberSystem : Node
+    public partial class DamageNumberSystem : BaseSystem
     {
         private static DamageNumberSystem _instance;
         public static DamageNumberSystem Instance => _instance;

@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.PetFoster
     /// <summary>
     /// 宠物寄养系统管理器
     /// </summary>
-    public partial class PetFosterSystem : Node
+    public partial class PetFosterSystem : BaseSystem
     {
         public static PetFosterSystem Instance { get; private set; }
         

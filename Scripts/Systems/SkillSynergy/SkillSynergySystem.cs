@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SkillSynergySystem : Node
+public class SkillSynergySystem : BaseSystem
 {
     public static SkillSynergySystem Instance { get; private set; }
 

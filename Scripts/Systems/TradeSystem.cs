@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Trade system that handles player-to-player item trading.
 /// Supports trade offers, item exchange, and trade history tracking.
 /// </summary>
-public partial class TradeSystem : Node {
+public partial class TradeSystem : BaseSystem {
     /// <summary>
     /// Gets the singleton instance of the TradeSystem.
     /// </summary>

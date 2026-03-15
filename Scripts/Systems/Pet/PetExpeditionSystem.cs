@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace GameSystems
 {
-    public class PetExpeditionSystem : Node
+    public class PetExpeditionSystem : BaseSystem
     {
         private static PetExpeditionSystem _instance;
         public static PetExpeditionSystem Instance

@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 随机世界事件系统 - 管理随机世界事件的生成和触发
     /// </summary>
-    public partial class RandomWorldEventSystem : Node {
+    public partial class RandomWorldEventSystem : BaseSystem {
         public static RandomWorldEventSystem Instance { get; private set; }
 
         // 事件数据库

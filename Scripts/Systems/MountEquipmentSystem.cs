@@ -71,7 +71,7 @@ namespace GameSystems {
     }
 
     // 坐骑装备管理器
-    public partial class MountEquipmentSystem : Node {
+    public partial class MountEquipmentSystem : BaseSystem {
         public static MountEquipmentSystem Instance { get; private set; }
 
         // 坐骑装备数据库

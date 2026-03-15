@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public partial class MomentumSystem : Node
+public partial class MomentumSystem : BaseSystem
 {
     public static MomentumSystem Instance { get; private set; }
     

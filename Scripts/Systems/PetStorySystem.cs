@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 宠物故事系统管理器
     /// </summary>
-    public class PetStorySystem : Node {
+    public class PetStorySystem : BaseSystem {
         public static PetStorySystem Instance { get; private set; }
         
         [Signal]

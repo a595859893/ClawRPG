@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 宠物友谊系统 - 管理宠物之间的友谊关系和互动
 /// </summary>
-public class PetFriendshipSystem : Node
+public class PetFriendshipSystem : BaseSystem
 {
     public static PetFriendshipSystem Instance { get; private set; }
 

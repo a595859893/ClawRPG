@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MonsterTamingDatabase : Node
+public class MonsterTamingDatabase : BaseSystem
 {
     // Monster Types
     public static string[] MonsterTypes = new string[]

@@ -120,7 +120,7 @@ public class SkillTreeResetDatabase
     }
 }
 
-public partial class SkillTreeResetSystem : Node
+public partial class SkillTreeResetSystem : BaseSystem
 {
     private static SkillTreeResetSystem _instance;
     public static SkillTreeResetSystem Instance => _instance;

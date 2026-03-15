@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// <summary>
     /// 宠物训练系统管理器
     /// </summary>
-    public class PetTrainingSystem : Node
+    public class PetTrainingSystem : BaseSystem
     {
         private static PetTrainingSystem _instance;
         public static PetTrainingSystem Instance => _instance ??= new PetTrainingSystem();

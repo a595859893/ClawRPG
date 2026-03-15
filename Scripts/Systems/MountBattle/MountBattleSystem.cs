@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
     /// 坐骑战斗系统 - Mount Battle System
     /// 允许玩家在坐骑上进行战斗，参与各种战斗模式
     /// </summary>
-    public class MountBattleSystem : Node {
+    public class MountBattleSystem : BaseSystem {
         private MountBattleData _data;
         private MountBattleState _currentState = MountBattleState.Idle;
         private float _skillCooldownTimer = 0f;

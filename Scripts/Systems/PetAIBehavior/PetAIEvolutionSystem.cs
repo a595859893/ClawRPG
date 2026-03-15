@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Pet AI Evolution System - pets learn and evolve based on battle experience
     /// </summary>
-    public partial class PetAIEvolutionSystem : Node
+    public partial class PetAIEvolutionSystem : BaseSystem
     {
         public static PetAIEvolutionSystem Instance { get; private set; }
 

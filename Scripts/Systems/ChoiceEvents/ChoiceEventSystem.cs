@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
     /// <summary>
     /// Choice event system - handles random choice events for roguelike gameplay
     /// </summary>
-    public class ChoiceEventSystem : Node
+    public class ChoiceEventSystem : BaseSystem
     {
         private static ChoiceEventSystem _instance;
         public static ChoiceEventSystem Instance

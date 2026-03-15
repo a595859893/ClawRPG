@@ -7,7 +7,7 @@ namespace Game.Systems.Pets
     /// <summary>
     /// 宠物装备系统管理器
     /// </summary>
-    public class PetEquipmentSystem : Node
+    public class PetEquipmentSystem : BaseSystem
     {
         public static PetEquipmentSystem Instance { get; private set; }
         

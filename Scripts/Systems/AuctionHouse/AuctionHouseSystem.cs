@@ -17,7 +17,7 @@ public class AuctionItem
     public string Category { get; set; }
 }
 
-public class AuctionHouseData : Node
+public class AuctionHouseData : BaseSystem
 {
     public Dictionary<int, AuctionItem> ActiveListings = new Dictionary<int, AuctionItem>();
     public Dictionary<int, List<int>> PurchaseHistory = new Dictionary<int, List<int>>();
@@ -33,7 +33,7 @@ public class AuctionHouseData : Node
     }
 }
 
-public class AuctionHouseSystem : Node
+public class AuctionHouseSystem : BaseSystem
 {
     private AuctionHouseData _data;
     private const int LISTING_FEE_PERCENT = 5;

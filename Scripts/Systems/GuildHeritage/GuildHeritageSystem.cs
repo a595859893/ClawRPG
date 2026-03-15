@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildHeritageSystem : Node
+public class GuildHeritageSystem : BaseSystem
 {
     private static GuildHeritageSystem _instance;
     public static GuildHeritageSystem Instance

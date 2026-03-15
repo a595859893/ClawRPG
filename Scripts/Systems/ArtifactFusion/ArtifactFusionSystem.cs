@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ArtifactFusionSystem : Node
+public class ArtifactFusionSystem : BaseSystem
 {
     public static ArtifactFusionSystem Instance { get; private set; }
     

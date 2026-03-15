@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 多人游戏队伍系统
 /// 队伍管理、权限、buff共享
 /// </summary>
-public class TeamSystem : Node
+public class TeamSystem : BaseSystem
 {
     public static TeamSystem Instance { get; private set; }
 

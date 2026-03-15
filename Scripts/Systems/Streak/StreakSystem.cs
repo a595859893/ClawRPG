@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class StreakSystem : Node
+public class StreakSystem : BaseSystem
 {
     private StreakData _data;
     private StreakDatabase _database;

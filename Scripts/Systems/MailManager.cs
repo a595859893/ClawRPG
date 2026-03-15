@@ -23,7 +23,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// 邮件管理器 - 处理玩家邮件
     /// </summary>
-    public partial class MailManager : Node {
+    public partial class MailManager : BaseSystem {
         public static MailManager Instance { get; private set; }
 
         private Dictionary<string, List<MailData>> _mailBox = new Dictionary<string, List<MailData>>();

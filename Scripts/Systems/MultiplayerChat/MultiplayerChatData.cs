@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class MultiplayerChatData : Node
+public class MultiplayerChatData : BaseSystem
 {
     // Chat channels
     public enum ChatChannel

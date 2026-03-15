@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildWarManager : Node
+public class GuildWarManager : BaseSystem
 {
     public static GuildWarManager Instance { get; private set; }
     

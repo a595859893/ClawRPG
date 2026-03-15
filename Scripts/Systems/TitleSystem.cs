@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 称号系统 - 管理玩家称号的解锁、装备和展示
     /// </summary>
-    public class TitleSystem : Node
+    public class TitleSystem : BaseSystem
     {
     public string TitleId { get; set; }
     public string TitleName { get; set; }
@@ -59,7 +59,7 @@ public enum TitleRarity
 /// <summary>
 /// TitleSystem - 玩家称号系统，管理称号的解锁、条件检查和装备
 /// </summary>
-public class TitleSystem : Node
+public class TitleSystem : BaseSystem
 {
     // Singleton
     private static TitleSystem _instance;

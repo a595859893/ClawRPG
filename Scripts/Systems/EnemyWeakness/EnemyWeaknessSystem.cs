@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class EnemyWeaknessSystem : Node
+public class EnemyWeaknessSystem : BaseSystem
 {
     // 引用
     private EnemyWeaknessData _data;

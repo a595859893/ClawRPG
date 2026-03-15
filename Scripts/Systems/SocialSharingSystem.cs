@@ -10,7 +10,7 @@ namespace ClawRPG.Systems
 /// 社交分享系统
 /// 战绩截图功能 + 战绩分享模板 + 群聊战绩机器人集成
 /// </summary>
-public class SocialSharingSystem : Node
+public class SocialSharingSystem : BaseSystem
 {
     public static SocialSharingSystem Instance { get; private set; }
 

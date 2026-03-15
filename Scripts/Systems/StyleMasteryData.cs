@@ -5,7 +5,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class StyleMasteryData : Node
+public class StyleMasteryData : BaseSystem
 {
     // Style mastery records
     public Dictionary<string, StyleMasteryRecord> MasteredStyles = new Dictionary<string, StyleMasteryRecord>();

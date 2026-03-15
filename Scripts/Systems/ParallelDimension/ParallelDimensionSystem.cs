@@ -5,7 +5,7 @@ using ClawRPG.Scripts.Systems.ParallelDimension;
 
 namespace ClawRPG.Scripts.Systems.ParallelDimension {
     
-    public class ParallelDimensionSystem : Node {
+    public class ParallelDimensionSystem : BaseSystem {
         
         private static ParallelDimensionSystem _instance;
         public static ParallelDimensionSystem Instance {

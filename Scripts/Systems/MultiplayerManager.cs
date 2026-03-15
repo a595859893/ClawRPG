@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 多人游戏管理器
 /// 房间管理、玩家同步、状态同步
 /// </summary>
-public class MultiplayerManager : Node
+public class MultiplayerManager : BaseSystem
 {
     public static MultiplayerManager Instance { get; private set; }
 

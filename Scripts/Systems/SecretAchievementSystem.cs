@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Secret Achievement System - hidden achievements discovered through gameplay
     /// </summary>
-    public partial class SecretAchievementSystem : Node
+    public partial class SecretAchievementSystem : BaseSystem
     {
         private static SecretAchievementSystem _instance;
         public static SecretAchievementSystem Instance => _instance;

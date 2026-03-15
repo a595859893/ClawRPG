@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Event Chain Database - 事件连锁配置数据库
     /// </summary>
-    public class EventChainDatabase : Node {
+    public class EventChainDatabase : BaseSystem {
         public static EventChainDatabase Instance { get; private set; }
 
         private Dictionary<string, EventChainData> chains = new Dictionary<string, EventChainData>();

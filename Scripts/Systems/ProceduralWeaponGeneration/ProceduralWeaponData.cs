@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
     /// <summary>
     /// Data structure for procedural weapon generation system
     /// </summary>
-    public class ProceduralWeaponData : Node {
+    public class ProceduralWeaponData : BaseSystem {
         
         // Weapon generation history
         public List<WeaponGenerationRecord> GenerationHistory { get; set; } = new List<WeaponGenerationRecord>();

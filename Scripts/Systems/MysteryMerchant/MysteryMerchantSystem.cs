@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 神秘商店系统管理器
     /// </summary>
-    public partial class MysteryMerchantSystem : Node
+    public partial class MysteryMerchantSystem : BaseSystem
     {
         public static MysteryMerchantSystem Instance { get; private set; }
         

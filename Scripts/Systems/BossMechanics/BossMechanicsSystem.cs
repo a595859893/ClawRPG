@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BossMechanicsSystem : Node
+public class BossMechanicsSystem : BaseSystem
 {
     public static BossMechanicsSystem Instance { get; private set; }
 

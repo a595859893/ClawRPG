@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class MultiplayerChatSystem : Node
+public class MultiplayerChatSystem : BaseSystem
 {
     private MultiplayerChatData _data;
     private MultiplayerChatDatabase _database;

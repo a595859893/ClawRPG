@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Scripts.Systems.FateWeaving {
-    public class FateWeavingSystem : Godot.Node {
+    public class FateWeavingSystem : BaseSystem {
         private static FateWeavingSystem _instance;
         public static FateWeavingSystem Instance {
             get {

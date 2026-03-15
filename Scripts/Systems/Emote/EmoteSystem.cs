@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace ClawRPG.Systems.Emote {
-    public partial class EmoteSystem : Node {
+    public partial class EmoteSystem : BaseSystem {
         public static EmoteSystem Instance { get; private set; }
 
         private PlayerEmoteData playerData = new PlayerEmoteData();

@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Elite Monster Database - Configuration for elite monster types, tiers, and spawn conditions
     /// </summary>
-    public partial class EliteMonsterDatabase : Node
+    public partial class EliteMonsterDatabase : BaseSystem
     {
         // Singleton
         public static EliteMonsterDatabase Instance { get; private set; }

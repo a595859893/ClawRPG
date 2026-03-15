@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class CrossServerBattleMain : Node
+public class CrossServerBattleMain : BaseSystem
 {
     private static CrossServerBattleSystem _system;
     private static CrossServerBattleUI _ui;

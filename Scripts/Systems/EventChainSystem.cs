@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems {
     /// Event Chain System - 事件连锁核心系统
     /// 应用 PCG 学习成果 - 程序化内容生成
     /// </summary>
-    public class EventChainSystem : Node {
+    public class EventChainSystem : BaseSystem {
         public static EventChainSystem Instance { get; private set; }
 
         private Dictionary<string, ActiveEventChain> activeChains = new Dictionary<string, ActiveEventChain>();

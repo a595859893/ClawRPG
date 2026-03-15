@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class CookingSystem : Node
+public partial class CookingSystem : BaseSystem
 {
     public static CookingSystem Instance { get; private set; }
 

@@ -7,7 +7,7 @@ using System.Linq;
 /// Market trend data container that tracks item price history and statistics.
 /// Used for market analysis and price prediction systems.
 /// </summary>
-public class MarketTrendData : Node
+public class MarketTrendData : BaseSystem
 {
     /// <summary>
     /// Price history for each item category, keyed by category name.

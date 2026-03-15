@@ -83,7 +83,7 @@ public class CharacterCreationUI : Control
         AddChild(mainPanel);
         
         // Create main container with scroll
-        var scroll = new ScrollContainer;
+        var scroll = new ScrollContainer()
         scroll.Name = "ScrollContainer";
         mainPanel.AddChild(scroll);
         

@@ -1,6 +1,6 @@
 using Godot;
 
-public class CombatRatingMain : Node
+public class CombatRatingMain : BaseSystem
 {
 	private CombatRatingSystem combatRatingSystem;
 	private CombatRatingUI combatRatingUI;

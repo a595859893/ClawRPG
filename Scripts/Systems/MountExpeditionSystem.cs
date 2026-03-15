@@ -10,7 +10,7 @@ namespace ClawRPG.Systems
     /// <summary>
     /// 坐骑远征系统 - 坐骑离线探险获取奖励
     /// </summary>
-    public class MountExpeditionSystem : Node
+    public class MountExpeditionSystem : BaseSystem
     {
         public static MountExpeditionSystem Instance { get; private set; }
         

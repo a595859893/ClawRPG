@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems.PetRecycle {
     /// <summary>
     /// 宠物回收配置数据库
     /// </summary>
-    public class PetRecycleDatabase : Node
+    public class PetRecycleDatabase : BaseSystem
     {
         // 宠物类型配置
         public Dictionary<string, PetTypeConfig> PetTypes { get; private set; } = new Dictionary<string, PetTypeConfig>();

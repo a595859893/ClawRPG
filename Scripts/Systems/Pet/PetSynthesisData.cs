@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetSynthesisData : Node
+public class PetSynthesisData : BaseSystem
 {
     // Synthesis records
     public Dictionary<int, List<PetSynthesisRecord>> SynthesisHistory = new Dictionary<int, List<PetSynthesisRecord>>();

@@ -104,7 +104,7 @@ public class PetEquipmentDatabase
 /// <summary>
 /// Core pet equipment system
 /// </summary>
-public partial class PetEquipmentSystem : Node
+public partial class PetEquipmentSystem : BaseSystem
 {
     public static PetEquipmentSystem Instance { get; private set; }
     

@@ -7,7 +7,7 @@ namespace ClawRPG.Systems.Meditation
     /// <summary>
     /// Meditation System - Allows players to meditate for buffs and benefits
     /// </summary>
-    public class MeditationSystem : Node
+    public class MeditationSystem : BaseSystem
     {
         public static MeditationSystem Instance { get; private set; }
         

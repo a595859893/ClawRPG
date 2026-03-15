@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public partial class SpinWheelManager : Node
+public partial class SpinWheelManager : BaseSystem
 {
     [Export] private PackedScene spinWheelScene;
     private Control spinWheelUI;

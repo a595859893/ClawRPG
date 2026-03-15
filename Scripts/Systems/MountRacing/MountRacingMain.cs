@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 namespace ClawRPG.Systems {
-    public partial class MountRacingMain : Node {
+    public partial class MountRacingMain : BaseSystem {
         private MountRacingSystem _mountRacingSystem;
         private MountRacingDatabase _mountRacingDatabase;
         private MountRacingData _mountRacingData;

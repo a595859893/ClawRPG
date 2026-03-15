@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// Prestige System - allows players to reset their progress for special rewards
     /// Based on Player Progression & Leveling System Design learning
     /// </summary>
-    public partial class PrestigeSystem : Node
+    public partial class PrestigeSystem : BaseSystem
     {
         public static PrestigeSystem Instance { get; private set; }
         

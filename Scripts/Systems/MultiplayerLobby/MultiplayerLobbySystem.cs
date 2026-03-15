@@ -8,7 +8,7 @@ namespace ClawRPG.Systems
     /// 多人游戏大厅核心系统
     /// 房间创建/加入/管理/邀请/准备状态
     /// </summary>
-    public class MultiplayerLobbySystem : Node
+    public class MultiplayerLobbySystem : BaseSystem
     {
         public static MultiplayerLobbySystem Instance { get; private set; }
         

@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems;
 /// <summary>
 /// Core screen effect system for post-processing
 /// </summary>
-public partial class ScreenEffectSystem : Node
+public partial class ScreenEffectSystem : BaseSystem
 {
     public static ScreenEffectSystem Instance { get; private set; }
     

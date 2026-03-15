@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class DungeonExpeditionSystem : Node
+public partial class DungeonExpeditionSystem : BaseSystem
 {
     public static DungeonExpeditionSystem Instance { get; private set; }
 

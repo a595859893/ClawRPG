@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class CombatStanceSystem : Node
+public partial class CombatStanceSystem : BaseSystem
 {
     public static CombatStanceSystem Instance { get; private set; }
     

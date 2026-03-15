@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class MythicPlusDungeonSystem : Node
+public class MythicPlusDungeonSystem : BaseSystem
 {
     private static MythicPlusDungeonSystem _instance;
     public static MythicPlusDungeonSystem Instance => _instance;

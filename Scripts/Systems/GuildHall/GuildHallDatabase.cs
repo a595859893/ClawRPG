@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Systems.GuildHall {
-    public class GuildHallDatabase : Godot.Node {
+    public class GuildHallDatabase : BaseSystem {
         public Dictionary<string, GuildHallRoom> Rooms { get; private set; }
         public Dictionary<string, GuildHallDecoration> Decorations { get; private set; }
         public Dictionary<string, GuildHallUpgrade> Upgrades { get; private set; }

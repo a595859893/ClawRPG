@@ -417,7 +417,7 @@ public class ComboChainUI : Control
 }
 
 // 便捷函数
-public partial class ComboChainMain : Node
+public partial class ComboChainMain : BaseSystem
 {
     public static ComboChainUI CurrentUI { get; private set; }
     

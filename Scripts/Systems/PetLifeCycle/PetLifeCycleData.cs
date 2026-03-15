@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class PetLifeCycleData : Node
+public class PetLifeCycleData : BaseSystem
 {
     // 宠物生命周期数据
     public Dictionary<int, PetLifeCycleEntry> PetLifeCycles = new Dictionary<int, PetLifeCycleEntry>();

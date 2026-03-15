@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 事件选择系统 - Roguelike风格的事件选择系统
     /// </summary>
-    public partial class ChoiceEventSystem : Node {
+    public partial class ChoiceEventSystem : BaseSystem {
         public static ChoiceEventSystem Instance { get; private set; }
         
         // 玩家数据

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Systems {
-    public partial class MountRacingSystem : Node {
+    public partial class MountRacingSystem : BaseSystem {
         private MountRacingData _data;
         private MountRacingDatabase _database;
         

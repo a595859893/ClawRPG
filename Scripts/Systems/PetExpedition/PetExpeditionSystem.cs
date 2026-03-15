@@ -9,7 +9,7 @@ namespace ClawRPG.Systems
     /// <summary>
     /// 宠物探险系统 - 宠物离线探险获取奖励
     /// </summary>
-    public class PetExpeditionSystem : Node
+    public class PetExpeditionSystem : BaseSystem
     {
         public static PetExpeditionSystem Instance { get; private set; }
         

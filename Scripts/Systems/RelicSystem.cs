@@ -7,7 +7,7 @@ namespace ClawRPG.Systems;
 /// <summary>
 /// 遗物系统管理器
 /// </summary>
-public class RelicSystem : Node
+public class RelicSystem : BaseSystem
 {
     public static RelicSystem Instance { get; private set; }
     

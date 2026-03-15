@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class DreamRealmSystem : Node
+public partial class DreamRealmSystem : BaseSystem
 {
     public static DreamRealmSystem Instance { get; private set; }
 

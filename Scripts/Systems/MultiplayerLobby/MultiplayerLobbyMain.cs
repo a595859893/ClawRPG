@@ -18,7 +18,7 @@ namespace ClawRPG.Systems
     /// 
     /// 快捷键: Ctrl+Shift+L
     /// </summary>
-    public class MultiplayerLobbyMain : Node
+    public class MultiplayerLobbyMain : BaseSystem
     {
         public static MultiplayerLobbyMain Instance { get; private set; }
         

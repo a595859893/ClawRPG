@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// Multiplayer Leaderboard System
     /// Tracks and displays player rankings in various categories
     /// </summary>
-    public class MultiplayerLeaderboard : Node
+    public class MultiplayerLeaderboard : BaseSystem
     {
         public static MultiplayerLeaderboard Instance { get; private set; }
 

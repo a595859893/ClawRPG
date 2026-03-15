@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SkillSynergyData : Node
+public class SkillSynergyData : BaseSystem
 {
     // 技能协同记录
     public class SynergyRecord

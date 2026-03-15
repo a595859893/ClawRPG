@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Music Collection System - Allows players to unlock and collect music tracks
     /// </summary>
-    public class MusicCollectionSystem : Node {
+    public class MusicCollectionSystem : BaseSystem {
         private static MusicCollectionSystem _instance;
         public static MusicCollectionSystem Instance => _instance;
         

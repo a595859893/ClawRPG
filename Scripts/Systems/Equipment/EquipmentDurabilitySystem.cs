@@ -41,7 +41,7 @@ public enum DurabilityState
     Broken        // 0%
 }
 
-public class EquipmentDurabilitySystem : Node
+public class EquipmentDurabilitySystem : BaseSystem
 {
     public static EquipmentDurabilitySystem Instance { get; private set; }
     

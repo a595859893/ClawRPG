@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Pet AI Behavior System - intelligent pet combat behavior
     /// </summary>
-    public partial class PetAIBehaviorSystem : Node
+    public partial class PetAIBehaviorSystem : BaseSystem
     {
         public static PetAIBehaviorSystem Instance { get; private set; }
 

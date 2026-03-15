@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ArtifactFusionDatabase : Node
+public class ArtifactFusionDatabase : BaseSystem
 {
     // 融合配方
     public static List<FusionRecipe> Recipes { get; private set; } = new List<FusionRecipe>();

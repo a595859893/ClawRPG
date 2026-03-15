@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
      * GuildQuestBoardSystem - 公会任务布告栏系统
      * 允许公会发布任务，玩家接受并完成任务获得奖励
      */
-    public class GuildQuestBoardSystem : Node {
+    public class GuildQuestBoardSystem : BaseSystem {
         // 单例
         private static GuildQuestBoardSystem _instance;
         public static GuildQuestBoardSystem Instance => _instance;

@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// Pet Combat Companion System - coordinates pet behavior with player combat
     /// Features: Combo system, learning, sync with player
     /// </summary>
-    public partial class PetCombatCompanionSystem : Node
+    public partial class PetCombatCompanionSystem : BaseSystem
     {
         public static PetCombatCompanionSystem Instance { get; private set; }
 

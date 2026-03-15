@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CharacterCreationDatabase : Node
+public class CharacterCreationDatabase : BaseSystem
 {
     // Class configurations
     public Dictionary<string, Dictionary<string, object>> Classes { get; set; } = new Dictionary<string, Dictionary<string, object>>

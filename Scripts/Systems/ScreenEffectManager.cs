@@ -4,7 +4,7 @@ using System;
 /// <summary>
 /// 屏幕特效管理器 - 管理战斗屏幕特效
 /// </summary>
-public partial class ScreenEffectManager : Node
+public partial class ScreenEffectManager : BaseSystem
 {
     public static ScreenEffectManager Instance { get; private set; }
     

@@ -60,7 +60,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Weapon mastery and special attack system
     /// </summary>
-    public partial class WeaponMasterySystem : Node
+    public partial class WeaponMasterySystem : BaseSystem
     {
         public static WeaponMasterySystem Instance { get; private set; }
 

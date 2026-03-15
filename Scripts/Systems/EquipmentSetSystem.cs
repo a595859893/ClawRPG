@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 装备套装系统 - 管理装备套装的收集和激活
 /// 支持多种套装，每种套装有2件和4件激活效果
 /// </summary>
-public class EquipmentSetSystem : Node
+public class EquipmentSetSystem : BaseSystem
 {
     /// <summary>
     /// 获取系统单例实例

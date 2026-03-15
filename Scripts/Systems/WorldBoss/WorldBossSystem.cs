@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// World boss system manager - handles world boss spawning and combat
     /// </summary>
-    public partial class WorldBossSystem : Node
+    public partial class WorldBossSystem : BaseSystem
     {
         public static WorldBossSystem Instance { get; private set; }
         

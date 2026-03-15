@@ -110,7 +110,7 @@ public class PlayerWeatherData
     }
 }
 
-public class WeatherSystem : Node
+public class WeatherSystem : BaseSystem
 {
     public static WeatherSystem Instance { get; private set; }
     

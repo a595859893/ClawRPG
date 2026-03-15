@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildDiplomacyData : Node
+public class GuildDiplomacyData : BaseSystem
 {
     // 外交关系数据
     public Dictionary<string, GuildRelation> Relations = new Dictionary<string, GuildRelation>();

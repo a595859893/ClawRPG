@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class MilestoneMain : Node
+public class MilestoneMain : BaseSystem
 {
     public static MilestoneSystem MilestoneSystem { get; private set; }
     public static MilestoneUI MilestoneUI { get; private set; }

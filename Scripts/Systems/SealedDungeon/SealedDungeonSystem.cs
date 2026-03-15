@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Systems.SealedDungeon {
-    public class SealedDungeonSystem : Node {
+    public class SealedDungeonSystem : BaseSystem {
         private static SealedDungeonSystem _instance;
         public static SealedDungeonSystem Instance {
             get {

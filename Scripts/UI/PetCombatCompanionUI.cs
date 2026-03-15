@@ -78,7 +78,7 @@ namespace ClawRPG.Scripts.UI
             var selectorLabel = new Label { Text = "选择宠物: " };
             selectorHBox.AddChild(selectorLabel);
 
-            _petSelector = new ComboBox;
+            _petSelector = new ComboBox()
             _petSelector.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _petSelector.ItemSelected += OnPetSelected;
             selectorHBox.AddChild(_petSelector);
@@ -117,7 +117,7 @@ namespace ClawRPG.Scripts.UI
             overviewTab.AddChild(_roleLabel);
 
             // Role buttons
-            var roleHBox = new HBoxContainer;
+            var roleHBox = new HBoxContainer()
             overviewTab.AddChild(roleHBox);
 
             string[] roles = { "Attacker", "Support", "Tank", "Scout" };

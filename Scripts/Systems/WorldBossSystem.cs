@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems {
     /// World Boss System - Global boss events that require player cooperation
     /// </summary>
     [GlobalClass]
-    public partial class WorldBossSystem : Node {
+    public partial class WorldBossSystem : BaseSystem {
         
         // Singleton instance
         public static WorldBossSystem Instance { get; private set; }

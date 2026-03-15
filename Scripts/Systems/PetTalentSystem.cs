@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 宠物天赋系统 - 管理宠物天赋的生成、学习和重置
 /// </summary>
-public class PetTalentSystem : Node
+public class PetTalentSystem : BaseSystem
 {
     public static PetTalentSystem Instance { get; private set; }
 

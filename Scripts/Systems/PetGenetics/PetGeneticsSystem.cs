@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetGeneticsSystem : Node
+public class PetGeneticsSystem : BaseSystem
 {
     private PetGeneticsData _data;
     private PetGeneticsDatabase _database;

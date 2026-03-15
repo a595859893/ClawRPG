@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class ProceduralStoryData : Node
+public class ProceduralStoryData : BaseSystem
 {
     // Story State
     public enum StoryState { Inactive, Active, Paused, Completed, Failed }

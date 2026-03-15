@@ -74,7 +74,7 @@ public class CombatHUDEnhancementData
 	}
 }
 
-public class CombatHUDEnhancementSystem : Node
+public class CombatHUDEnhancementSystem : BaseSystem
 {
 	public static CombatHUDEnhancementSystem Instance { get; private set; }
 	

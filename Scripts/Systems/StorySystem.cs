@@ -298,7 +298,7 @@ namespace ClawRPG.Scripts.Systems {
         }
     }
 
-    public class StoryManager : Node {
+    public class StoryManager : BaseSystem {
         public static StoryManager Instance { get; private set; }
         
         [Signal]

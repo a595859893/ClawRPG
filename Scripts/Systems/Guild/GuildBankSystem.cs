@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class GuildBankSystem : Node {
+public partial class GuildBankSystem : BaseSystem {
     public static GuildBankSystem Instance { get; private set; }
     
     // 当前公会银行数据

@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class PetLifeCycleSystem : Node
+public class PetLifeCycleSystem : BaseSystem
 {
     private PetLifeCycleData _data;
     private PetLifeCycleDatabase _database;

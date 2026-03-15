@@ -86,7 +86,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Bookmark manager - handles bookmark creation, storage, and retrieval
     /// </summary>
-    public partial class BookmarkSystem : Node {
+    public partial class BookmarkSystem : BaseSystem {
         public static BookmarkSystem Instance { get; private set; }
         
         // Signals for bookmark events

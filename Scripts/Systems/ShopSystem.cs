@@ -52,7 +52,7 @@ namespace GameSystems
     /// <summary>
     /// 商店系统 - 管理所有商店
     /// </summary>
-    public partial class ShopSystem : Node
+    public partial class ShopSystem : BaseSystem
     {
         public static ShopSystem Instance { get; private set; }
 

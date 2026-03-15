@@ -5,7 +5,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class StyleMasterySystem : Node
+public class StyleMasterySystem : BaseSystem
 {
     private StyleMasteryData data;
     private StyleMasteryDatabase database;

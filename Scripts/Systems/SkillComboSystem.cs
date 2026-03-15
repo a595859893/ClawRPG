@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 技能Combo系统。管理技能连击的检测、触发和奖励计算。
 /// </summary>
-public partial class SkillComboSystem : Node
+public partial class SkillComboSystem : BaseSystem
 {
     /// <summary>
     /// 获取系统单例实例。

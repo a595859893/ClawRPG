@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems.EquipmentRecycle
     /// 装备回收系统 - 金币回收机制
     /// 玩家可以分解不需要的装备获取金币和材料
     /// </summary>
-    public partial class EquipmentRecycleSystem : Node
+    public partial class EquipmentRecycleSystem : BaseSystem
     {
         public static EquipmentRecycleSystem Instance { get; private set; }
 

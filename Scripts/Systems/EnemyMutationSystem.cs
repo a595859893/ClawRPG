@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// 敌人变异系统
     /// 管理敌人的随机变异和效果
     /// </summary>
-    public partial class EnemyMutationSystem : Node
+    public partial class EnemyMutationSystem : BaseSystem
     {
         // 单例
         private static EnemyMutationSystem _instance;

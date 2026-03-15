@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CharacterCreationData : Node
+public class CharacterCreationData : BaseSystem
 {
     // Character Info
     public string CharacterName { get; set; } = "Hero";

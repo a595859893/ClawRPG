@@ -2,7 +2,7 @@ using Godot;
 using Godot.Collections;
 using System;
 
-public partial class GatheringNode : Node2D
+public partial class GatheringNode : BaseSystem2D
 {
     [Export] public string nodeId = "";
     [Export] public ResourceType resourceType = ResourceType.Herb;

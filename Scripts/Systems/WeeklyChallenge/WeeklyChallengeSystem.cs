@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class WeeklyChallengeSystem : Node
+public partial class WeeklyChallengeSystem : BaseSystem
 {
     public static WeeklyChallengeSystem Instance { get; private set; }
     

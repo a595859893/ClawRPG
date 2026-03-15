@@ -7,7 +7,7 @@ using System.Linq;
 /// Market trend system that dynamically manages item price trends and predictions.
 /// Updates market data periodically, calculates trend directions, and generates market sentiment.
 /// </summary>
-public class MarketTrendSystem : Node
+public class MarketTrendSystem : BaseSystem
 {
     private static MarketTrendSystem _instance;
     

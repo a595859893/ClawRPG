@@ -49,7 +49,7 @@ public class PlayerSummonData
 	public int TimesSummoned { get; set; }
 }
 
-public class SummonSystem : Node
+public class SummonSystem : BaseSystem
 {
 	private Dictionary<int, SummonData> summonDatabase = new Dictionary<int, SummonData>();
 	private Dictionary<int, PlayerSummonData> playerSummons = new Dictionary<int, PlayerSummonData>();

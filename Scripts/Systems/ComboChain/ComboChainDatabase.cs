@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ComboChainDatabase : Node
+public class ComboChainDatabase : BaseSystem
 {
     // 单例实例
     private static ComboChainDatabase _instance;

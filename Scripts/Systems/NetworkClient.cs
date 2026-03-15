@@ -8,7 +8,7 @@ using WebSocketSharp;
 /// 支持指数退避重连 + jitter 防惊群
 /// 心跳保连 (Ping/Pong)
 /// </summary>
-public class NetworkClient : Node
+public class NetworkClient : BaseSystem
 {
     public static NetworkClient Instance { get; private set; }
 

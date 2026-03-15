@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ProceduralStoryDatabase : Node
+public class ProceduralStoryDatabase : BaseSystem
 {
     // Story Templates
     public Dictionary<string, StoryTemplate> StoryTemplates = new Dictionary<string, StoryTemplate>();

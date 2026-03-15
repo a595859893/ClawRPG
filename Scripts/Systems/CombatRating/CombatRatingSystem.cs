@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CombatRatingSystem : Node
+public class CombatRatingSystem : BaseSystem
 {
 	private CombatRatingData data = new CombatRatingData();
 	private int battleIdCounter = 0;

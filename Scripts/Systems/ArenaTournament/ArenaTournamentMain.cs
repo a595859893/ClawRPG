@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class ArenaTournamentMain : Node
+public class ArenaTournamentMain : BaseSystem
 {
     private ArenaTournamentSystem _system;
     private ArenaTournamentUI _ui;
@@ -38,4 +38,23 @@ public class ArenaTournamentMain : Node
     
     public ArenaTournamentSystem GetSystem() => _system;
     public ArenaTournamentUI GetUI() => _ui;
+    
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        if (_system != null)
+        {
+            data["system"] = _system.ExportSaveData();
+        }
+        return data;
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        if (data.Contains("system") && _system != null)
+        {
+            _system.ImportSaveData((Dictionary)data["system"]);
+        }
+    }
 }

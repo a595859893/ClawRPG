@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class PetLifeCycleDatabase : Node
+public class PetLifeCycleDatabase : BaseSystem
 {
     // 宠物类型基础寿命配置
     public static Dictionary<string, PetTypeLifeConfig> PetTypeConfigs = new Dictionary<string, PetTypeLifeConfig>()

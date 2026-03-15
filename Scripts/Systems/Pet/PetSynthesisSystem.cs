@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetSynthesisSystem : Node
+public class PetSynthesisSystem : BaseSystem
 {
     private static PetSynthesisSystem _instance;
     public static PetSynthesisSystem Instance
