@@ -369,4 +369,72 @@ public class DailyLoginBonusSystem : BaseSystem
     {
         return _data.LoginHistory;
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 登录数据
+        data["current_streak"] = _data.CurrentStreak;
+        data["best_streak"] = _data.BestStreak;
+        data["total_logins"] = _data.TotalLogins;
+        data["total_days_claimed"] = _data.TotalDaysClaimed;
+        data["cumulative_login_days"] = _data.CumulativeLoginDays;
+        data["total_gold_received"] = _data.TotalGoldReceived;
+        data["total_exp_received"] = _data.TotalExpReceived;
+        data["total_diamonds_received"] = _data.TotalDiamondsReceived;
+        data["claimed_bonus_count"] = _data.ClaimedBonusCount;
+        
+        // 最后登录日期
+        data["last_login_year"] = (int)_data.LastLoginDate.Get("year", 0);
+        data["last_login_month"] = (int)_data.LastLoginDate.Get("month", 0);
+        data["last_login_day"] = (int)_data.LastLoginDate.Get("day", 0);
+        
+        // 本月登录天数
+        var monthlyDaysArray = new Array();
+        foreach (var day in _data.MonthlyLoginDays)
+        {
+            monthlyDaysArray.Add(day);
+        }
+        data["monthly_login_days"] = monthlyDaysArray;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("current_streak")) _data.CurrentStreak = (int)data["current_streak"];
+        if (data.Contains("best_streak")) _data.BestStreak = (int)data["best_streak"];
+        if (data.Contains("total_logins")) _data.TotalLogins = (int)data["total_logins"];
+        if (data.Contains("total_days_claimed")) _data.TotalDaysClaimed = (int)data["total_days_claimed"];
+        if (data.Contains("cumulative_login_days")) _data.CumulativeLoginDays = (int)data["cumulative_login_days"];
+        if (data.Contains("total_gold_received")) _data.TotalGoldReceived = (int)data["total_gold_received"];
+        if (data.Contains("total_exp_received")) _data.TotalExpReceived = (int)data["total_exp_received"];
+        if (data.Contains("total_diamonds_received")) _data.TotalDiamondsReceived = (int)data["total_diamonds_received"];
+        if (data.Contains("claimed_bonus_count")) _data.ClaimedBonusCount = (int)data["claimed_bonus_count"];
+        
+        // 最后登录日期
+        _data.LastLoginDate["year"] = data.Contains("last_login_year") ? (int)data["last_login_year"] : 0;
+        _data.LastLoginDate["month"] = data.Contains("last_login_month") ? (int)data["last_login_month"] : 0;
+        _data.LastLoginDate["day"] = data.Contains("last_login_day") ? (int)data["last_login_day"] : 0;
+        
+        // 本月登录天数
+        _data.MonthlyLoginDays.Clear();
+        if (data.Contains("monthly_login_days"))
+        {
+            var monthlyDaysArray = (Array)data["monthly_login_days"];
+            foreach (var day in monthlyDaysArray)
+            {
+                _data.MonthlyLoginDays.Add((int)day);
+            }
+        }
+    }
 }

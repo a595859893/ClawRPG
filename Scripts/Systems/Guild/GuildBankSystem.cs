@@ -276,4 +276,105 @@ public partial class GuildBankSystem : BaseSystem {
         int total = Mathf.Min(count, BankData.Transactions.Count);
         return BankData.Transactions.GetRange(0, total);
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 银行数据
+        data["guild_id"] = BankData.GuildId;
+        data["gold_deposit"] = BankData.GoldDeposit;
+        data["total_deposits"] = BankData.TotalDeposits;
+        data["total_withdrawals"] = BankData.TotalWithdrawals;
+        
+        // 物品
+        var itemsArray = new Array();
+        foreach (var item in BankData.Items)
+        {
+            itemsArray.Add(new Dictionary<string, object>
+            {
+                { "item_id", item.ItemId },
+                { "item_name", item.ItemName },
+                { "quantity", item.Quantity },
+                { "rarity", item.Rarity },
+                { "depositor_name", item.DepositorName },
+                { "deposit_time", item.DepositTime.ToString("o") },
+                { "icon_path", item.IconPath }
+            });
+        }
+        data["items"] = itemsArray;
+        
+        // 交易记录
+        var transactionsArray = new Array();
+        foreach (var transaction in BankData.Transactions)
+        {
+            transactionsArray.Add(new Dictionary<string, object>
+            {
+                { "transaction_id", transaction.TransactionId },
+                { "type", transaction.Type },
+                { "item_name", transaction.ItemName },
+                { "quantity", transaction.Quantity },
+                { "player_name", transaction.PlayerName },
+                { "time", transaction.Time.ToString("o") }
+            });
+        }
+        data["transactions"] = transactionsArray;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("guild_id")) BankData.GuildId = (string)data["guild_id"];
+        if (data.Contains("gold_deposit")) BankData.GoldDeposit = Convert.ToInt64(data["gold_deposit"]);
+        if (data.Contains("total_deposits")) BankData.TotalDeposits = Convert.ToInt64(data["total_deposits"]);
+        if (data.Contains("total_withdrawals")) BankData.TotalWithdrawals = Convert.ToInt64(data["total_withdrawals"]);
+        
+        // 物品
+        BankData.Items.Clear();
+        if (data.Contains("items"))
+        {
+            var itemsArray = (Array)data["items"];
+            foreach (Dictionary itemData in itemsArray)
+            {
+                BankData.Items.Add(new GuildBankItem
+                {
+                    ItemId = (string)itemData["item_id"],
+                    ItemName = (string)itemData["item_name"],
+                    Quantity = (int)itemData["quantity"],
+                    Rarity = (string)itemData["rarity"],
+                    DepositorName = (string)itemData["depositor_name"],
+                    DepositTime = DateTime.Parse((string)itemData["deposit_time"]),
+                    IconPath = (string)itemData["icon_path"]
+                });
+            }
+        }
+        
+        // 交易记录
+        BankData.Transactions.Clear();
+        if (data.Contains("transactions"))
+        {
+            var transactionsArray = (Array)data["transactions"];
+            foreach (Dictionary transactionData in transactionsArray)
+            {
+                BankData.Transactions.Add(new GuildBankTransaction
+                {
+                    TransactionId = (string)transactionData["transaction_id"],
+                    Type = (string)transactionData["type"],
+                    ItemName = (string)transactionData["item_name"],
+                    Quantity = (int)transactionData["quantity"],
+                    PlayerName = (string)transactionData["player_name"],
+                    Time = DateTime.Parse((string)transactionData["time"])
+                });
+            }
+        }
+    }
 }

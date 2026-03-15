@@ -393,4 +393,86 @@ public class EconomicDashboardSystem : BaseSystem
             }
         }
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 金币统计
+        data["total_gold_in_circulation"] = _data.TotalGoldInCirculation;
+        data["total_gold_earned"] = _data.TotalGoldEarned;
+        data["total_gold_spent"] = _data.TotalGoldSpent;
+        data["net_gold_change"] = _data.NetGoldChange;
+        
+        // 收入来源
+        data["combat_earnings"] = _data.CombatEarnings;
+        data["quest_rewards"] = _data.QuestRewards;
+        data["crafting_earnings"] = _data.CraftingEarnings;
+        data["trading_earnings"] = _data.TradingEarnings;
+        data["event_rewards"] = _data.EventRewards;
+        data["other_earnings"] = _data.OtherEarnings;
+        
+        // 支出分类
+        data["purchase_expenses"] = _data.PurchaseExpenses;
+        data["repair_expenses"] = _data.RepairExpenses;
+        data["upgrade_expenses"] = _data.UpgradeExpenses;
+        data["crafting_costs"] = _data.CraftingCosts;
+        data["auction_fees"] = _data.AuctionFees;
+        data["other_expenses"] = _data.OtherExpenses;
+        
+        // 物品统计
+        data["items_sold"] = _data.ItemsSold;
+        data["items_purchased"] = _data.ItemsPurchased;
+        data["items_crafted"] = _data.ItemsCrafted;
+        
+        // 经济健康度
+        data["economic_health"] = _data.EconomicHealth;
+        data["inflation_rate"] = _data.InflationRate;
+        data["gold_per_minute"] = _data.GoldPerMinute;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 金币统计
+        if (data.Contains("total_gold_in_circulation")) _data.TotalGoldInCirculation = Convert.ToInt64(data["total_gold_in_circulation"]);
+        if (data.Contains("total_gold_earned")) _data.TotalGoldEarned = Convert.ToInt64(data["total_gold_earned"]);
+        if (data.Contains("total_gold_spent")) _data.TotalGoldSpent = Convert.ToInt64(data["total_gold_spent"]);
+        if (data.Contains("net_gold_change")) _data.NetGoldChange = Convert.ToInt64(data["net_gold_change"]);
+        
+        // 收入来源
+        if (data.Contains("combat_earnings")) _data.CombatEarnings = Convert.ToInt64(data["combat_earnings"]);
+        if (data.Contains("quest_rewards")) _data.QuestRewards = Convert.ToInt64(data["quest_rewards"]);
+        if (data.Contains("crafting_earnings")) _data.CraftingEarnings = Convert.ToInt64(data["crafting_earnings"]);
+        if (data.Contains("trading_earnings")) _data.TradingEarnings = Convert.ToInt64(data["trading_earnings"]);
+        if (data.Contains("event_rewards")) _data.EventRewards = Convert.ToInt64(data["event_rewards"]);
+        if (data.Contains("other_earnings")) _data.OtherEarnings = Convert.ToInt64(data["other_earnings"]);
+        
+        // 支出分类
+        if (data.Contains("purchase_expenses")) _data.PurchaseExpenses = Convert.ToInt64(data["purchase_expenses"]);
+        if (data.Contains("repair_expenses")) _data.RepairExpenses = Convert.ToInt64(data["repair_expenses"]);
+        if (data.Contains("upgrade_expenses")) _data.UpgradeExpenses = Convert.ToInt64(data["upgrade_expenses"]);
+        if (data.Contains("crafting_costs")) _data.CraftingCosts = Convert.ToInt64(data["crafting_costs"]);
+        if (data.Contains("auction_fees")) _data.AuctionFees = Convert.ToInt64(data["auction_fees"]);
+        if (data.Contains("other_expenses")) _data.OtherExpenses = Convert.ToInt64(data["other_expenses"]);
+        
+        // 物品统计
+        if (data.Contains("items_sold")) _data.ItemsSold = (int)data["items_sold"];
+        if (data.Contains("items_purchased")) _data.ItemsPurchased = (int)data["items_purchased"];
+        if (data.Contains("items_crafted")) _data.ItemsCrafted = (int)data["items_crafted"];
+        
+        // 经济健康度
+        if (data.Contains("economic_health")) _data.EconomicHealth = (float)data["economic_health"];
+        if (data.Contains("inflation_rate")) _data.InflationRate = (float)data["inflation_rate"];
+        if (data.Contains("gold_per_minute")) _data.GoldPerMinute = (float)data["gold_per_minute"];
+    }
 }

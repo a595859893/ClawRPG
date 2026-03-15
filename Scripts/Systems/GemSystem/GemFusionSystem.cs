@@ -198,5 +198,47 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
                 }
             }
         }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 玩家合成数据
+        data["total_fusions"] = _playerFusionData.TotalFusions;
+        data["successful_fusions"] = _playerFusionData.SuccessfulFusions;
+        
+        // 按宝石类型的合成次数
+        var fusionCountData = new Dictionary();
+        foreach (var kvp in _playerFusionData.FusionCountByGem)
+        {
+            fusionCountData[kvp.Key] = kvp.Value;
+        }
+        data["fusion_count_by_gem"] = fusionCountData;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("total_fusions")) _playerFusionData.TotalFusions = (int)data["total_fusions"];
+        if (data.Contains("successful_fusions")) _playerFusionData.SuccessfulFusions = (int)data["successful_fusions"];
+        
+        _playerFusionData.FusionCountByGem.Clear();
+        if (data.Contains("fusion_count_by_gem"))
+        {
+            var fusionCountData = (Dictionary)data["fusion_count_by_gem"];
+            foreach (var kvp in fusionCountData)
+            {
+                _playerFusionData.FusionCountByGem[kvp.Key] = (int)kvp.Value;
+            }
+        }
     }
 }

@@ -425,4 +425,91 @@ public class EquipmentDurabilitySystem : BaseSystem
         TotalRepairCosts = Convert.ToInt32(data.GetValueOrDefault("totalRepairCosts", 0));
         TotalRepairsPerformed = Convert.ToInt32(data.GetValueOrDefault("totalRepairsPerformed", 0));
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 装备耐久度数据
+        var equipmentList = new Array();
+        foreach (var kvp in _equipmentDurability)
+        {
+            var durabilityData = new Dictionary<string, object>();
+            durabilityData["equipmentId"] = kvp.Key;
+            durabilityData["maxDurability"] = kvp.Value.MaxDurability;
+            durabilityData["currentDurability"] = kvp.Value.CurrentDurability;
+            durabilityData["durabilityLossMultiplier"] = kvp.Value.DurabilityLossMultiplier;
+            durabilityData["repairCount"] = kvp.Value.RepairCount;
+            durabilityData["totalDurabilityRepaired"] = kvp.Value.TotalDurabilityRepaired;
+            durabilityData["timesBroken"] = kvp.Value.TimesBroken;
+            durabilityData["totalDamageDealt"] = kvp.Value.TotalDamageDealt;
+            durabilityData["totalDamageReceived"] = kvp.Value.TotalDamageReceived;
+            equipmentList.Add(durabilityData);
+        }
+        data["equipment_durability"] = equipmentList;
+        
+        // 全局设置
+        data["global_durability_loss"] = _globalDurabilityLoss;
+        data["combat_durability_loss"] = _combatDurabilityLoss;
+        data["skill_use_durability_loss"] = _skillUseDurabilityLoss;
+        data["movement_durability_loss"] = _movementDurabilityLoss;
+        
+        // 统计
+        data["total_items_damaged"] = TotalItemsDamaged;
+        data["total_items_broken"] = TotalItemsBroken;
+        data["total_repair_costs"] = TotalRepairCosts;
+        data["total_repairs_performed"] = TotalRepairsPerformed;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 装备耐久度数据
+        _equipmentDurability.Clear();
+        _lastState.Clear();
+        
+        if (data.Contains("equipment_durability"))
+        {
+            var equipmentList = (Array)data["equipment_durability"];
+            foreach (Dictionary eq in equipmentList)
+            {
+                int equipmentId = (int)eq["equipmentId"];
+                var durabilityData = new DurabilityData
+                {
+                    MaxDurability = (int)eq["maxDurability"],
+                    CurrentDurability = (int)eq["currentDurability"],
+                    DurabilityLossMultiplier = (float)eq["durabilityLossMultiplier"],
+                    RepairCount = (int)eq["repairCount"],
+                    TotalDurabilityRepaired = (int)eq["totalDurabilityRepaired"],
+                    TimesBroken = (int)eq["timesBroken"],
+                    TotalDamageDealt = (int)eq["totalDamageDealt"],
+                    TotalDamageReceived = (int)eq["totalDamageReceived"]
+                };
+                
+                _equipmentDurability[equipmentId] = durabilityData;
+                _lastState[equipmentId] = GetDurabilityState(equipmentId);
+            }
+        }
+        
+        // 全局设置
+        if (data.Contains("global_durability_loss")) _globalDurabilityLoss = (float)data["global_durability_loss"];
+        if (data.Contains("combat_durability_loss")) _combatDurabilityLoss = (float)data["combat_durability_loss"];
+        if (data.Contains("skill_use_durability_loss")) _skillUseDurabilityLoss = (float)data["skill_use_durability_loss"];
+        if (data.Contains("movement_durability_loss")) _movementDurabilityLoss = (float)data["movement_durability_loss"];
+        
+        // 统计
+        if (data.Contains("total_items_damaged")) TotalItemsDamaged = (int)data["total_items_damaged"];
+        if (data.Contains("total_items_broken")) TotalItemsBroken = (int)data["total_items_broken"];
+        if (data.Contains("total_repair_costs")) TotalRepairCosts = (int)data["total_repair_costs"];
+        if (data.Contains("total_repairs_performed")) TotalRepairsPerformed = (int)data["total_repairs_performed"];
+    }
 }

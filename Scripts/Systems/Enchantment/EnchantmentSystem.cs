@@ -508,4 +508,128 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             }
         }
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 保存所有玩家的附魔进度
+        var playerProgressList = new Array();
+        foreach (var kvp in _playerProgress)
+        {
+            var playerData = new Dictionary();
+            playerData["player_id"] = kvp.Key;
+            
+            // 已解锁的附魔
+            var unlockedArray = new Array();
+            foreach (var ench in kvp.Value.UnlockedEnchantments)
+            {
+                unlockedArray.Add(new Dictionary<string, object>
+                {
+                    { "enchantment_id", ench.EnchantmentId },
+                    { "unlocked_at", ench.UnlockedAt.ToString("o") }
+                });
+            }
+            playerData["unlocked_enchantments"] = unlockedArray;
+            
+            // 活跃附魔
+            var activeArray = new Array();
+            foreach (var equip in kvp.Value.ActiveEnchantments)
+            {
+                activeArray.Add(new Dictionary<string, object>
+                {
+                    { "equipment_id", equip.EquipmentId },
+                    { "enchantment_id", equip.EnchantmentId },
+                    { "level", equip.EnchantmentLevel },
+                    { "enchanted_at", equip.EnchantedAt.ToString("o") },
+                    { "is_permanent", equip.IsPermanent }
+                });
+            }
+            playerData["active_enchantments"] = activeArray;
+            
+            // 统计
+            playerData["statistics"] = new Dictionary<string, object>
+            {
+                { "total_attempts", kvp.Value.Statistics.TotalAttempts },
+                { "total_successes", kvp.Value.Statistics.TotalSuccesses },
+                { "total_failures", kvp.Value.Statistics.TotalFailures },
+                { "total_expenses", kvp.Value.Statistics.TotalExpenses },
+                { "highest_tier", kvp.Value.Statistics.HighestTierUnlocked }
+            };
+            
+            playerProgressList.Add(playerData);
+        }
+        
+        data["player_progress"] = playerProgressList;
+        data["focus_bonus"] = _focusBonus;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("focus_bonus")) _focusBonus = (float)data["focus_bonus"];
+        
+        if (data.Contains("player_progress"))
+        {
+            var playerProgressList = (Array)data["player_progress"];
+            foreach (Dictionary playerData in playerProgressList)
+            {
+                string playerId = (string)playerData["player_id"];
+                var progress = GetOrCreateProgress(playerId);
+                
+                // 加载已解锁附魔
+                progress.UnlockedEnchantments.Clear();
+                if (playerData.Contains("unlocked_enchantments"))
+                {
+                    var unlockedArray = (Array)playerData["unlocked_enchantments"];
+                    foreach (Dictionary enchData in unlockedArray)
+                    {
+                        progress.UnlockedEnchantments.Add(new UnlockedEnchantment
+                        {
+                            EnchantmentId = (string)enchData["enchantment_id"],
+                            UnlockedAt = DateTime.Parse((string)enchData["unlocked_at"])
+                        });
+                    }
+                }
+                
+                // 加载活跃附魔
+                progress.ActiveEnchantments.Clear();
+                if (playerData.Contains("active_enchantments"))
+                {
+                    var activeArray = (Array)playerData["active_enchantments"];
+                    foreach (Dictionary equipData in activeArray)
+                    {
+                        progress.ActiveEnchantments.Add(new EquipmentEnchantment
+                        {
+                            EquipmentId = (string)equipData["equipment_id"],
+                            EnchantmentId = (string)equipData["enchantment_id"],
+                            EnchantmentLevel = (int)equipData["level"],
+                            EnchantedAt = DateTime.Parse((string)equipData["enchanted_at"]),
+                            IsPermanent = (bool)equipData["is_permanent"]
+                        });
+                    }
+                }
+                
+                // 加载统计
+                if (playerData.Contains("statistics"))
+                {
+                    var stats = (Dictionary)playerData["statistics"];
+                    progress.Statistics.TotalAttempts = (int)stats.Get("total_attempts", 0);
+                    progress.Statistics.TotalSuccesses = (int)stats.Get("total_successes", 0);
+                    progress.Statistics.TotalFailures = (int)stats.Get("total_failures", 0);
+                    progress.Statistics.TotalExpenses = (int)stats.Get("total_expenses", 0);
+                    progress.Statistics.HighestTierUnlocked = (int)stats.Get("highest_tier", 0);
+                }
+            }
+        }
+    }
 }

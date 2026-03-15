@@ -231,4 +231,150 @@ public class EnemyWeaknessSystem : BaseSystem
         var stats = GetStatistics();
         GD.Print($"Stats: {stats.Count} entries");
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 敌人弱点追踪数据
+        var enemyWeaknessesData = new Array();
+        foreach (var kvp in _data.EnemyWeaknesses)
+        {
+            var enemyData = new Dictionary();
+            enemyData["enemy_type"] = kvp.Key;
+            
+            var weaknessesArray = new Array();
+            foreach (var weakness in kvp.Value.Weaknesses)
+            {
+                weaknessesArray.Add(new Dictionary<string, object>
+                {
+                    { "type", (int)weakness.Type },
+                    { "element", (int)weakness.Element },
+                    { "damage_multiplier", weakness.DamageMultiplier },
+                    { "resistance_multiplier", weakness.ResistanceMultiplier },
+                    { "description", weakness.Description }
+                });
+            }
+            enemyData["weaknesses"] = weaknessesArray;
+            enemyWeaknessesData.Add(enemyData);
+        }
+        data["enemy_weaknesses"] = enemyWeaknessesData;
+        
+        // 弱点激活历史
+        var historyArray = new Array();
+        foreach (var record in _data.ActivationHistory)
+        {
+            historyArray.Add(new Dictionary<string, object>
+            {
+                { "enemy_type", record.EnemyType },
+                { "weakness_type", (int)record.WeaknessType },
+                { "element", (int)record.Element },
+                { "damage_bonus", record.DamageBonus },
+                { "timestamp", record.Timestamp }
+            });
+        }
+        data["activation_history"] = historyArray;
+        
+        // 统计
+        data["total_weakness_activations"] = _data.TotalWeaknessActivations;
+        data["total_bonus_damage"] = _data.TotalBonusDamage;
+        
+        var weaknessTypeUsageData = new Dictionary();
+        foreach (var kvp in _data.WeaknessTypeUsage)
+        {
+            weaknessTypeUsageData[kvp.Key] = kvp.Value;
+        }
+        data["weakness_type_usage"] = weaknessTypeUsageData;
+        
+        var elementUsageData = new Dictionary();
+        foreach (var kvp in _data.ElementUsage)
+        {
+            elementUsageData[kvp.Key] = kvp.Value;
+        }
+        data["element_usage"] = elementUsageData;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 敌人弱点追踪数据
+        _data.EnemyWeaknesses.Clear();
+        if (data.Contains("enemy_weaknesses"))
+        {
+            var enemyWeaknessesData = (Array)data["enemy_weaknesses"];
+            foreach (Dictionary enemyData in enemyWeaknessesData)
+            {
+                string enemyType = (string)enemyData["enemy_type"];
+                var record = new EnemyWeaknessData.EnemyWeaknessRecord { EnemyType = enemyType };
+                
+                if (enemyData.Contains("weaknesses"))
+                {
+                    var weaknessesArray = (Array)enemyData["weaknesses"];
+                    foreach (Dictionary weaknessData in weaknessesArray)
+                    {
+                        record.Weaknesses.Add(new EnemyWeaknessData.Weakness
+                        {
+                            Type = (EnemyWeaknessData.WeaknessType)(int)weaknessData["type"],
+                            Element = (EnemyWeaknessData.ElementType)(int)weaknessData["element"],
+                            DamageMultiplier = (float)weaknessData["damage_multiplier"],
+                            ResistanceMultiplier = (float)weaknessData["resistance_multiplier"],
+                            Description = (string)weaknessData["description"]
+                        });
+                    }
+                }
+                _data.EnemyWeaknesses[enemyType] = record;
+            }
+        }
+        
+        // 弱点激活历史
+        _data.ActivationHistory.Clear();
+        if (data.Contains("activation_history"))
+        {
+            var historyArray = (Array)data["activation_history"];
+            foreach (Dictionary recordData in historyArray)
+            {
+                _data.ActivationHistory.Add(new EnemyWeaknessData.WeaknessActivationRecord
+                {
+                    EnemyType = (string)recordData["enemy_type"],
+                    WeaknessType = (EnemyWeaknessData.WeaknessType)(int)recordData["weakness_type"],
+                    Element = (EnemyWeaknessData.ElementType)(int)recordData["element"],
+                    DamageBonus = (float)recordData["damage_bonus"],
+                    Timestamp = (long)recordData["timestamp"]
+                });
+            }
+        }
+        
+        // 统计
+        if (data.Contains("total_weakness_activations")) _data.TotalWeaknessActivations = (int)data["total_weakness_activations"];
+        if (data.Contains("total_bonus_damage")) _data.TotalBonusDamage = (int)data["total_bonus_damage"];
+        
+        _data.WeaknessTypeUsage.Clear();
+        if (data.Contains("weakness_type_usage"))
+        {
+            var weaknessTypeUsageData = (Dictionary)data["weakness_type_usage"];
+            foreach (var kvp in weaknessTypeUsageData)
+            {
+                _data.WeaknessTypeUsage[kvp.Key] = (int)kvp.Value;
+            }
+        }
+        
+        _data.ElementUsage.Clear();
+        if (data.Contains("element_usage"))
+        {
+            var elementUsageData = (Dictionary)data["element_usage"];
+            foreach (var kvp in elementUsageData)
+            {
+                _data.ElementUsage[kvp.Key] = (int)kvp.Value;
+            }
+        }
+    }
 }

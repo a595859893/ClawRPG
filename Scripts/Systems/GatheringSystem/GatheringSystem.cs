@@ -218,4 +218,68 @@ public partial class GatheringSystem : BaseSystem
             gatheringStats = new Dictionary<string, int>((Dictionary)data["gathering_stats"]);
         }
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 采集统计
+        foreach (var kvp in gatheringStats)
+        {
+            data[kvp.Key] = kvp.Value;
+        }
+        
+        // 工具数据
+        var toolsData = new Array();
+        foreach (var kvp in tools)
+        {
+            toolsData.Add(new Dictionary<string, object>
+            {
+                { "tool_id", kvp.Value.toolId },
+                { "tool_name", kvp.Value.toolName },
+                { "tool_type", kvp.Value.toolType },
+                { "level_required", kvp.Value.levelRequired },
+                { "durability", kvp.Value.durability },
+                { "efficiency", kvp.Value.efficiency }
+            });
+        }
+        data["tools"] = toolsData;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 采集统计
+        foreach (var key in gatheringStats.Keys)
+        {
+            if (data.Contains(key))
+            {
+                gatheringStats[key] = (int)data[key];
+            }
+        }
+        
+        // 工具数据
+        if (data.Contains("tools"))
+        {
+            var toolsData = (Array)data["tools"];
+            foreach (Dictionary toolData in toolsData)
+            {
+                string toolId = (string)toolData["tool_id"];
+                if (tools.ContainsKey(toolId))
+                {
+                    tools[toolId].durability = (int)toolData["durability"];
+                    tools[toolId].efficiency = (float)toolData["efficiency"];
+                }
+            }
+        }
+    }
 }

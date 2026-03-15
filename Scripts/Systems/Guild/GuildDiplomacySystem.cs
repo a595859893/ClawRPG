@@ -195,4 +195,64 @@ public class GuildDiplomacySystem : BaseSystem
         }
         return enemies;
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 公会外交关系
+        var relationsArray = new Array();
+        foreach (var kvp in diplomacyData.Relations)
+        {
+            relationsArray.Add(new Dictionary<string, object>
+            {
+                { "target_guild_id", kvp.Key },
+                { "type", (int)kvp.Value.Type },
+                { "treaty_end_time", kvp.Value.TreatyEndTime.ToString("o") },
+                { "interaction_count", kvp.Value.InteractionCount },
+                { "last_interaction", kvp.Value.LastInteraction.ToString("o") }
+            });
+        }
+        data["relations"] = relationsArray;
+        
+        // 外交统计
+        data["total_alliances"] = diplomacyData.TotalAlliances;
+        data["total_enemies"] = diplomacyData.TotalEnemies;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 外交关系
+        diplomacyData.Relations.Clear();
+        if (data.Contains("relations"))
+        {
+            var relationsArray = (Array)data["relations"];
+            foreach (Dictionary relationData in relationsArray)
+            {
+                string targetGuildId = (string)relationData["target_guild_id"];
+                var relation = new GuildDiplomacyData.GuildRelation
+                {
+                    Type = (GuildDiplomacyData.RelationType)(int)relationData["type"],
+                    TreatyEndTime = DateTime.Parse((string)relationData["treaty_end_time"]),
+                    InteractionCount = (int)relationData["interaction_count"],
+                    LastInteraction = DateTime.Parse((string)relationData["last_interaction"])
+                };
+                diplomacyData.Relations[targetGuildId] = relation;
+            }
+        }
+        
+        // 外交统计
+        if (data.Contains("total_alliances")) diplomacyData.TotalAlliances = (int)data["total_alliances"];
+        if (data.Contains("total_enemies")) diplomacyData.TotalEnemies = (int)data["total_enemies"];
+    }
 }

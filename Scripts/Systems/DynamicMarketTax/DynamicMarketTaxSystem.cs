@@ -402,4 +402,72 @@ public class DynamicMarketTaxSystem : BaseSystem
         GD.Print("DynamicMarketTaxSystem: 统计数据已重置");
         SaveTaxData();
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 税率数据
+        data["base_tax_rate"] = _data.BaseTaxRate;
+        data["current_dynamic_tax_rate"] = _data.CurrentDynamicTaxRate;
+        data["market_activity"] = _data.MarketActivity;
+        
+        // 统计
+        data["total_transactions"] = _data.TotalTransactions;
+        data["total_tax_collected"] = _data.TotalTaxCollected;
+        data["total_volume"] = _data.TotalVolume;
+        data["average_transaction_value"] = _data.AverageTransactionValue;
+        data["peak_volume"] = _data.PeakVolume;
+        
+        // 市场趋势
+        data["market_trend"] = _data.MarketTrend;
+        data["consecutive_high_activity"] = _data.ConsecutiveHighActivity;
+        data["consecutive_low_activity"] = _data.ConsecutiveLowActivity;
+        
+        // 活动历史
+        var activityHistoryArray = new Array();
+        foreach (var activity in _activityHistory)
+        {
+            activityHistoryArray.Add(activity);
+        }
+        data["activity_history"] = activityHistoryArray;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("base_tax_rate")) _data.BaseTaxRate = (float)data["base_tax_rate"];
+        if (data.Contains("current_dynamic_tax_rate")) _data.CurrentDynamicTaxRate = (float)data["current_dynamic_tax_rate"];
+        if (data.Contains("market_activity")) _data.MarketActivity = (float)data["market_activity"];
+        
+        if (data.Contains("total_transactions")) _data.TotalTransactions = (int)data["total_transactions"];
+        if (data.Contains("total_tax_collected")) _data.TotalTaxCollected = Convert.ToInt64(data["total_tax_collected"]);
+        if (data.Contains("total_volume")) _data.TotalVolume = Convert.ToInt64(data["total_volume"]);
+        if (data.Contains("average_transaction_value")) _data.AverageTransactionValue = (float)data["average_transaction_value"];
+        if (data.Contains("peak_volume")) _data.PeakVolume = (float)data["peak_volume"];
+        
+        if (data.Contains("market_trend")) _data.MarketTrend = (string)data["market_trend"];
+        if (data.Contains("consecutive_high_activity")) _data.ConsecutiveHighActivity = (int)data["consecutive_high_activity"];
+        if (data.Contains("consecutive_low_activity")) _data.ConsecutiveLowActivity = (int)data["consecutive_low_activity"];
+        
+        // 活动历史
+        _activityHistory.Clear();
+        if (data.Contains("activity_history"))
+        {
+            var activityHistoryArray = (Array)data["activity_history"];
+            foreach (var activity in activityHistoryArray)
+            {
+                _activityHistory.Add((float)activity);
+            }
+        }
+    }
 }

@@ -359,5 +359,49 @@ namespace Game.Scripts.Systems.EquipmentReforging
 
             return true;
         }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 玩家洗练数据
+        data["total_reforges"] = _playerData.TotalReforges;
+        data["successful_reforges"] = _playerData.SuccessfulReforges;
+        data["failed_reforges"] = _playerData.FailedReforges;
+        
+        // 按类型的洗练历史
+        var reforgeTypeHistoryData = new Dictionary();
+        foreach (var kvp in _playerData.ReforgeHistoryByType)
+        {
+            reforgeTypeHistoryData[kvp.Key] = kvp.Value;
+        }
+        data["reforge_type_history"] = reforgeTypeHistoryData;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("total_reforges")) _playerData.TotalReforges = (int)data["total_reforges"];
+        if (data.Contains("successful_reforges")) _playerData.SuccessfulReforges = (int)data["successful_reforges"];
+        if (data.Contains("failed_reforges")) _playerData.FailedReforges = (int)data["failed_reforges"];
+        
+        _playerData.ReforgeHistoryByType.Clear();
+        if (data.Contains("reforge_type_history"))
+        {
+            var reforgeTypeHistoryData = (Dictionary)data["reforge_type_history"];
+            foreach (var kvp in reforgeTypeHistoryData)
+            {
+                _playerData.ReforgeHistoryByType[kvp.Key] = (int)kvp.Value;
+            }
+        }
     }
 }
