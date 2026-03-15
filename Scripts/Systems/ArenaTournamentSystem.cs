@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 竞技场锦标赛系统 - 玩家竞技场比赛管理
+/// 支持淘汰赛、积分赛等多种赛制
+/// </summary>
 public class ArenaTournamentSystem : BaseSystem
 {
     private static ArenaTournamentSystem _instance;

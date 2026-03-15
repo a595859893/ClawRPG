@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Boss Rush 系统 - 连续挑战 Boss 的模式
+/// 支持多难度选择和进度追踪
+/// </summary>
 public class BossRushSystem : BaseSystem
 {
     private BossRushData data;
