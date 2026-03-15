@@ -272,4 +272,23 @@ public class CharacterCreationDatabase : BaseSystem
             return Backgrounds[backgroundName];
         return null;
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        // CharacterCreationDatabase 是静态配置数据，不需要持久化
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        // CharacterCreationDatabase 是静态配置数据，不需要持久化
+    }
 }

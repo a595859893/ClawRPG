@@ -135,4 +135,103 @@ public class MultiplayerChatData : BaseSystem
         
         return stats;
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 玩家名称
+        data["player_name"] = PlayerName;
+        
+        // 统计
+        data["total_messages_sent"] = TotalMessagesSent;
+        data["total_emotes_used"] = TotalEmotesUsed;
+        
+        // 每个频道的消息数
+        var messagesPerChannel = new Dictionary();
+        foreach (var kvp in MessagesPerChannel)
+        {
+            messagesPerChannel[kvp.Key.ToString()] = kvp.Value;
+        }
+        data["messages_per_channel"] = messagesPerChannel;
+        
+        // 忽略列表
+        data["ignored_players"] = new Array(IgnoredPlayers);
+        
+        // 频道设置
+        var channelSettingsData = new Dictionary();
+        foreach (var kvp in ChannelSettings)
+        {
+            var settings = new Dictionary
+            {
+                { "enabled", kvp.Value.Enabled },
+                { "muted", kvp.Value.Muted }
+            };
+            channelSettingsData[kvp.Key.ToString()] = settings;
+        }
+        data["channel_settings"] = channelSettingsData;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 玩家名称
+        PlayerName = (string)data.GetValueOrDefault("player_name", "Player");
+        
+        // 统计
+        TotalMessagesSent = (int)data.GetValueOrDefault("total_messages_sent", 0);
+        TotalEmotesUsed = (int)data.GetValueOrDefault("total_emotes_used", 0);
+        
+        // 每个频道的消息数
+        if (data.Contains("messages_per_channel"))
+        {
+            var messagesPerChannelDict = (Dictionary)data["messages_per_channel"];
+            MessagesPerChannel = new Dictionary<ChatChannel, int>();
+            foreach (var kvp in messagesPerChannelDict)
+            {
+                if (System.Enum.TryParse<ChatChannel>(kvp.Key, out var channel))
+                {
+                    MessagesPerChannel[channel] = (int)kvp.Value;
+                }
+            }
+        }
+        
+        // 忽略列表
+        if (data.Contains("ignored_players"))
+        {
+            var ignoredArray = (Array)data["ignored_players"];
+            IgnoredPlayers = new List<string>();
+            foreach (string player in ignoredArray)
+            {
+                IgnoredPlayers.Add(player);
+            }
+        }
+        
+        // 频道设置
+        if (data.Contains("channel_settings"))
+        {
+            var channelSettingsDict = (Dictionary)data["channel_settings"];
+            foreach (var kvp in channelSettingsDict)
+            {
+                if (System.Enum.TryParse<ChatChannel>(kvp.Key, out var channel))
+                {
+                    var settingsDict = (Dictionary)kvp.Value;
+                    if (ChannelSettings.ContainsKey(channel))
+                    {
+                        ChannelSettings[channel].Enabled = (bool)settingsDict["enabled"];
+                        ChannelSettings[channel].Muted = (bool)settingsDict["muted"];
+                    }
+                }
+            }
+        }
+    }
 }

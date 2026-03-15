@@ -70,5 +70,51 @@ namespace ClawRPG.Systems
         {
             Name = "MultiplayerLobbyData";
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 统计追踪
+            data["total_rooms_created"] = TotalRoomsCreated;
+            data["total_rooms_joined"] = TotalRoomsJoined;
+            data["total_games_played"] = TotalGamesPlayed;
+            data["total_wins"] = TotalWins;
+            data["total_losses"] = TotalLosses;
+            
+            // 房间历史记录
+            data["room_history"] = new Array(RoomHistory);
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 统计追踪
+            TotalRoomsCreated = (int)data.GetValueOrDefault("total_rooms_created", 0);
+            TotalRoomsJoined = (int)data.GetValueOrDefault("total_rooms_joined", 0);
+            TotalGamesPlayed = (int)data.GetValueOrDefault("total_games_played", 0);
+            TotalWins = (int)data.GetValueOrDefault("total_wins", 0);
+            TotalLosses = (int)data.GetValueOrDefault("total_losses", 0);
+            
+            // 房间历史记录
+            if (data.Contains("room_history"))
+            {
+                var historyArray = (Array)data["room_history"];
+                RoomHistory = new List<string>();
+                foreach (string roomId in historyArray)
+                {
+                    RoomHistory.Add(roomId);
+                }
+            }
+        }
     }
 }

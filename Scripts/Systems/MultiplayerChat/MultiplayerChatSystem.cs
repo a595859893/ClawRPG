@@ -298,4 +298,41 @@ public class MultiplayerChatSystem : BaseSystem
     
     [Signal]
     public delegate void ClearRequested();
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 当前频道
+        data["current_channel"] = (int)_currentChannel;
+        
+        // 设置
+        data["show_timestamps"] = _showTimestamps;
+        data["emote_enabled"] = _emoteEnabled;
+        data["profanity_filter"] = _profanityFilter;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 当前频道
+        if (data.Contains("current_channel"))
+        {
+            _currentChannel = (MultiplayerChatData.ChatChannel)(int)data["current_channel"];
+        }
+        
+        // 设置
+        _showTimestamps = (bool)data.GetValueOrDefault("show_timestamps", true);
+        _emoteEnabled = (bool)data.GetValueOrDefault("emote_enabled", true);
+        _profanityFilter = (bool)data.GetValueOrDefault("profanity_filter", false);
+    }
 }

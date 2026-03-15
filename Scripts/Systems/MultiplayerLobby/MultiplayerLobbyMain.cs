@@ -92,5 +92,24 @@ namespace ClawRPG.Systems
                 Instance._ui.Visible = false;
             }
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            // MultiplayerLobbyMain 是容器系统，无持久化状态
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            // MultiplayerLobbyMain 是容器系统，无持久化状态
+        }
     }
 }
