@@ -17,7 +17,7 @@ namespace ClawRPG.Scripts.Systems
     /// - Alchemy experience and leveling system
     /// - Data persistence
     /// </remarks>
-    public class AlchemySystem
+    public class AlchemySystem : BaseSystem
     {
         private static AlchemySystem _instance;
         
