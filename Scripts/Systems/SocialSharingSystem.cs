@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+
+namespace ClawRPG.Systems
 
 /// <summary>
 /// 社交分享系统
@@ -347,7 +350,7 @@ public class SocialSharingSystem : Node
             dict["achievements"] = data.Achievements;
         }
         
-        return Json.Stringify(dict);
+        return JsonSerializer.Serialize(dict);
     }
 
     #endregion
@@ -390,7 +393,7 @@ public class SocialSharingSystem : Node
     /// </summary>
     public async void QueryGroupLeaderboard(long groupId, string gameMode = "")
     {
-        var queryJson = Json.Stringify(new Dictionary<string, object>
+        var queryJson = JsonSerializer.Serialize(new Dictionary<string, object>
         {
             { "type", "query_leaderboard" },
             { "group_id", groupId },
@@ -425,7 +428,7 @@ public class SocialSharingSystem : Node
             messageData["extra"] = extraJson;
         }
         
-        var jsonString = Json.Stringify(messageData);
+        var jsonString = JsonSerializer.Serialize(messageData);
         
         // TODO: 实际通过 HTTP/WS 调用机器人API
         GD.Print($"[SocialSharing] Bot message prepared: {jsonString}");
@@ -456,7 +459,7 @@ public class SocialSharingSystem : Node
             messageData["text"] = message;
         }
         
-        var jsonString = Json.Stringify(messageData);
+        var jsonString = JsonSerializer.Serialize(messageData);
         
         GD.Print($"[SocialSharing] Bot image prepared: {jsonString}");
         
@@ -468,7 +471,7 @@ public class SocialSharingSystem : Node
     /// </summary>
     public void HandleBotCallback(string jsonResponse)
     {
-        var data = Json.Parse(jsonResponse).AsDictionary();
+        var data = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse);
         if (data.ContainsKey("type"))
         {
             string responseType = data["type"].ToString();

@@ -307,8 +307,8 @@ namespace ClawRPG.Systems
             int levelDiff = Math.Abs(a.Level - b.Level);
             if (levelDiff > LevelDifferenceTolerance)
             {
-                // 快速队列可以稍微放宽等级限制
-                if (!a.IsQuickQueue || !b.IsQuickQueue)
+                // 至少一方是快速队列时可以放宽等级限制
+                if (!a.IsQuickQueue && !b.IsQuickQueue)
                 {
                     return false;
                 }
