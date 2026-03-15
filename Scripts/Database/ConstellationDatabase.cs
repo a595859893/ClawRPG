@@ -1,8 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
-public class ConstellationDatabase : Node
+public class ConstellationDatabase : BaseSystem
 {
     // All constellation configurations
     private Dictionary<string, ConstellationData.Constellation> _constellations = new Dictionary<string, ConstellationData.Constellation>();

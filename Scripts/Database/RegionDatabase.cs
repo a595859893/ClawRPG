@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Scripts.Database {
     /// <summary>
@@ -36,7 +37,7 @@ namespace ClawRPG.Scripts.Database {
     /// Database managing all game regions/zones
     /// </summary>
     [GodotClass]
-    public class RegionDatabase : Node
+    public class RegionDatabase : BaseSystem
     {
         public static RegionDatabase Instance { get; private set; }
 

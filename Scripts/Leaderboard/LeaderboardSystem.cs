@@ -2,12 +2,13 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Framework;
 
 namespace ClawRPG.Scripts.Leaderboard {
     /// <summary>
     /// 排行榜核心系统
     /// </summary>
-    public class LeaderboardSystem : Node {
+    public class LeaderboardSystem : BaseSystem {
         private static LeaderboardSystem _instance;
         public static LeaderboardSystem Instance => _instance;
 

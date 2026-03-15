@@ -1,12 +1,13 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Scripts.Leaderboard {
     /// <summary>
     /// 排行榜配置数据库
     /// </summary>
-    public class LeaderboardDatabase : Node {
+    public class LeaderboardDatabase : BaseSystem {
         // 排行榜配置
         public Dictionary<LeaderboardType, LeaderboardConfig> Configs = new Dictionary<LeaderboardType, LeaderboardConfig>();
         

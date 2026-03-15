@@ -1,12 +1,13 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Scripts.Items {
     /// <summary>
     /// Equipment set manager - calculates and manages active set bonuses
     /// </summary>
-    public class EquipmentSetManager : Node
+    public class EquipmentSetManager : BaseSystem
     {
         private static EquipmentSetManager _instance;
         public static EquipmentSetManager Instance => _instance;

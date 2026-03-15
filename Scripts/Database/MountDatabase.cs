@@ -1,12 +1,13 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Scripts.Mounts {
     /// <summary>
     /// 坐骑数据库
     /// </summary>
-    public class MountDatabase : Node {
+    public class MountDatabase : BaseSystem {
         public static MountDatabase Instance { get; private set; }
 
         private Dictionary<string, Mount> _mounts = new Dictionary<string, Mount>();
