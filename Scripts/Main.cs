@@ -1099,6 +1099,9 @@ namespace ClawRPG.Scripts {
             // Initialize party system
             InitializeParty();
 
+            // Initialize coop session system
+            InitializeCoopSession();
+
             // Load game data
             LoadGameData();
 
@@ -2006,6 +2009,10 @@ namespace ClawRPG.Scripts {
         private PartySystem _partySystem;
         private PartyUI _partyUI;
         
+        // Initialize coop session system
+        private CoopSession.CoopSessionSystem _coopSessionSystem;
+        private CoopSession.CoopSessionUI _coopSessionUI;
+        
         private void InitializeAchievementMilestone()
         {
             // Initialize achievement milestone system
@@ -2072,6 +2079,19 @@ namespace ClawRPG.Scripts {
             AddChild(_partyUI);
             
             GD.Print("Party System initialized!");
+        }
+        
+        private void InitializeCoopSession()
+        {
+            // Initialize coop session system
+            _coopSessionSystem = CoopSession.CoopSessionSystem.Instance;
+            
+            // Initialize coop session UI
+            _coopSessionUI = new CoopSession.CoopSessionUI();
+            _coopSessionUI.Name = "CoopSessionUI";
+            AddChild(_coopSessionUI);
+            
+            GD.Print("Coop Session System initialized!");
         }
         
         private void TogglePartyUI()
@@ -2266,6 +2286,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.C))
             {
                 ToggleChoiceEventUI();
+            }
+
+            // Handle coop session UI toggle (Ctrl+Shift+O key)
+            if (Input.IsKeyPressed(Key.O) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
+            {
+                ToggleCoopSessionUI();
             }
 
             // Handle combo chain UI toggle (Ctrl+Shift+C key)
@@ -4008,6 +4034,17 @@ namespace ClawRPG.Scripts {
             if (partyUI != null)
             {
                 partyUI.Toggle();
+            }
+        }
+
+        /// <summary>
+        /// Toggle coop session UI
+        /// </summary>
+        private void ToggleCoopSessionUI()
+        {
+            if (_coopSessionUI != null)
+            {
+                _coopSessionUI.Toggle();
             }
         }
 
