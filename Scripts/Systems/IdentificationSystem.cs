@@ -258,4 +258,35 @@ public class IdentificationSystem : BaseSystem
         if (data.ContainsKey("highest_rarity_identified"))
             _highestRarityIdentified = Convert.ToInt32(data["highest_rarity_identified"]);
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "total_identifications", _totalIdentifications },
+            { "basic_identifications", _basicIdentifications },
+            { "standard_identifications", _standardIdentifications },
+            { "advanced_identifications", _advancedIdentifications },
+            { "premium_identifications", _premiumIdentifications },
+            { "highest_rarity_identified", _highestRarityIdentified }
+        };
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("total_identifications")) _totalIdentifications = (int)data["total_identifications"];
+        if (data.Contains("basic_identifications")) _basicIdentifications = (int)data["basic_identifications"];
+        if (data.Contains("standard_identifications")) _standardIdentifications = (int)data["standard_identifications"];
+        if (data.Contains("advanced_identifications")) _advancedIdentifications = (int)data["advanced_identifications"];
+        if (data.Contains("premium_identifications")) _premiumIdentifications = (int)data["premium_identifications"];
+        if (data.Contains("highest_rarity_identified")) _highestRarityIdentified = (int)data["highest_rarity_identified"];
+    }
 }

@@ -559,7 +559,7 @@ namespace ClawRPG.Scripts
         
         #region 存档
         
-        public Dictionary ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
             var data = new Dictionary();
             
@@ -608,7 +608,7 @@ namespace ClawRPG.Scripts
             return data;
         }
         
-        public void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
             

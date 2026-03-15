@@ -484,5 +484,96 @@ namespace ClawRPG.Scripts.Mounts {
             
             GD.Print($"[MountCombatSystem] Loaded {_mountCombatData.Count} mount combat data");
         }
+        
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            var mountCombatList = new Array();
+            
+            foreach (var kvp in _mountCombatData)
+            {
+                var mountData = new Dictionary
+                {
+                    { "mount_id", kvp.Value.MountId },
+                    { "level", kvp.Value.Level },
+                    { "experience", kvp.Value.Experience },
+                    { "is_in_combat", kvp.Value.IsInCombat },
+                    { "combat_damage_dealt", kvp.Value.CombatDamageDealt },
+                    { "combat_damage_taken", kvp.Value.CombatDamageTaken },
+                    { "combat_kills", kvp.Value.CombatKills },
+                    { "unlocked_skills", new Array(kvp.Value.UnlockedSkills) }
+                };
+                
+                // 序列化冷却
+                var cooldowns = new Dictionary();
+                foreach (var cd in kvp.Value.SkillCooldowns)
+                {
+                    cooldowns[cd.Key] = cd.Value;
+                }
+                mountData["cooldowns"] = cooldowns;
+                
+                mountCombatList.Add(mountData);
+            }
+            
+            data["mount_combat_data"] = mountCombatList;
+            return data;
+        }
+        
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            _mountCombatData.Clear();
+            
+            if (data.Contains("mount_combat_data"))
+            {
+                var mountCombatList = (Array)data["mount_combat_data"];
+                foreach (Dictionary mountData in mountCombatList)
+                {
+                    var instance = new MountCombatData.MountCombatInstance
+                    {
+                        MountId = (string)mountData["mount_id"],
+                        Level = (int)mountData["level"],
+                        Experience = (int)mountData["experience"],
+                        IsInCombat = (bool)mountData["is_in_combat"],
+                        CombatDamageDealt = (int)mountData["combat_damage_dealt"],
+                        CombatDamageTaken = (int)mountData["combat_damage_taken"],
+                        CombatKills = (int)mountData["combat_kills"]
+                    };
+                    
+                    // 解锁技能
+                    if (mountData.Contains("unlocked_skills"))
+                    {
+                        var skills = (Array)mountData["unlocked_skills"];
+                        instance.UnlockedSkills = new List<string>();
+                        foreach (string skill in skills)
+                        {
+                            instance.UnlockedSkills.Add(skill);
+                        }
+                    }
+                    
+                    // 冷却
+                    if (mountData.Contains("cooldowns"))
+                    {
+                        var cdData = (Dictionary)mountData["cooldowns"];
+                        instance.SkillCooldowns = new Dictionary<string, int>();
+                        foreach (var cd in cdData)
+                        {
+                            instance.SkillCooldowns[cd.Key] = (int)cd.Value;
+                        }
+                    }
+                    
+                    _mountCombatData[instance.MountId] = instance;
+                }
+            }
+            
+            GD.Print($"[MountCombatSystem] Loaded {_mountCombatData.Count} mount combat data");
+        }
     }
 }

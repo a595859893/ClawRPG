@@ -333,4 +333,28 @@ public partial class MountWeatherBonusSystem : BaseSystem
         WeatherType randomWeather = (WeatherType)weatherTypes.GetValue(GD.Randi() % weatherTypes.Length);
         SetWeather(randomWeather);
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "current_weather", (int)currentWeather }
+        };
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("current_weather"))
+        {
+            currentWeather = (WeatherType)(int)data["current_weather"];
+        }
+    }
 }

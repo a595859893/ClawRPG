@@ -201,4 +201,20 @@ public partial class HitStopSystem : BaseSystem
 	/// 当前震动强度
 	/// </summary>
 	public float CurrentIntensity => _shakeIntensity;
+	
+	/// <summary>
+	/// Export save data for persistence
+	/// </summary>
+	public override Dictionary ExportSaveData()
+	{
+		return new Dictionary();
+	}
+	
+	/// <summary>
+	/// Import save data from persistence
+	/// </summary>
+	public override void ImportSaveData(Dictionary data)
+	{
+		// No persistent data needed for visual effects system
+	}
 }
