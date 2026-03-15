@@ -272,5 +272,57 @@ namespace ClawRPG.Scripts.Systems
         {
             _spawnChanceOverride = chance;
         }
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        data["current_floor"] = _currentFloor;
+        data["current_combo"] = _currentCombo;
+        data["kills_this_floor"] = _killsThisFloor;
+        data["elapsed_time"] = _elapsedTime.TotalSeconds;
+        
+        if (_data != null)
+        {
+            data["total_spawned"] = _data.TotalSpawned;
+            data["total_killed"] = _data.TotalKilled;
+            data["normal_elite_count"] = _data.NormalEliteCount;
+            data["rare_elite_count"] = _data.RareEliteCount;
+            data["epic_elite_count"] = _data.EpicEliteCount;
+            data["legendary_elite_count"] = _data.LegendaryEliteCount;
+            data["berserkers_spawned"] = _data.BerserkersSpawned;
+            data["healers_spawned"] = _data.HealersSpawned;
+            data["brutes_spawned"] = _data.BrutesSpawned;
+            data["swifts_spawned"] = _data.SwiftsSpawned;
+            data["ancients_spawned"] = _data.AncientsSpawned;
+        }
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        _currentFloor = (int)(data.GetValueOrDefault("current_floor", 1));
+        _currentCombo = (int)(data.GetValueOrDefault("current_combo", 0));
+        _killsThisFloor = (int)(data.GetValueOrDefault("kills_this_floor", 0));
+        _elapsedTime = TimeSpan.FromSeconds((float)(data.GetValueOrDefault("elapsed_time", 0f)));
+        
+        if (_data == null) _data = new EliteMonsterData();
+        
+        _data.TotalSpawned = (int)(data.GetValueOrDefault("total_spawned", 0));
+        _data.TotalKilled = (int)(data.GetValueOrDefault("total_killed", 0));
+        _data.NormalEliteCount = (int)(data.GetValueOrDefault("normal_elite_count", 0));
+        _data.RareEliteCount = (int)(data.GetValueOrDefault("rare_elite_count", 0));
+        _data.EpicEliteCount = (int)(data.GetValueOrDefault("epic_elite_count", 0));
+        _data.LegendaryEliteCount = (int)(data.GetValueOrDefault("legendary_elite_count", 0));
+        _data.BerserkersSpawned = (int)(data.GetValueOrDefault("berserkers_spawned", 0));
+        _data.HealersSpawned = (int)(data.GetValueOrDefault("healers_spawned", 0));
+        _data.BrutesSpawned = (int)(data.GetValueOrDefault("brutes_spawned", 0));
+        _data.SwiftsSpawned = (int)(data.GetValueOrDefault("swifts_spawned", 0));
+        _data.AncientsSpawned = (int)(data.GetValueOrDefault("ancients_spawned", 0));
     }
 }

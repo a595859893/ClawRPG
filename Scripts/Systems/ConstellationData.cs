@@ -76,38 +76,66 @@ public class ConstellationData : BaseSystem
         // Initialize data
     }
     
-    public Dictionary<string, object> Serialize()
-    {
-        return new Dictionary<string, object>
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData() {
+        var data = new Dictionary();
+        
+        // 序列化已解锁的星座
+        var unlockedList = new List<Dictionary>();
+        foreach (var kvp in UnlockedConstellations)
         {
-            { "unlocked_constellations", UnlockedConstellations },
-            { "total_activation_points", TotalActivationPoints },
-            { "used_activation_points", UsedActivationPoints },
-            { "constellation_fragments", ConstellationFragments },
-            { "total_constellations_unlocked", TotalConstellationsUnlocked },
-            { "total_stars_activated", TotalStarsActivated },
-            { "gold_spent_on_constellations", GoldSpentOnConstellations },
-            { "fragments_collected", FragmentsCollected }
-        };
+            var constData = new Dictionary();
+            constData["constellationId"] = kvp.Key;
+            constData["unlocked"] = kvp.Value.Unlocked;
+            constData["activatedStars"] = kvp.Value.ActivatedStars;
+            constData["totalStars"] = kvp.Value.TotalStars;
+            constData["unlockTime"] = kvp.Value.UnlockTime.ToString();
+            unlockedList.Add(constData);
+        }
+        data["unlockedConstellations"] = unlockedList;
+        
+        data["totalActivationPoints"] = TotalActivationPoints;
+        data["usedActivationPoints"] = UsedActivationPoints;
+        data["constellationFragments"] = ConstellationFragments;
+        data["totalConstellationsUnlocked"] = TotalConstellationsUnlocked;
+        data["totalStarsActivated"] = TotalStarsActivated;
+        data["goldSpentOnConstellations"] = GoldSpentOnConstellations;
+        data["fragmentsCollected"] = FragmentsCollected;
+        
+        return data;
     }
     
-    public void Deserialize(Dictionary<string, object> data)
-    {
-        if (data.ContainsKey("unlocked_constellations"))
-            UnlockedConstellations = (Dictionary<string, ConstellationProgress>)data["unlocked_constellations"];
-        if (data.ContainsKey("total_activation_points"))
-            TotalActivationPoints = (int)data["total_activation_points"];
-        if (data.ContainsKey("used_activation_points"))
-            UsedActivationPoints = (int)data["used_activation_points"];
-        if (data.ContainsKey("constellation_fragments"))
-            ConstellationFragments = (int)data["constellation_fragments"];
-        if (data.ContainsKey("total_constellations_unlocked"))
-            TotalConstellationsUnlocked = (int)data["total_constellations_unlocked"];
-        if (data.ContainsKey("total_stars_activated"))
-            TotalStarsActivated = (int)data["total_stars_activated"];
-        if (data.ContainsKey("gold_spent_on_constellations"))
-            GoldSpentOnConstellations = (int)data["gold_spent_on_constellations"];
-        if (data.ContainsKey("fragments_collected"))
-            FragmentsCollected = (int)data["fragments_collected"];
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data) {
+        if (data == null) return;
+        
+        // 反序列化已解锁的星座
+        UnlockedConstellations.Clear();
+        if (data.Contains("unlockedConstellations"))
+        {
+            var unlockedList = (Godot.Array)data["unlockedConstellations"];
+            foreach (Dictionary constData in unlockedList)
+            {
+                var progress = new ConstellationProgress();
+                progress.ConstellationId = constData["constellationId"].ToString();
+                progress.Unlocked = (bool)constData["unlocked"];
+                progress.ActivatedStars = (int)constData["activatedStars"];
+                progress.TotalStars = (int)constData["totalStars"];
+                progress.UnlockTime = DateTime.Parse(constData["unlockTime"].ToString());
+                UnlockedConstellations[progress.ConstellationId] = progress;
+            }
+        }
+        
+        if (data.Contains("totalActivationPoints")) TotalActivationPoints = (int)data["totalActivationPoints"];
+        if (data.Contains("usedActivationPoints")) UsedActivationPoints = (int)data["usedActivationPoints"];
+        if (data.Contains("constellationFragments")) ConstellationFragments = (int)data["constellationFragments"];
+        if (data.Contains("totalConstellationsUnlocked")) TotalConstellationsUnlocked = (int)data["totalConstellationsUnlocked"];
+        if (data.Contains("totalStarsActivated")) TotalStarsActivated = (int)data["totalStarsActivated"];
+        if (data.Contains("goldSpentOnConstellations")) GoldSpentOnConstellations = (int)data["goldSpentOnConstellations"];
+        if (data.Contains("fragmentsCollected")) FragmentsCollected = (int)data["fragmentsCollected"];
     }
 }

@@ -484,4 +484,62 @@ public partial class DungeonExpeditionSystem : BaseSystem
     
     [Signal]
     public delegate void ExpeditionAbandonedEventHandler(int dungeonType);
+
+    // ===== 持久化方法 =====
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        if (_currentExpedition != null)
+        {
+            data["current_expedition_type"] = (int)_currentExpedition.DungeonType;
+            data["current_expedition_difficulty"] = (int)_currentExpedition.Difficulty;
+            data["current_expedition_status"] = (int)_currentExpedition.Status;
+            data["current_expedition_floor"] = _currentExpedition.CurrentFloor;
+            data["current_expedition_enemies"] = _currentExpedition.EnemiesDefeated;
+            data["current_expedition_start_time"] = _currentExpedition.StartTime.ToString("o");
+        }
+        
+        if (_playerProgress != null)
+        {
+            data["total_expeditions"] = _playerProgress.TotalExpeditions;
+            data["successful_expeditions"] = _playerProgress.SuccessfulExpeditions;
+            data["total_gold_earned"] = _playerProgress.TotalGoldEarned;
+            data["total_exp_earned"] = _playerProgress.TotalExpEarned;
+            data["best_floor"] = _playerProgress.BestFloor;
+            data["unlocked_dungeons"] = _playerProgress.UnlockedDungeons;
+        }
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 恢复当前远征
+        if (data.Contains("current_expedition_type"))
+        {
+            _currentExpedition = new ExpeditionRecord();
+            _currentExpedition.DungeonType = (DungeonType)(int)data["current_expedition_type"];
+            _currentExpedition.Difficulty = (Difficulty)(int)data["current_expedition_difficulty"];
+            _currentExpedition.Status = (ExpeditionStatus)(int)data["current_expedition_status"];
+            _currentExpedition.CurrentFloor = (int)(data.GetValueOrDefault("current_expedition_floor", 0));
+            _currentExpedition.EnemiesDefeated = (int)(data.GetValueOrDefault("current_expedition_enemies", 0));
+            if (data.Contains("current_expedition_start_time"))
+                _currentExpedition.StartTime = DateTime.Parse(data["current_expedition_start_time"].ToString());
+        }
+        
+        // 恢复玩家进度
+        _playerProgress = new PlayerDungeonProgress();
+        _playerProgress.TotalExpeditions = (int)(data.GetValueOrDefault("total_expeditions", 0));
+        _playerProgress.SuccessfulExpeditions = (int)(data.GetValueOrDefault("successful_expeditions", 0));
+        _playerProgress.TotalGoldEarned = (int)(data.GetValueOrDefault("total_gold_earned", 0));
+        _playerProgress.TotalExpEarned = (int)(data.GetValueOrDefault("total_exp_earned", 0));
+        _playerProgress.BestFloor = (int)(data.GetValueOrDefault("best_floor", 0));
+        
+        if (data.Contains("unlocked_dungeons"))
+            _playerProgress.UnlockedDungeons = (List<int>)data["unlocked_dungeons"];
+    }
 }

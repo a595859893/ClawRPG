@@ -414,6 +414,19 @@ public class ComboChainUI : Control
             _OnClosePressed();
         }
     }
+    
+    /// <summary>
+    /// 导出保存数据 - UI组件无持久化状态
+    /// </summary>
+    public override Dictionary ExportSaveData() {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// 导入保存数据 - UI组件无持久化状态
+    /// </summary>
+    public override void ImportSaveData(Dictionary data) {
+    }
 }
 
 // 便捷函数
