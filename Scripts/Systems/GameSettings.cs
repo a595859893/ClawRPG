@@ -541,4 +541,102 @@ public partial class GameSettings : BaseSystem
     }
 
     #endregion
+
+    #region Persistence
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // Audio settings
+        data["master_volume"] = _masterVolume;
+        data["music_volume"] = _musicVolume;
+        data["sfx_volume"] = _sfxVolume;
+        data["voice_volume"] = _voiceVolume;
+        
+        // Graphics settings
+        data["fullscreen"] = _fullscreen;
+        data["vsync"] = _vsync;
+        data["quality_level"] = _qualityLevel;
+        data["show_fps"] = _showFps;
+        data["show_damage_numbers"] = _showDamageNumbers;
+        
+        // Game settings
+        data["difficulty"] = _difficulty;
+        data["auto_save"] = _autoSave;
+        data["auto_save_interval"] = _autoSaveInterval;
+        data["show_tutorials"] = _showTutorials;
+        data["ui_scale"] = _uiScale;
+        
+        // Accessibility settings
+        data["screen_shake"] = _screenShake;
+        data["hit_stop"] = _hitStop;
+        data["controller_vibration"] = _controllerVibration;
+        
+        // Key bindings
+        var keyBindingsArray = new Godot.Array();
+        foreach (var kvp in _keyBindings)
+        {
+            var binding = new Dictionary();
+            binding["action"] = kvp.Key;
+            binding["key"] = kvp.Value;
+            keyBindingsArray.Add(binding);
+        }
+        data["key_bindings"] = keyBindingsArray;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // Audio settings
+        if (data.Contains("master_volume")) _masterVolume = Convert.ToSingle(data["master_volume"]);
+        if (data.Contains("music_volume")) _musicVolume = Convert.ToSingle(data["music_volume"]);
+        if (data.Contains("sfx_volume")) _sfxVolume = Convert.ToSingle(data["sfx_volume"]);
+        if (data.Contains("voice_volume")) _voiceVolume = Convert.ToSingle(data["voice_volume"]);
+        
+        // Graphics settings
+        if (data.Contains("fullscreen")) _fullscreen = Convert.ToBoolean(data["fullscreen"]);
+        if (data.Contains("vsync")) _vsync = Convert.ToBoolean(data["vsync"]);
+        if (data.Contains("quality_level")) _qualityLevel = Convert.ToInt32(data["quality_level"]);
+        if (data.Contains("show_fps")) _showFps = Convert.ToBoolean(data["show_fps"]);
+        if (data.Contains("show_damage_numbers")) _showDamageNumbers = Convert.ToBoolean(data["show_damage_numbers"]);
+        
+        // Game settings
+        if (data.Contains("difficulty")) _difficulty = Convert.ToInt32(data["difficulty"]);
+        if (data.Contains("auto_save")) _autoSave = Convert.ToBoolean(data["auto_save"]);
+        if (data.Contains("auto_save_interval")) _autoSaveInterval = Convert.ToInt32(data["auto_save_interval"]);
+        if (data.Contains("show_tutorials")) _showTutorials = Convert.ToBoolean(data["show_tutorials"]);
+        if (data.Contains("ui_scale")) _uiScale = Convert.ToSingle(data["ui_scale"]);
+        
+        // Accessibility settings
+        if (data.Contains("screen_shake")) _screenShake = Convert.ToBoolean(data["screen_shake"]);
+        if (data.Contains("hit_stop")) _hitStop = Convert.ToBoolean(data["hit_stop"]);
+        if (data.Contains("controller_vibration")) _controllerVibration = Convert.ToBoolean(data["controller_vibration"]);
+        
+        // Key bindings
+        if (data.Contains("key_bindings"))
+        {
+            var bindings = (Godot.Array)data["key_bindings"];
+            foreach (Dictionary binding in bindings)
+            {
+                string action = (string)binding["action"];
+                string key = (string)binding["key"];
+                _keyBindings[action] = key;
+            }
+        }
+        
+        // Apply display settings after loading
+        ApplyDisplaySettings();
+    }
+
+    #endregion
 }

@@ -251,4 +251,62 @@ public class ElementalResonanceSystem : BaseSystem
             return 0;
         return elementTimers[targetId];
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 保存目标元素状态
+        var targetsArray = new Godot.Array();
+        foreach (var kvp in targetElements)
+        {
+            var targetData = new Dictionary();
+            targetData["target_id"] = kvp.Key;
+            
+            var elementsArray = new Godot.Array();
+            foreach (var elem in kvp.Value)
+            {
+                elementsArray.Add((int)elem);
+            }
+            targetData["elements"] = elementsArray;
+            
+            targetsArray.Add(targetData);
+        }
+        data["targets"] = targetsArray;
+        
+        return data;
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        targetElements.Clear();
+        elementTimers.Clear();
+        
+        if (data.Contains("targets"))
+        {
+            var targetsArray = (Godot.Array)data["targets"];
+            foreach (Dictionary targetData in targetsArray)
+            {
+                int targetId = Convert.ToInt32(targetData["target_id"]);
+                var elementsArray = (Godot.Array)targetData["elements"];
+                
+                targetElements[targetId] = new List<Element>();
+                foreach (int elem in elementsArray)
+                {
+                    targetElements[targetId].Add((Element)elem);
+                }
+                
+                // 恢复元素持续时间
+                elementTimers[targetId] = elementDuration;
+            }
+        }
+    }
 }

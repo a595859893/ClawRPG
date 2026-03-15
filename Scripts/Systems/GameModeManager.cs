@@ -206,5 +206,39 @@ namespace ClawRPG.Scripts.Systems
                 _ => Config.NormalMode.TargetDurationMinutes
             };
         }
+
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["current_mode"] = (int)Config.CurrentMode;
+            data["is_quick_mode"] = Config.IsQuickMode;
+            return data;
+        }
+
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("current_mode"))
+            {
+                var mode = (GameModeType)(int)data["current_mode"];
+                Config.SetGameMode(mode);
+            }
+            
+            if (data.Contains("is_quick_mode"))
+            {
+                bool isQuick = (bool)data["is_quick_mode"];
+                if (isQuick && !Config.IsQuickMode)
+                    Config.EnableQuickMode();
+                else if (!isQuick && Config.IsQuickMode)
+                    Config.DisableQuickMode();
+            }
+        }
     }
 }
