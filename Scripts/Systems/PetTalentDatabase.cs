@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 宠物天赋数据库 - 存储所有宠物天赋定义和获取方法
+/// </summary>
 public class PetTalentDatabase
 {
     private static PetTalentDatabase _instance;

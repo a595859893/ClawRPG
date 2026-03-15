@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Data;
 
+/// <summary>
+/// 坐骑训练系统 - 管理坐骑的训练、经验和亲密度提升
+/// </summary>
 public class MountTrainingSystem : Node
 {
     public static MountTrainingSystem Instance { get; private set; }

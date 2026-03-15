@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 坐骑竞速数据库 - 存储所有坐骑竞速活动数据
+/// </summary>
 public class MountRaceDatabase
 {
 	private static MountRaceDatabase _instance;

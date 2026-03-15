@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 宠物友谊数据 - 存储宠物之间友谊等级和经验
+/// </summary>
 public class PetFriendshipData : Resource
 {
     public int PetId { get; set; }

@@ -6,6 +6,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 天气坐骑加成系统 - 根据天气类型为不同类型坐骑提供属性加成
+/// </summary>
 public partial class MountWeatherBonusSystem : Node
 {
     public static MountWeatherBonusSystem Instance { get; private set; }

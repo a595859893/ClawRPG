@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 宠物天赋数据 - 定义宠物天赋的类型、稀有度和效果
+/// </summary>
 public class PetTalentData : Godot.Object
 {
     public enum TalentType

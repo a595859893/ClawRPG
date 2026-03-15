@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 宠物友谊界面 - 显示宠物友谊关系和互动的UI
+/// </summary>
 public class PetFriendshipUI : Control
 {
     private PetManager petManager;

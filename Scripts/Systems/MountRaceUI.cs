@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 坐骑竞速界面 - 管理坐骑竞速活动的UI显示
+/// </summary>
 public class MountRaceUI : Control
 {
 	private Control _mainPanel;

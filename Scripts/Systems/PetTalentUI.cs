@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 宠物天赋界面 - 显示和管理宠物天赋的UI
+/// </summary>
 public class PetTalentUI : Control
 {
     private PetSystem _petSystem;

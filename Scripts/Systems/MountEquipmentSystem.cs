@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 
 namespace GameSystems {
+    /// <summary>
+    /// 坐骑装备系统 - 管理坐骑装备的穿戴、强化和属性加成
+    /// </summary>
     // 坐骑装备类型
     public enum MountEquipmentType {
         Saddle,       // 马鞍

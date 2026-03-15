@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 坐骑竞速数据 - 定义坐骑竞速相关的数据结构
+/// </summary>
 public class MountRaceData
 {
 	public enum RaceState

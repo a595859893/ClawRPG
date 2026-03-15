@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 
 namespace GameSystems {
+    /// <summary>
+    /// 坐骑装备界面 - 显示坐骑装备商店、背包和穿戴管理的UI
+    /// </summary>
     // 坐骑装备UI
     public partial class MountEquipmentUI : Control {
         private Control container;
