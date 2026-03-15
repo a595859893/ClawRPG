@@ -48,4 +48,58 @@ public class GuildDiplomacyData : BaseSystem
             { "Relations", Relations }
         };
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var relationsData = new Godot.Array();
+        foreach (var kvp in Relations)
+        {
+            var relationDict = new Dictionary
+            {
+                { "guild_id", kvp.Key },
+                { "guild_name", kvp.Value.GuildName },
+                { "type", (int)kvp.Value.Type },
+                { "trust", kvp.Value.Trust },
+                { "treaty_turns", kvp.Value.TreatyTurns }
+            };
+            relationsData.Add(relationDict);
+        }
+        
+        return new Dictionary
+        {
+            { "relations", relationsData }
+        };
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        Relations.Clear();
+        
+        if (data.Contains("relations"))
+        {
+            var relationsArray = data["relations"] as Godot.Array;
+            foreach (Dictionary relData in relationsArray)
+            {
+                string guildId = (string)relData["guild_id"];
+                var relation = new GuildRelation
+                {
+                    GuildId = guildId,
+                    GuildName = (string)relData["guild_name"],
+                    Type = (RelationType)(int)relData["type"],
+                    Trust = (int)relData["trust"],
+                    TreatyTurns = (int)relData["treaty_turns"],
+                    LastUpdate = DateTime.Now
+                };
+                Relations[guildId] = relation;
+            }
+        }
+    }
 }

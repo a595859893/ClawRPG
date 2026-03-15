@@ -320,5 +320,22 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
             
             return stones;
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return Serialize();
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            Deserialize(data);
+        }
     }
 }

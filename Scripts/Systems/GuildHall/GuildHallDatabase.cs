@@ -94,6 +94,25 @@ namespace ClawRPG.Systems.GuildHall {
         public GuildHallUpgrade GetUpgrade(string name) {
             return Upgrades.ContainsKey(name) ? Upgrades[name] : null;
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            // GuildHallDatabase 是静态配置数据，不需要持久化
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            // GuildHallDatabase 是静态配置数据，不需要持久化
+        }
     }
     
     public class GuildHallRoom {

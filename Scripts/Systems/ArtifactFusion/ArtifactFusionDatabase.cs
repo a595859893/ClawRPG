@@ -7,6 +7,10 @@ public class ArtifactFusionDatabase : BaseSystem
     // 融合配方
     public static List<FusionRecipe> Recipes { get; private set; } = new List<FusionRecipe>();
     
+    // 运行时数据（非静态）
+    public Dictionary<string, int> RecipeUsageCount { get; set; } = new Dictionary<string, int>();
+    public List<string> RecentlyUsedRecipes { get; set; } = new List<string>();
+    
     // 神器类型权重
     public static Dictionary<string, float> ArtifactWeights { get; private set; } = new Dictionary<string, float>
     {
@@ -352,4 +356,23 @@ public class FusionRecipe
     public int GoldCost { get; set; } = 100;
     public bool IsRandomResult { get; set; } = false;
     public FusionType FusionType { get; set; } = FusionType.Mixed;
+}
+
+/// <summary>
+/// 导出保存数据
+/// </summary>
+public override Dictionary ExportSaveData()
+{
+    var data = new Dictionary();
+    // ArtifactFusionDatabase 是静态配置数据，不需要持久化
+    return data;
+}
+
+/// <summary>
+/// 导入保存数据
+/// </summary>
+public override void ImportSaveData(Dictionary data)
+{
+    if (data == null) return;
+    // ArtifactFusionDatabase 是静态配置数据，不需要持久化
 }

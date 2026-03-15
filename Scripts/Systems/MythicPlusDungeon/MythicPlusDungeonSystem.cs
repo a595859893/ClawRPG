@@ -365,4 +365,165 @@ public class MythicPlusDungeonSystem : BaseSystem
     }
     
     #endregion
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 玩家进度
+        if (_playerProgress != null)
+        {
+            data["best_level"] = _playerProgress.BestLevel;
+            data["total_runs"] = _playerProgress.TotalRuns;
+            data["completed_runs"] = _playerProgress.CompletedRuns;
+            data["failed_runs"] = _playerProgress.FailedRuns;
+            data["highest_score"] = _playerProgress.HighestScore;
+            data["consecutive_completions"] = _playerProgress.ConsecutiveCompletions;
+            data["total_time_played"] = _playerProgress.TotalTimePlayed;
+            data["total_enemies_killed"] = _playerProgress.TotalEnemiesKilled;
+            data["total_deaths"] = _playerProgress.TotalDeaths;
+            
+            // 等级完成次数
+            data["level_completion_count"] = new Dictionary(_playerProgress.LevelCompletionCount);
+            
+            // 等级最佳时间
+            data["level_best_time"] = new Dictionary(_playerProgress.LevelBestTime);
+        }
+        
+        // 跑图历史
+        var historyList = new Array();
+        foreach (var run in _runHistory)
+        {
+            var runData = new Dictionary
+            {
+                { "run_id", run.RunId },
+                { "dungeon_level", run.DungeonLevel },
+                { "completed", run.Completed },
+                { "failed", run.Failed },
+                { "score", run.Score },
+                { "completed_time_seconds", run.CompletedTimeSeconds },
+                { "enemies_killed", run.EnemiesKilled },
+                { "bosses_defeated", run.BossesDefeated },
+                { "deaths", run.Deaths },
+                { "start_time", run.StartTime.ToString("o") }
+            };
+            historyList.Add(runData);
+        }
+        data["run_history"] = historyList;
+        
+        // 排行榜
+        var leaderboardList = new Array();
+        foreach (var entry in _leaderboard)
+        {
+            var entryData = new Dictionary
+            {
+                { "player_id", entry.PlayerId },
+                { "player_name", entry.PlayerName },
+                { "level", entry.Level },
+                { "score", entry.Score },
+                { "time_seconds", entry.TimeSeconds },
+                { "is_weekly", entry.IsWeekly }
+            };
+            leaderboardList.Add(entryData);
+        }
+        data["leaderboard"] = leaderboardList;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 玩家进度
+        if (_playerProgress == null)
+        {
+            _playerProgress = new MythicPlusProgress();
+        }
+        
+        _playerProgress.BestLevel = (int)data.GetValueOrDefault("best_level", 0);
+        _playerProgress.TotalRuns = (int)data.GetValueOrDefault("total_runs", 0);
+        _playerProgress.CompletedRuns = (int)data.GetValueOrDefault("completed_runs", 0);
+        _playerProgress.FailedRuns = (int)data.GetValueOrDefault("failed_runs", 0);
+        _playerProgress.HighestScore = (int)data.GetValueOrDefault("highest_score", 0);
+        _playerProgress.ConsecutiveCompletions = (int)data.GetValueOrDefault("consecutive_completions", 0);
+        _playerProgress.TotalTimePlayed = (int)data.GetValueOrDefault("total_time_played", 0);
+        _playerProgress.TotalEnemiesKilled = (int)data.GetValueOrDefault("total_enemies_killed", 0);
+        _playerProgress.TotalDeaths = (int)data.GetValueOrDefault("total_deaths", 0);
+        
+        // 等级完成次数
+        if (data.Contains("level_completion_count"))
+        {
+            var completionDict = (Dictionary)data["level_completion_count"];
+            _playerProgress.LevelCompletionCount = new Dictionary<int, int>();
+            foreach (var kvp in completionDict)
+            {
+                _playerProgress.LevelCompletionCount[int.Parse(kvp.Key.ToString())] = (int)kvp.Value;
+            }
+        }
+        
+        // 等级最佳时间
+        if (data.Contains("level_best_time"))
+        {
+            var bestTimeDict = (Dictionary)data["level_best_time"];
+            _playerProgress.LevelBestTime = new Dictionary<int, int>();
+            foreach (var kvp in bestTimeDict)
+            {
+                _playerProgress.LevelBestTime[int.Parse(kvp.Key.ToString())] = (int)kvp.Value;
+            }
+        }
+        
+        // 跑图历史
+        _runHistory = new List<MythicPlusRun>();
+        if (data.Contains("run_history"))
+        {
+            var historyArray = (Array)data["run_history"];
+            foreach (Dictionary runData in historyArray)
+            {
+                var run = new MythicPlusRun
+                {
+                    RunId = (int)runData["run_id"],
+                    DungeonLevel = (int)runData["dungeon_level"],
+                    Completed = (bool)runData["completed"],
+                    Failed = (bool)runData["failed"],
+                    Score = (int)runData["score"],
+                    CompletedTimeSeconds = (int)runData["completed_time_seconds"],
+                    EnemiesKilled = (int)runData["enemies_killed"],
+                    BossesDefeated = (int)runData["bosses_defeated"],
+                    Deaths = (int)runData["deaths"]
+                };
+                if (runData.Contains("start_time") && DateTime.TryParse(runData["start_time"].ToString(), out var startTime))
+                {
+                    run.StartTime = startTime;
+                }
+                _runHistory.Add(run);
+            }
+        }
+        
+        // 排行榜
+        _leaderboard = new List<MythicPlusLeaderboard>();
+        if (data.Contains("leaderboard"))
+        {
+            var leaderboardArray = (Array)data["leaderboard"];
+            foreach (Dictionary entryData in leaderboardArray)
+            {
+                var entry = new MythicPlusLeaderboard
+                {
+                    PlayerId = (int)entryData["player_id"],
+                    PlayerName = (string)entryData["player_name"],
+                    Level = (int)entryData["level"],
+                    Score = (int)entryData["score"],
+                    TimeSeconds = (int)entryData["time_seconds"],
+                    IsWeekly = (bool)entryData["is_weekly"]
+                };
+                _leaderboard.Add(entry);
+            }
+        }
+    }
 }

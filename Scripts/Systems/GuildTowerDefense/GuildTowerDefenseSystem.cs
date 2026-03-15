@@ -368,4 +368,20 @@ public class GuildTowerDefenseSystem : BaseSystem
             }
         }
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return SaveData();
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        LoadData(new Dictionary<string, object>(data));
+    }
 }

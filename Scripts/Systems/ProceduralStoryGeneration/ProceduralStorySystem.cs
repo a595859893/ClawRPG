@@ -290,4 +290,33 @@ public class ProceduralStorySystem : BaseSystem
     {
         _data.StoryHistory.Clear();
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 委托给数据类
+        if (_data != null)
+        {
+            data["story_data"] = _data.ExportSaveData();
+        }
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || _data == null) return;
+        
+        if (data.Contains("story_data"))
+        {
+            _data.ImportSaveData((Dictionary)data["story_data"]);
+        }
+    }
 }

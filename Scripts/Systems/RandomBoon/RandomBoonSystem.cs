@@ -336,4 +336,53 @@ public class RandomBoonSystem : BaseSystem
         _activeBonusCache.Clear();
         SaveData();
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        if (PlayerData != null)
+        {
+            data["active_boons"] = new Array(PlayerData.ActiveBoons);
+            data["boon_history"] = new Array(PlayerData.BoonHistory);
+            data["reroll_count"] = PlayerData.RerollCount;
+            data["total_boons_activated"] = PlayerData.TotalBoonsActivated;
+        }
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || PlayerData == null) return;
+        
+        if (data.Contains("active_boons"))
+        {
+            var boonsArray = (Array)data["active_boons"];
+            PlayerData.ActiveBoons = new List<string>();
+            foreach (string boon in boonsArray)
+            {
+                PlayerData.ActiveBoons.Add(boon);
+            }
+        }
+        
+        if (data.Contains("boon_history"))
+        {
+            var historyArray = (Array)data["boon_history"];
+            PlayerData.BoonHistory = new List<string>();
+            foreach (string boon in historyArray)
+            {
+                PlayerData.BoonHistory.Add(boon);
+            }
+        }
+        
+        PlayerData.RerollCount = (int)data.GetValueOrDefault("reroll_count", 0);
+        PlayerData.TotalBoonsActivated = (int)data.GetValueOrDefault("total_boons_activated", 0);
+    }
 }

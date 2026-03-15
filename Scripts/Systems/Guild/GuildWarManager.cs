@@ -433,4 +433,20 @@ public class GuildWarManager : BaseSystem
             nextWarId = (int)data["nextWarId"];
         }
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return SaveData();
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        LoadData(data);
+    }
 }

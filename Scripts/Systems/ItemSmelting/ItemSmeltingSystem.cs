@@ -245,3 +245,49 @@ public class SmeltingStatistics
     public float AverageMaterialsPerSmelt;
     public float SuccessRate;
 }
+
+/// <summary>
+/// 导出保存数据
+/// </summary>
+public override Dictionary ExportSaveData()
+{
+    var data = new Dictionary();
+    
+    // 当前锻造状态
+    data["current_recipe_id"] = CurrentRecipeId;
+    data["current_item_count"] = CurrentItemCount;
+    data["is_smelting"] = IsSmelting;
+    data["smelt_progress"] = SmeltProgress;
+    
+    // 委托给数据层
+    if (_data != null)
+    {
+        var dataData = _data.ExportSaveData();
+        foreach (var kvp in dataData)
+        {
+            data[kvp.Key] = kvp.Value;
+        }
+    }
+    
+    return data;
+}
+
+/// <summary>
+/// 导入保存数据
+/// </summary>
+public override void ImportSaveData(Dictionary data)
+{
+    if (data == null) return;
+    
+    // 当前锻造状态
+    CurrentRecipeId = (string)data.GetValueOrDefault("current_recipe_id", "");
+    CurrentItemCount = (int)data.GetValueOrDefault("current_item_count", 1);
+    IsSmelting = (bool)data.GetValueOrDefault("is_smelting", false);
+    SmeltProgress = (float)data.GetValueOrDefault("smelt_progress", 0f);
+    
+    // 委托给数据层
+    if (_data != null)
+    {
+        _data.ImportSaveData(data);
+    }
+}

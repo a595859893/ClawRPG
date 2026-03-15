@@ -102,5 +102,24 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
             _stones.Keys.CopyTo(ids, 0);
             return ids;
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            // EnhancementDatabase 是静态配置数据，不需要持久化
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            // EnhancementDatabase 是静态配置数据，不需要持久化
+        }
     }
 }

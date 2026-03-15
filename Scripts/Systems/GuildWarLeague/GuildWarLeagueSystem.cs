@@ -329,4 +329,29 @@ public class GuildWarLeagueSystem : BaseSystem {
             }
         }
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "current_season", _data.CurrentSeason },
+            { "season_start_timestamp", _data.SeasonStartTimestamp },
+            { "season_duration_days", _data.SeasonDurationDays }
+        };
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        _data.CurrentSeason = data.GetValueOrDefault("current_season", 1);
+        _data.SeasonStartTimestamp = data.GetValueOrDefault("season_start_timestamp", 0);
+        _data.SeasonDurationDays = data.GetValueOrDefault("season_duration_days", 7);
+    }
 }

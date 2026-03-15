@@ -24,5 +24,24 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
         public static void ToggleUI() {
             GuildTournamentBracketUI.Toggle();
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            // GuildTournamentBracketMain 是入口类，数据在_bracketSystem中
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            // GuildTournamentBracketMain 是入口类，数据在_bracketSystem中
+        }
     }
 }

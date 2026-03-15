@@ -354,4 +354,51 @@ namespace ClawRPG.Scripts.Systems
             }
         }
     }
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+
+        // 玩家宠物AI数据
+        var petAIStates = new Dictionary();
+        foreach (var kvp in _playerPetAIData.PetAIStates)
+        {
+            var state = new Dictionary
+            {
+                { "behavior", (int)kvp.Value.CurrentBehavior },
+                { "state", (int)kvp.Value.CurrentState }
+            };
+            petAIStates[kvp.Key] = state;
+        }
+        data["pet_ai_states"] = petAIStates;
+
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        if (data.Contains("pet_ai_states"))
+        {
+            var statesDict = (Dictionary)data["pet_ai_states"];
+            _playerPetAIData.PetAIStates = new Dictionary<string, PetAIData>();
+            foreach (var kvp in statesDict)
+            {
+                var stateDict = (Dictionary)kvp.Value;
+                _playerPetAIData.PetAIStates[kvp.Key] = new PetAIData
+                {
+                    PetId = kvp.Key,
+                    CurrentBehavior = (PetAIBehavior)(int)stateDict["behavior"],
+                    CurrentState = (PetAIState)(int)stateDict["state"]
+                };
+            }
+        }
+    }
 }

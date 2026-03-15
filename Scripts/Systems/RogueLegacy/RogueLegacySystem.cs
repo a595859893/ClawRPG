@@ -396,4 +396,38 @@ public class RogueLegacySystem : BaseSystem
     
     // 获取幸运加成
     public int GetLuckBonus() => _luckBonus;
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 委托给数据层
+        if (_data != null)
+        {
+            var dataData = _data.ExportSaveData();
+            foreach (var kvp in dataData)
+            {
+                data[kvp.Key] = kvp.Value;
+            }
+        }
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 委托给数据层
+        if (_data != null)
+        {
+            _data.ImportSaveData(data);
+        }
+    }
 }

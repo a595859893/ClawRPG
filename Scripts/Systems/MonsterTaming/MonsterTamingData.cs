@@ -37,4 +37,92 @@ public class MonsterTamingData : BaseSystem
         public DateTime TamedAt { get; set; }
         public Dictionary<string, int> Stats { get; set; } = new Dictionary<string, int>();
     }
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+
+        // 已捕获的怪物
+        var tamedMonstersList = new Array();
+        foreach (var monster in TamedMonsters)
+        {
+            var monsterDict = new Dictionary
+            {
+                { "id", monster.Id },
+                { "name", monster.Name },
+                { "type", monster.Type },
+                { "rarity", monster.Rarity },
+                { "level", monster.Level },
+                { "experience", monster.Experience },
+                { "bond_level", monster.BondLevel },
+                { "battles_won", monster.BattlesWon },
+                { "tamed_at", monster.TamedAt.ToString("o") }
+            };
+            tamedMonstersList.Add(monsterDict);
+        }
+        data["tamed_monsters"] = tamedMonstersList;
+
+        // 统计数据
+        data["total_monsters_captured"] = TotalMonstersCaptured;
+        data["total_battles_won"] = TotalBattlesWon;
+        data["total_capture_attempts"] = TotalCaptureAttempts;
+        data["successful_captures"] = SuccessfulCaptures;
+        data["legendary_captures"] = LegendaryCaptures;
+
+        // 活跃捕捉状态
+        data["is_capturing"] = IsCapturing;
+        data["capturing_monster_id"] = CapturingMonsterId;
+        data["capture_progress"] = CaptureProgress;
+
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        // 已捕获的怪物
+        TamedMonsters = new List<TamedMonster>();
+        if (data.Contains("tamed_monsters"))
+        {
+            var monstersArray = (Array)data["tamed_monsters"];
+            foreach (Dictionary monsterDict in monstersArray)
+            {
+                var monster = new TamedMonster
+                {
+                    Id = (int)monsterDict["id"],
+                    Name = (string)monsterDict["name"],
+                    Type = (string)monsterDict["type"],
+                    Rarity = (string)monsterDict["rarity"],
+                    Level = (int)monsterDict["level"],
+                    Experience = (int)monsterDict["experience"],
+                    BondLevel = (int)monsterDict["bond_level"],
+                    BattlesWon = (int)monsterDict["battles_won"]
+                };
+                if (monsterDict.Contains("tamed_at") && DateTime.TryParse(monsterDict["tamed_at"].ToString(), out var tamedAt))
+                {
+                    monster.TamedAt = tamedAt;
+                }
+                TamedMonsters.Add(monster);
+            }
+        }
+
+        // 统计数据
+        TotalMonstersCaptured = (int)data.GetValueOrDefault("total_monsters_captured", 0);
+        TotalBattlesWon = (int)data.GetValueOrDefault("total_battles_won", 0);
+        TotalCaptureAttempts = (int)data.GetValueOrDefault("total_capture_attempts", 0);
+        SuccessfulCaptures = (int)data.GetValueOrDefault("successful_captures", 0);
+        LegendaryCaptures = (int)data.GetValueOrDefault("legendary_captures", 0);
+
+        // 活跃捕捉状态
+        IsCapturing = (bool)data.GetValueOrDefault("is_capturing", false);
+        CapturingMonsterId = (int)data.GetValueOrDefault("capturing_monster_id", -1);
+        CaptureProgress = (float)data.GetValueOrDefault("capture_progress", 0f);
+    }
 }

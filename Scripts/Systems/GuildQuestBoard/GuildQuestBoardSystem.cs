@@ -431,5 +431,95 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
         }
         
         #endregion
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var questsArray = new Godot.Array();
+            foreach (var quest in _data.availableQuests.Values)
+            {
+                var questDict = new Dictionary
+                {
+                    { "id", quest.Id },
+                    { "title", quest.Title },
+                    { "description", quest.Description },
+                    { "quest_type", (int)quest.QuestType },
+                    { "difficulty", (int)quest.Difficulty },
+                    { "required_count", quest.RequiredCount },
+                    { "current_progress", quest.CurrentProgress },
+                    { "reward_gold", quest.RewardGold },
+                    { "reward_exp", quest.RewardExp },
+                    { "reward_guild_points", quest.RewardGuildPoints },
+                    { "is_completed", quest.IsCompleted },
+                    { "is_daily", quest.IsDaily },
+                    { "completion_count", quest.CompletionCount }
+                };
+                questsArray.Add(questDict);
+            }
+            
+            return new Dictionary
+            {
+                { "available_quests", questsArray },
+                { "accepted_quest_ids", new Godot.Array(_data.acceptedQuestIds) },
+                { "next_quest_id", _data.nextQuestId },
+                { "today_published_count", _data.todayPublishedCount },
+                { "last_reset_time", _data.lastResetTime },
+                { "publish_permission_level", _data.publishPermissionLevel },
+                { "daily_publish_limit", _data.dailyPublishLimit }
+            };
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            _data.availableQuests.Clear();
+            _data.acceptedQuestIds.Clear();
+            
+            if (data.Contains("available_quests"))
+            {
+                var questsArray = data["available_quests"] as Godot.Array;
+                foreach (Dictionary questDict in questsArray)
+                {
+                    var quest = new QuestBoardQuest
+                    {
+                        Id = (int)questDict["id"],
+                        Title = (string)questDict["title"],
+                        Description = (string)questDict["description"],
+                        QuestType = (QuestType)(int)questDict["quest_type"],
+                        Difficulty = (Difficulty)(int)questDict["difficulty"],
+                        RequiredCount = (int)questDict["required_count"],
+                        CurrentProgress = (int)questDict["current_progress"],
+                        RewardGold = (int)questDict["reward_gold"],
+                        RewardExp = (int)questDict["reward_exp"],
+                        RewardGuildPoints = (int)questDict["reward_guild_points"],
+                        IsCompleted = (bool)questDict["is_completed"],
+                        IsDaily = (bool)questDict["is_daily"],
+                        CompletionCount = (int)questDict["completion_count"]
+                    };
+                    _data.availableQuests[quest.Id] = quest;
+                }
+            }
+            
+            if (data.Contains("accepted_quest_ids"))
+            {
+                var acceptedArray = data["accepted_quest_ids"] as Godot.Array;
+                foreach (int questId in acceptedArray)
+                {
+                    _data.acceptedQuestIds.Add(questId);
+                }
+            }
+            
+            _data.nextQuestId = data.GetValueOrDefault("next_quest_id", 1);
+            _data.todayPublishedCount = data.GetValueOrDefault("today_published_count", 0);
+            _data.lastResetTime = data.GetValueOrDefault("last_reset_time", 0);
+            _data.publishPermissionLevel = data.GetValueOrDefault("publish_permission_level", 1);
+            _data.dailyPublishLimit = data.GetValueOrDefault("daily_publish_limit", 10);
+        }
     }
 }

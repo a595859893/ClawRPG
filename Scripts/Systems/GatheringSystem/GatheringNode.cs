@@ -187,4 +187,48 @@ public partial class GatheringNode : BaseSystem2D
             { "position", new Vector2(X, Y) }
         };
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "node_id", nodeId },
+            { "resource_type", (int)resourceType },
+            { "required_level", requiredLevel },
+            { "respawn_time", respawnTime },
+            { "is_depleted", isDepleted },
+            { "timer", timer }
+        };
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("node_id"))
+            nodeId = (string)data["node_id"];
+        
+        if (data.Contains("resource_type"))
+            resourceType = (ResourceType)(int)data["resource_type"];
+        
+        if (data.Contains("required_level"))
+            requiredLevel = (int)data["required_level"];
+        
+        if (data.Contains("respawn_time"))
+            respawnTime = (float)data["respawn_time"];
+        
+        if (data.Contains("is_depleted"))
+            isDepleted = (bool)data["is_depleted"];
+        
+        if (data.Contains("timer"))
+            timer = (float)data["timer"];
+        
+        UpdateVisuals();
+    }
 }

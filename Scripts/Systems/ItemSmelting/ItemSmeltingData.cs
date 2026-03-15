@@ -59,6 +59,55 @@ public class ItemSmeltingData : BaseSystem
         file.StoreString(json);
         file.Close();
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "total_smelts", TotalSmelts },
+            { "total_items_smelted", TotalItemsSmelted },
+            { "total_materials_generated", TotalMaterialsGenerated },
+            { "gold_spent", GoldSpent },
+            { "unlocked_recipes", new Godot.Array(UnlockedRecipes) },
+            { "recipe_usage_count", new Dictionary(RecipeUsageCount) }
+        };
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        TotalSmelts = data.GetValueOrDefault("total_smelts", 0);
+        TotalItemsSmelted = data.GetValueOrDefault("total_items_smelted", 0);
+        TotalMaterialsGenerated = data.GetValueOrDefault("total_materials_generated", 0);
+        GoldSpent = data.GetValueOrDefault("gold_spent", 0);
+        
+        if (data.Contains("unlocked_recipes"))
+        {
+            var recipesArray = data["unlocked_recipes"] as Godot.Array;
+            UnlockedRecipes = new HashSet<string>();
+            foreach (string recipe in recipesArray)
+            {
+                UnlockedRecipes.Add(recipe);
+            }
+        }
+        
+        if (data.Contains("recipe_usage_count"))
+        {
+            var usageDict = data["recipe_usage_count"] as Dictionary;
+            RecipeUsageCount = new Dictionary<string, int>();
+            foreach (var kvp in usageDict)
+            {
+                RecipeUsageCount[kvp.Key] = (int)kvp.Value;
+            }
+        }
+    }
 }
 
 public class SmeltingRecord

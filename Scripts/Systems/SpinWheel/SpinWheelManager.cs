@@ -397,4 +397,52 @@ public partial class SpinWheelManager : BaseSystem
             ToggleSpinWheel();
         }
     }
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+
+        data["total_spins"] = TotalSpins;
+        data["free_spins_remaining"] = FreeSpinsRemaining;
+        data["last_free_spin_time"] = LastFreeSpinTime;
+        data["total_gold_spent"] = TotalGoldSpent;
+        data["total_gold_won"] = TotalGoldWon;
+        data["spin_history"] = new Array(SpinHistory);
+
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        TotalSpins = (int)data.GetValueOrDefault("total_spins", 0);
+        FreeSpinsRemaining = (int)data.GetValueOrDefault("free_spins_remaining", 0);
+        TotalGoldSpent = (int)data.GetValueOrDefault("total_gold_spent", 0);
+        TotalGoldWon = (int)data.GetValueOrDefault("total_gold_won", 0);
+
+        if (data.Contains("last_free_spin_time"))
+        {
+            if (DateTime.TryParse(data["last_free_spin_time"].ToString(), out var time))
+            {
+                LastFreeSpinTime = time;
+            }
+        }
+
+        if (data.Contains("spin_history"))
+        {
+            var historyArray = (Array)data["spin_history"];
+            SpinHistory = new List<string>();
+            foreach (string result in historyArray)
+            {
+                SpinHistory.Add(result);
+            }
+        }
+    }
 }

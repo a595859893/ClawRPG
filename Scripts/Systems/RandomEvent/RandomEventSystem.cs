@@ -447,4 +447,72 @@ public partial class RandomEventSystem : BaseSystem
             }
         }
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 玩家统计
+        data["events_triggered"] = _stats.eventsTriggered;
+        data["events_accepted"] = _stats.eventsAccepted;
+        data["events_dismissed"] = _stats.eventsDismissed;
+        data["total_gold_from_events"] = _stats.totalGoldFromEvents;
+        data["total_exp_from_events"] = _stats.totalExpFromEvents;
+        
+        // 活跃效果
+        var activeEffects = new Array();
+        foreach (var effect in _stats.activeEffects)
+        {
+            activeEffects.Add(effect);
+        }
+        data["active_effects"] = activeEffects;
+        
+        // 当前事件
+        if (_currentEvent != null)
+        {
+            data["current_event_id"] = _currentEvent.eventId;
+            data["current_event_time"] = _currentEventTime.ToString("o");
+        }
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 玩家统计
+        _stats.eventsTriggered = (int)data.GetValueOrDefault("events_triggered", 0);
+        _stats.eventsAccepted = (int)data.GetValueOrDefault("events_accepted", 0);
+        _stats.eventsDismissed = (int)data.GetValueOrDefault("events_dismissed", 0);
+        _stats.totalGoldFromEvents = (int)data.GetValueOrDefault("total_gold_from_events", 0);
+        _stats.totalExpFromEvents = (int)data.GetValueOrDefault("total_exp_from_events", 0);
+        
+        // 活跃效果
+        if (data.Contains("active_effects"))
+        {
+            var effectsArray = (Array)data["active_effects"];
+            _stats.activeEffects = new List<string>();
+            foreach (string effect in effectsArray)
+            {
+                _stats.activeEffects.Add(effect);
+            }
+        }
+        
+        // 当前事件
+        if (data.Contains("current_event_id") && _eventDatabase.ContainsKey((string)data["current_event_id"]))
+        {
+            _currentEvent = _eventDatabase[(string)data["current_event_id"]];
+            if (data.Contains("current_event_time"))
+            {
+                DateTime.TryParse(data["current_event_time"].ToString(), out _currentEventTime);
+            }
+        }
+    }
 }

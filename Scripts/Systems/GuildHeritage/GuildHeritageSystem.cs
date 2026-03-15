@@ -391,4 +391,41 @@ public class GuildHeritageSystem : BaseSystem
             GD.PrintE("[GuildHeritageSystem] Load error: " + e.Message);
         }
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "heritage_points", _data.HeritagePoints },
+            { "total_transfers", _data.TotalTransfers },
+            { "total_gold_transferred", _data.TotalGoldTransferred },
+            { "total_exp_transferred", _data.TotalExpTransferred },
+            { "total_items_transferred", _data.TotalItemsTransferred },
+            { "total_heritage_points_earned", _data.TotalHeritagePointsEarned },
+            { "members_used", _data.MembersUsed },
+            { "transfers_today", _data.TransfersToday },
+            { "last_transfer_date", _data.LastTransferDate }
+        };
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        _data.HeritagePoints = data.GetValueOrDefault("heritage_points", 0);
+        _data.TotalTransfers = data.GetValueOrDefault("total_transfers", 0);
+        _data.TotalGoldTransferred = data.GetValueOrDefault("total_gold_transferred", 0);
+        _data.TotalExpTransferred = data.GetValueOrDefault("total_exp_transferred", 0);
+        _data.TotalItemsTransferred = data.GetValueOrDefault("total_items_transferred", 0);
+        _data.TotalHeritagePointsEarned = data.GetValueOrDefault("total_heritage_points_earned", 0);
+        _data.MembersUsed = data.GetValueOrDefault("members_used", 0);
+        _data.TransfersToday = data.GetValueOrDefault("transfers_today", 0);
+        _data.LastTransferDate = data.GetValueOrDefault("last_transfer_date", "");
+    }
 }

@@ -605,5 +605,108 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
                 ["enemies_defeated"] = CurrentDungeon.TotalEnemiesDefeated
             };
         }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 统计数据
+            if (Statistics != null)
+            {
+                data["total_dungeons_entered"] = Statistics.TotalDungeonsEntered;
+                data["total_dungeons_completed"] = Statistics.TotalDungeonsCompleted;
+                data["total_floors_cleared"] = Statistics.TotalFloorsCleared;
+                data["total_enemies_defeated"] = Statistics.TotalEnemiesDefeated;
+                data["total_treasures_found"] = Statistics.TotalTreasuresFound;
+                data["total_secrets_discovered"] = Statistics.TotalSecretsDiscovered;
+                data["total_time_in_dungeons"] = Statistics.TotalTimeInDungeons.Ticks;
+            }
+            
+            // 当前进度
+            if (CurrentProgress != null)
+            {
+                data["current_dungeon_id"] = CurrentProgress.DungeonId;
+                data["current_floor"] = CurrentProgress.CurrentFloor;
+                data["current_room_id"] = CurrentProgress.CurrentRoomId;
+                data["start_time"] = CurrentProgress.StartTime.ToString("o");
+                
+                // 已清理房间
+                data["cleared_rooms"] = new Array(CurrentProgress.ClearedRooms);
+                
+                // 发现的秘密
+                data["discovered_secrets"] = new Array(CurrentProgress.DiscoveredSecrets);
+            }
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 统计数据
+            if (Statistics == null)
+            {
+                Statistics = new DungeonStatistics();
+            }
+            
+            Statistics.TotalDungeonsEntered = (int)data.GetValueOrDefault("total_dungeons_entered", 0);
+            Statistics.TotalDungeonsCompleted = (int)data.GetValueOrDefault("total_dungeons_completed", 0);
+            Statistics.TotalFloorsCleared = (int)data.GetValueOrDefault("total_floors_cleared", 0);
+            Statistics.TotalEnemiesDefeated = (int)data.GetValueOrDefault("total_enemies_defeated", 0);
+            Statistics.TotalTreasuresFound = (int)data.GetValueOrDefault("total_treasures_found", 0);
+            Statistics.TotalSecretsDiscovered = (int)data.GetValueOrDefault("total_secrets_discovered", 0);
+            
+            if (data.Contains("total_time_in_dungeons"))
+            {
+                Statistics.TotalTimeInDungeons = TimeSpan.FromTicks((long)data["total_time_in_dungeons"]);
+            }
+            
+            // 当前进度
+            if (data.Contains("current_dungeon_id"))
+            {
+                if (CurrentProgress == null)
+                {
+                    CurrentProgress = new DungeonProgress();
+                }
+                
+                CurrentProgress.DungeonId = (string)data["current_dungeon_id"];
+                CurrentProgress.CurrentFloor = (int)data.GetValueOrDefault("current_floor", 1);
+                CurrentProgress.CurrentRoomId = (string)data.GetValueOrDefault("current_room_id", "");
+                
+                if (data.Contains("start_time") && DateTime.TryParse((string)data["start_time"], out var startTime))
+                {
+                    CurrentProgress.StartTime = startTime;
+                }
+                
+                // 已清理房间
+                if (data.Contains("cleared_rooms"))
+                {
+                    var clearedArray = (Array)data["cleared_rooms"];
+                    CurrentProgress.ClearedRooms = new List<string>();
+                    foreach (string roomId in clearedArray)
+                    {
+                        CurrentProgress.ClearedRooms.Add(roomId);
+                    }
+                }
+                
+                // 发现的秘密
+                if (data.Contains("discovered_secrets"))
+                {
+                    var secretsArray = (Array)data["discovered_secrets"];
+                    CurrentProgress.DiscoveredSecrets = new List<string>();
+                    foreach (string secret in secretsArray)
+                    {
+                        CurrentProgress.DiscoveredSecrets.Add(secret);
+                    }
+                }
+            }
+        }
     }
 }

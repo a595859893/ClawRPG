@@ -447,5 +447,32 @@ namespace ClawRPG.Systems
         {
             Instance = null;
         }
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+
+            // 队列状态不需要持久化（运行时状态）
+            // 但可以保存一些统计信息
+            data["total_matches_created"] = _totalMatchesCreated;
+            data["average_wait_time"] = _averageWaitTime;
+
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            // 统计信息
+            _totalMatchesCreated = (int)data.GetValueOrDefault("total_matches_created", 0);
+            _averageWaitTime = (float)data.GetValueOrDefault("average_wait_time", 0f);
+        }
     }
 }

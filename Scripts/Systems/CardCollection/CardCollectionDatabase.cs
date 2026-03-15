@@ -219,6 +219,25 @@ public class CardCollectionDatabase : BaseSystem
             return RarityColors[rarity];
         return Colors.White;
     }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        // CardCollectionDatabase 是静态配置数据，不需要持久化
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        // CardCollectionDatabase 是静态配置数据，不需要持久化
+    }
 }
 
 public class CardDefinition
