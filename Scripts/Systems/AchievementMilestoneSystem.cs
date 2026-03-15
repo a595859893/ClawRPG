@@ -86,6 +86,8 @@ namespace ClawRPG.Scripts
         /// <summary>
         /// 更新成就进度
         /// </summary>
+        /// <param name="achievementId">成就ID</param>
+        /// <param name="newValue">新值</param>
         public void UpdateAchievementProgress(string achievementId, int newValue)
         {
             if (!_playerData.Achievements.ContainsKey(achievementId))

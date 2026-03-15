@@ -45,11 +45,20 @@ public partial class TitleCollectionSystem : BaseSystem
     
     #region Public Methods
     
+    /// <summary>
+    /// 检查称号是否已解锁
+    /// </summary>
+    /// <param name="titleId">称号ID</param>
+    /// <returns>是否已解锁</returns>
     public bool IsTitleUnlocked(string titleId)
     {
         return _playerCollection.UnlockedTitles.ContainsKey(titleId);
     }
     
+    /// <summary>
+    /// 解锁称号
+    /// </summary>
+    /// <param name="titleId">称号ID</param>
     public void UnlockTitle(string titleId)
     {
         if (IsTitleUnlocked(titleId))
@@ -86,6 +95,10 @@ public partial class TitleCollectionSystem : BaseSystem
         GD.Print($"[TitleCollection] Unlocked: {title.Name}");
     }
     
+    /// <summary>
+    /// 装备称号
+    /// </summary>
+    /// <param name="titleId">称号ID</param>
     public void EquipTitle(string titleId)
     {
         if (!IsTitleUnlocked(titleId))
@@ -102,6 +115,9 @@ public partial class TitleCollectionSystem : BaseSystem
         GD.Print($"[TitleCollection] Equipped: {titleId}");
     }
     
+    /// <summary>
+    /// 卸下称号
+    /// </summary>
     public void UnequipTitle()
     {
         if (string.IsNullOrEmpty(_playerCollection.ActiveTitleId))
@@ -120,11 +136,19 @@ public partial class TitleCollectionSystem : BaseSystem
         GD.Print("[TitleCollection] Title unequipped");
     }
     
+    /// <summary>
+    /// 获取当前装备的称号ID
+    /// </summary>
+    /// <returns>装备的称号ID</returns>
     public string GetActiveTitleId()
     {
         return _playerCollection.ActiveTitleId;
     }
     
+    /// <summary>
+    /// 获取当前装备的称号
+    /// </summary>
+    /// <returns>称号数据</returns>
     public TitleCollectionData.Title GetActiveTitle()
     {
         if (string.IsNullOrEmpty(_playerCollection.ActiveTitleId))
@@ -133,20 +157,40 @@ public partial class TitleCollectionSystem : BaseSystem
         return TitleCollectionDatabase.Instance.GetTitle(_playerCollection.ActiveTitleId);
     }
     
+    /// <summary>
+    /// 获取已解锁称号列表
+    /// </summary>
+    /// <returns>已解锁称号字典</returns>
     public Dictionary<string, TitleCollectionData.PlayerTitleData> GetUnlockedTitles()
     {
         return new Dictionary<string, TitleCollectionData.PlayerTitleData>(_playerCollection.UnlockedTitles);
     }
     
+    /// <summary>
+    /// 获取统计数据
+    /// </summary>
+    /// <returns>统计数据</returns>
     public TitleCollectionData.TitleStatistics GetStatistics()
     {
         return _statistics;
     }
     
+    /// <summary>
+    /// 获取总解锁数量
+    /// </summary>
+    /// <returns>解锁数量</returns>
     public int GetTotalUnlocked() => _playerCollection.TotalUnlocked;
     
+    /// <summary>
+    /// 获取总可用数量
+    /// </summary>
+    /// <returns>可用数量</returns>
     public int GetTotalAvailable() => TitleCollectionDatabase.Instance.GetTotalTitleCount();
     
+    /// <summary>
+    /// 获取完成百分比
+    /// </summary>
+    /// <returns>完成百分比</returns>
     public float GetCompletionPercentage()
     {
         int total = GetTotalAvailable();

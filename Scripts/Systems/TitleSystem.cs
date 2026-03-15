@@ -191,6 +191,26 @@ public class TitleSystem : Node
     }
 
     // Check if player meets requirements for a title
+
+    /// <summary>
+    /// 检查玩家是否满足称号要求
+    /// </summary>
+    /// <param name="titleId">称号ID</param>
+    /// <param name="killCount">击杀数</param>
+    /// <param name="bossKills">Boss击杀数</param>
+    /// <param name="gold">金币数</param>
+    /// <param name="level">等级</param>
+    /// <param name="locations">地点数</param>
+    /// <param name="pets">宠物数</param>
+    /// <param name="mounts">坐骑数</param>
+    /// <param name="guildMembers">公会成员数</param>
+    /// <param name="pvpWins">PVP胜场数</param>
+    /// <param name="crafted">制造数</param>
+    /// <param name="battles">战斗数</param>
+    /// <param name="hoursPlayed">游玩小时数</param>
+    /// <param name="achievements">成就数</param>
+    /// <param name="seasonalWins">季节赛胜利数</param>
+    /// <returns>是否满足要求</returns>
     public bool CheckTitleRequirements(string titleId, int killCount = 0, int bossKills = 0, 
         int gold = 0, int level = 0, int locations = 0, int pets = 0, int mounts = 0,
         int guildMembers = 0, int pvpWins = 0, int crafted = 0, int battles = 0, 
@@ -288,6 +308,11 @@ public class TitleSystem : Node
     }
 
     // Unlock a title
+
+    /// <summary>
+    /// 解锁称号
+    /// </summary>
+    /// <param name="titleId">称号ID</param>
     public void UnlockTitle(string titleId)
     {
         if (!_titleDatabase.ContainsKey(titleId))
@@ -307,6 +332,11 @@ public class TitleSystem : Node
     }
 
     // Equip a title
+
+    /// <summary>
+    /// 装备称号
+    /// </summary>
+    /// <param name="titleId">称号ID</param>
     public void EquipTitle(string titleId)
     {
         if (!_unlockedTitles.Contains(titleId))
@@ -321,6 +351,10 @@ public class TitleSystem : Node
     }
 
     // Unequip current title
+
+    /// <summary>
+    /// 卸下称号
+    /// </summary>
     public void UnequipTitle()
     {
         _equippedTitle = "";
@@ -328,6 +362,12 @@ public class TitleSystem : Node
     }
 
     // Get all titles in a category
+
+    /// <summary>
+    /// 获取指定分类的称号
+    /// </summary>
+    /// <param name="category">称号分类</param>
+    /// <returns>称号列表</returns>
     public List<TitleData> GetTitlesByCategory(TitleCategory category)
     {
         var result = new List<TitleData>();
@@ -340,6 +380,11 @@ public class TitleSystem : Node
     }
 
     // Get all unlocked titles
+
+    /// <summary>
+    /// 获取已解锁称号列表
+    /// </summary>
+    /// <returns>已解锁称号列表</returns>
     public List<TitleData> GetUnlockedTitles()
     {
         var result = new List<TitleData>();
@@ -352,12 +397,22 @@ public class TitleSystem : Node
     }
 
     // Get equipped title
+
+    /// <summary>
+    /// 获取已装备称号ID
+    /// </summary>
+    /// <returns>装备的称号ID</returns>
     public string GetEquippedTitle()
     {
         return _equippedTitle;
     }
 
     // Get equipped title name
+
+    /// <summary>
+    /// 获取已装备称号名称
+    /// </summary>
+    /// <returns>装备的称号名称</returns>
     public string GetEquippedTitleName()
     {
         if (string.IsNullOrEmpty(_equippedTitle) || !_titleDatabase.ContainsKey(_equippedTitle))
@@ -366,12 +421,23 @@ public class TitleSystem : Node
     }
 
     // Check if title is unlocked
+
+    /// <summary>
+    /// 检查称号是否已解锁
+    /// </summary>
+    /// <param name="titleId">称号ID</param>
+    /// <returns>是否已解锁</returns>
     public bool IsTitleUnlocked(string titleId)
     {
         return _unlockedTitles.Contains(titleId);
     }
 
     // Get total unlocked count
+
+    /// <summary>
+    /// 获取已解锁称号总数
+    /// </summary>
+    /// <returns>已解锁数量</returns>
     public int GetTotalUnlockedCount()
     {
         return _unlockedTitles.Count;
@@ -394,6 +460,12 @@ public class TitleSystem : Node
     }
 
     // Get title data
+
+    /// <summary>
+    /// 获取称号数据
+    /// </summary>
+    /// <param name="titleId">称号ID</param>
+    /// <returns>称号数据</returns>
     public TitleData GetTitleData(string titleId)
     {
         if (_titleDatabase.ContainsKey(titleId))
@@ -402,6 +474,11 @@ public class TitleSystem : Node
     }
 
     // Get all titles
+
+    /// <summary>
+    /// 获取所有称号
+    /// </summary>
+    /// <returns>所有称号列表</returns>
     public List<TitleData> GetAllTitles()
     {
         return new List<TitleData>(_titleDatabase.Values);

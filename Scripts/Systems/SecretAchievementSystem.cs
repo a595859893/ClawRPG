@@ -58,8 +58,10 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Report progress for an achievement
+        /// 报告成就进度
         /// </summary>
+        /// <param name="achievementId">成就ID</param>
+        /// <param name="amount">进度增量</param>
         public void ReportProgress(string achievementId, int amount = 1)
         {
             if (!_playerAchievements.ContainsKey(achievementId))
@@ -82,8 +84,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Force discover an achievement (for special events)
+        /// 强制发现成就（用于特殊事件）
         /// </summary>
+        /// <param name="achievementId">成就ID</param>
         public void ForceDiscover(string achievementId)
         {
             if (_playerAchievements.ContainsKey(achievementId) && !_playerAchievements[achievementId].IsDiscovered)
@@ -156,8 +159,10 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Get discovery progress for an achievement (0.0 - 1.0)
+        /// 获取发现进度 (0.0 - 1.0)
         /// </summary>
+        /// <param name="achievementId">成就ID</param>
+        /// <returns>发现进度百分比</returns>
         public float GetDiscoveryProgress(string achievementId)
         {
             if (!_playerAchievements.ContainsKey(achievementId))
@@ -173,8 +178,10 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Check if an achievement is discovered
+        /// 检查成就是否已发现
         /// </summary>
+        /// <param name="achievementId">成就ID</param>
+        /// <returns>是否已发现</returns>
         public bool IsDiscovered(string achievementId)
         {
             return _playerAchievements.ContainsKey(achievementId) && 
@@ -182,8 +189,10 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Get player progress for an achievement
+        /// 获取成就进度
         /// </summary>
+        /// <param name="achievementId">成就ID</param>
+        /// <returns>当前进度</returns>
         public int GetProgress(string achievementId)
         {
             return _playerAchievements.ContainsKey(achievementId) ? 
@@ -191,16 +200,18 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Get all player achievement data
+        /// 获取所有玩家成就数据
         /// </summary>
+        /// <returns>玩家成就数据字典</returns>
         public Dictionary<string, PlayerSecretAchievementData> GetAllPlayerData()
         {
             return new Dictionary<string, PlayerSecretAchievementData>(_playerAchievements);
         }
 
         /// <summary>
-        /// Get discovered achievements
+        /// 获取已发现成就列表
         /// </summary>
+        /// <returns>已发现成就ID列表</returns>
         public List<string> GetDiscoveredAchievements()
         {
             List<string> discovered = new();
@@ -213,8 +224,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Get undiscovered achievements with progress
+        /// 获取未发现成就及进度
         /// </summary>
+        /// <returns>未发现成就进度字典</returns>
         public Dictionary<string, float> GetUndiscoveredWithProgress()
         {
             Dictionary<string, float> result = new();
@@ -229,8 +241,9 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Get discovery percentage
+        /// 获取发现百分比
         /// </summary>
+        /// <returns>发现百分比</returns>
         public float GetTotalDiscoveryPercentage()
         {
             int total = SecretAchievementDatabase.GetTotalCount();

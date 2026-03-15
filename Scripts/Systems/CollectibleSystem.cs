@@ -24,6 +24,11 @@ public class CollectibleSystem
 		GD.Print("[CollectibleSystem] Initialized");
 	}
 
+	/// <summary>
+	/// 发现收藏品
+	/// </summary>
+	/// <param name="collectibleId">收藏品ID</param>
+	/// <returns>是否成功发现</returns>
 	public bool DiscoverCollectible(string collectibleId)
 	{
 		var collectible = CollectibleDatabase.Instance.GetCollectible(collectibleId);
@@ -87,11 +92,21 @@ public class CollectibleSystem
 		return true;
 	}
 
+	/// <summary>
+	/// 检查收藏品是否已发现
+	/// </summary>
+	/// <param name="collectibleId">收藏品ID</param>
+	/// <returns>是否已发现</returns>
 	public bool IsDiscovered(string collectibleId)
 	{
 		return Data.DiscoveredCollectibles.ContainsKey(collectibleId) && Data.DiscoveredCollectibles[collectibleId];
 	}
 
+	/// <summary>
+	/// 获取发现进度
+	/// </summary>
+	/// <param name="category">收藏品分类（可选）</param>
+	/// <returns>进度百分比</returns>
 	public float GetDiscoveryProgress(CollectibleData.CollectibleCategory? category = null)
 	{
 		if (category == null)
@@ -110,6 +125,11 @@ public class CollectibleSystem
 		}
 	}
 
+	/// <summary>
+	/// 获取已发现数量
+	/// </summary>
+	/// <param name="category">收藏品分类（可选）</param>
+	/// <returns>已发现数量</returns>
 	public int GetDiscoveredCount(CollectibleData.CollectibleCategory? category = null)
 	{
 		if (category == null)
@@ -123,6 +143,11 @@ public class CollectibleSystem
 		}
 	}
 
+	/// <summary>
+	/// 获取总数量
+	/// </summary>
+	/// <param name="category">收藏品分类（可选）</param>
+	/// <returns>总数量</returns>
 	public int GetTotalCount(CollectibleData.CollectibleCategory? category = null)
 	{
 		if (category == null)
@@ -135,6 +160,11 @@ public class CollectibleSystem
 		}
 	}
 
+	/// <summary>
+	/// 获取已发现的收藏品列表
+	/// </summary>
+	/// <param name="category">收藏品分类（可选）</param>
+	/// <returns>收藏品列表</returns>
 	public List<CollectibleData> GetDiscoveredCollectibles(CollectibleData.CollectibleCategory? category = null)
 	{
 		var result = new List<CollectibleData>();
