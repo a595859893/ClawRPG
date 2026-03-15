@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 多人游戏队伍系统
 /// 队伍管理、Buff共享、经验加成
 /// </summary>
-public class PartySystem : Node
+public class PartySystem : BaseSystem
 {
     public static PartySystem Instance { get; private set; }
 
@@ -130,9 +130,14 @@ public class PartySystem : Node
     public bool ShareExp => _shareExp;
     public bool ShareLoot => _shareLoot;
 
-    public override void _Ready()
+    protected override void Initialize()
     {
         Instance = this;
+    }
+
+    public override void _Ready()
+    {
+        base._Ready();
     }
 
     public override void _Process(float delta)
