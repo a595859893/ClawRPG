@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 成就里程碑系统 - 追踪玩家成就进度里程碑
     /// </summary>
-    public class AchievementMilestoneSystem : BaseSystem : BaseSystem
+    public class AchievementMilestoneSystem : BaseSystem
     {
         private static AchievementMilestoneSystem _instance;
         public static AchievementMilestoneSystem Instance => _instance ??= new AchievementMilestoneSystem();
@@ -272,92 +272,102 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// 导出保存数据 (BaseSystem 接口)
+        /// 导出保存数据 (BaseSystem 接口) - 复用 Save 方法
         /// </summary>
         public override Dictionary ExportSaveData()
         {
-            var data = new Dictionary();
+            // 复用已有的 Save 方法，转换为 Godot Dictionary
+            var internalData = new Dictionary<string, object>();
+            Save(internalData);
             
-            // 保存里程碑
-            var milestones = new Dictionary();
-            foreach (var kvp in Data.Milestones)
-            {
-                milestones[kvp.Key] = kvp.Value;
-            }
-            data["milestones"] = milestones;
-            
-            // 保存历史
-            var history = new List<Dictionary<string, object>>();
-            foreach (var entry in Data.History)
-            {
-                history.Add(new Dictionary<string, object>
-                {
-                    ["achievement_id"] = entry.AchievementId,
-                    ["achievement_name"] = entry.AchievementName,
-                    ["milestone_level"] = entry.MilestoneLevel,
-                    ["timestamp"] = entry.Timestamp
-                });
-            }
-            data["history"] = history;
-            
-            data["total_milestones"] = Data.TotalMilestonesReached;
-            data["highest_level"] = Data.HighestMilestoneLevel;
-            
-            return data;
+            // 将 System.Collections.Generic.Dictionary 转换为 Godot Dictionary
+            return ConvertToGodotDictionary(internalData);
         }
         
         /// <summary>
-        /// 导入保存数据 (BaseSystem 接口)
+        /// 导入保存数据 (BaseSystem 接口) - 复用 Load 方法
         /// </summary>
         public override void ImportSaveData(Dictionary data)
         {
-            if (data == null) return;
+            if (data == null || data.Count == 0)
+                return;
             
-            // 加载里程碑
-            Data.Milestones = new Dictionary<string, int>();
-            if (data.Contains("milestones"))
+            // 将 Godot Dictionary 转换为 System.Collections.Generic.Dictionary
+            var internalData = ConvertFromGodotDictionary(data);
+            
+            // 复用已有的 Load 方法
+            Load(internalData);
+        }
+        
+        /// <summary>
+        /// 将 System Dictionary 转换为 Godot Dictionary
+        /// </summary>
+        private Dictionary ConvertToGodotDictionary(Dictionary<string, object> internalData)
+        {
+            var godotDict = new Dictionary();
+            foreach (var kvp in internalData)
             {
-                var milestones = data["milestones"] as Dictionary;
-                if (milestones != null)
+                godotDict[kvp.Key] = ConvertValueToGodot(kvp.Value);
+            }
+            return godotDict;
+        }
+        
+        /// <summary>
+        /// 将 Godot Dictionary 转换为 System Dictionary
+        /// </summary>
+        private Dictionary<string, object> ConvertFromGodotDictionary(Dictionary godotData)
+        {
+            var result = new Dictionary<string, object>();
+            foreach (var key in godotData.Keys)
+            {
+                result[key.ToString()] = ConvertValueFromGodot(godotData[key]);
+            }
+            return result;
+        }
+        
+        /// <summary>
+        /// 转换值为 Godot 兼容类型
+        /// </summary>
+        private object ConvertValueToGodot(object value)
+        {
+            if (value is Dictionary<string, object> dict)
+            {
+                return ConvertToGodotDictionary(dict);
+            }
+            if (value is List<Dictionary<string, object>> list)
+            {
+                var godotArray = new Godot.Collections.Array();
+                foreach (var item in list)
                 {
-                    foreach (var kvp in milestones)
+                    godotArray.Add(ConvertToGodotDictionary(item));
+                }
+                return godotArray;
+            }
+            return value;
+        }
+        
+        /// <summary>
+        /// 从 Godot 类型转换回 .NET 类型
+        /// </summary>
+        private object ConvertValueFromGodot(object value)
+        {
+            if (value is Dictionary godotDict)
+            {
+                return ConvertFromGodotDictionary(godotDict);
+            }
+            if (value is Godot.Collections.Array godotArray)
+            {
+                var list = new List<Dictionary<string, object>>();
+                foreach (var item in godotArray)
+                {
+                    if (item is Dictionary itemDict)
                     {
-                        Data.Milestones[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+                        list.Add(ConvertFromGodotDictionary(itemDict));
                     }
                 }
+                return list;
             }
-            
-            // 加载历史
-            Data.History = new List<MilestoneHistoryEntry>();
-            if (data.Contains("history"))
-            {
-                var history = data["history"] as Godot.Collections.Array;
-                if (history != null)
-                {
-                    foreach (var entry in history)
-                    {
-                        var dict = entry as Dictionary;
-                        if (dict != null)
-                        {
-                            Data.History.Add(new MilestoneHistoryEntry
-                            {
-                                AchievementId = dict["achievement_id"].ToString(),
-                                AchievementName = dict["achievement_name"].ToString(),
-                                MilestoneLevel = Convert.ToInt32(dict["milestone_level"]),
-                                Timestamp = Convert.ToInt32(dict["timestamp"])
-                            });
-                        }
-                    }
-                }
-            }
-            
-            if (data.Contains("total_milestones"))
-                Data.TotalMilestonesReached = Convert.ToInt32(data["total_milestones"]);
-            
-            if (data.Contains("highest_level"))
-                Data.HighestMilestoneLevel = Convert.ToInt32(data["highest_level"]);
-            
-            GD.Print($"[AchievementMilestone] Imported: {Data.Milestones.Count} milestones, {Data.History.Count} history entries");
+            return value;
         }
     }
 }
