@@ -391,7 +391,7 @@ public class ArenaTournamentSystem : BaseSystem
         return result;
     }
 
-    public Dictionary<string, object> GetSaveData()
+    public override Dictionary ExportSaveData()
     {
         var data = new Dictionary<string, object>();
         
@@ -449,7 +449,7 @@ public class ArenaTournamentSystem : BaseSystem
         return data;
     }
 
-    public void LoadSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         
