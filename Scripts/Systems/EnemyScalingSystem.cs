@@ -10,6 +10,9 @@ public class EnemyScalingSystem
 {
     // 单例
     private static EnemyScalingSystem _instance;
+    /// <summary>
+    /// 获取单例实例
+    /// </summary>
     public static EnemyScalingSystem Instance
     {
         get
@@ -22,13 +25,18 @@ public class EnemyScalingSystem
     private EnemyScalingData _data;
     private EnemyScalingDatabase _database;
 
+    /// <summary>
+    /// 初始化缩放数据与数据库
+    /// </summary>
     public EnemyScalingSystem()
     {
         _data = new EnemyScalingData();
         _database = EnemyScalingDatabase.Instance;
     }
 
-    // 初始化
+    /// <summary>
+    /// 初始化系统，输出日志信息
+    /// </summary>
     public void Initialize()
     {
         GD.Print("[EnemyScalingSystem] Initialized");
@@ -66,7 +74,13 @@ public class EnemyScalingSystem
         return value;
     }
 
-    // 获取缩放后的敌人属性
+    /// <summary>
+    /// 获取缩放后的敌人属性
+    /// </summary>
+    /// <param name="enemyType">敌人类型</param>
+    /// <param name="level">缩放等级</param>
+    /// <param name="difficulty">难度等级，默认为 Normal</param>
+    /// <returns>包含各项属性（生命、攻击、防御、速度、经验掉落等）的字典</returns>
     public Dictionary<string, float> GetScaledEnemyStats(string enemyType, int level, string difficulty = "Normal")
     {
         var config = _database.GetEnemyConfig(enemyType);
@@ -88,34 +102,57 @@ public class EnemyScalingSystem
         return stats;
     }
 
-    // 基于楼层获取缩放等级
+    /// <summary>
+    /// 基于楼层获取缩放等级
+    /// </summary>
+    /// <param name="floor">当前楼层号</param>
+    /// <returns>对应的缩放等级，每5层提升1级</returns>
     public int GetScalingLevelForFloor(int floor)
     {
         // 每5层提升1级缩放
         return 1 + (floor - 1) / 5;
     }
 
-    // 基于玩家等级获取缩放等级
+    /// <summary>
+    /// 基于玩家等级获取缩放等级
+    /// </summary>
+    /// <param name="playerLevel">玩家等级</param>
+    /// <returns>对应的缩放等级（与玩家等级相同）</returns>
     public int GetScalingLevelForPlayer(int playerLevel)
     {
         return playerLevel;
     }
 
-    // 基于击杀数获取缩放等级
+    /// <summary>
+    /// 基于击杀数获取缩放等级
+    /// </summary>
+    /// <param name="kills">已击杀敌人数量</param>
+    /// <returns>对应的缩放等级，每50击杀提升1级</returns>
     public int GetScalingLevelForKills(int kills)
     {
         // 每50击杀提升1级缩放
         return 1 + kills / 50;
     }
 
-    // 基于时间获取缩放等级 (分钟)
+    /// <summary>
+    /// 基于游戏时间获取缩放等级
+    /// </summary>
+    /// <param name="minutes">已游戏时间（分钟）</param>
+    /// <returns>对应的缩放等级，每10分钟提升1级</returns>
     public int GetScalingLevelForTime(float minutes)
     {
         // 每10分钟提升1级缩放
         return 1 + (int)(minutes / 10);
     }
 
-    // 组合多个因素获取最终缩放等级
+    /// <summary>
+    /// 组合多个因素计算最终缩放等级
+    /// </summary>
+    /// <param name="floor">当前楼层</param>
+    /// <param name="playerLevel">玩家等级</param>
+    /// <param name="kills">已击杀数量</param>
+    /// <param name="minutes">已游戏时间（分钟）</param>
+    /// <returns>综合计算后的最终缩放等级（各因素平均值）</returns>
     public int GetCombinedScalingLevel(int floor, int playerLevel, int kills, float minutes)
     {
         int floorLevel = GetScalingLevelForFloor(floor);
@@ -127,7 +164,14 @@ public class EnemyScalingSystem
         return (floorLevel + playerLevel2 + killsLevel + timeLevel) / 4;
     }
 
-    // 更新玩家进度
+    /// <summary>
+    /// 更新玩家进度数据
+    /// </summary>
+    /// <param name="playerLevel">玩家等级</param>
+    /// <param name="floor">当前楼层</param>
+    /// <param name="enemiesDefeated">已击败敌人数量</param>
+    /// <param name="combo">当前连击数</param>
+    /// <param name="playTimeMinutes">已游戏时间（分钟）</param>
     public void UpdatePlayerProgress(int playerLevel, int floor, int enemiesDefeated, int combo, float playTimeMinutes)
     {
         _data.PlayerLevel = playerLevel;
@@ -137,7 +181,10 @@ public class EnemyScalingSystem
         _data.PlayTimeMinutes = playTimeMinutes;
     }
 
-    // 获取统计信息
+    /// <summary>
+    /// 获取当前统计信息
+    /// </summary>
+    /// <returns>包含总缩放计算次数、当前楼层、玩家等级、已击败敌人、连击数、游戏时间和当前波次的字典</returns>
     public Dictionary<string, object> GetStatistics()
     {
         return new Dictionary<string, object>
@@ -152,7 +199,9 @@ public class EnemyScalingSystem
         };
     }
 
-    // 重置进度
+    /// <summary>
+    /// 重置所有进度数据到初始状态
+    /// </summary>
     public void ResetProgress()
     {
         _data.PlayerLevel = 1;
@@ -163,19 +212,29 @@ public class EnemyScalingSystem
         _data.CurrentWave = 1;
     }
 
-    // 保存数据
+    /// <summary>
+    /// 获取当前保存的缩放数据
+    /// </summary>
+    /// <returns>EnemyScalingData 实例</returns>
     public EnemyScalingData GetData()
     {
         return _data;
     }
 
-    // 加载数据
+    /// <summary>
+    /// 加载缩放数据
+    /// </summary>
+    /// <param name="data">要加载的 EnemyScalingData 实例</param>
     public void LoadData(EnemyScalingData data)
     {
         _data = data;
     }
 
-    // 获取缩放类型名称
+    /// <summary>
+    /// 获取缩放类型的名称字符串
+    /// </summary>
+    /// <param name="type">缩放类型枚举</param>
+    /// <returns>类型的名称（Linear/Exponential/Logarithmic/Plateau/Unknown）</returns>
     public string GetScalingTypeName(EnemyScalingData.ScalingType type)
     {
         switch (type)

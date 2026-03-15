@@ -2,14 +2,30 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 快速施法槽项目数据。
+/// </summary>
 public class QuickCastItem
 {
+    /// <summary>物品ID</summary>
     public string ItemId { get; set; }
+
+    /// <summary>物品名称</summary>
     public string ItemName { get; set; }
+
+    /// <summary>槽位索引</summary>
     public int SlotIndex { get; set; }
+
+    /// <summary>是否已分配物品</summary>
     public bool IsAssigned { get; set; }
+
+    /// <summary>物品数量</summary>
     public int Quantity { get; set; }
+
+    /// <summary>剩余冷却时间（秒）</summary>
     public float CooldownRemaining { get; set; }
+
+    /// <summary>冷却总时间（秒）</summary>
     public float CooldownTime { get; set; }
     
     public QuickCastItem()
@@ -24,8 +40,14 @@ public class QuickCastItem
     }
 }
 
+/// <summary>
+/// 快速施法系统。允许玩家通过数字键快速使用物品和技能。
+/// </summary>
 public partial class QuickCastSystem : Node
 {
+    /// <summary>
+    /// 获取系统单例实例。
+    /// </summary>
     public static QuickCastSystem Instance { get; private set; }
     
     [Export] public int MaxSlots = 9;
