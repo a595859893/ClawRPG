@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
 using ClawRPG.Systems;
+using ClawRPG.Scripts.Managers;
 using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.PetAIImprovements;
@@ -50,21 +51,33 @@ namespace ClawRPG.Scripts {
             GameOver
         }
 
-        private GameState _currentGameState = GameState.Playing;
-        private bool _shiftEToggleCooldown = false; 
+        // Managers - using new manager classes
+        private GameStateManager _gameStateManager;
+        private PlayerSpawnManager _playerSpawnManager;
+        private EnemySpawnManager _enemySpawnManager;
+        private GameInitializationManager _initializationManager;
 
-        public static bool IsPaused { get; private set; }
-        public static int CurrentDay { get; private set; } = 1;
+        private bool _shiftEToggleCooldown = false;
+
+        // Backward compatibility - delegate to GameStateManager
+        public static bool IsPaused => GameStateManager.IsPaused;
+        public static int CurrentDay => GameStateManager.Instance?.GetCurrentDay() ?? 1;
 
         public void SetGameState(GameState state)
         {
-            _currentGameState = state;
-            GD.Print("Game state changed to: " + state);
+            if (_gameStateManager != null)
+            {
+                _gameStateManager.SetState(state);
+            }
+            else
+            {
+                GD.Print("Game state changed to: " + state);
+            }
         }
 
-        public GameState GetGameState() => _currentGameState;
+        public GameState GetGameState() => _gameStateManager?.GetState() ?? GameState.Playing;
 
-        public Player GetPlayer() => _player;
+        public Player GetPlayer() => _playerSpawnManager?.GetPlayer() ?? _player;
 
         public override void _Ready()
         {
@@ -78,6 +91,9 @@ namespace ClawRPG.Scripts {
             _items = new Node2D();
             _items.Name = "Items";
             AddChild(_items);
+
+            // Initialize managers - these handle core game functionality
+            InitializeManagers();
 
             // Initialize weapon mastery system
             var weaponMasterySystem = new WeaponMasterySystem();
@@ -1137,8 +1153,46 @@ namespace ClawRPG.Scripts {
             GD.Print("Sound effect signals connected");
         }
 
+        /// <summary>
+        /// Initialize the core game managers
+        /// </summary>
+        private void InitializeManagers()
+        {
+            // Initialize GameStateManager
+            _gameStateManager = new GameStateManager();
+            _gameStateManager.Name = "GameStateManager";
+            AddChild(_gameStateManager);
+            
+            // Initialize PlayerSpawnManager
+            _playerSpawnManager = new PlayerSpawnManager();
+            _playerSpawnManager.Name = "PlayerSpawnManager";
+            _playerSpawnManager.SetPlayerScene(PlayerScene);
+            AddChild(_playerSpawnManager);
+            
+            // Initialize EnemySpawnManager
+            _enemySpawnManager = new EnemySpawnManager();
+            _enemySpawnManager.Name = "EnemySpawnManager";
+            _enemySpawnManager.SetDefaultEnemyScene(EnemyScene);
+            AddChild(_enemySpawnManager);
+            
+            // Initialize GameInitializationManager
+            _initializationManager = new GameInitializationManager();
+            _initializationManager.Name = "GameInitializationManager";
+            AddChild(_initializationManager);
+            
+            GD.Print("Managers initialized");
+        }
+
         private void SpawnPlayer()
         {
+            // Use PlayerSpawnManager if available
+            if (_playerSpawnManager != null)
+            {
+                _player = _playerSpawnManager.SpawnPlayer(null, true);
+                return;
+            }
+            
+            // Fallback to direct spawning
             if (PlayerScene == null)
             {
                 GD.PrintErr("PlayerScene not set!");
