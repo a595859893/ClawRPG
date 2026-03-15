@@ -1,6 +1,9 @@
 using Godot;
 using System;
 
+/// <summary>
+/// 打击停顿效果数据 - 定义打击停顿的参数
+/// </summary>
 [GlobalClass]
 public partial class HitStopEffectData : Resource
 {
@@ -12,6 +15,10 @@ public partial class HitStopEffectData : Resource
 	[Export] public bool EnableFlash { get; set; } = true;
 }
 
+/// <summary>
+/// 打击停顿系统 - 管理游戏中的打击停顿效果
+/// 包括时间减缓、屏幕震动、画面闪烁效果
+/// </summary>
 [GlobalClass]
 public partial class HitStopSystem : Node
 {
@@ -52,6 +59,10 @@ public partial class HitStopSystem : Node
 		}
 	}
 	
+	/// <summary>
+	/// 触发打击停顿效果
+	/// </summary>
+	/// <param name="effect">打击停顿效果数据</param>
 	public void TriggerHitStop(HitStopEffectData effect)
 	{
 		if (effect == null) return;
@@ -71,6 +82,11 @@ public partial class HitStopSystem : Node
 		}
 	}
 	
+	/// <summary>
+	/// 触发暴击打击效果
+	/// </summary>
+	/// <param name="baseDuration">基础持续时间</param>
+	/// <param name="intensity">效果强度</param>
 	public void TriggerCriticalHit(float baseDuration = 0.1f, float intensity = 1.0f)
 	{
 		var effect = new HitStopEffectData
@@ -85,6 +101,11 @@ public partial class HitStopSystem : Node
 		TriggerHitStop(effect);
 	}
 	
+	/// <summary>
+	/// 触发重击打击效果
+	/// </summary>
+	/// <param name="baseDuration">基础持续时间</param>
+	/// <param name="intensity">效果强度</param>
 	public void TriggerHeavyHit(float baseDuration = 0.15f, float intensity = 1.5f)
 	{
 		var effect = new HitStopEffectData

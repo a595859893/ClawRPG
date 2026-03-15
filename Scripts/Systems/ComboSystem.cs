@@ -3,20 +3,59 @@ using System;
 using System.Collections.Generic;
 using Framework;
 
+/// <summary>
+/// 连击数据资源 - 定义一个连击的完整配置
+/// </summary>
 public class ComboData : Resource
 {
+    /// <summary>
+    /// 连击ID
+    /// </summary>
     [Export] public string comboId;
+    /// <summary>
+    /// 连击名称
+    /// </summary>
     [Export] public string comboName;
+    /// <summary>
+    /// 连击描述
+    /// </summary>
     [Export] public string description;
-    [Export] public List<string> skillSequence = new List<string>(); // Required skill IDs in order
+    /// <summary>
+    /// 技能序列 - 按顺序需要使用的技能ID列表
+    /// </summary>
+    [Export] public List<string> skillSequence = new List<string>();
+    /// <summary>
+    /// 伤害倍率
+    /// </summary>
     [Export] public float damageMultiplier = 1.5f;
-    [Export] public float cooldownReduction = 0.2f; // 20% cooldown reduction
+    /// <summary>
+    /// 冷却缩减百分比
+    /// </summary>
+    [Export] public float cooldownReduction = 0.2f;
+    /// <summary>
+    /// 连击点奖励
+    /// </summary>
     [Export] public int comboPointReward = 10;
-    [Export] public string effectName; // Special effect name
+    /// <summary>
+    /// 特效名称
+    /// </summary>
+    [Export] public string effectName;
+    /// <summary>
+    /// 需要的连击等级
+    /// </summary>
     [Export] public int requiredComboLevel = 1;
+    /// <summary>
+    /// 连击类型
+    /// </summary>
     [Export] public ComboType comboType;
+    /// <summary>
+    /// 稀有度
+    /// </summary>
     [Export] public Rarity comboRarity;
     
+    /// <summary>
+    /// 连击类型枚举
+    /// </summary>
     public enum ComboType
     {
         Offensive,
@@ -26,6 +65,9 @@ public class ComboData : Resource
         Special
     }
     
+    /// <summary>
+    /// 稀有度枚举
+    /// </summary>
     public enum Rarity
     {
         Common,
@@ -36,17 +78,42 @@ public class ComboData : Resource
     }
 }
 
+/// <summary>
+/// 连击进度 - 追踪玩家当前连击的执行状态
+/// </summary>
 public class ComboProgress
 {
+    /// <summary>
+    /// 连击ID
+    /// </summary>
     public string comboId;
+    /// <summary>
+    /// 当前完成的步骤数
+    /// </summary>
     public int currentStep = 0;
+    /// <summary>
+    /// 剩余时间（秒）
+    /// </summary>
     public float timeRemaining = 0f;
+    /// <summary>
+    /// 连击是否激活
+    /// </summary>
     public bool isActive = false;
+    /// <summary>
+    /// 已执行次数
+    /// </summary>
     public int timesExecuted = 0;
 }
 
+/// <summary>
+/// 连击系统 - 管理玩家连击技能的系统
+/// 玩家按顺序使用特定技能可以触发强力的连击效果
+/// </summary>
 public class ComboSystem : BaseSystem
 {
+    /// <summary>
+    /// 单例实例
+    /// </summary>
     public static ComboSystem Instance { get; private set; }
     
     // Combo database
@@ -54,18 +121,42 @@ public class ComboSystem : BaseSystem
     
     // Player combo progress
     private Dictionary<string, ComboProgress> _playerCombos = new Dictionary<string, ComboProgress>();
+    /// <summary>
+    /// 当前连击点数
+    /// </summary>
     private int _comboPoints = 0;
+    /// <summary>
+    /// 当前连击等级
+    /// </summary>
     private int _comboLevel = 1;
     
     // Timing
-    private float _comboWindow = 3.0f; // Time to complete combo sequence
+    /// <summary>
+    /// 完成连击的时间窗口（秒）
+    /// </summary>
+    private float _comboWindow = 3.0f;
     private float _deltaTime;
     
     // Signals
+    /// <summary>
+    /// 连击执行时触发
+    /// </summary>
     public static signal ComboExecuted(string comboId, float damage, string effectName);
+    /// <summary>
+    /// 连击进度更新时触发
+    /// </summary>
     public static signal ComboProgressUpdated(string comboId, int currentStep, float timeRemaining);
+    /// <summary>
+    /// 连击点数变化时触发
+    /// </summary>
     public static signal ComboPointsChanged(int newPoints);
+    /// <summary>
+    /// 连击等级变化时触发
+    /// </summary>
     public static signal ComboLevelChanged(int newLevel);
+    /// <summary>
+    /// 发现新连击时触发
+    /// </summary>
     public static signal NewComboDiscovered(ComboData combo);
     
     public override void _Ready()
@@ -295,6 +386,10 @@ public class ComboSystem : BaseSystem
     }
     
     // Called when player uses a skill
+    /// <summary>
+    /// 当玩家使用技能时调用 - 检查是否触发连击
+    /// </summary>
+    /// <param name="skillId">使用的技能ID</param>
     public void OnSkillUsed(string skillId)
     {
         // Check each combo to see if this skill continues the sequence
@@ -380,12 +475,35 @@ public class ComboSystem : BaseSystem
     }
     
     // Getters
+    
+    /// <summary>
+    /// 获取所有连击数据
+    /// </summary>
     public Dictionary<string, ComboData> GetAllCombos() => _combos;
+    
+    /// <summary>
+    /// 获取玩家连击进度
+    /// </summary>
     public Dictionary<string, ComboProgress> GetPlayerProgress() => _playerCombos;
+    
+    /// <summary>
+    /// 获取当前连击点数
+    /// </summary>
     public int GetComboPoints() => _comboPoints;
+    
+    /// <summary>
+    /// 获取当前连击等级
+    /// </summary>
     public int GetComboLevel() => _comboLevel;
+    
+    /// <summary>
+    /// 获取连击时间窗口
+    /// </summary>
     public float GetComboWindow() => _comboWindow;
     
+    /// <summary>
+    /// 获取已解锁的连击列表
+    /// </summary>
     public List<ComboData> GetUnlockedCombos()
     {
         var unlocked = new List<ComboData>();
@@ -399,6 +517,10 @@ public class ComboSystem : BaseSystem
         return unlocked;
     }
     
+    /// <summary>
+    /// 按类型获取连击列表
+    /// </summary>
+    /// <param name="type">连击类型</param>
     public List<ComboData> GetCombosByType(ComboData.ComboType type)
     {
         var filtered = new List<ComboData>();
@@ -413,6 +535,10 @@ public class ComboSystem : BaseSystem
     }
     
     // Save/Load
+    
+    /// <summary>
+    /// 导出存档数据
+    /// </summary>
     public override Dictionary ExportSaveData()
     {
         var data = new Dictionary();
@@ -429,6 +555,10 @@ public class ComboSystem : BaseSystem
         return data;
     }
     
+    /// <summary>
+    /// 导入存档数据
+    /// </summary>
+    /// <param name="data">存档数据字典</param>
     public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
@@ -452,6 +582,10 @@ public class ComboSystem : BaseSystem
     }
     
     // 旧的存档方法（保留兼容性）
+    
+    /// <summary>
+    /// 获取存档数据（兼容性方法）
+    /// </summary>
     public Dictionary<string, object> GetSaveData()
     {
         return ExportSaveData();

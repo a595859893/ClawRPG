@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 快速栏数据 - 定义一个快捷栏槽位的配置
+/// </summary>
 public class QuickSlotData
 {
     public string ItemId { get; set; } = "";
@@ -12,6 +15,9 @@ public class QuickSlotData
     public bool IsEmpty => string.IsNullOrEmpty(ItemId) || ItemCount <= 0;
 }
 
+/// <summary>
+/// 快速栏类型枚举
+/// </summary>
 public enum QuickSlotType
 {
     Item,       // 消耗品
@@ -21,7 +27,11 @@ public enum QuickSlotType
     Mount       // 坐骑
 }
 
-public class QuickSlotSystem : Node
+/// <summary>
+/// 快速栏系统 - 管理玩家的快捷栏槽位
+/// 支持 1-8 数字键快速使用物品
+/// </summary>
+public partial class QuickSlotSystem : Node
 {
     public static QuickSlotSystem Instance { get; private set; }
     
