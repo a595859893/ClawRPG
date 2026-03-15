@@ -1,203 +1,41 @@
 using Godot;
 using System;
 using System.IO;
-using System.Text.Json;
 using System.Collections.Generic;
 using GameSystems;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Enhanced Save and Load system with auto-save, backup, and metadata
+    /// Coordinates SaveDataManager, SaveFileManager, and SaveEncryption
     /// </summary>
     public partial class SaveSystem : Node
     {
-        // Constants
-        private const string SavePath = "user://saves/";
-        private const string BackupPath = "user://saves/backups/";
-        private const int MaxSaveSlots = 3;
-        private const int MaxBackups = 5;
-        private const float AutoSaveInterval = 300f; // 5 minutes
+        // Module instances
+        private SaveFileManager _fileManager;
+        private SaveEncryption _encryption;
         
         // Auto-save state
         private float _autoSaveTimer = 0f;
         private bool _autoSaveEnabled = true;
+        
+        // Constants
+        private const float AutoSaveInterval = 300f; // 5 minutes
         
         // Signals
         [Signal] public delegate void OnSaveCompleteEventHandler(int slot, bool success);
         [Signal] public delegate void OnLoadCompleteEventHandler(int slot, bool success);
         [Signal] public delegate void OnAutoSaveEventHandler(int slot);
         
-        public class SaveData
-        {
-            public int Slot { get; set; }
-            public string SaveName { get; set; } = "";
-            public DateTime SaveTime { get; set; }
-            public TimeSpan PlayTime { get; set; }
-            public string LocationName { get; set; } = "Unknown";
-            
-            // Player data
-            public int Level { get; set; } = 1;
-            public int Experience { get; set; }
-            public int CurrentHealth { get; set; } = 100;
-            public int MaxHealth { get; set; } = 100;
-            public int CurrentMana { get; set; } = 50;
-            public int MaxMana { get; set; } = 50;
-            public int Gold { get; set; }
-            public int Strength { get; set; } = 10;
-            public int Agility { get; set; } = 10;
-            public int Intelligence { get; set; } = 10;
-            
-            // Position
-            public float X { get; set; }
-            public float Y { get; set; }
-            
-            // Inventory
-            public int[] Inventory { get; set; } = new int[30];
-            public int[] InventoryCounts { get; set; } = new int[30];
-            public int[] Equipment { get; set; } = new int[4];
-            
-            // Quest progress
-            public int[] CompletedQuests { get; set; } = new int[0];
-            public int[] ActiveQuests { get; set; } = new int[0];
-            public int[] QuestProgress { get; set; } = new int[0];
-            
-            // Skills
-            public int[] LearnedSkills { get; set; } = new int[0];
-            
-            // World state
-            public string CurrentArea { get; set; } = "forest";
-            public bool[] ExploredAreas { get; set; } = new bool[10];
-            
-            // Pet data
-            public int ActivePetId { get; set; } = -1;
-            public int PetLevel { get; set; } = 1;
-            
-            // Game stats
-            public int TotalKills { get; set; }
-            public int TotalDeaths { get; set; }
-            public int TotalDamageDealt { get; set; }
-            public int TotalDamageTaken { get; set; }
-            
-            // Extended game stats
-            public int TotalHealing { get; set; }
-            public int CriticalHits { get; set; }
-            public int PerfectBlocks { get; set; }
-            public int Dodges { get; set; }
-            public int GoldEarned { get; set; }
-            public int GoldSpent { get; set; }
-            public int ExperienceGained { get; set; }
-            public int ItemsCollected { get; set; }
-            public int ItemsCrafted { get; set; }
-            public int QuestsCompleted { get; set; }
-            public int SkillsLearned { get; set; }
-            public int SkillsUsed { get; set; }
-            public int RegionsDiscovered { get; set; }
-            public int EnemiesEncountered { get; set; }
-            public int BossesDefeated { get; set; }
-            public float TotalPlayTime { get; set; }
-            public int HighestLevel { get; set; }
-            public int HighestCombo { get; set; }
-            public int AchievementsUnlocked { get; set; }
-            
-            // Combo system data
-            public Dictionary<string, Variant> ComboData { get; set; }
-            
-            // Title system data
-            public string CurrentTitleId { get; set; } = "";
-            public string[] UnlockedTitleIds { get; set; } = new string[0];
-            
-            // Quick slot data
-            public string[] QuickSlotItemIds { get; set; } = new string[9];
-            public int[] QuickSlotQuantities { get; set; } = new int[9];
-            
-            // Mount system data
-            public Dictionary<string, Dictionary<string, object>> MountData { get; set; } = new();
-            
-            // Bookmark system data
-            public Dictionary<string, object> BookmarkData { get; set; } = new();
-            
-            // Auto bookmark system data
-            public Dictionary<string, object> AutoBookmarkData { get; set; } = new();
-            
-            // Enhancement system data
-            public Dictionary<string, object> EnhancementData { get; set; } = new();
-            
-            // Auto potion system data
-            public Dictionary<string, object> AutoPotionData { get; set; } = new();
-            
-            // Equipment visuals data (unlocked appearances)
-            public Dictionary<string, string[]> UnlockedVisuals { get; set; } = new();
-            
-            // Enchantment system data
-            public Dictionary<string, object> EnchantmentData { get; set; } = new();
-            
-            // Bounty system data
-            public Dictionary<string, object> BountyData { get; set; } = new();
-            
-            // Weather system data
-            public Dictionary<string, object> WeatherData { get; set; } = new();
-            
-            // Equipment visuals data
-            public Dictionary<string, string> EquipmentVisualsData { get; set; } = new();
-            
-            // Keybinding data
-            public Dictionary<string, int> KeybindingData { get; set; } = new();
-            
-            // Pet story system data
-            public Dictionary<string, object> PetStoryData { get; set; } = new();
-            
-            // Pet egg system data
-            public Dictionary<string, object> PetEggData { get; set; } = new();
-            
-            // Emote system data
-            public Dictionary<string, object> EmoteData { get; set; } = new();
-            
-            // Sealed Tower system data (roguelike endless dungeon)
-            public Dictionary<string, object> SealedTowerData { get; set; } = new();
-
-            // Prestige system data
-            public Dictionary<string, object> PrestigeData { get; set; } = new();
-            
-            // Quick Mode Reward system data
-            public Dictionary<string, object> QuickModeRewardData { get; set; } = new();
-
-            // Guild Quest system data
-            public Dictionary<string, object> GuildQuestData { get; set; } = new();
-            
-            // Player data (legacy support)
-            public object PlayerData { get; set; }
-            
-            // ===== 组合数据类 (新版 - 推荐使用) =====
-            // 基础属性
-            public PlayerBasicData BasicData { get; set; } = new();
-            // 背包装备
-            public PlayerInventoryData InventoryData { get; set; } = new();
-            // 任务进度
-            public PlayerQuestData QuestData { get; set; } = new();
-            // 统计数据
-            public PlayerStatisticsData StatisticsData { get; set; } = new();
-            // 宠物数据
-            public PlayerPetData PetData { get; set; } = new();
-            // 技能数据
-            public PlayerSkillData SkillData { get; set; } = new();
-            // 系统数据
-            public PlayerSystemData SystemData { get; set; } = new();
-        }
-        
-        // Save slot metadata (stored separately for quick loading)
-        public class SaveSlotInfo
-        {
-            public int Slot { get; set; }
-            public string SaveName { get; set; }
-            public DateTime SaveTime { get; set; }
-            public TimeSpan PlayTime { get; set; }
-            public string LocationName { get; set; }
-            public int Level { get; set; }
-        }
+        // Type aliases for backward compatibility
+        public class SaveData : SaveDataManager.SaveData { }
+        public class SaveSlotInfo : SaveDataManager.SaveSlotInfo { }
         
         public override void _Ready()
         {
-            EnsureDirectoriesExist();
+            // Initialize modules
+            _fileManager = new SaveFileManager();
+            _encryption = new SaveEncryption();
         }
         
         public override void _Process(double delta)
@@ -214,267 +52,91 @@ namespace ClawRPG.Scripts.Systems {
             }
         }
         
-        private void EnsureDirectoriesExist()
-        {
-            // Main saves directory
-            DirAccess dir = DirAccess.Open(SavePath);
-            if (dir == null)
-            {
-                DirAccess.MakeDirRecursiveAbsolute(SavePath);
-            }
-            
-            // Backup directory
-            dir = DirAccess.Open(BackupPath);
-            if (dir == null)
-            {
-                DirAccess.MakeDirRecursiveAbsolute(BackupPath);
-            }
-        }
-        
+        /// <summary>
+        /// Check if a save slot has data
+        /// </summary>
         public bool HasSave(int slot)
         {
-            if (slot < 0 || slot >= MaxSaveSlots) return false;
-            string path = GetSavePath(slot);
-            return File.Exists(path);
+            return _fileManager.HasSave(slot);
         }
         
+        /// <summary>
+        /// Save game to a slot
+        /// </summary>
         public void SaveGame(int slot, SaveData data, bool createBackup = true)
         {
-            if (slot < 0 || slot >= MaxSaveSlots)
+            if (slot < 0 || slot >= SaveFileManager.MaxSaveSlots)
             {
                 GD.PrintErr("Invalid save slot: " + slot);
                 EmitSignal(SignalName.OnSaveComplete, slot, false);
                 return;
             }
             
-            try
-            {
-                // Create backup before saving
-                if (createBackup && HasSave(slot))
-                {
-                    CreateBackup(slot);
-                }
-                
-                data.Slot = slot;
-                data.SaveTime = DateTime.Now;
-                
-                string json = JsonSerializer.Serialize(data, new JsonSerializerOptions 
-                { 
-                    WriteIndented = true 
-                });
-                
-                string path = GetSavePath(slot);
-                File.WriteAllText(path, json);
-                
-                // Update slot info
-                UpdateSlotInfo(slot, data);
-                
-                GD.Print("Game saved to slot " + slot);
-                EmitSignal(SignalName.OnSaveComplete, slot, true);
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("Failed to save game: " + e.Message);
-                EmitSignal(SignalName.OnSaveComplete, slot, false);
-            }
+            bool success = _fileManager.SaveGame(slot, data, createBackup);
+            EmitSignal(SignalName.OnSaveComplete, slot, success);
         }
         
+        /// <summary>
+        /// Load game from a slot
+        /// </summary>
         public SaveData LoadGame(int slot)
         {
-            if (slot < 0 || slot >= MaxSaveSlots)
+            if (slot < 0 || slot >= SaveFileManager.MaxSaveSlots)
             {
                 GD.PrintErr("Invalid save slot: " + slot);
                 EmitSignal(SignalName.OnLoadComplete, slot, false);
                 return null;
             }
             
-            try
+            var data = _fileManager.LoadGame(slot);
+            bool success = data != null;
+            
+            if (!success)
             {
-                string path = GetSavePath(slot);
-                
-                if (!File.Exists(path))
-                {
-                    GD.PrintErr("No save file found in slot " + slot);
-                    EmitSignal(SignalName.OnLoadComplete, slot, false);
-                    return null;
-                }
-                
-                string json = File.ReadAllText(path);
-                var data = JsonSerializer.Deserialize<SaveData>(json);
-                
-                GD.Print("Game loaded from slot " + slot + " - " + data.SaveName);
-                EmitSignal(SignalName.OnLoadComplete, slot, true);
-                return data;
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("Failed to load game: " + e.Message);
-                EmitSignal(SignalName.OnLoadComplete, slot, false);
-                
                 // Try to load from backup
-                return LoadFromBackup(slot);
+                data = _fileManager.LoadFromBackup(slot);
+                success = data != null;
             }
+            
+            EmitSignal(SignalName.OnLoadComplete, slot, success);
+            return data;
         }
         
+        /// <summary>
+        /// Get all saves
+        /// </summary>
         public SaveData[] GetAllSaves()
         {
-            var saves = new SaveData[MaxSaveSlots];
-            
-            for (int i = 0; i < MaxSaveSlots; i++)
-            {
-                if (HasSave(i))
-                {
-                    saves[i] = LoadGame(i);
-                }
-            }
-            
-            return saves;
+            return _fileManager.GetAllSaves();
         }
         
+        /// <summary>
+        /// Get all slot info
+        /// </summary>
         public SaveSlotInfo[] GetAllSlotInfo()
         {
-            var infos = new SaveSlotInfo[MaxSaveSlots];
-            
-            for (int i = 0; i < MaxSaveSlots; i++)
-            {
-                infos[i] = GetSlotInfo(i);
-            }
-            
-            return infos;
+            return _fileManager.GetAllSlotInfo();
         }
         
+        /// <summary>
+        /// Get slot info
+        /// </summary>
         public SaveSlotInfo GetSlotInfo(int slot)
         {
-            string infoPath = GetSlotInfoPath(slot);
-            
-            if (!File.Exists(infoPath))
-            {
-                return new SaveSlotInfo { Slot = slot };
-            }
-            
-            try
-            {
-                string json = File.ReadAllText(infoPath);
-                return JsonSerializer.Deserialize<SaveSlotInfo>(json);
-            }
-            catch
-            {
-                return new SaveSlotInfo { Slot = slot };
-            }
+            return _fileManager.GetSlotInfo(slot);
         }
         
-        private void UpdateSlotInfo(int slot, SaveData data)
-        {
-            var info = new SaveSlotInfo
-            {
-                Slot = slot,
-                SaveName = data.SaveName,
-                SaveTime = data.SaveTime,
-                PlayTime = data.PlayTime,
-                LocationName = data.CurrentArea,
-                Level = data.Level
-            };
-            
-            string json = JsonSerializer.Serialize(info, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(GetSlotInfoPath(slot), json);
-        }
-        
+        /// <summary>
+        /// Delete a save slot
+        /// </summary>
         public void DeleteSave(int slot)
         {
-            if (slot < 0 || slot >= MaxSaveSlots) return;
-            
-            string path = GetSavePath(slot);
-            string infoPath = GetSlotInfoPath(slot);
-            
-            if (File.Exists(path))
-            {
-                // Create final backup before deletion
-                CreateBackup(slot);
-                File.Delete(path);
-                GD.Print("Save deleted from slot " + slot);
-            }
-            
-            if (File.Exists(infoPath))
-            {
-                File.Delete(infoPath);
-            }
+            _fileManager.DeleteSave(slot);
         }
         
-        private void CreateBackup(int slot)
-        {
-            string sourcePath = GetSavePath(slot);
-            if (!File.Exists(sourcePath)) return;
-            
-            try
-            {
-                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                string backupName = $"save_{slot}_{timestamp}.json";
-                string backupFullPath = BackupPath + backupName;
-                
-                File.Copy(sourcePath, backupFullPath);
-                GD.Print("Backup created: " + backupName);
-                
-                // Clean old backups
-                CleanOldBackups(slot);
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("Failed to create backup: " + e.Message);
-            }
-        }
-        
-        private void CleanOldBackups(int slot)
-        {
-            try
-            {
-                var files = Directory.GetFiles(BackupPath, $"save_{slot}_*.json");
-                
-                if (files.Length > MaxBackups)
-                {
-                    // Sort by creation time and delete oldest
-                    Array.Sort(files);
-                    for (int i = 0; i < files.Length - MaxBackups; i++)
-                    {
-                        File.Delete(files[i]);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("Failed to clean backups: " + e.Message);
-            }
-        }
-        
-        private SaveData LoadFromBackup(int slot)
-        {
-            try
-            {
-                var files = Directory.GetFiles(BackupPath, $"save_{slot}_*.json");
-                
-                if (files.Length == 0)
-                {
-                    GD.PrintErr("No backup found for slot " + slot);
-                    return null;
-                }
-                
-                // Load most recent backup
-                Array.Sort(files);
-                string latestBackup = files[files.Length - 1];
-                
-                string json = File.ReadAllText(latestBackup);
-                var data = JsonSerializer.Deserialize<SaveData>(json);
-                
-                GD.Print("Game restored from backup: " + latestBackup);
-                EmitSignal(SignalName.OnLoadComplete, slot, true);
-                return data;
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("Failed to load backup: " + e.Message);
-                return null;
-            }
-        }
-        
+        /// <summary>
+        /// Perform auto-save
+        /// </summary>
         private void PerformAutoSave()
         {
             // Get player data from game state
@@ -491,12 +153,14 @@ namespace ClawRPG.Scripts.Systems {
             EmitSignal(SignalName.OnAutoSave, 0);
         }
         
+        /// <summary>
+        /// Create save data from player node
+        /// </summary>
         private SaveData CreateSaveDataFromPlayer(Node player)
         {
             var data = new SaveData();
             
-            // Get player properties via reflection or direct access
-            // This is a simplified version - actual implementation would read from Player node
+            // Get player properties
             data.Level = 1;
             data.Experience = 0;
             data.CurrentHealth = 100;
@@ -632,23 +296,17 @@ namespace ClawRPG.Scripts.Systems {
             return data;
         }
         
+        /// <summary>
+        /// Get current area name
+        /// </summary>
         private string GetCurrentAreaName()
         {
-            // Get from game state or return default
             return "Unknown Area";
         }
         
-        private string GetSavePath(int slot)
-        {
-            return SavePath + "save_" + slot + ".json";
-        }
-        
-        private string GetSlotInfoPath(int slot)
-        {
-            return SavePath + "slot_" + slot + "_info.json";
-        }
-        
-        // Quick save/load for convenience
+        /// <summary>
+        /// Quick save
+        /// </summary>
         public void QuickSave(Node player)
         {
             var data = CreateSaveDataFromPlayer(player);
@@ -656,12 +314,17 @@ namespace ClawRPG.Scripts.Systems {
             SaveGame(0, data);
         }
         
+        /// <summary>
+        /// Quick load
+        /// </summary>
         public SaveData QuickLoad()
         {
             return LoadGame(0);
         }
         
-        // Auto-save control
+        /// <summary>
+        /// Enable/disable auto-save
+        /// </summary>
         public void EnableAutoSave(bool enable)
         {
             _autoSaveEnabled = enable;
@@ -671,467 +334,176 @@ namespace ClawRPG.Scripts.Systems {
             }
         }
         
+        /// <summary>
+        /// Check if auto-save is enabled
+        /// </summary>
         public bool IsAutoSaveEnabled()
         {
             return _autoSaveEnabled;
         }
         
-        // Export save to external file
+        /// <summary>
+        /// Export save to external file
+        /// </summary>
         public bool ExportSave(int slot, string exportPath)
         {
-            string sourcePath = GetSavePath(slot);
-            if (!File.Exists(sourcePath)) return false;
-            
-            try
-            {
-                File.Copy(sourcePath, exportPath, true);
-                GD.Print("Save exported to: " + exportPath);
-                return true;
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("Failed to export save: " + e.Message);
-                return false;
-            }
+            return _fileManager.ExportSave(slot, exportPath);
         }
         
-        // Import save from external file
+        /// <summary>
+        /// Import save from external file
+        /// </summary>
         public bool ImportSave(string importPath, int slot)
         {
-            if (!File.Exists(importPath)) return false;
-            
-            try
-            {
-                // Validate the import file first
-                string json = File.ReadAllText(importPath);
-                var data = JsonSerializer.Deserialize<SaveData>(json);
-                
-                if (data == null)
-                {
-                    GD.PrintErr("Invalid save file format");
-                    return false;
-                }
-                
-                string destPath = GetSavePath(slot);
-                File.Copy(importPath, destPath, true);
-                
-                // Update slot info
-                UpdateSlotInfo(slot, data);
-                
-                GD.Print("Save imported from: " + importPath + " to slot " + slot);
-                return true;
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("Failed to import save: " + e.Message);
-                return false;
-            }
+            return _fileManager.ImportSave(importPath, slot);
         }
         
-        // Get save file size
+        /// <summary>
+        /// Get save file size
+        /// </summary>
         public long GetSaveFileSize(int slot)
         {
-            string path = GetSavePath(slot);
-            if (File.Exists(path))
-            {
-                return new FileInfo(path).Length;
-            }
-            return 0;
+            return _fileManager.GetSaveFileSize(slot);
         }
         
-        // Check if save is corrupted
+        /// <summary>
+        /// Check if save is corrupted
+        /// </summary>
         public bool IsSaveCorrupted(int slot)
         {
-            string path = GetSavePath(slot);
-            if (!File.Exists(path)) return true;
-            
-            try
-            {
-                string json = File.ReadAllText(path);
-                var data = JsonSerializer.Deserialize<SaveData>(json);
-                return data == null;
-            }
-            catch
-            {
-                return true;
-            }
+            return _fileManager.IsSaveCorrupted(slot);
         }
-
+        
+        /// <summary>
+        /// Enable encryption
+        /// </summary>
+        public void EnableEncryption()
+        {
+            _encryption.Enable();
+        }
+        
+        /// <summary>
+        /// Disable encryption
+        /// </summary>
+        public void DisableEncryption()
+        {
+            _encryption.Disable();
+        }
+        
         // ===== Pet Talent System Save/Load =====
         
         public void SavePetTalentData(PlayerPetTalentData data)
         {
-            try
-            {
-                string path = "user://pet_talent_data.json";
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(data, options);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Pet talent data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save pet talent data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://pet_talent_data.json", data, "SaveSystem");
         }
 
         public PlayerPetTalentData LoadPetTalentData()
         {
-            try
-            {
-                string path = "user://pet_talent_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<PlayerPetTalentData>(json);
-                    GD.Print("[SaveSystem] Pet talent data loaded");
-                    return data;
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load pet talent data: " + e.Message);
-            }
-            return new PlayerPetTalentData();
+            return _fileManager.LoadDataWithLogging<PlayerPetTalentData>("user://pet_talent_data.json", "SaveSystem");
         }
+        
         // ===== Loot Drop System Save/Load =====
         
         public void SaveLootDropData(LootDropData.PlayerLootData data)
         {
-            try
-            {
-                string path = "user://loot_drop_data.json";
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(data, options);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Loot drop data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save loot drop data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://loot_drop_data.json", data, "SaveSystem");
         }
 
         public LootDropData.PlayerLootData LoadLootDropData()
         {
-            try
-            {
-                string path = "user://loot_drop_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<LootDropData.PlayerLootData>(json);
-                    GD.Print("[SaveSystem] Loot drop data loaded");
-                    return data;
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load loot drop data: " + e.Message);
-            }
-            return new LootDropData.PlayerLootData();
+            return _fileManager.LoadDataWithLogging<LootDropData.PlayerLootData>("user://loot_drop_data.json", "SaveSystem");
         }
         
         // ===== Equipment Durability System Save/Load =====
         
         public void SaveEquipmentDurabilityData(Dictionary<string, object> data)
         {
-            try
-            {
-                string path = "user://equipment_durability_data.json";
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(data, options);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Equipment durability data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save equipment durability data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://equipment_durability_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadEquipmentDurabilityData()
         {
-            try
-            {
-                string path = "user://equipment_durability_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    GD.Print("[SaveSystem] Equipment durability data loaded");
-                    return data;
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load equipment durability data: " + e.Message);
-            }
-            return new Dictionary<string, object>();
+            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://equipment_durability_data.json", "SaveSystem");
         }
 
         // ===== Collectible System Save/Load =====
 
         public void SaveCollectibleData(Dictionary<string, object> data)
         {
-            try
-            {
-                string path = "user://collectible_data.json";
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(data, options);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Collectible data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save collectible data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://collectible_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadCollectibleData()
         {
-            try
-            {
-                string path = "user://collectible_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    GD.Print("[SaveSystem] Collectible data loaded");
-                    return data;
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load collectible data: " + e.Message);
-            }
-            return new Dictionary<string, object>();
+            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://collectible_data.json", "SaveSystem");
         }
 
         // ===== Seasonal Event System Save/Load =====
 
         public void SaveSeasonalEventData(Dictionary<string, object> data)
         {
-            try
-            {
-                string path = "user://seasonal_event_data.json";
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(data, options);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Seasonal event data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save seasonal event data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://seasonal_event_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadSeasonalEventData()
         {
-            try
-            {
-                string path = "user://seasonal_event_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    GD.Print("[SaveSystem] Seasonal event data loaded");
-                    return data;
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load seasonal event data: " + e.Message);
-            }
-            return new Dictionary<string, object>();
+            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://seasonal_event_data.json", "SaveSystem");
         }
 
         public void SaveMountRaceData(Dictionary<string, object> data)
         {
-            try
-            {
-                string path = "user://mount_race_data.json";
-                string json = JsonSerializer.Serialize(data);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Mount race data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save mount race data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://mount_race_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadMountRaceData()
         {
-            try
-            {
-                string path = "user://mount_race_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    GD.Print("[SaveSystem] Mount race data loaded");
-                    return data;
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load mount race data: " + e.Message);
-            }
-            return new Dictionary<string, object>();
+            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://mount_race_data.json", "SaveSystem");
         }
 
         public void SaveMountBattleArenaData(Dictionary<string, object> data)
         {
-            try
-            {
-                string path = "user://mount_battle_arena_data.json";
-                string json = JsonSerializer.Serialize(data);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Mount battle arena data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save mount battle arena data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://mount_battle_arena_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadMountBattleArenaData()
         {
-            try
-            {
-                string path = "user://mount_battle_arena_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    GD.Print("[SaveSystem] Mount battle arena data loaded");
-                    return data;
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load mount battle arena data: " + e.Message);
-            }
-            return new Dictionary<string, object>();
+            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://mount_battle_arena_data.json", "SaveSystem");
         }
 
         public void SavePlayerTalentData(Dictionary<string, object> data)
         {
-            try
-            {
-                string path = "user://player_talent_data.json";
-                string json = JsonSerializer.Serialize(data);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Player talent data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save player talent data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://player_talent_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadPlayerTalentData()
         {
-            try
-            {
-                string path = "user://player_talent_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    GD.Print("[SaveSystem] Player talent data loaded");
-                    return data;
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load player talent data: " + e.Message);
-            }
-            return new Dictionary<string, object>();
+            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://player_talent_data.json", "SaveSystem");
         }
 
         public void SavePetExpeditionData(Dictionary<string, object> data)
         {
-            try
-            {
-                string path = "user://pet_expedition_data.json";
-                string json = JsonSerializer.Serialize(data);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Pet expedition data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save pet expedition data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://pet_expedition_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadPetExpeditionData()
         {
-            try
-            {
-                string path = "user://pet_expedition_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    if (data != null)
-                    {
-                        GD.Print("[SaveSystem] Pet expedition data loaded");
-                        return data;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load pet expedition data: " + e.Message);
-            }
-            return new Dictionary<string, object>();
+            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://pet_expedition_data.json", "SaveSystem");
         }
 
         public void SavePetTrainingData(Dictionary<string, Variant> data)
         {
-            try
-            {
-                string path = "user://pet_training_data.json";
-                string json = JsonSerializer.Serialize(data);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Pet training data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save pet training data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://pet_training_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, Variant> LoadPetTrainingData()
         {
-            try
-            {
-                string path = "user://pet_training_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<Dictionary<string, Variant>>(json);
-                    if (data != null)
-                    {
-                        GD.Print("[SaveSystem] Pet training data loaded");
-                        return data;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load pet training data: " + e.Message);
-            }
-            return new Dictionary<string, Variant>();
+            return _fileManager.LoadDataWithLogging<Dictionary<string, Variant>>("user://pet_training_data.json", "SaveSystem");
         }
 
         public void SavePetHabitatData(PlayerHabitatData data)
         {
             try
             {
-                string path = "user://pet_habitat_data.json";
                 var dict = new Dictionary<string, object>();
                 
                 dict["current_habitat_id"] = data.CurrentHabitatId;
@@ -1158,9 +530,7 @@ namespace ClawRPG.Scripts.Systems {
                 // Serialize decoration counts
                 dict["decoration_counts"] = data.DecorationCounts;
                 
-                string json = JsonSerializer.Serialize(dict);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Pet habitat data saved");
+                _fileManager.SaveDataWithLogging("user://pet_habitat_data.json", dict, "SaveSystem");
             }
             catch (Exception e)
             {
@@ -1176,7 +546,7 @@ namespace ClawRPG.Scripts.Systems {
                 if (File.Exists(path))
                 {
                     string json = File.ReadAllText(path);
-                    var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
                     if (dict != null)
                     {
                         var data = new PlayerHabitatData();
@@ -1229,40 +599,12 @@ namespace ClawRPG.Scripts.Systems {
 
         public void SaveMountExpeditionData(Dictionary<string, object> data)
         {
-            try
-            {
-                string path = "user://mount_expedition_data.json";
-                string json = JsonSerializer.Serialize(data);
-                File.WriteAllText(path, json);
-                GD.Print("[SaveSystem] Mount expedition data saved");
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to save mount expedition data: " + e.Message);
-            }
+            _fileManager.SaveDataWithLogging("user://mount_expedition_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadMountExpeditionData()
         {
-            try
-            {
-                string path = "user://mount_expedition_data.json";
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    if (data != null)
-                    {
-                        GD.Print("[SaveSystem] Mount expedition data loaded");
-                        return data;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr("[SaveSystem] Failed to load mount expedition data: " + e.Message);
-            }
-            return new Dictionary<string, object>();
+            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://mount_expedition_data.json", "SaveSystem");
         }
 
         // ============ Quick Mode Reward Data ============
