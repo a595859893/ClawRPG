@@ -5,7 +5,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 相机特效增强系统 - 提供动态FOV、镜头震动、渐晕等视觉增强
     /// </summary>
-    public partial class CameraEffectSystem : Node {
+    public partial class CameraEffectSystem : BaseSystem {
         public static CameraEffectSystem Instance { get; private set; }
 
         [Export] private Camera3D playerCamera;
@@ -28,6 +28,24 @@ namespace ClawRPG.Scripts.UI {
         // 动态FOV
         private float currentTargetFOV;
         private float velocityFOV = 0f;
+        
+        public override void _Ready() {
+            Instance = this;
+            currentTargetFOV = defaultFOV;
+            
+            // 尝试自动获取相机
+            if (playerCamera == null) {
+                var player = GetTree().GetFirstNodeInGroup("Player");
+                if (player != null) {
+                    playerCamera = player.GetNode<Camera3D>("Camera3D");
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "CameraEffect";
         
         public override void _Ready() {
             Instance = this;
