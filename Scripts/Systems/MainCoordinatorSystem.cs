@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// MainCoordinatorSystem - 负责 Main 的初始化协调和节点结构创建
     /// </summary>
-    public partial class MainCoordinatorSystem : Node
+    public partial class MainCoordinatorSystem : BaseSystem
     {
         private Main _main;
         private Node2D _enemies;

@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// MainModuleSystem - 负责 Main 的模块组件初始化
     /// </summary>
-    public partial class MainModuleSystem : Node
+    public partial class MainModuleSystem : BaseSystem
     {
         private Main _main;
         

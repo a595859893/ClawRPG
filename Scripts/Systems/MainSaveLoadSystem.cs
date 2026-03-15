@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// MainSaveLoadSystem - 负责游戏数据的导入导出
     /// </summary>
-    public partial class MainSaveLoadSystem : Node
+    public partial class MainSaveLoadSystem : BaseSystem
     {
         private Main _main;
         private GameStateManager _gameStateManager;

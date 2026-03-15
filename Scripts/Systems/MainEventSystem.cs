@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// MainEventSystem - 负责事件总线连接和游戏事件处理
     /// </summary>
-    public partial class MainEventSystem : Node
+    public partial class MainEventSystem : BaseSystem
     {
         private Main _main;
 
