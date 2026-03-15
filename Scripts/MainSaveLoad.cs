@@ -253,4 +253,78 @@ public partial class MainSaveLoad : Node
     {
         _autoSaveTimer = 0f;
     }
+    
+    /// <summary>
+    /// 导出所有游戏数据（供存档使用）
+    /// </summary>
+    public Dictionary ExportSaveData()
+    {
+        var allData = new Dictionary();
+        
+        // 游戏状态数据
+        var gameStateManager = GetNodeOrNull<GameStateManager>("../GameStateManager");
+        if (gameStateManager != null)
+        {
+            allData["gameState"] = gameStateManager.ExportSaveData();
+        }
+        
+        // 系统初始化数据
+        var systemInitManager = GetNodeOrNull<SystemInitializationManager>("../SystemInitializationManager");
+        if (systemInitManager != null)
+        {
+            allData["systemInit"] = systemInitManager.ExportSaveData();
+        }
+        
+        // UI 数据
+        var uiManager = GetNodeOrNull<UI.UIManager>("../UIManager");
+        if (uiManager != null)
+        {
+            allData["ui"] = uiManager.ExportSaveData();
+        }
+        
+        // 存档管理数据
+        var saveLoadManager = GetNodeOrNull<SaveLoadManager>("../SaveLoadManager");
+        if (saveLoadManager != null)
+        {
+            allData["saveLoad"] = saveLoadManager.ExportSaveData();
+        }
+        
+        return allData;
+    }
+    
+    /// <summary>
+    /// 导入所有游戏数据（供读档使用）
+    /// </summary>
+    public void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        // 游戏状态数据
+        if (data.Contains("gameState"))
+        {
+            var gameStateManager = GetNodeOrNull<GameStateManager>("../GameStateManager");
+            gameStateManager?.ImportSaveData(data["gameState"] as Dictionary);
+        }
+        
+        // 系统初始化数据
+        if (data.Contains("systemInit"))
+        {
+            var systemInitManager = GetNodeOrNull<SystemInitializationManager>("../SystemInitializationManager");
+            systemInitManager?.ImportSaveData(data["systemInit"] as Dictionary);
+        }
+        
+        // UI 数据
+        if (data.Contains("ui"))
+        {
+            var uiManager = GetNodeOrNull<UI.UIManager>("../UIManager");
+            uiManager?.ImportSaveData(data["ui"] as Dictionary);
+        }
+        
+        // 存档管理数据
+        if (data.Contains("saveLoad"))
+        {
+            var saveLoadManager = GetNodeOrNull<SaveLoadManager>("../SaveLoadManager");
+            saveLoadManager?.ImportSaveData(data["saveLoad"] as Dictionary);
+        }
+    }
 }
