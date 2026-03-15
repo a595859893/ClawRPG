@@ -50,7 +50,7 @@ public class AchievementSystem : BaseSystem
     }
     
     /// <summary>
-    /// 系统名称
+    /// System name for identification
     /// </summary>
     protected override string SystemName => "Achievement";
 
@@ -72,7 +72,27 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 加载成就数据
+    /// Initialize achievements from database
+    /// </summary>
+    private void InitializeAchievements()
+    {
+        // Initialize category mapping
+        foreach (AchievementData.AchievementCategory cat in Enum.GetValues(typeof(AchievementData.AchievementCategory)))
+        {
+            _categoryAchievements[cat] = new List<string>();
+        }
+
+        // Load from database
+        var dbAchievements = AchievementDatabase.GetAllAchievements();
+        foreach (var achievement in dbAchievements)
+        {
+            _achievements[achievement.id] = achievement;
+            _categoryAchievements[achievement.category].Add(achievement.id);
+        }
+    }
+
+    /// <summary>
+    /// Load achievement data from save system
     /// </summary>
     public void LoadData()
     {
@@ -124,7 +144,7 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 保存成就数据
+    /// Save achievement data to save system
     /// </summary>
     public void SaveData()
     {
@@ -175,9 +195,9 @@ public class AchievementSystem : BaseSystem
     // Progress tracking methods
 
     /// <summary>
-    /// 记录击杀数
+    /// Record a kill event
     /// </summary>
-    /// <param name="isBoss">是否为Boss</param>
+    /// <param name="isBoss">Whether the killed entity is a boss</param>
     public void AddKill(bool isBoss = false)
     {
         _totalKills++;
@@ -200,7 +220,7 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 记录PVP胜利
+    /// Record a PVP victory
     /// </summary>
     public void AddPvpWin()
     {
@@ -213,9 +233,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 发现新区域
+    /// Record discovery of a new zone
     /// </summary>
-    /// <param name="zoneCount">已发现区域数量</param>
+    /// <param name="zoneCount">Total number of zones discovered</param>
     public void DiscoverZone(int zoneCount)
     {
         _zonesDiscovered = zoneCount;
@@ -227,9 +247,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 更新封印之塔进度
+    /// Update sealed tower progress
     /// </summary>
-    /// <param name="floor">当前层数</param>
+    /// <param name="floor">Current floor reached</param>
     public void UpdateSealedTower(int floor)
     {
         _sealedTowerFloor = floor;
@@ -240,7 +260,7 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 添加宠物收藏
+    /// Add a pet to collection
     /// </summary>
     public void AddPet()
     {
@@ -252,7 +272,7 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 添加坐骑收藏
+    /// Add a mount to collection
     /// </summary>
     public void AddMount()
     {
@@ -264,9 +284,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 添加装备收藏
+    /// Add equipment to collection
     /// </summary>
-    /// <param name="count">收藏数量</param>
+    /// <param name="count">Number of equipment to add</param>
     public void AddEquipment(int count = 1)
     {
         _equipmentCollected += count;
@@ -277,7 +297,7 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 添加好友
+    /// Add a friend
     /// </summary>
     public void AddFriend()
     {
@@ -288,9 +308,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 更新金币数量
+    /// Update accumulated gold amount
     /// </summary>
-    /// <param name="currentGold">当前金币</param>
+    /// <param name="currentGold">Current gold amount</param>
     public void UpdateGold(int currentGold)
     {
         if (currentGold > _goldAccumulated)
@@ -305,9 +325,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 添加金币花费
+    /// Add gold spent amount
     /// </summary>
-    /// <param name="amount">花费金额</param>
+    /// <param name="amount">Amount of gold spent</param>
     public void AddGoldSpent(int amount)
     {
         _goldSpent += amount;
@@ -317,9 +337,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 添加技能点花费
+    /// Add skill points spent
     /// </summary>
-    /// <param name="points">花费的技能点数</param>
+    /// <param name="points">Number of skill points spent</param>
     public void AddSkillPointsSpent(int points)
     {
         _skillPointsSpent += points;
@@ -329,7 +349,7 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 添加制造物品
+    /// Add a crafted item to the count
     /// </summary>
     public void AddCraftedItem()
     {
@@ -341,9 +361,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 更新登录天数
+    /// Update login streak count
     /// </summary>
-    /// <param name="streak">连续登录天数</param>
+    /// <param name="streak">Number of consecutive days logged in</param>
     public void UpdateLoginStreak(int streak)
     {
         _loginStreak = streak;
@@ -353,9 +373,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 更新游戏时间
+    /// Update total play time
     /// </summary>
-    /// <param name="hours">游戏小时数</param>
+    /// <param name="hours">Total hours played</param>
     public void UpdatePlayTime(float hours)
     {
         _playTimeHours = hours;
@@ -367,9 +387,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 更新玩家等级
+    /// Update player level
     /// </summary>
-    /// <param name="level">当前等级</param>
+    /// <param name="level">Current player level</param>
     public void UpdateLevel(int level)
     {
         UpdateAchievementProgress("level_10", level);
@@ -380,9 +400,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 设置公会加入状态
+    /// Set guild joined status
     /// </summary>
-    /// <param name="isLeader">是否为会长</param>
+    /// <param name="isLeader">Whether player is the guild leader</param>
     public void SetGuildJoined(bool isLeader = false)
     {
         UpdateAchievementProgress("guild_join", 1);
@@ -394,7 +414,7 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 设置首次战斗
+    /// Set first battle completed
     /// </summary>
     public void SetFirstBattle()
     {
@@ -405,8 +425,9 @@ public class AchievementSystem : BaseSystem
     // ============ Quick Mode Achievement Tracking ============
     
     /// <summary>
-    /// Track quick mode win
+    /// Track quick mode win count
     /// </summary>
+    /// <param name="wins">Total wins in quick mode</param>
     public void TrackQuickModeWin(int wins)
     {
         _quickModeWins = wins;
@@ -424,6 +445,7 @@ public class AchievementSystem : BaseSystem
     /// <summary>
     /// Track quick mode play count
     /// </summary>
+    /// <param name="plays">Total plays in quick mode</param>
     public void TrackQuickModePlay(int plays)
     {
         _quickModePlays = plays;
@@ -435,8 +457,9 @@ public class AchievementSystem : BaseSystem
     }
     
     /// <summary>
-    /// Track quick mode streak (consecutive wins)
+    /// Track quick mode win streak
     /// </summary>
+    /// <param name="streak">Current consecutive win streak</param>
     public void TrackQuickModeStreak(int streak)
     {
         _quickModeStreak = streak;
@@ -449,8 +472,9 @@ public class AchievementSystem : BaseSystem
     }
     
     /// <summary>
-    /// Track quick mode speed runs (under target time)
+    /// Track quick mode speed run completions
     /// </summary>
+    /// <param name="speedRuns">Number of speed runs completed</param>
     public void TrackQuickModeSpeedRun(int speedRuns)
     {
         _quickModeSpeedRuns = speedRuns;
@@ -463,8 +487,9 @@ public class AchievementSystem : BaseSystem
     }
     
     /// <summary>
-    /// Track quick mode perfect runs (no damage taken)
+    /// Track quick mode perfect run completions
     /// </summary>
+    /// <param name="perfectRuns">Number of perfect runs (no damage taken)</param>
     public void TrackQuickModePerfectRun(int perfectRuns)
     {
         _quickModePerfectRuns = perfectRuns;
@@ -534,19 +559,19 @@ public class AchievementSystem : BaseSystem
     // Public getters
 
     /// <summary>
-    /// 获取所有成就
+    /// Get all achievements
     /// </summary>
-    /// <returns>成就字典</returns>
+    /// <returns>Dictionary of all achievements</returns>
     public Dictionary<string, AchievementData.Achievement> GetAllAchievements()
     {
         return _achievements;
     }
 
     /// <summary>
-    /// 根据分类获取成就
+    /// Get achievements by category
     /// </summary>
-    /// <param name="category">成就分类</param>
-    /// <returns>成就列表</returns>
+    /// <param name="category">Achievement category</param>
+    /// <returns>List of achievements in the category</returns>
     public List<AchievementData.Achievement> GetAchievementsByCategory(AchievementData.AchievementCategory category)
     {
         var result = new List<AchievementData.Achievement>();
@@ -561,9 +586,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 获取已解锁成就列表
+    /// Get list of unlocked achievements
     /// </summary>
-    /// <returns>已解锁成就列表</returns>
+    /// <returns>List of unlocked achievements</returns>
     public List<AchievementData.Achievement> GetUnlockedAchievements()
     {
         var result = new List<AchievementData.Achievement>();
@@ -578,9 +603,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 获取已解锁成就数量
+    /// Get count of unlocked achievements
     /// </summary>
-    /// <returns>已解锁成就数量</returns>
+    /// <returns>Number of unlocked achievements</returns>
     public int GetUnlockedCount()
     {
         int count = 0;
@@ -592,18 +617,18 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 获取成就总数
+    /// Get total number of achievements
     /// </summary>
-    /// <returns>成就总数</returns>
+    /// <returns>Total achievement count</returns>
     public int GetTotalAchievementCount()
     {
         return _achievements.Count;
     }
 
     /// <summary>
-    /// 获取已解锁成就的总金币奖励
+    /// Get total gold rewards from unlocked achievements
     /// </summary>
-    /// <returns>总金币奖励</returns>
+    /// <returns>Total gold rewards</returns>
     public int GetTotalRewardGold()
     {
         int total = 0;
@@ -618,9 +643,9 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// 获取已解锁成就的总经验奖励
+    /// Get total experience rewards from unlocked achievements
     /// </summary>
-    /// <returns>总经验奖励</returns>
+    /// <returns>Total experience rewards</returns>
     public int GetTotalRewardExp()
     {
         int total = 0;
@@ -652,7 +677,7 @@ public class AchievementSystem : BaseSystem
     public float GetPlayTimeHours() => _playTimeHours;
 
     /// <summary>
-    /// 导出保存数据
+    /// Export save data for persistence
     /// </summary>
     public override Dictionary ExportSaveData()
     {
@@ -690,7 +715,7 @@ public class AchievementSystem : BaseSystem
     }
     
     /// <summary>
-    /// 导入保存数据
+    /// Import save data from persistence
     /// </summary>
     public override void ImportSaveData(Dictionary data)
     {

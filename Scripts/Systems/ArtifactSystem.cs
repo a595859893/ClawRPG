@@ -3,21 +3,21 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// 神器系统 - 管理神器获取和强化
+/// Artifact system - manages artifact acquisition and enhancement.
 /// </summary>
 public class ArtifactSystem : BaseSystem
 {
-    // 神器数据存储
+    // Artifact data storage
     private Dictionary<string, ArtifactData> _artifacts = new Dictionary<string, ArtifactData>();
     private List<string> _unlockedArtifacts = new List<string>();
     private string _equippedArtifact = "";
     
-    // 信号
+    // Signals
     public static Signal<string> ArtifactUnlocked { get; } = new Signal<string>();
     public static Signal<string> ArtifactEquipped { get; } = new Signal<string>();
     public static Signal<string> ArtifactUnequipped { get; } = new Signal<string>();
     
-    // 持久化
+    // Persistence
     private const string SAVE_KEY = "artifact_system";
     
     public override void _Ready()
@@ -27,12 +27,12 @@ public class ArtifactSystem : BaseSystem
     }
     
     /// <summary>
-    /// 系统名称
+    /// System name for identification
     /// </summary>
     protected override string SystemName => "Artifact";
     
     /// <summary>
-    /// 导出保存数据
+    /// Export save data for persistence
     /// </summary>
     public override Dictionary ExportSaveData()
     {
@@ -51,7 +51,7 @@ public class ArtifactSystem : BaseSystem
     }
     
     /// <summary>
-    /// 导入保存数据
+    /// Import save data from persistence
     /// </summary>
     public override void ImportSaveData(Dictionary data)
     {

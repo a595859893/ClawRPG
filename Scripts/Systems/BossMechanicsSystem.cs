@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// Boss机制系统 - 管理Boss战斗机制
-/// 包含Boss阶段切换、技能使用、狂暴机制、召唤小怪等
+/// Boss mechanics system - manages boss battle mechanics.
+/// Includes boss phase switching, skill usage, enrage mechanics, minion summoning, etc.
 /// </summary>
 public class BossMechanicsSystem : BaseSystem
 {
@@ -31,7 +31,7 @@ public class BossMechanicsSystem : BaseSystem
     }
     
     /// <summary>
-    /// 系统名称
+    /// System name for identification
     /// </summary>
     protected override string SystemName => "BossMechanics";
     
@@ -372,7 +372,7 @@ public class BossMechanicsSystem : BaseSystem
     }
 
     /// <summary>
-    /// 导出保存数据
+    /// Export save data for persistence
     /// </summary>
     public override Dictionary ExportSaveData()
     {
@@ -384,7 +384,7 @@ public class BossMechanicsSystem : BaseSystem
     }
 
     /// <summary>
-    /// 导入保存数据
+    /// Import save data from persistence
     /// </summary>
     public override void ImportSaveData(Dictionary data)
     {
