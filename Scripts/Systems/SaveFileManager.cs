@@ -7,23 +7,34 @@ using SaveDataManager = ClawRPG.Scripts.Systems.SaveDataManager;
 namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
-    /// Handles file I/O, save slot management, and backup operations
+    /// Handles file I/O operations, save slot management, and backup operations.
+    /// Provides methods for saving, loading, importing, and exporting game data.
     /// </summary>
     public class SaveFileManager
     {
         // Constants
+        /// <summary>Base path for save files.</summary>
         public const string SavePath = "user://saves/";
+        
+        /// <summary>Path for backup files.</summary>
         public const string BackupPath = "user://saves/backups/";
+        
+        /// <summary>Maximum number of save slots available.</summary>
         public const int MaxSaveSlots = 3;
+        
+        /// <summary>Maximum number of backups to keep per slot.</summary>
         public const int MaxBackups = 5;
         
+        /// <summary>
+        /// Creates a new SaveFileManager and ensures directories exist.
+        /// </summary>
         public SaveFileManager()
         {
             EnsureDirectoriesExist();
         }
         
         /// <summary>
-        /// Ensure save directories exist
+        /// Ensures save directories exist, creating them if necessary.
         /// </summary>
         public void EnsureDirectoriesExist()
         {
@@ -43,8 +54,10 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Check if a save slot has data
+        /// Checks if a save exists in the specified slot.
         /// </summary>
+        /// <param name="slot">Save slot index.</param>
+        /// <returns>True if a save file exists in the slot.</returns>
         public bool HasSave(int slot)
         {
             if (slot < 0 || slot >= MaxSaveSlots) return false;
@@ -53,24 +66,32 @@ namespace ClawRPG.Scripts.Systems
         }
         
         /// <summary>
-        /// Get the file path for a save slot
+        /// Gets the file path for a save slot.
         /// </summary>
+        /// <param name="slot">Save slot index.</param>
+        /// <returns>Full file path for the save slot.</returns>
         public string GetSavePath(int slot)
         {
             return SavePath + "save_" + slot + ".json";
         }
         
         /// <summary>
-        /// Get the file path for slot metadata
+        /// Gets the file path for slot metadata.
         /// </summary>
+        /// <param name="slot">Save slot index.</param>
+        /// <returns>Full file path for the slot info file.</returns>
         public string GetSlotInfoPath(int slot)
         {
             return SavePath + "slot_" + slot + "_info.json";
         }
         
         /// <summary>
-        /// Save game data to a slot
+        /// Saves game data to a slot, optionally creating a backup first.
         /// </summary>
+        /// <param name="slot">Save slot index (0 to MaxSaveSlots-1).</param>
+        /// <param name="data">SaveData to save.</param>
+        /// <param name="createBackup">Whether to create a backup before saving.</param>
+        /// <returns>True if save was successful.</returns>
         public bool SaveGame(int slot, SaveDataManager.SaveData data, bool createBackup = true)
         {
             if (slot < 0 || slot >= MaxSaveSlots)
