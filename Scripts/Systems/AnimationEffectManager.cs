@@ -5,7 +5,7 @@ using System;
 /// 动画效果管理器 - 负责玩家攻击动画、特效和屏幕反馈
 /// 集成 AnimationPlayer 概念用于攻击序列控制
 /// </summary>
-public partial class AnimationEffectManager : Node
+public partial class AnimationEffectManager : BaseSystem
 {
     public static AnimationEffectManager Instance { get; private set; }
     
@@ -45,6 +45,11 @@ public partial class AnimationEffectManager : Node
         Instance = this;
         SetupEffectContainer();
     }
+    
+    /// <summary>
+    /// 系统名称
+    /// </summary>
+    protected override string SystemName => "AnimationEffect";
     
     private void SetupEffectContainer()
     {

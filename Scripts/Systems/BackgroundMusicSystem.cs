@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Background Music System - Manages dynamic background music
     /// </summary>
-    public class BackgroundMusicSystem : Node {
+    public class BackgroundMusicSystem : BaseSystem {
         private static BackgroundMusicSystem _instance;
         public static BackgroundMusicSystem Instance => _instance;
         
@@ -46,6 +46,12 @@ namespace ClawRPG.Scripts.Systems {
             _musicPlayer = new AudioStreamPlayer();
             _musicPlayer.Name = "MusicPlayer";
             _musicPlayer.Bus = "Music";
+        }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "BackgroundMusic";
             AddChild(_musicPlayer);
             
             _battleMusicPlayer = new AudioStreamPlayer();
