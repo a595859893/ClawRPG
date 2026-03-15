@@ -12,10 +12,50 @@ namespace ClawRPG.Scripts.Systems
     /// </summary>
     public class SaveEncryption
     {
-        // Encryption key - in production, this should be securely stored
-        // For now, this is a placeholder for future implementation
-        private static readonly byte[] DefaultKey = Encoding.UTF8.GetBytes("ClawRPG_SaveKey_2024");
-        private static readonly byte[] DefaultIV = Encoding.UTF8.GetBytes("ClawRPG_IV_16!");
+        // 改进的密钥生成: 使用机器指纹混合盐值，而非硬编码
+        private static byte[] GetMachineKey()
+        {
+            // 使用机器名和用户名作为盐值
+            string machineFingerprint = $"{Environment.MachineName}_{Environment.UserName}_ClawRPG";
+            byte[] salt = Encoding.UTF8.GetBytes(machineFingerprint);
+            
+            // 使用 PBKDF2 派生密钥
+            using (var deriveBytes = new Rfc2898DeriveBytes("ClawRPG_Salt_2024", salt, 10000, HashAlgorithmName.SHA256))
+            {
+                return deriveBytes.GetBytes(32); // 256-bit key
+            }
+        }
+        
+        private static byte[] GetMachineIV()
+        {
+            string machineFingerprint = $"{Environment.MachineName}_{Environment.UserName}_ClawRPG";
+            byte[] salt = Encoding.UTF8.GetBytes(machineFingerprint);
+            
+            using (var deriveBytes = new Rfc2898DeriveBytes("ClawRPG_IV_Salt", salt, 10000, HashAlgorithmName.SHA256))
+            {
+                return deriveBytes.GetBytes(16); // 128-bit IV
+            }
+        }
+        
+        // 缓存派生后的密钥
+        private static byte[] _cachedKey;
+        private static byte[] _cachedIV;
+        
+        private static byte[] DefaultKey {
+            get {
+                if (_cachedKey == null)
+                    _cachedKey = GetMachineKey();
+                return _cachedKey;
+            }
+        }
+        
+        private static byte[] DefaultIV {
+            get {
+                if (_cachedIV == null)
+                    _cachedIV = GetMachineIV();
+                return _cachedIV;
+            }
+        }
         
         /// <summary>
         /// Whether encryption is enabled

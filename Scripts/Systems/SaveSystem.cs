@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems {
     /// Enhanced Save and Load system with auto-save, backup, and metadata
     /// Coordinates SaveDataManager, SaveFileManager, and SaveEncryption
     /// </summary>
-    public partial class SaveSystem : Node
+    public partial class SaveSystem : BaseSystem
     {
         // Module instances
         private SaveFileManager _fileManager;

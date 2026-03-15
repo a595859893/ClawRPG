@@ -7,7 +7,7 @@ using System.Reflection;
 /// <summary>
 /// 统一存档系统 - 自动发现并序列化所有实现了 ISaveable 的系统
 /// </summary>
-public class SaveSystem : Node
+public class SaveSystem : BaseSystem
 {
     /// <summary>
     /// 单例
@@ -202,5 +202,26 @@ public class SaveSystem : Node
     {
         var file = new File();
         return file.FileExists(SAVE_FILE);
+    }
+    
+    /// <summary>
+    /// 获取系统唯一ID
+    /// </summary>
+    public override string GetId() => "SaveSystem";
+    
+    /// <summary>
+    /// 导出保存数据 - 实现 BaseSystem 接口
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return ExportAllData();
+    }
+    
+    /// <summary>
+    /// 导入保存数据 - 实现 BaseSystem 接口
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        ImportAllData(data);
     }
 }

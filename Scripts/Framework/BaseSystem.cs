@@ -57,4 +57,12 @@ public abstract class BaseSystem : Node
     {
         IsInitialized = false;
     }
+    
+    /// <summary>
+    /// 获取系统唯一ID
+    /// </summary>
+    public virtual string GetId()
+    {
+        return SystemName;
+    }
 }
