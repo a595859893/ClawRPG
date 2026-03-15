@@ -2,132 +2,210 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ClawRPG.Scripts.Systems.BossMechanics {
-    /// <summary>
-    /// Boss 阶段类型
-    /// </summary>
-    public enum BossPhaseType {
-        Normal,      // 普通阶段
-        Enraged,     // 狂暴阶段
-        Desperate,   // 绝望阶段
-        Transition,  // 转换阶段
-        Final        // 最终阶段
-    }
+public enum BossType
+{
+    Normal,       // 普通Boss
+    Elite,        // 精英Boss
+    World,        // 世界Boss
+    Legendary,    // 传说Boss
+    Raid,         // 团本Boss
+    Dungeon       // 地下城Boss
+}
 
-    /// <summary>
-    /// 狂暴触发条件类型
-    /// </summary>
-    public enum EnrageTriggerType {
-        TimeBased,       // 基于时间
-        HealthBased,     // 基于血量
-        DamageBased,     // 基于伤害
-        PlayerCount      // 基于玩家数量
-    }
+public enum BossPhase
+{
+    Idle,         // 闲置
+    Intro,        // 开场动画
+    Active,       // 战斗中
+    Enraged,      // 狂暴阶段
+    Transition,   // 阶段转换
+    Defeated,     // 已被击败
+    Escaped       // 逃跑
+}
 
-    /// <summary>
-    /// Boss 阶段配置数据
-    /// </summary>
-    [System.Serializable]
-    public class BossPhaseConfig {
-        public string phaseName;
-        public BossPhaseType phaseType;
-        public float healthPercent;           // 进入该阶段的血量百分比
-        public float duration;                // 阶段持续时间(秒)
-        public float damageMultiplier;        // 伤害乘数
-        public float speedMultiplier;         // 速度乘数
-        public float attackSpeedMultiplier;   // 攻击速度乘数
-        public List<string> availableAbilities;  // 可用技能列表
-        public string phaseEnterEffect;       // 进入阶段特效
-        public string phaseExitEffect;        // 退出阶段特效
-        public bool showWarning;              // 是否显示警告
-        public string warningMessage;         // 警告消息
-    }
+public enum BossSkillType
+{
+    MeleeAttack,     // 近战攻击
+    RangedAttack,    // 远程攻击
+    AreaOfEffect,    // 范围攻击
+    Summon,          // 召唤小怪
+    Debuff,          // 减益效果
+    Heal,            // 治疗
+    Shield,          // 护盾
+    Teleport,        // 传送
+    Charge,          // 冲锋
+    SpinAttack,      // 旋转攻击
+    LaserBeam,       // 激光束
+    Projectile,      // 投射物
+    Stun,            // 眩晕
+    Knockback,       // 击退
+    Enrage           // 狂暴
+}
 
-    /// <summary>
-    /// 狂暴配置数据
-    /// </summary>
-    [System.Serializable]
-    public class EnrageConfig {
-        public string triggerName;
-        public EnrageTriggerType triggerType;
-        public float triggerValue;            // 触发值(时间/血量/伤害)
-        public float damageBonus;             // 伤害加成
-        public float speedBonus;              // 速度加成
-        public float attackSpeedBonus;        // 攻击速度加成
-        public bool immuneToStun;             // 是否免疫眩晕
-        public bool immuneToSlow;             // 是否免疫减速
-        public string enrageEffect;          // 狂暴特效
-        public string enrageMessage;         // 狂暴消息
-    }
+public enum AttackPattern
+{
+    Aggressive,      // 激进攻击
+    Defensive,       // 防守反击
+    Balanced,        // 平衡模式
+    Erratic,         // 不稳定模式
+    Phased,          // 阶段模式
+    Enraged          // 狂暴模式
+}
 
-    /// <summary>
-    /// Boss 特殊机制配置
-    /// </summary>
-    [System.Serializable]
-    public class BossSpecialMechanic {
-        public string mechanicName;
-        public string description;
-        public MechanicType mechanicType;
-        public float triggerChance;           // 触发几率
-        public float cooldown;               // 冷却时间
-        public Dictionary<string, float> effects;  // 效果参数
-    }
+public enum DifficultyLevel
+{
+    Easy,        // 简单
+    Normal,      // 普通
+    Hard,       // 困难
+    Nightmare,   // 噩梦
+    Legendary    // 传奇
+}
 
-    public enum MechanicType {
-        Teleport,           // 瞬移
-        SummonMinions,      // 召唤小怪
-        AreaOfEffect,       // 范围攻击
-        ProjectileStorm,    // 投射物风暴
-        Shield,             // 护盾
-        LifeDrain,          // 生命吸取
-        TimeSlow,           // 时间减缓
-        PhaseShift,         // 阶段转换
-        Enrage,             // 狂暴
-        Ultimate            // 终极技能
-    }
+// Boss 技能配置
+public class BossSkillConfig
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public BossSkillType SkillType { get; set; }
+    public float Damage { get; set; }
+    public float AreaRadius { get; set; }
+    public float Range { get; set; }
+    public float Cooldown { get; set; }
+    public float CastTime { get; set; }
+    public float Duration { get; set; }
+    public float KnockbackForce { get; set; }
+    public float StunDuration { get; set; }
+    public float HealAmount { get; set; }
+    public float ShieldAmount { get; set; }
+    public List<string> DebuffIds { get; set; } = new List<string>();
+    public string SummonMonsterId { get; set; }
+    public int SummonCount { get; set; }
+    public bool IsEnragedOnly { get; set; }
+    public int PhaseRequired { get; set; }
+    public float DamageMultiplier { get; set; } = 1.0f;
+    public float ExecuteProbability { get; set; } = 1.0f;
+}
 
-    /// <summary>
-    /// 玩家 Boss 战斗记录
-    /// </summary>
-    [System.Serializable]
-    public class PlayerBossRecord {
-        public string bossId;
-        public int timesFought;
-        public int timesDefeated;
-        public float bestTime;
-        public float totalDamageDealt;
-        public float totalDamageTaken;
-        public int bestCombo;
-        public DateTime lastFightTime;
-    }
+// Boss 配置
+public class BossConfig
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public BossType Type { get; set; }
+    public DifficultyLevel Difficulty { get; set; }
+    public float MaxHealth { get; set; }
+    public float AttackPower { get; set; }
+    public float Defense { get; set; }
+    public float MoveSpeed { get; set; }
+    public float AttackSpeed { get; set; }
+    public float CriticalChance { get; set; }
+    public float CriticalDamage { get; set; }
+    public int Level { get; set; }
+    public int PhaseCount { get; set; }
+    public float EnrageThreshold { get; set; }
+    public float EnrageTimer { get; set; }
+    public AttackPattern DefaultPattern { get; set; }
+    public List<BossSkillConfig> Skills { get; set; } = new List<BossSkillConfig>();
+    public List<DropTableEntry> DropTable { get; set; } = new List<DropTableEntry>();
+    public float GoldReward { get; set; }
+    public float ExpReward { get; set; }
+    public int PointReward { get; set; }
+    public string TitleReward { get; set; }
+    public float RespawnTime { get; set; }
+    public bool IsRaidBoss { get; set; }
+    public int RequiredPartySize { get; set; }
+}
 
-    /// <summary>
-    /// Boss 机制系统数据
-    /// </summary>
-    [System.Serializable]
-    public class BossMechanicsData {
-        public Dictionary<string, List<BossPhaseConfig>> bossPhases = new Dictionary<string, List<BossPhaseConfig>>();
-        public Dictionary<string, List<EnrageConfig>> bossEnrages = new Dictionary<string, List<EnrageConfig>>();
-        public Dictionary<string, List<BossSpecialMechanic>> bossSpecialMechanics = new Dictionary<string, List<BossSpecialMechanic>>();
-        public Dictionary<string, PlayerBossRecord> playerRecords = new Dictionary<string, PlayerBossRecord>();
-    }
+// Boss 阶段配置
+public class BossPhaseConfig
+{
+    public int PhaseNumber { get; set; }
+    public string Name { get; set; }
+    public float HealthPercentage { get; set; }
+    public float DamageMultiplier { get; set; } = 1.0f;
+    public float SpeedMultiplier { get; set; } = 1.0f;
+    public bool UnlocksNewSkills { get; set; }
+    public List<string> NewSkillIds { get; set; } = new List<string>();
+    public bool IsTransitionPhase { get; set; }
+    public float TransitionDuration { get; set; }
+    public string PhaseEffect { get; set; }
+}
 
-    /// <summary>
-    /// 当前 Boss 战斗状态
-    /// </summary>
-    public class ActiveBossFight {
-        public string bossId;
-        public string bossName;
-        public float maxHealth;
-        public float currentHealth;
-        public int currentPhase;
-        public float timeInCombat;
-        public float totalDamageDealt;
-        public float totalDamageTaken;
-        public int currentCombo;
-        public bool isEnraged;
-        public bool isInvincible;
-        public List<string> activeEffects = new List<string>();
-        public Dictionary<string, float> mechanicCooldowns = new Dictionary<string, float>();
-    }
+// 掉落表条目
+public class DropTableEntry
+{
+    public string ItemId { get; set; }
+    public float DropChance { get; set; }
+    public int MinQuantity { get; set; }
+    public int MaxQuantity { get; set; }
+    public bool IsGuaranteed { get; set; }
+    public float RareBonusChance { get; set; }
+}
+
+// 玩家 Boss 战斗记录
+public class BossBattleRecord
+{
+    public string BossId { get; set; }
+    public string BossName { get; set; }
+    public DateTime BattleStartTime { get; set; }
+    public DateTime? BattleEndTime { get; set; }
+    public bool IsVictory { get; set; }
+    public float TotalDamageDealt { get; set; }
+    public float TotalDamageTaken { get; set; }
+    public float TotalHealing { get; set; }
+    public int EnemiesKilled { get; set; }
+    public int TimesKnockedDown { get; set; }
+    public int SkillsUsed { get; set; }
+    public int BestCombo { get; set; }
+    public float SurvivalTime { get; set; }
+    public int Ranking { get; set; }
+    public List<string> RewardsReceived { get; set; } = new List<string>();
+}
+
+// 玩家 Boss 统计数据
+public class PlayerBossStats
+{
+    public int TotalBossesDefeated { get; set; }
+    public int WorldBossKills { get; set; }
+    public int LegendaryBossKills { get; set; }
+    public int TotalDamageDealt { get; set; }
+    public int TotalDamageTaken { get; set; }
+    public float TotalSurvivalTime { get; set; }
+    public int FirstBloods { get; set; }
+    public Dictionary<string, int> BossKillCount { get; set; } = new Dictionary<string, int>();
+    public Dictionary<string, float> BestSurvivalTimes { get; set; } = new Dictionary<string, float>();
+    public Dictionary<string, float> BestDPS { get; set; } = new Dictionary<string, float>();
+    public int CurrentCombo { get; set; }
+    public int BestCombo { get; set; }
+    public int TotalComboScore { get; set; }
+    public Dictionary<string, List<BossBattleRecord>> BattleHistory { get; set; } = new Dictionary<string, List<BossBattleRecord>>();
+}
+
+// Boss 战斗实例数据
+public class BossBattleInstance
+{
+    public string InstanceId { get; set; }
+    public string BossConfigId { get; set; }
+    public BossConfig Config { get; set; }
+    public float CurrentHealth { get; set; }
+    public int CurrentPhase { get; set; }
+    public BossPhase Phase { get; set; }
+    public float TimeInCombat { get; set; }
+    public float TimeSinceLastAttack { get; set; }
+    public float TimeSinceLastSkill { get; set; }
+    public AttackPattern CurrentPattern { get; set; }
+    public bool IsEnraged { get; set; }
+    public float EnrageProgress { get; set; }
+    public float CurrentDamageMultiplier { get; set; }
+    public float CurrentSpeedMultiplier { get; set; }
+    public Dictionary<string, float> SkillCooldowns { get; set; } = new Dictionary<string, float>();
+    public List<string> ActiveEffects { get; set; } = new List<string>();
+    public Vector3 LastTargetPosition { get; set; }
+    public int TargetsInCombat { get; set; }
+    public Dictionary<string, float> PlayerDamageDealt { get; set; } = new Dictionary<string, float>();
+    public Dictionary<string, float> PlayerHealingDone { get; set; } = new Dictionary<string, float>();
+    public List<string> SummonedMonsters { get; set; } = new List<string>();
+    public bool IsAlive => CurrentHealth > 0;
 }

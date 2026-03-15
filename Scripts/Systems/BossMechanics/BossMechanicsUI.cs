@@ -1,447 +1,459 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.Systems.BossMechanics;
 
-namespace ClawRPG.Scripts.UI {
-    /// <summary>
-    /// Boss 机制 UI - 显示 Boss 战斗状态和统计数据
-    /// </summary>
-    public class BossMechanicsUI : Control {
-        private static BossMechanicsUI _instance;
-        public static BossMechanicsUI Instance {
-            get => _instance;
-        }
+public class BossMechanicsUI : Control
+{
+    private BossMechanicsSystem _bossSystem;
+    
+    // UI 组件
+    private Label _titleLabel;
+    private TabContainer _tabContainer;
+    
+    // Boss列表标签页
+    private Control _bossListTab;
+    private ItemList _bossList;
+    private Label _bossInfoLabel;
+    private Button _startBattleButton;
+    
+    // 战斗标签页
+    private Control _battleTab;
+    private ProgressBar _bossHealthBar;
+    private Label _bossNameLabel;
+    private Label _phaseLabel;
+    private Label _enrageLabel;
+    private VBoxContainer _skillList;
+    private Label _combatStatsLabel;
+    
+    // 统计标签页
+    private Control _statsTab;
+    private Label _totalStatsLabel;
+    private Label _bestRecordsLabel;
+    private ItemList _historyList;
+    
+    // 当前状态
+    private string _selectedBossId = "";
+    private string _currentBattleId = "";
+    private int _currentTab = 0;
 
-        // UI 组件
-        private PanelContainer _mainPanel;
-        private VBoxContainer _contentBox;
-        private Label _titleLabel;
-        private TabContainer _tabContainer;
+    public override void _Ready()
+    {
+        _bossSystem = BossMechanicsSystem.Instance;
         
-        // 当前战斗标签页
-        private VBoxContainer _activeFightTab;
-        private Label _bossNameLabel;
-        private Label _phaseLabel;
-        private ProgressBar _healthBar;
-        private Label _healthLabel;
-        private Label _timeLabel;
-        private Label _comboLabel;
-        private Label _multiplierLabel;
-        
-        // 统计标签页
-        private VBoxContainer _statsTab;
-        private VBoxContainer _statsContainer;
-        
-        // 设置标签页
-        private VBoxContainer _settingsTab;
-        private CheckButton _showNotificationsCheck;
-        
-        private bool _isVisible = false; 
-        private bool _showNotifications = true;
+        SetupUI();
+        ConnectSignals();
+        RefreshBossList();
+    }
 
-        public override void _Ready() {
-            _instance = this;
-            SetupUI();
-            ConnectSignals();
-            Visible = false; 
+    private void SetupUI()
+    {
+        // 主容器
+        var mainVBox = new VBoxContainer();
+        mainVBox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        mainVBox.AddThemeConstantOverride("separation", 10);
+        AddChild(mainVBox);
+
+        // 标题
+        _titleLabel = new Label();
+        _titleLabel.Text = "=== Boss 战斗系统 ===";
+        _titleLabel.Align = Label.AlignEnum.Center;
+        mainVBox.AddChild(_titleLabel);
+
+        // 标签页容器
+        _tabContainer = new TabContainer();
+        _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+        mainVBox.AddChild(_tabContainer);
+
+        // 创建标签页
+        SetupBossListTab();
+        SetupBattleTab();
+        SetupStatsTab();
+
+        // 底部说明
+        var hintLabel = new Label();
+        hintLabel.Text = "[↑/↓] 选择 | [1-3] 切换标签页 | [Enter] 开始战斗 | [ESC] 关闭";
+        hintLabel.Align = Label.AlignEnum.Center;
+        mainVBox.AddChild(hintLabel);
+    }
+
+    private void SetupBossListTab()
+    {
+        _bossListTab = new Control();
+        _bossListTab.Name = "Boss列表";
+        _tabContainer.AddChild(_bossListTab);
+
+        var vbox = new VBoxContainer();
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        vbox.AddThemeConstantOverride("separation", 10);
+        _bossListTab.AddChild(vbox);
+
+        // Boss列表
+        var listLabel = new Label();
+        listLabel.Text = "可挑战的Boss:";
+        vbox.AddChild(listLabel);
+
+        _bossList = new ItemList();
+        _bossList.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+        _bossList.Connect("item_selected", this, nameof(OnBossListItemSelected));
+        vbox.AddChild(_bossList);
+
+        // Boss信息
+        _bossInfoLabel = new Label();
+        _bossInfoLabel.Text = "选择一个Boss查看详情";
+        vbox.AddChild(_bossInfoLabel);
+
+        // 开始战斗按钮
+        _startBattleButton = new Button();
+        _startBattleButton.Text = "[Enter] 开始挑战";
+        _startBattleButton.Connect("pressed", this, nameof(OnStartBattlePressed));
+        vbox.AddChild(_startBattleButton);
+    }
+
+    private void SetupBattleTab()
+    {
+        _battleTab = new Control();
+        _battleTab.Name = "战斗";
+        _tabContainer.AddChild(_battleTab);
+
+        var vbox = new VBoxContainer();
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        vbox.AddThemeConstantOverride("separation", 10);
+        _battleTab.AddChild(vbox);
+
+        // Boss血条
+        _bossNameLabel = new Label();
+        _bossNameLabel.Text = "等待挑战...";
+        _bossNameLabel.Align = Label.AlignEnum.Center;
+        vbox.AddChild(_bossNameLabel);
+
+        _bossHealthBar = new ProgressBar();
+        _bossHealthBar.MinValue = 0;
+        _bossHealthBar.MaxValue = 100;
+        _bossHealthBar.Value = 100;
+        _bossHealthBar.ShowPercentage = false;
+        vbox.AddChild(_bossHealthBar);
+
+        // 阶段和狂暴状态
+        var statusHBox = new HBoxContainer();
+        vbox.AddChild(statusHBox);
+
+        _phaseLabel = new Label();
+        _phaseLabel.Text = "阶段: -";
+        statusHBox.AddChild(_phaseLabel);
+
+        _enrageLabel = new Label();
+        _enrageLabel.Text = "狂暴: 未激活";
+        statusHBox.AddChild(_enrageLabel);
+
+        // 技能列表
+        var skillLabel = new Label();
+        skillLabel.Text = "Boss技能:";
+        vbox.AddChild(skillLabel);
+
+        _skillList = new VBoxContainer();
+        _skillList.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+        vbox.AddChild(_skillList);
+
+        // 战斗统计
+        _combatStatsLabel = new Label();
+        _combatStatsLabel.Text = "战斗统计: 等待挑战...";
+        vbox.AddChild(_combatStatsLabel);
+    }
+
+    private void SetupStatsTab()
+    {
+        _statsTab = new Control();
+        _statsTab.Name = "统计";
+        _tabContainer.AddChild(_statsTab);
+
+        var vbox = new VBoxContainer();
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        vbox.AddThemeConstantOverride("separation", 10);
+        _statsTab.AddChild(vbox);
+
+        // 总统计
+        _totalStatsLabel = new Label();
+        _totalStatsLabel.Text = "=== 总体统计 ===\n等待数据...";
+        vbox.AddChild(_totalStatsLabel);
+
+        // 最佳记录
+        _bestRecordsLabel = new Label();
+        _bestRecordsLabel.Text = "=== 最佳记录 ===\n等待数据...";
+        vbox.AddChild(_bestRecordsLabel);
+
+        // 历史记录
+        var historyLabel = new Label();
+        historyLabel.Text = "战斗历史:";
+        vbox.AddChild(historyLabel);
+
+        _historyList = new ItemList();
+        _historyList.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+        vbox.AddChild(_historyList);
+    }
+
+    private void ConnectSignals()
+    {
+        if (_bossSystem != null)
+        {
+            _bossSystem.Connect("BossSpawned", this, nameof(OnBossSpawned));
+            _bossSystem.Connect("BossDefeated", this, nameof(OnBossDefeated));
+            _bossSystem.Connect("BossPhaseChanged", this, nameof(OnBossPhaseChanged));
+            _bossSystem.Connect("BossEnraged", this, nameof(OnBossEnraged));
+            _bossSystem.Connect("BossSkillUsed", this, nameof(OnBossSkillUsed));
+            _bossSystem.Connect("PlayerComboChanged", this, nameof(OnPlayerComboChanged));
         }
+    }
 
-        /// <summary>
-        /// 设置 UI
-        /// </summary>
-        private void SetupUI() {
-            // 主面板
-            _mainPanel = new PanelContainer();
-            _mainPanel.SetAnchorsPreset(Control.LayoutPreset.Center);
-            _mainPanel.CustomMinimumSize = new Vector2(600, 500);
-            AddChild(_mainPanel);
-
-            var styleBox = new StyleBoxFlat();
-            styleBox.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.95f);
-            styleBox.BorderColor = new Color(0.3f, 0.3f, 0.4f);
-            styleBox.SetBorderWidthAll(2);
-            styleBox.SetCornerRadiusAll(8);
-            _mainPanel.AddThemeStyleboxOverride("panel", styleBox);
-
-            // 内容盒子
-            _contentBox = new VBoxContainer();
-            _contentBox.SetMeta("theme_constants", new Dictionary<string, int> {
-                { "separation", 10 }
-            });
-            _mainPanel.AddChild(_contentBox);
-
-            // 标题
-            _titleLabel = new Label();
-            _titleLabel.Text = "  ⚔️ Boss 机制系统";
-            _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            _titleLabel.AddThemeFontSizeOverride("font_size", 24);
-            _contentBox.AddChild(_titleLabel);
-
-            // 分隔线
-            var separator = new HSeparator();
-            _contentBox.AddChild(separator);
-
-            // 标签容器
-            _tabContainer = new TabContainer();
-            _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-            _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-            _contentBox.AddChild(_tabContainer);
-
-            // === 当前战斗标签页 ===
-            _activeFightTab = new VBoxContainer();
-            _activeFightTab.SetMeta("theme_constants", new Dictionary<string, int> {
-                { "separation", 8 }
-            });
-            _tabContainer.AddChild(_activeFightTab);
-            _tabContainer.SetTabTitle(_activeFightTab, "当前战斗");
-
-            // Boss 名称
-            _bossNameLabel = new Label();
-            _bossNameLabel.Text = "等待 Boss 战斗开始...";
-            _bossNameLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            _bossNameLabel.AddThemeFontSizeOverride("font_size", 20);
-            _activeFightTab.AddChild(_bossNameLabel);
-
-            // 阶段
-            _phaseLabel = new Label();
-            _phaseLabel.Text = "阶段: -";
-            _phaseLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            _phaseLabel.AddThemeFontSizeOverride("font_size", 16);
-            _activeFightTab.AddChild(_phaseLabel);
-
-            // 血量条
-            var healthContainer = new VBoxContainer();
-            _activeFightTab.AddChild(healthContainer);
-
-            var healthLabelTitle = new Label();
-            healthLabelTitle.Text = "生命值";
-            healthContainer.AddChild(healthLabelTitle);
-
-            _healthBar = new ProgressBar();
-            _healthBar.CustomMinimumSize = new Vector2(500, 30);
-            _healthBar.MaxValue = 100;
-            _healthBar.Value = 100;
-            _healthBar.ShowPercentage = false; 
-            healthContainer.AddChild(_healthBar);
-
-            _healthLabel = new Label();
-            _healthLabel.Text = "100%";
-            _healthLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            healthContainer.AddChild(_healthLabel);
-
-            // 战斗时间
-            _timeLabel = new Label();
-            _timeLabel.Text = "战斗时间: 00:00";
-            _timeLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            _activeFightTab.AddChild(_timeLabel);
-
-            // 连击数
-            _comboLabel = new Label();
-            _comboLabel.Text = "连击数: 0";
-            _comboLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            _activeFightTab.AddChild(_comboLabel);
-
-            // 属性乘数
-            _multiplierLabel = new Label();
-            _multiplierLabel.Text = "伤害乘数: 1.0x | 速度乘数: 1.0x";
-            _multiplierLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            _activeFightTab.AddChild(_multiplierLabel);
-
-            // === 统计标签页 ===
-            _statsTab = new VBoxContainer();
-            _statsTab.SetMeta("theme_constants", new Dictionary<string, int> {
-                { "separation", 5 }
-            });
-            _tabContainer.AddChild(_statsTab);
-            _tabContainer.SetTabTitle(_statsTab, "战斗统计");
-
-            var statsTitle = new Label();
-            statsTitle.Text = "Boss 战斗统计";
-            statsTitle.HorizontalAlignment = HorizontalAlignment.Center;
-            statsTitle.AddThemeFontSizeOverride("font_size", 18);
-            _statsTab.AddChild(statsTitle);
-
-            var statsSeparator = new HSeparator();
-            _statsTab.AddChild(statsSeparator);
-
-            _statsContainer = new VBoxContainer();
-            _statsContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-            _statsTab.AddChild(_statsContainer);
-
-            // === 设置标签页 ===
-            _settingsTab = new VBoxContainer();
-            _settingsTab.SetMeta("theme_constants", new Dictionary<string, int> {
-                { "separation", 10 }
-            });
-            _tabContainer.AddChild(_settingsTab);
-            _tabContainer.SetTabTitle(_settingsTab, "设置");
-
-            var settingsTitle = new Label();
-            settingsTitle.Text = "Boss 机制设置";
-            settingsTitle.HorizontalAlignment = HorizontalAlignment.Center;
-            settingsTitle.AddThemeFontSizeOverride("font_size", 18);
-            _settingsTab.AddChild(settingsTitle);
-
-            _showNotificationsCheck = new CheckButton();
-            _showNotificationsCheck.Text = "显示战斗通知";
-            _showNotificationsCheck.ButtonPressed = _showNotifications;
-            _showNotificationsCheck.Toggled += OnShowNotificationsToggled;
-            _settingsTab.AddChild(_showNotificationsCheck);
-
-            // 更新统计显示
-            UpdateStatsDisplay();
+    private void RefreshBossList()
+    {
+        _bossList.Clear();
+        
+        if (_bossSystem == null) return;
+        
+        var bosses = _bossSystem.GetAllBossConfigs();
+        foreach (var kvp in bosses)
+        {
+            var boss = kvp.Value;
+            string displayText = $"{GetBossTypeIcon(boss.Type)} {boss.Name} (Lv.{boss.Level})";
+            _bossList.AddItem(displayText);
         }
+    }
 
-        /// <summary>
-        /// 连接信号
-        /// </summary>
-        private void ConnectSignals() {
-            BossMechanicsSystem.BossPhaseChanged += OnBossPhaseChanged;
-            BossMechanicsSystem.BossEnraged += OnBossEnraged;
-            BossMechanicsSystem.BossSpecialMechanicTriggered += OnBossSpecialMechanicTriggered;
+    private string GetBossTypeIcon(BossType type)
+    {
+        switch (type)
+        {
+            case BossType.Normal: return "👹";
+            case BossType.Elite: return "💀";
+            case BossType.World: return "🐉";
+            case BossType.Legendary: return "👑";
+            case BossType.Raid: return "🏰";
+            case BossType.Dungeon: return "🗝️";
+            default: return "❓";
         }
+    }
 
-        /// <summary>
-        /// 切换显示
-        /// </summary>
-        public void Toggle() {
-            _isVisible = !_isVisible;
-            Visible = _isVisible;
-            
-            if (_isVisible) {
-                UpdateDisplay();
+    private void OnBossListItemSelected(int index)
+    {
+        var bosses = _bossSystem.GetAllBossConfigs();
+        int i = 0;
+        foreach (var kvp in bosses)
+        {
+            if (i == index)
+            {
+                _selectedBossId = kvp.Key;
+                UpdateBossInfo(kvp.Value);
+                break;
+            }
+            i++;
+        }
+    }
+
+    private void UpdateBossInfo(BossConfig boss)
+    {
+        string info = $@"
+=== {boss.Name} ===
+类型: {boss.Type}
+难度: {boss.Difficulty}
+等级: {boss.Level}
+
+生命值: {boss.MaxHealth:N0}
+攻击力: {boss.AttackPower}
+防御力: {boss.Defense}
+
+技能数量: {boss.Skills.Count}
+阶段数: {boss.PhaseCount}
+狂暴时间: {boss.EnrageTimer}秒
+
+金币奖励: {boss.GoldReward:N0}
+经验奖励: {boss.ExpReward:N0}
+积分奖励: {boss.PointReward}
+
+{boss.Description}
+";
+        _bossInfoLabel.Text = info;
+    }
+
+    private void OnStartBattlePressed()
+    {
+        if (string.IsNullOrEmpty(_selectedBossId)) return;
+        
+        // 假设玩家ID为"player1"
+        _bossSystem.StartBossBattle(_selectedBossId, "player1");
+    }
+
+    private void OnBossSpawned(string bossId, string bossName, BossType type)
+    {
+        _bossNameLabel.Text = $"⚔️ 战斗中: {bossName}";
+        _currentBattleId = bossId;
+        
+        var battles = _bossSystem.GetAllActiveBattles();
+        foreach (var battle in battles)
+        {
+            if (battle.BossConfigId == bossId)
+            {
+                UpdateBattleUI(battle);
+                break;
             }
         }
+        
+        RefreshStats();
+    }
 
-        /// <summary>
-        /// 更新显示
-        /// </summary>
-        private void UpdateDisplay() {
-            UpdateActiveFightDisplay();
-            UpdateStatsDisplay();
+    private void UpdateBattleUI(BossBattleInstance battle)
+    {
+        _bossHealthBar.MaxValue = battle.Config.MaxHealth;
+        _bossHealthBar.Value = battle.CurrentHealth;
+        
+        _phaseLabel.Text = $"阶段: {battle.CurrentPhase}/{battle.Config.PhaseCount}";
+        
+        if (battle.IsEnraged)
+        {
+            _enrageLabel.Text = "⚠️ 狂暴: 已激活!";
+            _enrageLabel.Modulate = new Color(1, 0, 0);
         }
+        
+        // 更新技能列表
+        foreach (var child in _skillList.GetChildren())
+        {
+            child.QueueFree();
+        }
+        
+        foreach (var skill in battle.Config.Skills)
+        {
+            var skillLabel = new Label();
+            skillLabel.Text = $"• {skill.Name} ({skill.SkillType})";
+            _skillList.AddChild(skillLabel);
+        }
+        
+        // 更新统计
+        int combo = _bossSystem.GetCombo("player1");
+        _combatStatsLabel.Text = $"连击数: {combo}";
+    }
 
-        /// <summary>
-        /// 更新当前战斗显示
-        /// </summary>
-        private void UpdateActiveFightDisplay() {
-            // 获取所有活跃战斗
-            var system = BossMechanicsSystem.Instance;
-            
-            // 显示第一个活跃战斗（或创建一个示例显示）
-            var bossIds = new List<string> { "forest_boss", "fire_boss", "ice_boss", "shadow_boss", "holy_boss" };
-            bool hasActiveFight = false; 
-            
-            foreach (var bossId in bossIds) {
-                var fight = system.GetBossFightStatus(bossId);
-                if (fight != null) {
-                    hasActiveFight = true;
-                    
-                    // 更新 Boss 名称
-                    _bossNameLabel.Text = $"🔥 {fight.bossName}";
-                    
-                    // 更新阶段
-                    var phase = system.GetCurrentPhaseConfig(bossId);
-                    if (phase != null) {
-                        _phaseLabel.Text = $"阶段: {phase.phaseName}";
-                        
-                        // 阶段颜色
-                        switch (phase.phaseType) {
-                            case BossPhaseType.Normal:
-                                _phaseLabel.Modulate = new Color(1f, 1f, 1f);
-                                break;
-                            case BossPhaseType.Enraged:
-                                _phaseLabel.Modulate = new Color(1f, 0.5f, 0f);
-                                break;
-                            case BossPhaseType.Final:
-                                _phaseLabel.Modulate = new Color(1f, 0.2f, 0.2f);
-                                break;
-                        }
-                    }
-                    
-                    // 更新血量
-                    float healthPercent = (fight.currentHealth / fight.maxHealth) * 100f;
-                    _healthBar.MaxValue = fight.maxHealth;
-                    _healthBar.Value = fight.currentHealth;
-                    _healthLabel.Text = $"{fight.currentHealth:F0} / {fight.maxHealth:F0} ({healthPercent:F1}%)";
-                    
-                    // 更新战斗时间
-                    int minutes = (int)(fight.timeInCombat / 60);
-                    int seconds = (int)(fight.timeInCombat % 60);
-                    _timeLabel.Text = $"战斗时间: {minutes:D2}:{seconds:D2}";
-                    
-                    // 更新连击
-                    _comboLabel.Text = $"连击数: {fight.currentCombo}";
-                    
-                    // 更新乘数
-                    float damageMult = system.GetDamageMultiplier(bossId);
-                    float speedMult = system.GetSpeedMultiplier(bossId);
-                    _multiplierLabel.Text = $"伤害乘数: {damageMult:F1}x | 速度乘数: {speedMult:F1}x";
-                    
+    private void OnBossDefeated(string bossId, string bossName, bool isFirstBlood, List<string> rewards)
+    {
+        string result = isFirstBlood ? "🎉 首杀!" : "✅ 击败!";
+        _bossNameLabel.Text = $"{result} {bossName}";
+        
+        string rewardText = "奖励:\n";
+        foreach (var reward in rewards)
+        {
+            rewardText += reward + "\n";
+        }
+        
+        _combatStatsLabel.Text = rewardText;
+        
+        RefreshStats();
+    }
+
+    private void OnBossPhaseChanged(string bossId, int newPhase)
+    {
+        _phaseLabel.Text = $"阶段: {newPhase}";
+        
+        // 更新UI显示
+    }
+
+    private void OnBossEnraged(string bossId)
+    {
+        _enrageLabel.Text = "⚠️ 狂暴: 已激活!";
+        _enrageLabel.Modulate = new Color(1, 0, 0);
+    }
+
+    private void OnBossSkillUsed(string bossId, string skillId, string skillName)
+    {
+        // 可选：显示技能使用提示
+    }
+
+    private void OnPlayerComboChanged(string playerId, int newCombo)
+    {
+        if (playerId == "player1")
+        {
+            _combatStatsLabel.Text = $"连击数: {newCombo}";
+        }
+    }
+
+    private void RefreshStats()
+    {
+        if (_bossSystem == null) return;
+        
+        var stats = _bossSystem.GetPlayerStats();
+        
+        string totalStats = $@"=== 总体统计 ===
+击败Boss总数: {stats.TotalBossesDefeated}
+世界Boss击杀: {stats.WorldBossKills}
+传说Boss击杀: {stats.LegendaryBossKills}
+首杀次数: {stats.FirstBloods}
+
+总伤害: {stats.TotalDamageDealt:N0}
+总存活时间: {stats.TotalSurvivalTime:N1}秒
+最佳连击: {stats.BestCombo}
+";
+        _totalStatsLabel.Text = totalStats;
+        
+        string bestRecords = "=== 最佳记录 ===\n";
+        
+        foreach (var kvp in stats.BestSurvivalTimes)
+        {
+            bestRecords += $"生存时间 - {kvp.Key}: {kvp.Value:N1}秒\n";
+        }
+        
+        foreach (var kvp in stats.BestDPS)
+        {
+            bestRecords += $"DPS - {kvp.Key}: {kvp.Value:N1}\n";
+        }
+        
+        _bestRecordsLabel.Text = bestRecords;
+    }
+
+    public override void _Input(InputEvent evt)
+    {
+        if (evt is InputEventKey keyEvent && keyEvent.Pressed)
+        {
+            switch (keyEvent.Scancode)
+            {
+                case KeyList.Up:
+                    MoveSelection(-1);
                     break;
-                }
-            }
-            
-            if (!hasActiveFight) {
-                _bossNameLabel.Text = "等待 Boss 战斗开始...";
-                _phaseLabel.Text = "阶段: -";
-                _phaseLabel.Modulate = new Color(1f, 1f, 1f);
-                _healthBar.Value = 0;
-                _healthLabel.Text = "0 / 0 (0%)";
-                _timeLabel.Text = "战斗时间: 00:00";
-                _comboLabel.Text = "连击数: 0";
-                _multiplierLabel.Text = "伤害乘数: 1.0x | 速度乘数: 1.0x";
-            }
-        }
-
-        /// <summary>
-        /// 更新统计显示
-        /// </summary>
-        private void UpdateStatsDisplay() {
-            // 清除现有内容
-            foreach (var child in _statsContainer.GetChildren()) {
-                child.QueueFree();
-            }
-            
-            var system = BossMechanicsSystem.Instance;
-            var records = system.GetAllPlayerRecords();
-            
-            if (records.Count == 0) {
-                var noDataLabel = new Label();
-                noDataLabel.Text = "暂无战斗记录";
-                noDataLabel.HorizontalAlignment = HorizontalAlignment.Center;
-                _statsContainer.AddChild(noDataLabel);
-                return;
-            }
-            
-            // Boss 名称映射
-            var bossNames = new Dictionary<string, string> {
-                { "forest_boss", "森林之王" },
-                { "fire_boss", "炎魔领主" },
-                { "ice_boss", "冰霜巨龙" },
-                { "shadow_boss", "暗影君王" },
-                { "holy_boss", "光明主教" }
-            };
-            
-            foreach (var kvp in records) {
-                var record = kvp.Value;
-                var bossName = bossNames.ContainsKey(record.bossId) ? bossNames[record.bossId] : record.bossId;
-                
-                var recordPanel = new PanelContainer();
-                recordPanel.CustomMinimumSize = new Vector2(0, 100);
-                _statsContainer.AddChild(recordPanel);
-                
-                var recordBox = new VBoxContainer();
-                recordBox.SetMeta("theme_constants", new Dictionary<string, int> { { "separation", 5 } });
-                recordPanel.AddChild(recordBox);
-                
-                // Boss 名称
-                var nameLabel = new Label();
-                nameLabel.Text = $"⚔️ {bossName}";
-                nameLabel.AddThemeFontSizeOverride("font_size", 16);
-                recordBox.AddChild(nameLabel);
-                
-                // 战斗次数
-                var timesLabel = new Label();
-                timesLabel.Text = $"   战斗次数: {record.timesFought} | 胜利: {record.timesDefeated}";
-                recordBox.AddChild(timesLabel);
-                
-                // 最佳时间
-                var bestTimeStr = record.bestTime < float.MaxValue 
-                    ? $"{(int)(record.bestTime / 60)}:{(int)(record.bestTime % 60):D2}" 
-                    : "--:--";
-                var bestTimeLabel = new Label();
-                bestTimeLabel.Text = $"   最佳时间: {bestTimeStr}";
-                recordBox.AddChild(bestTimeLabel);
-                
-                // 总伤害
-                var damageLabel = new Label();
-                damageLabel.Text = $"   总造成伤害: {record.totalDamageDealt:F0}";
-                recordBox.AddChild(damageLabel);
-                
-                // 最佳连击
-                var comboLabel = new Label();
-                comboLabel.Text = $"   最佳连击: {record.bestCombo}";
-                recordBox.AddChild(comboLabel);
+                case KeyList.Down:
+                    MoveSelection(1);
+                    break;
+                case KeyList._1:
+                    _tabContainer.CurrentTab = 0;
+                    break;
+                case KeyList._2:
+                    _tabContainer.CurrentTab = 1;
+                    break;
+                case KeyList._3:
+                    _tabContainer.CurrentTab = 2;
+                    RefreshStats();
+                    break;
+                case KeyList.Enter:
+                    if (_tabContainer.CurrentTab == 0)
+                        OnStartBattlePressed();
+                    break;
+                case KeyList.Escape:
+                    Visible = false;
+                    break;
             }
         }
+    }
 
-        /// <summary>
-        /// Boss 阶段改变回调
-        /// </summary>
-        private void OnBossPhaseChanged() {
-            if (_showNotifications && Visible) {
-                UpdateDisplay();
-            }
-        }
+    private void MoveSelection(int direction)
+    {
+        int current = _bossList.GetSelectedItems().Length > 0 ? _bossList.GetSelectedItems()[0] : 0;
+        int newIndex = Mathf.Clamp(current + direction, 0, _bossList.GetItemCount() - 1);
+        _bossList.Select(newIndex);
+        OnBossListItemSelected(newIndex);
+    }
 
-        /// <summary>
-        /// Boss 狂暴回调
-        /// </summary>
-        private void OnBossEnraged(string message) {
-            if (_showNotifications) {
-                GD.Print($"[BossMechanicsUI] {message}");
-            }
-            if (Visible) {
-                UpdateDisplay();
-            }
-        }
-
-        /// <summary>
-        /// Boss 特殊机制触发回调
-        /// </summary>
-        private void OnBossSpecialMechanicTriggered(string mechanicName) {
-            if (_showNotifications) {
-                GD.Print($"[BossMechanicsUI] Boss 使用技能: {mechanicName}");
-            }
-            if (Visible) {
-                UpdateDisplay();
-            }
-        }
-
-        /// <summary>
-        /// 通知开关切换
-        /// </summary>
-        private void OnShowNotificationsToggled(bool toggled) {
-            _showNotifications = toggled;
-        }
-
-        public override void _Process(float delta) {
-            if (Visible) {
-                UpdateActiveFightDisplay();
-            }
-        }
-
-        /// <summary>
-        /// 输入处理
-        /// </summary>
-        public override void _UnhandledInput(InputEvent @event) {
-            if (@event is InputEventKey keyEvent && keyEvent.Pressed) {
-                if (keyEvent.Keycode == Key.B) {
-                    Toggle();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 获取存档数据
-        /// </summary>
-        public Dictionary<string, Variant> GetSaveData() {
-            var data = new Dictionary<string, Variant> {
-                { "show_notifications", _showNotifications }
-            };
-            return data;
-        }
-
-        /// <summary>
-        /// 加载存档数据
-        /// </summary>
-        public void LoadSaveData(Dictionary<string, Variant> data) {
-            if (data.ContainsKey("show_notifications")) {
-                _showNotifications = (bool)data["show_notifications"];
-                _showNotificationsCheck.ButtonPressed = _showNotifications;
-            }
+    public void ToggleUI()
+    {
+        Visible = !Visible;
+        if (Visible)
+        {
+            RefreshBossList();
+            RefreshStats();
         }
     }
 }
