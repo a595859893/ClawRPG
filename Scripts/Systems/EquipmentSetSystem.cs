@@ -2,8 +2,15 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 装备套装系统 - 管理装备套装的收集和激活
+/// 支持多种套装，每种套装有2件和4件激活效果
+/// </summary>
 public class EquipmentSetSystem : Node
 {
+    /// <summary>
+    /// 获取系统单例实例
+    /// </summary>
     // Singleton instance
     public static EquipmentSetSystem Instance { get; private set; }
 
