@@ -8,7 +8,7 @@ namespace ClawRPG.Modules.MultiplayerVote
     /// <summary>
     /// Core system for multiplayer voting and party management
     /// </summary>
-    public partial class MultiplayerVoteSystem : Node
+    public partial class MultiplayerVoteSystem : BaseSystem
     {
         private static MultiplayerVoteSystem _instance;
         public static MultiplayerVoteSystem Instance => _instance;
@@ -30,6 +30,11 @@ namespace ClawRPG.Modules.MultiplayerVote
         {
             _instance = this;
         }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "MultiplayerVote";
 
         #region Party Management
 
