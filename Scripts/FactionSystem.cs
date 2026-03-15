@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class FactionSystem : Node
+public class FactionSystem : BaseSystem
 {
     // Singleton instance
     public static FactionSystem Instance { get; private set; }
@@ -26,6 +26,45 @@ public class FactionSystem : Node
         Instance = this;
         InitializeFactions();
         LoadData();
+    }
+    
+    /// <summary>
+    /// 系统名称
+    /// </summary>
+    protected override string SystemName => "Faction";
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        var reputations = new Dictionary();
+        foreach (var kvp in playerReputation)
+        {
+            reputations[kvp.Key] = kvp.Value;
+        }
+        
+        data["reputations"] = reputations;
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || !data.Contains("reputations")) return;
+        
+        var reputations = (Dictionary)data["reputations"];
+        foreach (var kvp in reputations)
+        {
+            if (playerReputation.ContainsKey(kvp.Key))
+            {
+                playerReputation[kvp.Key] = (int)kvp.Value;
+            }
+        }
     }
     
     private void InitializeFactions()
