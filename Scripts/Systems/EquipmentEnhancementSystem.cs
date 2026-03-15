@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 装备强化系统 - 管理装备的强化操作和属性加成
 /// 支持多种强化类型（攻击、防御、生命等），包含成功/暴击/失败机制
 /// </summary>
-public class EquipmentEnhancementSystem
+public class EquipmentEnhancementSystem : BaseSystem
 {
     private static EquipmentEnhancementSystem _instance;
     /// <summary>
@@ -387,5 +387,43 @@ public class EquipmentEnhancementSystem
         }
 
         GD.Print($"[EquipmentEnhancementSystem] Loaded {PlayerData.TotalEnhancements} enhancements");
+    }
+
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "total_enhancements", PlayerData.TotalEnhancements },
+            { "successful_enhancements", PlayerData.SuccessfulEnhancements },
+            { "failed_enhancements", PlayerData.FailedEnhancements },
+            { "critical_successes", PlayerData.CriticalSuccesses },
+            { "critical_failures", PlayerData.CriticalFailures },
+            { "equipment_enhancement_levels", PlayerData.EquipmentEnhancementLevels }
+        };
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        if (data.ContainsKey("total_enhancements"))
+            PlayerData.TotalEnhancements = Convert.ToInt32(data["total_enhancements"]);
+        if (data.ContainsKey("successful_enhancements"))
+            PlayerData.SuccessfulEnhancements = Convert.ToInt32(data["successful_enhancements"]);
+        if (data.ContainsKey("failed_enhancements"))
+            PlayerData.FailedEnhancements = Convert.ToInt32(data["failed_enhancements"]);
+        if (data.ContainsKey("critical_successes"))
+            PlayerData.CriticalSuccesses = Convert.ToInt32(data["critical_successes"]);
+        if (data.ContainsKey("critical_failures"))
+            PlayerData.CriticalFailures = Convert.ToInt32(data["critical_failures"]);
+        if (data.ContainsKey("equipment_enhancement_levels"))
+        {
+            var levelsData = data["equipment_enhancement_levels"] as Dictionary<object, object>;
+            PlayerData.EquipmentEnhancementLevels = new Dictionary<int, int>();
+            foreach (var kvp in levelsData)
+            {
+                PlayerData.EquipmentEnhancementLevels[Convert.ToInt32(kvp.Key)] = Convert.ToInt32(kvp.Value);
+            }
+        }
     }
 }
