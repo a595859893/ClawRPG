@@ -415,4 +415,27 @@ namespace ClawRPG.Scripts.Systems {
     }
     
     #endregion
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["music_volume"] = _musicVolume;
+        data["battle_music_volume"] = _battleMusicVolume;
+        data["crossfade_duration"] = _crossfadeDuration;
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        if (data.Contains("music_volume")) _musicVolume = (float)data["music_volume"];
+        if (data.Contains("battle_music_volume")) _battleMusicVolume = (float)data["battle_music_volume"];
+        if (data.Contains("crossfade_duration")) _crossfadeDuration = (float)data["crossfade_duration"];
+    }
 }

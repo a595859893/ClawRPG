@@ -330,5 +330,32 @@ namespace ClawRPG.Scripts.Systems
             if (data.ContainsKey("manaThreshold"))
                 ManaPotionThreshold = Convert.ToInt32(data["manaThreshold"]);
         }
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["auto_use_health_potion"] = AutoUseHealthPotion;
+            data["auto_use_mana_potion"] = AutoUseManaPotion;
+            data["auto_use_buff_potions"] = AutoUseBuffPotions;
+            data["health_potion_threshold"] = HealthPotionThreshold;
+            data["mana_potion_threshold"] = ManaPotionThreshold;
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            if (data.Contains("auto_use_health_potion")) AutoUseHealthPotion = (bool)data["auto_use_health_potion"];
+            if (data.Contains("auto_use_mana_potion")) AutoUseManaPotion = (bool)data["auto_use_mana_potion"];
+            if (data.Contains("auto_use_buff_potions")) AutoUseBuffPotions = (bool)data["auto_use_buff_potions"];
+            if (data.Contains("health_potion_threshold")) HealthPotionThreshold = (int)data["health_potion_threshold"];
+            if (data.Contains("mana_potion_threshold")) ManaPotionThreshold = (int)data["mana_potion_threshold"];
+        }
     }
 }

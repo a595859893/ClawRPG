@@ -366,4 +366,27 @@ public class BossMechanicsSystem : BaseSystem
         // Load stats from save system
         GD.Print("[BossMechanics] Loading boss mechanics statistics");
     }
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["defeated_bosses"] = _defeatedBosses;
+        data["total_boss_damage"] = _totalBossDamage;
+        data["enrage_triggers"] = _enrageTriggers;
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        if (data.Contains("defeated_bosses")) _defeatedBosses = (int)data["defeated_bosses"];
+        if (data.Contains("total_boss_damage")) _totalBossDamage = (int)data["total_boss_damage"];
+        if (data.Contains("enrage_triggers")) _enrageTriggers = (int)data["enrage_triggers"];
+    }
 }

@@ -548,4 +548,66 @@ public class AchievementSystem : BaseSystem
     public int GetItemsCrafted() => _itemsCrafted;
     public int GetLoginStreak() => _loginStreak;
     public float GetPlayTimeHours() => _playTimeHours;
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 统计数据
+        data["total_kills"] = _totalKills;
+        data["boss_kills"] = _bossKills;
+        data["pvp_wins"] = _pvpWins;
+        data["zones_discovered"] = _zonesDiscovered;
+        data["sealed_tower_floor"] = _sealedTowerFloor;
+        data["pets_collected"] = _petsCollected;
+        data["mounts_collected"] = _mountsCollected;
+        data["equipment_collected"] = _equipmentCollected;
+        data["friends_made"] = _friendsMade;
+        data["gold_accumulated"] = _goldAccumulated;
+        data["gold_spent"] = _goldSpent;
+        data["skill_points_spent"] = _skillPointsSpent;
+        data["items_crafted"] = _itemsCrafted;
+        data["login_streak"] = _loginStreak;
+        data["play_time_hours"] = _playTimeHours;
+        
+        // 已解锁成就
+        var unlocked = new Array();
+        foreach (var kvp in _achievements)
+        {
+            if (kvp.Value.isUnlocked)
+            {
+                unlocked.Add(kvp.Key);
+            }
+        }
+        data["unlocked_achievements"] = unlocked;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("total_kills")) _totalKills = (int)data["total_kills"];
+        if (data.Contains("boss_kills")) _bossKills = (int)data["boss_kills"];
+        if (data.Contains("pvp_wins")) _pvpWins = (int)data["pvp_wins"];
+        if (data.Contains("zones_discovered")) _zonesDiscovered = (int)data["zones_discovered"];
+        if (data.Contains("sealed_tower_floor")) _sealedTowerFloor = (int)data["sealed_tower_floor"];
+        if (data.Contains("pets_collected")) _petsCollected = (int)data["pets_collected"];
+        if (data.Contains("mounts_collected")) _mountsCollected = (int)data["mounts_collected"];
+        if (data.Contains("equipment_collected")) _equipmentCollected = (int)data["equipment_collected"];
+        if (data.Contains("friends_made")) _friendsMade = (int)data["friends_made"];
+        if (data.Contains("gold_accumulated")) _goldAccumulated = (int)data["gold_accumulated"];
+        if (data.Contains("gold_spent")) _goldSpent = (int)data["gold_spent"];
+        if (data.Contains("skill_points_spent")) _skillPointsSpent = (int)data["skill_points_spent"];
+        if (data.Contains("items_crafted")) _itemsCrafted = (int)data["items_crafted"];
+        if (data.Contains("login_streak")) _loginStreak = (int)data["login_streak"];
+        if (data.Contains("play_time_hours")) _playTimeHours = (float)data["play_time_hours"];
+    }
 }
