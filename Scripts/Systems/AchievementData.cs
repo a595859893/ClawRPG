@@ -212,6 +212,52 @@ public class AchievementDatabase
             AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Rare, 100, 800, 1500));
         _achievements.Add(CreateAchievement("craft_500", "Legendary Artisan", "Craft 500 items", 
             AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Epic, 500, 4000, 8000));
+
+        // ============ Quick Mode Achievements ============
+        _achievements.Add(CreateAchievement("quick_first_win", "Quick Start", "Win your first Quick Mode game", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Common, 1, 100, 200));
+        
+        _achievements.Add(CreateAchievement("quick_wins_10", "Quick Fighter", "Win 10 Quick Mode games", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Uncommon, 10, 300, 600));
+        
+        _achievements.Add(CreateAchievement("quick_wins_50", "Quick Veteran", "Win 50 Quick Mode games", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Rare, 50, 1000, 2000));
+        
+        _achievements.Add(CreateAchievement("quick_wins_100", "Quick Master", "Win 100 Quick Mode games", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Epic, 100, 3000, 6000));
+        
+        _achievements.Add(CreateAchievement("quick_wins_500", "Quick Legend", "Win 500 Quick Mode games", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Legendary, 500, 10000, 20000));
+        
+        _achievements.Add(CreateAchievement("quick_streak_5", "Quick Streak", "Win 5 Quick Mode games in a row", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Uncommon, 5, 500, 1000));
+        
+        _achievements.Add(CreateAchievement("quick_streak_10", "Unstoppable", "Win 10 Quick Mode games in a row", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Rare, 10, 1500, 3000));
+        
+        _achievements.Add(CreateAchievement("quick_streak_25", "Godlike", "Win 25 Quick Mode games in a row", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Epic, 25, 5000, 10000));
+        
+        _achievements.Add(CreateAchievement("quick_speed_5", "Speed Demon", "Complete 5 Quick Mode games under target time", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Uncommon, 5, 400, 800));
+        
+        _achievements.Add(CreateAchievement("quick_speed_10", "Lightning Fast", "Complete 10 Quick Mode games under target time", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Rare, 10, 1200, 2500));
+        
+        _achievements.Add(CreateAchievement("quick_speed_25", "Time Warp", "Complete 25 Quick Mode games under target time", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Epic, 25, 4000, 8000));
+        
+        _achievements.Add(CreateAchievement("quick_perfect_3", "Flawless", "Complete 3 Quick Mode games without taking damage", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Rare, 3, 1500, 3000));
+        
+        _achievements.Add(CreateAchievement("quick_perfect_10", "Perfect Runner", "Complete 10 Quick Mode games without taking damage", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Epic, 10, 5000, 10000));
+        
+        _achievements.Add(CreateAchievement("quick_plays_50", "Quick Regular", "Play 50 Quick Mode games", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Uncommon, 50, 800, 1600));
+        
+        _achievements.Add(CreateAchievement("quick_plays_200", "Quick Addict", "Play 200 Quick Mode games", 
+            AchievementData.AchievementCategory.Special, AchievementData.AchievementRarity.Rare, 200, 2500, 5000));
     }
 
     private static AchievementData.Achievement CreateAchievement(string id, string name, string desc, 

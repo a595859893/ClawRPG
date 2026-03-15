@@ -156,6 +156,9 @@ namespace ClawRPG.Scripts.Systems {
 
             // Prestige system data
             public Dictionary<string, object> PrestigeData { get; set; } = new();
+            
+            // Quick Mode Reward system data
+            public Dictionary<string, object> QuickModeRewardData { get; set; } = new();
 
             // Guild Quest system data
             public Dictionary<string, object> GuildQuestData { get; set; } = new();
@@ -600,6 +603,13 @@ namespace ClawRPG.Scripts.Systems {
             {
                 var prestigeData = prestigeSystem.SaveData();
                 data.PrestigeData = prestigeData;
+            }
+            
+            // Save quick mode reward data
+            var quickModeRewardSystem = GetNodeOrNull<Systems.QuickModeRewardSystem>("QuickModeRewardSystem");
+            if (quickModeRewardSystem != null)
+            {
+                data.QuickModeRewardData = quickModeRewardSystem.ExportSaveData();
             }
             
             return data;
@@ -1234,6 +1244,58 @@ namespace ClawRPG.Scripts.Systems {
             catch (Exception e)
             {
                 GD.PrintErr("[SaveSystem] Failed to load mount expedition data: " + e.Message);
+            }
+            return new Dictionary<string, object>();
+        }
+
+        // ============ Quick Mode Reward Data ============
+        
+        /// <summary>
+        /// Save quick mode reward system data (standalone, not part of main save)
+        /// </summary>
+        public void SaveQuickModeData(Dictionary<string, object> data)
+        {
+            try
+            {
+                var quickModeData = new Dictionary<string, object>();
+                foreach (var kvp in data)
+                {
+                    quickModeData[kvp.Key] = kvp.Value;
+                }
+                
+                // Also save to main save data
+                var mainSave = LoadGame(0);
+                if (mainSave != null)
+                {
+                    mainSave.QuickModeRewardData = quickModeData;
+                    SaveGame(0, mainSave, false);
+                }
+                
+                GD.Print("[SaveSystem] Quick mode reward data saved");
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to save quick mode reward data: " + e.Message);
+            }
+        }
+        
+        /// <summary>
+        /// Load quick mode reward system data
+        /// </summary>
+        public Dictionary<string, object> LoadQuickModeData()
+        {
+            try
+            {
+                var mainSave = LoadGame(0);
+                if (mainSave != null && mainSave.QuickModeRewardData != null)
+                {
+                    GD.Print("[SaveSystem] Quick mode reward data loaded");
+                    return mainSave.QuickModeRewardData;
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr("[SaveSystem] Failed to load quick mode reward data: " + e.Message);
             }
             return new Dictionary<string, object>();
         }

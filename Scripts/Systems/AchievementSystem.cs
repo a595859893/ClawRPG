@@ -26,6 +26,13 @@ public class AchievementSystem : BaseSystem
     private int _itemsCrafted;
     private int _loginStreak;
     private float _playTimeHours;
+    
+    // Quick Mode Stats
+    private int _quickModeWins;
+    private int _quickModePlays;
+    private int _quickModeStreak;
+    private int _quickModeSpeedRuns;
+    private int _quickModePerfectRuns;
 
     // Signals
     [Signal] public delegate void AchievementUnlocked(AchievementData.Achievement achievement);
@@ -320,6 +327,79 @@ public class AchievementSystem : BaseSystem
     public void SetFirstBattle()
     {
         UpdateAchievementProgress("first_blood", 1);
+        SaveData();
+    }
+
+    // ============ Quick Mode Achievement Tracking ============
+    
+    /// <summary>
+    /// Track quick mode win
+    /// </summary>
+    public void TrackQuickModeWin(int wins)
+    {
+        _quickModeWins = wins;
+        
+        // Update all quick mode win achievements
+        UpdateAchievementProgress("quick_first_win", _quickModeWins);
+        UpdateAchievementProgress("quick_wins_10", _quickModeWins);
+        UpdateAchievementProgress("quick_wins_50", _quickModeWins);
+        UpdateAchievementProgress("quick_wins_100", _quickModeWins);
+        UpdateAchievementProgress("quick_wins_500", _quickModeWins);
+        
+        SaveData();
+    }
+    
+    /// <summary>
+    /// Track quick mode play count
+    /// </summary>
+    public void TrackQuickModePlay(int plays)
+    {
+        _quickModePlays = plays;
+        
+        UpdateAchievementProgress("quick_plays_50", _quickModePlays);
+        UpdateAchievementProgress("quick_plays_200", _quickModePlays);
+        
+        SaveData();
+    }
+    
+    /// <summary>
+    /// Track quick mode streak (consecutive wins)
+    /// </summary>
+    public void TrackQuickModeStreak(int streak)
+    {
+        _quickModeStreak = streak;
+        
+        UpdateAchievementProgress("quick_streak_5", _quickModeStreak);
+        UpdateAchievementProgress("quick_streak_10", _quickModeStreak);
+        UpdateAchievementProgress("quick_streak_25", _quickModeStreak);
+        
+        SaveData();
+    }
+    
+    /// <summary>
+    /// Track quick mode speed runs (under target time)
+    /// </summary>
+    public void TrackQuickModeSpeedRun(int speedRuns)
+    {
+        _quickModeSpeedRuns = speedRuns;
+        
+        UpdateAchievementProgress("quick_speed_5", _quickModeSpeedRuns);
+        UpdateAchievementProgress("quick_speed_10", _quickModeSpeedRuns);
+        UpdateAchievementProgress("quick_speed_25", _quickModeSpeedRuns);
+        
+        SaveData();
+    }
+    
+    /// <summary>
+    /// Track quick mode perfect runs (no damage taken)
+    /// </summary>
+    public void TrackQuickModePerfectRun(int perfectRuns)
+    {
+        _quickModePerfectRuns = perfectRuns;
+        
+        UpdateAchievementProgress("quick_perfect_3", _quickModePerfectRuns);
+        UpdateAchievementProgress("quick_perfect_10", _quickModePerfectRuns);
+        
         SaveData();
     }
 
