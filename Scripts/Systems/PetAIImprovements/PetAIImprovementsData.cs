@@ -1,285 +1,469 @@
-# Pet AI Improvements Data
-# Enhanced pet AI behaviors and learning systems
+using Godot;
+using System;
+using System.Collections.Generic;
 
-class PetAIPersonality extends Node:
-	enum PersonalityType:
-		AGGRESSIVE = 0  # 主动攻击型
-		DEFENSIVE = 1   # 防御保护型
-		SUPPORTIVE = 2  # 辅助支援型
-		CURIOUS = 3     # 探索好奇型
-		LAZY = 4        # 懒散休息型
-	
-	var personality_type: int = PersonalityType.AGGRESSIVE
-	var curiosity_level: float = 0.5  # 0.0 - 1.0
-	var energy_level: float = 1.0    # 0.0 - 1.0
-	var loyalty_level: float = 0.5   # 0.0 - 1.0
-	var aggression_modifier: float = 1.0
-	var defense_modifier: float = 1.0
-	
-	func _init(type: int = PersonalityType.AGGRESSIVE):
-		personality_type = type
-		match type:
-			PersonalityType.AGGRESSIVE:
-				aggression_modifier = 1.5
-				defense_modifier = 0.8
-			PersonalityType.DEFENSIVE:
-				aggression_modifier = 0.7
-				defense_modifier = 1.5
-			PersonalityType.SUPPORTIVE:
-				aggression_modifier = 0.8
-				defense_modifier = 1.0
-			PersonalityType.CURIOUS:
-				curiosity_level = 0.9
-				aggression_modifier = 1.0
-			PersonalityType.LAZY:
-				energy_level = 0.3
-				aggression_modifier = 0.5
+/// <summary>
+/// Pet AI Improvements Data
+/// Enhanced pet AI behaviors and learning systems
+/// </summary>
+public class PetAIImprovementsData : BaseSystem
+{
+    // 内部类定义
+    public class PetAIPersonality
+    {
+        public enum PersonalityType
+        {
+            AGGRESSIVE = 0,
+            DEFENSIVE = 1,
+            SUPPORTIVE = 2,
+            CURIOUS = 3,
+            LAZY = 4
+        }
 
-class PetAIBehavior extends Node:
-	enum BehaviorState:
-		IDLE = 0
-		PATROL = 1
-		CHASE = 2
-		ATTACK = 3
-		RETREAT = 4
-		FOLLOW = 5
-		EXPLORE = 6
-		HEAL = 7
-	
-	var current_state: int = BehaviorState.IDLE
-	var target_position: Vector2 = Vector2.ZERO
-	var target_entity: Node = null
-	var state_timer: float = 0.0
-	var behavior_priority: int = 0
-	
-	func get_state_name() -> String:
-		match current_state:
-			BehaviorState.IDLE: return "Idle"
-			BehaviorState.PATROL: return "Patrol"
-			BehaviorState.CHASE: return "Chase"
-			BehaviorState.ATTACK: return "Attack"
-			BehaviorState.RETREAT: return "Retreat"
-			BehaviorState.FOLLOW: return "Follow"
-			BehaviorState.EXPLORE: return "Explore"
-			BehaviorState.HEAL: return "Heal"
-		return "Unknown"
+        public int personalityType = (int)PersonalityType.AGGRESSIVE;
+        public float curiosityLevel = 0.5f;
+        public float energyLevel = 1.0f;
+        public float loyaltyLevel = 0.5f;
+        public float aggressionModifier = 1.0f;
+        public float defenseModifier = 1.0f;
 
-class PetAILearning extends Node:
-	var learning_data: Dictionary = {}
-	var enemy_type_kills: Dictionary = {}  # EnemyType -> kill_count
-	var player_action_mimic: Array = []      # 记录玩家行为用于学习
-	var adaptation_level: float = 0.0        # 0.0 - 1.0
-	var preferred_tactics: Array = []        # 偏好的战术
-	
-	func _init():
-		learning_data = {
-			"total_battles": 0,
-			"wins": 0,
-			"losses": 0,
-			"dodge_count": 0,
-			"block_count": 0,
-			"heal_count": 0,
-			"combo_count": 0,
-			"best_combo": 0,
-			"average_response_time": 0.0,
-			"preferred_enemy_types": [],
-			"weak_against": []
-		}
-	
-	func record_battle_result(win: bool):
-		learning_data["total_battles"] += 1
-		if win:
-			learning_data["wins"] += 1
-		else:
-			learning_data["losses"] += 1
-		update_adaptation_level()
-	
-	func record_enemy_killed(enemy_type: String):
-		if not enemy_type_kills.has(enemy_type):
-			enemy_type_kills[enemy_type] = 0
-		enemy_type_kills[enemy_type] += 1
-	
-	func record_dodge():
-		learning_data["dodge_count"] += 1
-	
-	func record_block():
-		learning_data["block_count"] += 1
-	
-	func record_heal():
-		learning_data["heal_count"] += 1
-	
-	func record_combo(combo_size: int):
-		learning_data["combo_count"] += 1
-		if combo_size > learning_data["best_combo"]:
-			learning_data["best_combo"] = combo_size
-	
-	func update_adaptation_level():
-		var total: float = float(learning_data["total_battles"])
-		if total > 0:
-			adaptation_level = min(1.0, total / 100.0)
-	
-	func get_win_rate() -> float:
-		var total: int = learning_data["total_battles"]
-		if total == 0:
-			return 0.0
-		return float(learning_data["wins"]) / float(total)
-	
-	func get_most_killed_enemy() -> String:
-		var max_kills: int = 0
-		var result: String = ""
-		for enemy_type in enemy_type_kills:
-			if enemy_type_kills[enemy_type] > max_kills:
-				max_kills = enemy_type_kills[enemy_type]
-				result = enemy_type
-		return result
+        public PetAIPersonality(int type = (int)PersonalityType.AGGRESSIVE)
+        {
+            personalityType = type;
+            switch (type)
+            {
+                case (int)PersonalityType.AGGRESSIVE:
+                    aggressionModifier = 1.5f;
+                    defenseModifier = 0.8f;
+                    break;
+                case (int)PersonalityType.DEFENSIVE:
+                    aggressionModifier = 0.7f;
+                    defenseModifier = 1.5f;
+                    break;
+                case (int)PersonalityType.SUPPORTIVE:
+                    aggressionModifier = 0.8f;
+                    defenseModifier = 1.0f;
+                    break;
+                case (int)PersonalityType.CURIOUS:
+                    curiosityLevel = 0.9f;
+                    aggressionModifier = 1.0f;
+                    break;
+                case (int)PersonalityType.LAZY:
+                    energyLevel = 0.3f;
+                    aggressionModifier = 0.5f;
+                    break;
+            }
+        }
 
-class PetAIDecision extends Node:
-	var decision_weights: Dictionary = {
-		"attack": 1.0,
-		"defend": 1.0,
-		"support": 1.0,
-		"retreat": 1.0,
-		"explore": 1.0
-	}
-	var personality_influence: float = 0.5
-	var learning_influence: float = 0.3
-	var situation_influence: float = 0.2
-	
-	func calculate_decision(personality: PetAIPersonality, learning: PetAILearning, 
-							situation: Dictionary) -> String:
-		var weights = decision_weights.duplicate()
-		
-		# 性格影响
-		match personality.personality_type:
-			PetAIPersonality.PersonalityType.AGGRESSIVE:
-				weights["attack"] *= personality.aggression_modifier * personality_influence * 2.0
-				weights["retreat"] *= 0.5
-			PetAIPersonality.PersonalityType.DEFENSIVE:
-				weights["defend"] *= personality.defense_modifier * personality_influence * 2.0
-				weights["attack"] *= 0.7
-			PetAIPersonality.PersonalityType.SUPPORTIVE:
-				weights["support"] *= personality_influence * 2.0
-				weights["attack"] *= 0.8
-			PetAIPersonality.PersonalityType.CURIOUS:
-				weights["explore"] *= personality.curiosity_level * personality_influence * 2.0
-		
-		# 学习影响
-		var win_rate: float = learning.get_win_rate()
-		if win_rate > 0.7:
-			weights["attack"] *= (1.0 + learning_influence)
-		elif win_rate < 0.4:
-			weights["defend"] *= (1.0 + learning_influence)
-			weights["retreat"] *= (1.0 + learning_influence * 0.5)
-		
-		# 情况影响
-		if situation.has("player_health"):
-			var player_health: float = situation["player_health"]
-			if player_health < 0.3:
-				weights["support"] *= situation_influence * 3.0
-				weights["defend"] *= situation_influence * 2.0
-		
-		if situation.has("enemy_count"):
-			var enemy_count: int = situation["enemy_count"]
-			if enemy_count > 3:
-				weights["attack"] *= 0.7
-				weights["defend"] *= 1.5
-		
-		# 选择最高权重
-		var best_decision: String = "attack"
-		var best_weight: float = 0.0
-		for decision in weights:
-			if weights[decision] > best_weight:
-				best_weight = weights[decision]
-				best_decision = decision
-		
-		return best_decision
+        public string GetStateName()
+        {
+            return ((PersonalityType)personalityType).ToString();
+        }
+    }
 
-class PetAIEmotionalState extends Node:
-	enum Emotion:
-		HAPPY = 0
-		SAD = 1
-		ANGRY = 2
-		EXCITED = 3
-		SCARED = 4
-		CALM = 5
-	
-	var current_emotion: int = Emotion.HAPPY
-	var emotion_intensity: float = 0.5  # 0.0 - 1.0
-	var mood_timer: float = 0.0
-	var emotion_history: Array = []
-	
-	func _init():
-		emotion_history = []
-	
-	func update_emotion(new_emotion: int, intensity: float = 0.5):
-		current_emotion = new_emotion
-		emotion_intensity = clamp(intensity, 0.0, 1.0)
-		mood_timer = 0.0
-		
-		emotion_history.append({
-			"emotion": new_emotion,
-			"intensity": intensity,
-			"time": Time.get_unix_time_from_system()
-		})
-		
-		# 保持历史在最近20条
-		if emotion_history.size() > 20:
-			emotion_history.pop_front()
-	
-	func get_emotion_name() -> String:
-		match current_emotion:
-			Emotion.HAPPY: return "Happy"
-			Emotion.SAD: return "Sad"
-			Emotion.ANGRY: return "Angry"
-			Emotion.EXCITED: return "Excited"
-			Emotion.SCARED: return "Scared"
-			Emotion.CALM: return "Calm"
-		return "Unknown"
-	
-	func update_emotion_from_battle(win: bool, player_health_change: float):
-		if win:
-			update_emotion(Emotion.EXCITED, 0.8)
-		elif player_health_change < -0.3:
-			update_emotion(Emotion.SCARED, 0.7)
-		elif player_health_change > 0.3:
-			update_emotion(Emotion.HAPPY, 0.6)
-		else:
-			update_emotion(Emotion.CALM, 0.5)
+    public class PetAIBehavior
+    {
+        public enum BehaviorState
+        {
+            IDLE = 0,
+            PATROL = 1,
+            CHASE = 2,
+            ATTACK = 3,
+            RETREAT = 4,
+            FOLLOW = 5,
+            EXPLORE = 6,
+            HEAL = 7
+        }
 
-class PetAIImprovementsData extends Node:
-	var personality: PetAIPersonality
-	var behavior: PetAIBehavior
-	var learning: PetAILearning
-	var decision: PetAIDecision
-	var emotion: PetAIEmotionalState
-	
-	# 战斗统计
-	var total_damage_dealt: float = 0.0
-	var total_damage_prevented: float = 0.0
-	var total_healing_done: float = 0.0
-	var critical_hits: int = 0
-	var perfect_dodges: int = 0
-	
-	func _init():
-		personality = PetAIPersonality.new()
-		behavior = PetAIBehavior.new()
-		learning = PetAILearning.new()
-		decision = PetAIDecision.new()
-		emotion = PetAIEmotionalState.new()
-	
-	func reset():
-		total_damage_dealt = 0.0
-		total_damage_prevented = 0.0
-		total_healing_done = 0.0
-		critical_hits = 0
-		perfect_dodges = 0
-	
-	func get_ai_level() -> int:
-		# 基于学习数据和适应等级计算AI等级
-		var level: float = 1.0
-		level += learning.adaptation_level * 9.0  # 1-10级
-		level += learning.get_win_rate() * 5.0    # 额外加分
-		return int(clamp(level, 1, 15))
+        public int currentState = (int)BehaviorState.IDLE;
+        public Vector2 targetPosition = Vector2.Zero;
+        public Node targetEntity = null;
+        public float stateTimer = 0f;
+        public int behaviorPriority = 0;
 
-# Export variables for Godot
-extends Node
+        public string GetStateName()
+        {
+            return ((BehaviorState)currentState).ToString();
+        }
+    }
+
+    public class PetAILearning
+    {
+        public Dictionary learningData = new Dictionary();
+        public Dictionary enemyTypeKills = new Dictionary();
+        public Array playerActionMimic = new Array();
+        public float adaptationLevel = 0f;
+        public Array preferredTactics = new Array();
+
+        public PetAILearning()
+        {
+            learningData = new Dictionary
+            {
+                { "total_battles", 0 },
+                { "wins", 0 },
+                { "losses", 0 },
+                { "dodge_count", 0 },
+                { "block_count", 0 },
+                { "heal_count", 0 },
+                { "combo_count", 0 },
+                { "best_combo", 0 },
+                { "average_response_time", 0.0 },
+                { "preferred_enemy_types", new Array() },
+                { "weak_against", new Array() }
+            };
+        }
+
+        public void RecordBattleResult(bool won)
+        {
+            learningData["total_battles"] = (int)learningData["total_battles"] + 1;
+            if (won)
+            {
+                learningData["wins"] = (int)learningData["wins"] + 1;
+            }
+            else
+            {
+                learningData["losses"] = (int)learningData["losses"] + 1;
+            }
+            UpdateAdaptationLevel();
+        }
+
+        public void RecordEnemyKilled(string enemyType)
+        {
+            if (!enemyTypeKills.ContainsKey(enemyType))
+            {
+                enemyTypeKills[enemyType] = 0;
+            }
+            enemyTypeKills[enemyType] = (int)enemyTypeKills[enemyType] + 1;
+        }
+
+        public void RecordDodge()
+        {
+            learningData["dodge_count"] = (int)learningData["dodge_count"] + 1;
+        }
+
+        public void RecordBlock()
+        {
+            learningData["block_count"] = (int)learningData["block_count"] + 1;
+        }
+
+        public void RecordHeal()
+        {
+            learningData["heal_count"] = (int)learningData["heal_count"] + 1;
+        }
+
+        public void RecordCombo(int comboSize)
+        {
+            learningData["combo_count"] = (int)learningData["combo_count"] + 1;
+            if (comboSize > (int)learningData["best_combo"])
+            {
+                learningData["best_combo"] = comboSize;
+            }
+        }
+
+        public void UpdateAdaptationLevel()
+        {
+            float total = (int)learningData["total_battles"];
+            if (total > 0)
+            {
+                adaptationLevel = Mathf.Min(1.0f, total / 100.0f);
+            }
+        }
+
+        public float GetWinRate()
+        {
+            int total = (int)learningData["total_battles"];
+            if (total == 0) return 0f;
+            return (int)learningData["wins"] / (float)total;
+        }
+
+        public string GetMostKilledEnemy()
+        {
+            int maxKills = 0;
+            string result = "";
+            foreach (string enemyType in enemyTypeKills.Keys)
+            {
+                if ((int)enemyTypeKills[enemyType] > maxKills)
+                {
+                    maxKills = (int)enemyTypeKills[enemyType];
+                    result = enemyType;
+                }
+            }
+            return result;
+        }
+    }
+
+    public class PetAIDecision
+    {
+        public Dictionary decisionWeights = new Dictionary();
+        public float personalityInfluence = 0.5f;
+        public float learningInfluence = 0.3f;
+        public float situationInfluence = 0.2f;
+
+        public PetAIDecision()
+        {
+            decisionWeights = new Dictionary
+            {
+                { "attack", 1.0 },
+                { "defend", 1.0 },
+                { "support", 1.0 },
+                { "retreat", 1.0 },
+                { "explore", 1.0 }
+            };
+        }
+
+        public string CalculateDecision(PetAIPersonality personality, PetAILearning learning, Dictionary situation)
+        {
+            var weights = new Dictionary(decisionWeights);
+
+            // 性格影响
+            switch (personality.personalityType)
+            {
+                case (int)PetAIPersonality.PersonalityType.AGGRESSIVE:
+                    weights["attack"] = (float)weights["attack"] * personality.aggressionModifier * personalityInfluence * 2.0;
+                    weights["retreat"] = (float)weights["retreat"] * 0.5;
+                    break;
+                case (int)PetAIPersonality.PersonalityType.DEFENSIVE:
+                    weights["defend"] = (float)weights["defend"] * personality.defenseModifier * personalityInfluence * 2.0;
+                    weights["attack"] = (float)weights["attack"] * 0.7;
+                    break;
+                case (int)PetAIPersonality.PersonalityType.SUPPORTIVE:
+                    weights["support"] = (float)weights["support"] * personalityInfluence * 2.0;
+                    weights["attack"] = (float)weights["attack"] * 0.8;
+                    break;
+                case (int)PetAIPersonality.PersonalityType.CURIOUS:
+                    weights["explore"] = (float)weights["explore"] * personality.curiosityLevel * personalityInfluence * 2.0;
+                    break;
+            }
+
+            // 学习影响
+            float winRate = learning.GetWinRate();
+            if (winRate > 0.7f)
+            {
+                weights["attack"] = (float)weights["attack"] * (1.0 + learningInfluence);
+            }
+            else if (winRate < 0.4f)
+            {
+                weights["defend"] = (float)weights["defend"] * (1.0 + learningInfluence);
+                weights["retreat"] = (float)weights["retreat"] * (1.0 + learningInfluence * 0.5);
+            }
+
+            // 情况影响
+            if (situation.ContainsKey("player_health"))
+            {
+                float playerHealth = (float)situation["player_health"];
+                if (playerHealth < 0.3f)
+                {
+                    weights["support"] = (float)weights["support"] * situationInfluence * 3.0;
+                    weights["defend"] = (float)weights["defend"] * situationInfluence * 2.0;
+                }
+            }
+
+            if (situation.ContainsKey("enemy_count"))
+            {
+                int enemyCount = (int)situation["enemy_count"];
+                if (enemyCount > 3)
+                {
+                    weights["attack"] = (float)weights["attack"] * 0.7;
+                    weights["defend"] = (float)weights["defend"] * 1.5;
+                }
+            }
+
+            // 选择最高权重
+            string bestDecision = "attack";
+            float bestWeight = 0f;
+            foreach (string decision in weights.Keys)
+            {
+                if ((float)weights[decision] > bestWeight)
+                {
+                    bestWeight = (float)weights[decision];
+                    bestDecision = decision;
+                }
+            }
+
+            return bestDecision;
+        }
+    }
+
+    public class PetAIEmotionalState
+    {
+        public enum Emotion
+        {
+            HAPPY = 0,
+            SAD = 1,
+            ANGRY = 2,
+            EXCITED = 3,
+            SCARED = 4,
+            CALM = 5
+        }
+
+        public int currentEmotion = (int)Emotion.HAPPY;
+        public float emotionIntensity = 0.5f;
+        public float moodTimer = 0f;
+        public Array emotionHistory = new Array();
+
+        public PetAIEmotionalState()
+        {
+            emotionHistory = new Array();
+        }
+
+        public void UpdateEmotion(int newEmotion, float intensity = 0.5f)
+        {
+            currentEmotion = newEmotion;
+            emotionIntensity = Mathf.Clamp(intensity, 0f, 1f);
+            moodTimer = 0f;
+
+            var entry = new Dictionary
+            {
+                { "emotion", newEmotion },
+                { "intensity", intensity },
+                { "time", Time.GetUnixTimeFromSystem() }
+            };
+            emotionHistory.Add(entry);
+
+            // 保持历史在最近20条
+            if (emotionHistory.Count > 20)
+            {
+                emotionHistory.RemoveAt(0);
+            }
+        }
+
+        public string GetEmotionName()
+        {
+            switch (currentEmotion)
+            {
+                case (int)Emotion.HAPPY: return "Happy";
+                case (int)Emotion.SAD: return "Sad";
+                case (int)Emotion.ANGRY: return "Angry";
+                case (int)Emotion.EXCITED: return "Excited";
+                case (int)Emotion.SCARED: return "Scared";
+                case (int)Emotion.CALM: return "Calm";
+            }
+            return "Unknown";
+        }
+
+        public void UpdateEmotionFromBattle(bool win, float playerHealthChange)
+        {
+            if (win)
+            {
+                UpdateEmotion((int)Emotion.EXCITED, 0.8f);
+            }
+            else if (playerHealthChange < -0.3f)
+            {
+                UpdateEmotion((int)Emotion.SCARED, 0.7f);
+            }
+            else if (playerHealthChange > 0.3f)
+            {
+                UpdateEmotion((int)Emotion.HAPPY, 0.6f);
+            }
+            else
+            {
+                UpdateEmotion((int)Emotion.CALM, 0.5f);
+            }
+        }
+    }
+
+    // 主数据类字段
+    public PetAIPersonality personality;
+    public PetAIBehavior behavior;
+    public PetAILearning learning;
+    public PetAIDecision decision;
+    public PetAIEmotionalState emotion;
+
+    // 战斗统计
+    public float totalDamageDealt = 0f;
+    public float totalDamagePrevented = 0f;
+    public float totalHealingDone = 0f;
+    public int criticalHits = 0;
+    public int perfectDodges = 0;
+
+    protected override void Initialize()
+    {
+        base.Initialize();
+        personality = new PetAIPersonality();
+        behavior = new PetAIBehavior();
+        learning = new PetAILearning();
+        decision = new PetAIDecision();
+        emotion = new PetAIEmotionalState();
+    }
+
+    public void Reset()
+    {
+        totalDamageDealt = 0f;
+        totalDamagePrevented = 0f;
+        totalHealingDone = 0f;
+        criticalHits = 0;
+        perfectDodges = 0;
+    }
+
+    public int GetAiLevel()
+    {
+        // 基于学习数据和适应等级计算AI等级
+        float level = 1.0f;
+        level += learning.adaptationLevel * 9.0f;  // 1-10级
+        level += learning.GetWinRate() * 5.0f;    // 额外加分
+        return (int)Mathf.Clamp(level, 1f, 15f);
+    }
+
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "personality_type", personality.personalityType },
+            { "curiosity_level", personality.curiosityLevel },
+            { "energy_level", personality.energyLevel },
+            { "loyalty_level", personality.loyaltyLevel },
+            { "adaptation_level", learning.adaptationLevel },
+            { "total_battles", learning.learningData["total_battles"] },
+            { "wins", learning.learningData["wins"] },
+            { "losses", learning.learningData["losses"] },
+            { "best_combo", learning.learningData["best_combo"] },
+            { "enemy_type_kills", learning.enemyTypeKills },
+            { "current_emotion", emotion.currentEmotion },
+            { "emotion_intensity", emotion.emotionIntensity },
+            { "total_damage_dealt", totalDamageDealt },
+            { "total_damage_prevented", totalDamagePrevented },
+            { "total_healing_done", totalHealingDone },
+            { "critical_hits", criticalHits },
+            { "perfect_dodges", perfectDodges }
+        };
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        base.ImportSaveData(data);
+
+        if (data.Contains("personality_type"))
+        {
+            personality = new PetAIPersonality((int)data["personality_type"]);
+            personality.curiosityLevel = data.Contains("curiosity_level") ? (float)data["curiosity_level"] : 0.5f;
+            personality.energyLevel = data.Contains("energy_level") ? (float)data["energy_level"] : 1.0f;
+            personality.loyaltyLevel = data.Contains("loyalty_level") ? (float)data["loyalty_level"] : 0.5f;
+        }
+
+        if (data.Contains("adaptation_level"))
+        {
+            learning.adaptationLevel = (float)data["adaptation_level"];
+            learning.learningData["total_battles"] = data.Contains("total_battles") ? data["total_battles"] : 0;
+            learning.learningData["wins"] = data.Contains("wins") ? data["wins"] : 0;
+            learning.learningData["losses"] = data.Contains("losses") ? data["losses"] : 0;
+            learning.learningData["best_combo"] = data.Contains("best_combo") ? data["best_combo"] : 0;
+        }
+
+        if (data.Contains("enemy_type_kills"))
+        {
+            learning.enemyTypeKills = (Dictionary)data["enemy_type_kills"];
+        }
+
+        if (data.Contains("current_emotion"))
+        {
+            emotion.currentEmotion = (int)data["current_emotion"];
+            emotion.emotionIntensity = data.Contains("emotion_intensity") ? (float)data["emotion_intensity"] : 0.5f;
+        }
+
+        totalDamageDealt = data.Contains("total_damage_dealt") ? (float)data["total_damage_dealt"] : 0f;
+        totalDamagePrevented = data.Contains("total_damage_prevented") ? (float)data["total_damage_prevented"] : 0f;
+        totalHealingDone = data.Contains("total_healing_done") ? (float)data["total_healing_done"] : 0f;
+        criticalHits = data.Contains("critical_hits") ? (int)data["critical_hits"] : 0;
+        perfectDodges = data.Contains("perfect_dodges") ? (int)data["perfect_dodges"] : 0;
+    }
+}
