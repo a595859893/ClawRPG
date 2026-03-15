@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Systems.ProceduralDungeon
 {
@@ -34,12 +35,14 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         
         private Random _random;
         private ProceduralDungeonDatabase _database;
+        private GameModeConfig _gameModeConfig;
         
         public ProceduralDungeonSystem()
         {
             _instance = this;
             _random = new Random();
             _database = ProceduralDungeonDatabase.Instance;
+            _gameModeConfig = GameModeConfig.Instance;
             Statistics = new DungeonStatistics();
         }
         
@@ -73,7 +76,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
             {
                 DungeonId = Guid.NewGuid().ToString(),
                 DungeonName = config.DisplayName,
-                TotalFloors = config.TotalFloors,
+                TotalFloors = (int)(config.TotalFloors * _gameModeConfig.GetFloorCountMultiplier()),
                 CurrentFloor = 1
             };
             
@@ -122,8 +125,22 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
                 FloorName = $"{config.DisplayName} - {floorConfig.FloorName}"
             };
             
-            // 决定房间数量
-            int roomCount = _random.Next(floorConfig.MinRooms, floorConfig.MaxRooms + 1);
+            // 决定房间数量 - 支持快速模式
+            int roomCount;
+            bool quickMode = GameModeManager.Instance?.IsQuickMode() ?? false;
+            
+            if (quickMode)
+            {
+                // 快速模式：减少房间数量
+                var gameConfig = GameModeManager.Instance;
+                var (min, max) = gameConfig.GetRoomRange(floorConfig.MinRooms, floorConfig.MaxRooms);
+                roomCount = _random.Next(min, max + 1);
+                GD.Print($"[QuickMode] Room count reduced: {floorConfig.MinRooms}-{floorConfig.MaxRooms} -> {min}-{max}");
+            }
+            else
+            {
+                roomCount = _random.Next(floorConfig.MinRooms, floorConfig.MaxRooms + 1);
+            }
             
             // 生成房间布局
             var rooms = GenerateRoomLayout(roomCount, config, floorNumber, isBossFloor);

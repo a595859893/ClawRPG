@@ -8,6 +8,7 @@ using ClawRPG.Scripts.Database;
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Manages enemy spawning using the EnemyDatabase
+    /// Supports Quick Mode with reduced enemy count and strength
     /// </summary>
     public partial class EnemySpawner : Node
     {
@@ -37,8 +38,23 @@ namespace ClawRPG.Scripts.Systems {
         private int _currentWave = 1;
         private float _waveTimer;
         
+        // Quick mode support
+        private bool _quickModeEnabled = false;
+        
         public override void _Ready()
         {
+            // Check for quick mode
+            if (GameModeManager.Instance != null)
+            {
+                _quickModeEnabled = GameModeManager.Instance.IsQuickMode();
+            }
+            
+            // Adjust spawn settings for quick mode
+            if (_quickModeEnabled)
+            {
+                AdjustForQuickMode();
+            }
+            
             // Find player
             _player = GetTree().GetFirstNodeInGroup("player") as Player;
             
@@ -58,6 +74,37 @@ namespace ClawRPG.Scripts.Systems {
             }
             
             GD.Print("[EnemySpawner] Ready - Max Enemies: " + MaxEnemies);
+            if (_quickModeEnabled)
+            {
+                GD.Print("[EnemySpawner] Quick Mode active - enemies reduced");
+            }
+        }
+        
+        /// <summary>
+        /// Adjust spawn settings for quick mode
+        /// </summary>
+        private void AdjustForQuickMode()
+        {
+            var config = GameModeManager.Instance;
+            
+            // Reduce max enemies
+            MaxEnemies = config.GetMaxEnemies(MaxEnemies);
+            MaxEnemies = Math.Max(MaxEnemies, 3); // Minimum 3 enemies
+            
+            // Reduce initial spawn count
+            InitialSpawnCount = (int)(InitialSpawnCount * config.GetEnemyCountMultiplier());
+            InitialSpawnCount = Math.Max(InitialSpawnCount, 2);
+            
+            // Reduce spawn interval for faster pacing
+            SpawnInterval = Math.Max(SpawnInterval * 0.7f, 2.0f);
+            
+            // Reduce wave size
+            if (UseWaves)
+            {
+                EnemiesPerWave = (int)(EnemiesPerWave * config.GetEnemyCountMultiplier());
+            }
+            
+            GD.Print($"[EnemySpawner] Quick Mode adjustments: MaxEnemies={MaxEnemies}, InitialSpawn={InitialSpawnCount}, Interval={SpawnInterval}");
         }
         
         /// <summary>
