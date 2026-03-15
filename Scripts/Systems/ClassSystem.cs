@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 public class ClassData
 {
@@ -492,8 +493,5 @@ public class ClassSystem : BaseSystem
     public void LoadData(Dictionary<string, object> data)
     {
         ImportSaveData(new Dictionary(data));
-    }
-}
-);
     }
 }

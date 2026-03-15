@@ -2,6 +2,7 @@ using Godot;
 using Godot.Collections;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
@@ -395,7 +396,5 @@ namespace ClawRPG.Scripts.Systems {
             
             UpdateEquippedStatus();
         }
-    }
-}t;
     }
 }

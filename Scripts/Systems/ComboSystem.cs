@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 public class ComboData : Resource
 {
@@ -459,8 +460,5 @@ public class ComboSystem : BaseSystem
     public void LoadSaveData(Dictionary<string, object> data)
     {
         ImportSaveData(new Dictionary(data));
-    }
-}
- }
     }
 }

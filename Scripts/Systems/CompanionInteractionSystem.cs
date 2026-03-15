@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Scripts.Systems
 {
@@ -672,8 +673,5 @@ namespace ClawRPG.Scripts.Systems
         {
             ImportSaveData(new Dictionary(data));
         }
-    }
-}
- }
     }
 }
