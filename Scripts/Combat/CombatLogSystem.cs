@@ -901,5 +901,384 @@ namespace ClawRPG.Scripts.Combat
         }
         
         #endregion
+        
+        #region Save/Load System
+        
+        /// <summary>
+        /// Export save data - implements BaseSystem interface
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // Session time
+            data["sessionTime"] = _currentSessionTime;
+            
+            // Log entries - serialize to list of dictionaries
+            var entriesList = new List<Dictionary>();
+            foreach (var entry in _logEntries)
+            {
+                entriesList.Add(new Dictionary
+                {
+                    ["timestamp"] = entry.Timestamp,
+                    ["type"] = (int)entry.Type,
+                    ["message"] = entry.Message,
+                    ["value"] = entry.Value,
+                    ["source"] = entry.Source,
+                    ["target"] = entry.Target,
+                    ["isPlayerAction"] = entry.IsPlayerAction
+                });
+            }
+            data["logEntries"] = entriesList;
+            
+            // Statistics
+            data["statistics"] = new Dictionary
+            {
+                ["totalEntries"] = _statistics.TotalEntries,
+                ["damageEntries"] = _statistics.DamageEntries,
+                ["healingEntries"] = _statistics.HealingEntries,
+                ["killEntries"] = _statistics.KillEntries,
+                ["criticalHits"] = _statistics.CriticalHits,
+                ["misses"] = _statistics.Misses,
+                ["blocks"] = _statistics.Blocks,
+                ["dodges"] = _statistics.Dodges,
+                ["totalDamageDealt"] = _statistics.TotalDamageDealt,
+                ["totalDamageTaken"] = _statistics.TotalDamageTaken,
+                ["totalHealing"] = _statistics.TotalHealing
+            };
+            
+            // Filters
+            data["filters"] = new Dictionary
+            {
+                ["showDamage"] = _showDamage,
+                ["showHealing"] = _showHealing,
+                ["showBuffs"] = _showBuffs,
+                ["showSkills"] = _showSkills,
+                ["showCombat"] = _showCombat,
+                ["showInfo"] = _showInfo,
+                ["playerOnly"] = _playerOnly,
+                ["enemyOnly"] = _enemyOnly
+            };
+            
+            // Combo
+            data["combo"] = new Dictionary
+            {
+                ["currentCombo"] = _currentCombo,
+                ["comboTimer"] = _comboTimer
+            };
+            
+            // Kill streak
+            data["killStreak"] = new Dictionary
+            {
+                ["killStreak"] = _killStreak,
+                ["killStreakTimer"] = _killStreakTimer
+            };
+            
+            // Configuration
+            data["config"] = new Dictionary
+            {
+                ["maxEntries"] = _maxEntries,
+                ["autoClearTime"] = _autoClearTime,
+                ["comboTimeWindow"] = _comboTimeWindow
+            };
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// Import save data - implements BaseSystem interface
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // Session time
+            if (data.Contains("sessionTime"))
+                _currentSessionTime = Convert.ToSingle(data["sessionTime"]);
+            
+            // Log entries
+            if (data.Contains("logEntries"))
+            {
+                _logEntries.Clear();
+                var entriesList = data["logEntries"] as List;
+                if (entriesList != null)
+                {
+                    foreach (Dictionary entryData in entriesList)
+                    {
+                        var entry = new CombatLogEntry
+                        {
+                            Timestamp = entryData.Contains("timestamp") ? Convert.ToSingle(entryData["timestamp"]) : 0f,
+                            Type = entryData.Contains("type") ? (CombatLogType)Convert.ToInt32(entryData["type"]) : CombatLogType.Info,
+                            Message = entryData.Contains("message") ? entryData["message"].ToString() : "",
+                            Value = entryData.Contains("value") ? Convert.ToSingle(entryData["value"]) : 0f,
+                            Source = entryData.Contains("source") ? entryData["source"].ToString() : "",
+                            Target = entryData.Contains("target") ? entryData["target"].ToString() : "",
+                            IsPlayerAction = entryData.Contains("isPlayerAction") ? Convert.ToBoolean(entryData["isPlayerAction"]) : true
+                        };
+                        _logEntries.Add(entry);
+                    }
+                }
+            }
+            
+            // Statistics
+            if (data.Contains("statistics"))
+            {
+                var statsData = data["statistics"] as Dictionary;
+                if (statsData != null)
+                {
+                    _statistics.TotalEntries = statsData.Contains("totalEntries") ? Convert.ToInt32(statsData["totalEntries"]) : 0;
+                    _statistics.DamageEntries = statsData.Contains("damageEntries") ? Convert.ToInt32(statsData["damageEntries"]) : 0;
+                    _statistics.HealingEntries = statsData.Contains("healingEntries") ? Convert.ToInt32(statsData["healingEntries"]) : 0;
+                    _statistics.KillEntries = statsData.Contains("killEntries") ? Convert.ToInt32(statsData["killEntries"]) : 0;
+                    _statistics.CriticalHits = statsData.Contains("criticalHits") ? Convert.ToInt32(statsData["criticalHits"]) : 0;
+                    _statistics.Misses = statsData.Contains("misses") ? Convert.ToInt32(statsData["misses"]) : 0;
+                    _statistics.Blocks = statsData.Contains("blocks") ? Convert.ToInt32(statsData["blocks"]) : 0;
+                    _statistics.Dodges = statsData.Contains("dodges") ? Convert.ToInt32(statsData["dodges"]) : 0;
+                    _statistics.TotalDamageDealt = statsData.Contains("totalDamageDealt") ? Convert.ToSingle(statsData["totalDamageDealt"]) : 0f;
+                    _statistics.TotalDamageTaken = statsData.Contains("totalDamageTaken") ? Convert.ToSingle(statsData["totalDamageTaken"]) : 0f;
+                    _statistics.TotalHealing = statsData.Contains("totalHealing") ? Convert.ToSingle(statsData["totalHealing"]) : 0f;
+                }
+            }
+            
+            // Filters
+            if (data.Contains("filters"))
+            {
+                var filtersData = data["filters"] as Dictionary;
+                if (filtersData != null)
+                {
+                    _showDamage = filtersData.Contains("showDamage") && Convert.ToBoolean(filtersData["showDamage"]);
+                    _showHealing = filtersData.Contains("showHealing") && Convert.ToBoolean(filtersData["showHealing"]);
+                    _showBuffs = filtersData.Contains("showBuffs") && Convert.ToBoolean(filtersData["showBuffs"]);
+                    _showSkills = filtersData.Contains("showSkills") && Convert.ToBoolean(filtersData["showSkills"]);
+                    _showCombat = filtersData.Contains("showCombat") && Convert.ToBoolean(filtersData["showCombat"]);
+                    _showInfo = filtersData.Contains("showInfo") && Convert.ToBoolean(filtersData["showInfo"]);
+                    _playerOnly = filtersData.Contains("playerOnly") && Convert.ToBoolean(filtersData["playerOnly"]);
+                    _enemyOnly = filtersData.Contains("enemyOnly") && Convert.ToBoolean(filtersData["enemyOnly"]);
+                }
+            }
+            
+            // Combo
+            if (data.Contains("combo"))
+            {
+                var comboData = data["combo"] as Dictionary;
+                if (comboData != null)
+                {
+                    _currentCombo = comboData.Contains("currentCombo") ? Convert.ToInt32(comboData["currentCombo"]) : 0;
+                    _comboTimer = comboData.Contains("comboTimer") ? Convert.ToSingle(comboData["comboTimer"]) : 0f;
+                }
+            }
+            
+            // Kill streak
+            if (data.Contains("killStreak"))
+            {
+                var streakData = data["killStreak"] as Dictionary;
+                if (streakData != null)
+                {
+                    _killStreak = streakData.Contains("killStreak") ? Convert.ToInt32(streakData["killStreak"]) : 0;
+                    _killStreakTimer = streakData.Contains("killStreakTimer") ? Convert.ToSingle(streakData["killStreakTimer"]) : 0f;
+                }
+            }
+            
+            // Configuration
+            if (data.Contains("config"))
+            {
+                var configData = data["config"] as Dictionary;
+                if (configData != null)
+                {
+                    _maxEntries = configData.Contains("maxEntries") ? Convert.ToInt32(configData["maxEntries"]) : 500;
+                    _autoClearTime = configData.Contains("autoClearTime") ? Convert.ToSingle(configData["autoClearTime"]) : 300f;
+                    _comboTimeWindow = configData.Contains("comboTimeWindow") ? Convert.ToSingle(configData["comboTimeWindow"]) : 3f;
+                }
+            }
+            
+            // Rebuild filtered entries
+            ApplyFilters();
+            
+            GD.Print("[CombatLogSystem] Save data imported successfully");
+        }
+        
+        #endregion
+
+        #region 数据持久化
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+
+            // 会话时间
+            data["sessionTime"] = _currentSessionTime;
+
+            // 统计信息
+            var stats = new Dictionary
+            {
+                { "totalEntries", _statistics.TotalEntries },
+                { "damageEntries", _statistics.DamageEntries },
+                { "healingEntries", _statistics.HealingEntries },
+                { "killEntries", _statistics.KillEntries },
+                { "criticalHits", _statistics.CriticalHits },
+                { "misses", _statistics.Misses },
+                { "blocks", _statistics.Blocks },
+                { "dodges", _statistics.Dodges },
+                { "totalDamageDealt", _statistics.TotalDamageDealt },
+                { "totalDamageTaken", _statistics.TotalDamageTaken },
+                { "totalHealing", _statistics.TotalHealing }
+            };
+            data["statistics"] = stats;
+
+            // 筛选器设置
+            var filters = new Dictionary
+            {
+                { "showDamage", _showDamage },
+                { "showHealing", _showHealing },
+                { "showBuffs", _showBuffs },
+                { "showSkills", _showSkills },
+                { "showCombat", _showCombat },
+                { "showInfo", _showInfo },
+                { "playerOnly", _playerOnly },
+                { "enemyOnly", _enemyOnly }
+            };
+            data["filters"] = filters;
+
+            // 连击状态
+            var combo = new Dictionary
+            {
+                { "currentCombo", _currentCombo },
+                { "comboTimer", _comboTimer }
+            };
+            data["combo"] = combo;
+
+            // 击杀streak
+            var killStreak = new Dictionary
+            {
+                { "killStreak", _killStreak },
+                { "killStreakTimer", _killStreakTimer }
+            };
+            data["killStreak"] = killStreak;
+
+            // 日志条目（只保存最后100条，避免存档过大）
+            var entries = new ArrayList();
+            var startIndex = Math.Max(0, _logEntries.Count - 100);
+            for (int i = startIndex; i < _logEntries.Count; i++)
+            {
+                var entry = _logEntries[i];
+                entries.Add(new Dictionary
+                {
+                    { "timestamp", entry.Timestamp },
+                    { "type", (int)entry.Type },
+                    { "message", entry.Message ?? "" },
+                    { "value", entry.Value },
+                    { "source", entry.Source ?? "" },
+                    { "target", entry.Target ?? "" },
+                    { "isPlayerAction", entry.IsPlayerAction }
+                });
+            }
+            data["logEntries"] = entries;
+
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            // 恢复会话时间
+            if (data.Contains("sessionTime"))
+                _currentSessionTime = Convert.ToSingle(data["sessionTime"]);
+
+            // 恢复统计信息
+            if (data.Contains("statistics"))
+            {
+                var stats = data["statistics"] as Dictionary;
+                if (stats != null)
+                {
+                    if (stats.Contains("totalEntries")) _statistics.TotalEntries = Convert.ToInt32(stats["totalEntries"]);
+                    if (stats.Contains("damageEntries")) _statistics.DamageEntries = Convert.ToInt32(stats["damageEntries"]);
+                    if (stats.Contains("healingEntries")) _statistics.HealingEntries = Convert.ToInt32(stats["healingEntries"]);
+                    if (stats.Contains("killEntries")) _statistics.KillEntries = Convert.ToInt32(stats["killEntries"]);
+                    if (stats.Contains("criticalHits")) _statistics.CriticalHits = Convert.ToInt32(stats["criticalHits"]);
+                    if (stats.Contains("misses")) _statistics.Misses = Convert.ToInt32(stats["misses"]);
+                    if (stats.Contains("blocks")) _statistics.Blocks = Convert.ToInt32(stats["blocks"]);
+                    if (stats.Contains("dodges")) _statistics.Dodges = Convert.ToInt32(stats["dodges"]);
+                    if (stats.Contains("totalDamageDealt")) _statistics.TotalDamageDealt = Convert.ToSingle(stats["totalDamageDealt"]);
+                    if (stats.Contains("totalDamageTaken")) _statistics.TotalDamageTaken = Convert.ToSingle(stats["totalDamageTaken"]);
+                    if (stats.Contains("totalHealing")) _statistics.TotalHealing = Convert.ToSingle(stats["totalHealing"]);
+                }
+            }
+
+            // 恢复筛选器设置
+            if (data.Contains("filters"))
+            {
+                var filters = data["filters"] as Dictionary;
+                if (filters != null)
+                {
+                    if (filters.Contains("showDamage")) _showDamage = Convert.ToBoolean(filters["showDamage"]);
+                    if (filters.Contains("showHealing")) _showHealing = Convert.ToBoolean(filters["showHealing"]);
+                    if (filters.Contains("showBuffs")) _showBuffs = Convert.ToBoolean(filters["showBuffs"]);
+                    if (filters.Contains("showSkills")) _showSkills = Convert.ToBoolean(filters["showSkills"]);
+                    if (filters.Contains("showCombat")) _showCombat = Convert.ToBoolean(filters["showCombat"]);
+                    if (filters.Contains("showInfo")) _showInfo = Convert.ToBoolean(filters["showInfo"]);
+                    if (filters.Contains("playerOnly")) _playerOnly = Convert.ToBoolean(filters["playerOnly"]);
+                    if (filters.Contains("enemyOnly")) _enemyOnly = Convert.ToBoolean(filters["enemyOnly"]);
+                }
+            }
+
+            // 恢复连击状态
+            if (data.Contains("combo"))
+            {
+                var combo = data["combo"] as Dictionary;
+                if (combo != null)
+                {
+                    if (combo.Contains("currentCombo")) _currentCombo = Convert.ToInt32(combo["currentCombo"]);
+                    if (combo.Contains("comboTimer")) _comboTimer = Convert.ToSingle(combo["comboTimer"]);
+                }
+            }
+
+            // 恢复击杀streak
+            if (data.Contains("killStreak"))
+            {
+                var killStreak = data["killStreak"] as Dictionary;
+                if (killStreak != null)
+                {
+                    if (killStreak.Contains("killStreak")) _killStreak = Convert.ToInt32(killStreak["killStreak"]);
+                    if (killStreak.Contains("killStreakTimer")) _killStreakTimer = Convert.ToSingle(killStreak["killStreakTimer"]);
+                }
+            }
+
+            // 恢复日志条目
+            if (data.Contains("logEntries"))
+            {
+                _logEntries.Clear();
+                var entries = data["logEntries"] as ArrayList;
+                if (entries != null)
+                {
+                    foreach (Dictionary entryData in entries)
+                    {
+                        var entry = new CombatLogEntry
+                        {
+                            Timestamp = entryData.Contains("timestamp") ? Convert.ToSingle(entryData["timestamp"]) : 0f,
+                            Type = entryData.Contains("type") ? (CombatLogType)Convert.ToInt32(entryData["type"]) : CombatLogType.Info,
+                            Message = entryData.Contains("message") ? entryData["message"].ToString() : "",
+                            Value = entryData.Contains("value") ? Convert.ToSingle(entryData["value"]) : 0f,
+                            Source = entryData.Contains("source") ? entryData["source"].ToString() : "",
+                            Target = entryData.Contains("target") ? entryData["target"].ToString() : "",
+                            IsPlayerAction = entryData.Contains("isPlayerAction") && Convert.ToBoolean(entryData["isPlayerAction"])
+                        };
+                        _logEntries.Add(entry);
+                    }
+                }
+                // 重新应用筛选器
+                ApplyFilters();
+            }
+
+            GD.Print("[CombatLogSystem] Save data imported successfully");
+        }
+
+        #endregion
     }
 }
