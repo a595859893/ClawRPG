@@ -1134,7 +1134,7 @@ namespace ClawRPG.Scripts {
             AddChild(mainSaveLoad);
 
             // Load game data
-            LoadGameData();
+            mainSaveLoad.LoadGameData();
 
             GD.Print("Game initialized successfully!");
         }
@@ -2022,68 +2022,11 @@ namespace ClawRPG.Scripts {
 
         private void LoadGameData()
         {
-            // Load player data if exists
-            var saveSystem = new SaveSystem();
-            if (saveSystem.HasSave(0))
+            // Delegate to MainSaveLoad
+            var mainSaveLoad = GetNodeOrNull<MainSaveLoad>("MainSaveLoad");
+            if (mainSaveLoad != null)
             {
-                GD.Print("Found save file, loading...");
-                var data = saveSystem.LoadGame(0);
-                if (data != null)
-                {
-                    // Load statistics
-                    var statsData = new Dictionary<string, object>
-                    {
-                        ["TotalKills"] = data.TotalKills,
-                        ["TotalDeaths"] = data.TotalDeaths,
-                        ["TotalDamageDealt"] = data.TotalDamageDealt,
-                        ["TotalDamageTaken"] = data.TotalDamageTaken,
-                        ["TotalHealing"] = data.TotalHealing,
-                        ["CriticalHits"] = data.CriticalHits,
-                        ["PerfectBlocks"] = data.PerfectBlocks,
-                        ["Dodges"] = data.Dodges,
-                        ["GoldEarned"] = data.GoldEarned,
-                        ["GoldSpent"] = data.GoldSpent,
-                        ["ExperienceGained"] = data.ExperienceGained,
-                        ["ItemsCollected"] = data.ItemsCollected,
-                        ["ItemsCrafted"] = data.ItemsCrafted,
-                        ["QuestsCompleted"] = data.QuestsCompleted,
-                        ["SkillsLearned"] = data.SkillsLearned,
-                        ["SkillsUsed"] = data.SkillsUsed,
-                        ["RegionsDiscovered"] = data.RegionsDiscovered,
-                        ["EnemiesEncountered"] = data.EnemiesEncountered,
-                        ["BossesDefeated"] = data.BossesDefeated,
-                        ["TotalPlayTime"] = data.TotalPlayTime,
-                        ["HighestLevel"] = data.HighestLevel,
-                        ["HighestCombo"] = data.HighestCombo,
-                        ["AchievementsUnlocked"] = data.AchievementsUnlocked
-                    };
-                    StatisticsManager.Instance.LoadStatistics(statsData);
-                    GD.Print("Statistics loaded successfully!");
-
-                    // Load combo system data
-                    var comboSystem = GetNodeOrNull<ComboSystem>("ComboSystem");
-                    if (comboSystem != null && data.ComboData != null)
-                    {
-                        comboSystem.Deserialize(data.ComboData);
-                        GD.Print("Combo data loaded successfully!");
-                    }
-
-                    // Load keybinding data
-                    var keybindingSystem = GetNodeOrNull<Systems.KeybindingSystem>("KeybindingSystem");
-                    if (keybindingSystem != null && data.KeybindingData != null)
-                    {
-                        keybindingSystem.Deserialize(data.KeybindingData);
-                        GD.Print("Keybinding data loaded successfully!");
-                    }
-                    
-                    // Load pet story data
-                    var petStorySystem = GetNodeOrNull<PetStorySystem>("PetStorySystem");
-                    if (petStorySystem != null && data.PetStoryData != null)
-                    {
-                        petStorySystem.Deserialize(data.PetStoryData);
-                        GD.Print("Pet story data loaded successfully!");
-                    }
-                }
+                mainSaveLoad.LoadGameData();
             }
         }
 
