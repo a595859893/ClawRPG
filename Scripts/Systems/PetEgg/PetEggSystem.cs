@@ -326,3 +326,64 @@ public class PetEgg
     public bool isHatching = false;
     public bool isHatched = false;
 }
+
+/// <summary>
+/// 导出保存数据
+/// </summary>
+public override Dictionary ExportSaveData()
+{
+    var data = new Dictionary();
+    
+    // 拥有的蛋
+    var eggsList = new Array();
+    foreach (var kvp in ownedEggs)
+    {
+        var eggDict = new Dictionary
+        {
+            { "egg_id", kvp.Value.eggId },
+            { "acquire_time", kvp.Value.acquireTime },
+            { "hatch_start_time", kvp.Value.hatchStartTime },
+            { "is_hatching", kvp.Value.isHatching },
+            { "is_hatched", kvp.Value.isHatched }
+        };
+        eggsList.Add(eggDict);
+    }
+    data["owned_eggs"] = eggsList;
+    
+    // 统计数据
+    data["total_eggs_hatched"] = totalEggsHatched;
+    data["total_gold_spent"] = totalGoldSpent;
+    
+    return data;
+}
+
+/// <summary>
+/// 导入保存数据
+/// </summary>
+public override void ImportSaveData(Dictionary data)
+{
+    if (data == null) return;
+    
+    // 拥有的蛋
+    if (data.Contains("owned_eggs"))
+    {
+        ownedEggs = new Dictionary<string, PetEgg>();
+        var eggsArray = (Array)data["owned_eggs"];
+        foreach (Dictionary eggDict in eggsArray)
+        {
+            var egg = new PetEgg
+            {
+                eggId = (string)eggDict["egg_id"],
+                acquireTime = (float)eggDict["acquire_time"],
+                hatchStartTime = (float)eggDict["hatch_start_time"],
+                isHatching = (bool)eggDict["is_hatching"],
+                isHatched = (bool)eggDict["is_hatched"]
+            };
+            ownedEggs[egg.eggId] = egg;
+        }
+    }
+    
+    // 统计数据
+    totalEggsHatched = (int)data.GetValueOrDefault("total_eggs_hatched", 0);
+    totalGoldSpent = (int)data.GetValueOrDefault("total_gold_spent", 0);
+}

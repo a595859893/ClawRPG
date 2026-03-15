@@ -357,4 +357,32 @@ public class PetBreedingSystem : BaseSystem
         _data = new PetBreedingData();
         SaveData();
     }
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        if (_data != null)
+        {
+            var dataData = _data.ExportSaveData();
+            foreach (var kvp in dataData)
+            {
+                data[kvp.Key] = kvp.Value;
+            }
+        }
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || _data == null) return;
+        _data.ImportSaveData(data);
+    }
 }
