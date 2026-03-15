@@ -323,6 +323,35 @@ public class SealedTowerManager : BaseSystem
         if (data.ContainsKey("wins"))
             _wins = (int)data["wins"];
     }
+    
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "current_floor", _currentFloor },
+            { "max_floor_reached", _maxFloorReached },
+            { "total_runs", _totalRuns },
+            { "wins", _wins },
+            { "is_in_tower", _isInTower }
+        };
+    }
+    
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("current_floor")) _currentFloor = (int)data["current_floor"];
+        if (data.Contains("max_floor_reached")) _maxFloorReached = (int)data["max_floor_reached"];
+        if (data.Contains("total_runs")) _totalRuns = (int)data["total_runs"];
+        if (data.Contains("wins")) _wins = (int)data["wins"];
+        if (data.Contains("is_in_tower")) _isInTower = (bool)data["is_in_tower"];
+    }
 }
 
 public class TowerFloor

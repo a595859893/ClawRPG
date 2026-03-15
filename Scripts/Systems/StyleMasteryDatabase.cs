@@ -186,4 +186,20 @@ public class StyleMasteryDatabase : BaseSystem
     {
         return Styles;
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }

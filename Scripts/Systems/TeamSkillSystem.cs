@@ -430,4 +430,20 @@ public class TeamSkillSystem : BaseSystem
         var team = TeamSystem.Instance.CurrentTeam;
         return team != null && team.Members.Count >= skill.RequiredMembers;
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }

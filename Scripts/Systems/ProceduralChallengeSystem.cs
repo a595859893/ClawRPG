@@ -349,4 +349,20 @@ public class ProceduralChallengeSystem : BaseSystem
             _lastRefreshTime = (float)data["last_refresh"];
         }
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }

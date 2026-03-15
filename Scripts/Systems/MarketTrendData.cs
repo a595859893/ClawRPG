@@ -55,6 +55,22 @@ public class MarketTrendData : BaseSystem
     {
         LastUpdateTime = Time.GetUnixTimeFromSystem();
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }
 
 /// <summary>
@@ -89,6 +105,22 @@ public class PriceRecord
         Timestamp = timestamp;
         Price = price;
         Volume = volume;
+    }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
     }
 }
 
@@ -140,6 +172,22 @@ public class MarketTrend
         Volatility = 0;
         TrendStrength = 0;
         Duration = 0;
+    }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
     }
 }
 
@@ -195,6 +243,22 @@ public class MarketPrediction
         IsCorrect = false;
         Confidence = confidence;
     }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }
 
 /// <summary>
@@ -221,4 +285,20 @@ public enum TrendDirection
     /// Price is highly volatile with significant fluctuations.
     /// </summary>
     Volatile
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }

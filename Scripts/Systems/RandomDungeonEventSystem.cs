@@ -43,6 +43,22 @@ public partial class RandomDungeonEventData : BaseSystem
     
     // Daily reset tracking
     public string LastEventDate { get; set; } = "";
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }
 
 public enum DungeonEventCategory
@@ -57,6 +73,22 @@ public enum DungeonEventCategory
     Exploration,
     Trap,
     Reward
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }
 
 public enum DungeonEventRarity
@@ -66,6 +98,22 @@ public enum DungeonEventRarity
     Rare,
     Epic,
     Legendary
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }
 
 public enum DungeonEventOutcome
@@ -74,6 +122,22 @@ public enum DungeonEventOutcome
     Failure,
     Mixed,
     Nothing
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
+    }
 }
 
 [GlobalClass]
@@ -950,5 +1014,21 @@ public partial class RandomDungeonEventSystem : BaseSystem
             _data.ItemsGained = Convert.ToInt32(saveData["items_gained"]);
         if (saveData.ContainsKey("items_lost"))
             _data.ItemsLost = Convert.ToInt32(saveData["items_lost"]);
+    }
+
+    /// <summary>
+    /// Export save data for persistence
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+
+    /// <summary>
+    /// Import save data from persistence
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No persistent data needed
     }
 }
