@@ -1,323 +1,532 @@
-# Combo Skill System - 连击技能系统核心
-## 连击技能系统核心逻辑
+using Godot;
+using System;
+using System.Collections.Generic;
 
-extends Node
-class_name ComboSkillSystem
+/// <summary>
+/// Combo Skill System - 连击技能系统核心
+/// </summary>
+public class ComboSkillSystem : BaseSystem
+{
+    // 信号定义 (C# 事件)
+    public event Action<string> OnComboExecuted;
+    public event Action<string> OnComboCompleted;
+    public event Action<string, int> OnComboStepTriggered;
+    public event Action<string> OnComboCancelled;
+    public event Action<string, float> OnCooldownUpdated;
+    public event Action<string> OnComboUnlocked;
 
-## 连击执行信号
-signal combo_executed(combo_id: String)
+    // 枚举定义
+    public enum ComboType
+    {
+        Sequential,
+        Parallel,
+        Chain,
+        Conditional
+    }
 
-## 连击完成信号
-signal combo_completed(combo_id: String)
+    public enum TriggerCondition
+    {
+        OnHit,
+        OnCritical,
+        OnKill,
+        OnDamageTaken,
+        OnHealthBelow,
+        OnManaBelow,
+        OnEnemyType,
+        OnComboComplete,
+        Manual,
+        Cooldown
+    }
 
-## 连击步骤触发信号
-signal combo_step_triggered(combo_id: String, step: int)
+    public enum EffectType
+    {
+        Damage,
+        Heal,
+        Shield,
+        Buff,
+        Debuff,
+        Teleport,
+        Summon,
+        Transform,
+        ClearDebuffs,
+        GrantInvulnerability
+    }
 
-## 连击取消信号
-signal combo_cancelled(combo_id: String)
+    // 内部类定义
+    public class ComboSkillEffect
+    {
+        public EffectType effectType;
+        public float value;
+        public float duration = 0f;
+        public string description = "";
+        public string target = "enemy";
+    }
 
-## 冷却更新信号
-signal cooldown_updated(combo_id: String, remaining: float)
-signal combo_unlocked(combo_id: String)
+    public class ComboStep
+    {
+        public string skillId = "";
+        public float delay = 0f;
+        public TriggerCondition condition = TriggerCondition.Manual;
+        public float conditionValue = 0f;
+        public List<ComboSkillEffect> effects = new List<ComboSkillEffect>();
+    }
 
-static var instance: ComboSkillSystem
+    public class ComboSkill
+    {
+        public string id = "";
+        public string name = "";
+        public string description = "";
+        public ComboType comboType;
+        public List<ComboStep> steps = new List<ComboStep>();
+        public float totalTime = 0f;
+        public float cooldown = 0f;
+        public float manaCost = 0f;
+        public int levelRequired = 1;
+        public int rarity = 0;
+    }
 
-# 玩家数据
-var unlocked_combos: Array[String] = []
-var equipped_combos: Array[PlayerComboSkill] = []
-var execution_queue: Array[ComboExecutionState] = []
+    public class PlayerComboSkill
+    {
+        public string comboId = "";
+        public bool isEquipped = false;
+        public float currentCooldown = 0f;
+        public int useCount = 0;
+    }
 
-# 统计
-var total_combos_executed: int = 0
-var total_combos_completed: int = 0
+    public class ComboExecutionState
+    {
+        public string comboId = "";
+        public int currentStep = 0;
+        public bool isExecuting = false;
+        public double startTime = 0;
+        public int effectsApplied = 0;
+    }
 
-func _ready():
-	instance = self
+    // 单例
+    private static ComboSkillSystem instance;
 
-static func get_instance():
-	return instance
+    // 玩家数据
+    private List<string> unlockedCombos = new List<string>();
+    private List<PlayerComboSkill> equippedCombos = new List<PlayerComboSkill>();
+    private List<ComboExecutionState> executionQueue = new List<ComboExecutionState>();
 
-# ============ 解锁管理 ============
+    // 统计
+    private int totalCombosExecuted = 0;
+    private int totalCombosCompleted = 0;
 
-func unlock_combo(combo_id: String) -> bool:
-	if unlocked_combos.has(combo_id):
-		return false
-	
-	var combo = ComboSkillDatabase.get_instance().get_combo(combo_id)
-	if combo == null:
-		return false
-	
-	unlocked_combos.append(combo_id)
-	combo_unlocked.emit(combo_id)
-	return true
+    // 数据库引用
+    private ComboSkillDatabase database;
 
-func is_unlocked(combo_id: String) -> bool:
-	return unlocked_combos.has(combo_id)
+    protected override void Initialize()
+    {
+        base.Initialize();
+        instance = this;
+        database = GetNodeOrNull<ComboSkillDatabase>("/root/ComboSkillDatabase");
+    }
 
-func get_unlocked_combos() -> Array[String]:
-	return unlocked_combos.duplicate()
+    public static ComboSkillSystem GetInstance()
+    {
+        return instance;
+    }
 
-# ============ 装备管理 ============
+    // ============ 解锁管理 ============
 
-func equip_combo(combo_id: String) -> bool:
-	if not unlocked_combos.has(combo_id):
-		return false
-	
-	# 检查是否已装备
-	for equipped in equipped_combos:
-		if equipped.combo_id == combo_id:
-			return true
-	
-	# 限制装备数量
-	if equipped_combos.size() >= 5:
-		return false
-	
-	var combo = ComboSkillDatabase.get_instance().get_combo(combo_id)
-	if combo == null:
-		return false
-	
-	var player_combo = PlayerComboSkill.new()
-	player_combo.combo_id = combo_id
-	player_combo.is_equipped = true
-	player_combo.current_cooldown = 0.0
-	player_combo.use_count = 0
-	
-	equipped_combos.append(player_combo)
-	return true
+    public bool UnlockCombo(string comboId)
+    {
+        if (unlockedCombos.Contains(comboId))
+            return false;
 
-func unequip_combo(combo_id: String) -> bool:
-	for equipped in equipped_combos:
-		if equipped.combo_id == combo_id:
-			equipped.is_equipped = false
-			equipped_combos.erase(equipped)
-			return true
-	return false
+        var combo = database?.GetCombo(comboId);
+        if (combo == null)
+            return false;
 
-func is_equipped(combo_id: String) -> bool:
-	for equipped in equipped_combos:
-		if equipped.combo_id == combo_id:
-			return equipped.is_equipped
-	return false
+        unlockedCombos.Add(comboId);
+        OnComboUnlocked?.Invoke(comboId);
+        return true;
+    }
 
-func get_equipped_combos() -> Array[PlayerComboSkill]:
-	return equipped_combos.duplicate()
+    public bool IsUnlocked(string comboId)
+    {
+        return unlockedCombos.Contains(comboId);
+    }
 
-# ============ 执行系统 ============
+    public List<string> GetUnlockedCombos()
+    {
+        return new List<string>(unlockedCombos);
+    }
 
-func execute_combo(combo_id: String) -> bool:
-	if not unlocked_combos.has(combo_id):
-		return false
-	
-	# 检查冷却
-	var player_combo = _get_player_combo(combo_id)
-	if player_combo != null and player_combo.current_cooldown > 0:
-		return false
-	
-	# 检查是否正在执行
-	for state in execution_queue:
-		if state.combo_id == combo_id:
-			return false
-	
-	var combo = ComboSkillDatabase.get_instance().get_combo(combo_id)
-	if combo == null:
-		return false
-	
-	# 创建执行状态
-	var state = ComboExecutionState.new()
-	state.combo_id = combo_id
-	state.current_step = 0
-	state.is_executing = true
-	state.start_time = Time.get_unix_time_from_system()
-	state.effects_applied = 0
-	
-	execution_queue.append(state)
-	
-	# 设置冷却
-	if player_combo != null:
-		player_combo.current_cooldown = combo.cooldown
-		player_combo.use_count += 1
-	
-	total_combos_executed += 1
-	combo_executed.emit(combo_id)
-	
-	# 开始执行第一步
-	_execute_step(state)
-	
-	return true
+    // ============ 装备管理 ============
 
-func _execute_step(state: ComboExecutionState):
-	if not state.is_executing:
-		return
-	
-	var combo = ComboSkillDatabase.get_instance().get_combo(state.combo_id)
-	if combo == null or state.current_step >= combo.steps.size():
-		_complete_combo(state)
-		return
-	
-	var step = combo.steps[state.current_step]
-	
-	# 延迟执行
-	if step.delay > 0:
-		await get_tree().create_timer(step.delay).timeout
-	
-	# 检查触发条件
-	if not _check_condition(step):
-		# 条件不满足，跳过此步骤
-		state.current_step += 1
-		_execute_step(state)
-		return
-	
-	# 执行效果
-	_apply_effects(step.effects)
-	state.effects_applied += step.effects.size()
-	combo_step_triggered.emit(state.combo_id, state.current_step)
-	
-	state.current_step += 1
-	
-	# 继续下一步或完成
-	if state.current_step < combo.steps.size():
-		_execute_step(state)
-	else:
-		_complete_combo(state)
+    public bool EquipCombo(string comboId)
+    {
+        if (!unlockedCombos.Contains(comboId))
+            return false;
 
-func _check_condition(step: ComboStep) -> bool:
-	match step.condition:
-		TriggerCondition.Manual:
-			return true
-		TriggerCondition.OnHit:
-			# 需要外部事件触发
-			return true
-		TriggerCondition.OnCritical:
-			# 需要外部事件触发
-			return false
-		TriggerCondition.OnKill:
-			return false
-		TriggerCondition.OnHealthBelow:
-			# 需要获取玩家生命值
-			# var player_health = 100  # 从玩家系统获取
-			# return player_health < step.condition_value
-			return false
-		TriggerCondition.OnManaBelow:
-			return false
-		_:
-			return true
+        // 检查是否已装备
+        foreach (var equipped in equippedCombos)
+        {
+            if (equipped.comboId == comboId)
+                return true;
+        }
 
-func _apply_effects(effects: Array):
-	for effect in effects:
-		match effect.effect_type:
-			EffectType.Damage:
-				_apply_damage(effect.value)
-			EffectType.Heal:
-				_apply_heal(effect.value)
-			EffectType.Shield:
-				_apply_shield(effect.value, effect.duration)
-			EffectType.Buff:
-				_apply_buff(effect.value, effect.duration)
-			EffectType.Debuff:
-				_apply_debuff(effect.value, effect.duration)
+        // 限制装备数量
+        if (equippedCombos.Count >= 5)
+            return false;
 
-func _apply_damage(value: float):
-	# 实际伤害应用需要敌人目标
-	print("Combo Skill: Dealing %f damage" % value)
+        var combo = database?.GetCombo(comboId);
+        if (combo == null)
+            return false;
 
-func _apply_heal(value: float):
-	print("Combo Skill: Healing %f HP" % value)
+        var playerCombo = new PlayerComboSkill
+        {
+            comboId = comboId,
+            isEquipped = true,
+            currentCooldown = 0f,
+            useCount = 0
+        };
 
-func _apply_shield(value: float, duration: float):
-	print("Combo Skill: Shield %f for %f seconds" % [value, duration])
+        equippedCombos.Add(playerCombo);
+        return true;
+    }
 
-func _apply_buff(value: float, duration: float):
-	print("Combo Skill: Buff +%f for %f seconds" % [value, duration])
+    public bool UnequipCombo(string comboId)
+    {
+        for (int i = 0; i < equippedCombos.Count; i++)
+        {
+            if (equippedCombos[i].comboId == comboId)
+            {
+                equippedCombos[i].isEquipped = false;
+                equippedCombos.RemoveAt(i);
+                return true;
+            }
+        }
+        return false;
+    }
 
-func _apply_debuff(value: float, duration: float):
-	print("Combo Skill: Debuff %f for %f seconds" % [value, duration])
+    public bool IsEquipped(string comboId)
+    {
+        foreach (var equipped in equippedCombos)
+        {
+            if (equipped.comboId == comboId)
+                return equipped.isEquipped;
+        }
+        return false;
+    }
 
-func _complete_combo(state: ComboExecutionState):
-	state.is_executing = false
-	execution_queue.erase(state)
-	total_combos_completed += 1
-	combo_completed.emit(state.combo_id)
+    public List<PlayerComboSkill> GetEquippedCombos()
+    {
+        return new List<PlayerComboSkill>(equippedCombos);
+    }
 
-func cancel_combo(combo_id: String) -> bool:
-	for state in execution_queue:
-		if state.combo_id == combo_id:
-			state.is_executing = false
-			execution_queue.erase(state)
-			combo_cancelled.emit(combo_id)
-			return true
-	return false
+    // ============ 执行系统 ============
 
-# ============ 冷却管理 ============
+    public bool ExecuteCombo(string comboId)
+    {
+        if (!unlockedCombos.Contains(comboId))
+            return false;
 
-func _process(delta: float):
-	for equipped in equipped_combos:
-		if equipped.current_cooldown > 0:
-			equipped.current_cooldown -= delta
-			if equipped.current_cooldown < 0:
-				equipped.current_cooldown = 0
-			cooldown_updated.emit(equipped.combo_id, equipped.current_cooldown)
+        // 检查冷却
+        var playerCombo = GetPlayerCombo(comboId);
+        if (playerCombo != null && playerCombo.currentCooldown > 0)
+            return false;
 
-func get_cooldown(combo_id: String) -> float:
-	var player_combo = _get_player_combo(combo_id)
-	if player_combo == null:
-		return 0.0
-	return player_combo.current_cooldown
+        // 检查是否正在执行
+        foreach (var state in executionQueue)
+        {
+            if (state.comboId == comboId)
+                return false;
+        }
 
-func is_on_cooldown(combo_id: String) -> bool:
-	return get_cooldown(combo_id) > 0
+        var combo = database?.GetCombo(comboId);
+        if (combo == null)
+            return false;
 
-func _get_player_combo(combo_id: String) -> PlayerComboSkill:
-	for pc in equipped_combos:
-		if pc.combo_id == combo_id:
-			return pc
-	return null
+        // 创建执行状态
+        var state = new ComboExecutionState
+        {
+            comboId = comboId,
+            currentStep = 0,
+            isExecuting = true,
+            startTime = Time.GetUnixTimeFromSystem(),
+            effectsApplied = 0
+        };
 
-# ============ 统计信息 ============
+        executionQueue.Add(state);
 
-func get_statistics() -> Dictionary:
-	return {
-		"total_executed": total_combos_executed,
-		"total_completed": total_combos_completed,
-		"unlocked_count": unlocked_combos.size(),
-		"equipped_count": equipped_combos.size()
-	}
+        // 设置冷却
+        if (playerCombo != null)
+        {
+            playerCombo.currentCooldown = (float)combo.cooldown;
+            playerCombo.useCount++;
+        }
 
-# ============ 存档支持 ============
+        totalCombosExecuted++;
+        OnComboExecuted?.Invoke(comboId);
 
-func ExportSaveData() -> Dictionary:
-	var data = {
-		"unlocked_combos": unlocked_combos.duplicate(),
-		"equipped": [],
-		"statistics": {
-			"total_executed": total_combos_executed,
-			"total_completed": total_combos_completed
-		}
-	}
-	
-	for equipped in equipped_combos:
-		data["equipped"].append({
-			"combo_id": equipped.combo_id,
-			"cooldown": equipped.current_cooldown,
-			"use_count": equipped.use_count
-		})
-	
-	return data
+        // 开始执行第一步
+        ExecuteStep(state);
 
-func ImportSaveData(data: Dictionary):
-	if data.has("unlocked_combos"):
-		unlocked_combos = data["unlocked_combos"]
-	
-	equipped_combos.clear()
-	if data.has("equipped"):
-		for eq_data in data["equipped"]:
-			var pc = PlayerComboSkill.new()
-			pc.combo_id = eq_data["combo_id"]
-			pc.is_equipped = true
-			pc.current_cooldown = eq_data.get("cooldown", 0.0)
-			pc.use_count = eq_data.get("use_count", 0)
-			equipped_combos.append(pc)
-	
-	if data.has("statistics"):
-		var stats = data["statistics"]
-		total_combos_executed = stats.get("total_executed", 0)
-		total_combos_completed = stats.get("total_completed", 0)
+        return true;
+    }
+
+    private async void ExecuteStep(ComboExecutionState state)
+    {
+        if (!state.isExecuting)
+            return;
+
+        var combo = database?.GetCombo(state.comboId);
+        if (combo == null || state.currentStep >= combo.steps.Count)
+        {
+            CompleteCombo(state);
+            return;
+        }
+
+        var step = combo.steps[state.currentStep];
+
+        // 延迟执行
+        if (step.delay > 0)
+        {
+            await ToSignal(GetTree().CreateTimer(step.delay), "timeout");
+        }
+
+        // 检查触发条件
+        if (!CheckCondition(step))
+        {
+            // 条件不满足，跳过此步骤
+            state.currentStep++;
+            ExecuteStep(state);
+            return;
+        }
+
+        // 执行效果
+        ApplyEffects(step.effects);
+        state.effectsApplied += step.effects.Count;
+        OnComboStepTriggered?.Invoke(state.comboId, state.currentStep);
+
+        state.currentStep++;
+
+        // 继续下一步或完成
+        if (state.currentStep < combo.steps.Count)
+        {
+            ExecuteStep(state);
+        }
+        else
+        {
+            CompleteCombo(state);
+        }
+    }
+
+    private bool CheckCondition(ComboStep step)
+    {
+        switch (step.condition)
+        {
+            case TriggerCondition.Manual:
+                return true;
+            case TriggerCondition.OnHit:
+                return true;
+            case TriggerCondition.OnCritical:
+                return false;
+            case TriggerCondition.OnKill:
+                return false;
+            case TriggerCondition.OnHealthBelow:
+                return false;
+            case TriggerCondition.OnManaBelow:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    private void ApplyEffects(List<ComboSkillEffect> effects)
+    {
+        foreach (var effect in effects)
+        {
+            switch (effect.effectType)
+            {
+                case EffectType.Damage:
+                    ApplyDamage(effect.value);
+                    break;
+                case EffectType.Heal:
+                    ApplyHeal(effect.value);
+                    break;
+                case EffectType.Shield:
+                    ApplyShield(effect.value, effect.duration);
+                    break;
+                case EffectType.Buff:
+                    ApplyBuff(effect.value, effect.duration);
+                    break;
+                case EffectType.Debuff:
+                    ApplyDebuff(effect.value, effect.duration);
+                    break;
+            }
+        }
+    }
+
+    private void ApplyDamage(float value)
+    {
+        GD.Print($"Combo Skill: Dealing {value} damage");
+    }
+
+    private void ApplyHeal(float value)
+    {
+        GD.Print($"Combo Skill: Healing {value} HP");
+    }
+
+    private void ApplyShield(float value, float duration)
+    {
+        GD.Print($"Combo Skill: Shield {value} for {duration} seconds");
+    }
+
+    private void ApplyBuff(float value, float duration)
+    {
+        GD.Print($"Combo Skill: Buff +{value} for {duration} seconds");
+    }
+
+    private void ApplyDebuff(float value, float duration)
+    {
+        GD.Print($"Combo Skill: Debuff {value} for {duration} seconds");
+    }
+
+    private void CompleteCombo(ComboExecutionState state)
+    {
+        state.isExecuting = false;
+        executionQueue.Remove(state);
+        totalCombosCompleted++;
+        OnComboCompleted?.Invoke(state.comboId);
+    }
+
+    public bool CancelCombo(string comboId)
+    {
+        for (int i = 0; i < executionQueue.Count; i++)
+        {
+            if (executionQueue[i].comboId == comboId)
+            {
+                executionQueue[i].isExecuting = false;
+                executionQueue.RemoveAt(i);
+                OnComboCancelled?.Invoke(comboId);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ============ 冷却管理 ============
+
+    public override void _Process(float delta)
+    {
+        base._Process(delta);
+        
+        foreach (var equipped in equippedCombos)
+        {
+            if (equipped.currentCooldown > 0)
+            {
+                equipped.currentCooldown -= delta;
+                if (equipped.currentCooldown < 0)
+                    equipped.currentCooldown = 0;
+                OnCooldownUpdated?.Invoke(equipped.comboId, equipped.currentCooldown);
+            }
+        }
+    }
+
+    public float GetCooldown(string comboId)
+    {
+        var playerCombo = GetPlayerCombo(comboId);
+        if (playerCombo == null)
+            return 0f;
+        return playerCombo.currentCooldown;
+    }
+
+    public bool IsOnCooldown(string comboId)
+    {
+        return GetCooldown(comboId) > 0;
+    }
+
+    private PlayerComboSkill GetPlayerCombo(string comboId)
+    {
+        foreach (var pc in equippedCombos)
+        {
+            if (pc.comboId == comboId)
+                return pc;
+        }
+        return null;
+    }
+
+    // ============ 统计信息 ============
+
+    public Dictionary GetStatistics()
+    {
+        return new Dictionary
+        {
+            { "total_executed", totalCombosExecuted },
+            { "total_completed", totalCombosCompleted },
+            { "unlocked_count", unlockedCombos.Count },
+            { "equipped_count", equippedCombos.Count }
+        };
+    }
+
+    // ============ 存档支持 ============
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary
+        {
+            { "unlocked_combos", new List<string>(unlockedCombos) },
+            { "equipped", new List<Dictionary>() },
+            { "statistics", new Dictionary
+                {
+                    { "total_executed", totalCombosExecuted },
+                    { "total_completed", totalCombosCompleted }
+                }
+            }
+        };
+
+        var equippedList = new List<Dictionary>();
+        foreach (var equipped in equippedCombos)
+        {
+            equippedList.Add(new Dictionary
+            {
+                { "combo_id", equipped.comboId },
+                { "cooldown", equipped.currentCooldown },
+                { "use_count", equipped.useCount }
+            });
+        }
+        data["equipped"] = equippedList;
+
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        base.ImportSaveData(data);
+
+        if (data.Contains("unlocked_combos"))
+        {
+            unlockedCombos = new List<string>((List<string>)data["unlocked_combos"]);
+        }
+
+        equippedCombos.Clear();
+        if (data.Contains("equipped"))
+        {
+            var equippedList = (List<object>)data["equipped"];
+            foreach (var eqData in equippedList)
+            {
+                var dict = (Dictionary)eqData;
+                var pc = new PlayerComboSkill
+                {
+                    comboId = (string)dict["combo_id"],
+                    isEquipped = true,
+                    currentCooldown = dict.Contains("cooldown") ? (float)dict["cooldown"] : 0f,
+                    useCount = dict.Contains("use_count") ? (int)dict["use_count"] : 0
+                };
+                equippedCombos.Add(pc);
+            }
+        }
+
+        if (data.Contains("statistics"))
+        {
+            var stats = (Dictionary)data["statistics"];
+            totalCombosExecuted = stats.Contains("total_executed") ? (int)stats["total_executed"] : 0;
+            totalCombosCompleted = stats.Contains("total_completed") ? (int)stats["total_completed"] : 0;
+        }
+    }
+}
