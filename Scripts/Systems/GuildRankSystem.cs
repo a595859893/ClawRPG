@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 公会排行数据 - 存储公会成员排名信息
+/// </summary>
 public class GuildRankData
 {
 	public int MemberId { get; set; }

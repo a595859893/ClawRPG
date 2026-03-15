@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 公会UI - 管理公会界面显示
+/// </summary>
 public partial class GuildUI : Control {
     private Panel mainPanel;
     private TabContainer tabContainer;

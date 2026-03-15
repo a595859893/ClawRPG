@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 公会节日UI - 显示节日活动界面
+/// </summary>
 public class GuildFestivalUI : Control
 {
     private GuildFestivalSystem _festivalSystem;

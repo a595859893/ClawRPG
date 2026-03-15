@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 排位系统 - 管理玩家排位赛段位和积分
+/// </summary>
 public enum RankTier
 {
     Bronze,

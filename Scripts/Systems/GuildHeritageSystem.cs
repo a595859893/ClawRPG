@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
+/// <summary>
+/// 公会传承系统 - 管理公会遗产和永久加成
+/// </summary>
 public class GuildHeritageSystem
 {
     private static GuildHeritageSystem _instance;

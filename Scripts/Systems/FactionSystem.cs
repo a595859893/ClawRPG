@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 阵营系统 - 管理玩家阵营选择和阵营声望
+/// </summary>
 public class FactionSystem : BaseSystem
 {
     // Singleton instance

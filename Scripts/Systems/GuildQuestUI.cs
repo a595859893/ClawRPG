@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 公会任务UI - 显示公会任务界面
+/// </summary>
 public partial class GuildQuestUI : Control
 {
     private VBoxContainer _questList;

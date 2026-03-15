@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 公会节日系统 - 管理公会节日活动和庆典
+/// </summary>
 public class GuildFestivalSystem : Node
 {
     // 节日类型

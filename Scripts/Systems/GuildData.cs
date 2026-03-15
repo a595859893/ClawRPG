@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 
 namespace GameSystems {
+    /// <summary>
+    /// 公会数据 - 存储公会成员、建筑、等级等信息
+    /// </summary>
     // 公会等级枚举
     public enum GuildLevel {
         None = 0,

@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 公会任务系统 - 管理公会每日任务和周常任务
+/// </summary>
 public partial class GuildQuestSystem : Node
 {
     public static GuildQuestSystem Instance { get; private set; }

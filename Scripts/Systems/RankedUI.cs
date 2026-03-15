@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 排位UI - 显示排位赛界面
+/// </summary>
 public partial class RankedUI : Control
 {
     private Control container;

@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 
 namespace GameSystems {
+    /// <summary>
+    /// 公会数据库 - 配置所有公会相关数据
+    /// </summary>
     // 公会数据库 - 配置所有公会相关数据
     public static class GuildDatabase {
         // 等级名称
