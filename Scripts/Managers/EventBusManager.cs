@@ -11,6 +11,11 @@ public class EventBusManager : ManagerBase
     public static EventBusManager Instance { get; private set; }
     
     /// <summary>
+    /// 优先级（数值越小越先初始化）
+    /// </summary>
+    public override int Priority => 1;
+    
+    /// <summary>
     /// 事件字典 - 存储所有事件回调
     /// </summary>
     private Dictionary<string, Delegate> _eventHandlers = new Dictionary<string, Delegate>();

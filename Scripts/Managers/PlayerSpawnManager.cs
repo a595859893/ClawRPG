@@ -11,6 +11,11 @@ namespace ClawRPG.Scripts.Managers
     {
         public static PlayerSpawnManager Instance { get; private set; }
         
+        /// <summary>
+        /// 优先级（数值越小越先初始化）
+        /// </summary>
+        public override int Priority => 20;
+        
         // Player reference
         private Player _player;
         private PackedScene _playerScene;

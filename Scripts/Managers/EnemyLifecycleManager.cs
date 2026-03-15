@@ -12,6 +12,11 @@ public class EnemyLifecycleManager : ManagerBase
     public static EnemyLifecycleManager Instance { get; private set; }
     
     /// <summary>
+    /// 优先级（数值越小越先初始化）
+    /// </summary>
+    public override int Priority => 30;
+    
+    /// <summary>
     /// 所有活跃敌人列表
     /// </summary>
     public List<Enemy> ActiveEnemies { get; private set; } = new List<Enemy>();

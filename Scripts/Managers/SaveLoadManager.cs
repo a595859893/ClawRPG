@@ -11,6 +11,11 @@ public class SaveLoadManager : ManagerBase
     public static SaveLoadManager Instance { get; private set; }
     
     /// <summary>
+    /// 优先级（数值越小越先初始化）
+    /// </summary>
+    public override int Priority => 5;
+    
+    /// <summary>
     /// 最大存档槽位数量
     /// </summary>
     public const int MaxSaveSlots = 10;

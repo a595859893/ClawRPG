@@ -11,6 +11,11 @@ namespace ClawRPG.Scripts.Managers
     {
         public static EnemySpawnManager Instance { get; private set; }
         
+        /// <summary>
+        /// 优先级（数值越小越先初始化）
+        /// </summary>
+        public override int Priority => 25;
+        
         // Enemy container
         private Node2D _enemyContainer;
         

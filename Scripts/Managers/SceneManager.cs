@@ -12,6 +12,11 @@ public class SceneManager : ManagerBase
     public static SceneManager Instance { get; private set; }
     
     /// <summary>
+    /// 优先级（数值越小越先初始化）
+    /// </summary>
+    public override int Priority => 3;
+    
+    /// <summary>
     /// 当前场景路径
     /// </summary>
     public string CurrentScenePath { get; private set; } = "";

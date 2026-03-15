@@ -420,6 +420,13 @@ namespace ClawRPG.Scripts
                 allData["ui"] = _uiManager.ExportSaveData();
             }
 
+            // 从 SaveLoadManager 获取存档数据
+            var saveLoadManager = GetNodeOrNull<SaveLoadManager>("SaveLoadManager");
+            if (saveLoadManager != null)
+            {
+                allData["saveLoad"] = saveLoadManager.ExportSaveData();
+            }
+
             return allData;
         }
 
@@ -443,6 +450,13 @@ namespace ClawRPG.Scripts
             if (data.Contains("ui"))
             {
                 _uiManager?.ImportSaveData(data["ui"] as Dictionary);
+            }
+
+            // 导入存档管理数据
+            if (data.Contains("saveLoad"))
+            {
+                var saveLoadManager = GetNodeOrNull<SaveLoadManager>("SaveLoadManager");
+                saveLoadManager?.ImportSaveData(data["saveLoad"] as Dictionary);
             }
         }
     }

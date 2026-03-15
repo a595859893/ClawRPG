@@ -14,6 +14,11 @@ namespace ClawRPG.Scripts.Systems
         public static SystemInitializationManager Instance { get; private set; }
         
         /// <summary>
+        /// 优先级（数值越小越先初始化）
+        /// </summary>
+        public override int Priority => 2;
+        
+        /// <summary>
         /// 所有需要初始化的系统类型
         /// </summary>
         private List<Type> _systemTypes = new List<Type>();

@@ -11,6 +11,11 @@ public class PlayerLifecycleManager : ManagerBase
     public static PlayerLifecycleManager Instance { get; private set; }
     
     /// <summary>
+    /// 优先级（数值越小越先初始化）
+    /// </summary>
+    public override int Priority => 15;
+    
+    /// <summary>
     /// 当前玩家节点
     /// </summary>
     public Player CurrentPlayer { get; private set; }

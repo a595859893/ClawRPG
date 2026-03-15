@@ -12,6 +12,11 @@ namespace ClawRPG.Scripts.UI
         public static UIManager Instance { get; private set; }
         
         /// <summary>
+        /// 优先级（数值越小越先初始化）
+        /// </summary>
+        public override int Priority => 50;
+        
+        /// <summary>
         /// 所有 UI 实例的缓存
         /// </summary>
         private Dictionary<string, Control> _uiCache = new Dictionary<string, Control>();
