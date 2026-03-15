@@ -28,11 +28,35 @@ public class ArenaTournamentSystem : BaseSystem
     private int _matchIdCounter = 0;
 
     public Signal<string> TournamentRegistered { get; } = new Signal<string>();
+    
+    /// <summary>
+    /// 锦标赛开始时触发。参数：锦标赛ID。
+    /// </summary>
     public Signal<string> TournamentStarted { get; } = new Signal<string>();
+    
+    /// <summary>
+    /// 比赛开始时触发。参数：锦标赛ID，比赛ID。
+    /// </summary>
     public Signal<string, string> MatchStarted { get; } = new Signal<string, string>();
+    
+    /// <summary>
+    /// 比赛完成时触发。参数：锦标赛ID，比赛ID。
+    /// </summary>
     public Signal<string, string> MatchCompleted { get; } = new Signal<string, string>();
+    
+    /// <summary>
+    /// 锦标赛完成时触发。参数：锦标赛ID。
+    /// </summary>
     public Signal<string, string> TournamentCompleted { get; } = new Signal<string, string>();
+    
+    /// <summary>
+    /// 玩家被淘汰时触发。参数：锦标赛ID，玩家ID。
+    /// </summary>
     public Signal<string, string> PlayerEliminated { get; } = new Signal<string, string>();
+    
+    /// <summary>
+    /// 玩家获得冠军时触发。参数：锦标赛ID，玩家ID。
+    /// </summary>
     public Signal<string, string> PlayerChampion { get; } = new Signal<string, string>();
 
     protected override void Initialize()
@@ -55,11 +79,19 @@ public class ArenaTournamentSystem : BaseSystem
         }
     }
 
+    /// <summary>
+    /// 获取所有已注册的锦标赛列表。
+    /// </summary>
+    /// <returns>所有锦标赛的列表。</returns>
     public List<ArenaTournamentData.Tournament> GetAllTournaments()
     {
         return new List<ArenaTournamentData.Tournament>(_tournaments.Values);
     }
 
+    /// <summary>
+    /// 获取当前可报名的锦标赛列表（报名阶段）。
+    /// </summary>
+    /// <returns>可报名的锦标赛列表。</returns>
     public List<ArenaTournamentData.Tournament> GetAvailableTournaments()
     {
         var result = new List<ArenaTournamentData.Tournament>();
@@ -76,6 +108,11 @@ public class ArenaTournamentSystem : BaseSystem
         return result;
     }
 
+    /// <summary>
+    /// 按类型获取锦标赛列表。
+    /// </summary>
+    /// <param name="type">锦标赛类型。</param>
+    /// <returns>指定类型的锦标赛列表。</returns>
     public List<ArenaTournamentData.Tournament> GetTournamentsByType(ArenaTournamentData.TournamentType type)
     {
         var result = new List<ArenaTournamentData.Tournament>();
@@ -91,6 +128,11 @@ public class ArenaTournamentSystem : BaseSystem
         return result;
     }
 
+    /// <summary>
+    /// 获取指定ID的锦标赛。
+    /// </summary>
+    /// <param name="tournamentId">锦标赛ID。</param>
+    /// <returns>锦标赛对象，不存在则返回 null。</returns>
     public ArenaTournamentData.Tournament GetTournament(string tournamentId)
     {
         if (_tournaments.ContainsKey(tournamentId))
@@ -100,6 +142,14 @@ public class ArenaTournamentSystem : BaseSystem
         return null;
     }
 
+    /// <summary>
+    /// 检查玩家是否可以报名指定锦标赛。
+    /// </summary>
+    /// <param name="tournamentId">锦标赛ID。</param>
+    /// <param name="playerId">玩家ID。</param>
+    /// <param name="playerLevel">玩家等级。</param>
+    /// <param name="playerGold">玩家金币数量。</param>
+    /// <returns>可以报名返回 true，否则返回 false。</returns>
     public bool CanRegister(string tournamentId, string playerId, int playerLevel, int playerGold)
     {
         var tournament = GetTournament(tournamentId);
@@ -138,6 +188,13 @@ public class ArenaTournamentSystem : BaseSystem
         return true;
     }
 
+    /// <summary>
+    /// 注册玩家参加锦标赛。
+    /// </summary>
+    /// <param name="tournamentId">锦标赛ID。</param>
+    /// <param name="playerId">玩家ID。</param>
+    /// <param name="playerGold">引用参数，报名成功后扣除报名费。</param>
+    /// <returns>报名成功返回 true，否则返回 false。</returns>
     public bool RegisterPlayer(string tournamentId, string playerId, ref int playerGold)
     {
         var tournament = GetTournament(tournamentId);
@@ -172,6 +229,11 @@ public class ArenaTournamentSystem : BaseSystem
         return true;
     }
 
+    /// <summary>
+    /// 开始指定锦标赛。
+    /// </summary>
+    /// <param name="tournamentId">锦标赛ID。</param>
+    /// <returns>开始成功返回 true，否则返回 false。</returns>
     public bool StartTournament(string tournamentId)
     {
         var tournament = GetTournament(tournamentId);
@@ -262,6 +324,11 @@ public class ArenaTournamentSystem : BaseSystem
         }
     }
 
+    /// <summary>
+    /// 完成指定比赛，记录胜者并处理淘汰逻辑。
+    /// </summary>
+    /// <param name="matchId">比赛ID。</param>
+    /// <param name="winnerId">获胜玩家ID。</param>
     public void CompleteMatch(string matchId, string winnerId)
     {
         if (!_matches.ContainsKey(matchId)) return;
@@ -370,6 +437,11 @@ public class ArenaTournamentSystem : BaseSystem
         TournamentCompleted.Emit(tournament.Id);
     }
 
+    /// <summary>
+    /// 获取玩家的锦标赛数据。
+    /// </summary>
+    /// <param name="playerId">玩家ID。</param>
+    /// <returns>玩家的锦标赛数据对象。</returns>
     public ArenaTournamentData.PlayerTournamentData GetPlayerData(string playerId)
     {
         if (_playerData.ContainsKey(playerId))
@@ -380,6 +452,11 @@ public class ArenaTournamentSystem : BaseSystem
         return new ArenaTournamentData.PlayerTournamentData { PlayerId = playerId };
     }
 
+    /// <summary>
+    /// 获取指定锦标赛的所有比赛。
+    /// </summary>
+    /// <param name="tournamentId">锦标赛ID。</param>
+    /// <returns>比赛列表。</returns>
     public List<ArenaTournamentData.TournamentMatch> GetTournamentMatches(string tournamentId)
     {
         var result = new List<ArenaTournamentData.TournamentMatch>();
@@ -395,6 +472,10 @@ public class ArenaTournamentSystem : BaseSystem
         return result;
     }
 
+    /// <summary>
+    /// 导出锦标赛系统数据用于存档保存。
+    /// </summary>
+    /// <returns>包含所有锦标赛数据的字典。</returns>
     public override Dictionary ExportSaveData()
     {
         var data = new Dictionary<string, object>();
@@ -453,6 +534,10 @@ public class ArenaTournamentSystem : BaseSystem
         return data;
     }
 
+    /// <summary>
+    /// 从存档数据导入锦标赛系统数据。
+    /// </summary>
+    /// <param name="data">包含锦标赛数据的字典。</param>
     public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
