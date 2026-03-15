@@ -605,4 +605,19 @@ public partial class GuildSystem : BaseSystem {
 
         return data;
     }
+    
+    #region Data Persistence
+    
+    public override Dictionary ExportSaveData()
+    {
+        return SaveData();
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        LoadData(new Dictionary<string, object>(data));
+    }
+    
+    #endregion
 }

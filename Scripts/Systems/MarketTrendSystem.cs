@@ -398,4 +398,19 @@ public class MarketTrendSystem : BaseSystem
         if (data.ContainsKey("LastUpdateTime"))
             _data.LastUpdateTime = Convert.ToDouble(data["LastUpdateTime"]);
     }
+    
+    #region Data Persistence
+    
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary(SaveData());
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        LoadData(new Dictionary<string, object>(data));
+    }
+    
+    #endregion
 }

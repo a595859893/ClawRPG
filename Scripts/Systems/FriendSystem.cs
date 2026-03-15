@@ -267,6 +267,21 @@ public class FriendSystem : BaseSystem
         
         return data;
     }
+    
+    #region Data Persistence
+    
+    public override Dictionary ExportSaveData()
+    {
+        return SaveData();
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        LoadData(data);
+    }
+    
+    #endregion
 
     public void LoadData(Dictionary data)
     {

@@ -157,24 +157,36 @@ namespace ClawRPG.Scripts.Systems {
             // Load from save
         }
         
-        public Dictionary<string, Variant> Save() {
-            return new Dictionary<string, Variant> {
+        #region Data Persistence
+        
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary
+            {
                 { "current_time", _currentTime },
                 { "time_scale", _timeScale },
                 { "day_duration", _dayDuration }
             };
         }
         
-        public void Load(Dictionary<string, Variant> data) {
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
             if (data.TryGetValue("current_time", out var time)) {
-                _currentTime = (float)time;
+                _currentTime = Convert.ToSingle(time);
             }
             if (data.TryGetValue("time_scale", out var scale)) {
-                _timeScale = (float)scale;
+                _timeScale = Convert.ToSingle(scale);
             }
             if (data.TryGetValue("day_duration", out var duration)) {
-                _dayDuration = (float)duration;
+                _dayDuration = Convert.ToSingle(duration);
             }
+            
+            UpdatePhase();
+            UpdateModifiers();
         }
+        
+        #endregion
     }
 }

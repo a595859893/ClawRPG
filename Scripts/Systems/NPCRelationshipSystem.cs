@@ -327,6 +327,21 @@ namespace ClawRPG.Systems {
                 };
             }
         }
+        
+        #region Data Persistence
+        
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary(GetSaveData());
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            LoadFromSaveData(new Dictionary<string, object>(data));
+        }
+        
+        #endregion
 
         private void LoadData()
         {

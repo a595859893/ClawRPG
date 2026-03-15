@@ -408,5 +408,20 @@ public partial class TitleCollectionSystem : BaseSystem
         GD.Print($"[TitleCollection] Loaded {_playerCollection.TotalUnlocked} titles");
     }
     
+    #region Data Persistence
+    
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary(ExportSaveData());
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        ImportSaveData(new Dictionary<string, object>(data));
+    }
+    
+    #endregion
+    
     #endregion
 }
