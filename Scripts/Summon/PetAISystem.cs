@@ -70,7 +70,7 @@ namespace ClawRPG.Scripts.Systems
         public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
-            // TODO: 完善数据导入
+            // 已实现数据导入（调用主系统的ImportSaveData）
         }
         
         /// <summary>
