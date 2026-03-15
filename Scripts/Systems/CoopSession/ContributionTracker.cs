@@ -435,15 +435,15 @@ public partial class ContributionTracker : BaseSystem
                     ContributionPercent = percent,
                     Rewards = new RewardPackage
                     {
-                        Experience = (int)(baseExp * percent + GetBonusExp(contribution)),
+                        Experience = (int)(baseExp * percent),
                         Gold = (int)(baseGold * percent),
                         Items = new List<string>(),
                         ItemIds = new List<int>()
                     }
                 };
 
-                // 添加额外经验奖励
-                result.Rewards.Experience += GetBonusExp(contribution);
+                // 添加额外经验奖励（击杀、助攻、存活）
+                result.Rewards.Experience += (int)GetBonusExp(contribution);
                 
                 results.Add(result);
             }
