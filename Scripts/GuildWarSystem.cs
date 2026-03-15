@@ -8,7 +8,7 @@ namespace ClawRPG.Core.Systems.GuildWar
     /// <summary>
     /// Guild War System - Core system for guild battles
     /// </summary>
-    public partial class GuildWarSystem : Node
+    public partial class GuildWarSystem : BaseSystem
     {
         public static GuildWarSystem Instance { get; private set; }
 
@@ -39,6 +39,45 @@ namespace ClawRPG.Core.Systems.GuildWar
             Instance = this;
             InitializeTerritories();
             LoadData();
+        }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "GuildWar";
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            var wars = new Array();
+            foreach (var war in _activeWars.Values)
+            {
+                wars.Add(war.WarId);
+            }
+            data["active_wars"] = wars;
+            
+            var playerProgress = new Array();
+            foreach (var kvp in _playerProgress)
+            {
+                var progress = new Dictionary { { "guild_id", kvp.Key } };
+                playerProgress.Add(progress);
+            }
+            data["player_progress"] = playerProgress;
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            // TODO: 完善数据导入逻辑
         }
 
         private void InitializeTerritories()
