@@ -425,6 +425,9 @@ public class BattleStatisticsSystem : BaseSystem
         if (data.Contains("SessionVictories")) _stats.SessionVictories = Convert.ToInt32(data["SessionVictories"]);
     }
     
+    /// <summary>
+    /// 重置所有统计数据
+    /// </summary>
     public void ResetStats()
     {
         _stats = new BattleStatsData();
