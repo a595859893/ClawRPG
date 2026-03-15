@@ -282,6 +282,11 @@ namespace ClawRPG.Scripts {
             leaderboardDatabase.Name = "LeaderboardDatabase";
             AddChild(leaderboardDatabase);
 
+            // Initialize party system
+            var partySystem = new PartySystem();
+            partySystem.Name = "PartySystem";
+            AddChild(partySystem);
+
             // Initialize combat UI system
             var combatUISystem = new Combat.CombatUISystem();
             combatUISystem.Name = "CombatUISystem";
@@ -1090,6 +1095,9 @@ namespace ClawRPG.Scripts {
 
             // Initialize sealed dungeon system
             InitializeSealedDungeon();
+
+            // Initialize party system
+            InitializeParty();
 
             // Load game data
             LoadGameData();
@@ -1994,6 +2002,10 @@ namespace ClawRPG.Scripts {
         private SealedDungeon.SealedDungeonSystem _sealedDungeonSystem;
         private SealedDungeon.SealedDungeonUI _sealedDungeonUI;
         
+        // Initialize party system
+        private PartySystem _partySystem;
+        private PartyUI _partyUI;
+        
         private void InitializeAchievementMilestone()
         {
             // Initialize achievement milestone system
@@ -2044,6 +2056,29 @@ namespace ClawRPG.Scripts {
                 {
                     _sealedDungeonUI.RefreshUI();
                 }
+            }
+        }
+        
+        private void InitializeParty()
+        {
+            // Initialize party system
+            _partySystem = new PartySystem();
+            _partySystem.Name = "PartySystem";
+            AddChild(_partySystem);
+            
+            // Initialize party UI
+            _partyUI = new PartyUI();
+            _partyUI.Name = "PartyUI";
+            AddChild(_partyUI);
+            
+            GD.Print("Party System initialized!");
+        }
+        
+        private void TogglePartyUI()
+        {
+            if (_partyUI != null)
+            {
+                _partyUI.ToggleVisibility();
             }
         }
         
@@ -2585,6 +2620,12 @@ namespace ClawRPG.Scripts {
             if (Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.P))
             {
                 TogglePrestigeUI();
+            }
+
+            // Handle party UI toggle (Shift+P key)
+            if (Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.P))
+            {
+                TogglePartyUI();
             }
 
             // Handle identification UI toggle (I key)
