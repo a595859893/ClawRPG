@@ -658,5 +658,38 @@ namespace ClawRPG.Scripts.Systems {
             }
             return new Dictionary<string, object>();
         }
+        
+        /// <summary>
+        /// 获取系统唯一ID
+        /// </summary>
+        public override string GetId() => "SaveSystem";
+        
+        /// <summary>
+        /// 导出保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["auto_save_enabled"] = _autoSaveEnabled;
+            data["auto_save_timer"] = _autoSaveTimer;
+            return data;
+        }
+        
+        /// <summary>
+        /// 导入保存数据 - 实现 BaseSystem 接口
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("auto_save_enabled"))
+            {
+                _autoSaveEnabled = (bool)data["auto_save_enabled"];
+            }
+            if (data.Contains("auto_save_timer"))
+            {
+                _autoSaveTimer = (float)data["auto_save_timer"];
+            }
+        }
     }
 }
