@@ -372,7 +372,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 互动系统管理器
     /// </summary>
-    public partial class CompanionInteractionSystem : Node
+    public partial class CompanionInteractionSystem : BaseSystem
     {
         private static CompanionInteractionSystem _instance;
         public static CompanionInteractionSystem Instance => _instance;
@@ -610,9 +610,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 序列化数据
         /// </summary>
-        public Dictionary<string, object> GetSaveData()
+        public override Dictionary ExportSaveData()
         {
-            return new Dictionary<string, object>
+            return new Dictionary
             {
                 { "totalInteractions", _playerData.TotalInteractions },
                 { "totalAffectionGained", _playerData.TotalAffectionGained },
@@ -626,7 +626,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 反序列化数据
         /// </summary>
-        public void LoadSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
 
@@ -638,7 +638,7 @@ namespace ClawRPG.Scripts.Systems
             // 恢复字典数据
             if (data.ContainsKey("actionCounts"))
             {
-                var actionCounts = (Dictionary<string, object>)data["actionCounts"];
+                var actionCounts = (Dictionary)data["actionCounts"];
                 _playerData.ActionCounts = new Dictionary<string, int>();
                 foreach (var kvp in actionCounts)
                 {
@@ -648,7 +648,7 @@ namespace ClawRPG.Scripts.Systems
 
             if (data.ContainsKey("entityInteractions"))
             {
-                var entityInteractions = (Dictionary<string, object>)data["entityInteractions"];
+                var entityInteractions = (Dictionary)data["entityInteractions"];
                 _playerData.EntityInteractions = new Dictionary<string, int>();
                 foreach (var kvp in entityInteractions)
                 {
@@ -656,5 +656,24 @@ namespace ClawRPG.Scripts.Systems
                 }
             }
         }
+        
+        /// <summary>
+        /// 旧的序列化方法（保留兼容性）
+        /// </summary>
+        public Dictionary<string, object> GetSaveData()
+        {
+            return ExportSaveData();
+        }
+
+        /// <summary>
+        /// 旧的反序列化方法（保留兼容性）
+        /// </summary>
+        public void LoadSaveData(Dictionary<string, object> data)
+        {
+            ImportSaveData(new Dictionary(data));
+        }
+    }
+}
+ }
     }
 }

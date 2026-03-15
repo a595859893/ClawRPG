@@ -56,7 +56,7 @@ public class ClassData
     }
 }
 
-public class ClassSystem : Node
+public class ClassSystem : BaseSystem
 {
     // 单例
     private static ClassSystem _instance;
@@ -450,10 +450,9 @@ public class ClassSystem : Node
         return result;
     }
 
-    // 存档支持
-    public Dictionary<string, object> SaveData()
+    public override Dictionary ExportSaveData()
     {
-        return new Dictionary<string, object>
+        return new Dictionary
         {
             { "current_class", (int)_currentClass },
             { "secondary_class", _secondaryClass.HasValue ? (int)_secondaryClass.Value : -1 },
@@ -464,8 +463,10 @@ public class ClassSystem : Node
         };
     }
 
-    public void LoadData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary data)
     {
+        if (data == null) return;
+        
         if (data.ContainsKey("current_class"))
             _currentClass = (ClassData.ClassType)(int)data["current_class"];
         if (data.ContainsKey("secondary_class") && (int)data["secondary_class"] >= 0)
@@ -480,5 +481,19 @@ public class ClassSystem : Node
             _currentTier = (ClassData.ClassTier)(int)data["current_tier"];
         
         UpdateBonuses();
+    }
+    
+    // 旧的存档支持方法（保留兼容性）
+    public Dictionary<string, object> SaveData()
+    {
+        return ExportSaveData();
+    }
+
+    public void LoadData(Dictionary<string, object> data)
+    {
+        ImportSaveData(new Dictionary(data));
+    }
+}
+);
     }
 }

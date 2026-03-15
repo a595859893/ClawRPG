@@ -1,8 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
-public class DynamicDifficultySystem : Node
+public class DynamicDifficultySystem : BaseSystem
 {
     // 单例
     private static DynamicDifficultySystem _instance;
@@ -401,9 +402,9 @@ public class DynamicDifficultySystem : Node
     #region 存档支持
 
     // 获取存档数据
-    public Dictionary<string, object> GetSaveData()
+    public override Dictionary ExportSaveData()
     {
-        Dictionary<string, object> data = new Dictionary<string, object>();
+        Dictionary data = new Dictionary();
         
         data["currentDifficulty"] = (int)_playerData.CurrentDifficulty;
         data["recommendedDifficulty"] = (int)_playerData.RecommendedDifficulty;
@@ -411,7 +412,7 @@ public class DynamicDifficultySystem : Node
         data["sessionsSinceLastAdjustment"] = _playerData.SessionsSinceLastAdjustment;
 
         // 技能档案
-        Dictionary<string, object> profile = new Dictionary<string, object>();
+        Dictionary profile = new Dictionary();
         profile["totalSessions"] = _playerData.SkillProfile.TotalSessions;
         profile["wins"] = _playerData.SkillProfile.Wins;
         profile["losses"] = _playerData.SkillProfile.Losses;
@@ -423,7 +424,7 @@ public class DynamicDifficultySystem : Node
     }
 
     // 加载存档数据
-    public void LoadSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
 
@@ -442,7 +443,7 @@ public class DynamicDifficultySystem : Node
         // 技能档案
         if (data.ContainsKey("skillProfile"))
         {
-            Dictionary<string, object> profile = (Dictionary<string, object>)data["skillProfile"];
+            Dictionary profile = (Dictionary)data["skillProfile"];
             if (profile.ContainsKey("totalSessions"))
                 _playerData.SkillProfile.TotalSessions = (int)profile["totalSessions"];
             if (profile.ContainsKey("wins"))
@@ -462,6 +463,22 @@ public class DynamicDifficultySystem : Node
         }
 
         GD.Print("Dynamic Difficulty data loaded");
+    }
+    
+    // 旧的存档方法（保留兼容性）
+    public Dictionary<string, object> GetSaveData()
+    {
+        var data = new Dictionary<string, object>();
+        foreach (var key in ExportSaveData().Keys)
+        {
+            data[key.ToString()] = ExportSaveData()[key];
+        }
+        return data;
+    }
+    
+    public void LoadSaveData(Dictionary<string, object> data)
+    {
+        ImportSaveData(new Dictionary(data));
     }
 
     #endregion

@@ -44,7 +44,7 @@ public class ComboProgress
     public int timesExecuted = 0;
 }
 
-public class ComboSystem : Node
+public class ComboSystem : BaseSystem
 {
     public static ComboSystem Instance { get; private set; }
     
@@ -412,13 +412,13 @@ public class ComboSystem : Node
     }
     
     // Save/Load
-    public Dictionary<string, object> GetSaveData()
+    public override Dictionary ExportSaveData()
     {
-        var data = new Dictionary<string, object>();
+        var data = new Dictionary();
         data["comboPoints"] = _comboPoints;
         data["comboLevel"] = _comboLevel;
         
-        var progressData = new Dictionary<string, int>();
+        var progressData = new Dictionary();
         foreach (var progress in _playerCombos)
         {
             progressData[progress.Key] = progress.Value.timesExecuted;
@@ -428,8 +428,10 @@ public class ComboSystem : Node
         return data;
     }
     
-    public void LoadSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary data)
     {
+        if (data == null) return;
+        
         if (data.ContainsKey("comboPoints"))
             _comboPoints = (int)data["comboPoints"];
         if (data.ContainsKey("comboLevel"))
@@ -437,7 +439,7 @@ public class ComboSystem : Node
         
         if (data.ContainsKey("progress"))
         {
-            var progressData = (Dictionary<string, object>)data["progress"];
+            var progressData = (Dictionary)data["progress"];
             foreach (var entry in progressData)
             {
                 if (_playerCombos.TryGetValue(entry.Key, out var progress))
@@ -446,5 +448,19 @@ public class ComboSystem : Node
                 }
             }
         }
+    }
+    
+    // 旧的存档方法（保留兼容性）
+    public Dictionary<string, object> GetSaveData()
+    {
+        return ExportSaveData();
+    }
+    
+    public void LoadSaveData(Dictionary<string, object> data)
+    {
+        ImportSaveData(new Dictionary(data));
+    }
+}
+ }
     }
 }

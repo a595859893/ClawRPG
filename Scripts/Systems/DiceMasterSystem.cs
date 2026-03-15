@@ -1,8 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
-public class DiceMasterSystem : Node
+public class DiceMasterSystem : BaseSystem
 {
     public static DiceMasterSystem Instance { get; private set; }
     
@@ -237,10 +238,10 @@ public class DiceMasterSystem : Node
         };
     }
     
-    // Save data
-    public Dictionary<string, object> SaveData()
+    // 持久化支持
+    public override Dictionary ExportSaveData()
     {
-        return new Dictionary<string, object>
+        return new Dictionary
         {
             { "total_rolls", TotalRolls },
             { "total_wins", TotalWins },
@@ -251,8 +252,7 @@ public class DiceMasterSystem : Node
         };
     }
     
-    // Load data
-    public void LoadData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         
@@ -262,6 +262,17 @@ public class DiceMasterSystem : Node
         LuckyStreak = data.ContainsKey("lucky_streak") ? Convert.ToInt32(data["lucky_streak"]) : 0;
         UnluckyStreak = data.ContainsKey("unlucky_streak") ? Convert.ToInt32(data["unlucky_streak"]) : 0;
         Diamonds = data.ContainsKey("diamonds") ? Convert.ToInt32(data["diamonds"]) : 10;
+    }
+    
+    // 旧的存档方法（保留兼容性）
+    public Dictionary<string, object> SaveData()
+    {
+        return ExportSaveData();
+    }
+    
+    public void LoadData(Dictionary<string, object> data)
+    {
+        ImportSaveData(new Dictionary(data));
     }
     
     // Signal

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace 悬疑RPG
 {
@@ -46,7 +47,7 @@ namespace 悬疑RPG
     /// <summary>
     /// 每日登录奖励系统
     /// </summary>
-    public partial class DailyLoginRewardSystem : Node
+    public partial class DailyLoginRewardSystem : BaseSystem
     {
         public static DailyLoginRewardSystem Instance { get; private set; }
 
@@ -405,6 +406,52 @@ namespace 悬疑RPG
                 return currentDay;
             }
             return -1; // 已全部领取
+        }
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary
+            {
+                { "last_login_date", playerData.LastLoginDate.ToString("yyyy-MM-dd HH:mm:ss") },
+                { "total_login_days", playerData.TotalLoginDays },
+                { "consecutive_login_days", playerData.ConsecutiveLoginDays },
+                { "claimed_days", new Array(playerData.ClaimedDays) },
+                { "last_claim_date", playerData.LastClaimDate.ToString("yyyy-MM-dd HH:mm:ss") }
+            };
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.ContainsKey("last_login_date") && data["last_login_date"] != null)
+                playerData.LastLoginDate = DateTime.Parse(data["last_login_date"].ToString());
+            if (data.ContainsKey("total_login_days"))
+                playerData.TotalLoginDays = Convert.ToInt32(data["total_login_days"]);
+            if (data.ContainsKey("consecutive_login_days"))
+                playerData.ConsecutiveLoginDays = Convert.ToInt32(data["consecutive_login_days"]);
+            
+            playerData.ClaimedDays = new List<int>();
+            if (data.ContainsKey("claimed_days") && data["claimed_days"] != null)
+            {
+                var claimed = data["claimed_days"] as Array;
+                if (claimed != null)
+                {
+                    foreach (var item in claimed)
+                    {
+                        playerData.ClaimedDays.Add(Convert.ToInt32(item));
+                    }
+                }
+            }
+
+            if (data.ContainsKey("last_claim_date") && data["last_claim_date"] != null)
+                playerData.LastClaimDate = DateTime.Parse(data["last_claim_date"].ToString());
         }
     }
 }

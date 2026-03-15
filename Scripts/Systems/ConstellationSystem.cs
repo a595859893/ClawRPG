@@ -1,8 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
-public class ConstellationSystem : Node
+public class ConstellationSystem : BaseSystem
 {
     private ConstellationData _data;
     private ConstellationDatabase _database;
@@ -261,5 +262,76 @@ public class ConstellationSystem : Node
     public ConstellationData GetData()
     {
         return _data;
+    }
+    
+    // 持久化支持
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 序列化玩家星座数据
+        var unlockedData = new Dictionary<string, Dictionary<string, object>>();
+        foreach (var kvp in _data.UnlockedConstellations)
+        {
+            unlockedData[kvp.Key] = new Dictionary<string, object>
+            {
+                { "constellationId", kvp.Value.ConstellationId },
+                { "unlocked", kvp.Value.Unlocked },
+                { "activatedStars", kvp.Value.ActivatedStars },
+                { "totalStars", kvp.Value.TotalStars },
+                { "unlockTime", kvp.Value.UnlockTime.ToString("yyyy-MM-dd HH:mm:ss") }
+            };
+        }
+        
+        data["unlockedConstellations"] = unlockedData;
+        data["totalActivationPoints"] = _data.TotalActivationPoints;
+        data["usedActivationPoints"] = _data.UsedActivationPoints;
+        data["constellationFragments"] = _data.ConstellationFragments;
+        data["totalConstellationsUnlocked"] = _data.TotalConstellationsUnlocked;
+        data["totalStarsActivated"] = _data.TotalStarsActivated;
+        data["goldSpentOnConstellations"] = _data.GoldSpentOnConstellations;
+        data["fragmentsCollected"] = _data.FragmentsCollected;
+        
+        return data;
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 反序列化玩家星座数据
+        if (data.ContainsKey("unlockedConstellations"))
+        {
+            var unlockedData = (Dictionary)data["unlockedConstellations"];
+            _data.UnlockedConstellations.Clear();
+            foreach (var kvp in unlockedData)
+            {
+                var constellationData = (Dictionary)kvp.Value;
+                var progress = new ConstellationData.ConstellationProgress
+                {
+                    ConstellationId = (string)constellationData["constellationId"],
+                    Unlocked = (bool)constellationData["unlocked"],
+                    ActivatedStars = (int)constellationData["activatedStars"],
+                    TotalStars = (int)constellationData["totalStars"],
+                    UnlockTime = DateTime.Parse((string)constellationData["unlockTime"])
+                };
+                _data.UnlockedConstellations[kvp.Key] = progress;
+            }
+        }
+        
+        if (data.ContainsKey("totalActivationPoints"))
+            _data.TotalActivationPoints = (int)data["totalActivationPoints"];
+        if (data.ContainsKey("usedActivationPoints"))
+            _data.UsedActivationPoints = (int)data["usedActivationPoints"];
+        if (data.ContainsKey("constellationFragments"))
+            _data.ConstellationFragments = (int)data["constellationFragments"];
+        if (data.ContainsKey("totalConstellationsUnlocked"))
+            _data.TotalConstellationsUnlocked = (int)data["totalConstellationsUnlocked"];
+        if (data.ContainsKey("totalStarsActivated"))
+            _data.TotalStarsActivated = (int)data["totalStarsActivated"];
+        if (data.ContainsKey("goldSpentOnConstellations"))
+            _data.GoldSpentOnConstellations = (int)data["goldSpentOnConstellations"];
+        if (data.ContainsKey("fragmentsCollected"))
+            _data.FragmentsCollected = (int)data["fragmentsCollected"];
     }
 }

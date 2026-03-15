@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Costume system manager - handles purchasing, equipping, and managing costumes
     /// </summary>
-    public class CostumeSystem : Node
+    public class CostumeSystem : BaseSystem
     {
         private static CostumeSystem _instance;
         public static CostumeSystem Instance => _instance ??= new CostumeSystem();
@@ -345,5 +345,57 @@ namespace ClawRPG.Scripts.Systems {
         public int GetTotalCostumeCount() => _database.GetAllCostumes().Count;
         
         public int GetPurchasedCostumeCount() => _playerData.PurchasedCostumes.Count;
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary
+            {
+                { "purchased_costumes", new Array(_playerData.PurchasedCostumes) },
+                { "equipped_outfit", _playerData.EquippedOutfit },
+                { "equipped_hat", _playerData.EquippedHat },
+                { "equipped_weapon_skin", _playerData.EquippedWeaponSkin },
+                { "equipped_effect", _playerData.EquippedEffect },
+                { "equipped_trail", _playerData.EquippedTrail }
+            };
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("purchased_costumes"))
+            {
+                var purchased = data["purchased_costumes"] as Array;
+                _playerData.PurchasedCostumes = new List<string>();
+                foreach (var item in purchased)
+                {
+                    _playerData.PurchasedCostumes.Add((string)item);
+                    var costume = _database.GetCostume((string)item);
+                    if (costume != null)
+                        costume.IsPurchased = true;
+                }
+            }
+            
+            if (data.Contains("equipped_outfit"))
+                _playerData.EquippedOutfit = (string)data["equipped_outfit"];
+            if (data.Contains("equipped_hat"))
+                _playerData.EquippedHat = (string)data["equipped_hat"];
+            if (data.Contains("equipped_weapon_skin"))
+                _playerData.EquippedWeaponSkin = (string)data["equipped_weapon_skin"];
+            if (data.Contains("equipped_effect"))
+                _playerData.EquippedEffect = (string)data["equipped_effect"];
+            if (data.Contains("equipped_trail"))
+                _playerData.EquippedTrail = (string)data["equipped_trail"];
+            
+            UpdateEquippedStatus();
+        }
+    }
+}t;
     }
 }
