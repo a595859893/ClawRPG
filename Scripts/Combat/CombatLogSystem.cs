@@ -48,7 +48,7 @@ namespace ClawRPG.Scripts.Combat
         public string Source { get; set; }
         public string Target { get; set; }
         public bool IsPlayerAction { get; set; }
-        
+
         public CombatLogEntry()
         {
             Timestamp = 0f;
@@ -77,12 +77,12 @@ namespace ClawRPG.Scripts.Combat
         public float TotalDamageDealt { get; set; }
         public float TotalDamageTaken { get; set; }
         public float TotalHealing { get; set; }
-        
+
         public CombatLogStatistics()
         {
             Reset();
         }
-        
+
         public void Reset()
         {
             TotalEntries = 0;
@@ -106,19 +106,19 @@ namespace ClawRPG.Scripts.Combat
     {
         private static CombatLogSystem _instance;
         public static CombatLogSystem Instance => _instance;
-        
+
         // Log storage
         private List<CombatLogEntry> _logEntries = new List<CombatLogEntry>();
         private List<CombatLogEntry> _filteredEntries = new List<CombatLogEntry>();
-        
+
         // Configuration
         private int _maxEntries = 500;
         private float _autoClearTime = 300f; // 5 minutes
         private float _currentSessionTime = 0f;
-        
+
         // Statistics
         private CombatLogStatistics _statistics = new CombatLogStatistics();
-        
+
         // Filters
         private bool _showDamage = true;
         private bool _showHealing = true;
@@ -128,58 +128,58 @@ namespace ClawRPG.Scripts.Combat
         private bool _showInfo = true;
         private bool _playerOnly = false;
         private bool _enemyOnly = false;
-        
+
         // Combat state
         private int _currentCombo = 0;
         private float _comboTimer = 0f;
         private float _comboTimeWindow = 3f;
-        
+
         // Recent kills tracking
         private List<string> _recentKills = new List<string>();
         private float _killStreakTimer = 0f;
         private int _killStreak = 0;
-        
+
         // Signals
         public static string SignalNewEntry = "new_combat_log_entry";
         public static string SignalComboMilestone = "combo_milestone";
         public static string SignalKillStreak = "kill_streak";
-        
+
         public override void _Ready()
         {
             _instance = this;
             GD.Print("[CombatLogSystem] Combat Log System initialized");
         }
-        
+
         public override void _Process(float delta)
         {
             _currentSessionTime += delta;
             _comboTimer -= delta;
             _killStreakTimer -= delta;
-            
+
             // Update filtered entries
             ApplyFilters();
-            
+
             // Auto-clear old entries
             if (_logEntries.Count > _maxEntries)
             {
                 _logEntries.RemoveAt(0);
             }
-            
+
             // Clear combo if timer expired
             if (_comboTimer <= 0 && _currentCombo > 0)
             {
                 _currentCombo = 0;
             }
-            
+
             // Reset kill streak if timer expired
             if (_killStreakTimer <= 0 && _killStreak > 0)
             {
                 _killStreak = 0;
             }
         }
-        
+
         #region Public API
-        
+
         /// <summary>
         /// Log a damage event
         /// </summary>
@@ -195,13 +195,13 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerSource
             };
-            
+
             AddEntry(entry);
-            
+
             // Update statistics
             _statistics.DamageEntries++;
             if (isCritical) _statistics.CriticalHits++;
-            
+
             if (isPlayerSource)
             {
                 _statistics.TotalDamageDealt += damage;
@@ -212,7 +212,7 @@ namespace ClawRPG.Scripts.Combat
                 _statistics.TotalDamageTaken += damage;
             }
         }
-        
+
         /// <summary>
         /// Log a healing event
         /// </summary>
@@ -228,14 +228,14 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerSource
             };
-            
+
             AddEntry(entry);
-            
+
             // Update statistics
             _statistics.HealingEntries++;
             _statistics.TotalHealing += amount;
         }
-        
+
         /// <summary>
         /// Log a miss event
         /// </summary>
@@ -250,11 +250,11 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerSource
             };
-            
+
             AddEntry(entry);
             _statistics.Misses++;
         }
-        
+
         /// <summary>
         /// Log a block event
         /// </summary>
@@ -270,11 +270,11 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerSource
             };
-            
+
             AddEntry(entry);
             _statistics.Blocks++;
         }
-        
+
         /// <summary>
         /// Log a dodge event
         /// </summary>
@@ -289,11 +289,11 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerSource
             };
-            
+
             AddEntry(entry);
             _statistics.Dodges++;
         }
-        
+
         /// <summary>
         /// Log a parry event
         /// </summary>
@@ -308,10 +308,10 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerSource
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log a kill event
         /// </summary>
@@ -326,18 +326,18 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerKiller
             };
-            
+
             AddEntry(entry);
-            
+
             // Update statistics
             _statistics.KillEntries++;
-            
+
             // Track kill streak
             if (isPlayerKiller)
             {
                 _killStreak++;
                 _killStreakTimer = 5f;
-                
+
                 if (_killStreak >= 3)
                 {
                     EmitSignal(SignalKillStreak, _killStreak);
@@ -352,14 +352,14 @@ namespace ClawRPG.Scripts.Combat
                     AddEntry(streakEntry);
                 }
             }
-            
+
             _recentKills.Add(target);
             if (_recentKills.Count > 10)
             {
                 _recentKills.RemoveAt(0);
             }
         }
-        
+
         /// <summary>
         /// Log a death event
         /// </summary>
@@ -374,10 +374,10 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = false
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log a buff application
         /// </summary>
@@ -392,10 +392,10 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerTarget
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log a debuff application
         /// </summary>
@@ -410,19 +410,19 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerTarget
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log a skill use
         /// </summary>
         public void LogSkill(string skillName, string user, string target = "", bool isPlayerUser = true)
         {
-            var message = string.IsNullOrEmpty(target) 
+            var message = string.IsNullOrEmpty(target)
                 ? $"⚔️ {user} 使用 {skillName}"
                 : $"⚔️ {user} 使用 {skillName} 对 {target}";
-            
+
             var entry = new CombatLogEntry
             {
                 Timestamp = _currentSessionTime,
@@ -432,10 +432,10 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = isPlayerUser
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log an item use
         /// </summary>
@@ -444,7 +444,7 @@ namespace ClawRPG.Scripts.Combat
             var message = string.IsNullOrEmpty(effect)
                 ? $"🎒 {user} 使用 {itemName}"
                 : $"🎒 {user} 使用 {itemName} - {effect}";
-            
+
             var entry = new CombatLogEntry
             {
                 Timestamp = _currentSessionTime,
@@ -454,10 +454,10 @@ namespace ClawRPG.Scripts.Combat
                 Target = effect,
                 IsPlayerAction = isPlayerUser
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log mana/energy change
         /// </summary>
@@ -467,7 +467,7 @@ namespace ClawRPG.Scripts.Combat
             {
                 Timestamp = _currentSessionTime,
                 Type = CombatLogType.Mana,
-                Message = isGain 
+                Message = isGain
                     ? $"💎 {target} 恢复 {amount:F0} {resourceType}"
                     : $"💎 {target} 消耗 {amount:F0} {resourceType}",
                 Value = amount,
@@ -475,10 +475,10 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = true
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log experience gain
         /// </summary>
@@ -494,10 +494,10 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = true
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log level up
         /// </summary>
@@ -512,10 +512,10 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = true
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log info message
         /// </summary>
@@ -528,10 +528,10 @@ namespace ClawRPG.Scripts.Combat
                 Message = $"ℹ️ {message}",
                 IsPlayerAction = isPlayerAction
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log warning message
         /// </summary>
@@ -544,10 +544,10 @@ namespace ClawRPG.Scripts.Combat
                 Message = $"⚠️ {message}",
                 IsPlayerAction = isPlayerAction
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log enemy spawn
         /// </summary>
@@ -562,10 +562,10 @@ namespace ClawRPG.Scripts.Combat
                 Value = waveNumber,
                 IsPlayerAction = false
             };
-            
+
             AddEntry(entry);
         }
-        
+
         /// <summary>
         /// Log enemy aggro
         /// </summary>
@@ -580,34 +580,34 @@ namespace ClawRPG.Scripts.Combat
                 Target = target,
                 IsPlayerAction = false
             };
-            
+
             AddEntry(entry);
         }
-        
+
         #endregion
-        
+
         #region Entry Management
-        
+
         private void AddEntry(CombatLogEntry entry)
         {
             _logEntries.Add(entry);
             _statistics.TotalEntries++;
-            
+
             // Emit signal for UI update
             EmitSignal(SignalNewEntry, entry);
-            
+
             // Check for combo milestones
             CheckComboMilestone();
         }
-        
+
         private void ApplyFilters()
         {
             _filteredEntries.Clear();
-            
+
             foreach (var entry in _logEntries)
             {
                 bool include = true;
-                
+
                 // Type filter
                 switch (entry.Type)
                 {
@@ -643,36 +643,36 @@ namespace ClawRPG.Scripts.Combat
                         include = _showInfo;
                         break;
                 }
-                
+
                 // Player/Enemy filter
                 if (include)
                 {
                     if (_playerOnly && !entry.IsPlayerAction) include = false;
                     if (_enemyOnly && entry.IsPlayerAction) include = false;
                 }
-                
+
                 if (include)
                 {
                     _filteredEntries.Add(entry);
                 }
             }
         }
-        
+
         private void AddCombo(int hits)
         {
             _currentCombo += hits;
             _comboTimer = _comboTimeWindow;
-            
+
             if (_currentCombo >= 5)
             {
                 CheckComboMilestone();
             }
         }
-        
+
         private void CheckComboMilestone()
         {
             int[] milestones = { 5, 10, 15, 20, 25, 30, 40, 50, 75, 100 };
-            
+
             foreach (int milestone in milestones)
             {
                 if (_currentCombo == milestone)
@@ -686,17 +686,17 @@ namespace ClawRPG.Scripts.Combat
                         IsPlayerAction = true
                     };
                     AddEntry(entry);
-                    
+
                     EmitSignal(SignalComboMilestone, milestone);
                     break;
                 }
             }
         }
-        
+
         #endregion
-        
+
         #region Getters
-        
+
         /// <summary>
         /// Get all log entries
         /// </summary>
@@ -704,7 +704,7 @@ namespace ClawRPG.Scripts.Combat
         {
             return new List<CombatLogEntry>(_logEntries);
         }
-        
+
         /// <summary>
         /// Get filtered entries
         /// </summary>
@@ -712,7 +712,7 @@ namespace ClawRPG.Scripts.Combat
         {
             return new List<CombatLogEntry>(_filteredEntries);
         }
-        
+
         /// <summary>
         /// Get recent entries (last n entries)
         /// </summary>
@@ -720,19 +720,19 @@ namespace ClawRPG.Scripts.Combat
         {
             int start = Math.Max(0, _filteredEntries.Count - count);
             int length = Math.Min(count, _filteredEntries.Count - start);
-            
+
             if (length <= 0) return new List<CombatLogEntry>();
-            
+
             return _filteredEntries.GetRange(start, length);
         }
-        
+
         /// <summary>
         /// Get entries by type
         /// </summary>
         public List<CombatLogEntry> GetEntriesByType(CombatLogType type)
         {
             var result = new List<CombatLogEntry>();
-            
+
             foreach (var entry in _logEntries)
             {
                 if (entry.Type == type)
@@ -740,10 +740,10 @@ namespace ClawRPG.Scripts.Combat
                     result.Add(entry);
                 }
             }
-            
+
             return result;
         }
-        
+
         /// <summary>
         /// Get current combo count
         /// </summary>
@@ -751,7 +751,7 @@ namespace ClawRPG.Scripts.Combat
         {
             return _currentCombo;
         }
-        
+
         /// <summary>
         /// Get kill streak
         /// </summary>
@@ -759,7 +759,7 @@ namespace ClawRPG.Scripts.Combat
         {
             return _killStreak;
         }
-        
+
         /// <summary>
         /// Get statistics
         /// </summary>
@@ -767,7 +767,7 @@ namespace ClawRPG.Scripts.Combat
         {
             return _statistics;
         }
-        
+
         /// <summary>
         /// Get session time
         /// </summary>
@@ -775,7 +775,7 @@ namespace ClawRPG.Scripts.Combat
         {
             return _currentSessionTime;
         }
-        
+
         /// <summary>
         /// Get recent kills
         /// </summary>
@@ -783,11 +783,11 @@ namespace ClawRPG.Scripts.Combat
         {
             return new List<string>(_recentKills);
         }
-        
+
         #endregion
-        
+
         #region Filter Control
-        
+
         /// <summary>
         /// Set damage filter
         /// </summary>
@@ -795,7 +795,7 @@ namespace ClawRPG.Scripts.Combat
         {
             _showDamage = show;
         }
-        
+
         /// <summary>
         /// Set healing filter
         /// </summary>
@@ -803,7 +803,7 @@ namespace ClawRPG.Scripts.Combat
         {
             _showHealing = show;
         }
-        
+
         /// <summary>
         /// Set buff filter
         /// </summary>
@@ -811,7 +811,7 @@ namespace ClawRPG.Scripts.Combat
         {
             _showBuffs = show;
         }
-        
+
         /// <summary>
         /// Set skill filter
         /// </summary>
@@ -819,7 +819,7 @@ namespace ClawRPG.Scripts.Combat
         {
             _showSkills = show;
         }
-        
+
         /// <summary>
         /// Set combat filter
         /// </summary>
@@ -827,7 +827,7 @@ namespace ClawRPG.Scripts.Combat
         {
             _showCombat = show;
         }
-        
+
         /// <summary>
         /// Set info filter
         /// </summary>
@@ -835,7 +835,7 @@ namespace ClawRPG.Scripts.Combat
         {
             _showInfo = show;
         }
-        
+
         /// <summary>
         /// Set player only filter
         /// </summary>
@@ -844,7 +844,7 @@ namespace ClawRPG.Scripts.Combat
             _playerOnly = playerOnly;
             if (playerOnly) _enemyOnly = false;
         }
-        
+
         /// <summary>
         /// Set enemy only filter
         /// </summary>
@@ -853,7 +853,7 @@ namespace ClawRPG.Scripts.Combat
             _enemyOnly = enemyOnly;
             if (enemyOnly) _playerOnly = false;
         }
-        
+
         /// <summary>
         /// Clear all filters
         /// </summary>
@@ -868,7 +868,7 @@ namespace ClawRPG.Scripts.Combat
             _playerOnly = false;
             _enemyOnly = false;
         }
-        
+
         /// <summary>
         /// Clear all log entries
         /// </summary>
@@ -879,7 +879,7 @@ namespace ClawRPG.Scripts.Combat
             _currentCombo = 0;
             _killStreak = 0;
         }
-        
+
         /// <summary>
         /// Reset statistics
         /// </summary>
@@ -887,7 +887,7 @@ namespace ClawRPG.Scripts.Combat
         {
             _statistics.Reset();
         }
-        
+
         /// <summary>
         /// Reset session
         /// </summary>
@@ -899,206 +899,9 @@ namespace ClawRPG.Scripts.Combat
             _currentCombo = 0;
             _killStreak = 0;
         }
-        
-        #endregion
-        
-        #region Save/Load System
-        
-        /// <summary>
-        /// Export save data - implements BaseSystem interface
-        /// </summary>
-        public override Dictionary ExportSaveData()
-        {
-            var data = new Dictionary();
-            
-            // Session time
-            data["sessionTime"] = _currentSessionTime;
-            
-            // Log entries - serialize to list of dictionaries
-            var entriesList = new List<Dictionary>();
-            foreach (var entry in _logEntries)
-            {
-                entriesList.Add(new Dictionary
-                {
-                    ["timestamp"] = entry.Timestamp,
-                    ["type"] = (int)entry.Type,
-                    ["message"] = entry.Message,
-                    ["value"] = entry.Value,
-                    ["source"] = entry.Source,
-                    ["target"] = entry.Target,
-                    ["isPlayerAction"] = entry.IsPlayerAction
-                });
-            }
-            data["logEntries"] = entriesList;
-            
-            // Statistics
-            data["statistics"] = new Dictionary
-            {
-                ["totalEntries"] = _statistics.TotalEntries,
-                ["damageEntries"] = _statistics.DamageEntries,
-                ["healingEntries"] = _statistics.HealingEntries,
-                ["killEntries"] = _statistics.KillEntries,
-                ["criticalHits"] = _statistics.CriticalHits,
-                ["misses"] = _statistics.Misses,
-                ["blocks"] = _statistics.Blocks,
-                ["dodges"] = _statistics.Dodges,
-                ["totalDamageDealt"] = _statistics.TotalDamageDealt,
-                ["totalDamageTaken"] = _statistics.TotalDamageTaken,
-                ["totalHealing"] = _statistics.TotalHealing
-            };
-            
-            // Filters
-            data["filters"] = new Dictionary
-            {
-                ["showDamage"] = _showDamage,
-                ["showHealing"] = _showHealing,
-                ["showBuffs"] = _showBuffs,
-                ["showSkills"] = _showSkills,
-                ["showCombat"] = _showCombat,
-                ["showInfo"] = _showInfo,
-                ["playerOnly"] = _playerOnly,
-                ["enemyOnly"] = _enemyOnly
-            };
-            
-            // Combo
-            data["combo"] = new Dictionary
-            {
-                ["currentCombo"] = _currentCombo,
-                ["comboTimer"] = _comboTimer
-            };
-            
-            // Kill streak
-            data["killStreak"] = new Dictionary
-            {
-                ["killStreak"] = _killStreak,
-                ["killStreakTimer"] = _killStreakTimer
-            };
-            
-            // Configuration
-            data["config"] = new Dictionary
-            {
-                ["maxEntries"] = _maxEntries,
-                ["autoClearTime"] = _autoClearTime,
-                ["comboTimeWindow"] = _comboTimeWindow
-            };
-            
-            return data;
-        }
-        
-        /// <summary>
-        /// Import save data - implements BaseSystem interface
-        /// </summary>
-        public override void ImportSaveData(Dictionary data)
-        {
-            if (data == null) return;
-            
-            // Session time
-            if (data.Contains("sessionTime"))
-                _currentSessionTime = Convert.ToSingle(data["sessionTime"]);
-            
-            // Log entries
-            if (data.Contains("logEntries"))
-            {
-                _logEntries.Clear();
-                var entriesList = data["logEntries"] as List;
-                if (entriesList != null)
-                {
-                    foreach (Dictionary entryData in entriesList)
-                    {
-                        var entry = new CombatLogEntry
-                        {
-                            Timestamp = entryData.Contains("timestamp") ? Convert.ToSingle(entryData["timestamp"]) : 0f,
-                            Type = entryData.Contains("type") ? (CombatLogType)Convert.ToInt32(entryData["type"]) : CombatLogType.Info,
-                            Message = entryData.Contains("message") ? entryData["message"].ToString() : "",
-                            Value = entryData.Contains("value") ? Convert.ToSingle(entryData["value"]) : 0f,
-                            Source = entryData.Contains("source") ? entryData["source"].ToString() : "",
-                            Target = entryData.Contains("target") ? entryData["target"].ToString() : "",
-                            IsPlayerAction = entryData.Contains("isPlayerAction") ? Convert.ToBoolean(entryData["isPlayerAction"]) : true
-                        };
-                        _logEntries.Add(entry);
-                    }
-                }
-            }
-            
-            // Statistics
-            if (data.Contains("statistics"))
-            {
-                var statsData = data["statistics"] as Dictionary;
-                if (statsData != null)
-                {
-                    _statistics.TotalEntries = statsData.Contains("totalEntries") ? Convert.ToInt32(statsData["totalEntries"]) : 0;
-                    _statistics.DamageEntries = statsData.Contains("damageEntries") ? Convert.ToInt32(statsData["damageEntries"]) : 0;
-                    _statistics.HealingEntries = statsData.Contains("healingEntries") ? Convert.ToInt32(statsData["healingEntries"]) : 0;
-                    _statistics.KillEntries = statsData.Contains("killEntries") ? Convert.ToInt32(statsData["killEntries"]) : 0;
-                    _statistics.CriticalHits = statsData.Contains("criticalHits") ? Convert.ToInt32(statsData["criticalHits"]) : 0;
-                    _statistics.Misses = statsData.Contains("misses") ? Convert.ToInt32(statsData["misses"]) : 0;
-                    _statistics.Blocks = statsData.Contains("blocks") ? Convert.ToInt32(statsData["blocks"]) : 0;
-                    _statistics.Dodges = statsData.Contains("dodges") ? Convert.ToInt32(statsData["dodges"]) : 0;
-                    _statistics.TotalDamageDealt = statsData.Contains("totalDamageDealt") ? Convert.ToSingle(statsData["totalDamageDealt"]) : 0f;
-                    _statistics.TotalDamageTaken = statsData.Contains("totalDamageTaken") ? Convert.ToSingle(statsData["totalDamageTaken"]) : 0f;
-                    _statistics.TotalHealing = statsData.Contains("totalHealing") ? Convert.ToSingle(statsData["totalHealing"]) : 0f;
-                }
-            }
-            
-            // Filters
-            if (data.Contains("filters"))
-            {
-                var filtersData = data["filters"] as Dictionary;
-                if (filtersData != null)
-                {
-                    _showDamage = filtersData.Contains("showDamage") && Convert.ToBoolean(filtersData["showDamage"]);
-                    _showHealing = filtersData.Contains("showHealing") && Convert.ToBoolean(filtersData["showHealing"]);
-                    _showBuffs = filtersData.Contains("showBuffs") && Convert.ToBoolean(filtersData["showBuffs"]);
-                    _showSkills = filtersData.Contains("showSkills") && Convert.ToBoolean(filtersData["showSkills"]);
-                    _showCombat = filtersData.Contains("showCombat") && Convert.ToBoolean(filtersData["showCombat"]);
-                    _showInfo = filtersData.Contains("showInfo") && Convert.ToBoolean(filtersData["showInfo"]);
-                    _playerOnly = filtersData.Contains("playerOnly") && Convert.ToBoolean(filtersData["playerOnly"]);
-                    _enemyOnly = filtersData.Contains("enemyOnly") && Convert.ToBoolean(filtersData["enemyOnly"]);
-                }
-            }
-            
-            // Combo
-            if (data.Contains("combo"))
-            {
-                var comboData = data["combo"] as Dictionary;
-                if (comboData != null)
-                {
-                    _currentCombo = comboData.Contains("currentCombo") ? Convert.ToInt32(comboData["currentCombo"]) : 0;
-                    _comboTimer = comboData.Contains("comboTimer") ? Convert.ToSingle(comboData["comboTimer"]) : 0f;
-                }
-            }
-            
-            // Kill streak
-            if (data.Contains("killStreak"))
-            {
-                var streakData = data["killStreak"] as Dictionary;
-                if (streakData != null)
-                {
-                    _killStreak = streakData.Contains("killStreak") ? Convert.ToInt32(streakData["killStreak"]) : 0;
-                    _killStreakTimer = streakData.Contains("killStreakTimer") ? Convert.ToSingle(streakData["killStreakTimer"]) : 0f;
-                }
-            }
-            
-            // Configuration
-            if (data.Contains("config"))
-            {
-                var configData = data["config"] as Dictionary;
-                if (configData != null)
-                {
-                    _maxEntries = configData.Contains("maxEntries") ? Convert.ToInt32(configData["maxEntries"]) : 500;
-                    _autoClearTime = configData.Contains("autoClearTime") ? Convert.ToSingle(configData["autoClearTime"]) : 300f;
-                    _comboTimeWindow = configData.Contains("comboTimeWindow") ? Convert.ToSingle(configData["comboTimeWindow"]) : 3f;
-                }
-            }
-            
-            // Rebuild filtered entries
-            ApplyFilters();
-            
-            GD.Print("[CombatLogSystem] Save data imported successfully");
-        }
-        
-        #endregion
 
+        #endregion
+        
         #region 数据持久化
 
         /// <summary>
