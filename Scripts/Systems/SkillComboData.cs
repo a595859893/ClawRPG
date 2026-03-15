@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 技能连击类型枚举。
+/// </summary>
 public enum ComboType
 {
     Sequential,    // Skills used in order
@@ -9,6 +12,9 @@ public enum ComboType
     ChainReaction  // One skill triggers another
 }
 
+/// <summary>
+/// 技能连击触发条件枚举。
+/// </summary>
 public enum ComboTrigger
 {
     TimeWindow,    // Within time window

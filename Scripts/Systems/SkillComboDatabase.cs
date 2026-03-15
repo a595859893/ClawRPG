@@ -2,9 +2,19 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 技能Combo数据库。存储所有技能Combo配置和奖励信息。
+/// </summary>
 public class SkillComboDatabase
 {
+    /// <summary>
+    /// 获取数据库单例实例。
+    /// </summary>
     private static SkillComboDatabase _instance;
+
+    /// <summary>
+    /// 获取单例实例。
+    /// </summary>
     public static SkillComboDatabase Instance => _instance ??= new SkillComboDatabase();
     
     public Dictionary<string, SkillCombo> Combos { get; private set; }

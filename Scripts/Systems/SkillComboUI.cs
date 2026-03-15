@@ -2,8 +2,14 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 技能Combo用户界面。显示和管理技能Combo面板。
+/// </summary>
 public partial class SkillComboUI : Control
 {
+    /// <summary>
+    /// 获取界面单例实例。
+    /// </summary>
     private static SkillComboUI _instance;
     public static SkillComboUI Instance => _instance;
     
