@@ -3,72 +3,24 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// 多人游戏队伍系统
-/// 队伍管理、Buff共享、经验加成
+/// 队伍系统协调器 - 提供统一的队伍API入口
+/// 内部委托给PartyManager、PartyBuffSystem、PartyLootSystem处理
 /// </summary>
 public class PartySystem : BaseSystem
 {
     public static PartySystem Instance { get; private set; }
 
-    // 队伍成员
-    public class PartyMember
-    {
-        public int PlayerId;
-        public string PlayerName;
-        public Vector2 Position;
-        public int Level;
-        public int Health;
-        public int MaxHealth;
-        public PartyRole Role;
-        public bool IsOnline;
-        public float LastUpdate;
-    }
-
-    // 队伍角色
-    public enum PartyRole
-    {
-        Leader,      // 队长
-        Tank,        // 坦克
-        Healer,      // 治疗
-        DamageDealer, // 输出
-        Support,     // 辅助
-        Scout        // 侦察
-    }
-
-    // 队伍Buff类型
-    public enum PartyBuffType
-    {
-        ExperienceBoost,   // 经验加成
-        GoldBoost,         // 金币加成
-        DamageBoost,       // 伤害加成
-        DefenseBoost,      // 防御加成
-        HealthRegen,       // 生命恢复
-        ManaRegen,         // 法力恢复
-        LuckBoost,         // 幸运加成
-        DropRateBoost      // 掉落率加成
-    }
-
-    // 队伍Buff
-    public class PartyBuff
-    {
-        public PartyBuffType Type;
-        public float Value;
-        public float Duration;
-        public float RemainingTime;
-        public int ProviderId;
-    }
-
-    // 信号
+    // 事件信号 - 兼容旧API
     public delegate void PartyCreatedEvent(int partyId);
     public delegate void PartyJoinedEvent(int partyId);
     public delegate void PartyLeftEvent();
     public delegate void MemberJoinedEvent(int playerId, string playerName);
     public delegate void MemberLeftEvent(int playerId);
-    public delegate void RoleChangedEvent(int playerId, PartyRole newRole);
-    public delegate void BuffAddedEvent(PartyBuff buff);
-    public delegate void BuffRemovedEvent(PartyBuffType buffType);
+    public delegate void RoleChangedEvent(int playerId, PartyData.PartyRole newRole);
+    public delegate void BuffAddedEvent(PartyData.PartyBuff buff);
+    public delegate void BuffRemovedEvent(PartyData.PartyBuffType buffType);
     public delegate void LeaderChangedEvent(int newLeaderId);
-    public delegate void MemberStateUpdateEvent(int playerId, PartyMember member);
+    public delegate void MemberStateUpdateEvent(int playerId, PartyData.PartyMember member);
 
     public event PartyCreatedEvent OnPartyCreated;
     public event PartyJoinedEvent OnPartyJoined;
@@ -81,99 +33,71 @@ public class PartySystem : BaseSystem
     public event LeaderChangedEvent OnLeaderChanged;
     public event MemberStateUpdateEvent OnMemberStateUpdate;
 
-    // 状态
-    private int _partyId = -1;
-    private bool _isLeader = false;
-    private int _localPlayerId = -1;
-    private PartyRole _currentRole = PartyRole.DamageDealer;
-    
-    // 队伍成员
-    private Dictionary<int, PartyMember> _members = new Dictionary<int, PartyMember>();
-    private readonly object _membersLock = new object();
+    // 属性 - 兼容旧API
+    public bool IsInParty => PartyManager.Instance != null && PartyManager.Instance.IsInParty;
+    public bool IsLeader => PartyManager.Instance != null && PartyManager.Instance.IsLeader;
+    public int PartyId => PartyManager.Instance != null ? PartyManager.Instance.PartyId : -1;
+    public PartyData.PartyRole CurrentRole => PartyManager.Instance != null ? PartyManager.Instance.CurrentRole : PartyData.PartyRole.DamageDealer;
+    public bool ShareExp => PartyLootSystem.Instance != null && PartyLootSystem.Instance.ShareExp;
+    public bool ShareLoot => PartyLootSystem.Instance != null && PartyLootSystem.Instance.ShareLoot;
 
-    // 队伍Buff
-    private List<PartyBuff> _activeBuffs = new List<PartyBuff>();
-    private readonly object _buffsLock = new object();
-
-    // Buff配置
-    private Dictionary<PartyBuffType, float> _buffDefaults = new Dictionary<PartyBuffType, float>
-    {
-        { PartyBuffType.ExperienceBoost, 0.10f },   // 10%
-        { PartyBuffType.GoldBoost, 0.10f },         // 10%
-        { PartyBuffType.DamageBoost, 0.05f },      // 5%
-        { PartyBuffType.DefenseBoost, 0.05f },      // 5%
-        { PartyBuffType.HealthRegen, 1.0f },        // 1hp/s
-        { PartyBuffType.ManaRegen, 1.0f },          // 1mp/s
-        { PartyBuffType.LuckBoost, 0.05f },         // 5%
-        { PartyBuffType.DropRateBoost, 0.05f }      // 5%
-    };
-
-    // 队伍设置
-    private bool _shareExp = true;
-    private bool _shareLoot = false;
-    private bool _autoAccept = false;
-
-    // 经验分配模式
-    private enum ExpDistributionMode
-    {
-        Equal,          // 平均分配
-        BasedOnLevel,   // 按等级分配
-        BasedOnDamage,  // 按伤害分配
-        BasedOnHealing  // 按治疗分配
-    }
-    private ExpDistributionMode _expMode = ExpDistributionMode.Equal;
-
-    public bool IsInParty => _partyId > 0;
-    public bool IsLeader => _isLeader;
-    public int PartyId => _partyId;
-    public PartyRole CurrentRole => _currentRole;
-    public bool ShareExp => _shareExp;
-    public bool ShareLoot => _shareLoot;
+    // 内部系统引用
+    private PartyManager _partyManager;
+    private PartyBuffSystem _buffSystem;
+    private PartyLootSystem _lootSystem;
 
     protected override void Initialize()
     {
         Instance = this;
-    }
-
-    public override void _Process(float delta)
-    {
-        if (!IsInParty) return;
-
-        // 更新Buff时间
-        UpdateBuffs(delta);
         
-        // 同步成员状态
-        SyncMemberState();
+        // 创建子系统（作为子节点）
+        _partyManager = new PartyManager();
+        _partyManager.Name = "PartyManager";
+        AddChild(_partyManager);
+        
+        _buffSystem = new PartyBuffSystem();
+        _buffSystem.Name = "PartyBuffSystem";
+        AddChild(_buffSystem);
+        
+        _lootSystem = new PartyLootSystem();
+        _lootSystem.Name = "PartyLootSystem";
+        AddChild(_lootSystem);
+        
+        // 绑定事件
+        BindEvents();
+        
+        GD.Print("[PartySystem] Initialized");
     }
+
+    private void BindEvents()
+    {
+        if (_partyManager != null)
+        {
+            _partyManager.OnPartyCreated += (id) => OnPartyCreated?.Invoke(id);
+            _partyManager.OnPartyJoined += (id) => OnPartyJoined?.Invoke(id);
+            _partyManager.OnPartyLeft += () => OnPartyLeft?.Invoke();
+            _partyManager.OnMemberJoined += (id, name) => OnMemberJoined?.Invoke(id, name);
+            _partyManager.OnMemberLeft += (id) => OnMemberLeft?.Invoke(id);
+            _partyManager.OnRoleChanged += (id, role) => OnRoleChanged?.Invoke(id, role);
+            _partyManager.OnLeaderChanged += (id) => OnLeaderChanged?.Invoke(id);
+            _partyManager.OnMemberStateUpdate += (id, member) => OnMemberStateUpdate?.Invoke(id, member);
+        }
+        
+        if (_buffSystem != null)
+        {
+            _buffSystem.OnBuffAdded += (buff) => OnBuffAdded?.Invoke(buff);
+            _buffSystem.OnBuffRemoved += (type) => OnBuffRemoved?.Invoke(type);
+        }
+    }
+
+    // ============ 组队管理 API ============
 
     /// <summary>
     /// 创建队伍
     /// </summary>
     public void CreateParty(int playerId)
     {
-        _localPlayerId = playerId;
-        _partyId = (int)GD.Randi() % 10000 + 1;
-        _isLeader = true;
-        
-        var member = new PartyMember
-        {
-            PlayerId = playerId,
-            PlayerName = GetPlayerName(playerId),
-            Level = GetPlayerLevel(playerId),
-            Role = PartyRole.Leader,
-            IsOnline = true,
-            LastUpdate = OS.GetTicksMsec() / 1000f
-        };
-        
-        lock (_membersLock)
-        {
-            _members[playerId] = member;
-        }
-        
-        _currentRole = PartyRole.Leader;
-        
-        GD.Print($"[PartySystem] Party created: {_partyId}");
-        OnPartyCreated?.Invoke(_partyId);
+        _partyManager?.CreateParty(playerId);
     }
 
     /// <summary>
@@ -181,15 +105,7 @@ public class PartySystem : BaseSystem
     /// </summary>
     public void JoinParty(int partyId, int playerId)
     {
-        _localPlayerId = playerId;
-        _partyId = partyId;
-        _isLeader = false;
-        
-        // 向服务器请求队伍成员列表
-        RequestPartyMembers();
-        
-        GD.Print($"[PartySystem] Joined party: {_partyId}");
-        OnPartyJoined?.Invoke(_partyId);
+        _partyManager?.JoinParty(partyId, playerId);
     }
 
     /// <summary>
@@ -197,35 +113,8 @@ public class PartySystem : BaseSystem
     /// </summary>
     public void LeaveParty()
     {
-        if (!IsInParty) return;
-
-        // 通知服务器
-        if (NetworkClient.Instance != null && NetworkClient.Instance.IsConnected)
-        {
-            var message = new Dictionary<string, object>
-            {
-                { "type", "party_leave" },
-                { "party_id", _partyId },
-                { "player_id", _localPlayerId }
-            };
-            NetworkClient.Instance.SendJson(message);
-        }
-
-        _partyId = -1;
-        _isLeader = false;
-        
-        lock (_membersLock)
-        {
-            _members.Clear();
-        }
-        
-        lock (_buffsLock)
-        {
-            _activeBuffs.Clear();
-        }
-        
-        GD.Print("[PartySystem] Left party");
-        OnPartyLeft?.Invoke();
+        _partyManager?.LeaveParty();
+        _buffSystem?.ClearAllBuffs();
     }
 
     /// <summary>
@@ -233,19 +122,7 @@ public class PartySystem : BaseSystem
     /// </summary>
     public void InvitePlayer(int targetPlayerId)
     {
-        if (!IsInParty || !_isLeader) return;
-
-        if (NetworkClient.Instance != null && NetworkClient.Instance.IsConnected)
-        {
-            var message = new Dictionary<string, object>
-            {
-                { "type", "party_invite" },
-                { "party_id", _partyId },
-                { "inviter_id", _localPlayerId },
-                { "target_id", targetPlayerId }
-            };
-            NetworkClient.Instance.SendJson(message);
-        }
+        _partyManager?.InvitePlayer(targetPlayerId);
     }
 
     /// <summary>
@@ -253,32 +130,7 @@ public class PartySystem : BaseSystem
     /// </summary>
     public void KickMember(int memberId)
     {
-        if (!IsInParty || !_isLeader) return;
-        if (memberId == _localPlayerId) return; // 不能踢自己
-
-        lock (_membersLock)
-        {
-            if (_members.ContainsKey(memberId))
-            {
-                var member = _members[memberId];
-                
-                // 通知服务器
-                if (NetworkClient.Instance != null && NetworkClient.Instance.IsConnected)
-                {
-                    var message = new Dictionary<string, object>
-                    {
-                        { "type", "party_kick" },
-                        { "party_id", _partyId },
-                        { "kicker_id", _localPlayerId },
-                        { "target_id", memberId }
-                    };
-                    NetworkClient.Instance.SendJson(message);
-                }
-                
-                _members.Remove(memberId);
-                OnMemberLeft?.Invoke(memberId);
-            }
-        }
+        _partyManager?.KickMember(memberId);
     }
 
     /// <summary>
@@ -286,392 +138,39 @@ public class PartySystem : BaseSystem
     /// </summary>
     public void TransferLeadership(int newLeaderId)
     {
-        if (!IsInParty || !_isLeader) return;
-        if (!_members.ContainsKey(newLeaderId)) return;
-
-        // 通知服务器
-        if (NetworkClient.Instance != null && NetworkClient.Instance.IsConnected)
-        {
-            var message = new Dictionary<string, object>
-            {
-                { "type", "party_transfer_leader" },
-                { "party_id", _partyId },
-                { "current_leader_id", _localPlayerId },
-                { "new_leader_id", newLeaderId }
-            };
-            NetworkClient.Instance.SendJson(message);
-        }
-
-        // 本地更新
-        lock (_membersLock)
-        {
-            if (_members.ContainsKey(_localPlayerId))
-            {
-                _members[_localPlayerId].Role = PartyRole.DamageDealer;
-            }
-            if (_members.ContainsKey(newLeaderId))
-            {
-                _members[newLeaderId].Role = PartyRole.Leader;
-            }
-        }
-        
-        _isLeader = false;
-        if (newLeaderId == _localPlayerId)
-        {
-            _isLeader = true;
-        }
-        
-        OnLeaderChanged?.Invoke(newLeaderId);
+        _partyManager?.TransferLeadership(newLeaderId);
     }
 
     /// <summary>
     /// 设置成员角色
     /// </summary>
-    public void SetMemberRole(int memberId, PartyRole role)
+    public void SetMemberRole(int memberId, PartyData.PartyRole role)
     {
-        if (!IsInParty || !_isLeader) return;
-        
-        lock (_membersLock)
-        {
-            if (_members.ContainsKey(memberId))
-            {
-                _members[memberId].Role = role;
-                OnRoleChanged?.Invoke(memberId, role);
-            }
-        }
+        _partyManager?.SetMemberRole(memberId, role);
     }
 
     /// <summary>
     /// 设置自己的角色
     /// </summary>
-    public void SetRole(PartyRole role)
+    public void SetRole(PartyData.PartyRole role)
     {
-        if (!IsInParty) return;
-        
-        _currentRole = role;
-        
-        lock (_membersLock)
-        {
-            if (_members.ContainsKey(_localPlayerId))
-            {
-                _members[_localPlayerId].Role = role;
-            }
-        }
-        
-        // 通知服务器
-        if (NetworkClient.Instance != null && NetworkClient.Instance.IsConnected)
-        {
-            var message = new Dictionary<string, object>
-            {
-                { "type", "party_set_role" },
-                { "party_id", _partyId },
-                { "player_id", _localPlayerId },
-                { "role", role.ToString() }
-            };
-            NetworkClient.Instance.SendJson(message);
-        }
-    }
-
-    /// <summary>
-    /// 添加队伍Buff
-    /// </summary>
-    public void AddBuff(PartyBuffType type, float value, float duration, int providerId)
-    {
-        var buff = new PartyBuff
-        {
-            Type = type,
-            Value = value,
-            Duration = duration,
-            RemainingTime = duration,
-            ProviderId = providerId
-        };
-        
-        lock (_buffsLock)
-        {
-            // 移除同类型的旧Buff
-            _activeBuffs.RemoveAll(b => b.Type == type);
-            _activeBuffs.Add(buff);
-        }
-        
-        OnBuffAdded?.Invoke(buff);
-        
-        // 通知其他成员
-        if (NetworkClient.Instance != null && NetworkClient.Instance.IsConnected)
-        {
-            var message = new Dictionary<string, object>
-            {
-                { "type", "party_add_buff" },
-                { "party_id", _partyId },
-                { "buff_type", type.ToString() },
-                { "value", value },
-                { "duration", duration },
-                { "provider_id", providerId }
-            };
-            NetworkClient.Instance.SendJson(message);
-        }
-    }
-
-    /// <summary>
-    /// 移除队伍Buff
-    /// </summary>
-    public void RemoveBuff(PartyBuffType type)
-    {
-        lock (_buffsLock)
-        {
-            _activeBuffs.RemoveAll(b => b.Type == type);
-        }
-        
-        OnBuffRemoved?.Invoke(type);
-    }
-
-    /// <summary>
-    /// 获取队伍Buff效果
-    /// </summary>
-    public float GetBuffValue(PartyBuffType type)
-    {
-        lock (_buffsLock)
-        {
-            foreach (var buff in _activeBuffs)
-            {
-                if (buff.Type == type)
-                {
-                    return buff.Value;
-                }
-            }
-        }
-        return 0f;
-    }
-
-    /// <summary>
-    /// 获取所有Buff效果
-    /// </summary>
-    public Dictionary<PartyBuffType, float> GetAllBuffValues()
-    {
-        var result = new Dictionary<PartyBuffType, float>();
-        
-        lock (_buffsLock)
-        {
-            foreach (var buff in _activeBuffs)
-            {
-                if (!result.ContainsKey(buff.Type))
-                {
-                    result[buff.Type] = 0f;
-                }
-                result[buff.Type] += buff.Value;
-            }
-        }
-        
-        return result;
-    }
-
-    /// <summary>
-    /// 更新Buff时间
-    /// </summary>
-    private void UpdateBuffs(float delta)
-    {
-        lock (_buffsLock)
-        {
-            for (int i = _activeBuffs.Count - 1; i >= 0; i--)
-            {
-                var buff = _activeBuffs[i];
-                buff.RemainingTime -= delta;
-                
-                if (buff.RemainingTime <= 0)
-                {
-                    _activeBuffs.RemoveAt(i);
-                    OnBuffRemoved?.Invoke(buff.Type);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 同步成员状态
-    /// </summary>
-    private void SyncMemberState()
-    {
-        if (_localPlayerId <= 0) return;
-        
-        lock (_membersLock)
-        {
-            if (_members.ContainsKey(_localPlayerId))
-            {
-                var member = _members[_localPlayerId];
-                member.Position = GetPlayerPosition(_localPlayerId);
-                member.Health = GetPlayerHealth(_localPlayerId);
-                member.MaxHealth = GetPlayerMaxHealth(_localPlayerId);
-                member.Level = GetPlayerLevel(_localPlayerId);
-                member.LastUpdate = OS.GetTicksMsec() / 1000f;
-                
-                // 发送给服务器
-                if (NetworkClient.Instance != null && NetworkClient.Instance.IsConnected)
-                {
-                    var message = new Dictionary<string, object>
-                    {
-                        { "type", "party_member_state" },
-                        { "party_id", _partyId },
-                        { "player_id", _localPlayerId },
-                        { "position", new Dictionary<string, float> { { "x", member.Position.X }, { "y", member.Position.Y } } },
-                        { "health", member.Health },
-                        { "max_health", member.MaxHealth },
-                        { "level", member.Level }
-                    };
-                    NetworkClient.Instance.SendJson(message);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 请求队伍成员列表
-    /// </summary>
-    private void RequestPartyMembers()
-    {
-        if (NetworkClient.Instance != null && NetworkClient.Instance.IsConnected)
-        {
-            var message = new Dictionary<string, object>
-            {
-                { "type", "party_request_members" },
-                { "party_id", _partyId },
-                { "player_id", _localPlayerId }
-            };
-            NetworkClient.Instance.SendJson(message);
-        }
-    }
-
-    /// <summary>
-    /// 处理服务器消息
-    /// </summary>
-    public void HandleMessage(Dictionary<string, object> data)
-    {
-        if (!data.ContainsKey("type")) return;
-        
-        string msgType = data["type"].ToString();
-        
-        switch (msgType)
-        {
-            case "party_created":
-                _partyId = Convert.ToInt32(data["party_id"]);
-                _isLeader = true;
-                _localPlayerId = Convert.ToInt32(data["player_id"]);
-                OnPartyCreated?.Invoke(_partyId);
-                break;
-                
-            case "party_joined":
-                _partyId = Convert.ToInt32(data["party_id"]);
-                _localPlayerId = Convert.ToInt32(data["player_id"]);
-                OnPartyJoined?.Invoke(_partyId);
-                break;
-                
-            case "party_member_joined":
-                int memberId = Convert.ToInt32(data["player_id"]);
-                string memberName = data["player_name"].ToString();
-                var newMember = new PartyMember
-                {
-                    PlayerId = memberId,
-                    PlayerName = memberName,
-                    Level = data.ContainsKey("level") ? Convert.ToInt32(data["level"]) : 1,
-                    Role = PartyRole.DamageDealer,
-                    IsOnline = true,
-                    LastUpdate = OS.GetTicksMsec() / 1000f
-                };
-                lock (_membersLock)
-                {
-                    _members[memberId] = newMember;
-                }
-                OnMemberJoined?.Invoke(memberId, memberName);
-                break;
-                
-            case "party_member_left":
-                int leftId = Convert.ToInt32(data["player_id"]);
-                lock (_membersLock)
-                {
-                    _members.Remove(leftId);
-                }
-                OnMemberLeft?.Invoke(leftId);
-                break;
-                
-            case "party_leader_changed":
-                int newLeader = Convert.ToInt32(data["new_leader_id"]);
-                _isLeader = (newLeader == _localPlayerId);
-                lock (_membersLock)
-                {
-                    foreach (var kvp in _members)
-                    {
-                        kvp.Value.Role = (kvp.Key == newLeader) ? PartyRole.Leader : PartyRole.DamageDealer;
-                    }
-                }
-                OnLeaderChanged?.Invoke(newLeader);
-                break;
-                
-            case "party_buff_added":
-                var buffType = Enum.Parse<PartyBuffType>(data["buff_type"].ToString());
-                float buffValue = Convert.ToSingle(data["value"]);
-                float buffDuration = Convert.ToSingle(data["duration"]);
-                int provider = Convert.ToInt32(data["provider_id"]);
-                AddBuff(buffType, buffValue, buffDuration, provider);
-                break;
-                
-            case "party_member_state":
-                int statePlayerId = Convert.ToInt32(data["player_id"]);
-                lock (_membersLock)
-                {
-                    if (_members.ContainsKey(statePlayerId))
-                    {
-                        var member = _members[statePlayerId];
-                        if (data.ContainsKey("position"))
-                        {
-                            var pos = data["position"] as Dictionary<string, object>;
-                            member.Position = new Vector2(Convert.ToSingle(pos["x"]), Convert.ToSingle(pos["y"]));
-                        }
-                        if (data.ContainsKey("health"))
-                            member.Health = Convert.ToInt32(data["health"]);
-                        if (data.ContainsKey("max_health"))
-                            member.MaxHealth = Convert.ToInt32(data["max_health"]);
-                        if (data.ContainsKey("level"))
-                            member.Level = Convert.ToInt32(data["level"]);
-                        member.LastUpdate = OS.GetTicksMsec() / 1000f;
-                        
-                        OnMemberStateUpdate?.Invoke(statePlayerId, member);
-                    }
-                }
-                break;
-                
-            case "party_disbanded":
-                _partyId = -1;
-                lock (_membersLock)
-                {
-                    _members.Clear();
-                }
-                lock (_buffsLock)
-                {
-                    _activeBuffs.Clear();
-                }
-                OnPartyLeft?.Invoke();
-                break;
-        }
+        _partyManager?.SetRole(role);
     }
 
     /// <summary>
     /// 获取队伍成员列表
     /// </summary>
-    public List<PartyMember> GetMembers()
+    public List<PartyData.PartyMember> GetMembers()
     {
-        lock (_membersLock)
-        {
-            return new List<PartyMember>(_members.Values);
-        }
+        return _partyManager?.GetMembers() ?? new List<PartyData.PartyMember>();
     }
 
     /// <summary>
     /// 获取指定成员
     /// </summary>
-    public PartyMember GetMember(int playerId)
+    public PartyData.PartyMember GetMember(int playerId)
     {
-        lock (_membersLock)
-        {
-            return _members.ContainsKey(playerId) ? _members[playerId] : null;
-        }
+        return _partyManager?.GetMember(playerId);
     }
 
     /// <summary>
@@ -679,15 +178,7 @@ public class PartySystem : BaseSystem
     /// </summary>
     public int GetOnlineMemberCount()
     {
-        int count = 0;
-        lock (_membersLock)
-        {
-            foreach (var member in _members.Values)
-            {
-                if (member.IsOnline) count++;
-            }
-        }
-        return count;
+        return _partyManager?.GetOnlineMemberCount() ?? 0;
     }
 
     /// <summary>
@@ -695,30 +186,51 @@ public class PartySystem : BaseSystem
     /// </summary>
     public float GetAverageLevel()
     {
-        int totalLevel = 0;
-        int count = 0;
-        
-        lock (_membersLock)
-        {
-            foreach (var member in _members.Values)
-            {
-                if (member.IsOnline)
-                {
-                    totalLevel += member.Level;
-                    count++;
-                }
-            }
-        }
-        
-        return count > 0 ? (float)totalLevel / count : 0;
+        return _partyManager?.GetAverageLevel() ?? 0;
     }
+
+    // ============ Buff API ============
+
+    /// <summary>
+    /// 添加队伍Buff
+    /// </summary>
+    public void AddBuff(PartyData.PartyBuffType type, float value, float duration, int providerId)
+    {
+        _buffSystem?.AddBuff(type, value, duration, providerId);
+    }
+
+    /// <summary>
+    /// 移除队伍Buff
+    /// </summary>
+    public void RemoveBuff(PartyData.PartyBuffType type)
+    {
+        _buffSystem?.RemoveBuff(type);
+    }
+
+    /// <summary>
+    /// 获取队伍Buff效果
+    /// </summary>
+    public float GetBuffValue(PartyData.PartyBuffType type)
+    {
+        return _buffSystem?.GetBuffValue(type) ?? 0f;
+    }
+
+    /// <summary>
+    /// 获取所有Buff效果
+    /// </summary>
+    public Dictionary<PartyData.PartyBuffType, float> GetAllBuffValues()
+    {
+        return _buffSystem?.GetAllBuffValues() ?? new Dictionary<PartyData.PartyBuffType, float>();
+    }
+
+    // ============ 战利品API ============
 
     /// <summary>
     /// 设置经验共享
     /// </summary>
     public void SetShareExp(bool share)
     {
-        _shareExp = share;
+        _lootSystem?.SetShareExp(share);
     }
 
     /// <summary>
@@ -726,7 +238,7 @@ public class PartySystem : BaseSystem
     /// </summary>
     public void SetShareLoot(bool share)
     {
-        _shareLoot = share;
+        _lootSystem?.SetShareLoot(share);
     }
 
     /// <summary>
@@ -734,15 +246,15 @@ public class PartySystem : BaseSystem
     /// </summary>
     public void SetAutoAccept(bool autoAccept)
     {
-        _autoAccept = autoAccept;
+        _lootSystem?.SetAutoAccept(autoAccept);
     }
 
     /// <summary>
     /// 设置经验分配模式
     /// </summary>
-    public void SetExpDistributionMode(ExpDistributionMode mode)
+    public void SetExpDistributionMode(PartyData.ExpDistributionMode mode)
     {
-        _expMode = mode;
+        _lootSystem?.SetExpDistributionMode(mode);
     }
 
     /// <summary>
@@ -750,134 +262,47 @@ public class PartySystem : BaseSystem
     /// </summary>
     public Dictionary<int, int> CalculateExpDistribution(int totalExp)
     {
-        var distribution = new Dictionary<int, int>();
-        
-        if (!_shareExp)
-        {
-            distribution[_localPlayerId] = totalExp;
-            return distribution;
-        }
-        
-        lock (_membersLock)
-        {
-            List<int> onlineMembers = new List<int>();
-            foreach (var member in _members.Values)
-            {
-                if (member.IsOnline)
-                    onlineMembers.Add(member.PlayerId);
-            }
-            
-            int memberCount = onlineMembers.Count;
-            if (memberCount == 0)
-            {
-                distribution[_localPlayerId] = totalExp;
-                return distribution;
-            }
-            
-            switch (_expMode)
-            {
-                case ExpDistributionMode.Equal:
-                    int expPerMember = totalExp / memberCount;
-                    foreach (var id in onlineMembers)
-                        distribution[id] = expPerMember;
-                    break;
-                    
-                case ExpDistributionMode.BasedOnLevel:
-                    int totalLevel = 0;
-                    Dictionary<int, int> memberLevels = new Dictionary<int, int>();
-                    foreach (var id in onlineMembers)
-                    {
-                        int level = _members[id].Level;
-                        memberLevels[id] = level;
-                        totalLevel += level;
-                    }
-                    foreach (var id in onlineMembers)
-                    {
-                        float ratio = (float)memberLevels[id] / totalLevel;
-                        distribution[id] = (int)(totalExp * ratio);
-                    }
-                    break;
-                    
-                default:
-                    int equalExp = totalExp / memberCount;
-                    foreach (var id in onlineMembers)
-                        distribution[id] = equalExp;
-                    break;
-            }
-        }
-        
-        return distribution;
+        return _lootSystem?.CalculateExpDistribution(totalExp) ?? new Dictionary<int, int>();
     }
 
-    // 辅助方法 - 需要从GameManager获取
-    private string GetPlayerName(int playerId)
+    /// <summary>
+    /// 获取经验倍率
+    /// </summary>
+    public float GetExpMultiplier()
     {
-        var root = GetTree().Root;
-        foreach (Node child in root.GetChildren())
-        {
-            if (child is GameManager gm)
-            {
-                return gm.GetPlayerName(playerId);
-            }
-        }
-        return "Player" + playerId;
+        return _lootSystem?.GetExpMultiplier() ?? 1f;
     }
 
-    private int GetPlayerLevel(int playerId)
+    /// <summary>
+    /// 获取金币倍率
+    /// </summary>
+    public float GetGoldMultiplier()
     {
-        var root = GetTree().Root;
-        foreach (Node child in root.GetChildren())
-        {
-            if (child is GameManager gm)
-            {
-                return gm.GetPlayerLevel(playerId);
-            }
-        }
-        return 1;
+        return _lootSystem?.GetGoldMultiplier() ?? 1f;
     }
 
-    private Vector2 GetPlayerPosition(int playerId)
+    /// <summary>
+    /// 获取掉落率倍率
+    /// </summary>
+    public float GetDropRateMultiplier()
     {
-        var root = GetTree().Root;
-        foreach (Node child in root.GetChildren())
-        {
-            if (child is Player player && player.PlayerId == playerId)
-            {
-                return player.Position;
-            }
-        }
-        return Vector2.Zero;
+        return _lootSystem?.GetDropRateMultiplier() ?? 1f;
     }
 
-    private int GetPlayerHealth(int playerId)
-    {
-        var root = GetTree().Root;
-        foreach (Node child in root.GetChildren())
-        {
-            if (child is Player player && player.PlayerId == playerId)
-            {
-                return player.Health;
-            }
-        }
-        return 100;
-    }
+    // ============ 消息处理 ============
 
-    private int GetPlayerMaxHealth(int playerId)
+    /// <summary>
+    /// 处理服务器消息
+    /// </summary>
+    public void HandleMessage(Dictionary<string, object> data)
     {
-        var root = GetTree().Root;
-        foreach (Node child in root.GetChildren())
-        {
-            if (child is Player player && player.PlayerId == playerId)
-            {
-                return player.MaxHealth;
-            }
-        }
-        return 100;
+        _partyManager?.HandleMessage(data);
+        _buffSystem?.HandleMessage(data);
     }
 
     public override void _ExitTree()
     {
-        LeaveParty();
+        _partyManager?.LeaveParty();
         Instance = null;
     }
 
@@ -888,50 +313,29 @@ public class PartySystem : BaseSystem
     {
         var data = new Dictionary();
         
-        data["party_id"] = _partyId;
-        data["is_leader"] = _isLeader;
-        data["local_player_id"] = _localPlayerId;
-        data["current_role"] = (int)_currentRole;
-        data["share_exp"] = _shareExp;
-        data["share_loot"] = _shareLoot;
-        data["auto_accept"] = _autoAccept;
-        data["exp_mode"] = (int)_expMode;
-        
-        // 队伍成员
-        var members = new Array();
-        lock (_membersLock)
+        if (_partyManager != null)
         {
-            foreach (var kvp in _members)
+            foreach (var kvp in _partyManager.ExportSaveData())
             {
-                var member = new Dictionary();
-                member["player_id"] = kvp.Value.PlayerId;
-                member["player_name"] = kvp.Value.PlayerName;
-                member["level"] = kvp.Value.Level;
-                member["health"] = kvp.Value.Health;
-                member["max_health"] = kvp.Value.MaxHealth;
-                member["role"] = (int)kvp.Value.Role;
-                member["is_online"] = kvp.Value.IsOnline;
-                members.Add(member);
+                data[kvp.Key] = kvp.Value;
             }
         }
-        data["members"] = members;
         
-        // 队伍Buff
-        var buffs = new Array();
-        lock (_buffsLock)
+        if (_buffSystem != null)
         {
-            foreach (var buff in _activeBuffs)
+            foreach (var kvp in _buffSystem.ExportSaveData())
             {
-                var b = new Dictionary();
-                b["type"] = (int)buff.Type;
-                b["value"] = buff.Value;
-                b["duration"] = buff.Duration;
-                b["remaining_time"] = buff.RemainingTime;
-                b["provider_id"] = buff.ProviderId;
-                buffs.Add(b);
+                data[kvp.Key] = kvp.Value;
             }
         }
-        data["active_buffs"] = buffs;
+        
+        if (_lootSystem != null)
+        {
+            foreach (var kvp in _lootSystem.ExportSaveData())
+            {
+                data[kvp.Key] = kvp.Value;
+            }
+        }
         
         return data;
     }
@@ -943,60 +347,8 @@ public class PartySystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("party_id")) _partyId = (int)data["party_id"];
-        if (data.Contains("is_leader")) _isLeader = (bool)data["is_leader"];
-        if (data.Contains("local_player_id")) _localPlayerId = (int)data["local_player_id"];
-        if (data.Contains("current_role")) _currentRole = (PartyRole)(int)data["current_role"];
-        if (data.Contains("share_exp")) _shareExp = (bool)data["share_exp"];
-        if (data.Contains("share_loot")) _shareLoot = (bool)data["share_loot"];
-        if (data.Contains("auto_accept")) _autoAccept = (bool)data["auto_accept"];
-        if (data.Contains("exp_mode")) _expMode = (ExpDistributionMode)(int)data["exp_mode"];
-        
-        // 队伍成员
-        if (data.Contains("members"))
-        {
-            lock (_membersLock)
-            {
-                _members.Clear();
-                var members = (Array)data["members"];
-                foreach (Dictionary member in members)
-                {
-                    var pm = new PartyMember
-                    {
-                        PlayerId = (int)member["player_id"],
-                        PlayerName = (string)member["player_name"],
-                        Level = (int)member["level"],
-                        Health = (int)member["health"],
-                        MaxHealth = (int)member["max_health"],
-                        Role = (PartyRole)(int)member["role"],
-                        IsOnline = (bool)member["is_online"],
-                        LastUpdate = OS.GetTicksMsec() / 1000f
-                    };
-                    _members[pm.PlayerId] = pm;
-                }
-            }
-        }
-        
-        // 队伍Buff
-        if (data.Contains("active_buffs"))
-        {
-            lock (_buffsLock)
-            {
-                _activeBuffs.Clear();
-                var buffs = (Array)data["active_buffs"];
-                foreach (Dictionary b in buffs)
-                {
-                    var buff = new PartyBuff
-                    {
-                        Type = (PartyBuffType)(int)b["type"],
-                        Value = (float)b["value"],
-                        Duration = (float)b["duration"],
-                        RemainingTime = (float)b["remaining_time"],
-                        ProviderId = (int)b["provider_id"]
-                    };
-                    _activeBuffs.Add(buff);
-                }
-            }
-        }
+        _partyManager?.ImportSaveData(data);
+        _buffSystem?.ImportSaveData(data);
+        _lootSystem?.ImportSaveData(data);
     }
 }
