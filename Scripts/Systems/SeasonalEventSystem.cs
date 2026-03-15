@@ -1,4 +1,3 @@
-// Seasonal Event System - Time-limited events with special rewards
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -288,46 +287,53 @@ public class SeasonalEventDatabase
     }
 }
 
-public partial class SeasonalEventSystem : BaseSystem
+public class SeasonalEventSystem : BaseSystem
 {
     /// <summary>
     /// 获取系统单例实例。
     /// </summary>
-    private static SeasonalEventSystem instance;
+    private static SeasonalEventSystem _instance;
 
     /// <summary>
     /// 获取单例实例。
     /// </summary>
-    public static SeasonalEventSystem Instance => instance ??= new SeasonalEventSystem();
+    public static SeasonalEventSystem Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = GetNode<SeasonalEventSystem>("/root/SeasonalEventSystem");
+                if (_instance == null)
+                {
+                    var node = new SeasonalEventSystem();
+                    node.Name = "SeasonalEventSystem";
+                    Engine.GetMainLoop().Root.AddChild(node);
+                }
+            }
+            return _instance;
+        }
+        private set => _instance = value;
+    }
 
     private Dictionary<string, SeasonalEventData.PlayerEventData> _playerEventData = new Dictionary<string, SeasonalEventData.PlayerEventData>();
     private Dictionary<string, int> _eventEntries = new Dictionary<string, int>();
 
     // Signals
-    [Signal]
-    public delegate void EventStarted(string eventId);
-    [Signal]
-    public delegate void EventEnded(string eventId);
-    [Signal]
-    public delegate void EventRewardClaimed(string eventId, int score);
-    [Signal]
-    public delegate void EventEntryRecorded(string eventId, int entries);
+    public Action<string> EventStarted;
+    public Action<string> EventEnded;
+    public Action<string, int> EventRewardClaimed;
+    public Action<string, int> EventEntryRecorded;
 
-    public SeasonalEventSystem()
+    protected override void Initialize()
     {
-    }
-
-    public override void _Ready() {
-        base._Ready();
-        Initialize();
-    }
-
-    protected override void Initialize() {
-        GD.Print("[SeasonalEventSystem] Initialized");
-    }
-
-    public void Initialize()
-    {
+        base.Initialize();
+        
+        Instance = this;
+        
+        // 注册到保存系统
+        SaveSystem.Instance?.Register(this);
+        
         GD.Print("[SeasonalEventSystem] Initialized");
     }
 
@@ -348,8 +354,13 @@ public partial class SeasonalEventSystem : BaseSystem
             return false;
 
         // Check if player meets level requirement
-        if (Player.Instance != null && Player.Instance.Level < evt.RequiredLevel)
-            return false;
+        var player = GetPlayer();
+        if (player != null)
+        {
+            int playerLevel = (int)player.Get("level", 1);
+            if (playerLevel < evt.RequiredLevel)
+                return false;
+        }
 
         // Check if event is active
         if (!evt.IsActive)
@@ -388,12 +399,16 @@ public partial class SeasonalEventSystem : BaseSystem
         // Check entry fee
         if (evt.EntryFee > 0)
         {
-            if (Player.Instance == null || Player.Instance.Gold < evt.EntryFee)
+            var player = GetPlayer();
+            if (player == null) return false;
+            
+            int playerGold = (int)player.Get("gold", 0);
+            if (playerGold < evt.EntryFee)
             {
                 GD.Print($"[SeasonalEventSystem] Not enough gold for event: {eventId}");
                 return false;
             }
-            Player.Instance.Gold -= evt.EntryFee;
+            player.Set("gold", playerGold - evt.EntryFee);
         }
 
         // Record entry
@@ -457,56 +472,65 @@ public partial class SeasonalEventSystem : BaseSystem
         }
         return false;
     }
-
-    public Dictionary<string, object> GetSaveData()
+    
+    /// <summary>
+    /// 获取玩家节点
+    /// </summary>
+    private Node GetPlayer()
     {
-        Dictionary<string, object> data = new Dictionary<string, object>();
-        data["event_entries"] = _eventEntries;
-        return data;
-    }
-
-    public void LoadSaveData(Dictionary<string, object> data)
-    {
-        if (data == null)
-            return;
-
-        if (data.ContainsKey("event_entries"))
-        {
-            var entries = (Dictionary<string, object>)data["event_entries"];
-            _eventEntries.Clear();
-            foreach (var kvp in entries)
-            {
-                _eventEntries[kvp.Key] = Convert.ToInt32(kvp.Value);
-            }
+        var tree = Engine.GetMainLoop();
+        if (tree is SceneTree sceneTree) {
+            var nodes = sceneTree.GetNodesInGroup("player");
+            if (nodes.Count > 0) return nodes[0];
         }
+        return null;
     }
     
     /// <summary>
-    /// Export save data
+    /// 导出保存数据
     /// </summary>
     public override Dictionary ExportSaveData()
     {
         var data = new Dictionary();
-        data["event_entries"] = _eventEntries;
+        
+        var entriesData = new Dictionary<string, int>();
+        foreach (var kvp in _eventEntries)
+        {
+            entriesData[kvp.Key] = kvp.Value;
+        }
+        data["event_entries"] = entriesData;
+        
         return data;
     }
     
     /// <summary>
-    /// Import save data
+    /// 导入保存数据
     /// </summary>
     public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
-        
-        if (data.Contains("event_entries") && data["event_entries"] is Dictionary entries)
+
+        if (data.Contains("event_entries"))
         {
-            _eventEntries.Clear();
-            foreach (var kvp in entries)
+            var entries = data["event_entries"] as Dictionary;
+            if (entries != null)
             {
-                _eventEntries[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+                _eventEntries.Clear();
+                foreach (var kvp in entries)
+                {
+                    _eventEntries[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+                }
             }
         }
         
-        IsInitialized = true;
+        GD.Print("[SeasonalEventSystem] Data loaded");
+    }
+    
+    /// <summary>
+    /// 获取系统ID
+    /// </summary>
+    public override string GetId()
+    {
+        return "SeasonalEventSystem";
     }
 }

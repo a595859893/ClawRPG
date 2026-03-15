@@ -2,481 +2,525 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ClawRPG.Scripts.Systems {
+public class TutorialSystem : BaseSystem
+{
+    private TutorialData _data;
+    private TutorialDatabase _database;
+    private string _currentTutorialId = "";
+    private int _currentStepIndex = 0;
+    private float _stepTimer = 0f;
+    private bool _isTutorialActive = false;
+    private Player _player;
+
+    public override void _Ready()
+    {
+        base._Ready();
+        _database = TutorialDatabase.Instance;
+        _data = new TutorialData();
+        LoadTutorialData();
+        GD.Print("[TutorialSystem] 游戏教程系统已初始化");
+    }
+
+    public void SetPlayer(Player player)
+    {
+        _player = player;
+        CheckAutoStartTutorials();
+    }
+
+    private void CheckAutoStartTutorials()
+    {
+        int playerLevel = 1;
+        if (_player != null)
+        {
+            playerLevel = _player.GetLevel();
+        }
+
+        var availableTutorials = _database.GetAvailableTutorials(playerLevel);
+        foreach (var tutorial in availableTutorials)
+        {
+            if (tutorial.AutoStart && !IsTutorialCompleted(tutorial.TutorialId) && !IsTutorialInProgress(tutorial.TutorialId))
+            {
+                StartTutorial(tutorial.TutorialId);
+                break;
+            }
+        }
+    }
+
+    public bool StartTutorial(string tutorialId)
+    {
+        var tutorial = _database.GetTutorial(tutorialId);
+        if (tutorial == null)
+        {
+            GD.PrintErr("[TutorialSystem] 教程不存在: " + tutorialId);
+            return false;
+        }
+
+        if (IsTutorialCompleted(tutorialId))
+        {
+            GD.Print("[TutorialSystem] 教程已完成: " + tutorialId);
+            return false;
+        }
+
+        _currentTutorialId = tutorialId;
+        _currentStepIndex = 0;
+        _isTutorialActive = true;
+        _stepTimer = 0f;
+
+        if (!_data.InProgressTutorials.Contains(tutorialId))
+        {
+            _data.InProgressTutorials.Add(tutorialId);
+        }
+
+        _data.TutorialProgress[tutorialId] = 0;
+        SaveTutorialData();
+
+        NotifyTutorialStarted(tutorial);
+        GD.Print("[TutorialSystem] 开始教程: " + tutorial.Title);
+        return true;
+    }
+
+    public void CompleteCurrentStep()
+    {
+        if (!_isTutorialActive) return;
+
+        var tutorial = _database.GetTutorial(_currentTutorialId);
+        if (tutorial == null || _currentStepIndex >= tutorial.Steps.Count) return;
+
+        var currentStep = tutorial.Steps[_currentStepIndex];
+        _data.TutorialProgress[_currentTutorialId] = _currentStepIndex + 1;
+        
+        GD.Print("[TutorialSystem] 完成步骤: " + currentStep.Title);
+        
+        _currentStepIndex++;
+        _stepTimer = 0f;
+
+        if (_currentStepIndex >= tutorial.Steps.Count)
+        {
+            CompleteTutorial(_currentTutorialId);
+        }
+        else
+        {
+            NotifyStepChanged(tutorial.Steps[_currentStepIndex]);
+        }
+
+        SaveTutorialData();
+    }
+
+    public void SkipStep()
+    {
+        if (!_isTutorialActive) return;
+
+        var tutorial = _database.GetTutorial(_currentTutorialId);
+        if (tutorial == null) return;
+
+        string stepId = tutorial.Steps[_currentStepIndex].StepId;
+        if (_data.StepSkips.ContainsKey(stepId))
+            _data.StepSkips[stepId]++;
+        else
+            _data.StepSkips[stepId] = 1;
+
+        _data.HintsUsed++;
+        
+        GD.Print("[TutorialSystem] 跳过步骤: " + tutorial.Steps[_currentStepIndex].Title);
+        
+        CompleteCurrentStep();
+    }
+
+    public void CompleteTutorial(string tutorialId)
+    {
+        if (!_data.CompletedTutorials.ContainsKey(tutorialId) || !_data.CompletedTutorials[tutorialId])
+        {
+            _data.CompletedTutorials[tutorialId] = true;
+            _data.TotalTutorialsCompleted++;
+            _data.TutorialCompletionTimes[tutorialId] = DateTime.Now;
+        }
+
+        if (_data.InProgressTutorials.Contains(tutorialId))
+        {
+            _data.InProgressTutorials.Remove(tutorialId);
+        }
+
+        if (_currentTutorialId == tutorialId)
+        {
+            _isTutorialActive = false;
+            _currentTutorialId = "";
+            _currentStepIndex = 0;
+        }
+
+        _data.LastTutorialTime = DateTime.Now;
+        SaveTutorialData();
+
+        var tutorial = _database.GetTutorial(tutorialId);
+        if (tutorial != null)
+        {
+            NotifyTutorialCompleted(tutorial);
+            GD.Print("[TutorialSystem] 教程完成: " + tutorial.Title);
+        }
+    }
+
+    public bool IsTutorialCompleted(string tutorialId)
+    {
+        return _data.CompletedTutorials.ContainsKey(tutorialId) && _data.CompletedTutorials[tutorialId];
+    }
+
+    public bool IsTutorialInProgress(string tutorialId)
+    {
+        return _data.InProgressTutorials.Contains(tutorialId);
+    }
+
+    public bool IsAnyTutorialActive()
+    {
+        return _isTutorialActive;
+    }
+
+    public string GetCurrentTutorialId()
+    {
+        return _currentTutorialId;
+    }
+
+    public TutorialStep GetCurrentStep()
+    {
+        if (!_isTutorialActive) return null;
+
+        var tutorial = _database.GetTutorial(_currentTutorialId);
+        if (tutorial == null || _currentStepIndex >= tutorial.Steps.Count) return null;
+
+        return tutorial.Steps[_currentStepIndex];
+    }
+
+    public int GetCurrentStepIndex()
+    {
+        return _currentStepIndex;
+    }
+
+    public int GetTotalSteps()
+    {
+        if (!_isTutorialActive) return 0;
+
+        var tutorial = _database.GetTutorial(_currentTutorialId);
+        return tutorial?.Steps.Count ?? 0;
+    }
+
+    public float GetStepProgress()
+    {
+        int total = GetTotalSteps();
+        if (total == 0) return 0f;
+        return (float)_currentStepIndex / total;
+    }
+
+    public Dictionary<string, bool> GetCompletedTutorials()
+    {
+        return _data.CompletedTutorials;
+    }
+
+    public List<TutorialDefinition> GetAllTutorials()
+    {
+        List<TutorialDefinition> result = new List<TutorialDefinition>();
+        foreach (var tutorial in _database.Tutorials.Values)
+        {
+            result.Add(tutorial);
+        }
+        return result;
+    }
+
+    public List<TutorialDefinition> GetTutorialsByCategory(string category)
+    {
+        return _database.GetTutorialsByCategory(category);
+    }
+
+    public string[] GetCategories()
+    {
+        return _database.GetCategories();
+    }
+
+    public Dictionary<string, int> GetStatistics()
+    {
+        Dictionary<string, int> stats = new Dictionary<string, int>();
+        stats["TotalCompleted"] = _data.TotalTutorialsCompleted;
+        stats["TotalViewed"] = _data.TotalTutorialsViewed;
+        stats["InProgress"] = _data.InProgressTutorials.Count;
+        stats["HintsUsed"] = _data.HintsUsed;
+        stats["TotalAvailable"] = _database.Tutorials.Count;
+        
+        // Category stats
+        var categories = _database.GetCategories();
+        foreach (var category in categories)
+        {
+            int completed = 0;
+            int total = 0;
+            var tutorials = _database.GetTutorialsByCategory(category);
+            foreach (var t in tutorials)
+            {
+                total++;
+                if (IsTutorialCompleted(t.TutorialId))
+                    completed++;
+            }
+            stats["Category_" + category + "_Completed"] = completed;
+            stats["Category_" + category + "_Total"] = total;
+        }
+
+        return stats;
+    }
+
+    public void ResetTutorial(string tutorialId)
+    {
+        if (_data.CompletedTutorials.ContainsKey(tutorialId))
+        {
+            _data.CompletedTutorials[tutorialId] = false;
+            _data.TotalTutorialsCompleted = Math.Max(0, _data.TotalTutorialsCompleted - 1);
+        }
+
+        if (_data.TutorialCompletionTimes.ContainsKey(tutorialId))
+        {
+            _data.TutorialCompletionTimes.Remove(tutorialId);
+        }
+
+        if (_currentTutorialId == tutorialId)
+        {
+            _isTutorialActive = false;
+            _currentTutorialId = "";
+            _currentStepIndex = 0;
+        }
+
+        SaveTutorialData();
+        GD.Print("[TutorialSystem] 重置教程: " + tutorialId);
+    }
+
+    public void ResetAllTutorials()
+    {
+        _data.CompletedTutorials.Clear();
+        _data.InProgressTutorials.Clear();
+        _data.TutorialProgress.Clear();
+        _data.TutorialCompletionTimes.Clear();
+        _data.TotalTutorialsCompleted = 0;
+        _data.TotalTutorialsViewed = 0;
+        _data.HintsUsed = 0;
+        _data.StepSkips.Clear();
+
+        _isTutorialActive = false;
+        _currentTutorialId = "";
+        _currentStepIndex = 0;
+
+        SaveTutorialData();
+        GD.Print("[TutorialSystem] 重置所有教程");
+    }
+
+    private void NotifyTutorialStarted(TutorialDefinition tutorial)
+    {
+        // Emit signal for UI to update
+        // This would typically call a signal or event system
+    }
+
+    private void NotifyStepChanged(TutorialStep step)
+    {
+        // Emit signal for UI to update
+    }
+
+    private void NotifyTutorialCompleted(TutorialDefinition tutorial)
+    {
+        // Emit signal for UI to show completion
+    }
+
+    public override void _Process(float delta)
+    {
+        if (!_isTutorialActive) return;
+
+        var currentStep = GetCurrentStep();
+        if (currentStep == null) return;
+
+        // Handle timed steps
+        if (currentStep.Duration > 0)
+        {
+            _stepTimer += delta;
+            if (_stepTimer >= currentStep.Duration)
+            {
+                if (!currentStep.RequireAction)
+                {
+                    CompleteCurrentStep();
+                }
+            }
+        }
+    }
+
+    private void LoadTutorialData()
+    {
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) return;
+
+        if (data.Contains("tutorial_data"))
+        {
+            var tutorialData = (Godot.Collections.Dictionary)data["tutorial_data"];
+            
+            if (tutorialData.Contains("completed"))
+            {
+                var completed = (Godot.Collections.Dictionary)tutorialData["completed"];
+                foreach (var key in completed.Keys)
+                {
+                    _data.CompletedTutorials[key.ToString()] = (bool)completed[key];
+                }
+            }
+
+            if (tutorialData.Contains("progress"))
+            {
+                var progress = (Godot.Collections.Dictionary)tutorialData["progress"];
+                foreach (var key in progress.Keys)
+                {
+                    _data.TutorialProgress[key.ToString()] = (int)(long)progress[key];
+                }
+            }
+
+            if (tutorialData.Contains("in_progress"))
+            {
+                var inProgress = (Godot.Collections.Array)tutorialData["in_progress"];
+                foreach (var item in inProgress)
+                {
+                    _data.InProgressTutorials.Add(item.ToString());
+                }
+            }
+
+            if (tutorialData.Contains("hints_used"))
+                _data.HintsUsed = (int)(long)tutorialData["hints_used"];
+
+            if (tutorialData.Contains("total_completed"))
+                _data.TotalTutorialsCompleted = (int)(long)tutorialData["total_completed"];
+
+            GD.Print("[TutorialSystem] 教程数据已加载");
+        }
+    }
+
+    private void SaveTutorialData()
+    {
+        var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        if (saveSystem == null) return;
+
+        var data = saveSystem.LoadGame();
+        if (data == null) data = new Godot.Collections.Dictionary();
+
+        var tutorialData = new Godot.Collections.Dictionary();
+        
+        var completed = new Godot.Collections.Dictionary();
+        foreach (var kvp in _data.CompletedTutorials)
+        {
+            completed[kvp.Key] = kvp.Value;
+        }
+        tutorialData["completed"] = completed;
+
+        var progress = new Godot.Collections.Dictionary();
+        foreach (var kvp in _data.TutorialProgress)
+        {
+            progress[kvp.Key] = kvp.Value;
+        }
+        tutorialData["progress"] = progress;
+
+        var inProgress = new Godot.Collections.Array();
+        foreach (var item in _data.InProgressTutorials)
+        {
+            inProgress.Add(item);
+        }
+        tutorialData["in_progress"] = inProgress;
+
+        tutorialData["hints_used"] = _data.HintsUsed;
+        tutorialData["total_completed"] = _data.TotalTutorialsCompleted;
+
+        data["tutorial_data"] = tutorialData;
+        saveSystem.SaveGame(data);
+    }
+    
     /// <summary>
-    /// 教程系统 - 引导新玩家了解游戏机制
+    /// 导出保存数据
     /// </summary>
-    public class TutorialStep {
-        public string StepId;
-        public string Title;
-        public string Description;
-        public string HighlightNodePath;  // 高亮节点路径
-        public Vector2 HighlightPosition; // 高亮位置
-        public float HighlightRadius;
-        public TutorialTrigger Trigger;
-        public TutorialTargetType TargetType;
-        public string TargetAction;       // 目标操作
-        public float Duration;            // 持续时间(秒)，0表示手动关闭
-        public bool IsCompleted;
-        public bool CanSkip;
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        var completed = new Dictionary();
+        foreach (var kvp in _data.CompletedTutorials)
+        {
+            completed[kvp.Key] = kvp.Value;
+        }
+        data["completed"] = completed;
+        
+        var progress = new Dictionary();
+        foreach (var kvp in _data.TutorialProgress)
+        {
+            progress[kvp.Key] = kvp.Value;
+        }
+        data["progress"] = progress;
+        
+        var inProgress = new List<object>();
+        foreach (var item in _data.InProgressTutorials)
+        {
+            inProgress.Add(item);
+        }
+        data["in_progress"] = inProgress;
+        
+        data["hints_used"] = _data.HintsUsed;
+        data["total_completed"] = _data.TotalTutorialsCompleted;
+        
+        return data;
     }
-
-    public enum TutorialTrigger {
-        Manual,           // 手动触发
-        GameStart,        // 游戏开始
-        FirstCombat,      // 首次战斗
-        FirstCraft,       // 首次合成
-        FirstEnchant,    // 首次附魔
-        FirstQuest,      // 首次任务
-        FirstMount,      // 首次坐骑
-        FirstPet,        // 首次宠物
-        LevelUp,         // 升级
-        BossEncounter,   // 遇到Boss
-        RegionEnter,     // 进入区域
-        ItemCollected,   // 收集物品
-        SkillUnlocked,   // 技能解锁
-        FirstPotion,     // 首次使用药水
-        FirstEnhance,    // 首次强化装备
-        FirstRune,       // 首次镶嵌符文
-        FirstPetCombat,  // 首次宠物战斗
-        FirstMountRide,  // 首次骑乘坐骑
-        FirstCombo,      // 首次连击
-        FirstCounter,    // 首次反击
-        FirstDodge,      // 首次闪避成功
-        FirstBlock,      // 首次格挡
-        FirstCrit,       // 首次暴击
-        FirstSkillUse,   // 首次使用技能
-        FirstTitle,      // 首次获得称号
-        FirstAchievement // 首次获得成就
-    }
-
-    public enum TutorialTargetType {
-        None,
-        Key,              // 按键
-        UIButton,         // UI按钮
-        WorldObject,      // 世界物体
-        NPC,              // NPC
-        InventorySlot,    // 背包槽
-        EquipmentSlot,    // 装备槽
-        SkillSlot,        // 技能槽
-        CraftingStation, // 合成台
-        EnchantmentStation // 附魔台
-    }
-
-    public class TutorialDatabase {
-        public static TutorialDatabase Instance { get; private set; }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
         
-        private List<TutorialStep> steps = new List<TutorialStep>();
-        
-        public TutorialDatabase() {
-            Instance = this;
-            InitializeTutorials();
-        }
-        
-        private void InitializeTutorials() {
-            // 游戏基础教程
-            steps.Add(new TutorialStep {
-                StepId = "welcome",
-                Title = "欢迎来到 ClawRPG",
-                Description = "恭喜你成为冒险者！按 WASD 或 方向键移动，点击鼠标攻击。",
-                Trigger = TutorialTrigger.GameStart,
-                TargetType = TutorialTargetType.None,
-                Duration = 8f,
-                CanSkip = true
-            });
-
-            steps.Add(new TutorialStep {
-                StepId = "movement",
-                Title = "移动控制",
-                Description = "使用 WASD 或 方向键在世界中移动。尝试靠近敌人进行战斗！",
-                Trigger = TutorialTrigger.GameStart,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "WASD",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            steps.Add(new TutorialStep {
-                StepId = "attack",
-                Title = "攻击",
-                Description = "左键点击敌人进行普通攻击。右键点击进行重击！",
-                Trigger = TutorialTrigger.GameStart,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "LeftClick",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            steps.Add(new TutorialStep {
-                StepId = "dodge",
-                Title = "闪避",
-                Description = "按 Shift 键进行闪避，快速躲避敌人攻击！",
-                Trigger = TutorialTrigger.FirstCombat,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "Shift",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            steps.Add(new TutorialStep {
-                StepId = "block",
-                Title = "格挡",
-                Description = "按 Ctrl 键举起武器格挡，减少受到的伤害！",
-                Trigger = TutorialTrigger.FirstCombat,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "Ctrl",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 背包与物品
-            steps.Add(new TutorialStep {
-                StepId = "inventory",
-                Title = "背包系统",
-                Description = "按 I 键打开背包，查看和管理你的物品。",
-                Trigger = TutorialTrigger.Manual,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "I",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            steps.Add(new TutorialStep {
-                StepId = "equipment",
-                Title = "装备系统",
-                Description = "在背包中点击物品可装备。装备更好的武器和防具提升战斗力！",
-                Trigger = TutorialTrigger.Manual,
-                TargetType = TutorialTargetType.UIButton,
-                TargetAction = "Equip",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 合成系统
-            steps.Add(new TutorialStep {
-                StepId = "crafting",
-                Title = "合成系统",
-                Description = "按 C 键打开合成界面，将材料组合成强大的装备！",
-                Trigger = TutorialTrigger.FirstCraft,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "C",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            steps.Add(new TutorialStep {
-                StepId = "crafting_recipe",
-                Title = "配方",
-                Description = "选择配方，消耗材料进行合成。越高级的配方需要越多材料！",
-                Trigger = TutorialTrigger.FirstCraft,
-                TargetType = TutorialTargetType.UIButton,
-                TargetAction = "Recipe",
-                Duration = 0f,
-                CanSkip = true
-            });
-
-            // 附魔系统
-            steps.Add(new TutorialStep {
-                StepId = "enchantment",
-                Title = "附魔系统",
-                Description = "按 E 键打开附魔界面，为装备附加强力魔法属性！",
-                Trigger = TutorialTrigger.FirstEnchant,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "E",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            steps.Add(new TutorialStep {
-                StepId = "enchantment_rune",
-                Title = "符文",
-                Description = "使用符文可以为装备增加额外属性。不同符文组合产生不同效果！",
-                Trigger = TutorialTrigger.FirstEnchant,
-                TargetType = TutorialTargetType.UIButton,
-                TargetAction = "Rune",
-                Duration = 0f,
-                CanSkip = true
-            });
-
-            // 任务系统
-            steps.Add(new TutorialStep {
-                StepId = "quest",
-                Title = "任务系统",
-                Description = "按 Q 键打开任务界面，跟随任务指引完成目标获得奖励！",
-                Trigger = TutorialTrigger.FirstQuest,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "Q",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 技能系统
-            steps.Add(new TutorialStep {
-                StepId = "skill_tree",
-                Title = "技能树",
-                Description = "按 K 键打开技能树，学习强大的职业技能！",
-                Trigger = TutorialTrigger.SkillUnlocked,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "K",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 宠物系统
-            steps.Add(new TutorialStep {
-                StepId = "pet",
-                Title = "宠物系统",
-                Description = "按 P 键打开宠物界面，召唤宠物协助战斗！",
-                Trigger = TutorialTrigger.FirstPet,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "P",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 坐骑系统
-            steps.Add(new TutorialStep {
-                StepId = "mount",
-                Title = "坐骑系统",
-                Description = "按 M 键打开坐骑界面，骑乘坐骑快速移动！",
-                Trigger = TutorialTrigger.FirstMount,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "M",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // Boss战斗
-            steps.Add(new TutorialStep {
-                StepId = "boss_warning",
-                Title = "Boss预警",
-                Description = "注意屏幕提示！Boss即将释放技能，及时闪避或格挡！",
-                Trigger = TutorialTrigger.BossEncounter,
-                TargetType = TutorialTargetType.None,
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            steps.Add(new TutorialStep {
-                StepId = "boss_enrage",
-                Title = "狂暴模式",
-                Description = "Boss血量低时会进入狂暴模式，伤害大幅提升！集中精神！",
-                Trigger = TutorialTrigger.BossEncounter,
-                TargetType = TutorialTargetType.None,
-                Duration = 0f,
-                CanSkip = true
-            });
-
-            // 反击系统
-            steps.Add(new TutorialStep {
-                StepId = "counter_attack",
-                Title = "反击系统",
-                Description = "完美格挡后可触发反击！按 Shift+C 打开反击界面释放强力反击！",
-                Trigger = TutorialTrigger.FirstCombat,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "Shift+C",
-                Duration = 0f,
-                CanSkip = true
-            });
-
-            // 区域探索
-            steps.Add(new TutorialStep {
-                StepId = "region",
-                Title = "区域探索",
-                Description = "不同区域有不同怪物和资源。查看小地图了解周围环境！",
-                Trigger = TutorialTrigger.RegionEnter,
-                TargetType = TutorialTargetType.None,
-                Duration = 5f,
-                CanSkip = true
-            });
-
-            // 升级
-            steps.Add(new TutorialStep {
-                StepId = "level_up",
-                Title = "升级了！",
-                Description = "升级会获得属性点和技能点。合理分配提升战力！",
-                Trigger = TutorialTrigger.LevelUp,
-                TargetType = TutorialTargetType.None,
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 快捷键汇总
-            steps.Add(new TutorialStep {
-                StepId = "hotkeys",
-                Title = "快捷键汇总",
-                Description = "I:背包 C:合成 E:附魔 Q:任务 K:技能 P:宠物 M:坐骑 ESC:菜单",
-                Trigger = TutorialTrigger.Manual,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "Hotkeys",
-                Duration = 0f,
-                CanSkip = true
-            });
-
-            // 药水系统
-            steps.Add(new TutorialStep {
-                StepId = "potion",
-                Title = "药水系统",
-                Description = "按 H 键使用背包中的药水恢复生命值。合理使用药水是战斗的关键！",
-                Trigger = TutorialTrigger.FirstPotion,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "H",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 强化系统
-            steps.Add(new TutorialStep {
-                StepId = "enhancement",
-                Title = "强化系统",
-                Description = "按 Ctrl+E 打开强化界面，消耗材料提升装备属性！",
-                Trigger = TutorialTrigger.FirstEnhance,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "Ctrl+E",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 符文系统
-            steps.Add(new TutorialStep {
-                StepId = "rune",
-                Title = "符文镶嵌",
-                Description = "在装备上镶嵌符文可以获得额外属性加成。高品质符文带来更强效果！",
-                Trigger = TutorialTrigger.FirstRune,
-                TargetType = TutorialTargetType.UIButton,
-                TargetAction = "Rune",
-                Duration = 0f,
-                CanSkip = true
-            });
-
-            // 宠物战斗
-            steps.Add(new TutorialStep {
-                StepId = "pet_combat",
-                Title = "宠物战斗",
-                Description = "宠物会在战斗中自动协助你作战。升级宠物提升其能力！",
-                Trigger = TutorialTrigger.FirstPetCombat,
-                TargetType = TutorialTargetType.None,
-                Duration = 5f,
-                CanSkip = true
-            });
-
-            // 骑乘坐骑
-            steps.Add(new TutorialStep {
-                StepId = "mount_ride",
-                Title = "骑乘出行",
-                Description = "骑乘坐骑可以大幅提升移动速度。某些坐骑还能在战斗中提供帮助！",
-                Trigger = TutorialTrigger.FirstMountRide,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "M",
-                Duration = 0f,
-                CanSkip = true
-            });
-
-            // 连击系统
-            steps.Add(new TutorialStep {
-                StepId = "combo",
-                Title = "连击系统",
-                Description = "连续攻击敌人会积累连击数！高连击数获得额外伤害加成！",
-                Trigger = TutorialTrigger.FirstCombo,
-                TargetType = TutorialTargetType.None,
-                Duration = 5f,
-                CanSkip = true
-            });
-
-            // 暴击系统
-            steps.Add(new TutorialStep {
-                StepId = "critical",
-                Title = "暴击机制",
-                Description = "攻击时有几率触发暴击，造成双倍伤害！提升暴击率属性成为致命杀手！",
-                Trigger = TutorialTrigger.FirstCrit,
-                TargetType = TutorialTargetType.None,
-                Duration = 5f,
-                CanSkip = true
-            });
-
-            // 技能使用
-            steps.Add(new TutorialStep {
-                StepId = "skill_use",
-                Title = "技能释放",
-                Description = "点击技能栏或按数字键1-4释放技能。合理搭配技能形成强力连招！",
-                Trigger = TutorialTrigger.FirstSkillUse,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "1-4",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 称号系统
-            steps.Add(new TutorialStep {
-                StepId = "title",
-                Title = "称号系统",
-                Description = "完成特定成就可获得炫酷称号！称号会显示在角色头顶彰显你的荣耀！",
-                Trigger = TutorialTrigger.FirstTitle,
-                TargetType = TutorialTargetType.None,
-                Duration = 5f,
-                CanSkip = true
-            });
-
-            // 成就系统
-            steps.Add(new TutorialStep {
-                StepId = "achievement",
-                Title = "成就系统",
-                Description = "完成各种挑战目标解锁成就！成就不仅有奖励还能展示你的实力！",
-                Trigger = TutorialTrigger.FirstAchievement,
-                TargetType = TutorialTargetType.Key,
-                TargetAction = "L",
-                Duration = 0f,
-                CanSkip = false
-            });
-
-            // 快捷栏
-            steps.Add(new TutorialStep {
-                StepId = "quickslot",
-                Title = "快捷栏",
-                Description = "将物品或技能拖放到快捷栏，按数字键快速使用！战斗中使用更便捷！",
-                Trigger = TutorialTrigger.Manual,
-                TargetType = TutorialTargetType.None,
-                Duration = 5f,
-                CanSkip = true
-            });
-        }
-        
-        public List<TutorialStep> GetAllSteps() => steps;
-        
-        public TutorialStep GetStep(string stepId) {
-            return steps.Find(s => s.StepId == stepId);
-        }
-        
-        public List<TutorialStep> GetStepsByTrigger(TutorialTrigger trigger) {
-            return steps.FindAll(s => s.Trigger == trigger && !s.IsCompleted);
-        }
-        
-        public List<TutorialStep> GetIncompleteSteps() {
-            return steps.FindAll(s => !s.IsCompleted);
-        }
-        
-        /// <summary>
-        /// 便捷方法：触发指定类型的教程
-        /// </summary>
-        public static void Trigger(TutorialTrigger trigger) {
-            if (Instance != null) {
-                var ui = TutorialUI.Instance;
-                if (ui != null) {
-                    ui.TriggerTutorial(trigger);
+        if (data.Contains("completed"))
+        {
+            var completed = data["completed"] as Dictionary;
+            if (completed != null)
+            {
+                foreach (var key in completed.Keys)
+                {
+                    _data.CompletedTutorials[key.ToString()] = (bool)completed[key];
                 }
             }
         }
         
-        /// <summary>
-        /// 便捷方法：通过ID开始教程
-        /// </summary>
-        public static void TriggerById(string stepId) {
-            if (Instance != null) {
-                var ui = TutorialUI.Instance;
-                if (ui != null) {
-                    ui.StartTutorialById(stepId);
+        if (data.Contains("progress"))
+        {
+            var progress = data["progress"] as Dictionary;
+            if (progress != null)
+            {
+                foreach (var key in progress.Keys)
+                {
+                    _data.TutorialProgress[key.ToString()] = Convert.ToInt32(progress[key]);
                 }
             }
         }
+        
+        if (data.Contains("in_progress"))
+        {
+            var inProgress = data["in_progress"] as List<object>;
+            if (inProgress != null)
+            {
+                _data.InProgressTutorials.Clear();
+                foreach (var item in inProgress)
+                {
+                    _data.InProgressTutorials.Add(item.ToString());
+                }
+            }
+        }
+        
+        if (data.Contains("hints_used"))
+            _data.HintsUsed = Convert.ToInt32(data["hints_used"]);
+        
+        if (data.Contains("total_completed"))
+            _data.TotalTutorialsCompleted = Convert.ToInt32(data["total_completed"]);
+        
+        GD.Print("[TutorialSystem] Data loaded via ImportSaveData");
+    }
+    
+    /// <summary>
+    /// 获取系统ID
+    /// </summary>
+    public override string GetId()
+    {
+        return "TutorialSystem";
     }
 }

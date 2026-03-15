@@ -388,7 +388,7 @@ namespace ClawRPG.Scripts.Systems {
             var tree = Engine.GetMainLoop();
             if (tree is SceneTree sceneTree) {
                 var nodes = sceneTree.GetNodesInGroup("player");
-                if nodes.Count > 0) return nodes[0];
+                if (nodes.Count > 0) return nodes[0];
             }
             return null;
         }

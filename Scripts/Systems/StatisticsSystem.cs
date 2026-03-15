@@ -145,6 +145,8 @@ namespace ClawRPG.Scripts.Systems {
         {
             if (data.ContainsKey(key) && data[key] is int value)
                 return value;
+            if (data.ContainsKey(key) && data[key] is long longValue)
+                return (int)longValue;
             return defaultValue;
         }
         
@@ -154,6 +156,8 @@ namespace ClawRPG.Scripts.Systems {
                 return value;
             if (data.ContainsKey(key) && data[key] is int intValue)
                 return intValue;
+            if (data.ContainsKey(key) && data[key] is double doubleValue)
+                return (float)doubleValue;
             return defaultValue;
         }
         
@@ -211,25 +215,40 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Statistics Manager - singleton to track player statistics
     /// </summary>
-    public partial class StatisticsManager : BaseSystem
+    public class StatisticsSystem : BaseSystem
     {
-        private static StatisticsManager instance;
-        public static StatisticsManager Instance => instance ??= new StatisticsManager();
+        private static StatisticsSystem _instance;
+        public static StatisticsSystem Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = GetNode<StatisticsSystem>("/root/StatisticsSystem");
+                    if (_instance == null)
+                    {
+                        var node = new StatisticsSystem();
+                        node.Name = "StatisticsSystem";
+                        Engine.GetMainLoop().Root.AddChild(node);
+                    }
+                }
+                return _instance;
+            }
+        }
         
         public PlayerStatistics Stats { get; private set; } = new PlayerStatistics();
         
         // Statistics update signal
-        public Action OnStatisticsUpdated { get; set; }
+        public Action OnStatisticsUpdated;
         
-        private StatisticsManager() { }
-
-        public override void _Ready() {
-            base._Ready();
-            Initialize();
-        }
-
-        protected override void Initialize() {
-            GD.Print("[StatisticsManager] Initialized");
+        protected override void Initialize()
+        {
+            base.Initialize();
+            
+            // 注册到保存系统
+            SaveSystem.Instance?.Register(this);
+            
+            GD.Print("[StatisticsSystem] Initialized");
         }
         
         public void ResetStatistics()
@@ -238,15 +257,38 @@ namespace ClawRPG.Scripts.Systems {
             OnStatisticsUpdated?.Invoke();
         }
         
-        public void LoadStatistics(Dictionary<string, object> data)
-        {
-            Stats.FromDictionary(data);
-            OnStatisticsUpdated?.Invoke();
-        }
-        
-        public Dictionary<string, object> GetSaveData()
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
         {
             return Stats.ToDictionary();
+        }
+        
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            var dict = new Dictionary<string, object>();
+            foreach (var key in data.Keys)
+            {
+                dict[key.ToString()] = data[key];
+            }
+            Stats.FromDictionary(dict);
+            OnStatisticsUpdated?.Invoke();
+            
+            GD.Print("[StatisticsSystem] Data loaded");
+        }
+        
+        /// <summary>
+        /// 获取系统ID
+        /// </summary>
+        public override string GetId()
+        {
+            return "StatisticsSystem";
         }
         
         // Convenience methods for tracking
@@ -273,35 +315,17 @@ namespace ClawRPG.Scripts.Systems {
         public void UpdateHighestLevel(int level) { Stats.UpdateHighestLevel(level); OnStatisticsUpdated?.Invoke(); }
         public void UpdateHighestCombo(int combo) { Stats.UpdateHighestCombo(combo); OnStatisticsUpdated?.Invoke(); }
         public void RecordAchievementUnlocked() { Stats.RecordAchievementUnlocked(); OnStatisticsUpdated?.Invoke(); }
-        public void AddPlayTime(float seconds) { Stats.AddPlayTime(seconds); }
+        public void AddPlayTime(float seconds) { Stats.AddPlayTime(seconds); OnStatisticsUpdated?.Invoke(); }
         
-        /// <summary>
-        /// Export save data
-        /// </summary>
-        public override Dictionary ExportSaveData()
-        {
-            var data = new Dictionary();
-            if (Stats != null)
-            {
-                data["stats"] = Stats.ToDictionary();
-            }
-            return data;
-        }
-        
-        /// <summary>
-        /// Import save data
-        /// </summary>
-        public override void ImportSaveData(Dictionary data)
-        {
-            if (data == null) return;
-            
-            if (data.Contains("stats") && data["stats"] is Dictionary statsDict)
-            {
-                Stats.FromDictionary(statsDict);
-            }
-            
-            IsInitialized = true;
-            OnStatisticsUpdated?.Invoke();
-        }
+        // Keep StatisticsManager as alias for compatibility
+        public static StatisticsSystem Manager => Instance;
+    }
+    
+    /// <summary>
+    /// Statistics Manager - alias for compatibility
+    /// </summary>
+    public class StatisticsManager
+    {
+        public static StatisticsSystem Instance => StatisticsSystem.Instance;
     }
 }

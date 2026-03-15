@@ -14,6 +14,7 @@ public class TutorialSystem : BaseSystem
 
     public override void _Ready()
     {
+        base._Ready();
         _database = TutorialDatabase.Instance;
         _data = new TutorialData();
         LoadTutorialData();
@@ -426,5 +427,100 @@ public class TutorialSystem : BaseSystem
 
         data["tutorial_data"] = tutorialData;
         saveSystem.SaveGame(data);
+    }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        var completed = new Dictionary();
+        foreach (var kvp in _data.CompletedTutorials)
+        {
+            completed[kvp.Key] = kvp.Value;
+        }
+        data["completed"] = completed;
+        
+        var progress = new Dictionary();
+        foreach (var kvp in _data.TutorialProgress)
+        {
+            progress[kvp.Key] = kvp.Value;
+        }
+        data["progress"] = progress;
+        
+        var inProgress = new List<object>();
+        foreach (var item in _data.InProgressTutorials)
+        {
+            inProgress.Add(item);
+        }
+        data["in_progress"] = inProgress;
+        
+        data["hints_used"] = _data.HintsUsed;
+        data["total_completed"] = _data.TotalTutorialsCompleted;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("completed"))
+        {
+            var completed = data["completed"] as Dictionary;
+            if (completed != null)
+            {
+                foreach (var key in completed.Keys)
+                {
+                    _data.CompletedTutorials[key.ToString()] = (bool)completed[key];
+                }
+            }
+        }
+        
+        if (data.Contains("progress"))
+        {
+            var progress = data["progress"] as Dictionary;
+            if (progress != null)
+            {
+                foreach (var key in progress.Keys)
+                {
+                    _data.TutorialProgress[key.ToString()] = Convert.ToInt32(progress[key]);
+                }
+            }
+        }
+        
+        if (data.Contains("in_progress"))
+        {
+            var inProgress = data["in_progress"] as List<object>;
+            if (inProgress != null)
+            {
+                _data.InProgressTutorials.Clear();
+                foreach (var item in inProgress)
+                {
+                    _data.InProgressTutorials.Add(item.ToString());
+                }
+            }
+        }
+        
+        if (data.Contains("hints_used"))
+            _data.HintsUsed = Convert.ToInt32(data["hints_used"]);
+        
+        if (data.Contains("total_completed"))
+            _data.TotalTutorialsCompleted = Convert.ToInt32(data["total_completed"]);
+        
+        GD.Print("[TutorialSystem] Data loaded via ImportSaveData");
+    }
+    
+    /// <summary>
+    /// 获取系统ID
+    /// </summary>
+    public override string GetId()
+    {
+        return "TutorialSystem";
     }
 }
