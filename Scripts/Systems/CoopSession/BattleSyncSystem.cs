@@ -784,11 +784,47 @@ namespace ClawRPG.Scripts.Systems.CoopSession
                 }
             }
 
-            // TODO: 通过网络层广播到其他玩家
-            // if (MultiplayerManager.Instance != null && MultiplayerManager.Instance.IsInRoom)
-            // {
-            //     BroadcastActionsToNetwork();
-            // }
+            // 通过网络层广播到其他玩家
+            BroadcastActionsToNetwork();
+        }
+
+        /// <summary>
+        /// 通过网络广播战斗操作到其他玩家
+        /// </summary>
+        private void BroadcastActionsToNetwork()
+        {
+            if (_broadcastBuffer.Count == 0) return;
+
+            // 检查是否在房间中
+            if (MultiplayerManager.Instance == null || !MultiplayerManager.Instance.IsInRoom)
+                return;
+
+            // 创建广播消息
+            var actions = new ArrayList();
+            while (_broadcastBuffer.Count > 0)
+            {
+                var action = _broadcastBuffer.Dequeue();
+                actions.Add(new Dictionary
+                {
+                    { "id", action.ActionId },
+                    { "playerId", action.PlayerId },
+                    { "enemyId", action.EnemyId },
+                    { "actionType", action.ActionType },
+                    { "damage", action.Damage },
+                    { "healing", action.Healing },
+                    { "timestamp", action.Timestamp }
+                });
+            }
+
+            var message = new Dictionary<string, object>
+            {
+                { "type", "battle_actions" },
+                { "room_id", MultiplayerManager.Instance.GetRoomInfo()?.RoomId ?? "" },
+                { "actions", actions }
+            };
+
+            NetworkClient.Instance.SendJson(message);
+            GD.Print($"[BattleSync] Broadcasted {actions.Count} actions to network");
         }
 
         /// <summary>
