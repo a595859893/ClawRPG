@@ -77,7 +77,61 @@ namespace ClawRPG.Core.Systems.GuildWar
         public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
-            // TODO: 完善数据导入逻辑
+            
+            // 导入进行中的战争
+            if (data.Contains("active_wars"))
+            {
+                var wars = data["active_wars"] as Array;
+                if (wars != null)
+                {
+                    foreach (string warId in wars)
+                    {
+                        if (!string.IsNullOrEmpty(warId) && !_activeWars.ContainsKey(warId))
+                        {
+                            // 从战争历史中恢复（如果存在）
+                            var existingWar = _warHistory.FirstOrDefault(w => w.WarId == warId);
+                            if (existingWar != null)
+                            {
+                                _activeWars[warId] = existingWar;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 导入玩家进度
+            if (data.Contains("player_progress"))
+            {
+                var progressList = data["player_progress"] as Array;
+                if (progressList != null)
+                {
+                    foreach (Dictionary progressData in progressList)
+                    {
+                        if (progressData.Contains("guild_id"))
+                        {
+                            string guildId = progressData["guild_id"] as string;
+                            if (!string.IsNullOrEmpty(guildId) && !_playerProgress.ContainsKey(guildId))
+                            {
+                                _playerProgress[guildId] = new GuildWarProgress
+                                {
+                                    GuildId = guildId,
+                                    TotalContributions = 0,
+                                    WarsParticipated = 0,
+                                    BattlesFought = 0,
+                                    BattlesWon = 0,
+                                    TotalKills = 0,
+                                    TotalDeaths = 0,
+                                    HighestScore = 0,
+                                    BestRank = 0,
+                                    EarnedRewards = 0
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            
+            GD.Print($"[GuildWarSystem] Imported {_activeWars.Count} active wars, {_playerProgress.Count} player progress entries");
         }
 
         private void InitializeTerritories()

@@ -58,7 +58,43 @@ namespace ClawRPG.Scripts.Mounts {
         public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
-            // TODO: 实现数据导入
+            
+            // 导入已拥有的坐骑
+            if (data.Contains("owned_mounts"))
+            {
+                var mounts = data["owned_mounts"] as Array;
+                if (mounts != null)
+                {
+                    foreach (string mountId in mounts)
+                    {
+                        if (!string.IsNullOrEmpty(mountId) && !_ownedMounts.ContainsKey(mountId))
+                        {
+                            _ownedMounts[mountId] = new MountInstance
+                            {
+                                MountId = mountId,
+                                Level = 1,
+                                Experience = 0,
+                                IsActive = false,
+                                ObtainedAt = DateTime.Now
+                            };
+                        }
+                    }
+                }
+            }
+            
+            // 导入当前激活的坐骑
+            if (data.Contains("active_mount_id"))
+            {
+                string activeMountId = data["active_mount_id"] as string;
+                if (!string.IsNullOrEmpty(activeMountId) && _ownedMounts.ContainsKey(activeMountId))
+                {
+                    _activeMountId = activeMountId;
+                    _ownedMounts[activeMountId].IsActive = true;
+                    EmitSignal(nameof(OnMountActivated), activeMountId);
+                }
+            }
+            
+            GD.Print($"[MountManager] Imported {_ownedMounts.Count} mounts, active: {_activeMountId}");
         }
 
         /// <summary>

@@ -505,9 +505,130 @@ public class PartyUI : Control
     {
         if (PartySystem.Instance != null && PartySystem.Instance.IsLeader)
         {
-            // TODO: 打开玩家选择界面
-            GD.Print("[PartyUI] Invite button pressed - TODO: show player selection");
+            // 显示玩家选择界面（模拟在线玩家列表）
+            ShowPlayerSelectionUI();
         }
+    }
+    
+    /// <summary>
+    /// 显示玩家选择界面
+    /// </summary>
+    private void ShowPlayerSelectionUI()
+    {
+        // 创建玩家选择弹窗
+        var popup = new WindowDialog();
+        popup.Title = "邀请玩家";
+        popup.RectMinSize = new Vector2(400, 300);
+        AddChild(popup);
+        
+        var vbox = new VBoxContainer();
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        vbox.Margin = new MarginContainer.Margin { Top = 40, Bottom = 40, Left = 20, Right = 20 };
+        popup.AddChild(vbox);
+        
+        // 标题
+        var titleLabel = new Label();
+        titleLabel.Text = "选择要邀请的玩家:";
+        titleLabel.Align = Label.AlignEnum.Center;
+        vbox.AddChild(titleLabel);
+        
+        // 玩家列表（模拟数据，实际应从服务器获取）
+        var playerList = new ItemList();
+        playerList.RectMinSize = new Vector2(0, 200);
+        
+        // 模拟在线玩家（实际应从网络获取）
+        var onlinePlayers = GetOnlinePlayers();
+        foreach (var player in onlinePlayers)
+        {
+            playerList.AddItem($"{player.Value} (Lv.{player.Key})");
+        }
+        
+        if (onlinePlayers.Count == 0)
+        {
+            playerList.AddItem("当前没有在线玩家");
+        }
+        
+        vbox.AddChild(playerList);
+        
+        // 按钮容器
+        var buttonBox = new HBoxContainer();
+        buttonBox.Alignment = HBoxContainer.AlignmentMode.Center;
+        vbox.AddChild(buttonBox);
+        
+        // 邀请按钮
+        var inviteBtn = new Button();
+        inviteBtn.Text = "邀请";
+        inviteBtn.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+        inviteBtn.Connect("pressed", this, nameof(OnPlayerSelected), new[] { playerList.Name });
+        buttonBox.AddChild(inviteBtn);
+        
+        // 取消按钮
+        var cancelBtn = new Button();
+        cancelBtn.Text = "取消";
+        cancelBtn.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+        cancelBtn.Connect("pressed", this, nameof(OnInviteCancelled), new[] { popup.Name });
+        buttonBox.AddChild(cancelBtn);
+        
+        popup.PopupCentered();
+        GD.Print("[PartyUI] Player selection dialog opened");
+    }
+    
+    /// <summary>
+    /// 获取在线玩家列表（模拟实现）
+    /// </summary>
+    private Dictionary<int, string> GetOnlinePlayers()
+    {
+        var players = new Dictionary<int, string>();
+        
+        // 模拟一些在线玩家（实际应从网络获取）
+        // 这里返回空列表，因为是单人游戏
+        // 多人模式下应从NetworkClient获取在线玩家
+        
+        return players;
+    }
+    
+    /// <summary>
+    /// 玩家选择确认
+    /// </summary>
+    private void OnPlayerSelected(string listName)
+    {
+        var list = FindChild(listName, true, false) as ItemList;
+        if (list != null && list.GetItemCount() > 0)
+        {
+            int selected = list.GetSelectedItems()[0];
+            if (selected >= 0)
+            {
+                string playerInfo = list.GetItemText(selected);
+                GD.Print($"[PartyUI] Selected player: {playerInfo}");
+                
+                // 从列表中提取玩家信息并邀请（模拟）
+                // 实际应使用真实的玩家ID
+                int playerId = selected + 1000; // 模拟ID
+                PartySystem.Instance?.InvitePlayer(playerId);
+            }
+        }
+        
+        // 关闭弹窗
+        foreach (var child in GetChildren())
+        {
+            if (child is WindowDialog popup)
+            {
+                popup.QueueFree();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 邀请取消
+    /// </summary>
+    private void OnInviteCancelled(string popupName)
+    {
+        var popup = FindChild(popupName, true, false) as WindowDialog;
+        if (popup != null)
+        {
+            popup.QueueFree();
+        }
+        GD.Print("[PartyUI] Invite cancelled");
     }
 
     private void OnLeavePartyPressed()
