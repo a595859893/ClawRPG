@@ -65,6 +65,7 @@ namespace ClawRPG.Scripts {
         private MainGame _mainGame;
         private MainMenu _mainMenu;
         private MainLobby _mainLobby;
+        private MainNetwork _mainNetwork;
 
         // Backward compatibility - delegate to GameStateManager
         public static bool IsPaused => GameStateManager.IsPaused;
@@ -1236,6 +1237,12 @@ namespace ClawRPG.Scripts {
             AddChild(_mainLobby);
 
             GD.Print("Modular components initialized");
+
+            // Initialize MainNetwork for network functionality
+            _mainNetwork = new MainNetwork();
+            _mainNetwork.Name = "MainNetwork";
+            AddChild(_mainNetwork);
+            _mainNetwork.InitializeNetwork();
         }
 
         private void SpawnPlayer()
@@ -2191,6 +2198,7 @@ namespace ClawRPG.Scripts {
             _mainInput?.ProcessInput(dt);
             _mainGame?.ProcessGame(delta);
             _mainGame?.UpdatePlayerUI();
+            _mainNetwork?.ProcessNetwork(delta);
 
             // Update boss mechanics system
             var bossMechanicsSystem = GetNode<Systems.BossMechanics.BossMechanicsSystem>("BossMechanicsSystem");
