@@ -1,21 +1,15 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 附魔系统 - 管理装备附魔功能
     /// </summary>
-    public class EnchantmentSystem {
+    public class EnchantmentSystem : BaseSystem {
         private static EnchantmentSystem _instance;
-        public static EnchantmentSystem Instance {
-            get {
-                if (_instance == null) {
-                    _instance = new EnchantmentSystem();
-                }
-                return _instance;
-            }
-        }
+        public static EnchantmentSystem Instance => _instance ??= GetNode<EnchantmentSystem>("/root/EnchantmentSystem");
 
         // 玩家已解锁的附魔
         private HashSet<int> _unlockedEnchantments;
@@ -27,12 +21,20 @@ namespace ClawRPG.Scripts.Systems {
         public event Action<EnchantmentData> OnEnchantmentUnlocked;
         public event Action<EnchantmentData> OnEnchantmentUsed;
 
-        public EnchantmentSystem() {
+        public override void _Ready()
+        {
+            base._Ready();
+            _instance = this;
             _unlockedEnchantments = new HashSet<int>();
             _enchantmentHistory = new List<EnchantmentData>();
             _rarityCount = new Dictionary<EnchantmentRarity, int>();
-            
             InitializeDefaults();
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            GD.Print($"[{SystemName}] Enchantment system initialized");
         }
 
         /// <summary>
@@ -215,29 +217,61 @@ namespace ClawRPG.Scripts.Systems {
         }
 
         /// <summary>
-        /// 保存数据
+        /// 导出稀有度统计
         /// </summary>
-        public Dictionary<string, object> SaveData() {
-            var data = new Dictionary<string, object>();
-            data["unlockedEnchantments"] = new List<int>(_unlockedEnchantments);
+        private Dictionary ExportRarityCount() {
+            var rarityData = new Dictionary();
+            foreach (var kvp in _rarityCount) {
+                rarityData[kvp.Key.ToString()] = kvp.Value;
+            }
+            return rarityData;
+        }
+
+        /// <summary>
+        /// 导出保存数据 (BaseSystem 接口)
+        /// </summary>
+        public override Dictionary ExportSaveData() {
+            var data = new Dictionary();
+            
+            // 已解锁附魔ID列表
+            data["unlocked_enchantments"] = new Godot.Array(_unlockedEnchantments.ToList());
+            
+            // 附魔使用历史统计
+            data["rarity_count"] = ExportRarityCount();
+            
+            // 附魔历史记录数量（用于成就等）
+            data["total_enchantments_used"] = _enchantmentHistory.Count;
+            
             return data;
         }
 
         /// <summary>
-        /// 加载数据
+        /// 导入保存数据 (BaseSystem 接口)
         /// </summary>
-        public void LoadData(Dictionary<string, object> data) {
+        public override void ImportSaveData(Dictionary data) {
             if (data == null) return;
             
-            if (data.ContainsKey("unlockedEnchantments")) {
-                var list = data["unlockedEnchantments"] as List<object>;
-                if (list != null) {
-                    _unlockedEnchantments.Clear();
-                    foreach (var item in list) {
-                        _unlockedEnchantments.Add(Convert.ToInt32(item));
+            // 加载已解锁附魔
+            if (data.Contains("unlocked_enchantments")) {
+                _unlockedEnchantments.Clear();
+                var array = (Godot.Array)data["unlocked_enchantments"];
+                foreach (var item in array) {
+                    _unlockedEnchantments.Add(Convert.ToInt32(item));
+                }
+            }
+            
+            // 加载稀有度统计
+            if (data.Contains("rarity_count")) {
+                _rarityCount.Clear();
+                var rarityData = (Dictionary)data["rarity_count"];
+                foreach (var key in rarityData.Keys) {
+                    if (Enum.TryParse<EnchantmentRarity>(key.ToString(), out var rarity)) {
+                        _rarityCount[rarity] = Convert.ToInt32(rarityData[key]);
                     }
                 }
             }
+            
+            GD.Print("[EnchantmentSystem] Data Loaded - Unlocked: " + _unlockedEnchantments.Count);
         }
     }
 }
