@@ -330,9 +330,10 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         }
         
         /// <summary>
-        /// 存档
+        /// 导出保存数据（继承自 BaseSystem）
         /// </summary>
-        public Dictionary Save() {
+        public override Dictionary ExportSaveData()
+        {
             var data = new Dictionary {
                 { "owned_gems", _playerGemData.OwnedGems },
                 { "equipment_slots", SaveEquipmentSlots() }
@@ -361,9 +362,10 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         }
         
         /// <summary>
-        /// 读取存档
+        /// 导入保存数据（继承自 BaseSystem）
         /// </summary>
-        public void Load(Dictionary data) {
+        public override void ImportSaveData(Dictionary data)
+        {
             if (data == null) return;
             
             if (data.Contains("owned_gems")) {
@@ -375,7 +377,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             }
             
             if (data.Contains("equipment_slots")) {
-                LoadEquipmentSlots(data["equipment_slops"] as Dictionary);
+                LoadEquipmentSlots(data["equipment_slots"] as Dictionary);
             }
         }
         
