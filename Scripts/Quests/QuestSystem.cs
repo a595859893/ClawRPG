@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Framework;
 
 namespace ClawRPG.Scripts.Quests {
     /// <summary>
@@ -272,15 +273,23 @@ namespace ClawRPG.Scripts.Quests {
     /// <summary>
     /// Quest manager - handles quest progress
     /// </summary>
-    public class QuestManager
+    public partial class QuestManager : BaseSystem
     {
         private Dictionary<int, QuestStatus> _questStatus = new();
+        
+        // 任务目标进度 (questId -> objectiveIndex -> currentAmount)
+        private Dictionary<int, Dictionary<int, int>> _questProgress = new();
         
         // Signals for UI updates
         public static event Action<Quest> OnQuestAccepted;
         public static event Action<Quest> OnQuestCompleted;
         public static event Action<Quest, QuestObjective> OnQuestObjectiveUpdated;
         public static event Action<Quest> OnQuestTurnedIn;
+        
+        protected override void Initialize()
+        {
+            IsInitialized = true;
+        }
         
         public QuestStatus GetQuestStatus(int questId)
         {
@@ -420,5 +429,86 @@ namespace ClawRPG.Scripts.Quests {
             }
             return null;
         }
+        
+        #region Save/Load
+        
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // 任务状态
+            data["questStatus"] = _questStatus;
+            
+            // 任务进度
+            data["questProgress"] = _questProgress;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            
+            // 任务状态
+            if (data.TryGetValue("questStatus", out var qs))
+            {
+                _questStatus.Clear();
+                var dict = qs as Dictionary<object, object>;
+                if (dict != null)
+                {
+                    foreach (var kvp in dict)
+                    {
+                        _questStatus[Convert.ToInt32(kvp.Key)] = (QuestStatus)Convert.ToInt32(kvp.Value);
+                    }
+                }
+            }
+            
+            // 任务进度
+            if (data.TryGetValue("questProgress", out var qp))
+            {
+                _questProgress.Clear();
+                var dict = qp as Dictionary<object, object>;
+                if (dict != null)
+                {
+                    foreach (var questKvp in dict)
+                    {
+                        var questId = Convert.ToInt32(questKvp.Key);
+                        var progressDict = questKvp.Value as Dictionary<object, object>;
+                        if (progressDict != null)
+                        {
+                            var progress = new Dictionary<int, int>();
+                            foreach (var objKvp in progressDict)
+                            {
+                                progress[Convert.ToInt32(objKvp.Key)] = Convert.ToInt32(objKvp.Value);
+                            }
+                            _questProgress[questId] = progress;
+                        }
+                    }
+                }
+            }
+            
+            // 恢复任务目标的当前进度
+            RestoreQuestProgress();
+        }
+        
+        private void RestoreQuestProgress()
+        {
+            foreach (var questKvp in _questProgress)
+            {
+                var quest = QuestDatabase.Instance.GetQuest(questKvp.Key);
+                if (quest == null) continue;
+                
+                var progress = questKvp.Value;
+                for (int i = 0; i < quest.Objectives.Count && i < progress.Count; i++)
+                {
+                    if (progress.TryGetValue(i, out var amount))
+                    {
+                        quest.Objectives[i].CurrentAmount = amount;
+                    }
+                }
+            }
+        }
+        
+        #endregion
     }
 }

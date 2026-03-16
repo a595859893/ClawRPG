@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
 
 namespace ClawRPG.Scripts.Skills {
     /// <summary>
@@ -115,7 +116,7 @@ namespace ClawRPG.Scripts.Skills {
     /// Skill Mastery and Combo System
     /// Manages skill progression, combos, and rune equipment
     /// </summary>
-    public class SkillMasterySystem
+    public partial class SkillMasterySystem : BaseSystem
     {
         private static SkillMasterySystem _instance;
         public static SkillMasterySystem Instance => _instance ??= new SkillMasterySystem();
@@ -130,10 +131,11 @@ namespace ClawRPG.Scripts.Skills {
         public int TotalMasteryXP { get; private set; } = 0;
         public int HighestMasteryRank { get; private set; } = 0;
         
-        public SkillMasterySystem()
+        protected override void Initialize()
         {
             InitializeRunes();
             InitializeCombos();
+            IsInitialized = true;
         }
         
         private void InitializeRunes()
@@ -662,26 +664,68 @@ namespace ClawRPG.Scripts.Skills {
         
         #region Save/Load
         
-        public SkillProgressionData GetSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new SkillProgressionData
-            {
-                Masteries = _masteries,
-                ComboUsages = ComboUsages,
-                TotalMasteryXP = TotalMasteryXP,
-                HighestMasteryRank = HighestMasteryRank
-            };
+            var data = new Dictionary<string, object>();
+            
+            // 精通数据
+            data["masteries"] = _masteries;
+            
+            // Combo 使用次数
+            data["comboUsages"] = ComboUsages;
+            
+            // 精通总经验
+            data["totalMasteryXP"] = TotalMasteryXP;
+            
+            // 最高精通等级
+            data["highestMasteryRank"] = HighestMasteryRank;
+            
             return data;
         }
         
-        public void LoadSaveData(SkillProgressionData data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             
-            _masteries = data.Masteries ?? new Dictionary<int, SkillMastery>();
-            ComboUsages = data.ComboUsages ?? new Dictionary<int, int>();
-            TotalMasteryXP = data.TotalMasteryXP;
-            HighestMasteryRank = data.HighestMasteryRank;
+            // 精通数据
+            if (data.TryGetValue("masteries", out var m))
+            {
+                _masteries.Clear();
+                var dict = m as Dictionary<object, object>;
+                if (dict != null)
+                {
+                    foreach (var kvp in dict)
+                    {
+                        var mastery = kvp.Value as SkillMastery;
+                        if (mastery != null)
+                        {
+                            _masteries[Convert.ToInt32(kvp.Key)] = mastery;
+                        }
+                    }
+                }
+            }
+            
+            // Combo 使用次数
+            if (data.TryGetValue("comboUsages", out var cu))
+            {
+                ComboUsages.Clear();
+                var dict = cu as Dictionary<object, object>;
+                if (dict != null)
+                {
+                    foreach (var kvp in dict)
+                    {
+                        ComboUsages[Convert.ToInt32(kvp.Key)] = Convert.ToInt32(kvp.Value);
+                    }
+                }
+            }
+            
+            // 精通总经验
+            if (data.TryGetValue("totalMasteryXP", out var tm))
+                TotalMasteryXP = Convert.ToInt32(tm);
+            
+            // 最高精通等级
+            if (data.TryGetValue("highestMasteryRank", out var hmr))
+                HighestMasteryRank = Convert.ToInt32(hmr);
         }
         
         #endregion

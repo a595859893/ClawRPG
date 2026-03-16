@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Framework;
 
 namespace ClawRPG.Scripts.Skills {
     /// <summary>
@@ -402,8 +403,14 @@ namespace ClawRPG.Scripts.Skills {
     /// <summary>
     /// Skill manager - handles skill usage and cooldowns
     /// </summary>
-    public class SkillManager
+    public partial class SkillManager : BaseSystem
     {
+        private static SkillManager _instance;
+        public static SkillManager Instance => _instance ??= new SkillManager();
+        
+        // Skill points available
+        public int SkillPoints { get; set; } = 0;
+        
         private Dictionary<int, float> _cooldowns = new();
         private HashSet<int> _learnedSkills = new();
         
@@ -482,5 +489,70 @@ namespace ClawRPG.Scripts.Skills {
                 _cooldowns[key] = Math.Max(0, _cooldowns[key] - delta);
             }
         }
+        
+        #region Save/Load
+        
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // 技能点
+            data["skillPoints"] = SkillPoints;
+            
+            // 解锁的技能列表
+            data["learnedSkills"] = new List<int>(_learnedSkills);
+            
+            // 冷却时间 (只保存非零的)
+            var cooldownsData = new Dictionary<int, float>();
+            foreach (var kvp in _cooldowns)
+            {
+                if (kvp.Value > 0)
+                {
+                    cooldownsData[kvp.Key] = kvp.Value;
+                }
+            }
+            data["cooldowns"] = cooldownsData;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            
+            // 技能点
+            if (data.TryGetValue("skillPoints", out var sp))
+                SkillPoints = Convert.ToInt32(sp);
+            
+            // 解锁的技能列表
+            if (data.TryGetValue("learnedSkills", out var ls))
+            {
+                _learnedSkills.Clear();
+                var list = ls as List<object>;
+                if (list != null)
+                {
+                    foreach (var item in list)
+                    {
+                        _learnedSkills.Add(Convert.ToInt32(item));
+                    }
+                }
+            }
+            
+            // 冷却时间
+            if (data.TryGetValue("cooldowns", out var cd))
+            {
+                _cooldowns.Clear();
+                var dict = cd as Dictionary<object, object>;
+                if (dict != null)
+                {
+                    foreach (var kvp in dict)
+                    {
+                        _cooldowns[Convert.ToInt32(kvp.Key)] = Convert.ToSingle(kvp.Value);
+                    }
+                }
+            }
+        }
+        
+        #endregion
     }
 }

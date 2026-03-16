@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
 
 namespace ClawRPG.Scripts.Items {
     /// <summary>
@@ -397,9 +398,12 @@ namespace ClawRPG.Scripts.Items {
     /// <summary>
     /// Player inventory system
     /// </summary>
-    public class Inventory
+    public partial class Inventory : BaseSystem
     {
         public const int MaxSlots = 30;
+        
+        // 货币数量
+        public int Gold { get; set; } = 0;
         
         public class InventorySlot
         {
@@ -415,6 +419,12 @@ namespace ClawRPG.Scripts.Items {
             {
                 _slots[i] = new InventorySlot();
             }
+            IsInitialized = true;
+        }
+        
+        protected override void Initialize()
+        {
+            IsInitialized = true;
         }
         
         public bool AddItem(int itemId, int quantity = 1)
@@ -491,17 +501,93 @@ namespace ClawRPG.Scripts.Items {
             }
             return count;
         }
+        
+        #region Save/Load
+        
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // 货币
+            data["gold"] = Gold;
+            
+            // 背包物品
+            var items = new List<Dictionary<string, object>>();
+            for (int i = 0; i < MaxSlots; i++)
+            {
+                if (_slots[i].Item != null)
+                {
+                    items.Add(new Dictionary<string, object>
+                    {
+                        ["slot"] = i,
+                        ["itemId"] = _slots[i].Item.Id,
+                        ["quantity"] = _slots[i].Quantity
+                    });
+                }
+            }
+            data["items"] = items;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            
+            // 货币
+            if (data.TryGetValue("gold", out var g))
+                Gold = Convert.ToInt32(g);
+            
+            // 背包物品
+            if (data.TryGetValue("items", out var items))
+            {
+                // 清空背包
+                for (int i = 0; i < MaxSlots; i++)
+                {
+                    _slots[i].Item = null;
+                    _slots[i].Quantity = 0;
+                }
+                
+                var list = items as List<object>;
+                if (list != null)
+                {
+                    foreach (var itemData in list)
+                    {
+                        var dict = itemData as Dictionary<object, object>;
+                        if (dict != null)
+                        {
+                            int slot = Convert.ToInt32(dict["slot"]);
+                            int itemId = Convert.ToInt32(dict["itemId"]);
+                            int quantity = Convert.ToInt32(dict["quantity"]);
+                            
+                            if (slot >= 0 && slot < MaxSlots)
+                            {
+                                _slots[slot].Item = ItemDatabase.Instance.GetItem(itemId);
+                                _slots[slot].Quantity = quantity;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        #endregion
     }
     
     /// <summary>
     /// Equipment slots
     /// </summary>
-    public class Equipment
+    public partial class Equipment : BaseSystem
     {
         public Item Weapon { get; set; }
         public Item Armor { get; set; }
         public Item Accessory1 { get; set; }
         public Item Accessory2 { get; set; }
+        
+        protected override void Initialize()
+        {
+            IsInitialized = true;
+        }
         
         public Item GetEquipped(int slot)
         {
@@ -550,5 +636,50 @@ namespace ClawRPG.Scripts.Items {
             }
             return item;
         }
+        
+        #region Save/Load
+        
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            data["weapon"] = Weapon?.Id ?? 0;
+            data["armor"] = Armor?.Id ?? 0;
+            data["accessory1"] = Accessory1?.Id ?? 0;
+            data["accessory2"] = Accessory2?.Id ?? 0;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            
+            if (data.TryGetValue("weapon", out var w))
+            {
+                int id = Convert.ToInt32(w);
+                Weapon = id > 0 ? ItemDatabase.Instance.GetItem(id) : null;
+            }
+            
+            if (data.TryGetValue("armor", out var a))
+            {
+                int id = Convert.ToInt32(a);
+                Armor = id > 0 ? ItemDatabase.Instance.GetItem(id) : null;
+            }
+            
+            if (data.TryGetValue("accessory1", out var a1))
+            {
+                int id = Convert.ToInt32(a1);
+                Accessory1 = id > 0 ? ItemDatabase.Instance.GetItem(id) : null;
+            }
+            
+            if (data.TryGetValue("accessory2", out var a2))
+            {
+                int id = Convert.ToInt32(a2);
+                Accessory2 = id > 0 ? ItemDatabase.Instance.GetItem(id) : null;
+            }
+        }
+        
+        #endregion
     }
 }
