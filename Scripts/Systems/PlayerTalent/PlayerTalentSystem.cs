@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class PlayerTalentSystem
+public class PlayerTalentSystem : BaseSystem
 {
     private static PlayerTalentSystem _instance;
     public static PlayerTalentSystem Instance
@@ -313,5 +313,21 @@ public class PlayerTalentSystem
                 ApplyTalentBonuses(talent);
             }
         }
+    }
+
+    /// <summary>
+    /// 导出保存数据（供 SaveSystem 调用）
+    /// </summary>
+    public Dictionary ExportSaveData()
+    {
+        return GetSaveData();
+    }
+
+    /// <summary>
+    /// 导入保存数据（供 SaveSystem 调用）
+    /// </summary>
+    public void ImportSaveData(Dictionary data)
+    {
+        LoadSaveData(data);
     }
 }

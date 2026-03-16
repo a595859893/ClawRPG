@@ -644,5 +644,21 @@ public class PartySystem
 
         GD.Print($"[PartySystem] Loaded {_parties.Count} parties");
     }
+
+    /// <summary>
+    /// 导出保存数据（供 SaveSystem 调用）
+    /// </summary>
+    public Dictionary ExportSaveData()
+    {
+        return GetSaveData();
+    }
+
+    /// <summary>
+    /// 导入保存数据（供 SaveSystem 调用）
+    /// </summary>
+    public void ImportSaveData(Dictionary data)
+    {
+        LoadSaveData(data);
+    }
 }
 }

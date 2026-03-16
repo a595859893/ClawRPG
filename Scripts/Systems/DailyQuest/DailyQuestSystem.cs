@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DailyQuestSystem
+public class DailyQuestSystem : BaseSystem
 {
 	public static DailyQuestSystem Instance { get; private set; }
 
@@ -326,5 +326,53 @@ public class DailyQuestSystem
 		}
 
 		GD.Print("[DailyQuestSystem] Loaded - Completed: " + _totalQuestsCompleted + ", Claimed: " + _totalQuestsClaimed);
+	}
+
+	/// <summary>
+	/// 导出保存数据（实现 BaseSystem 接口）
+	/// </summary>
+	public override Dictionary ExportSaveData()
+	{
+		var data = new Dictionary();
+		data["lastRefreshDate"] = _lastRefreshDate.ToString("o");
+		data["totalQuestsCompleted"] = _totalQuestsCompleted;
+		data["totalQuestsClaimed"] = _totalQuestsClaimed;
+		data["totalGoldEarned"] = _totalGoldEarned;
+		data["totalExpEarned"] = _totalExpEarned;
+
+		// 任务进度
+		var questProgress = new Dictionary<string, int>
+		{
+			{ "kills", _killCount },
+			{ "collects", _collectCount },
+			{ "visits", _visitCount },
+			{ "talks", _talkCount },
+			{ "dungeons", _dungeonCount },
+			{ "skillUses", _skillUseCount },
+			{ "gold", _goldEarnedCount },
+			{ "exp", _expGainedCount },
+			{ "potions", _potionUseCount },
+			{ "crafts", _craftCount },
+			{ "trades", _tradeCount },
+			{ "mounts", _mountUseCount },
+			{ "pets", _petUseCount },
+			{ "trials", _trialCount },
+			{ "arenaWins", _arenaWinCount }
+		};
+		data["questProgress"] = questProgress;
+
+		// 已完成和已领取的任务
+		data["completedQuests"] = _dailyQuests.FindAll(q => q.IsCompleted).ConvertAll(q => q.QuestId);
+		data["claimedQuests"] = _dailyQuests.FindAll(q => q.IsClaimed).ConvertAll(q => q.QuestId);
+
+		return data;
+	}
+
+	/// <summary>
+	/// 导入保存数据（实现 BaseSystem 接口）
+	/// </summary>
+	public override void ImportSaveData(Dictionary data)
+	{
+		Load(data);
 	}
 }
