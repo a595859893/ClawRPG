@@ -1,23 +1,28 @@
 using Godot;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace ClawRPG.Scripts.Systems.CoopSession
 {
     /// <summary>
-    /// 战斗同步系统 - 实现多人实时战斗同步
-    /// 负责战斗操作广播、状态同步、Buff管理
+    /// 战斗同步系统 - 多人实时战斗同步主系统
+    /// 整合 CoreSystem, Combat, Network, State 四个子模块
     /// </summary>
     public class BattleSyncSystem : BaseSystem
     {
         private static BattleSyncSystem _instance;
         public static BattleSyncSystem Instance => _instance ??= new BattleSyncSystem();
 
+        // 子系统实例
+        private BattleSyncCoreSystem _coreSystem;
+        private BattleSyncCombat _combatSystem;
+        private BattleSyncNetwork _networkSystem;
+        private BattleSyncState _stateSystem;
+
         // 线程安全锁
         private readonly object _lock = new object();
-        private readonly ReaderWriterLockSlim _stateLock = new ReaderWriterLockSlim();
 
         // 同步配置
         private BattleSyncData.BattleSyncConfig _config;
@@ -43,7 +48,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         private long _lastSyncTime = 0;
         private float _avgSyncLatency = 0f;
 
-        #region 信号定义 (Godot 4.x)
+        #region 信号定义 (Godot 4.x) - 委托给CoreSystem
 
         /// <summary>
         /// 战斗操作已广播（本地或远程）
@@ -145,6 +150,9 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             base._Ready();
             _instance = this;
             
+            // 初始化子系统
+            InitializeSubsystems();
+            
             // 初始化数据结构
             _playerStates = new Dictionary<int, BattleSyncData.PlayerBattleState>();
             _enemyStates = new Dictionary<int, BattleSyncData.EnemyBattleState>();
@@ -154,7 +162,29 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             // 默认配置
             _config = new BattleSyncData.BattleSyncConfig();
             
-            GD.Print("[BattleSyncSystem] Initialized");
+            // 设置网络回调
+            _networkSystem.OnRemoteActionReceived += HandleRemoteAction;
+            
+            GD.Print("[BattleSyncSystem] Initialized with subsystems");
+        }
+
+        /// <summary>
+        /// 初始化子系统
+        /// </summary>
+        private void InitializeSubsystems()
+        {
+            _coreSystem = new BattleSyncCoreSystem();
+            _combatSystem = new BattleSyncCombat();
+            _networkSystem = new BattleSyncNetwork();
+            _stateSystem = new BattleSyncState();
+            
+            // 初始化战斗系统队列
+            _combatSystem.InitializeCombatQueues();
+            
+            // 初始化网络组件
+            _networkSystem.InitializeNetworkComponents();
+            
+            GD.Print("[BattleSyncSystem] Subsystems initialized");
         }
 
         protected override void Initialize()
@@ -342,6 +372,14 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         }
 
         /// <summary>
+        /// 处理远程操作（网络回调）
+        /// </summary>
+        private void HandleRemoteAction(BattleSyncData.BattleAction action)
+        {
+            ReceiveRemoteAction(action);
+        }
+
+        /// <summary>
         /// 应用战斗操作效果
         /// </summary>
         private void ApplyActionEffect(BattleSyncData.BattleAction action)
@@ -382,20 +420,19 @@ namespace ClawRPG.Scripts.Systems.CoopSession
                     case BattleActionType.Dodge:
                     case BattleActionType.Block:
                     case BattleActionType.Counter:
-                        // 这些是闪避/格挡/反击行为，不需要数值变化
                         break;
                 }
             }
         }
 
-        /// <summary>
-        /// 应用伤害
-        /// </summary>
+        #endregion
+
+        #region 伤害与治疗 (委托给Combat)
+
         private void ApplyDamage(BattleSyncData.BattleAction action)
         {
             if (action.TargetId <= 0) return;
 
-            // 检查目标是玩家还是敌人
             if (_playerStates.TryGetValue(action.TargetId, out var playerState))
             {
                 float oldHealth = playerState.Health;
@@ -405,7 +442,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
                 float change = playerState.Health - oldHealth;
                 EmitSignal(SignalName.PlayerHealthChanged, action.TargetId, playerState.Health, playerState.MaxHealth, change);
 
-                // 检查死亡
                 if (playerState.Health <= 0 && oldHealth > 0)
                 {
                     HandlePlayerDeath(action.TargetId);
@@ -419,7 +455,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
                 enemyState.Health = Math.Max(0, enemyState.Health - action.Value);
                 enemyState.LastUpdate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-                // 检查死亡
                 if (enemyState.Health <= 0 && oldHealth > 0)
                 {
                     enemyState.IsDead = true;
@@ -430,9 +465,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 应用治疗
-        /// </summary>
         private void ApplyHealing(BattleSyncData.BattleAction action)
         {
             if (action.TargetId <= 0) return;
@@ -450,9 +482,10 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 应用Buff
-        /// </summary>
+        #endregion
+
+        #region Buff管理 (委托给Combat)
+
         private void ApplyBuff(BattleSyncData.BattleAction action)
         {
             if (action.TargetId <= 0 || string.IsNullOrEmpty(action.SkillId)) return;
@@ -463,20 +496,18 @@ namespace ClawRPG.Scripts.Systems.CoopSession
                 
                 if (existingBuff != null)
                 {
-                    // 更新现有Buff
                     existingBuff.Stacks = Math.Min(existingBuff.Stacks + 1, _config.MaxBuffsPerPlayer);
-                    existingBuff.Duration = action.Value;  // Value作为持续时间
+                    existingBuff.Duration = action.Value;
                 }
                 else
                 {
-                    // 添加新Buff
                     var newBuff = new BattleSyncData.BuffState
                     {
                         BuffId = action.SkillId,
                         BuffName = action.SkillId,
                         Stacks = 1,
                         Duration = action.Value,
-                        IsDebuff = action.Value < 0  // 负值持续时间表示debuff
+                        IsDebuff = action.Value < 0
                     };
                     playerState.ActiveBuffs.Add(newBuff);
                 }
@@ -487,9 +518,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 移除Buff
-        /// </summary>
         private void RemoveBuff(BattleSyncData.BattleAction action)
         {
             if (action.TargetId <= 0 || string.IsNullOrEmpty(action.SkillId)) return;
@@ -507,9 +535,10 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 处理玩家死亡
-        /// </summary>
+        #endregion
+
+        #region 死亡与复活
+
         private void HandlePlayerDeath(int playerId)
         {
             if (_playerStates.TryGetValue(playerId, out var playerState))
@@ -522,9 +551,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 处理玩家复活
-        /// </summary>
         private void HandlePlayerRevive(int playerId, float healthPercent)
         {
             if (_playerStates.TryGetValue(playerId, out var playerState))
@@ -542,9 +568,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
 
         #region 敌人管理
 
-        /// <summary>
-        /// 添加敌人到战斗
-        /// </summary>
         public void AddEnemy(int enemyId, string enemyType, float maxHealth, float x, float y)
         {
             lock (_lock)
@@ -563,9 +586,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 移除敌人
-        /// </summary>
         public void RemoveEnemy(int enemyId)
         {
             lock (_lock)
@@ -577,9 +597,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 更新敌人仇恨目标（用于配合玩法：吸引仇恨）
-        /// </summary>
         public void SetEnemyAggro(int enemyId, int targetPlayerId)
         {
             lock (_lock)
@@ -596,9 +613,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 更新敌人位置
-        /// </summary>
         public void UpdateEnemyPosition(int enemyId, float x, float y)
         {
             lock (_lock)
@@ -616,9 +630,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
 
         #region 状态管理
 
-        /// <summary>
-        /// 更新玩家位置
-        /// </summary>
         public void UpdatePlayerPosition(int playerId, float x, float y)
         {
             lock (_lock)
@@ -632,9 +643,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 更新玩家属性
-        /// </summary>
         public void UpdatePlayerStats(int playerId, float health, float mana)
         {
             lock (_lock)
@@ -660,9 +668,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 获取玩家状态
-        /// </summary>
         public BattleSyncData.PlayerBattleState? GetPlayerState(int playerId)
         {
             lock (_lock)
@@ -671,9 +676,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 获取所有玩家状态
-        /// </summary>
         public List<BattleSyncData.PlayerBattleState> GetAllPlayerStates()
         {
             lock (_lock)
@@ -682,9 +684,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 获取敌人状态
-        /// </summary>
         public BattleSyncData.EnemyBattleState? GetEnemyState(int enemyId)
         {
             lock (_lock)
@@ -693,9 +692,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 获取所有敌人状态
-        /// </summary>
         public List<BattleSyncData.EnemyBattleState> GetAllEnemyStates()
         {
             lock (_lock)
@@ -704,9 +700,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 创建战斗快照（用于全量同步）
-        /// </summary>
         public BattleSyncData.BattleSnapshot CreateSnapshot()
         {
             lock (_lock)
@@ -721,9 +714,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 应用战斗快照（用于全量同步）
-        /// </summary>
         public void ApplySnapshot(BattleSyncData.BattleSnapshot snapshot)
         {
             lock (_lock)
@@ -752,54 +742,37 @@ namespace ClawRPG.Scripts.Systems.CoopSession
 
         #region 同步处理
 
-        /// <summary>
-        /// 处理状态同步
-        /// </summary>
         private void ProcessStateSync()
         {
-            // 这里可以添加网络同步逻辑
-            // 目前仅用于本地状态更新检查
-            
             long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             _lastSyncTime = now;
         }
 
-        /// <summary>
-        /// 处理战斗操作广播
-        /// </summary>
         private void ProcessActionBroadcast()
         {
             lock (_lock)
             {
                 if (_pendingActions.Count == 0) return;
 
-                // 将待处理操作移动到广播缓冲区
                 while (_pendingActions.Count > 0)
                 {
                     var action = _pendingActions.Dequeue();
                     _broadcastBuffer.Enqueue(action);
-
-                    // 发出信号通知UI/其他系统
                     EmitSignal(SignalName.BattleActionReceived, action);
                 }
             }
 
-            // 通过网络层广播到其他玩家
+            // 通过网络层广播
             BroadcastActionsToNetwork();
         }
 
-        /// <summary>
-        /// 通过网络广播战斗操作到其他玩家
-        /// </summary>
         private void BroadcastActionsToNetwork()
         {
             if (_broadcastBuffer.Count == 0) return;
 
-            // 检查是否在房间中
             if (MultiplayerManager.Instance == null || !MultiplayerManager.Instance.IsInRoom)
                 return;
 
-            // 创建广播消息
             var actions = new ArrayList();
             while (_broadcastBuffer.Count > 0)
             {
@@ -831,9 +804,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             GD.Print($"[BattleSync] Broadcasted {actions.Count} actions to network");
         }
 
-        /// <summary>
-        /// 更新Buff持续时间
-        /// </summary>
         private void UpdateBuffDurations(float delta)
         {
             lock (_lock)
@@ -851,7 +821,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
                         }
                     }
 
-                    // 移除过期的Buff
                     foreach (var buff in expiredBuffs)
                     {
                         playerState.ActiveBuffs.Remove(buff);
@@ -866,15 +835,11 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        /// <summary>
-        /// 检查同步延迟
-        /// </summary>
         private void CheckSyncLatency()
         {
             long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             long diff = now - _lastSyncTime;
             
-            // 简单的延迟估算
             _avgSyncLatency = _avgSyncLatency * 0.9f + diff * 0.1f;
 
             if (_avgSyncLatency > _config.TargetLatencyMs)
@@ -887,9 +852,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
 
         #region 配置
 
-        /// <summary>
-        /// 设置同步配置
-        /// </summary>
         public void SetConfig(BattleSyncData.BattleSyncConfig config)
         {
             _config = config;
@@ -907,7 +869,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
                 var data = new Dictionary();
                 data["current_session_id"] = _currentSessionId;
                 
-                // 导出玩家状态
                 var playerStatesList = new Array();
                 foreach (var kvp in _playerStates)
                 {
