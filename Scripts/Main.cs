@@ -168,13 +168,35 @@ namespace ClawRPG.Scripts
 
         public override void _Process(double delta)
         {
-            float dt = (float)delta;
+            try
+            {
+                float dt = (float)delta;
 
-            // 处理模块组件
-            _modules?.ProcessInput(dt);
-            _modules?.ProcessGame(delta);
-            _modules?.UpdatePlayerUI();
-            _modules?.ProcessNetwork(delta);
+                // 处理模块组件
+                _modules?.ProcessInput(dt);
+                _modules?.ProcessGame(delta);
+                _modules?.UpdatePlayerUI();
+                _modules?.ProcessNetwork(delta);
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"_Process: Exception during process: {ex.Message}");
+                GD.PrintErr($"Stack trace: {ex.StackTrace}");
+            }
+        }
+
+        public override void _Input(InputEvent @event)
+        {
+            try
+            {
+                // Pass input to modules for handling
+                _modules?.ProcessInputEvent(@event);
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"_Input: Exception during input handling: {ex.Message}");
+                GD.PrintErr($"Stack trace: {ex.StackTrace}");
+            }
         }
 
         /// <summary>
