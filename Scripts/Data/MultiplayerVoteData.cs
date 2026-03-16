@@ -33,6 +33,17 @@ namespace ClawRPG.Modules.MultiplayerVote
     }
 
     /// <summary>
+    /// Vote statistics
+    /// </summary>
+    public class VoteStatistics
+    {
+        public int VotesInitiated { get; set; }
+        public int VotesCast { get; set; }
+        public int VotesPassed { get; set; }
+        public int VotesFailed { get; set; }
+    }
+
+    /// <summary>
     /// Individual vote record
     /// </summary>
     public class VoteRecord
@@ -44,25 +55,12 @@ namespace ClawRPG.Modules.MultiplayerVote
     }
 
     /// <summary>
-    /// Vote configuration
-    /// </summary>
-    public class VoteConfig
-    {
-        public VoteType Type { get; set; }
-        public string Name { get; set; } = "";
-        public string Description { get; set; } = ""
-        public int DurationSeconds { get; set; } = 30;
-        public float PassThreshold { get; set; } = 0.5f;  // 50% needed to pass
-        public bool RequireMajority { get; set; } = false;
-        public bool AutoCancelOnLeaver { get; set; } = true;
-    }
-
-    /// <summary>
     /// Active vote instance
     /// </summary>
     public class ActiveVote
     {
         public string VoteId { get; set; } = Guid.NewGuid().ToString();
+        public string PartyId { get; set; } = "";
         public VoteType Type { get; set; }
         public string InitiatorId { get; set; } = "";
         public string InitiatorName { get; set; } = "";
@@ -146,9 +144,7 @@ namespace ClawRPG.Modules.MultiplayerVote
     /// </summary>
     public class MultiplayerVoteData
     {
-        public Dictionary<string, Party> ActiveParties { get; set; } = new Dictionary<string, Party>();
         public Dictionary<string, ActiveVote> ActiveVotes { get; set; } = new Dictionary<string, ActiveVote>();
-        public Dictionary<string, PlayerPartyData> PlayerPartyData { get; set; } = new Dictionary<string, PlayerPartyData>();
-        public Dictionary<string, PartyStatistics> PlayerStatistics { get; set; } = new Dictionary<string, PartyStatistics>();
+        public Dictionary<string, VoteStatistics> VoteStatistics { get; set; } = new Dictionary<string, VoteStatistics>();
     }
 }

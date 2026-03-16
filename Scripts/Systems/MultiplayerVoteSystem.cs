@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using ClawRPG.Modules.MultiplayerParty;
 
 namespace ClawRPG.Modules.MultiplayerVote
 {
     /// <summary>
-    /// Core system for multiplayer voting and party management
+    /// Core system for multiplayer voting
     /// </summary>
     public partial class MultiplayerVoteSystem : BaseSystem
     {
@@ -16,15 +17,13 @@ namespace ClawRPG.Modules.MultiplayerVote
         private MultiplayerVoteData _data = new MultiplayerVoteData();
         private MultiplayerVoteDatabase _database = MultiplayerVoteDatabase.Instance;
         
+        // Reference to party system
+        private MultiplayerPartySystem PartySystem => MultiplayerPartySystem.Instance;
+        
         // Signals for game events
         [Signal] public delegate void VoteStartedEventHandler(ActiveVote vote);
         [Signal] public delegate void VoteEndedEventHandler(ActiveVote vote, bool passed);
         [Signal] public delegate void VoteUpdatedEventHandler(ActiveVote vote);
-        [Signal] public delegate void PartyCreatedEventHandler(Party party);
-        [Signal] public delegate void PartyJoinedEventHandler(string partyId, PartyMember member);
-        [Signal] public delegate void PartyLeftEventHandler(string partyId, string playerId);
-        [Signal] public delegate void PartyMemberKickedEventHandler(string partyId, string playerId);
-        [Signal] public delegate void PartyLeaderChangedEventHandler(string partyId, string newLeaderId);
 
         public override void _Ready()
         {
@@ -36,226 +35,6 @@ namespace ClawRPG.Modules.MultiplayerVote
         /// </summary>
         protected override string SystemName => "MultiplayerVote";
 
-        #region Party Management
-
-        /// <summary>
-        /// Create a new party
-        /// </summary>
-        public Party CreateParty(string leaderId, string leaderName, string partyName = "", bool isPublic = true, string password = "", string gameMode = "", int maxMembers = 4)
-        {
-            if (string.IsNullOrEmpty(partyName))
-            {
-                partyName = $"{leaderName}'s Party";
-            }
-
-            var party = new Party
-            {
-                PartyName = partyName,
-                LeaderId = leaderId,
-                IsPublic = isPublic,
-                Password = password,
-                GameMode = gameMode,
-                MaxMembers = maxMembers > 0 ? maxMembers : _database.DefaultMaxMembers,
-                CreateTime = OS.GetUnixTime()
-            };
-
-            var leaderMember = new PartyMember
-            {
-                PlayerId = leaderId,
-                PlayerName = leaderName,
-                IsLeader = true,
-                IsReady = true,
-                Role = "Leader",
-                JoinTime = OS.GetUnixTime()
-            };
-            party.Members.Add(leaderMember);
-
-            _data.ActiveParties[party.PartyId] = party;
-
-            // Initialize player data
-            GetOrCreatePlayerPartyData(leaderId);
-            _data.PlayerPartyData[leaderId].CurrentPartyId = party.PartyId;
-            _data.PlayerPartyData[leaderId].TotalPartiesCreated++;
-            GetOrCreatePlayerStatistics(leaderId).PartiesCreated++;
-
-            EmitSignal(SignalName.PartyCreated, party);
-            return party;
-        }
-
-        /// <summary>
-        /// Join an existing party
-        /// </summary>
-        public bool JoinParty(string playerId, string playerName, int level, int power, string partyId, string password = "")
-        {
-            if (!_data.ActiveParties.ContainsKey(partyId))
-                return false;
-
-            var party = _data.ActiveParties[partyId];
-
-            // Check restrictions
-            if (party.Members.Count >= party.MaxMembers)
-                return false;
-            
-            if (!party.IsPublic && party.Password != password)
-                return false;
-            
-            if (level < party.MinLevel || level > party.MaxLevel)
-                return false;
-
-            // Check if already in party
-            if (party.Members.Any(m => m.PlayerId == playerId))
-                return false;
-
-            var member = new PartyMember
-            {
-                PlayerId = playerId,
-                PlayerName = playerName,
-                Level = level,
-                Power = power,
-                IsLeader = false,
-                IsReady = false,
-                Role = "Member",
-                JoinTime = OS.GetUnixTime()
-            };
-
-            party.Members.Add(member);
-
-            // Update player data
-            GetOrCreatePlayerPartyData(playerId);
-            _data.PlayerPartyData[playerId].CurrentPartyId = partyId;
-            _data.PlayerPartyData[playerId].TotalPartiesJoined++;
-            GetOrCreatePlayerStatistics(playerId).PartiesJoined++;
-
-            EmitSignal(SignalName.PartyJoined, partyId, member);
-            return true;
-        }
-
-        /// <summary>
-        /// Leave current party
-        /// </summary>
-        public bool LeaveParty(string playerId)
-        {
-            var playerData = GetPlayerPartyData(playerId);
-            if (playerData == null || string.IsNullOrEmpty(playerData.CurrentPartyId))
-                return false;
-
-            var partyId = playerData.CurrentPartyId;
-            if (!_data.ActiveParties.ContainsKey(partyId))
-                return false;
-
-            var party = _data.ActiveParties[partyId];
-            var member = party.Members.FirstOrDefault(m => m.PlayerId == playerId);
-            
-            if (member == null)
-                return false;
-
-            party.Members.Remove(member);
-
-            // If leader left, promote new leader
-            if (member.IsLeader && party.Members.Count > 0)
-            {
-                var newLeader = party.Members.First();
-                newLeader.IsLeader = true;
-                newLeader.Role = "Leader";
-                party.LeaderId = newLeader.PlayerId;
-                EmitSignal(SignalName.PartyLeaderChanged, partyId, newLeader.PlayerId);
-            }
-
-            // If party empty, remove it
-            if (party.Members.Count == 0)
-            {
-                _data.ActiveParties.Remove(partyId);
-            }
-
-            playerData.CurrentPartyId = "";
-            playerData.PastPartyIds.Add(partyId);
-
-            EmitSignal(SignalName.PartyLeft, partyId, playerId);
-            return true;
-        }
-
-        /// <summary>
-        /// Kick a player from party
-        /// </summary>
-        public bool KickPlayer(string kickerId, string targetId)
-        {
-            var kickerData = GetPlayerPartyData(kickerId);
-            if (kickerData == null || string.IsNullOrEmpty(kickerData.CurrentPartyId))
-                return false;
-
-            var party = _data.ActiveParties[kickerData.CurrentPartyId];
-            
-            // Only leader can kick
-            if (party.LeaderId != kickerId)
-                return false;
-
-            var targetMember = party.Members.FirstOrDefault(m => m.PlayerId == targetId);
-            if (targetMember == null || targetMember.IsLeader)
-                return false;
-
-            party.Members.Remove(targetMember);
-
-            // Update target's party data
-            var targetData = GetPlayerPartyData(targetId);
-            if (targetData != null)
-            {
-                targetData.CurrentPartyId = "";
-                targetData.PastPartyIds.Add(party.PartyId);
-            }
-
-            GetOrCreatePlayerStatistics(targetId).TimesKicked++;
-            GetOrCreatePlayerStatistics(kickerId).TimesKickedOthers++;
-
-            EmitSignal(SignalName.PartyMemberKicked, party.PartyId, targetId);
-            return true;
-        }
-
-        /// <summary>
-        /// Set player ready status
-        /// </summary>
-        public bool SetReady(string playerId, bool ready)
-        {
-            var playerData = GetPlayerPartyData(playerId);
-            if (playerData == null || string.IsNullOrEmpty(playerData.CurrentPartyId))
-                return false;
-
-            var party = _data.ActiveParties[playerData.CurrentPartyId];
-            var member = party.Members.FirstOrDefault(m => m.PlayerId == playerId);
-            
-            if (member == null)
-                return false;
-
-            member.IsReady = ready;
-            return true;
-        }
-
-        /// <summary>
-        /// Update party settings
-        /// </summary>
-        public bool UpdatePartySettings(string playerId, bool? isPublic = null, string password = null, string gameMode = null, int? maxMembers = null, int? minLevel = null, int? maxLevel = null)
-        {
-            var playerData = GetPlayerPartyData(playerId);
-            if (playerData == null || string.IsNullOrEmpty(playerData.CurrentPartyId))
-                return false;
-
-            var party = _data.ActiveParties[playerData.CurrentPartyId];
-            
-            // Only leader can update settings
-            if (party.LeaderId != playerId)
-                return false;
-
-            if (isPublic.HasValue) party.IsPublic = isPublic.Value;
-            if (password != null) party.Password = password;
-            if (gameMode != null) party.GameMode = gameMode;
-            if (maxMembers.HasValue) party.MaxMembers = Math.Max(2, Math.Min(maxMembers.Value, 10));
-            if (minLevel.HasValue) party.MinLevel = minLevel.Value;
-            if (maxLevel.HasValue) party.MaxLevel = maxLevel.Value;
-
-            return true;
-        }
-
-        #endregion
-
         #region Vote System
 
         /// <summary>
@@ -263,18 +42,12 @@ namespace ClawRPG.Modules.MultiplayerVote
         /// </summary>
         public ActiveVote InitiateVote(string initiatorId, VoteType voteType, string targetId = "", string targetName = "", string reason = "")
         {
-            var initiatorData = GetPlayerPartyData(initiatorId);
-            if (initiatorData == null || string.IsNullOrEmpty(initiatorData.CurrentPartyId))
+            var party = PartySystem.GetPlayerParty(initiatorId);
+            if (party == null)
                 return null;
-
-            var partyId = initiatorData.CurrentPartyId;
-            if (!_data.ActiveParties.ContainsKey(partyId))
-                return null;
-
-            var party = _data.ActiveParties[partyId];
 
             // Check if too many active votes
-            var partyVotes = _data.ActiveVotes.Values.Where(v => GetPartyIdByVote(v.VoteId) == partyId && v.Status == VoteStatus.Pending).ToList();
+            var partyVotes = _data.ActiveVotes.Values.Where(v => v.PartyId == party.PartyId && v.Status == VoteStatus.Pending).ToList();
             if (partyVotes.Count >= _database.MaxActiveVotes)
                 return null;
 
@@ -289,6 +62,8 @@ namespace ClawRPG.Modules.MultiplayerVote
             int currentTime = OS.GetUnixTime();
             var vote = new ActiveVote
             {
+                VoteId = Guid.NewGuid().ToString(),
+                PartyId = party.PartyId,
                 Type = voteType,
                 InitiatorId = initiatorId,
                 InitiatorName = initiatorMember.PlayerName,
@@ -310,8 +85,8 @@ namespace ClawRPG.Modules.MultiplayerVote
 
             _data.ActiveVotes[vote.VoteId] = vote;
 
-            // Update statistics
-            GetOrCreatePlayerStatistics(initiatorId).VotesInitiated++;
+            // Update vote statistics
+            GetOrCreateVoteStatistics(initiatorId).VotesInitiated++;
 
             EmitSignal(SignalName.VoteStarted, vote);
             return vote;
@@ -337,15 +112,10 @@ namespace ClawRPG.Modules.MultiplayerVote
             }
 
             // Check if voter is in the same party
-            var voterData = GetPlayerPartyData(voterId);
-            if (voterData == null || string.IsNullOrEmpty(voterData.CurrentPartyId))
+            var party = PartySystem.GetPlayerParty(voterId);
+            if (party == null || party.PartyId != vote.PartyId)
                 return false;
 
-            var partyId = voterData.CurrentPartyId;
-            if (GetPartyIdByVote(voteId) != partyId)
-                return false;
-
-            var party = _data.ActiveParties[partyId];
             var member = party.Members.FirstOrDefault(m => m.PlayerId == voterId);
             if (member == null)
                 return false;
@@ -368,8 +138,8 @@ namespace ClawRPG.Modules.MultiplayerVote
                 });
             }
 
-            // Update statistics
-            GetOrCreatePlayerStatistics(voterId).VotesCast++;
+            // Update vote statistics
+            GetOrCreateVoteStatistics(voterId).VotesCast++;
 
             EmitSignal(SignalName.VoteUpdated, vote);
             
@@ -392,11 +162,10 @@ namespace ClawRPG.Modules.MultiplayerVote
                 return false;
 
             // Only initiator or party leader can cancel
-            var voterData = GetPlayerPartyData(cancellerId);
-            if (voterData == null || string.IsNullOrEmpty(voterData.CurrentPartyId))
+            var party = PartySystem.GetPlayerParty(cancellerId);
+            if (party == null || party.PartyId != vote.PartyId)
                 return false;
 
-            var party = _data.ActiveParties[voterData.CurrentPartyId];
             if (vote.InitiatorId != cancellerId && party.LeaderId != cancellerId)
                 return false;
 
@@ -423,23 +192,15 @@ namespace ClawRPG.Modules.MultiplayerVote
             // Calculate if vote passed
             if (config != null)
             {
-                if (config.RequireMajority)
-                {
-                    passed = vote.YesPercentage >= config.PassThreshold;
-                }
-                else
-                {
-                    // Simple threshold check
-                    passed = vote.YesPercentage >= config.PassThreshold;
-                }
+                passed = vote.YesPercentage >= config.PassThreshold;
             }
 
             vote.Status = passed ? VoteStatus.Passed : VoteStatus.Failed;
 
-            // Update statistics
+            // Update vote statistics
             if (vote.InitiatorId != "")
             {
-                var stats = GetOrCreatePlayerStatistics(vote.InitiatorId);
+                var stats = GetOrCreateVoteStatistics(vote.InitiatorId);
                 if (passed)
                     stats.VotesPassed++;
                 else
@@ -464,11 +225,10 @@ namespace ClawRPG.Modules.MultiplayerVote
                 return;
 
             var vote = _data.ActiveVotes[voteId];
-            var partyId = GetPartyIdByVote(voteId);
-            if (partyId == null || !_data.ActiveParties.ContainsKey(partyId))
+            var party = PartySystem.GetParty(vote.PartyId);
+            if (party == null)
                 return;
 
-            var party = _data.ActiveParties[partyId];
             var config = _database.GetVoteConfig(vote.Type);
 
             // Check if everyone has voted
@@ -496,34 +256,26 @@ namespace ClawRPG.Modules.MultiplayerVote
         /// </summary>
         private void ExecuteVoteEffects(ActiveVote vote)
         {
-            var partyId = GetPartyIdByVote(vote.VoteId);
-            if (partyId == null || !_data.ActiveParties.ContainsKey(partyId))
+            var party = PartySystem.GetParty(vote.PartyId);
+            if (party == null)
                 return;
-
-            var party = _data.ActiveParties[partyId];
 
             switch (vote.Type)
             {
                 case VoteType.KickPlayer:
-                    KickPlayer(party.LeaderId, vote.TargetId);
+                    PartySystem.KickPlayer(party.LeaderId, vote.TargetId);
                     break;
                     
                 case VoteType.PromoteLeader:
-                    // Promote new leader
-                    var newLeader = party.Members.FirstOrDefault(m => m.PlayerId == vote.TargetId);
-                    if (newLeader != null)
-                    {
-                        var oldLeader = party.Members.FirstOrDefault(m => m.IsLeader);
-                        if (oldLeader != null)
-                        {
-                            oldLeader.IsLeader = false;
-                            oldLeader.Role = "Member";
-                        }
-                        newLeader.IsLeader = true;
-                        newLeader.Role = "Leader";
-                        party.LeaderId = newLeader.PlayerId;
-                        EmitSignal(SignalName.PartyLeaderChanged, partyId, newLeader.PlayerId);
-                    }
+                    PartySystem.PromoteLeader(party.LeaderId, vote.TargetId);
+                    break;
+                    
+                case VoteType.StartGame:
+                    // Handle start game vote
+                    break;
+                    
+                case VoteType.Surrender:
+                    // Handle surrender vote
                     break;
             }
         }
@@ -532,91 +284,30 @@ namespace ClawRPG.Modules.MultiplayerVote
 
         #region Query Methods
 
-        private string GetPartyIdByVote(string voteId)
-        {
-            // Find party by vote - we need to track this differently
-            // For now, search through all parties
-            foreach (var party in _data.ActiveParties.Values)
-            {
-                // Check if any vote in party matches
-            }
-            return null;
-        }
-
-        public Party GetParty(string partyId)
-        {
-            return _data.ActiveParties.ContainsKey(partyId) ? _data.ActiveParties[partyId] : null;
-        }
-
-        public Party GetPlayerParty(string playerId)
-        {
-            var playerData = GetPlayerPartyData(playerId);
-            if (playerData == null || string.IsNullOrEmpty(playerData.CurrentPartyId))
-                return null;
-
-            return _data.ActiveParties.ContainsKey(playerData.CurrentPartyId) 
-                ? _data.ActiveParties[playerData.CurrentPartyId] 
-                : null;
-        }
-
         public ActiveVote GetVote(string voteId)
         {
             return _data.ActiveVotes.ContainsKey(voteId) ? _data.ActiveVotes[voteId] : null;
         }
 
-        public List<Party> GetPublicParties()
+        public List<ActiveVote> GetPartyVotes(string partyId)
         {
-            return _data.ActiveParties.Values
-                .Where(p => p.IsPublic && p.Members.Count < p.MaxMembers)
-                .OrderByDescending(p => p.Members.Count)
+            return _data.ActiveVotes.Values
+                .Where(v => v.Status == VoteStatus.Pending && v.PartyId == partyId)
                 .ToList();
         }
 
-        public List<ActiveVote> GetPartyVotes(string partyId)
+        private VoteStatistics GetOrCreateVoteStatistics(string playerId)
         {
-            // Filter votes by checking if voter is in party
-            var result = new List<ActiveVote>();
-            foreach (var vote in _data.ActiveVotes.Values)
+            if (!_data.VoteStatistics.ContainsKey(playerId))
             {
-                if (vote.Status == VoteStatus.Pending)
-                {
-                    // Check if vote belongs to this party
-                    var initiatorData = GetPlayerPartyData(vote.InitiatorId);
-                    if (initiatorData != null && initiatorData.CurrentPartyId == partyId)
-                    {
-                        result.Add(vote);
-                    }
-                }
+                _data.VoteStatistics[playerId] = new VoteStatistics();
             }
-            return result;
+            return _data.VoteStatistics[playerId];
         }
 
-        public PlayerPartyData GetPlayerPartyData(string playerId)
+        public VoteStatistics GetPlayerVoteStatistics(string playerId)
         {
-            return _data.PlayerPartyData.ContainsKey(playerId) ? _data.PlayerPartyData[playerId] : null;
-        }
-
-        public PartyStatistics GetPlayerStatistics(string playerId)
-        {
-            return _data.PlayerStatistics.ContainsKey(playerId) ? _data.PlayerStatistics[playerId] : null;
-        }
-
-        private PlayerPartyData GetOrCreatePlayerPartyData(string playerId)
-        {
-            if (!_data.PlayerPartyData.ContainsKey(playerId))
-            {
-                _data.PlayerPartyData[playerId] = new PlayerPartyData { PlayerId = playerId };
-            }
-            return _data.PlayerPartyData[playerId];
-        }
-
-        private PartyStatistics GetOrCreatePlayerStatistics(string playerId)
-        {
-            if (!_data.PlayerStatistics.ContainsKey(playerId))
-            {
-                _data.PlayerStatistics[playerId] = new PartyStatistics();
-            }
-            return _data.PlayerStatistics[playerId];
+            return _data.VoteStatistics.ContainsKey(playerId) ? _data.VoteStatistics[playerId] : null;
         }
 
         #endregion
@@ -646,72 +337,48 @@ namespace ClawRPG.Modules.MultiplayerVote
         {
             var saveData = new Dictionary<string, object>();
             
-            // Export parties
-            var partiesData = new List<Dictionary<string, object>>();
-            foreach (var party in _data.ActiveParties.Values)
+            // Export votes
+            var votesData = new List<Dictionary<string, object>>();
+            foreach (var vote in _data.ActiveVotes.Values)
             {
-                partiesData.Add(new Dictionary<string, object>
+                votesData.Add(new Dictionary<string, object>
                 {
-                    { "party_id", party.PartyId },
-                    { "party_name", party.PartyName },
-                    { "leader_id", party.LeaderId },
-                    { "is_public", party.IsPublic },
-                    { "password", party.Password },
-                    { "game_mode", party.GameMode },
-                    { "max_members", party.MaxMembers },
-                    { "min_level", party.MinLevel },
-                    { "max_level", party.MaxLevel },
-                    { "create_time", party.CreateTime },
-                    { "members", party.Members.Select(m => new Dictionary<string, object>
+                    { "vote_id", vote.VoteId },
+                    { "party_id", vote.PartyId },
+                    { "type", (int)vote.Type },
+                    { "initiator_id", vote.InitiatorId },
+                    { "initiator_name", vote.InitiatorName },
+                    { "target_id", vote.TargetId },
+                    { "target_name", vote.TargetName },
+                    { "reason", vote.Reason },
+                    { "status", (int)vote.Status },
+                    { "start_time", vote.StartTime },
+                    { "end_time", vote.EndTime },
+                    { "votes", vote.Votes.Select(v => new Dictionary<string, object>
                     {
-                        { "player_id", m.PlayerId },
-                        { "player_name", m.PlayerName },
-                        { "level", m.Level },
-                        { "power", m.Power },
-                        { "is_leader", m.IsLeader },
-                        { "is_ready", m.IsReady },
-                        { "role", m.Role },
-                        { "join_time", m.JoinTime }
+                        { "player_id", v.PlayerId },
+                        { "player_name", v.PlayerName },
+                        { "voted_yes", v.VotedYes },
+                        { "vote_time", v.VoteTime }
                     }).ToList() }
                 });
             }
-            saveData["parties"] = partiesData;
+            saveData["votes"] = votesData;
 
-            // Export player data
-            var playerDataList = new List<Dictionary<string, object>>();
-            foreach (var pd in _data.PlayerPartyData.Values)
-            {
-                playerDataList.Add(new Dictionary<string, object>
-                {
-                    { "player_id", pd.PlayerId },
-                    { "current_party_id", pd.CurrentPartyId },
-                    { "pending_invites", pd.PendingInvites },
-                    { "past_party_ids", pd.PastPartyIds },
-                    { "total_parties_joined", pd.TotalPartiesJoined },
-                    { "total_parties_created", pd.TotalPartiesCreated },
-                    { "votes_cast", pd.VotesCast },
-                    { "votes_initiated", pd.VotesInitiated }
-                });
-            }
-            saveData["player_data"] = playerDataList;
-
-            // Export statistics
+            // Export vote statistics
             var statsData = new List<Dictionary<string, object>>();
-            foreach (var stats in _data.PlayerStatistics)
+            foreach (var stats in _data.VoteStatistics)
             {
                 statsData.Add(new Dictionary<string, object>
                 {
                     { "player_id", stats.Key },
-                    { "total_votes", stats.Value.TotalVotes },
+                    { "votes_initiated", stats.Value.VotesInitiated },
+                    { "votes_cast", stats.Value.VotesCast },
                     { "votes_passed", stats.Value.VotesPassed },
-                    { "votes_failed", stats.Value.VotesFailed },
-                    { "parties_created", stats.Value.PartiesCreated },
-                    { "parties_joined", stats.Value.PartiesJoined },
-                    { "times_kicked", stats.Value.TimesKicked },
-                    { "times_kicked_others", stats.Value.TimesKickedOthers }
+                    { "votes_failed", stats.Value.VotesFailed }
                 });
             }
-            saveData["statistics"] = statsData;
+            saveData["vote_statistics"] = statsData;
 
             return saveData;
         }
@@ -722,116 +389,75 @@ namespace ClawRPG.Modules.MultiplayerVote
 
             _data = new MultiplayerVoteData();
 
-            // Import parties
-            if (data.Contains("parties"))
+            // Import votes
+            if (data.Contains("votes"))
             {
-                var partiesData = saveData["parties"] as List<object>;
-                if (partiesData != null)
+                var votesData = data["votes"] as Godot.Collections.Array;
+                if (votesData != null)
                 {
-                    foreach (var partyObj in partiesData)
+                    foreach (var voteObj in votesData)
                     {
-                        var pd = partyObj as Dictionary<string, object>;
-                        if (pd == null) continue;
+                        var vd = voteObj as Godot.Collections.Dictionary;
+                        if (vd == null) continue;
 
-                        var party = new Party
+                        var vote = new ActiveVote
                         {
-                            PartyId = pd["party_id"].ToString(),
-                            PartyName = pd["party_name"].ToString(),
-                            LeaderId = pd["leader_id"].ToString(),
-                            IsPublic = (bool)pd["is_public"],
-                            Password = pd["password"].ToString(),
-                            GameMode = pd["game_mode"].ToString(),
-                            MaxMembers = Convert.ToInt32(pd["max_members"]),
-                            MinLevel = Convert.ToInt32(pd["min_level"]),
-                            MaxLevel = Convert.ToInt32(pd["max_level"]),
-                            CreateTime = Convert.ToInt32(pd["create_time"])
+                            VoteId = vd["vote_id"].ToString(),
+                            PartyId = vd["party_id"].ToString(),
+                            Type = (VoteType)Convert.ToInt32(vd["type"]),
+                            InitiatorId = vd["initiator_id"].ToString(),
+                            InitiatorName = vd["initiator_name"].ToString(),
+                            TargetId = vd["target_id"].ToString(),
+                            TargetName = vd["target_name"].ToString(),
+                            Reason = vd["reason"].ToString(),
+                            Status = (VoteStatus)Convert.ToInt32(vd["status"]),
+                            StartTime = Convert.ToInt32(vd["start_time"]),
+                            EndTime = Convert.ToInt32(vd["end_time"])
                         };
 
-                        var membersData = pd["members"] as List<object>;
-                        if (membersData != null)
+                        var voteRecords = vd["votes"] as Godot.Collections.Array;
+                        if (voteRecords != null)
                         {
-                            foreach (var memObj in membersData)
+                            foreach (var vrObj in voteRecords)
                             {
-                                var md = memObj as Dictionary<string, object>;
-                                if (md == null) continue;
+                                var vrd = vrObj as Godot.Collections.Dictionary;
+                                if (vrd == null) continue;
 
-                                party.Members.Add(new PartyMember
+                                vote.Votes.Add(new VoteRecord
                                 {
-                                    PlayerId = md["player_id"].ToString(),
-                                    PlayerName = md["player_name"].ToString(),
-                                    Level = Convert.ToInt32(md["level"]),
-                                    Power = Convert.ToInt32(md["power"]),
-                                    IsLeader = (bool)md["is_leader"],
-                                    IsReady = (bool)md["is_ready"],
-                                    Role = md["role"].ToString(),
-                                    JoinTime = Convert.ToInt32(md["join_time"])
+                                    PlayerId = vrd["player_id"].ToString(),
+                                    PlayerName = vrd["player_name"].ToString(),
+                                    VotedYes = (bool)vrd["voted_yes"],
+                                    VoteTime = Convert.ToInt32(vrd["vote_time"])
                                 });
                             }
                         }
 
-                        _data.ActiveParties[party.PartyId] = party;
+                        _data.ActiveVotes[vote.VoteId] = vote;
                     }
                 }
             }
 
-            // Import player data
-            if (data.Contains("player_data"))
+            // Import vote statistics
+            if (data.Contains("vote_statistics"))
             {
-                var playerDataList = saveData["player_data"] as List<object>;
-                if (playerDataList != null)
-                {
-                    foreach (var pdObj in playerDataList)
-                    {
-                        var pd = pdObj as Dictionary<string, object>;
-                        if (pd == null) continue;
-
-                        var playerData = new PlayerPartyData
-                        {
-                            PlayerId = pd["player_id"].ToString(),
-                            CurrentPartyId = pd["current_party_id"].ToString()
-                        };
-
-                        var pendingInvites = pd["pending_invites"] as List<object>;
-                        if (pendingInvites != null)
-                            playerData.PendingInvites = pendingInvites.Select(i => i.ToString()).ToList();
-
-                        var pastParties = pd["past_party_ids"] as List<object>;
-                        if (pastParties != null)
-                            playerData.PastPartyIds = pastParties.Select(i => i.ToString()).ToList();
-
-                        playerData.TotalPartiesJoined = Convert.ToInt32(pd["total_parties_joined"]);
-                        playerData.TotalPartiesCreated = Convert.ToInt32(pd["total_parties_created"]);
-                        playerData.VotesCast = Convert.ToInt32(pd["votes_cast"]);
-                        playerData.VotesInitiated = Convert.ToInt32(pd["votes_initiated"]);
-
-                        _data.PlayerPartyData[playerData.PlayerId] = playerData;
-                    }
-                }
-            }
-
-            // Import statistics
-            if (data.Contains("statistics"))
-            {
-                var statsDataList = saveData["statistics"] as List<object>;
+                var statsDataList = data["vote_statistics"] as Godot.Collections.Array;
                 if (statsDataList != null)
                 {
                     foreach (var sdObj in statsDataList)
                     {
-                        var sd = sdObj as Dictionary<string, object>;
+                        var sd = sdObj as Godot.Collections.Dictionary;
                         if (sd == null) continue;
 
-                        var stats = new PartyStatistics
+                        var stats = new VoteStatistics
                         {
-                            TotalVotes = Convert.ToInt32(sd["total_votes"]),
+                            VotesInitiated = Convert.ToInt32(sd["votes_initiated"]),
+                            VotesCast = Convert.ToInt32(sd["votes_cast"]),
                             VotesPassed = Convert.ToInt32(sd["votes_passed"]),
-                            VotesFailed = Convert.ToInt32(sd["votes_failed"]),
-                            PartiesCreated = Convert.ToInt32(sd["parties_created"]),
-                            PartiesJoined = Convert.ToInt32(sd["parties_joined"]),
-                            TimesKicked = Convert.ToInt32(sd["times_kicked"]),
-                            TimesKickedOthers = Convert.ToInt32(sd["times_kicked_others"])
+                            VotesFailed = Convert.ToInt32(sd["votes_failed"])
                         };
 
-                        _data.PlayerStatistics[sd["player_id"].ToString()] = stats;
+                        _data.VoteStatistics[sd["player_id"].ToString()] = stats;
                     }
                 }
             }
