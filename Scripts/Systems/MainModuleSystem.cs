@@ -95,5 +95,24 @@ namespace ClawRPG.Scripts.Systems
         {
             _mainNetwork?.ProcessNetwork(delta);
         }
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            // MainModuleSystem 主要负责模块组件初始化，无持久化状态
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            base.ImportSaveData(data);
+            // MainModuleSystem 主要负责模块组件初始化，无持久化状态
+        }
     }
 }

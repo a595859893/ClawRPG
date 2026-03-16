@@ -124,5 +124,24 @@ namespace ClawRPG.Scripts.Systems
         {
             GD.Print($"[MainEventSystem] Game Over! Play time: {data.TotalPlayTime}s, Kills: {data.KillCount}, Deaths: {data.DeathCount}");
         }
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            // MainEventSystem 主要负责事件连接，无持久化状态
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            base.ImportSaveData(data);
+            // MainEventSystem 主要负责事件连接，无持久化状态
+        }
     }
 }

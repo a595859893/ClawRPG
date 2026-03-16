@@ -133,5 +133,42 @@ namespace ClawRPG.Scripts.Systems
         /// 获取 EnemySpawnManager
         /// </summary>
         public EnemySpawnManager GetEnemySpawnManager() => _enemySpawnManager;
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["PlayerScene"] = PlayerScene?.ResourcePath ?? "";
+            data["EnemyScene"] = EnemyScene?.ResourcePath ?? "";
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            base.ImportSaveData(data);
+            
+            if (data.Contains("PlayerScene"))
+            {
+                var path = data["PlayerScene"] as string;
+                if (!string.IsNullOrEmpty(path))
+                {
+                    PlayerScene = GD.Load<PackedScene>(path);
+                }
+            }
+            
+            if (data.Contains("EnemyScene"))
+            {
+                var path = data["EnemyScene"] as string;
+                if (!string.IsNullOrEmpty(path))
+                {
+                    EnemyScene = GD.Load<PackedScene>(path);
+                }
+            }
+        }
     }
 }
