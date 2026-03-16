@@ -29,36 +29,59 @@ namespace ClawRPG.Scripts
 
         public void SetGameState(Main.GameState state)
         {
-            var gsm = GetNode<GameStateManager>("GameStateManager");
+            var gsm = GetNodeOrNull<GameStateManager>("GameStateManager");
+            if (gsm == null)
+            {
+                GD.PrintErr("SetGameState: GameStateManager node not found!");
+                return;
+            }
             gsm?.SetState(state);
         }
 
         public Main.GameState GetGameState()
         {
-            var gsm = GetNode<GameStateManager>("GameStateManager");
+            var gsm = GetNodeOrNull<GameStateManager>("GameStateManager");
+            if (gsm == null)
+            {
+                GD.PrintErr("GetGameState: GameStateManager node not found!");
+                return Main.GameState.Playing;
+            }
             return gsm?.GetState() ?? Main.GameState.Playing;
         }
 
         public Player GetPlayer()
         {
-            var psm = GetNode<PlayerSpawnManager>("PlayerSpawnManager");
+            var psm = GetNodeOrNull<PlayerSpawnManager>("PlayerSpawnManager");
+            if (psm == null)
+            {
+                GD.PrintErr("GetPlayer: PlayerSpawnManager node not found!");
+                return _player;
+            }
             return psm?.GetPlayer() ?? _player;
         }
 
         public override void _Ready()
         {
-            GD.Print("=== ClawRPG Starting ===");
+            try
+            {
+                GD.Print("=== ClawRPG Starting ===");
 
-            // 初始化协调系统
-            InitializeSystems();
+                // 初始化协调系统
+                InitializeSystems();
 
-            // 生成玩家
-            SpawnPlayer();
+                // 生成玩家
+                SpawnPlayer();
 
-            // 加载游戏数据
-            LoadGameData();
+                // 加载游戏数据
+                LoadGameData();
 
-            GD.Print("Game initialized successfully!");
+                GD.Print("Game initialized successfully!");
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"_Ready: Exception during initialization: {ex.Message}");
+                GD.PrintErr($"Stack trace: {ex.StackTrace}");
+            }
         }
 
         /// <summary>
