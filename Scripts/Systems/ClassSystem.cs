@@ -62,11 +62,6 @@ public class ClassData
 }
 
 /// <summary>
-/// ClassSystem - 职业系统
-/// 管理玩家职业选择、职业升级和职业技能解锁
-/// 支持主职业和副职业机制
-/// </summary>
-    /// <summary>
     /// 职业系统单例 - 处理职业数据初始化、经验获取、等级提升和属性计算。
     /// </summary>
     public class ClassSystem : BaseSystem
