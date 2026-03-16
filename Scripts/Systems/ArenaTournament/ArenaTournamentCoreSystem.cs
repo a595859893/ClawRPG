@@ -865,12 +865,55 @@ namespace ClawRPG.Scripts.Systems
 
         private void LoadData()
         {
-            GD.Print("[ArenaTournamentCoreSystem] 数据加载完成");
+            // 尝试从文件加载数据
+            try
+            {
+                var savePath = "user://tournament_save.dat";
+                if (FileAccess.FileExists(savePath))
+                {
+                    using var file = FileAccess.Open(savePath, FileAccess.ModeFlags.Read);
+                    var jsonString = file.GetAsText();
+                    var json = new Json();
+                    var result = json.Parse(jsonString);
+                    if (result == Error.Ok && json.Data is Dictionary data)
+                    {
+                        ImportSaveData(data);
+                        GD.Print("[ArenaTournamentCoreSystem] 数据加载完成");
+                    }
+                    else
+                    {
+                        GD.PrintErr("[ArenaTournamentCoreSystem] 数据解析失败");
+                    }
+                }
+                else
+                {
+                    GD.Print("[ArenaTournamentCoreSystem] 无保存数据，开始新游戏");
+                }
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"[ArenaTournamentCoreSystem] 加载数据时出错: {ex.Message}");
+            }
         }
 
         public void SaveData()
         {
-            GD.Print("[ArenaTournamentCoreSystem] 数据保存完成");
+            try
+            {
+                var savePath = "user://tournament_save.dat";
+                using var file = FileAccess.Open(savePath, FileAccess.ModeFlags.Write);
+                
+                var data = ExportSaveData();
+                var json = new Json();
+                var jsonString = json.Stringify(new Variant(data));
+                
+                file.StoreString(jsonString);
+                GD.Print("[ArenaTournamentCoreSystem] 数据保存完成");
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"[ArenaTournamentCoreSystem] 保存数据时出错: {ex.Message}");
+            }
         }
 
         #endregion
