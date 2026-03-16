@@ -7,7 +7,7 @@ using ClawRPG.Scripts.Database;
 namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
-    /// 竞技场锦标赛系统 - 管理所有锦标赛活动
+    /// 竞技场锦标赛系统 - 管理所有锦标赛活动（整合层）
     /// </summary>
     public class ArenaTournamentSystem : BaseSystem
     {
@@ -15,12 +15,9 @@ namespace ClawRPG.Scripts.Systems
         private static ArenaTournamentSystem _instance;
         public static ArenaTournamentSystem Instance => _instance;
 
-        // 锦标赛存储
-        private Dictionary<string, Tournament> _tournaments = new Dictionary<string, Tournament>();
-        private List<Tournament> _activeTournaments = new List<Tournament>();
-        
-        // 玩家进度
-        private Dictionary<string, TournamentProgress> _playerProgress = new Dictionary<string, TournamentProgress>();
+        // 子系统引用
+        private ArenaTournamentCoreSystem _coreSystem;
+        private ArenaTournamentQueries _queriesSystem;
         
         // 信号
         public signal tournament_created(Tournament tournament);
@@ -40,50 +37,35 @@ namespace ClawRPG.Scripts.Systems
         private void InitializeSystem()
         {
             GD.Print("[ArenaTournamentSystem] 锦标赛系统初始化");
+            
+            // 确保子系统已初始化
+            _coreSystem = ArenaTournamentCoreSystem.Instance;
+            _queriesSystem = ArenaTournamentQueries.Instance;
+            
+            // 订阅核心系统事件用于转发信号
+            SubscribeToCoreEvents();
+            
             LoadData();
         }
 
-        #region Tournament Management
+        private void SubscribeToCoreEvents()
+        {
+            // 核心系统的事件订阅可以在这里添加
+            // 目前使用直接调用方式，信号由本系统发出
+        }
+
+        #region Tournament Management (代理到核心系统)
 
         /// <summary>
         /// 从模板创建锦标赛
         /// </summary>
         public Tournament CreateTournamentFromTemplate(string templateId, string organizerId)
         {
-            var template = ArenaTournamentDatabase.GetTemplate(templateId);
-            if (template == null)
+            var tournament = _coreSystem.CreateTournamentFromTemplate(templateId, organizerId);
+            if (tournament != null)
             {
-                GD.PrintErr($"[ArenaTournamentSystem] 模板不存在: {templateId}");
-                return null;
+                tournament_created?.Emit(tournament);
             }
-
-            var tournament = new Tournament
-            {
-                tournamentId = GenerateTournamentId(),
-                tournamentName = template.name,
-                description = template.description,
-                format = template.format,
-                status = TournamentStatus.Pending,
-                currentStage = TournamentStage.Registration,
-                maxPlayers = template.maxPlayers,
-                minPlayers = template.minPlayers,
-                currentPlayerCount = 0,
-                registrationStart = DateTime.Now,
-                registrationEnd = DateTime.Now.AddSeconds(template.registrationDuration),
-                rounds = template.rounds,
-                currentRound = 0,
-                prizePool = template.prizePool,
-                entryFee = template.entryFee,
-                organizerId = organizerId,
-                createdAt = DateTime.Now,
-                updatedAt = DateTime.Now,
-                rewards = ArenaTournamentDatabase.GetRewardPool(template.maxPlayers)
-            };
-
-            _tournaments[tournament.tournamentId] = tournament;
-            tournament_created?.Emit(tournament);
-            
-            GD.Print($"[ArenaTournamentSystem] 创建锦标赛: {tournament.tournamentName} ({tournament.tournamentId})");
             return tournament;
         }
 
@@ -93,33 +75,12 @@ namespace ClawRPG.Scripts.Systems
         public Tournament CreateCustomTournament(string name, string description, TournamentFormat format, 
             int maxPlayers, int minPlayers, int prizePool, int entryFee, string organizerId)
         {
-            var tournament = new Tournament
+            var tournament = _coreSystem.CreateCustomTournament(name, description, format, 
+                maxPlayers, minPlayers, prizePool, entryFee, organizerId);
+            if (tournament != null)
             {
-                tournamentId = GenerateTournamentId(),
-                tournamentName = name,
-                description = description,
-                format = format,
-                status = TournamentStatus.Pending,
-                currentStage = TournamentStage.Registration,
-                maxPlayers = maxPlayers,
-                minPlayers = minPlayers,
-                currentPlayerCount = 0,
-                registrationStart = DateTime.Now,
-                registrationEnd = DateTime.Now.AddHours(2), // 默认2小时报名
-                rounds = CalculateRounds(format, maxPlayers),
-                currentRound = 0,
-                prizePool = prizePool,
-                entryFee = entryFee,
-                organizerId = organizerId,
-                createdAt = DateTime.Now,
-                updatedAt = DateTime.Now,
-                rewards = ArenaTournamentDatabase.GetRewardPool(maxPlayers)
-            };
-
-            _tournaments[tournament.tournamentId] = tournament;
-            tournament_created?.Emit(tournament);
-            
-            GD.Print($"[ArenaTournamentSystem] 创建自定义锦标赛: {tournament.tournamentName}");
+                tournament_created?.Emit(tournament);
+            }
             return tournament;
         }
 
@@ -128,56 +89,12 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public bool RegisterPlayer(string tournamentId, string playerId, string playerName)
         {
-            if (!_tournaments.ContainsKey(tournamentId))
+            var result = _coreSystem.RegisterPlayer(tournamentId, playerId, playerName);
+            if (result)
             {
-                GD.PrintErr($"[ArenaTournamentSystem] 锦标赛不存在: {tournamentId}");
-                return false;
+                player_registered?.Emit(tournamentId, playerId);
             }
-
-            var tournament = _tournaments[tournamentId];
-            
-            if (tournament.status != TournamentStatus.Pending)
-            {
-                GD.PrintErr($"[ArenaTournamentSystem] 锦标赛无法报名: {tournament.status}");
-                return false;
-            }
-
-            if (DateTime.Now > tournament.registrationEnd)
-            {
-                GD.PrintErr("[ArenaTournamentSystem] 报名已结束");
-                return false;
-            }
-
-            if (tournament.currentPlayerCount >= tournament.maxPlayers)
-            {
-                GD.PrintErr("[ArenaTournamentSystem] 锦标赛已满");
-                return false;
-            }
-
-            // 检查是否已报名
-            if (tournament.registeredPlayers.Any(p => p.playerId == playerId))
-            {
-                GD.PrintErr("[ArenaTournamentSystem] 玩家已报名");
-                return false;
-            }
-
-            // 创建玩家数据
-            var player = new TournamentPlayer
-            {
-                playerId = playerId,
-                playerName = playerName,
-                seedNumber = tournament.currentPlayerCount + 1,
-                registrationTime = DateTime.Now
-            };
-
-            tournament.registeredPlayers.Add(player);
-            tournament.currentPlayerCount++;
-            tournament.updatedAt = DateTime.Now;
-
-            player_registered?.Emit(tournamentId, playerId);
-            
-            GD.Print($"[ArenaTournamentSystem] 玩家 {playerName} 报名锦标赛 {tournament.tournamentName}");
-            return true;
+            return result;
         }
 
         /// <summary>
@@ -185,211 +102,20 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public bool StartTournament(string tournamentId)
         {
-            if (!_tournaments.ContainsKey(tournamentId))
+            var result = _coreSystem.StartTournament(tournamentId);
+            if (result)
             {
-                GD.PrintErr($"[ArenaTournamentSystem] 锦标赛不存在: {tournamentId}");
-                return false;
-            }
-
-            var tournament = _tournaments[tournamentId];
-            
-            if (tournament.currentPlayerCount < tournament.minPlayers)
-            {
-                GD.PrintErr($"[ArenaTournamentSystem] 玩家不足，无法开始 (当前: {tournament.currentPlayerCount}, 最低: {tournament.minPlayers})");
-                return false;
-            }
-
-            // 根据赛制生成比赛
-            GenerateMatches(tournament);
-            
-            tournament.status = TournamentStatus.Active;
-            tournament.startTime = DateTime.Now;
-            tournament.currentStage = TournamentStage.QuarterFinals; // 从淘汰赛开始
-            tournament.currentRound = 1;
-            tournament.updatedAt = DateTime.Now;
-
-            _activeTournaments.Add(tournament);
-            tournament_started?.Emit(tournament);
-            
-            GD.Print($"[ArenaTournamentSystem] 锦标赛 {tournament.tournamentName} 开始!");
-            return true;
-        }
-
-        /// <summary>
-        /// 生成比赛对阵
-        /// </summary>
-        private void GenerateMatches(Tournament tournament)
-        {
-            tournament.matches.Clear();
-            
-            switch (tournament.format)
-            {
-                case TournamentFormat.SingleElimination:
-                    GenerateSingleEliminationMatches(tournament);
-                    break;
-                case TournamentFormat.DoubleElimination:
-                    GenerateDoubleEliminationMatches(tournament);
-                    break;
-                case TournamentFormat.RoundRobin:
-                    GenerateRoundRobinMatches(tournament);
-                    break;
-                case TournamentFormat.SwissSystem:
-                    GenerateSwissMatches(tournament, 1);
-                    break;
-            }
-        }
-
-        private void GenerateSingleEliminationMatches(Tournament tournament)
-        {
-            var players = tournament.registeredPlayers.OrderBy(p => p.seedNumber).ToList();
-            int round = 1;
-            int matchNum = 1;
-            
-            // 洗牌或按种子生成对阵
-            for (int i = 0; i < players.Count - 1; i += 2)
-            {
-                var match = new TournamentMatch
-                {
-                    matchId = $"{tournament.tournamentId}_R{round}_M{matchNum}",
-                    roundNumber = round,
-                    matchNumber = matchNum,
-                    stage = GetStageForRound(tournament.format, round),
-                    player1Id = players[i].playerId,
-                    player2Id = players[i + 1].playerId,
-                    scheduledTime = DateTime.Now.AddMinutes(matchNum * 5)
-                };
-                tournament.matches.Add(match);
-                matchNum++;
-            }
-
-            // 如果玩家数为奇数，有玩家轮空
-            if (players.Count % 2 == 1)
-            {
-                var lastPlayer = players[players.Count - 1];
-                var match = new TournamentMatch
-                {
-                    matchId = $"{tournament.tournamentId}_R{round}_M{matchNum}",
-                    roundNumber = round,
-                    matchNumber = matchNum,
-                    stage = GetStageForRound(tournament.format, round),
-                    player1Id = lastPlayer.playerId,
-                    player2Id = "", // 轮空
-                    winnerId = lastPlayer.playerId,
-                    isCompleted = true,
-                    scheduledTime = DateTime.Now
-                };
-                tournament.matches.Add(match);
-            }
-        }
-
-        private void GenerateDoubleEliminationMatches(Tournament tournament)
-        {
-            // 简化实现：先生成单败，然后在胜者组基础上生成败者组
-            GenerateSingleEliminationMatches(tournament);
-            
-            // 标记为双败赛制
-            foreach (var match in tournament.matches)
-            {
-                match.stage = TournamentStage.GroupStage; // 胜者组第一轮
-            }
-        }
-
-        private void GenerateRoundRobinMatches(Tournament tournament)
-        {
-            var players = tournament.registeredPlayers.OrderBy(p => p.seedNumber).ToList();
-            int matchNum = 1;
-            
-            // 创建小组
-            var group = new TournamentGroup
-            {
-                groupId = $"{tournament.tournamentId}_A",
-                groupName = "A组"
-            };
-            
-            for (int i = 0; i < players.Count; i++)
-            {
-                group.playerIds.Add(players[i].playerId);
+                var tournament = _coreSystem.Tournaments[tournamentId];
+                tournament_started?.Emit(tournament);
                 
-                for (int j = i + 1; j < players.Count; j++)
+                // 发出第一场比赛开始的信号
+                var firstMatch = _queriesSystem.GetCurrentRoundMatches(tournamentId)?.FirstOrDefault();
+                if (firstMatch != null)
                 {
-                    var match = new TournamentMatch
-                    {
-                        matchId = $"{tournament.tournamentId}_RR_{matchNum}",
-                        roundNumber = j - i,
-                        matchNumber = matchNum,
-                        stage = TournamentStage.GroupStage,
-                        player1Id = players[i].playerId,
-                        player2Id = players[j].playerId,
-                        scheduledTime = DateTime.Now.AddMinutes(matchNum * 5)
-                    };
-                    tournament.matches.Add(match);
-                    group.matches.Add(match);
-                    matchNum++;
+                    match_started?.Emit(firstMatch);
                 }
             }
-            
-            tournament.groups.Add(group);
-        }
-
-        private void GenerateSwissMatches(Tournament tournament, int round)
-        {
-            var players = tournament.registeredPlayers
-                .Where(p => !p.isEliminated)
-                .OrderByDescending(p => p.score)
-                .ThenBy(p => p.seedNumber)
-                .ToList();
-            
-            int matchNum = 1;
-            
-            for (int i = 0; i < players.Count - 1; i += 2)
-            {
-                // 避免重复对战
-                var player1 = players[i];
-                var player2 = players[i + 1];
-                
-                var match = new TournamentMatch
-                {
-                    matchId = $"{tournament.tournamentId}_S{round}_M{matchNum}",
-                    roundNumber = round,
-                    matchNumber = matchNum,
-                    stage = TournamentStage.GroupStage,
-                    player1Id = player1.playerId,
-                    player2Id = player2.playerId,
-                    scheduledTime = DateTime.Now.AddMinutes(matchNum * 5)
-                };
-                tournament.matches.Add(match);
-                matchNum++;
-            }
-            
-            // 轮空处理
-            if (players.Count % 2 == 1)
-            {
-                var lastPlayer = players[players.Count - 1];
-                var match = new TournamentMatch
-                {
-                    matchId = $"{tournament.tournamentId}_S{round}_M{matchNum}",
-                    roundNumber = round,
-                    matchNumber = matchNum,
-                    stage = TournamentStage.GroupStage,
-                    player1Id = lastPlayer.playerId,
-                    player2Id = "",
-                    winnerId = lastPlayer.playerId,
-                    isCompleted = true,
-                    scheduledTime = DateTime.Now
-                };
-                tournament.matches.Add(match);
-            }
-        }
-
-        private TournamentStage GetStageForRound(TournamentFormat format, int round)
-        {
-            return round switch
-            {
-                1 => TournamentStage.QuarterFinals,
-                2 => TournamentStage.SemiFinals,
-                3 => TournamentStage.Finals,
-                _ => TournamentStage.GroupStage
-            };
+            return result;
         }
 
         /// <summary>
@@ -397,315 +123,47 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public bool ReportMatchResult(string matchId, string winnerId, int winnerScore, int loserScore)
         {
-            TournamentMatch match = null;
-            Tournament tournament = null;
-            
-            foreach (var t in _tournaments.Values)
+            var result = _coreSystem.ReportMatchResult(matchId, winnerId, winnerScore, loserScore);
+            if (result)
             {
-                var m = t.matches.FirstOrDefault(x => x.matchId == matchId);
-                if (m != null)
+                var match = _queriesSystem.GetMatch(matchId);
+                if (match != null)
                 {
-                    match = m;
-                    tournament = t;
-                    break;
-                }
-            }
-            
-            if (match == null)
-            {
-                GD.PrintErr($"[ArenaTournamentSystem] 比赛不存在: {matchId}");
-                return false;
-            }
-            
-            if (match.isCompleted)
-            {
-                GD.PrintErr("[ArenaTournamentSystem] 比赛已完成");
-                return false;
-            }
-            
-            // 验证胜者是参赛者
-            if (winnerId != match.player1Id && winnerId != match.player2Id)
-            {
-                GD.PrintErr("[ArenaTournamentSystem] 无效的胜者");
-                return false;
-            }
-            
-            string loserId = winnerId == match.player1Id ? match.player2Id : match.player1Id;
-            
-            // 更新比赛结果
-            match.winnerId = winnerId;
-            match.isCompleted = true;
-            match.completedTime = DateTime.Now;
-            
-            if (winnerId == match.player1Id)
-            {
-                match.player1Score = winnerScore;
-                match.player2Score = loserScore;
-            }
-            else
-            {
-                match.player1Score = loserScore;
-                match.player2Score = winnerScore;
-            }
-            
-            // 更新玩家统计
-            var winner = tournament.registeredPlayers.FirstOrDefault(p => p.playerId == winnerId);
-            var loser = tournament.registeredPlayers.FirstOrDefault(p => p.playerId == loserId);
-            
-            if (winner != null)
-            {
-                winner.wins++;
-                winner.matchesPlayed++;
-                winner.score += 3; // 胜3分
-                winner.matchHistory.Add(matchId);
-            }
-            
-            if (loser != null)
-            {
-                loser.losses++;
-                loser.matchesPlayed++;
-                loser.matchHistory.Add(matchId);
-            }
-            
-            // 检查是否需要淘汰
-            if (tournament.format == TournamentFormat.SingleElimination && loser != null)
-            {
-                loser.isEliminated = true;
-            }
-            else if (tournament.format == TournamentFormat.DoubleElimination && loser != null)
-            {
-                if (loser.hasLostOnce)
-                {
-                    loser.isEliminated = true;
-                }
-                else
-                {
-                    loser.hasLostOnce = true;
-                }
-            }
-            
-            // 检查阶段完成
-            CheckStageCompletion(tournament, match.stage);
-            
-            match_completed?.Emit(match);
-            
-            GD.Print($"[ArenaTournamentSystem] 比赛 {matchId} 完成，胜者: {winnerId}");
-            return true;
-        }
-
-        private void CheckStageCompletion(Tournament tournament, TournamentStage stage)
-        {
-            var stageMatches = tournament.matches
-                .Where(m => m.stage == stage && m.roundNumber == tournament.currentRound)
-                .ToList();
-            
-            if (stageMatches.All(m => m.isCompleted))
-            {
-                stage_completed?.Emit(tournament, stage);
-                
-                // 检查是否需要进入下一阶段
-                if (stage == TournamentStage.Finals)
-                {
-                    CompleteTournament(tournament);
-                }
-                else if (tournament.format == TournamentFormat.SwissSystem && 
-                         tournament.currentRound < tournament.rounds)
-                {
-                    // 瑞士制进入下一轮
-                    GenerateSwissMatches(tournament, tournament.currentRound + 1);
-                    tournament.currentRound++;
-                }
-                else
-                {
-                    // 淘汰赛进入下一阶段
-                    AdvanceToNextStage(tournament);
-                }
-            }
-        }
-
-        private void AdvanceToNextStage(Tournament tournament)
-        {
-            var currentStage = tournament.currentStage;
-            TournamentStage nextStage;
-            
-            switch (currentStage)
-            {
-                case TournamentStage.QuarterFinals:
-                    nextStage = TournamentStage.SemiFinals;
-                    break;
-                case TournamentStage.SemiFinals:
-                    nextStage = TournamentStage.Finals;
-                    break;
-                case TournamentStage.Finals:
-                    return; // 决赛不需要进入下一阶段
-                default:
-                    return;
-            }
-            
-            tournament.currentStage = nextStage;
-            tournament.currentRound++;
-            
-            // 生成下一阶段比赛
-            GenerateNextStageMatches(tournament);
-        }
-
-        private void GenerateNextStageMatches(Tournament tournament)
-        {
-            var winners = tournament.matches
-                .Where(m => m.stage == tournament.currentStage - 1 && m.isCompleted)
-                .Select(m => m.winnerId)
-                .ToList();
-            
-            int matchNum = 1;
-            for (int i = 0; i < winners.Count - 1; i += 2)
-            {
-                var match = new TournamentMatch
-                {
-                    matchId = $"{tournament.tournamentId}_S{(int)tournament.currentStage}_M{matchNum}",
-                    roundNumber = tournament.currentRound,
-                    matchNumber = matchNum,
-                    stage = tournament.currentStage,
-                    player1Id = winners[i],
-                    player2Id = winners[i + 1],
-                    scheduledTime = DateTime.Now.AddMinutes(matchNum * 10)
-                };
-                tournament.matches.Add(match);
-                matchNum++;
-            }
-        }
-
-        /// <summary>
-        /// 完成锦标赛
-        /// </summary>
-        private void CompleteTournament(Tournament tournament)
-        {
-            tournament.status = TournamentStatus.Completed;
-            tournament.currentStage = TournamentStage.Completed;
-            tournament.endTime = DateTime.Now;
-            
-            // 计算排名
-            var rankings = tournament.registeredPlayers
-                .OrderByDescending(p => p.score)
-                .ThenByDescending(p => p.wins)
-                .ToList();
-            
-            for (int i = 0; i < rankings.Count; i++)
-            {
-                rankings[i].score = i + 1; // 临时用作排名
-            }
-            
-            // 发放奖励
-            DistributeRewards(tournament);
-            
-            // 更新玩家记录
-            foreach (var player in tournament.registeredPlayers)
-            {
-                UpdatePlayerRecord(tournament, player);
-            }
-            
-            _activeTournaments.Remove(tournament);
-            tournament_completed?.Emit(tournament);
-            
-            GD.Print($"[ArenaTournamentSystem] 锦标赛 {tournament.tournamentName} 结束!");
-        }
-
-        private void DistributeRewards(Tournament tournament)
-        {
-            var rankings = tournament.registeredPlayers
-                .OrderByDescending(p => p.score)
-                .ThenByDescending(p => p.wins)
-                .ToList();
-            
-            for (int i = 0; i < rankings.Count; i++)
-            {
-                int rank = i + 1;
-                var player = rankings[i];
-                
-                foreach (var reward in tournament.rewards)
-                {
-                    if (rank >= reward.rankStart && rank <= reward.rankEnd)
+                    match_completed?.Emit(match);
+                    
+                    // 检查是否完成锦标赛
+                    var tournament = _coreSystem.Tournaments.Values.FirstOrDefault(t => t.matches.Any(m => m.matchId == matchId));
+                    if (tournament != null && tournament.status == TournamentStatus.Completed)
                     {
-                        // 发放奖励 (实际实现需要与经济系统集成)
-                        GD.Print($"[ArenaTournamentSystem] 玩家 {player.playerName} 获得排名 {rank} 奖励: {reward.rewardType} x{reward.rewardAmount}");
+                        tournament_completed?.Emit(tournament);
                     }
                 }
             }
+            return result;
         }
 
-        private void UpdatePlayerRecord(Tournament tournament, TournamentPlayer player)
+        /// <summary>
+        /// 生成比赛对阵
+        /// </summary>
+        public void GenerateMatches(string tournamentId)
         {
-            var rankings = tournament.registeredPlayers
-                .OrderByDescending(p => p.score)
-                .ThenByDescending(p => p.wins)
-                .ToList();
-            
-            int rank = rankings.FindIndex(p => p.playerId == player.playerId) + 1;
-            
-            if (!_playerProgress.ContainsKey(player.playerId))
+            var tournament = _coreSystem.Tournaments[tournamentId];
+            if (tournament != null)
             {
-                _playerProgress[player.playerId] = new TournamentProgress
-                {
-                    playerId = player.playerId,
-                    statistics = new TournamentStatistics { playerId = player.playerId }
-                };
+                _coreSystem.GenerateMatches(tournament);
             }
-            
-            var progress = _playerProgress[player.playerId];
-            
-            progress.participatedTournaments.Add(tournament.tournamentId);
-            
-            var record = new PlayerTournamentRecord
-            {
-                playerId = player.playerId,
-                tournamentId = tournament.tournamentId,
-                tournamentName = tournament.tournamentName,
-                finalRank = rank,
-                score = player.score,
-                wins = player.wins,
-                losses = player.losses,
-                participatedAt = DateTime.Now
-            };
-            
-            progress.recentRecords.Insert(0, record);
-            if (progress.recentRecords.Count > 10)
-            {
-                progress.recentRecords.RemoveAt(progress.recentRecords.Count - 1);
-            }
-            
-            // 更新统计
-            var stats = progress.statistics;
-            stats.totalTournaments++;
-            stats.totalWins += player.wins;
-            stats.totalLosses += player.losses;
-            
-            if (rank == 1) stats.firstPlace++;
-            else if (rank == 2) stats.secondPlace++;
-            else if (rank == 3) stats.thirdPlace++;
-            else if (rank <= 4) stats.top4++;
-            else if (rank <= 8) stats.top8++;
-            else if (rank <= 16) stats.top16++;
-            
-            if (stats.highestRank == 0 || rank < stats.highestRank)
-            {
-                stats.highestRank = rank;
-            }
-            
-            stats.totalPrizeWon += tournament.prizePool / tournament.currentPlayerCount;
         }
 
         #endregion
 
-        #region Queries
+        #region Queries (代理到查询系统)
 
         /// <summary>
         /// 获取所有可报名的锦标赛
         /// </summary>
         public List<Tournament> GetAvailableTournaments()
         {
-            return _tournaments.Values
-                .Where(t => t.status == TournamentStatus.Pending && DateTime.Now <= t.registrationEnd)
-                .OrderBy(t => t.registrationEnd)
-                .ToList();
+            return _queriesSystem.GetAvailableTournaments();
         }
 
         /// <summary>
@@ -713,7 +171,39 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public List<Tournament> GetActiveTournaments()
         {
-            return _activeTournaments.ToList();
+            return _queriesSystem.GetActiveTournaments();
+        }
+
+        /// <summary>
+        /// 获取已完成的锦标赛
+        /// </summary>
+        public List<Tournament> GetCompletedTournaments()
+        {
+            return _queriesSystem.GetCompletedTournaments();
+        }
+
+        /// <summary>
+        /// 获取玩家可报名的锦标赛
+        /// </summary>
+        public List<Tournament> GetJoinableTournamentsForPlayer(string playerId)
+        {
+            return _queriesSystem.GetJoinableTournamentsForPlayer(playerId);
+        }
+
+        /// <summary>
+        /// 获取玩家已报名的锦标赛
+        /// </summary>
+        public List<Tournament> GetRegisteredTournaments(string playerId)
+        {
+            return _queriesSystem.GetRegisteredTournaments(playerId);
+        }
+
+        /// <summary>
+        /// 获取玩家正在参加的锦标赛
+        /// </summary>
+        public List<Tournament> GetPlayerActiveTournaments(string playerId)
+        {
+            return _queriesSystem.GetPlayerActiveTournaments(playerId);
         }
 
         /// <summary>
@@ -721,7 +211,31 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public Tournament GetTournament(string tournamentId)
         {
-            return _tournaments.ContainsKey(tournamentId) ? _tournaments[tournamentId] : null;
+            return _queriesSystem.GetTournament(tournamentId);
+        }
+
+        /// <summary>
+        /// 获取锦标赛参赛玩家
+        /// </summary>
+        public List<TournamentPlayer> GetTournamentPlayers(string tournamentId)
+        {
+            return _queriesSystem.GetTournamentPlayers(tournamentId);
+        }
+
+        /// <summary>
+        /// 获取锦标赛比赛列表
+        /// </summary>
+        public List<TournamentMatch> GetTournamentMatches(string tournamentId)
+        {
+            return _queriesSystem.GetTournamentMatches(tournamentId);
+        }
+
+        /// <summary>
+        /// 获取锦标赛当前轮次的比赛
+        /// </summary>
+        public List<TournamentMatch> GetCurrentRoundMatches(string tournamentId)
+        {
+            return _queriesSystem.GetCurrentRoundMatches(tournamentId);
         }
 
         /// <summary>
@@ -729,15 +243,23 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public TournamentMatch GetPlayerNextMatch(string tournamentId, string playerId)
         {
-            if (!_tournaments.ContainsKey(tournamentId))
-                return null;
-            
-            var tournament = _tournaments[tournamentId];
-            return tournament.matches
-                .Where(m => !m.isCompleted && 
-                           (m.player1Id == playerId || m.player2Id == playerId))
-                .OrderBy(m => m.scheduledTime)
-                .FirstOrDefault();
+            return _queriesSystem.GetPlayerNextMatch(tournamentId, playerId);
+        }
+
+        /// <summary>
+        /// 获取玩家的所有比赛
+        /// </summary>
+        public List<TournamentMatch> GetPlayerMatches(string tournamentId, string playerId)
+        {
+            return _queriesSystem.GetPlayerMatches(tournamentId, playerId);
+        }
+
+        /// <summary>
+        /// 获取比赛详情
+        /// </summary>
+        public TournamentMatch GetMatch(string matchId)
+        {
+            return _queriesSystem.GetMatch(matchId);
         }
 
         /// <summary>
@@ -745,7 +267,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public TournamentProgress GetPlayerProgress(string playerId)
         {
-            return _playerProgress.ContainsKey(playerId) ? _playerProgress[playerId] : null;
+            return _queriesSystem.GetPlayerProgress(playerId);
         }
 
         /// <summary>
@@ -753,8 +275,55 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public TournamentStatistics GetPlayerStatistics(string playerId)
         {
-            var progress = GetPlayerProgress(playerId);
-            return progress?.statistics;
+            return _queriesSystem.GetPlayerStatistics(playerId);
+        }
+
+        /// <summary>
+        /// 获取玩家历史记录
+        /// </summary>
+        public List<PlayerTournamentRecord> GetPlayerHistory(string playerId)
+        {
+            return _queriesSystem.GetPlayerHistory(playerId);
+        }
+
+        /// <summary>
+        /// 获取玩家参加的锦标赛数量
+        /// </summary>
+        public int GetPlayerTournamentCount(string playerId)
+        {
+            return _queriesSystem.GetPlayerTournamentCount(playerId);
+        }
+
+        /// <summary>
+        /// 获取玩家排名
+        /// </summary>
+        public int GetPlayerGlobalRank(string playerId)
+        {
+            return _queriesSystem.GetPlayerGlobalRank(playerId);
+        }
+
+        /// <summary>
+        /// 检查玩家是否在锦标赛中
+        /// </summary>
+        public bool IsPlayerInTournament(string tournamentId, string playerId)
+        {
+            return _queriesSystem.IsPlayerInTournament(tournamentId, playerId);
+        }
+
+        /// <summary>
+        /// 获取玩家在锦标赛中的信息
+        /// </summary>
+        public TournamentPlayer GetPlayerInTournament(string tournamentId, string playerId)
+        {
+            return _queriesSystem.GetPlayerInTournament(tournamentId, playerId);
+        }
+
+        /// <summary>
+        /// 获取锦标赛玩家排名
+        /// </summary>
+        public List<TournamentPlayer> GetTournamentRankings(string tournamentId)
+        {
+            return _queriesSystem.GetTournamentRankings(tournamentId);
         }
 
         /// <summary>
@@ -762,37 +331,45 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public List<TournamentTemplate> GetTemplates()
         {
-            return ArenaTournamentDatabase.GetAllTemplates();
+            return _queriesSystem.GetTemplates();
+        }
+
+        /// <summary>
+        /// 获取特定模板
+        /// </summary>
+        public TournamentTemplate GetTemplate(string templateId)
+        {
+            return _queriesSystem.GetTemplate(templateId);
+        }
+
+        /// <summary>
+        /// 获取适合玩家数量的模板
+        /// </summary>
+        public List<TournamentTemplate> GetTemplatesForPlayerCount(int playerCount)
+        {
+            return _queriesSystem.GetTemplatesForPlayerCount(playerCount);
+        }
+
+        /// <summary>
+        /// 获取特定赛制的模板
+        /// </summary>
+        public List<TournamentTemplate> GetTemplatesByFormat(TournamentFormat format)
+        {
+            return _queriesSystem.GetTemplatesByFormat(format);
         }
 
         #endregion
 
-        #region Helpers
-
-        private string GenerateTournamentId()
-        {
-            return $"T_{DateTime.Now:yyyyMMddHHmmss}_{GD.Randomi(1000, 9999)}";
-        }
-
-        private int CalculateRounds(TournamentFormat format, int playerCount)
-        {
-            var config = ArenaTournamentDatabase.GetFormatConfig(format);
-            if (config != null)
-            {
-                return (int)Math.Ceiling(Math.Log(playerCount, 2));
-            }
-            return 4;
-        }
+        #region Data Management
 
         private void LoadData()
         {
-            // 实际实现需要从存档加载数据
             GD.Print("[ArenaTournamentSystem] 数据加载完成");
         }
 
         public void SaveData()
         {
-            // 实际实现需要保存数据到存档
+            _coreSystem.SaveData();
             GD.Print("[ArenaTournamentSystem] 数据保存完成");
         }
 
@@ -803,7 +380,7 @@ namespace ClawRPG.Scripts.Systems
         public override Dictionary<string, object> ExportSaveData()
         {
             var tournamentsData = new List<Dictionary<string, object>>();
-            foreach (var kvp in _tournaments)
+            foreach (var kvp in _coreSystem.Tournaments)
             {
                 tournamentsData.Add(new Dictionary<string, object>
                 {
@@ -823,7 +400,7 @@ namespace ClawRPG.Scripts.Systems
             }
 
             var progressData = new List<Dictionary<string, object>>();
-            foreach (var kvp in _playerProgress)
+            foreach (var kvp in _coreSystem.PlayerProgress)
             {
                 progressData.Add(new Dictionary<string, object>
                 {
@@ -864,7 +441,7 @@ namespace ClawRPG.Scripts.Systems
                         prizePool = Convert.ToInt32(tData["prizePool"]),
                         entryFee = Convert.ToInt32(tData["entryFee"])
                     };
-                    _tournaments[tournament.tournamentId] = tournament;
+                    _coreSystem.Tournaments[tournament.tournamentId] = tournament;
                 }
             }
 
@@ -881,7 +458,7 @@ namespace ClawRPG.Scripts.Systems
                         losses = Convert.ToInt32(pData["losses"]),
                         totalPoints = Convert.ToInt32(pData["totalPoints"])
                     };
-                    _playerProgress[progress.playerId] = progress;
+                    _coreSystem.PlayerProgress[progress.playerId] = progress;
                 }
             }
 
