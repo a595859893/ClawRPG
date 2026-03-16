@@ -27,9 +27,6 @@ public partial class DailyPuzzleUI : Control
         // Create UI
         CreateUI();
         
-        // Initialize system
-        DailyPuzzleSystem.Initialize();
-        
         // Load today's puzzle
         LoadDailyPuzzle();
     }
@@ -52,7 +49,7 @@ public partial class DailyPuzzleUI : Control
         
         // Streak info
         _streakLabel = new Label();
-        _streakLabel.Text = $"🔥 Streak: {DailyPuzzleSystem.GetCurrentStreak()} | Best: {DailyPuzzleSystem.GetBestStreak()}";
+        _streakLabel.Text = $"🔥 Streak: {DailyPuzzleSystem.Instance.GetCurrentStreak()} | Best: {DailyPuzzleSystem.Instance.GetBestStreak()}";
         _streakLabel.HorizontalAlignment = HorizontalAlignment.Center;
         mainContainer.AddChild(_streakLabel);
         
@@ -118,7 +115,7 @@ public partial class DailyPuzzleUI : Control
         
         // Statistics
         _statsLabel = new Label();
-        _statsLabel.Text = $"Total Solved: {DailyPuzzleSystem.GetTotalSolved()}";
+        _statsLabel.Text = $"Total Solved: {DailyPuzzleSystem.Instance.GetTotalSolved()}";
         _statsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _resultContainer.AddChild(_statsLabel);
         
@@ -137,7 +134,7 @@ public partial class DailyPuzzleUI : Control
     
     private void LoadDailyPuzzle()
     {
-        var puzzle = DailyPuzzleSystem.GetDailyPuzzle();
+        var puzzle = DailyPuzzleSystem.Instance.GetDailyPuzzle();
         if (puzzle == null)
         {
             _puzzleLabel.Text = "No puzzle available";
@@ -145,7 +142,7 @@ public partial class DailyPuzzleUI : Control
         }
         
         // Check if already solved
-        if (DailyPuzzleSystem.IsTodayPuzzleSolved())
+        if (DailyPuzzleSystem.Instance.IsTodayPuzzleSolved())
         {
             ShowAlreadySolved();
             return;
@@ -184,13 +181,13 @@ public partial class DailyPuzzleUI : Control
         _resultLabel.Text = "✅ Today's Puzzle Solved!";
         _resultLabel.Modulate = new Color(0, 1, 0); // Green
         
-        var stats = DailyPuzzleSystem.GetStatistics();
-        if (stats.SolvedPuzzles.TryGetValue(DailyPuzzleSystem.GetCurrentPuzzleId(), out var record))
+        var stats = DailyPuzzleSystem.Instance.GetStatistics();
+        if (stats.SolvedPuzzles.TryGetValue(DailyPuzzleSystem.Instance.GetCurrentPuzzleId(), out var record))
         {
             _statsLabel.Text = $"Gold: {record.GoldEarned} | Exp: {record.ExpEarned}\nTime: {record.TimeTakenSeconds}s | Hints: {record.HintsUsed}";
         }
         
-        _streakLabel.Text = $"🔥 Streak: {DailyPuzzleSystem.GetCurrentStreak()} | Best: {DailyPuzzleSystem.GetBestStreak()}";
+        _streakLabel.Text = $"🔥 Streak: {DailyPuzzleSystem.Instance.GetCurrentStreak()} | Best: {DailyPuzzleSystem.Instance.GetBestStreak()}";
     }
     
     private void OnAnswerSubmitted(string text)
@@ -208,11 +205,11 @@ public partial class DailyPuzzleUI : Control
         _timer.Stop();
         
         // Calculate time taken
-        var puzzle = DailyPuzzleSystem.GetDailyPuzzle();
+        var puzzle = DailyPuzzleSystem.Instance.GetDailyPuzzle();
         int timeTaken = puzzle.TimeLimit - _timeRemaining;
         
         // Solve puzzle
-        var record = DailyPuzzleSystem.SolvePuzzle(_answerInput.Text, timeTaken, _hintsUsed);
+        var record = DailyPuzzleSystem.Instance.SolvePuzzle(_answerInput.Text, timeTaken, _hintsUsed);
         
         if (record != null)
         {
@@ -235,12 +232,12 @@ public partial class DailyPuzzleUI : Control
         }
         
         // Update streak
-        _streakLabel.Text = $"🔥 Streak: {DailyPuzzleSystem.GetCurrentStreak()} | Best: {DailyPuzzleSystem.GetBestStreak()}";
+        _streakLabel.Text = $"🔥 Streak: {DailyPuzzleSystem.Instance.GetCurrentStreak()} | Best: {DailyPuzzleSystem.Instance.GetBestStreak()}";
     }
     
     private void OnHintPressed()
     {
-        string hint = DailyPuzzleSystem.GetHint();
+        string hint = DailyPuzzleSystem.Instance.GetHint();
         if (hint != "")
         {
             _hintLabel.Text = "💡 " + hint;
@@ -263,7 +260,7 @@ public partial class DailyPuzzleUI : Control
             _timer.Stop();
             
             // Time's up - record as failed
-            DailyPuzzleSystem.SolvePuzzle("", 999, _hintsUsed);
+            DailyPuzzleSystem.Instance.SolvePuzzle("", 999, _hintsUsed);
             
             _resultLabel.Text = "⏰ Time's Up!";
             _resultLabel.Modulate = new Color(1, 0.5, 0); // Orange
