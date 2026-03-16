@@ -1,50 +1,32 @@
 using Godot;
 using System;
-using System.Collections.Generic;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
-    /// Combat Stats Panel Components - UI element creation
-    /// Handles all UI element creation and styling
+    /// UI Components for CombatStatsPanel
+    /// Handles creation and styling of all UI elements
     /// </summary>
-    public partial class CombatStatsPanel : Control
+    public class CombatStatsPanelComponents
     {
-        // Stats labels
-        private Label _damageDealtLabel;
-        private Label _damageTakenLabel;
-        private Label _killsLabel;
-        private Label _combatTimeLabel;
-        private Label _dodgesLabel;
-        private Label _blocksLabel;
-        private Label _critsLabel;
-        private Label _comboLabel;
+        private readonly Control _owner;
         
-        // Rating components
-        private PanelContainer _ratingPanel;
-        private Label _ratingLabel;
-        private Label _ratingDetailLabel;
+        // Rating panel references (exposed to owner)
+        public PanelContainer RatingPanel { get; private set; }
+        public Label RatingLabel { get; private set; }
+        public Label RatingDetailLabel { get; private set; }
         
-        // UI containers
-        private PanelContainer _mainPanel;
-        private VBoxContainer _statsContainer;
-        
-        // Animation
-        private Tween _pulseTween;
-        
-        #region UI Setup
-        
-        private void SetupUI()
+        public CombatStatsPanelComponents(Control owner)
         {
-            Name = "CombatStatsPanel";
-            AnchorRight = 0f;
-            AnchorBottom = 0f;
-            OffsetLeft = 20;
-            OffsetTop = 300;
-            OffsetRight = 220;
-            OffsetBottom = 550;
-            
+            _owner = owner;
+        }
+        
+        /// <summary>
+        /// Setup the main panel and stats container
+        /// </summary>
+        public void SetupMainPanel(out PanelContainer mainPanel, out VBoxContainer statsContainer)
+        {
             // Main panel
-            _mainPanel = new PanelContainer
+            mainPanel = new PanelContainer
             {
                 Name = "MainPanel",
                 AnchorRight = 1f,
@@ -54,7 +36,6 @@ namespace ClawRPG.Scripts.UI {
                 OffsetRight = 0,
                 OffsetBottom = 0
             };
-            AddChild(_mainPanel);
             
             // Style
             var panelStyle = new StyleBoxFlat();
@@ -68,10 +49,10 @@ namespace ClawRPG.Scripts.UI {
             panelStyle.BorderWidthRight = 2;
             panelStyle.BorderWidthBottom = 2;
             panelStyle.BorderColor = new Color(0.4f, 0.3f, 0.2f, 0.8f);
-            _mainPanel.AddThemeStyleBoxOverride("panel", panelStyle);
+            mainPanel.AddThemeStyleBoxOverride("panel", panelStyle);
             
             // Stats container
-            _statsContainer = new VBoxContainer
+            statsContainer = new VBoxContainer
             {
                 Name = "StatsContainer",
                 AnchorRight = 1f,
@@ -82,7 +63,7 @@ namespace ClawRPG.Scripts.UI {
                 OffsetBottom = -10,
                 Theme = CreateTheme()
             };
-            _mainPanel.AddChild(_statsContainer);
+            mainPanel.AddChild(statsContainer);
             
             // Title
             var titleLabel = new Label
@@ -93,28 +74,18 @@ namespace ClawRPG.Scripts.UI {
             };
             titleLabel.AddThemeFontSizeOverride("font_size", 18);
             titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.4f, 1f));
-            _statsContainer.AddChild(titleLabel);
+            statsContainer.AddChild(titleLabel);
             
             // Separator
-            AddSeparator();
-            
-            // Create stat rows
-            _damageDealtLabel = AddStatRow("造成伤害", "0", new Color(1f, 0.4f, 0.4f, 1f));
-            _damageTakenLabel = AddStatRow("受到伤害", "0", new Color(0.4f, 0.6f, 1f, 1f));
-            _killsLabel = AddStatRow("击杀敌人", "0", new Color(0.4f, 1f, 0.5f, 1f));
-            _combatTimeLabel = AddStatRow("战斗时间", "0:00", new Color(1f, 0.9f, 0.5f, 1f));
-            _dodgesLabel = AddStatRow("闪避次数", "0", new Color(0.5f, 0.8f, 1f, 1f));
-            _blocksLabel = AddStatRow("格挡次数", "0", new Color(0.8f, 0.6f, 1f, 1f));
-            _critsLabel = AddStatRow("暴击次数", "0", new Color(1f, 0.5f, 0.8f, 1f));
-            _comboLabel = AddStatRow("最高连击", "0", new Color(1f, 0.85f, 0.2f, 1f));
-            
-            // Rating panel (initially hidden)
-            SetupRatingPanel();
+            AddSeparator(statsContainer);
         }
         
-        private void SetupRatingPanel()
+        /// <summary>
+        /// Setup the rating panel (shown after combat)
+        /// </summary>
+        public void SetupRatingPanel()
         {
-            _ratingPanel = new PanelContainer
+            RatingPanel = new PanelContainer
             {
                 Name = "RatingPanel",
                 Visible = false,
@@ -134,7 +105,7 @@ namespace ClawRPG.Scripts.UI {
             ratingStyle.BorderWidthTop = 3;
             ratingStyle.BorderWidthRight = 3;
             ratingStyle.BorderWidthBottom = 3;
-            _ratingPanel.AddThemeStyleBoxOverride("panel", ratingStyle);
+            RatingPanel.AddThemeStyleBoxOverride("panel", ratingStyle);
             
             var ratingContainer = new VBoxContainer
             {
@@ -144,31 +115,34 @@ namespace ClawRPG.Scripts.UI {
                 OffsetRight = -15,
                 OffsetBottom = -15
             };
-            _ratingPanel.AddChild(ratingContainer);
+            RatingPanel.AddChild(ratingContainer);
             
-            _ratingLabel = new Label
+            RatingLabel = new Label
             {
                 Text = "S",
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            _ratingLabel.AddThemeFontSizeOverride("font_size", 48);
-            _ratingLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f, 1f));
-            ratingContainer.AddChild(_ratingLabel);
+            RatingLabel.AddThemeFontSizeOverride("font_size", 48);
+            RatingLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f, 1f));
+            ratingContainer.AddChild(RatingLabel);
             
-            _ratingDetailLabel = new Label
+            RatingDetailLabel = new Label
             {
                 Text = "完美表现！",
                 HorizontalAlignment = HorizontalAlignment.Center
             };
-            _ratingDetailLabel.AddThemeFontSizeOverride("font_size", 14);
-            _ratingDetailLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
-            ratingContainer.AddChild(_ratingDetailLabel);
+            RatingDetailLabel.AddThemeFontSizeOverride("font_size", 14);
+            RatingDetailLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
+            ratingContainer.AddChild(RatingDetailLabel);
             
-            // Add as overlay
-            AddChild(_ratingPanel);
+            // Add as overlay to owner
+            _owner.AddChild(RatingPanel);
         }
         
+        /// <summary>
+        /// Create a theme for the stats container
+        /// </summary>
         private Theme CreateTheme()
         {
             var theme = new Theme();
@@ -176,14 +150,17 @@ namespace ClawRPG.Scripts.UI {
             return theme;
         }
         
-        private Label AddStatRow(string label, string value, Color valueColor)
+        /// <summary>
+        /// Add a stat row with label and value
+        /// </summary>
+        public Label AddStatRow(VBoxContainer container, string label, string value, Color valueColor)
         {
-            var container = new HBoxContainer
+            var rowContainer = new HBoxContainer
             {
                 Alignment = BoxContainer.AlignmentMode.Center,
                 CustomMinimumHeight = 24
             };
-            _statsContainer.AddChild(container);
+            container.AddChild(rowContainer);
             
             var labelControl = new Label
             {
@@ -193,7 +170,7 @@ namespace ClawRPG.Scripts.UI {
             };
             labelControl.AddThemeFontSizeOverride("font_size", 13);
             labelControl.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f, 1f));
-            container.AddChild(labelControl);
+            rowContainer.AddChild(labelControl);
             
             var valueControl = new Label
             {
@@ -203,21 +180,22 @@ namespace ClawRPG.Scripts.UI {
             };
             valueControl.AddThemeFontSizeOverride("font_size", 14);
             valueControl.AddThemeColorOverride("font_color", valueColor);
-            container.AddChild(valueControl);
+            rowContainer.AddChild(valueControl);
             
             return valueControl;
         }
         
-        private void AddSeparator()
+        /// <summary>
+        /// Add a separator between sections
+        /// </summary>
+        public void AddSeparator(VBoxContainer container)
         {
             var separator = new HSeparator
             {
                 Modulate = new Color(0.4f, 0.3f, 0.2f, 0.5f),
                 CustomMinimumHeight = 1
             };
-            _statsContainer.AddChild(separator);
+            container.AddChild(separator);
         }
-        
-        #endregion
     }
 }
