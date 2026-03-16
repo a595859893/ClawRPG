@@ -316,18 +316,78 @@ public class PlayerTalentSystem : BaseSystem
     }
 
     /// <summary>
-    /// 导出保存数据（供 SaveSystem 调用）
+    /// 导出保存数据 - 继承自 BaseSystem
     /// </summary>
-    public Dictionary ExportSaveData()
+    public override Dictionary ExportSaveData()
     {
-        return GetSaveData();
+        var data = new Dictionary();
+        data["unlocked_talents"] = new Godot.Collections.Array(PlayerData.UnlockedTalents);
+        data["total_points_spent"] = PlayerData.TotalPointsSpent;
+        data["available_points"] = _availablePoints;
+        
+        var treePoints = new Dictionary();
+        foreach (var kvp in PlayerData.TreePoints)
+            treePoints[kvp.Key.ToString()] = kvp.Value;
+        data["tree_points"] = treePoints;
+        
+        var unlockedTrees = new Dictionary();
+        foreach (var kvp in PlayerData.UnlockedTrees)
+            unlockedTrees[kvp.Key.ToString()] = kvp.Value;
+        data["unlocked_trees"] = unlockedTrees;
+        
+        return data;
     }
 
     /// <summary>
-    /// 导入保存数据（供 SaveSystem 调用）
+    /// 导入保存数据 - 继承自 BaseSystem
     /// </summary>
-    public void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary data)
     {
-        LoadSaveData(data);
+        if (data == null) return;
+        
+        if (data.Contains("unlocked_talents"))
+        {
+            var talents = (Godot.Collections.Array)data["unlocked_talents"];
+            PlayerData.UnlockedTalents = new HashSet<string>();
+            foreach (var t in talents)
+            {
+                PlayerData.UnlockedTalents.Add(t.ToString());
+            }
+        }
+        
+        if (data.Contains("total_points_spent"))
+        {
+            PlayerData.TotalPointsSpent = Convert.ToInt32(data["total_points_spent"]);
+        }
+
+        if (data.Contains("available_points"))
+        {
+            _availablePoints = Convert.ToInt32(data["available_points"]);
+        }
+        
+        if (data.Contains("tree_points"))
+        {
+            var treePoints = (Dictionary)data["tree_points"];
+            foreach (var kvp in treePoints)
+            {
+                PlayerTalentData.TalentTree tree = Enum.Parse<PlayerTalentData.TalentTree>(kvp.Key.ToString());
+                PlayerData.TreePoints[tree] = Convert.ToInt32(kvp.Value);
+            }
+        }
+        
+        if (data.Contains("unlocked_trees"))
+        {
+            var unlockedTrees = (Dictionary)data["unlocked_trees"];
+            foreach (var kvp in unlockedTrees)
+            {
+                PlayerTalentData.TalentTree tree = Enum.Parse<PlayerTalentData.TalentTree>(kvp.Key.ToString());
+                PlayerData.UnlockedTrees[tree] = Convert.ToInt32(kvp.Value);
+            }
+        }
+        
+        // 重新应用所有已解锁天赋
+        ReapplyAllTalents();
+        
+        GD.Print("[PlayerTalentSystem] Loaded - Unlocked Talents: " + PlayerData.UnlockedTalents.Count);
     }
 }
