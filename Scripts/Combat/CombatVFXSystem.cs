@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Combat {
     /// <summary>
     /// 战斗视觉特效系统 - 管理战斗中的各种视觉反馈效果
     /// </summary>
-    public partial class CombatVFXSystem : Node {
+    public partial class CombatVFXSystem : BaseSystem {
         public static CombatVFXSystem Instance { get; private set; }
         
         // 数据
@@ -38,10 +38,11 @@ namespace ClawRPG.Scripts.Combat {
         [Signal] public delegate void ScreenEffectTriggeredEventHandler(ScreenEffectType type);
         [Signal] public delegate void ComboMilestoneReachedEventHandler(int comboCount, string milestone);
         
-        public override void _Ready() {
+        protected override void Initialize() {
             Instance = this;
             SetupContainers();
             GetReferences();
+            base.Initialize();
         }
         
         private void SetupContainers() {
@@ -662,8 +663,8 @@ namespace ClawRPG.Scripts.Combat {
         
         #region 保存/加载
         
-        public Dictionary<string, object> Save() {
-            return new Dictionary<string, object> {
+        public override Dictionary ExportSaveData() {
+            return new Dictionary {
                 { "player_data", new Dictionary<string, int> {
                     { "total_damage_numbers", PlayerData.TotalDamageNumbers },
                     { "critical_hits", PlayerData.CriticalHits },
@@ -677,10 +678,10 @@ namespace ClawRPG.Scripts.Combat {
             };
         }
         
-        public void Load(Dictionary<string, object> data) {
+        public override void ImportSaveData(Dictionary data) {
             if (data == null || !data.ContainsKey("player_data")) return;
             
-            var playerData = (Dictionary<string, object>)data["player_data"];
+            var playerData = (Dictionary)data["player_data"];
             PlayerData.TotalDamageNumbers = Convert.ToInt32(playerData.GetValueOrDefault("total_damage_numbers", 0));
             PlayerData.CriticalHits = Convert.ToInt32(playerData.GetValueOrDefault("critical_hits", 0));
             PlayerData.Heals = Convert.ToInt32(playerData.GetValueOrDefault("heals", 0));
