@@ -23,6 +23,10 @@ public class $CLASS_NAME$System : BaseSystem
         base.Initialize();
         
         // TODO: 添加初始化逻辑
+        // 示例：加载配置、初始化数据、订阅事件等
+        // LoadConfig();
+        // _data = new Dictionary();
+        // EventBus.Subscribe(EventTypes.PlayerLevelUp, OnPlayerLevelUp);
         
         GD.Print($"[$CLASS_NAME$System] Initialized");
     }
@@ -35,6 +39,10 @@ public class $CLASS_NAME$System : BaseSystem
         var data = new Dictionary();
         
         // TODO: 添加需要保存的数据
+        // 示例：保存当前等级、金币数、解锁的成就等
+        // data["level"] = _currentLevel;
+        // data["gold"] = _goldCount;
+        // data["achievements"] = _unlockedAchievements;
         
         return data;
     }
@@ -47,6 +55,10 @@ public class $CLASS_NAME$System : BaseSystem
         if (data == null) return;
         
         // TODO: 添加数据导入逻辑
+        // 示例：从存档数据恢复状态
+        // if (data.Contains("level")) _currentLevel = (int)data["level"];
+        // if (data.Contains("gold")) _goldCount = (int)data["gold"];
+        // if (data.Contains("achievements")) _unlockedAchievements = (Array)data["achievements"];
         
         _data = data;
     }
