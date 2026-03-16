@@ -231,6 +231,14 @@ public class DailyPuzzleSystem : BaseSystem
         }
         data["solved_puzzles"] = solvedArray;
         
+        // Export solved puzzle IDs list
+        var solvedIdsArray = new Godot.Array();
+        foreach (int puzzleId in _data.SolvedPuzzleIds)
+        {
+            solvedIdsArray.Add(puzzleId);
+        }
+        data["solved_puzzle_ids"] = solvedIdsArray;
+        
         return data;
     }
     
