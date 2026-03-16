@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.CoopSession;
 
 /// <summary>
 /// 多人游戏管理器
@@ -436,6 +437,9 @@ public class MultiplayerManager : BaseSystem
                 case "room_locked":
                     HandleRoomLocked(data);
                     break;
+                case "battle_action":
+                    HandleBattleAction(data);
+                    break;
             }
         }
         catch (Exception ex)
@@ -607,6 +611,57 @@ public class MultiplayerManager : BaseSystem
         string reason = data.ContainsKey("reason") ? data["reason"].ToString() : "Unknown reason";
         GD.Print($"[MultiplayerManager] Room locked: {reason}");
         OnConnectionFailed?.Invoke(reason);
+    }
+
+    /// <summary>
+    /// 处理接收到的战斗操作消息
+    /// </summary>
+    private void HandleBattleAction(Dictionary<string, object> data)
+    {
+        try
+        {
+            if (!data.ContainsKey("actions")) return;
+
+            var actions = data["actions"] as ArrayList;
+            if (actions == null) return;
+
+            foreach (Dictionary<string, object> actionData in actions)
+            {
+                var action = new BattleSyncData.BattleAction
+                {
+                    ActionId = actionData.ContainsKey("actionId") ? actionData["actionId"].ToString() : "",
+                    PlayerId = actionData.ContainsKey("playerId") ? Convert.ToInt32(actionData["playerId"]) : 0,
+                    PlayerName = actionData.ContainsKey("playerName") ? actionData["playerName"].ToString() : "",
+                    SkillId = actionData.ContainsKey("skillId") ? actionData["skillId"].ToString() : "",
+                    Value = actionData.ContainsKey("value") ? Convert.ToSingle(actionData["value"]) : 0f,
+                    TargetX = actionData.ContainsKey("targetX") ? Convert.ToSingle(actionData["targetX"]) : 0f,
+                    TargetY = actionData.ContainsKey("targetY") ? Convert.ToSingle(actionData["targetY"]) : 0f,
+                    TargetId = actionData.ContainsKey("targetId") ? Convert.ToInt32(actionData["targetId"]) : 0,
+                    IsCritical = actionData.ContainsKey("isCritical") && Convert.ToBoolean(actionData["isCritical"]),
+                    Timestamp = actionData.ContainsKey("timestamp") ? Convert.ToInt64(actionData["timestamp"]) : 0
+                };
+
+                // 解析 ActionType 枚举
+                if (actionData.ContainsKey("type"))
+                {
+                    if (Enum.TryParse<BattleActionType>(actionData["type"].ToString(), out var actionType))
+                    {
+                        action.Type = actionType;
+                    }
+                }
+
+                // 转发到 BattleSyncSystem
+                if (BattleSyncSystem.Instance != null)
+                {
+                    BattleSyncSystem.Instance.ReceiveRemoteAction(action);
+                    GD.Print($"[MultiplayerManager] Forwarded battle action {action.ActionId} to BattleSyncSystem");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr($"[MultiplayerManager] HandleBattleAction error: {ex.Message}");
+        }
     }
 
     private void OnError(string error)

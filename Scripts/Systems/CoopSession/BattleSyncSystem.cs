@@ -804,21 +804,25 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             while (_broadcastBuffer.Count > 0)
             {
                 var action = _broadcastBuffer.Dequeue();
-                actions.Add(new Dictionary
+                actions.Add(new Dictionary<string, object>
                 {
-                    { "id", action.ActionId },
+                    { "actionId", action.ActionId },
                     { "playerId", action.PlayerId },
-                    { "enemyId", action.EnemyId },
-                    { "actionType", action.ActionType },
-                    { "damage", action.Damage },
-                    { "healing", action.Healing },
+                    { "playerName", action.PlayerName },
+                    { "type", action.Type.ToString() },
+                    { "skillId", action.SkillId },
+                    { "value", action.Value },
+                    { "targetX", action.TargetX },
+                    { "targetY", action.TargetY },
+                    { "targetId", action.TargetId },
+                    { "isCritical", action.IsCritical },
                     { "timestamp", action.Timestamp }
                 });
             }
 
             var message = new Dictionary<string, object>
             {
-                { "type", "battle_actions" },
+                { "type", "battle_action" },
                 { "room_id", MultiplayerManager.Instance.GetRoomInfo()?.RoomId ?? "" },
                 { "actions", actions }
             };
