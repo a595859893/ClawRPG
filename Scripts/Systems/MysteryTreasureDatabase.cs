@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// MysteryTreasureDatabase - 神秘宝藏数据库
+/// 管理所有神秘宝箱的配置和奖励池
+/// </summary>
 public class MysteryTreasureDatabase
 {
     private static MysteryTreasureDatabase _instance;

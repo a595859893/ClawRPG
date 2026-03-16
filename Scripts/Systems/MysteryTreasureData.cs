@@ -2,7 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-// 神秘宝藏数据类型
+/// <summary>
+/// MysteryTreasureData - 神秘宝藏数据
+/// 定义神秘宝箱的奖励内容和属性
+/// </summary>
 public class MysteryTreasureData
 {
     public string TreasureId { get; set; }

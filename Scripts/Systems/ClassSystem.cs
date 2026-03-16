@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using Framework;
 
+/// <summary>
+/// 职业系统 - 管理玩家的职业选择、等级、经验和属性加成。
+/// 支持多种职业类型（战士、法师、刺客等）和职业阶级（初级、熟练、大师、传奇）。
+/// </summary>
 public class ClassData
 {
     public enum ClassType
@@ -57,7 +61,15 @@ public class ClassData
     }
 }
 
-public class ClassSystem : BaseSystem
+/// <summary>
+/// ClassSystem - 职业系统
+/// 管理玩家职业选择、职业升级和职业技能解锁
+/// 支持主职业和副职业机制
+/// </summary>
+    /// <summary>
+    /// 职业系统单例 - 处理职业数据初始化、经验获取、等级提升和属性计算。
+    /// </summary>
+    public class ClassSystem : BaseSystem
 {
     // 单例
     private static ClassSystem _instance;

@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// ClassUI - 职业选择界面
+/// 提供职业查看、选择和属性展示的UI界面
+/// </summary>
 public class ClassUI : Control
 {
     private static ClassUI _instance;
