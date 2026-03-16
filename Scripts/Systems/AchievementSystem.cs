@@ -72,26 +72,6 @@ public class AchievementSystem : BaseSystem
     }
 
     /// <summary>
-    /// Initialize achievements from database
-    /// </summary>
-    private void InitializeAchievements()
-    {
-        // Initialize category mapping
-        foreach (AchievementData.AchievementCategory cat in Enum.GetValues(typeof(AchievementData.AchievementCategory)))
-        {
-            _categoryAchievements[cat] = new List<string>();
-        }
-
-        // Load from database
-        var dbAchievements = AchievementDatabase.GetAllAchievements();
-        foreach (var achievement in dbAchievements)
-        {
-            _achievements[achievement.id] = achievement;
-            _categoryAchievements[achievement.category].Add(achievement.id);
-        }
-    }
-
-    /// <summary>
     /// Load achievement data from save system
     /// </summary>
     public void LoadData()
@@ -700,6 +680,13 @@ public class AchievementSystem : BaseSystem
         data["login_streak"] = _loginStreak;
         data["play_time_hours"] = _playTimeHours;
         
+        // Quick Mode 统计数据
+        data["quick_mode_wins"] = _quickModeWins;
+        data["quick_mode_plays"] = _quickModePlays;
+        data["quick_mode_streak"] = _quickModeStreak;
+        data["quick_mode_speed_runs"] = _quickModeSpeedRuns;
+        data["quick_mode_perfect_runs"] = _quickModePerfectRuns;
+        
         // 已解锁成就
         var unlocked = new Array();
         foreach (var kvp in _achievements)
@@ -736,5 +723,12 @@ public class AchievementSystem : BaseSystem
         if (data.Contains("items_crafted")) _itemsCrafted = (int)data["items_crafted"];
         if (data.Contains("login_streak")) _loginStreak = (int)data["login_streak"];
         if (data.Contains("play_time_hours")) _playTimeHours = (float)data["play_time_hours"];
+        
+        // Quick Mode 统计数据
+        if (data.Contains("quick_mode_wins")) _quickModeWins = (int)data["quick_mode_wins"];
+        if (data.Contains("quick_mode_plays")) _quickModePlays = (int)data["quick_mode_plays"];
+        if (data.Contains("quick_mode_streak")) _quickModeStreak = (int)data["quick_mode_streak"];
+        if (data.Contains("quick_mode_speed_runs")) _quickModeSpeedRuns = (int)data["quick_mode_speed_runs"];
+        if (data.Contains("quick_mode_perfect_runs")) _quickModePerfectRuns = (int)data["quick_mode_perfect_runs"];
     }
 }
