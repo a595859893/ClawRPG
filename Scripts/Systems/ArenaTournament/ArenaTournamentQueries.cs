@@ -448,5 +448,24 @@ namespace ClawRPG.Scripts.Systems
         }
 
         #endregion
+
+        #region 数据持久化
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary();
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+        }
+
+        #endregion
     }
 }
