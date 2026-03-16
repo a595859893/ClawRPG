@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 卡牌收藏界面控制器
+/// 负责显示和管理玩家的卡牌收藏、卡包购买以及统计信息
+/// </summary>
 public class CardCollectionUI : Control
 {
     private CardCollectionSystem _system;
@@ -40,6 +44,10 @@ public class CardCollectionUI : Control
     private string _selectedCategory = "All";
     private string _selectedRarity = "All";
     
+    /// <summary>
+    /// 节点准备就绪时调用
+    /// 初始化系统引用并加载UI数据
+    /// </summary>
     public override void _Ready()
     {
         _system = GetNode<CardCollectionSystem>("/root/CardCollectionSystem");
@@ -52,6 +60,10 @@ public class CardCollectionUI : Control
         RefreshStatistics();
     }
     
+    /// <summary>
+    /// 设置界面布局和控件
+    /// 包括三个标签页：收藏、卡包、统计
+    /// </summary>
     private void SetupUI()
     {
         // Main container
@@ -194,6 +206,10 @@ public class CardCollectionUI : Control
         _statisticsTab.AddChild(_categoryDistLabel);
     }
     
+    /// <summary>
+    /// 分类筛选选项改变时的回调
+    /// </summary>
+    /// <param name="index">选中的分类索引</param>
     private void OnCategorySelected(int index)
     {
         string[] categories = { "All", "Attack", "Skill", "Power", "Defense", "Special" };
@@ -201,6 +217,10 @@ public class CardCollectionUI : Control
         RefreshCollection();
     }
     
+    /// <summary>
+    /// 稀有度筛选选项改变时的回调
+    /// </summary>
+    /// <param name="index">选中的稀有度索引</param>
     private void OnRaritySelected(int index)
     {
         string[] rarities = { "All", "Common", "Uncommon", "Rare", "Epic", "Legendary" };
@@ -208,6 +228,10 @@ public class CardCollectionUI : Control
         RefreshCollection();
     }
     
+    /// <summary>
+    /// 刷新收藏界面显示
+    /// 根据当前筛选条件显示已拥有的卡牌
+    /// </summary>
     private void RefreshCollection()
     {
         // Clear grid
@@ -240,6 +264,12 @@ public class CardCollectionUI : Control
         }
     }
     
+    /// <summary>
+    /// 创建卡牌显示按钮
+    /// </summary>
+    /// <param name="cardId">卡牌ID</param>
+    /// <param name="count">拥有数量</param>
+    /// <returns>创建的卡牌按钮</returns>
     private Button CreateCardButton(string cardId, int count)
     {
         var card = _database.GetCard(cardId);
@@ -267,6 +297,10 @@ public class CardCollectionUI : Control
         return btn;
     }
     
+    /// <summary>
+    /// 显示卡牌预览信息
+    /// </summary>
+    /// <param name="cardId">要预览的卡牌ID</param>
     private void ShowCardPreview(string cardId)
     {
         var card = _database.GetCard(cardId);
@@ -291,6 +325,9 @@ public class CardCollectionUI : Control
         };
     }
     
+    /// <summary>
+    /// 刷新卡包界面显示
+    /// </summary>
     private void RefreshPacks()
     {
         // Clear pack grid
@@ -308,6 +345,11 @@ public class CardCollectionUI : Control
         }
     }
     
+    /// <summary>
+    /// 创建卡包购买按钮
+    /// </summary>
+    /// <param name="pack">卡包数据</param>
+    /// <returns>创建的卡包按钮</returns>
     private Button CreatePackButton(CardPack pack)
     {
         var btn = new Button();
@@ -326,6 +368,9 @@ public class CardCollectionUI : Control
         return btn;
     }
     
+    /// <summary>
+    /// 刷新统计数据界面显示
+    /// </summary>
     private void RefreshStatistics()
     {
         var stats = _system.GetStatistics();
