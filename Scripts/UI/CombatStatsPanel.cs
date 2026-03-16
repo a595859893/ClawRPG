@@ -38,17 +38,9 @@ namespace ClawRPG.Scripts.UI {
         private float _combatStartTime = 0;
         private bool _inCombat = false; 
         
-        // Rating system
-        private PanelContainer _ratingPanel;
-        private Label _ratingLabel;
-        private Label _ratingDetailLabel;
-        
-        // Rating constants
-        private const float RATING_S_THRESHOLD = 95f;  // S rank: top 5%
-        private const float RATING_A_THRESHOLD = 85f;  // A rank: top 15%
-        private const float RATING_B_THRESHOLD = 70f;  // B rank: top 30%
-        private const float RATING_C_THRESHOLD = 50f;  // C rank: top 50%
-        // Below C is D rank
+        // Components and Display helpers
+        private CombatStatsPanelComponents _components;
+        private CombatStatsPanelDisplay _display;
         
         private float _lastUpdate = 0;
         private PanelContainer _mainPanel;
@@ -74,182 +66,27 @@ namespace ClawRPG.Scripts.UI {
             OffsetRight = 220;
             OffsetBottom = 550;
             
-            // Main panel
-            _mainPanel = new PanelContainer
-            {
-                Name = "MainPanel",
-                AnchorRight = 1f,
-                AnchorBottom = 1f,
-                OffsetLeft = 0,
-                OffsetTop = 0,
-                OffsetRight = 0,
-                OffsetBottom = 0
-            };
+            // Initialize components helper
+            _components = new CombatStatsPanelComponents(this);
+            _components.SetupMainPanel(out _mainPanel, out _statsContainer);
             AddChild(_mainPanel);
             
-            // Style
-            var panelStyle = new StyleBoxFlat();
-            panelStyle.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.9f);
-            panelStyle.CornerRadiusTopLeft = 8;
-            panelStyle.CornerRadiusTopRight = 8;
-            panelStyle.CornerRadiusBottomLeft = 8;
-            panelStyle.CornerRadiusBottomRight = 8;
-            panelStyle.BorderWidthLeft = 2;
-            panelStyle.BorderWidthTop = 2;
-            panelStyle.BorderWidthRight = 2;
-            panelStyle.BorderWidthBottom = 2;
-            panelStyle.BorderColor = new Color(0.4f, 0.3f, 0.2f, 0.8f);
-            _mainPanel.AddThemeStyleBoxOverride("panel", panelStyle);
-            
-            // Stats container
-            _statsContainer = new VBoxContainer
-            {
-                Name = "StatsContainer",
-                AnchorRight = 1f,
-                AnchorBottom = 1f,
-                OffsetLeft = 10,
-                OffsetTop = 10,
-                OffsetRight = -10,
-                OffsetBottom = -10,
-                Theme = CreateTheme()
-            };
-            _mainPanel.AddChild(_statsContainer);
-            
-            // Title
-            var titleLabel = new Label
-            {
-                Text = "⚔️ 战斗统计",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            titleLabel.AddThemeFontSizeOverride("font_size", 18);
-            titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.4f, 1f));
-            _statsContainer.AddChild(titleLabel);
-            
-            // Separator
-            AddSeparator();
-            
             // Create stat rows
-            _damageDealtLabel = AddStatRow("造成伤害", "0", new Color(1f, 0.4f, 0.4f, 1f));
-            _damageTakenLabel = AddStatRow("受到伤害", "0", new Color(0.4f, 0.6f, 1f, 1f));
-            _killsLabel = AddStatRow("击杀敌人", "0", new Color(0.4f, 1f, 0.5f, 1f));
-            _combatTimeLabel = AddStatRow("战斗时间", "0:00", new Color(1f, 0.9f, 0.5f, 1f));
-            _dodgesLabel = AddStatRow("闪避次数", "0", new Color(0.5f, 0.8f, 1f, 1f));
-            _blocksLabel = AddStatRow("格挡次数", "0", new Color(0.8f, 0.6f, 1f, 1f));
-            _critsLabel = AddStatRow("暴击次数", "0", new Color(1f, 0.5f, 0.8f, 1f));
-            _comboLabel = AddStatRow("最高连击", "0", new Color(1f, 0.85f, 0.2f, 1f));
+            _damageDealtLabel = _components.AddStatRow(_statsContainer, "造成伤害", "0", new Color(1f, 0.4f, 0.4f, 1f));
+            _damageTakenLabel = _components.AddStatRow(_statsContainer, "受到伤害", "0", new Color(0.4f, 0.6f, 1f, 1f));
+            _killsLabel = _components.AddStatRow(_statsContainer, "击杀敌人", "0", new Color(0.4f, 1f, 0.5f, 1f));
+            _combatTimeLabel = _components.AddStatRow(_statsContainer, "战斗时间", "0:00", new Color(1f, 0.9f, 0.5f, 1f));
+            _dodgesLabel = _components.AddStatRow(_statsContainer, "闪避次数", "0", new Color(0.5f, 0.8f, 1f, 1f));
+            _blocksLabel = _components.AddStatRow(_statsContainer, "格挡次数", "0", new Color(0.8f, 0.6f, 1f, 1f));
+            _critsLabel = _components.AddStatRow(_statsContainer, "暴击次数", "0", new Color(1f, 0.5f, 0.8f, 1f));
+            _comboLabel = _components.AddStatRow(_statsContainer, "最高连击", "0", new Color(1f, 0.85f, 0.2f, 1f));
             
-            // Rating panel (initially hidden)
-            SetupRatingPanel();
+            // Initialize display helper
+            _display = new CombatStatsPanelDisplay(this);
+            _display.SetupRatingPanel();
             
             // Connect signals
             ConnectCombatSignals();
-        }
-        
-        private void SetupRatingPanel()
-        {
-            _ratingPanel = new PanelContainer
-            {
-                Name = "RatingPanel",
-                Visible = false,
-                OffsetLeft = -10,
-                OffsetTop = -10,
-                OffsetRight = 10,
-                OffsetBottom = 10
-            };
-            
-            var ratingStyle = new StyleBoxFlat();
-            ratingStyle.BgColor = new Color(0.15f, 0.12f, 0.1f, 0.95f);
-            ratingStyle.CornerRadiusTopLeft = 10;
-            ratingStyle.CornerRadiusTopRight = 10;
-            ratingStyle.CornerRadiusBottomLeft = 10;
-            ratingStyle.CornerRadiusBottomRight = 10;
-            ratingStyle.BorderWidthLeft = 3;
-            ratingStyle.BorderWidthTop = 3;
-            ratingStyle.BorderWidthRight = 3;
-            ratingStyle.BorderWidthBottom = 3;
-            _ratingPanel.AddThemeStyleBoxOverride("panel", ratingStyle);
-            
-            var ratingContainer = new VBoxContainer
-            {
-                Name = "RatingContainer",
-                OffsetLeft = 15,
-                OffsetTop = 15,
-                OffsetRight = -15,
-                OffsetBottom = -15
-            };
-            _ratingPanel.AddChild(ratingContainer);
-            
-            _ratingLabel = new Label
-            {
-                Text = "S",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            _ratingLabel.AddThemeFontSizeOverride("font_size", 48);
-            _ratingLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f, 1f));
-            ratingContainer.AddChild(_ratingLabel);
-            
-            _ratingDetailLabel = new Label
-            {
-                Text = "完美表现！",
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-            _ratingDetailLabel.AddThemeFontSizeOverride("font_size", 14);
-            _ratingDetailLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
-            ratingContainer.AddChild(_ratingDetailLabel);
-            
-            // Add as overlay
-            AddChild(_ratingPanel);
-        }
-        
-        private Theme CreateTheme()
-        {
-            var theme = new Theme();
-            theme.SetFontSize("font_size", 14);
-            return theme;
-        }
-        
-        private Label AddStatRow(string label, string value, Color valueColor)
-        {
-            var container = new HBoxContainer
-            {
-                Alignment = BoxContainer.AlignmentMode.Center,
-                CustomMinimumHeight = 24
-            };
-            _statsContainer.AddChild(container);
-            
-            var labelControl = new Label
-            {
-                Text = label + ":",
-                HorizontalAlignment = HorizontalAlignment.Left,
-                SizeFlagsHorizontal = SizeFlags.Expand
-            };
-            labelControl.AddThemeFontSizeOverride("font_size", 13);
-            labelControl.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f, 1f));
-            container.AddChild(labelControl);
-            
-            var valueControl = new Label
-            {
-                Text = value,
-                HorizontalAlignment = HorizontalAlignment.Right,
-                SizeFlagsHorizontal = SizeFlags.ShrinkEnd
-            };
-            valueControl.AddThemeFontSizeOverride("font_size", 14);
-            valueControl.AddThemeColorOverride("font_color", valueColor);
-            container.AddChild(valueControl);
-            
-            return valueControl;
-        }
-        
-        private void AddSeparator()
-        {
-            var separator = new HSeparator
-            {
-                Modulate = new Color(0.4f, 0.3f, 0.2f, 0.5f),
-                CustomMinimumHeight = 1
-            };
-            _statsContainer.AddChild(separator);
         }
         
         private void ConnectSignals()
@@ -315,7 +152,7 @@ namespace ClawRPG.Scripts.UI {
                 if (_autoShowInCombat)
                 {
                     Show();
-                    PlayAppearAnimation();
+                    _display.PlayAppearAnimation(this);
                 }
             }
         }
@@ -329,7 +166,7 @@ namespace ClawRPG.Scripts.UI {
                 // Calculate and show rating
                 if (_showRatingOnEnd && _totalKills > 0)
                 {
-                    ShowRating();
+                    _display.ShowRating(CalculateRating, GetRatingInfo);
                 }
                 
                 if (_autoShowInCombat)
@@ -398,6 +235,11 @@ namespace ClawRPG.Scripts.UI {
         /// </summary>
         private (string letter, string detail, Color color) GetRatingInfo(float score)
         {
+            const float RATING_S_THRESHOLD = 95f;  // S rank: top 5%
+            const float RATING_A_THRESHOLD = 85f;  // A rank: top 15%
+            const float RATING_B_THRESHOLD = 70f;  // B rank: top 30%
+            const float RATING_C_THRESHOLD = 50f;  // C rank: top 50%
+            
             if (score >= RATING_S_THRESHOLD)
                 return ("S", "完美表现！", new Color(1f, 0.84f, 0f, 1f)); // Gold
             if (score >= RATING_A_THRESHOLD)
@@ -410,43 +252,11 @@ namespace ClawRPG.Scripts.UI {
         }
         
         /// <summary>
-        /// Show combat rating popup
-        /// </summary>
-        private void ShowRating()
-        {
-            float score = CalculateRating();
-            var (letter, detail, color) = GetRatingInfo(score);
-            
-            _ratingLabel.Text = letter;
-            _ratingLabel.AddThemeColorOverride("font_color", color);
-            _ratingDetailLabel.Text = detail;
-            
-            _ratingPanel.Visible = true;
-            
-            // Animate rating panel
-            _ratingPanel.Modulate = new Color(1f, 1f, 1f, 0f);
-            _ratingPanel.Scale = new Vector2(0.5f, 0.5f);
-            
-            var tween = CreateTween();
-            tween.SetParallel(true);
-            tween.TweenProperty(_ratingPanel, "modulate:a", 1f, 0.3f);
-            tween.TweenProperty(_ratingPanel, "scale", new Vector2(1.1f, 1.1f), 0.3f);
-            tween.TweenCallback(new Callable(this, nameof(_OnRatingShowComplete)));
-        }
-        
-        private void _OnRatingShowComplete()
-        {
-            // Bounce effect
-            var tween = CreateTween();
-            tween.TweenProperty(_ratingPanel, "scale", new Vector2(1f, 1f), 0.1f);
-        }
-        
-        /// <summary>
         /// Hide rating panel
         /// </summary>
         public void HideRating()
         {
-            _ratingPanel.Visible = false; 
+            _display?.HideRating();
         }
         
         public void ResetStats()
@@ -548,13 +358,6 @@ namespace ClawRPG.Scripts.UI {
             _combatTimeLabel.Text = $"{minutes}:{seconds:D2}";
         }
         
-        private void PlayAppearAnimation()
-        {
-            Modulate = new Color(1f, 1f, 1f, 0f);
-            var tween = CreateTween();
-            tween.TweenProperty(this, "modulate:a", 1f, 0.3f);
-        }
-        
         public override void _Process(double delta)
         {
             if (_inCombat)
@@ -578,7 +381,7 @@ namespace ClawRPG.Scripts.UI {
             else
             {
                 Show();
-                PlayAppearAnimation();
+                _display.PlayAppearAnimation(this);
             }
         }
         
