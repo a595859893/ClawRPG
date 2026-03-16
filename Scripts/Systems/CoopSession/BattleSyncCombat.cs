@@ -440,5 +440,140 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         }
 
         #endregion
+
+        #region 持久化
+
+        /// <summary>
+        /// 导出持久化数据
+        /// </summary>
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // 序列化待广播的战斗操作
+            var pendingActionsData = new List<Dictionary<string, object>>();
+            if (_pendingActions != null)
+            {
+                foreach (var action in _pendingActions)
+                {
+                    pendingActionsData.Add(new Dictionary<string, object>
+                    {
+                        ["playerId"] = action.PlayerId,
+                        ["playerName"] = action.PlayerName,
+                        ["type"] = (int)action.Type,
+                        ["value"] = action.Value,
+                        ["skillId"] = action.SkillId,
+                        ["targetId"] = action.TargetId,
+                        ["targetX"] = action.TargetX,
+                        ["targetY"] = action.TargetY,
+                        ["isCritical"] = action.IsCritical,
+                        ["timestamp"] = action.Timestamp
+                    });
+                }
+            }
+            data["PendingActions"] = pendingActionsData;
+            
+            // 序列化广播缓冲区
+            var broadcastBufferData = new List<Dictionary<string, object>>();
+            if (_broadcastBuffer != null)
+            {
+                foreach (var action in _broadcastBuffer)
+                {
+                    broadcastBufferData.Add(new Dictionary<string, object>
+                    {
+                        ["playerId"] = action.PlayerId,
+                        ["playerName"] = action.PlayerName,
+                        ["type"] = (int)action.Type,
+                        ["value"] = action.Value,
+                        ["skillId"] = action.SkillId,
+                        ["targetId"] = action.TargetId,
+                        ["targetX"] = action.TargetX,
+                        ["targetY"] = action.TargetY,
+                        ["isCritical"] = action.IsCritical,
+                        ["timestamp"] = action.Timestamp
+                    });
+                }
+            }
+            data["BroadcastBuffer"] = broadcastBufferData;
+            
+            GD.Print($"[BattleSyncCombat] 导出 {pendingActionsData.Count} 待处理操作, {broadcastBufferData.Count} 广播缓冲");
+            return data;
+        }
+
+        /// <summary>
+        /// 导入持久化数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null)
+            {
+                GD.Print("[BattleSyncCombat] 无数据可导入");
+                return;
+            }
+            
+            // 导入待处理操作
+            _pendingActions?.Clear();
+            if (data.ContainsKey("PendingActions") && _pendingActions != null)
+            {
+                var pendingActionsData = data["PendingActions"] as List<object>;
+                if (pendingActionsData != null)
+                {
+                    foreach (var aObj in pendingActionsData)
+                    {
+                        var aDict = aObj as Dictionary<string, object>;
+                        if (aDict == null) continue;
+                        
+                        var action = new BattleSyncData.BattleAction
+                        {
+                            PlayerId = (int)(aDict["playerId"] ?? 0),
+                            PlayerName = aDict["playerName"] as string ?? "",
+                            Type = (BattleActionType)(int)(aDict["type"] ?? 0),
+                            Value = (float)(aDict["value"] ?? 0f),
+                            SkillId = aDict["skillId"] as string ?? "",
+                            TargetId = (int)(aDict["targetId"] ?? -1),
+                            TargetX = (float)(aDict["targetX"] ?? 0f),
+                            TargetY = (float)(aDict["targetY"] ?? 0f),
+                            IsCritical = (bool)(aDict["isCritical"] ?? false),
+                            Timestamp = (long)(aDict["timestamp"] ?? 0L)
+                        };
+                        _pendingActions.Enqueue(action);
+                    }
+                }
+            }
+            
+            // 导入广播缓冲区
+            _broadcastBuffer?.Clear();
+            if (data.ContainsKey("BroadcastBuffer") && _broadcastBuffer != null)
+            {
+                var broadcastBufferData = data["BroadcastBuffer"] as List<object>;
+                if (broadcastBufferData != null)
+                {
+                    foreach (var aObj in broadcastBufferData)
+                    {
+                        var aDict = aObj as Dictionary<string, object>;
+                        if (aDict == null) continue;
+                        
+                        var action = new BattleSyncData.BattleAction
+                        {
+                            PlayerId = (int)(aDict["playerId"] ?? 0),
+                            PlayerName = aDict["playerName"] as string ?? "",
+                            Type = (BattleActionType)(int)(aDict["type"] ?? 0),
+                            Value = (float)(aDict["value"] ?? 0f),
+                            SkillId = aDict["skillId"] as string ?? "",
+                            TargetId = (int)(aDict["targetId"] ?? -1),
+                            TargetX = (float)(aDict["targetX"] ?? 0f),
+                            TargetY = (float)(aDict["targetY"] ?? 0f),
+                            IsCritical = (bool)(aDict["isCritical"] ?? false),
+                            Timestamp = (long)(aDict["timestamp"] ?? 0L)
+                        };
+                        _broadcastBuffer.Enqueue(action);
+                    }
+                }
+            }
+            
+            GD.Print($"[BattleSyncCombat] 导入 {_pendingActions?.Count ?? 0} 待处理操作, {_broadcastBuffer?.Count ?? 0} 广播缓冲");
+        }
+
+        #endregion
     }
 }

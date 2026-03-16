@@ -684,6 +684,185 @@ namespace ClawRPG.Scripts.Systems
             return 4;
         }
 
+        /// <summary>
+        /// 导出持久化数据
+        /// </summary>
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // 序列化 Tournaments
+            var tournamentsData = new List<Dictionary<string, object>>();
+            foreach (var kvp in Tournaments)
+            {
+                var t = kvp.Value;
+                tournamentsData.Add(new Dictionary<string, object>
+                {
+                    ["tournamentId"] = t.tournamentId,
+                    ["tournamentName"] = t.tournamentName,
+                    ["description"] = t.description,
+                    ["format"] = (int)t.format,
+                    ["status"] = (int)t.status,
+                    ["currentStage"] = (int)t.currentStage,
+                    ["maxPlayers"] = t.maxPlayers,
+                    ["minPlayers"] = t.minPlayers,
+                    ["currentPlayerCount"] = t.currentPlayerCount,
+                    ["registrationStart"] = t.registrationStart.ToString("o"),
+                    ["registrationEnd"] = t.registrationEnd.ToString("o"),
+                    ["startTime"] = t.startTime?.ToString("o") ?? "",
+                    ["endTime"] = t.endTime?.ToString("o") ?? "",
+                    ["rounds"] = t.rounds,
+                    ["currentRound"] = t.currentRound,
+                    ["prizePool"] = t.prizePool,
+                    ["organizerId"] = t.organizerId,
+                    ["createdAt"] = t.createdAt.ToString("o"),
+                    ["updatedAt"] = t.updatedAt.ToString("o")
+                });
+            }
+            data["Tournaments"] = tournamentsData;
+            
+            // 序列化 ActiveTournaments (通过 ID 引用)
+            var activeIds = new List<string>();
+            foreach (var t in ActiveTournaments)
+            {
+                activeIds.Add(t.tournamentId);
+            }
+            data["ActiveTournamentIds"] = activeIds;
+            
+            // 序列化 PlayerProgress
+            var progressData = new Dictionary<string, Dictionary<string, object>>();
+            foreach (var kvp in PlayerProgress)
+            {
+                var p = kvp.Value;
+                progressData[kvp.Key] = new Dictionary<string, object>
+                {
+                    ["playerId"] = p.playerId,
+                    ["participatedTournaments"] = p.participatedTournaments,
+                    ["highestRank"] = p.statistics?.highestRank ?? 0,
+                    ["totalWins"] = p.statistics?.totalWins ?? 0,
+                    ["totalLosses"] = p.statistics?.totalLosses ?? 0
+                };
+            }
+            data["PlayerProgress"] = progressData;
+            
+            GD.Print($"[ArenaTournamentCoreSystem] 导出 {Tournaments.Count} 个锦标赛数据");
+            return data;
+        }
+
+        /// <summary>
+        /// 导入持久化数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null)
+            {
+                GD.Print("[ArenaTournamentCoreSystem] 无数据可导入");
+                return;
+            }
+            
+            // 导入 Tournaments
+            if (data.ContainsKey("Tournaments"))
+            {
+                var tournamentsData = data["Tournaments"] as List<object>;
+                if (tournamentsData != null)
+                {
+                    foreach (var tObj in tournamentsData)
+                    {
+                        var tDict = tObj as Dictionary<string, object>;
+                        if (tDict == null) continue;
+                        
+                        var tournament = new Tournament
+                        {
+                            tournamentId = tDict["tournamentId"] as string ?? "",
+                            tournamentName = tDict["tournamentName"] as string ?? "",
+                            description = tDict["description"] as string ?? "",
+                            format = (TournamentFormat)(int)(tDict["format"] ?? 0),
+                            status = (TournamentStatus)(int)(tDict["status"] ?? 0),
+                            currentStage = (TournamentStage)(int)(tDict["currentStage"] ?? 0),
+                            maxPlayers = (int)(tDict["maxPlayers"] ?? 0),
+                            minPlayers = (int)(tDict["minPlayers"] ?? 0),
+                            currentPlayerCount = (int)(tDict["currentPlayerCount"] ?? 0),
+                            registrationStart = DateTime.Parse(tDict["registrationStart"] as string ?? "2024-01-01"),
+                            registrationEnd = DateTime.Parse(tDict["registrationEnd"] as string ?? "2024-01-01"),
+                            rounds = (int)(tDict["rounds"] ?? 0),
+                            currentRound = (int)(tDict["currentRound"] ?? 0),
+                            prizePool = (int)(tDict["prizePool"] ?? 0),
+                            organizerId = tDict["organizerId"] as string ?? "",
+                            createdAt = DateTime.Parse(tDict["createdAt"] as string ?? "2024-01-01"),
+                            updatedAt = DateTime.Parse(tDict["updatedAt"] as string ?? "2024-01-01")
+                        };
+                        
+                        var startTimeStr = tDict["startTime"] as string;
+                        if (!string.IsNullOrEmpty(startTimeStr))
+                            tournament.startTime = DateTime.Parse(startTimeStr);
+                            
+                        var endTimeStr = tDict["endTime"] as string;
+                        if (!string.IsNullOrEmpty(endTimeStr))
+                            tournament.endTime = DateTime.Parse(endTimeStr);
+                        
+                        Tournaments[tournament.tournamentId] = tournament;
+                    }
+                }
+            }
+            
+            // 导入 ActiveTournaments
+            ActiveTournaments.Clear();
+            if (data.ContainsKey("ActiveTournamentIds"))
+            {
+                var activeIds = data["ActiveTournamentIds"] as List<object>;
+                if (activeIds != null)
+                {
+                    foreach (var id in activeIds)
+                    {
+                        if (Tournaments.ContainsKey(id as string ?? ""))
+                        {
+                            ActiveTournaments.Add(Tournaments[id as string ?? ""]);
+                        }
+                    }
+                }
+            }
+            
+            // 导入 PlayerProgress
+            if (data.ContainsKey("PlayerProgress"))
+            {
+                var progressData = data["PlayerProgress"] as Dictionary<string, object>;
+                if (progressData != null)
+                {
+                    foreach (var kvp in progressData)
+                    {
+                        var pDict = kvp.Value as Dictionary<string, object>;
+                        if (pDict == null) continue;
+                        
+                        var progress = new TournamentProgress
+                        {
+                            playerId = pDict["playerId"] as string ?? ""
+                        };
+                        
+                        var participated = pDict["participatedTournaments"] as List<object>;
+                        if (participated != null)
+                        {
+                            foreach (var t in participated)
+                            {
+                                progress.participatedTournaments.Add(t as string ?? "");
+                            }
+                        }
+                        
+                        progress.statistics = new TournamentStatistics
+                        {
+                            playerId = progress.playerId,
+                            highestRank = (int)(pDict["highestRank"] ?? 0),
+                            totalWins = (int)(pDict["totalWins"] ?? 0),
+                            totalLosses = (int)(pDict["totalLosses"] ?? 0)
+                        };
+                        
+                        PlayerProgress[kvp.Key] = progress;
+                    }
+                }
+            }
+            
+            GD.Print($"[ArenaTournamentCoreSystem] 导入 {Tournaments.Count} 个锦标赛, {PlayerProgress.Count} 个玩家进度");
+        }
+
         private void LoadData()
         {
             GD.Print("[ArenaTournamentCoreSystem] 数据加载完成");
@@ -692,6 +871,350 @@ namespace ClawRPG.Scripts.Systems
         public void SaveData()
         {
             GD.Print("[ArenaTournamentCoreSystem] 数据保存完成");
+        }
+
+        #endregion
+
+        #region 数据持久化
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+
+            // 序列化所有锦标赛
+            var tournamentsData = new ArrayList();
+            foreach (var kvp in Tournaments)
+            {
+                var t = kvp.Value;
+                var tournamentDict = new Dictionary
+                {
+                    { "tournamentId", t.tournamentId },
+                    { "tournamentName", t.tournamentName },
+                    { "description", t.description },
+                    { "format", (int)t.format },
+                    { "status", (int)t.status },
+                    { "currentStage", (int)t.currentStage },
+                    { "maxPlayers", t.maxPlayers },
+                    { "minPlayers", t.minPlayers },
+                    { "currentPlayerCount", t.currentPlayerCount },
+                    { "registrationStart", t.registrationStart.ToString("o") },
+                    { "registrationEnd", t.registrationEnd.ToString("o") },
+                    { "startTime", t.startTime?.ToString("o") },
+                    { "endTime", t.endTime?.ToString("o") },
+                    { "rounds", t.rounds },
+                    { "currentRound", t.currentRound },
+                    { "prizePool", t.prizePool },
+                    { "entryFee", t.entryFee },
+                    { "organizerId", t.organizerId },
+                    { "createdAt", t.createdAt.ToString("o") },
+                    { "updatedAt", t.updatedAt.ToString("o") }
+                };
+
+                // 序列化玩家
+                var playersData = new ArrayList();
+                foreach (var p in t.registeredPlayers)
+                {
+                    playersData.Add(new Dictionary
+                    {
+                        { "playerId", p.playerId },
+                        { "playerName", p.playerName },
+                        { "seedNumber", p.seedNumber },
+                        { "score", p.score },
+                        { "wins", p.wins },
+                        { "losses", p.losses },
+                        { "matchesPlayed", p.matchesPlayed },
+                        { "isEliminated", p.isEliminated },
+                        { "hasLostOnce", p.hasLostOnce },
+                        { "registrationTime", p.registrationTime.ToString("o") },
+                        { "matchHistory", new ArrayList(p.matchHistory) }
+                    });
+                }
+                tournamentDict["registeredPlayers"] = playersData;
+
+                // 序列化比赛
+                var matchesData = new ArrayList();
+                foreach (var m in t.matches)
+                {
+                    matchesData.Add(new Dictionary
+                    {
+                        { "matchId", m.matchId },
+                        { "roundNumber", m.roundNumber },
+                        { "matchNumber", m.matchNumber },
+                        { "stage", (int)m.stage },
+                        { "player1Id", m.player1Id },
+                        { "player2Id", m.player2Id },
+                        { "winnerId", m.winnerId },
+                        { "player1Score", m.player1Score },
+                        { "player2Score", m.player2Score },
+                        { "isCompleted", m.isCompleted },
+                        { "scheduledTime", m.scheduledTime.ToString("o") },
+                        { "completedTime", m.completedTime?.ToString("o") }
+                    });
+                }
+                tournamentDict["matches"] = matchesData;
+
+                // 序列化奖励
+                var rewardsData = new ArrayList();
+                foreach (var r in t.rewards)
+                {
+                    rewardsData.Add(new Dictionary
+                    {
+                        { "rankStart", r.rankStart },
+                        { "rankEnd", r.rankEnd },
+                        { "rewardType", r.rewardType },
+                        { "rewardId", r.rewardId },
+                        { "rewardAmount", r.rewardAmount }
+                    });
+                }
+                tournamentDict["rewards"] = rewardsData;
+
+                tournamentsData.Add(tournamentDict);
+            }
+            data["tournaments"] = tournamentsData;
+
+            // 序列化活动锦标赛索引
+            var activeTournamentIds = new ArrayList();
+            foreach (var t in ActiveTournaments)
+            {
+                activeTournamentIds.Add(t.tournamentId);
+            }
+            data["activeTournamentIds"] = activeTournamentIds;
+
+            // 序列化玩家进度
+            var progressData = new ArrayList();
+            foreach (var kvp in PlayerProgress)
+            {
+                var p = kvp.Value;
+                var progressDict = new Dictionary
+                {
+                    { "playerId", p.playerId },
+                    { "participatedTournaments", new ArrayList(p.participatedTournaments) }
+                };
+
+                // 序列化最近记录
+                var recordsData = new ArrayList();
+                foreach (var r in p.recentRecords)
+                {
+                    recordsData.Add(new Dictionary
+                    {
+                        { "playerId", r.playerId },
+                        { "tournamentId", r.tournamentId },
+                        { "tournamentName", r.tournamentName },
+                        { "finalRank", r.finalRank },
+                        { "score", r.score },
+                        { "wins", r.wins },
+                        { "losses", r.losses },
+                        { "participatedAt", r.participatedAt.ToString("o") }
+                    });
+                }
+                progressDict["recentRecords"] = recordsData;
+
+                // 序列化统计
+                if (p.statistics != null)
+                {
+                    progressDict["statistics"] = new Dictionary
+                    {
+                        { "playerId", p.statistics.playerId },
+                        { "totalTournaments", p.statistics.totalTournaments },
+                        { "firstPlace", p.statistics.firstPlace },
+                        { "secondPlace", p.statistics.secondPlace },
+                        { "thirdPlace", p.statistics.thirdPlace },
+                        { "top4", p.statistics.top4 },
+                        { "top8", p.statistics.top8 },
+                        { "top16", p.statistics.top16 },
+                        { "totalWins", p.statistics.totalWins },
+                        { "totalLosses", p.statistics.totalLosses },
+                        { "highestRank", p.statistics.highestRank },
+                        { "totalPrizeWon", p.statistics.totalPrizeWon }
+                    };
+                }
+
+                progressData.Add(progressDict);
+            }
+            data["playerProgress"] = progressData;
+
+            GD.Print($"[ArenaTournamentCoreSystem] 导出 {Tournaments.Count} 个锦标赛, {PlayerProgress.Count} 个玩家进度");
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            // 导入锦标赛
+            if (data.Contains("tournaments"))
+            {
+                var tournamentsData = (ArrayList)data["tournaments"];
+                foreach (Dictionary td in tournamentsData)
+                {
+                    var tournament = new Tournament
+                    {
+                        tournamentId = td["tournamentId"]?.ToString() ?? "",
+                        tournamentName = td["tournamentName"]?.ToString() ?? "",
+                        description = td["description"]?.ToString() ?? "",
+                        format = (TournamentFormat)(td["format"] as int? ?? 0),
+                        status = (TournamentStatus)(td["status"] as int? ?? 0),
+                        currentStage = (TournamentStage)(td["currentStage"] as int? ?? 0),
+                        maxPlayers = td["maxPlayers"] as int? ?? 0,
+                        minPlayers = td["minPlayers"] as int? ?? 0,
+                        currentPlayerCount = td["currentPlayerCount"] as int? ?? 0,
+                        registrationStart = DateTime.Parse(td["registrationStart"]?.ToString() ?? DateTime.Now.ToString("o")),
+                        registrationEnd = DateTime.Parse(td["registrationEnd"]?.ToString() ?? DateTime.Now.AddHours(2).ToString("o")),
+                        rounds = td["rounds"] as int? ?? 0,
+                        currentRound = td["currentRound"] as int? ?? 0,
+                        prizePool = td["prizePool"] as int? ?? 0,
+                        entryFee = td["entryFee"] as int? ?? 0,
+                        organizerId = td["organizerId"]?.ToString() ?? "",
+                        createdAt = DateTime.Parse(td["createdAt"]?.ToString() ?? DateTime.Now.ToString("o")),
+                        updatedAt = DateTime.Parse(td["updatedAt"]?.ToString() ?? DateTime.Now.ToString("o"))
+                    };
+
+                    if (td["startTime"] != null && !string.IsNullOrEmpty(td["startTime"]?.ToString()))
+                        tournament.startTime = DateTime.Parse(td["startTime"]?.ToString());
+                    if (td["endTime"] != null && !string.IsNullOrEmpty(td["endTime"]?.ToString()))
+                        tournament.endTime = DateTime.Parse(td["endTime"]?.ToString());
+
+                    // 导入玩家
+                    if (td.Contains("registeredPlayers"))
+                    {
+                        foreach (Dictionary pd in (ArrayList)td["registeredPlayers"])
+                        {
+                            tournament.registeredPlayers.Add(new TournamentPlayer
+                            {
+                                playerId = pd["playerId"]?.ToString() ?? "",
+                                playerName = pd["playerName"]?.ToString() ?? "",
+                                seedNumber = pd["seedNumber"] as int? ?? 0,
+                                score = pd["score"] as int? ?? 0,
+                                wins = pd["wins"] as int? ?? 0,
+                                losses = pd["losses"] as int? ?? 0,
+                                matchesPlayed = pd["matchesPlayed"] as int? ?? 0,
+                                isEliminated = pd["isEliminated"] as bool? ?? false,
+                                hasLostOnce = pd["hasLostOnce"] as bool? ?? false,
+                                registrationTime = DateTime.Parse(pd["registrationTime"]?.ToString() ?? DateTime.Now.ToString("o")),
+                                matchHistory = new List<string>((ArrayList)pd["matchHistory"])
+                            });
+                        }
+                    }
+
+                    // 导入比赛
+                    if (td.Contains("matches"))
+                    {
+                        foreach (Dictionary md in (ArrayList)td["matches"])
+                        {
+                            var match = new TournamentMatch
+                            {
+                                matchId = md["matchId"]?.ToString() ?? "",
+                                roundNumber = md["roundNumber"] as int? ?? 0,
+                                matchNumber = md["matchNumber"] as int? ?? 0,
+                                stage = (TournamentStage)(md["stage"] as int? ?? 0),
+                                player1Id = md["player1Id"]?.ToString() ?? "",
+                                player2Id = md["player2Id"]?.ToString() ?? "",
+                                winnerId = md["winnerId"]?.ToString() ?? "",
+                                player1Score = md["player1Score"] as int? ?? 0,
+                                player2Score = md["player2Score"] as int? ?? 0,
+                                isCompleted = md["isCompleted"] as bool? ?? false,
+                                scheduledTime = DateTime.Parse(md["scheduledTime"]?.ToString() ?? DateTime.Now.ToString("o"))
+                            };
+                            if (md["completedTime"] != null && !string.IsNullOrEmpty(md["completedTime"]?.ToString()))
+                                match.completedTime = DateTime.Parse(md["completedTime"]?.ToString());
+                            tournament.matches.Add(match);
+                        }
+                    }
+
+                    // 导入奖励
+                    if (td.Contains("rewards"))
+                    {
+                        foreach (Dictionary rd in (ArrayList)td["rewards"])
+                        {
+                            tournament.rewards.Add(new TournamentReward
+                            {
+                                rankStart = rd["rankStart"] as int? ?? 0,
+                                rankEnd = rd["rankEnd"] as int? ?? 0,
+                                rewardType = rd["rewardType"]?.ToString() ?? "",
+                                rewardId = rd["rewardId"]?.ToString() ?? "",
+                                rewardAmount = rd["rewardAmount"] as int? ?? 0
+                            });
+                        }
+                    }
+
+                    Tournaments[tournament.tournamentId] = tournament;
+                }
+            }
+
+            // 恢复活动锦标赛
+            if (data.Contains("activeTournamentIds"))
+            {
+                foreach (string tid in (ArrayList)data["activeTournamentIds"])
+                {
+                    if (Tournaments.TryGetValue(tid, out var tournament))
+                    {
+                        ActiveTournaments.Add(tournament);
+                    }
+                }
+            }
+
+            // 导入玩家进度
+            if (data.Contains("playerProgress"))
+            {
+                foreach (Dictionary pd in (ArrayList)data["playerProgress"])
+                {
+                    var progress = new TournamentProgress
+                    {
+                        playerId = pd["playerId"]?.ToString() ?? "",
+                        participatedTournaments = new List<string>((ArrayList)pd["participatedTournaments"])
+                    };
+
+                    // 导入最近记录
+                    if (pd.Contains("recentRecords"))
+                    {
+                        foreach (Dictionary rd in (ArrayList)pd["recentRecords"])
+                        {
+                            progress.recentRecords.Add(new PlayerTournamentRecord
+                            {
+                                playerId = rd["playerId"]?.ToString() ?? "",
+                                tournamentId = rd["tournamentId"]?.ToString() ?? "",
+                                tournamentName = rd["tournamentName"]?.ToString() ?? "",
+                                finalRank = rd["finalRank"] as int? ?? 0,
+                                score = rd["score"] as int? ?? 0,
+                                wins = rd["wins"] as int? ?? 0,
+                                losses = rd["losses"] as int? ?? 0,
+                                participatedAt = DateTime.Parse(rd["participatedAt"]?.ToString() ?? DateTime.Now.ToString("o"))
+                            });
+                        }
+                    }
+
+                    // 导入统计
+                    if (pd.Contains("statistics"))
+                    {
+                        var sd = (Dictionary)pd["statistics"];
+                        progress.statistics = new TournamentStatistics
+                        {
+                            playerId = sd["playerId"]?.ToString() ?? "",
+                            totalTournaments = sd["totalTournaments"] as int? ?? 0,
+                            firstPlace = sd["firstPlace"] as int? ?? 0,
+                            secondPlace = sd["secondPlace"] as int? ?? 0,
+                            thirdPlace = sd["thirdPlace"] as int? ?? 0,
+                            top4 = sd["top4"] as int? ?? 0,
+                            top8 = sd["top8"] as int? ?? 0,
+                            top16 = sd["top16"] as int? ?? 0,
+                            totalWins = sd["totalWins"] as int? ?? 0,
+                            totalLosses = sd["totalLosses"] as int? ?? 0,
+                            highestRank = sd["highestRank"] as int? ?? 0,
+                            totalPrizeWon = sd["totalPrizeWon"] as int? ?? 0
+                        };
+                    }
+
+                    PlayerProgress[progress.playerId] = progress;
+                }
+            }
+
+            GD.Print($"[ArenaTournamentCoreSystem] 导入 {Tournaments.Count} 个锦标赛, {PlayerProgress.Count} 个玩家进度");
         }
 
         #endregion

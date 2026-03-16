@@ -483,5 +483,134 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         }
 
         #endregion
+
+        #region 持久化
+
+        /// <summary>
+        /// 导出持久化数据
+        /// </summary>
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // 序列化玩家状态
+            var playerStatesData = new List<Dictionary<string, object>>();
+            if (_playerStates != null)
+            {
+                foreach (var kvp in _playerStates)
+                {
+                    var state = kvp.Value;
+                    playerStatesData.Add(new Dictionary<string, object>
+                    {
+                        ["playerId"] = kvp.Key,
+                        ["health"] = state.Health,
+                        ["maxHealth"] = state.MaxHealth,
+                        ["mana"] = state.Mana,
+                        ["maxMana"] = state.MaxMana,
+                        ["positionX"] = state.PositionX,
+                        ["positionY"] = state.PositionY,
+                        ["lastUpdate"] = state.LastUpdate
+                    });
+                }
+            }
+            data["PlayerStates"] = playerStatesData;
+            
+            // 序列化敌人状态
+            var enemyStatesData = new List<Dictionary<string, object>>();
+            if (_enemyStates != null)
+            {
+                foreach (var kvp in _enemyStates)
+                {
+                    var state = kvp.Value;
+                    enemyStatesData.Add(new Dictionary<string, object>
+                    {
+                        ["enemyId"] = kvp.Key,
+                        ["health"] = state.Health,
+                        ["maxHealth"] = state.MaxHealth,
+                        ["positionX"] = state.PositionX,
+                        ["positionY"] = state.PositionY,
+                        ["aggroPlayerId"] = state.AggroPlayerId,
+                        ["lastUpdate"] = state.LastUpdate
+                    });
+                }
+            }
+            data["EnemyStates"] = enemyStatesData;
+            
+            GD.Print($"[BattleSyncPlayer] 导出 {playerStatesData.Count} 玩家状态, {enemyStatesData.Count} 敌人状态");
+            return data;
+        }
+
+        /// <summary>
+        /// 导入持久化数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null)
+            {
+                GD.Print("[BattleSyncPlayer] 无数据可导入");
+                return;
+            }
+            
+            // 导入玩家状态
+            _playerStates?.Clear();
+            if (data.ContainsKey("PlayerStates"))
+            {
+                var playerStatesData = data["PlayerStates"] as List<object>;
+                if (playerStatesData != null && _playerStates != null)
+                {
+                    foreach (var pObj in playerStatesData)
+                    {
+                        var pDict = pObj as Dictionary<string, object>;
+                        if (pDict == null) continue;
+                        
+                        var state = new BattleSyncData.PlayerBattleState
+                        {
+                            Health = (float)(pDict["health"] ?? 0f),
+                            MaxHealth = (float)(pDict["maxHealth"] ?? 100f),
+                            Mana = (float)(pDict["mana"] ?? 0f),
+                            MaxMana = (float)(pDict["maxMana"] ?? 100f),
+                            PositionX = (float)(pDict["positionX"] ?? 0f),
+                            PositionY = (float)(pDict["positionY"] ?? 0f),
+                            LastUpdate = (long)(pDict["lastUpdate"] ?? 0L)
+                        };
+                        
+                        var playerId = (int)(pDict["playerId"] ?? 0);
+                        _playerStates[playerId] = state;
+                    }
+                }
+            }
+            
+            // 导入敌人状态
+            _enemyStates?.Clear();
+            if (data.ContainsKey("EnemyStates"))
+            {
+                var enemyStatesData = data["EnemyStates"] as List<object>;
+                if (enemyStatesData != null && _enemyStates != null)
+                {
+                    foreach (var eObj in enemyStatesData)
+                    {
+                        var eDict = eObj as Dictionary<string, object>;
+                        if (eDict == null) continue;
+                        
+                        var state = new BattleSyncData.EnemyBattleState
+                        {
+                            Health = (float)(eDict["health"] ?? 0f),
+                            MaxHealth = (float)(eDict["maxHealth"] ?? 100f),
+                            PositionX = (float)(eDict["positionX"] ?? 0f),
+                            PositionY = (float)(eDict["positionY"] ?? 0f),
+                            AggroPlayerId = (int)(eDict["aggroPlayerId"] ?? 0),
+                            LastUpdate = (long)(eDict["lastUpdate"] ?? 0L)
+                        };
+                        
+                        var enemyId = (int)(eDict["enemyId"] ?? 0);
+                        _enemyStates[enemyId] = state;
+                    }
+                }
+            }
+            
+            GD.Print($"[BattleSyncPlayer] 导入 {_playerStates?.Count ?? 0} 玩家状态, {_enemyStates?.Count ?? 0} 敌人状态");
+        }
+
+        #endregion
     }
 }

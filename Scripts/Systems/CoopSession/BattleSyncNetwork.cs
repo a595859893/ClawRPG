@@ -341,5 +341,43 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         }
 
         #endregion
+
+        #region 持久化
+
+        /// <summary>
+        /// 导出持久化数据
+        /// </summary>
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // 序列化网络状态
+            data["IsNetworkEnabled"] = _isNetworkEnabled;
+            
+            GD.Print($"[BattleSyncNetwork] 导出网络状态: {_isNetworkEnabled}");
+            return data;
+        }
+
+        /// <summary>
+        /// 导入持久化数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null)
+            {
+                GD.Print("[BattleSyncNetwork] 无数据可导入");
+                return;
+            }
+            
+            // 导入网络状态
+            if (data.ContainsKey("IsNetworkEnabled"))
+            {
+                _isNetworkEnabled = (bool)(data["IsNetworkEnabled"] ?? false);
+            }
+            
+            GD.Print($"[BattleSyncNetwork] 导入网络状态: {_isNetworkEnabled}");
+        }
+
+        #endregion
     }
 }
