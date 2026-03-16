@@ -5,12 +5,13 @@ using System.Text;
 
 namespace ClawRPG.Scripts.Combat {
     /// <summary>
-    /// 战斗日志格式化器 - 负责格式化日志输出
+    /// Combat log formatter - formats log entries for display
+    /// Uses CombatLogData types (CombatLogEntry, CombatLogType)
     /// </summary>
     public partial class CombatLogFormatter : BaseSystem {
         
         /// <summary>
-        /// 日志格式类型
+        /// Log format types
         /// </summary>
         public enum FormatType {
             Simple,
