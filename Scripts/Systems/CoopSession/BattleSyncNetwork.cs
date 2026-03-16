@@ -347,9 +347,9 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// <summary>
         /// 导出持久化数据
         /// </summary>
-        public override Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            var data = new Dictionary<string, object>();
+            var data = new Dictionary();
             
             // 序列化网络状态
             data["IsNetworkEnabled"] = _isNetworkEnabled;
@@ -361,7 +361,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// <summary>
         /// 导入持久化数据
         /// </summary>
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null)
             {
@@ -370,9 +370,9 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
             
             // 导入网络状态
-            if (data.ContainsKey("IsNetworkEnabled"))
+            if (data.Contains("IsNetworkEnabled"))
             {
-                _isNetworkEnabled = (bool)(data["IsNetworkEnabled"] ?? false);
+                _isNetworkEnabled = data["IsNetworkEnabled"] is bool ine && ine;
             }
             
             GD.Print($"[BattleSyncNetwork] 导入网络状态: {_isNetworkEnabled}");

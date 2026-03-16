@@ -10,6 +10,9 @@ namespace ClawRPG.Scripts.Systems.CoopSession
     /// </summary>
     public class BattleSyncCombat : BaseSystem
     {
+        // 线程安全锁
+        protected readonly object _lock = new object();
+
         // 待广播的战斗操作
         protected Queue<BattleSyncData.BattleAction> _pendingActions;
         protected Queue<BattleSyncData.BattleAction> _broadcastBuffer;
@@ -446,17 +449,17 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// <summary>
         /// 导出持久化数据
         /// </summary>
-        public override Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            var data = new Dictionary<string, object>();
+            var data = new Dictionary();
             
             // 序列化待广播的战斗操作
-            var pendingActionsData = new List<Dictionary<string, object>>();
+            var pendingActionsData = new ArrayList();
             if (_pendingActions != null)
             {
                 foreach (var action in _pendingActions)
                 {
-                    pendingActionsData.Add(new Dictionary<string, object>
+                    pendingActionsData.Add(new Dictionary
                     {
                         ["playerId"] = action.PlayerId,
                         ["playerName"] = action.PlayerName,
@@ -474,12 +477,12 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             data["PendingActions"] = pendingActionsData;
             
             // 序列化广播缓冲区
-            var broadcastBufferData = new List<Dictionary<string, object>>();
+            var broadcastBufferData = new ArrayList();
             if (_broadcastBuffer != null)
             {
                 foreach (var action in _broadcastBuffer)
                 {
-                    broadcastBufferData.Add(new Dictionary<string, object>
+                    broadcastBufferData.Add(new Dictionary
                     {
                         ["playerId"] = action.PlayerId,
                         ["playerName"] = action.PlayerName,
@@ -503,7 +506,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// <summary>
         /// 导入持久化数据
         /// </summary>
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null)
             {
@@ -511,63 +514,53 @@ namespace ClawRPG.Scripts.Systems.CoopSession
                 return;
             }
             
+            // 初始化队列
+            if (_pendingActions == null) _pendingActions = new Queue<BattleSyncData.BattleAction>();
+            if (_broadcastBuffer == null) _broadcastBuffer = new Queue<BattleSyncData.BattleAction>();
+            
             // 导入待处理操作
-            _pendingActions?.Clear();
-            if (data.ContainsKey("PendingActions") && _pendingActions != null)
+            _pendingActions.Clear();
+            if (data.Contains("PendingActions") && data["PendingActions"] is ArrayList pendingActionsData)
             {
-                var pendingActionsData = data["PendingActions"] as List<object>;
-                if (pendingActionsData != null)
+                foreach (Dictionary aDict in pendingActionsData)
                 {
-                    foreach (var aObj in pendingActionsData)
+                    var action = new BattleSyncData.BattleAction
                     {
-                        var aDict = aObj as Dictionary<string, object>;
-                        if (aDict == null) continue;
-                        
-                        var action = new BattleSyncData.BattleAction
-                        {
-                            PlayerId = (int)(aDict["playerId"] ?? 0),
-                            PlayerName = aDict["playerName"] as string ?? "",
-                            Type = (BattleActionType)(int)(aDict["type"] ?? 0),
-                            Value = (float)(aDict["value"] ?? 0f),
-                            SkillId = aDict["skillId"] as string ?? "",
-                            TargetId = (int)(aDict["targetId"] ?? -1),
-                            TargetX = (float)(aDict["targetX"] ?? 0f),
-                            TargetY = (float)(aDict["targetY"] ?? 0f),
-                            IsCritical = (bool)(aDict["isCritical"] ?? false),
-                            Timestamp = (long)(aDict["timestamp"] ?? 0L)
-                        };
-                        _pendingActions.Enqueue(action);
-                    }
+                        PlayerId = aDict["playerId"] is int pid ? pid : 0,
+                        PlayerName = aDict["playerName"]?.ToString() ?? "",
+                        Type = aDict["type"] is int t ? (BattleActionType)t : BattleActionType.Attack,
+                        Value = aDict["value"] is float v ? v : 0f,
+                        SkillId = aDict["skillId"]?.ToString() ?? "",
+                        TargetId = aDict["targetId"] is int tid ? tid : -1,
+                        TargetX = aDict["targetX"] is float tx ? tx : 0f,
+                        TargetY = aDict["targetY"] is float ty ? ty : 0f,
+                        IsCritical = aDict["isCritical"] is bool ic ? ic : false,
+                        Timestamp = aDict["timestamp"] is long ts ? ts : 0L
+                    };
+                    _pendingActions.Enqueue(action);
                 }
             }
             
             // 导入广播缓冲区
-            _broadcastBuffer?.Clear();
-            if (data.ContainsKey("BroadcastBuffer") && _broadcastBuffer != null)
+            _broadcastBuffer.Clear();
+            if (data.Contains("BroadcastBuffer") && data["BroadcastBuffer"] is ArrayList broadcastBufferData)
             {
-                var broadcastBufferData = data["BroadcastBuffer"] as List<object>;
-                if (broadcastBufferData != null)
+                foreach (Dictionary aDict in broadcastBufferData)
                 {
-                    foreach (var aObj in broadcastBufferData)
+                    var action = new BattleSyncData.BattleAction
                     {
-                        var aDict = aObj as Dictionary<string, object>;
-                        if (aDict == null) continue;
-                        
-                        var action = new BattleSyncData.BattleAction
-                        {
-                            PlayerId = (int)(aDict["playerId"] ?? 0),
-                            PlayerName = aDict["playerName"] as string ?? "",
-                            Type = (BattleActionType)(int)(aDict["type"] ?? 0),
-                            Value = (float)(aDict["value"] ?? 0f),
-                            SkillId = aDict["skillId"] as string ?? "",
-                            TargetId = (int)(aDict["targetId"] ?? -1),
-                            TargetX = (float)(aDict["targetX"] ?? 0f),
-                            TargetY = (float)(aDict["targetY"] ?? 0f),
-                            IsCritical = (bool)(aDict["isCritical"] ?? false),
-                            Timestamp = (long)(aDict["timestamp"] ?? 0L)
-                        };
-                        _broadcastBuffer.Enqueue(action);
-                    }
+                        PlayerId = aDict["playerId"] is int pid ? pid : 0,
+                        PlayerName = aDict["playerName"]?.ToString() ?? "",
+                        Type = aDict["type"] is int t ? (BattleActionType)t : BattleActionType.Attack,
+                        Value = aDict["value"] is float v ? v : 0f,
+                        SkillId = aDict["skillId"]?.ToString() ?? "",
+                        TargetId = aDict["targetId"] is int tid ? tid : -1,
+                        TargetX = aDict["targetX"] is float tx ? tx : 0f,
+                        TargetY = aDict["targetY"] is float ty ? ty : 0f,
+                        IsCritical = aDict["isCritical"] is bool ic ? ic : false,
+                        Timestamp = aDict["timestamp"] is long ts ? ts : 0L
+                    };
+                    _broadcastBuffer.Enqueue(action);
                 }
             }
             

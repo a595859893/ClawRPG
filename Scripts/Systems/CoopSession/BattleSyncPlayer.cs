@@ -489,47 +489,65 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// <summary>
         /// 导出持久化数据
         /// </summary>
-        public override Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            var data = new Dictionary<string, object>();
+            var data = new Dictionary();
             
             // 序列化玩家状态
-            var playerStatesData = new List<Dictionary<string, object>>();
+            var playerStatesData = new ArrayList();
             if (_playerStates != null)
             {
                 foreach (var kvp in _playerStates)
                 {
                     var state = kvp.Value;
-                    playerStatesData.Add(new Dictionary<string, object>
+                    var buffsData = new ArrayList();
+                    foreach (var buff in state.ActiveBuffs)
+                    {
+                        buffsData.Add(new Dictionary
+                        {
+                            ["buffId"] = buff.BuffId,
+                            ["buffName"] = buff.BuffName,
+                            ["stacks"] = buff.Stacks,
+                            ["duration"] = buff.Duration,
+                            ["isDebuff"] = buff.IsDebuff
+                        });
+                    }
+                    
+                    playerStatesData.Add(new Dictionary
                     {
                         ["playerId"] = kvp.Key,
+                        ["playerName"] = state.PlayerName,
                         ["health"] = state.Health,
                         ["maxHealth"] = state.MaxHealth,
                         ["mana"] = state.Mana,
                         ["maxMana"] = state.MaxMana,
                         ["positionX"] = state.PositionX,
                         ["positionY"] = state.PositionY,
-                        ["lastUpdate"] = state.LastUpdate
+                        ["isDead"] = state.IsDead,
+                        ["lastUpdate"] = state.LastUpdate,
+                        ["activeBuffs"] = buffsData
                     });
                 }
             }
             data["PlayerStates"] = playerStatesData;
             
             // 序列化敌人状态
-            var enemyStatesData = new List<Dictionary<string, object>>();
+            var enemyStatesData = new ArrayList();
             if (_enemyStates != null)
             {
                 foreach (var kvp in _enemyStates)
                 {
                     var state = kvp.Value;
-                    enemyStatesData.Add(new Dictionary<string, object>
+                    enemyStatesData.Add(new Dictionary
                     {
                         ["enemyId"] = kvp.Key,
+                        ["enemyType"] = state.EnemyType,
                         ["health"] = state.Health,
                         ["maxHealth"] = state.MaxHealth,
                         ["positionX"] = state.PositionX,
                         ["positionY"] = state.PositionY,
                         ["aggroPlayerId"] = state.AggroPlayerId,
+                        ["isDead"] = state.IsDead,
                         ["lastUpdate"] = state.LastUpdate
                     });
                 }
@@ -543,7 +561,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// <summary>
         /// 导入持久化数据
         /// </summary>
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null)
             {
@@ -553,28 +571,43 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             
             // 导入玩家状态
             _playerStates?.Clear();
-            if (data.ContainsKey("PlayerStates"))
+            if (data.Contains("PlayerStates") && data["PlayerStates"] is ArrayList playerStatesData)
             {
-                var playerStatesData = data["PlayerStates"] as List<object>;
-                if (playerStatesData != null && _playerStates != null)
+                if (_playerStates != null)
                 {
-                    foreach (var pObj in playerStatesData)
+                    foreach (Dictionary pDict in playerStatesData)
                     {
-                        var pDict = pObj as Dictionary<string, object>;
-                        if (pDict == null) continue;
-                        
+                        var playerId = pDict["playerId"] is int pid ? pid : 0;
                         var state = new BattleSyncData.PlayerBattleState
                         {
-                            Health = (float)(pDict["health"] ?? 0f),
-                            MaxHealth = (float)(pDict["maxHealth"] ?? 100f),
-                            Mana = (float)(pDict["mana"] ?? 0f),
-                            MaxMana = (float)(pDict["maxMana"] ?? 100f),
-                            PositionX = (float)(pDict["positionX"] ?? 0f),
-                            PositionY = (float)(pDict["positionY"] ?? 0f),
-                            LastUpdate = (long)(pDict["lastUpdate"] ?? 0L)
+                            PlayerId = playerId,
+                            PlayerName = pDict["playerName"]?.ToString() ?? "",
+                            Health = pDict["health"] is float hp ? hp : 0f,
+                            MaxHealth = pDict["maxHealth"] is float mhp ? mhp : 100f,
+                            Mana = pDict["mana"] is float m ? m : 0f,
+                            MaxMana = pDict["maxMana"] is float mm ? mm : 100f,
+                            PositionX = pDict["positionX"] is float px ? px : 0f,
+                            PositionY = pDict["positionY"] is float py ? py : 0f,
+                            IsDead = pDict["isDead"] is bool id ? id : false,
+                            LastUpdate = pDict["lastUpdate"] is long lu ? lu : 0L
                         };
                         
-                        var playerId = (int)(pDict["playerId"] ?? 0);
+                        // 导入 Buff
+                        if (pDict["activeBuffs"] is ArrayList buffsData)
+                        {
+                            foreach (Dictionary bd in buffsData)
+                            {
+                                state.ActiveBuffs.Add(new BattleSyncData.BuffState
+                                {
+                                    BuffId = bd["buffId"]?.ToString() ?? "",
+                                    BuffName = bd["buffName"]?.ToString() ?? "",
+                                    Stacks = bd["stacks"] is int s ? s : 0,
+                                    Duration = bd["duration"] is float d ? d : 0f,
+                                    IsDebuff = bd["isDebuff"] is bool isd ? isd : false
+                                });
+                            }
+                        }
+                        
                         _playerStates[playerId] = state;
                     }
                 }
@@ -582,27 +615,25 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             
             // 导入敌人状态
             _enemyStates?.Clear();
-            if (data.ContainsKey("EnemyStates"))
+            if (data.Contains("EnemyStates") && data["EnemyStates"] is ArrayList enemyStatesData)
             {
-                var enemyStatesData = data["EnemyStates"] as List<object>;
-                if (enemyStatesData != null && _enemyStates != null)
+                if (_enemyStates != null)
                 {
-                    foreach (var eObj in enemyStatesData)
+                    foreach (Dictionary eDict in enemyStatesData)
                     {
-                        var eDict = eObj as Dictionary<string, object>;
-                        if (eDict == null) continue;
-                        
+                        var enemyId = eDict["enemyId"] is int eid ? eid : 0;
                         var state = new BattleSyncData.EnemyBattleState
                         {
-                            Health = (float)(eDict["health"] ?? 0f),
-                            MaxHealth = (float)(eDict["maxHealth"] ?? 100f),
-                            PositionX = (float)(eDict["positionX"] ?? 0f),
-                            PositionY = (float)(eDict["positionY"] ?? 0f),
-                            AggroPlayerId = (int)(eDict["aggroPlayerId"] ?? 0),
-                            LastUpdate = (long)(eDict["lastUpdate"] ?? 0L)
+                            EnemyId = enemyId,
+                            EnemyType = eDict["enemyType"]?.ToString() ?? "",
+                            Health = eDict["health"] is float hp ? hp : 0f,
+                            MaxHealth = eDict["maxHealth"] is float mhp ? mhp : 100f,
+                            PositionX = eDict["positionX"] is float px ? px : 0f,
+                            PositionY = eDict["positionY"] is float py ? py : 0f,
+                            AggroPlayerId = eDict["aggroPlayerId"] is int apid ? apid : 0,
+                            IsDead = eDict["isDead"] is bool id ? id : false,
+                            LastUpdate = eDict["lastUpdate"] is long lu ? lu : 0L
                         };
-                        
-                        var enemyId = (int)(eDict["enemyId"] ?? 0);
                         _enemyStates[enemyId] = state;
                     }
                 }
