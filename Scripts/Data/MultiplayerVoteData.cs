@@ -137,6 +137,8 @@ namespace ClawRPG.Modules.MultiplayerVote
         public int PartiesJoined { get; set; }
         public int TimesKicked { get; set; }
         public int TimesKickedOthers { get; set; }
+        public int TimesPromoted { get; set; }
+        public int TimesDemoted { get; set; }
     }
 
     /// <summary>

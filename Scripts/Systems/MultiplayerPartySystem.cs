@@ -281,6 +281,46 @@ namespace ClawRPG.Modules.MultiplayerVote
         }
 
         /// <summary>
+        /// Promote a party member to leader
+        /// </summary>
+        public bool PromoteLeader(string oldLeaderId, string newLeaderId)
+        {
+            var oldLeaderData = GetPlayerPartyData(oldLeaderId);
+            if (oldLeaderData == null || string.IsNullOrEmpty(oldLeaderData.CurrentPartyId))
+                return false;
+
+            var party = _data.ActiveParties[oldLeaderData.CurrentPartyId];
+            
+            // Verify the old leader is actually the leader
+            if (party.LeaderId != oldLeaderId)
+                return false;
+
+            var oldLeaderMember = party.Members.FirstOrDefault(m => m.PlayerId == oldLeaderId);
+            var newLeaderMember = party.Members.FirstOrDefault(m => m.PlayerId == newLeaderId);
+            
+            if (oldLeaderMember == null || newLeaderMember == null)
+                return false;
+
+            // Update old leader
+            oldLeaderMember.IsLeader = false;
+            oldLeaderMember.Role = "Member";
+            
+            // Update new leader
+            newLeaderMember.IsLeader = true;
+            newLeaderMember.Role = "Leader";
+            
+            // Update party
+            party.LeaderId = newLeaderId;
+
+            // Update statistics
+            GetOrCreatePlayerStatistics(oldLeaderId).TimesDemoted++;
+            GetOrCreatePlayerStatistics(newLeaderId).TimesPromoted++;
+
+            EmitSignal(SignalName.PartyLeaderChanged, party.PartyId, newLeaderId);
+            return true;
+        }
+
+        /// <summary>
         /// Set player ready status
         /// </summary>
         public bool SetReady(string playerId, bool ready)
@@ -437,7 +477,9 @@ namespace ClawRPG.Modules.MultiplayerVote
                     ["PartiesCreated"] = stat.PartiesCreated,
                     ["PartiesJoined"] = stat.PartiesJoined,
                     ["TimesKicked"] = stat.TimesKicked,
-                    ["TimesKickedOthers"] = stat.TimesKickedOthers
+                    ["TimesKickedOthers"] = stat.TimesKickedOthers,
+                    ["TimesPromoted"] = stat.TimesPromoted,
+                    ["TimesDemoted"] = stat.TimesDemoted
                 });
             }
             data["PlayerStatistics"] = statistics;
@@ -531,7 +573,9 @@ namespace ClawRPG.Modules.MultiplayerVote
                         PartiesCreated = Convert.ToInt32(statDict.GetValueOrDefault("PartiesCreated", 0)),
                         PartiesJoined = Convert.ToInt32(statDict.GetValueOrDefault("PartiesJoined", 0)),
                         TimesKicked = Convert.ToInt32(statDict.GetValueOrDefault("TimesKicked", 0)),
-                        TimesKickedOthers = Convert.ToInt32(statDict.GetValueOrDefault("TimesKickedOthers", 0))
+                        TimesKickedOthers = Convert.ToInt32(statDict.GetValueOrDefault("TimesKickedOthers", 0)),
+                        TimesPromoted = Convert.ToInt32(statDict.GetValueOrDefault("TimesPromoted", 0)),
+                        TimesDemoted = Convert.ToInt32(statDict.GetValueOrDefault("TimesDemoted", 0))
                     };
 
                     _data.PlayerStatistics[stat.PlayerId] = stat;
