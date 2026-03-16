@@ -1,9 +1,13 @@
+using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Random = System.Random;
 
-public class DailyPuzzleSystem
+/// <summary>
+/// 每日谜题系统 - 提供每日挑战玩法
+/// </summary>
+public class DailyPuzzleSystem : BaseSystem
 {
     private static DailyPuzzleData _data;
     private static Random _random = new Random();
@@ -13,6 +17,15 @@ public class DailyPuzzleSystem
     {
         _data = new DailyPuzzleData();
         LoadData();
+    }
+    
+    // BaseSystem Initialize override
+    protected override void Initialize()
+    {
+        _data = new DailyPuzzleData();
+        LoadData();
+        IsInitialized = true;
+        GD.Print("[DailyPuzzleSystem] Initialized");
     }
     
     // Get daily puzzle based on date
@@ -185,7 +198,111 @@ public class DailyPuzzleSystem
         return _data.SolvedPuzzleIds;
     }
     
-    // Load data from file
+    #region 数据持久化接口
+    
+    /// <summary>
+    /// 导出保存数据 - 实现 BaseSystem 接口
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        if (_data == null) return data;
+        
+        data["current_daily_puzzle_id"] = _data.CurrentDailyPuzzleId;
+        data["last_puzzle_date"] = _data.LastPuzzleDate.ToString("o");
+        data["current_streak"] = _data.CurrentStreak;
+        data["best_streak"] = _data.BestStreak;
+        data["total_solved"] = _data.TotalSolved;
+        data["total_failed"] = _data.TotalFailed;
+        data["hints_used"] = _data.HintsUsed;
+        data["total_gold_earned"] = _data.TotalGoldEarned;
+        data["total_exp_earned"] = _data.TotalExpEarned;
+        
+        // Save solved puzzles
+        var solvedArray = new Godot.Array();
+        if (_data.SolvedPuzzles != null)
+        {
+            foreach (var kvp in _data.SolvedPuzzles)
+            {
+                var record = kvp.Value;
+                var puzzleRecord = new Godot.Dictionary();
+                puzzleRecord["puzzle_id"] = record.PuzzleId;
+                puzzleRecord["solved_date"] = record.SolvedDate.ToString("o");
+                puzzleRecord["time_taken"] = record.TimeTakenSeconds;
+                puzzleRecord["hints_used"] = record.HintsUsed;
+                puzzleRecord["used_bonus_time"] = record.UsedBonusTime;
+                puzzleRecord["gold_earned"] = record.GoldEarned;
+                puzzleRecord["exp_earned"] = record.ExpEarned;
+                solvedArray.Add(puzzleRecord);
+            }
+        }
+        data["solved_puzzles"] = solvedArray;
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据 - 实现 BaseSystem 接口
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || _data == null) return;
+        
+        if (data.Contains("current_daily_puzzle_id"))
+            _data.CurrentDailyPuzzleId = (int)data["current_daily_puzzle_id"];
+        
+        if (data.Contains("last_puzzle_date"))
+            _data.LastPuzzleDate = DateTime.Parse((string)data["last_puzzle_date"]);
+        
+        if (data.Contains("current_streak"))
+            _data.CurrentStreak = (int)data["current_streak"];
+        
+        if (data.Contains("best_streak"))
+            _data.BestStreak = (int)data["best_streak"];
+        
+        if (data.Contains("total_solved"))
+            _data.TotalSolved = (int)data["total_solved"];
+        
+        if (data.Contains("total_failed"))
+            _data.TotalFailed = (int)data["total_failed"];
+        
+        if (data.Contains("hints_used"))
+            _data.HintsUsed = (int)data["hints_used"];
+        
+        if (data.Contains("total_gold_earned"))
+            _data.TotalGoldEarned = (int)data["total_gold_earned"];
+        
+        if (data.Contains("total_exp_earned"))
+            _data.TotalExpEarned = (int)data["total_exp_earned"];
+        
+        // Load solved puzzles
+        if (data.Contains("solved_puzzles"))
+        {
+            var solvedArray = (Godot.Array)data["solved_puzzles"];
+            foreach (Godot.Dictionary puzzleRecord in solvedArray)
+            {
+                var record = new PuzzleRecord
+                {
+                    PuzzleId = (int)puzzleRecord["puzzle_id"],
+                    SolvedDate = DateTime.Parse((string)puzzleRecord["solved_date"]),
+                    TimeTakenSeconds = (int)puzzleRecord["time_taken"],
+                    HintsUsed = (int)puzzleRecord["hints_used"],
+                    UsedBonusTime = (bool)puzzleRecord["used_bonus_time"],
+                    GoldEarned = (int)puzzleRecord["gold_earned"],
+                    ExpEarned = (int)puzzleRecord["exp_earned"]
+                };
+                _data.SolvedPuzzles[record.PuzzleId] = record;
+                
+                if (!_data.SolvedPuzzleIds.Contains(record.PuzzleId))
+                    _data.SolvedPuzzleIds.Add(record.PuzzleId);
+            }
+        }
+    }
+    
+    #endregion
+    
+    // Load data from file (legacy, 兼容旧调用)
     private static void LoadData()
     {
         var saveSystem = SaveSystem.Instance;
@@ -251,7 +368,7 @@ public class DailyPuzzleSystem
         }
     }
     
-    // Save data to file
+    // Save data to file (legacy, 兼容旧调用)
     private static void SaveData()
     {
         var saveSystem = SaveSystem.Instance;
