@@ -10,7 +10,14 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     
     public class GemSystem : BaseSystem {
         private static GemSystem _instance;
-        public static GemSystem Instance => _instance ??= new GemSystem();
+        public static GemSystem Instance => _instance ??= GetNode<GemSystem>("/root/GemSystem");
+
+        public override void _Ready()
+        {
+            base._Ready();
+            _instance = this;
+            _gemDatabase = GemDatabase.Instance;
+        }
         
         // 信号系统
         public static event Action<string, string> GemInserted; // 装备ID, 宝石ID
@@ -405,112 +412,3 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
                 _playerGemData.EquipmentSlots[key.ToString()] = slots;
             }
         }
-        
-        /// <summary>
-        /// 保存数据到文件
-        /// </summary>
-        private void SaveData() {
-            // 这里需要实现保存到存档系统
-            // 暂时使用 PlayerPrefs 或其他方式
-            // SaveManager.SaveGemSystemData(_playerGemData);
-        }
-        
-        /// <summary>
-        /// 从存档加载数据
-        /// </summary>
-        private void LoadData() {
-            // 这里需要实现从存档加载
-            // _playerGemData = LoadManager.LoadGemSystemData();
-        }
-        
-        /// <summary>
-        /// 导出保存数据（实现 BaseSystem 接口）
-        /// </summary>
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
-            
-            // 保存玩家拥有的宝石
-            var ownedGems = new Dictionary();
-            foreach (var kvp in _playerGemData.OwnedGems) {
-                ownedGems[kvp.Key] = kvp.Value;
-            }
-            data["owned_gems"] = ownedGems;
-            
-            // 保存装备槽位数据
-            data["equipment_slots"] = ExportEquipmentSlots();
-            
-            return data;
-        }
-        
-        /// <summary>
-        /// 导出装备槽位数据
-        /// </summary>
-        private Dictionary ExportEquipmentSlots() {
-            var data = new Dictionary();
-            foreach (var kvp in _playerGemData.EquipmentSlots) {
-                var slots = new Array();
-                foreach (var slot in kvp.Value) {
-                    var slotData = new Dictionary {
-                        { "index", slot.SlotIndex },
-                        { "unlocked", slot.IsUnlocked },
-                        { "gem_id", slot.GemId }
-                    };
-                    slots.Add(slotData);
-                }
-                data[kvp.Key] = slots;
-            }
-            return data;
-        }
-        
-        /// <summary>
-        /// 导入保存数据（实现 BaseSystem 接口）
-        /// </summary>
-        public override void ImportSaveData(Dictionary data) {
-            if (data == null) return;
-            
-            // 导入玩家拥有的宝石
-            if (data.Contains("owned_gems")) {
-                var gems = data["owned_gems"] as Dictionary;
-                _playerGemData.OwnedGems = new Dictionary<string, int>();
-                if (gems != null) {
-                    foreach (var key in gems.Keys) {
-                        _playerGemData.OwnedGems[key.ToString()] = (int)gems[key];
-                    }
-                }
-            }
-            
-            // 导入装备槽位数据
-            if (data.Contains("equipment_slots")) {
-                ImportEquipmentSlots(data["equipment_slots"] as Dictionary);
-            }
-        }
-        
-        /// <summary>
-        /// 导入装备槽位数据
-        /// </summary>
-        private void ImportEquipmentSlots(Dictionary data) {
-            if (data == null) return;
-            
-            _playerGemData.EquipmentSlots = new Dictionary<string, List<EquipmentGemSlot>>();
-            foreach (var key in data.Keys) {
-                var slotsArray = data[key] as Array;
-                if (slotsArray == null) continue;
-                
-                var slots = new List<EquipmentGemSlot>();
-                foreach (var slotData in slotsArray) {
-                    var sd = slotData as Dictionary;
-                    if (sd == null) continue;
-                    
-                    var slot = new EquipmentGemSlot {
-                        SlotIndex = (int)sd["index"],
-                        IsUnlocked = (bool)sd["unlocked"],
-                        GemId = sd["gem_id"].ToString()
-                    };
-                    slots.Add(slot);
-                }
-                
-                _playerGemData.EquipmentSlots[key.ToString()] = slots;
-            }
-        }
-    }
-}
