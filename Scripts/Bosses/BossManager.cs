@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Bosses {
     /// <summary>
     /// Manages boss encounters and spawning
     /// </summary>
-    public partial class BossManager : Node
+    public partial class BossManager : BaseSystem
     {
         public static BossManager Instance { get; private set; }
         
@@ -27,11 +27,12 @@ namespace ClawRPG.Scripts.Bosses {
         public event Action<int> OnBossPhaseChange;
         public event Action OnBossEnrage;
         
-        public override void _Ready()
+        protected override void Initialize()
         {
             Instance = this;
             InitializeSpawnPoints();
             GD.Print("BossManager initialized");
+            IsInitialized = true;
         }
         
         private void InitializeSpawnPoints()
@@ -336,6 +337,54 @@ namespace ClawRPG.Scripts.Bosses {
             
             var randomBoss = bosses[(int)GD.Randi() % bosses.Count];
             return SpawnBoss(randomBoss.Id, position);
+        }
+        
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            data["is_boss_active"] = _isBossActive;
+            data["boss_defeated"] = _bossDefeated;
+            
+            if (_currentBossData != null)
+            {
+                data["current_boss_id"] = _currentBossData.Id;
+            }
+            
+            return data;
+        }
+        
+        /// <summary>
+        /// Import save data on game load
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("is_boss_active"))
+            {
+                _isBossActive = (bool)data["is_boss_active"];
+            }
+            
+            if (data.Contains("boss_defeated"))
+            {
+                _bossDefeated = (bool)data["boss_defeated"];
+            }
+            
+            if (data.Contains("current_boss_id"))
+            {
+                var bossId = (string)data["current_boss_id"];
+                if (_isBossActive && !_bossDefeated)
+                {
+                    // Resume the boss encounter if it was active
+                    SpawnBoss(bossId);
+                }
+            }
+            
+            GD.Print($"BossManager save data loaded: active={_isBossActive}, defeated={_bossDefeated}");
         }
     }
 }
