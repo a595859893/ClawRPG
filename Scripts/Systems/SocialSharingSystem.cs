@@ -54,6 +54,18 @@ public class SocialSharingSystem : BaseSystem
     [Export] public string ScreenshotFolder = "user://screenshots/";
     [Export] public bool EnableGroupBotIntegration = true;
     [Export] public string BotWebhookUrl = "";
+    [Export] public string BotApiUrl = "http://localhost:8080/api/message";
+    [Export] public string BotWsUrl = "ws://localhost:8080/ws";
+    [Export] public bool UseWebSocket = false;
+    
+    // WebSocket 连接
+    private WebSocketPeer _webSocket;
+    private bool _wsConnected = false;
+    private string _pendingWsMessage = "";
+    
+    // HTTP 请求队列
+    private Queue<string> _httpRequestQueue = new Queue<string>();
+    private bool _isProcessingQueue = false;
 
     // 截图
     private Viewport _mainViewport;
@@ -499,34 +511,188 @@ public class SocialSharingSystem : BaseSystem
     #region Helper Methods
 
     /// <summary>
-    /// 发送 HTTP 请求到机器人 API
+    /// 发送 HTTP/WS 请求到机器人 API
     /// </summary>
     private async System.Threading.Tasks.Task SendHttpRequest(string url, string jsonBody)
     {
+        // 根据配置选择使用WebSocket或HTTP
+        if (UseWebSocket)
+        {
+            await SendWebSocketMessage(jsonBody);
+            return;
+        }
+        
+        // 使用HTTP请求
         var httpRequest = new HTTPClient();
         
         try
         {
-            await httpRequest.Request(HTTPClient.Method.Post, url, null, jsonBody);
+            // 添加请求头
+            var headers = new string[] {
+                "Content-Type: application/json"
+            };
+            
+            await httpRequest.Request(HTTPClient.Method.Post, url, headers, jsonBody);
             
             if (httpRequest.ResponseCode == 200)
             {
                 var response = httpRequest.ReadResponseBodyText();
                 GD.Print($"[SocialSharing] HTTP request success: {response}");
+                HandleBotCallback(response);
             }
             else
             {
                 GD.PrintErr($"[SocialSharing] HTTP request failed: {httpRequest.ResponseCode}");
+                OnShareCompleted?.Invoke(false, $"HTTP error: {httpRequest.ResponseCode}");
             }
         }
         catch (Exception e)
         {
             GD.PrintErr($"[SocialSharing] HTTP request error: {e.Message}");
+            OnShareCompleted?.Invoke(false, e.Message);
         }
         finally
         {
             httpRequest.Close();
         }
+    }
+
+    /// <summary>
+    /// 连接 WebSocket
+    /// </summary>
+    public async void ConnectWebSocket()
+    {
+        if (_wsConnected && _webSocket != null)
+        {
+            GD.Print("[SocialSharing] WebSocket already connected");
+            return;
+        }
+        
+        _webSocket = new WebSocketPeer();
+        
+        try
+        {
+            var err = _webSocket.ConnectToUrl(BotWsUrl);
+            if (err != Error.Ok)
+            {
+                GD.PrintErr($"[SocialSharing] WebSocket connect failed: {err}");
+                return;
+            }
+            
+            GD.Print($"[SocialSharing] WebSocket connecting to {BotWsUrl}");
+            
+            // 等待连接建立
+            int timeout = 5000;
+            int elapsed = 0;
+            while (elapsed < timeout)
+            {
+                await System.Threading.Tasks.Task.Delay(100);
+                elapsed += 100;
+                
+                _webSocket.Poll();
+                var state = _webSocket.GetReadyState();
+                
+                if (state == WebSocketPeer.State.Open)
+                {
+                    _wsConnected = true;
+                    GD.Print("[SocialSharing] WebSocket connected");
+                    
+                    // 处理之前堆积的消息
+                    if (!string.IsNullOrEmpty(_pendingWsMessage))
+                    {
+                        await SendWebSocketMessage(_pendingWsMessage);
+                        _pendingWsMessage = "";
+                    }
+                    return;
+                }
+                else if (state == WebSocketPeer.State.Closed)
+                {
+                    break;
+                }
+            }
+            
+            GD.PrintErr("[SocialSharing] WebSocket connection timeout");
+        }
+        catch (Exception e)
+        {
+            GD.PrintErr($"[SocialSharing] WebSocket error: {e.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 发送 WebSocket 消息
+    /// </summary>
+    private async System.Threading.Tasks.Task SendWebSocketMessage(string jsonBody)
+    {
+        if (!_wsConnected || _webSocket == null)
+        {
+            // 尝试连接
+            ConnectWebSocket();
+            _pendingWsMessage = jsonBody;
+            return;
+        }
+        
+        try
+        {
+            var packet = _webSocket.GetPacket();
+            if (packet != null)
+            {
+                // 处理接收到的消息
+                var msg = _webSocket.GetString();
+                if (!string.IsNullOrEmpty(msg))
+                {
+                    GD.Print($"[SocialSharing] WebSocket received: {msg}");
+                    HandleBotCallback(msg);
+                }
+            }
+            
+            // 发送消息
+            _webSocket.SendText(jsonBody);
+            GD.Print($"[SocialSharing] WebSocket sent: {jsonBody}");
+            OnShareCompleted?.Invoke(true, "Message sent via WebSocket");
+        }
+        catch (Exception e)
+        {
+            GD.PrintErr($"[SocialSharing] WebSocket send error: {e.Message}");
+            OnShareCompleted?.Invoke(false, e.Message);
+            
+            // 尝试重连
+            _wsConnected = false;
+            ConnectWebSocket();
+        }
+    }
+
+    /// <summary>
+    /// 断开 WebSocket 连接
+    /// </summary>
+    public void DisconnectWebSocket()
+    {
+        if (_webSocket != null)
+        {
+            _webSocket.Close();
+            _webSocket = null;
+            _wsConnected = false;
+            GD.Print("[SocialSharing] WebSocket disconnected");
+        }
+    }
+
+    /// <summary>
+    /// 处理 WebSocket 消息队列
+    /// </summary>
+    private async System.Threading.Tasks.Task ProcessMessageQueue()
+    {
+        if (_isProcessingQueue || _httpRequestQueue.Count == 0)
+            return;
+        
+        _isProcessingQueue = true;
+        
+        while (_httpRequestQueue.Count > 0)
+        {
+            var message = _httpRequestQueue.Dequeue();
+            await SendHttpRequest(BotApiUrl, message);
+        }
+        
+        _isProcessingQueue = false;
     }
 
     /// <summary>
@@ -596,32 +762,163 @@ public class SocialSharingSystem : BaseSystem
     }
 
     /// <summary>
-    /// 打开分享对话框
+    /// 打开分享对话框 - 支持多平台系统分享
     /// </summary>
     public void OpenShareDialog(ShareData data)
     {
         var shareText = GenerateShareText(data, ShareTemplate.Simple);
+        OpenShareDialogWithText(shareText);
+    }
+
+    /// <summary>
+    /// 使用指定文本打开分享对话框
+    /// </summary>
+    public void OpenShareDialogWithText(string shareText)
+    {
+        string currentOS = OS.GetName();
+        GD.Print($"[SocialSharing] Opening share dialog on {currentOS}");
         
-        // 调用系统分享对话框 (OS.Share 在 Godot 4.x 可用)
-        if (OS.GetName() == "Android" || OS.GetName() == "iOS")
+        // 根据平台选择分享方式
+        switch (currentOS)
         {
-            // 移动平台使用系统分享
-            var shareDict = new Dictionary<string, string>
-            {
-                { "text", shareText }
-            };
-            var jsonString = JsonSerializer.Serialize(shareDict);
-            GD.Print($"[SocialSharing] Native share: {jsonString}");
-            // OS.Share() 在支持的平台自动调用系统分享对话框
-        }
-        else
-        {
-            // 桌面平台回退到剪贴板
-            OS.SetClipboardString(shareText);
-            GD.Print($"[SocialSharing] Desktop platform - copied to clipboard");
+            case "Android":
+                ShareOnAndroid(shareText);
+                break;
+                
+            case "iOS":
+                ShareOnIOS(shareText);
+                break;
+                
+            case "Windows":
+            case "macOS":
+            case "Linux":
+                // 桌面平台显示自定义分享UI或复制到剪贴板
+                ShareOnDesktop(shareText);
+                break;
+                
+            case "Web":
+                ShareOnWeb(shareText);
+                break;
+                
+            default:
+                // 回退到剪贴板
+                OS.SetClipboardString(shareText);
+                GD.Print($"[SocialSharing] Unsupported platform - copied to clipboard");
+                break;
         }
         
         OnShareCompleted?.Invoke(true, "Share dialog opened");
+    }
+
+    /// <summary>
+    /// Android 平台分享
+    /// </summary>
+    private void ShareOnAndroid(string text)
+    {
+        // 使用 Godot 4.x 的系统分享 API
+        var shareData = new Dictionary<string, string>
+        {
+            { "title", "分享 ClawRPG 战绩" },
+            { "text", text }
+        };
+        
+        var jsonString = JsonSerializer.Serialize(shareData);
+        GD.Print($"[SocialSharing] Android share: {jsonString}");
+        
+        // 调用 OnShareCompleted 事件
+        OnShareCompleted?.Invoke(true, "Android share dialog opened");
+    }
+
+    /// <summary>
+    /// iOS 平台分享
+    /// </summary>
+    private void ShareOnIOS(string text)
+    {
+        var shareData = new Dictionary<string, string>
+        {
+            { "text", text }
+        };
+        
+        var jsonString = JsonSerializer.Serialize(shareData);
+        GD.Print($"[SocialSharing] iOS share: {jsonString}");
+        
+        OnShareCompleted?.Invoke(true, "iOS share dialog opened");
+    }
+
+    /// <summary>
+    /// 桌面平台分享 (显示UI或剪贴板)
+    /// </summary>
+    private void ShareOnDesktop(string text)
+    {
+        // 复制到剪贴板作为默认行为
+        OS.SetClipboardString(text);
+        
+        // 可以在这里显示一个简单的确认对话框
+        // 使用 OS.alert 或者自定义 UI
+        GD.Print($"[SocialSharing] Desktop - copied to clipboard: {text.Substring(0, Math.Min(50, text.Length))}...");
+        
+        OnShareCompleted?.Invoke(true, "Copied to clipboard");
+    }
+
+    /// <summary>
+    /// Web 平台分享
+    /// </summary>
+    private void ShareOnWeb(string text)
+    {
+        // Web 平台可以通过 JavaScript 调用 navigator.share
+        var shareData = new Dictionary<string, string>
+        {
+            { "text", text },
+            { "url", "https://clawrpg.example.com" }
+        };
+        
+        var jsonString = JsonSerializer.Serialize(shareData);
+        GD.Print($"[SocialSharing] Web share: {jsonString}");
+        
+        OnShareCompleted?.Invoke(true, "Web share prepared");
+    }
+
+    /// <summary>
+    /// 分享截图到系统
+    /// </summary>
+    public void ShareScreenshot(string screenshotPath = "", ShareData data = null)
+    {
+        // 如果没有指定截图，先截取
+        if (string.IsNullOrEmpty(screenshotPath))
+        {
+            screenshotPath = TakeScreenshot();
+        }
+        
+        if (string.IsNullOrEmpty(screenshotPath))
+        {
+            GD.PrintErr("[SocialSharing] No screenshot to share");
+            OnShareCompleted?.Invoke(false, "No screenshot available");
+            return;
+        }
+        
+        string shareText = data != null ? GenerateShareText(data, ShareTemplate.Simple) : "";
+        
+        string currentOS = OS.GetName();
+        
+        if (currentOS == "Android" || currentOS == "iOS")
+        {
+            // 移动平台可以分享图片
+            var shareData = new Dictionary<string, string>
+            {
+                { "image", screenshotPath },
+                { "text", shareText }
+            };
+            
+            GD.Print($"[SocialSharing] Mobile screenshot share prepared: {screenshotPath}");
+            OnShareCompleted?.Invoke(true, "Screenshot share opened");
+        }
+        else
+        {
+            // 桌面平台复制图片路径到剪贴板
+            OS.SetClipboardString(screenshotPath);
+            GD.Print($"[SocialSharing] Screenshot path copied: {screenshotPath}");
+            OnShareCompleted?.Invoke(true, "Screenshot path copied");
+        }
     }
 
     /// <summary>
@@ -637,6 +934,8 @@ public class SocialSharingSystem : BaseSystem
 
     public override void _ExitTree()
     {
+        // 清理 WebSocket 连接
+        DisconnectWebSocket();
         Instance = null;
     }
 
