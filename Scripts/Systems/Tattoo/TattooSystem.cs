@@ -2,18 +2,56 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 纹身系统 - 管理玩家的纹身数据、购买和装备
+/// </summary>
 public class TattooSystem : BaseSystem
 {
+    private static TattooSystem _instance;
+    public static TattooSystem Instance
+    {
+        get
+        {
+            if (_instance == null) _instance = GetTree().Root.GetNode<TattooSystem>("TattooSystem");
+            return _instance;
+        }
+    }
+    
     private TattooData _data;
     private TattooDatabase _database;
     
-    public TattooSystem()
+    private bool _isInitialized = false;
+    public override bool IsInitialized => _isInitialized;
+    
+    protected override string SystemName => "TattooSystem";
+    
+    public override void _Ready()
+    {
+        base._Ready();
+        if (GetParent() == null)
+        {
+            GD.PrintErr("[TattooSystem] Warning: Not added to scene tree!");
+        }
+    }
+    
+    protected override void Initialize()
     {
         _database = new TattooDatabase();
         _data = new TattooData();
         
         // Initialize unlocked tattoos
         InitializeDefaultTattoos();
+        
+        _isInitialized = true;
+        GD.Print("[TattooSystem] Initialized - Unlocked: " + _data.UnlockedTattoos.Count);
+    }
+    
+    public override void Reset()
+    {
+        base.Reset();
+        _data = new TattooData();
+        InitializeDefaultTattoos();
+        _isInitialized = false;
     }
     
     private void InitializeDefaultTattoos()
