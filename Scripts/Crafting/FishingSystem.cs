@@ -366,7 +366,62 @@ public class FishingSystem : BaseSystem
         PlayerSkill.SpeedBonus = 1.0f + (PlayerSkill.Level * 0.01f);
         PlayerSkill.ExperienceToNextLevel = CalculateExpToNextLevel(PlayerSkill.Level);
     }
-    
+
+    /// <summary>
+    /// 导出保存数据 - 实现 BaseSystem 持久化接口
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary
+        {
+            { "currentRodId", CurrentRodId },
+            { "currentRodDurability", CurrentRodDurability },
+            { "skillLevel", PlayerSkill.Level },
+            { "skillExperience", PlayerSkill.Experience },
+            { "skillExpToNextLevel", PlayerSkill.ExperienceToNextLevel },
+            { "totalCatches", _totalCatches },
+            { "totalFish", _totalFish },
+            { "rarestFishCaught", _rarestFishCaught }
+        };
+    }
+
+    /// <summary>
+    /// 导入保存数据 - 实现 BaseSystem 持久化接口
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        if (data.Contains("currentRodId"))
+            CurrentRodId = data["currentRodId"].ToString();
+
+        if (data.Contains("currentRodDurability"))
+            CurrentRodDurability = Convert.ToInt32(data["currentRodDurability"]);
+
+        if (data.Contains("skillLevel"))
+            PlayerSkill.Level = Convert.ToInt32(data["skillLevel"]);
+
+        if (data.Contains("skillExperience"))
+            PlayerSkill.Experience = Convert.ToInt32(data["skillExperience"]);
+
+        if (data.Contains("skillExpToNextLevel"))
+            PlayerSkill.ExperienceToNextLevel = Convert.ToInt32(data["skillExpToNextLevel"]);
+
+        if (data.Contains("totalCatches"))
+            _totalCatches = Convert.ToInt32(data["totalCatches"]);
+
+        if (data.Contains("totalFish"))
+            _totalFish = Convert.ToInt32(data["totalFish"]);
+
+        if (data.Contains("rarestFishCaught"))
+            _rarestFishCaught = Convert.ToInt32(data["rarestFishCaught"]);
+
+        // 重新计算技能加成
+        PlayerSkill.CatchBonus = 1.0f + (PlayerSkill.Level * 0.02f);
+        PlayerSkill.LuckBonus = 1.0f + (PlayerSkill.Level * 0.015f);
+        PlayerSkill.SpeedBonus = 1.0f + (PlayerSkill.Level * 0.01f);
+    }
+
     private void SaveSkillData()
     {
         // 保存到玩家数据

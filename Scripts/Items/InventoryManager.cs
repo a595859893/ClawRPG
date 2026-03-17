@@ -284,6 +284,67 @@ namespace ClawRPG.Scripts.Items
         /// Get item count by id
         /// </summary>
         public int GetItemCount(int itemId) => _slots.Where(s => s.ItemId == itemId).Sum(s => s.Quantity);
+
+        /// <summary>
+        /// 导出保存数据 - 实现 BaseSystem 持久化接口
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var slotsData = new Godot.Collections.Array();
+            foreach (var slot in _slots)
+            {
+                slotsData.Add(new Dictionary
+                {
+                    { "index", slot.Index },
+                    { "itemId", slot.ItemId },
+                    { "quantity", slot.Quantity }
+                });
+            }
+
+            return new Dictionary
+            {
+                { "maxSlots", MaxSlots },
+                { "slots", slotsData },
+                { "currentFilter", (int)_currentFilter },
+                { "currentSort", (int)_currentSort }
+            };
+        }
+
+        /// <summary>
+        /// 导入保存数据 - 实现 BaseSystem 持久化接口
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            if (data.Contains("maxSlots"))
+                MaxSlots = Convert.ToInt32(data["maxSlots"]);
+
+            if (data.Contains("currentFilter"))
+                _currentFilter = (InventoryFilter)Convert.ToInt32(data["currentFilter"]);
+
+            if (data.Contains("currentSort"))
+                _currentSort = (InventorySort)Convert.ToInt32(data["currentSort"]);
+
+            if (data.Contains("slots"))
+            {
+                var slotsData = data["slots"] as Godot.Collections.Array;
+                foreach (Dictionary slotDict in slotsData)
+                {
+                    var index = Convert.ToInt32(slotDict["index"]);
+                    var itemId = Convert.ToInt32(slotDict["itemId"]);
+                    var quantity = Convert.ToInt32(slotDict["quantity"]);
+
+                    if (index >= 0 && index < _slots.Count)
+                    {
+                        _slots[index].ItemId = itemId;
+                        _slots[index].Quantity = quantity;
+                    }
+                }
+            }
+
+            EmitSignal(SignalName.InventoryUpdated);
+        }
     }
 
     /// <summary>

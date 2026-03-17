@@ -405,5 +405,87 @@ namespace ClawRPG.Systems
         {
             return _database;
         }
+
+        /// <summary>
+        /// 导出保存数据 - 实现 BaseSystem 持久化接口
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var categoryData = new Dictionary();
+            foreach (var kvp in _playerData.CategoryMasteries)
+            {
+                categoryData[kvp.Key.ToString()] = new Dictionary
+                {
+                    { "level", kvp.Value.Level },
+                    { "experience", kvp.Value.Experience },
+                    { "totalCrafted", kvp.Value.TotalCrafted },
+                    { "masteryPoints", kvp.Value.MasteryPoints }
+                };
+            }
+
+            var recipeData = new Godot.Collections.Array();
+            foreach (var recipe in _playerData.UnlockedRecipes)
+            {
+                recipeData.Add(recipe);
+            }
+
+            return new Dictionary
+            {
+                { "categoryMasteries", categoryData },
+                { "unlockedRecipes", recipeData },
+                { "totalMasteryPoints", _playerData.TotalMasteryPoints }
+            };
+        }
+
+        /// <summary>
+        /// 导入保存数据 - 实现 BaseSystem 持久化接口
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            if (data.Contains("categoryMasteries"))
+            {
+                var categoryData = data["categoryMasteries"] as Dictionary;
+                foreach (string catName in categoryData.Keys)
+                {
+                    if (Enum.TryParse<CraftingCategory>(catName, out var category))
+                    {
+                        var catDict = categoryData[catName] as Dictionary;
+                        if (!_playerData.CategoryMasteries.ContainsKey(category))
+                        {
+                            _playerData.CategoryMasteries[category] = new CategoryMastery
+                            {
+                                Category = category,
+                                Level = 1,
+                                Experience = 0
+                            };
+                        }
+
+                        if (catDict.Contains("level"))
+                            _playerData.CategoryMasteries[category].Level = Convert.ToInt32(catDict["level"]);
+                        if (catDict.Contains("experience"))
+                            _playerData.CategoryMasteries[category].Experience = Convert.ToInt32(catDict["experience"]);
+                        if (catDict.Contains("totalCrafted"))
+                            _playerData.CategoryMasteries[category].TotalCrafted = Convert.ToInt32(catDict["totalCrafted"]);
+                        if (catDict.Contains("masteryPoints"))
+                            _playerData.CategoryMasteries[category].MasteryPoints = Convert.ToInt32(catDict["masteryPoints"]);
+                    }
+                }
+            }
+
+            if (data.Contains("unlockedRecipes"))
+            {
+                _playerData.UnlockedRecipes.Clear();
+                var recipeData = data["unlockedRecipes"] as Godot.Collections.Array;
+                foreach (string recipe in recipeData)
+                {
+                    _playerData.UnlockedRecipes.Add(recipe);
+                }
+            }
+
+            if (data.Contains("totalMasteryPoints"))
+                _playerData.TotalMasteryPoints = Convert.ToInt32(data["totalMasteryPoints"]);
+        }
     }
 }

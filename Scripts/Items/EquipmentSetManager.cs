@@ -205,5 +205,84 @@ namespace ClawRPG.Scripts.Items {
             }
             return total;
         }
+
+        /// <summary>
+        /// 导出保存数据 - 实现 BaseSystem 持久化接口
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var equippedSetsData = new Dictionary();
+            foreach (var kvp in _equippedSets)
+            {
+                var equipmentList = new Godot.Collections.Array();
+                foreach (var equipId in kvp.Value)
+                {
+                    equipmentList.Add(equipId);
+                }
+                equippedSetsData[kvp.Key] = equipmentList;
+            }
+
+            var activeBonusesData = new Godot.Collections.Array();
+            foreach (var bonus in _activeSetBonuses)
+            {
+                activeBonusesData.Add(new Dictionary
+                {
+                    { "setId", bonus.SetId },
+                    { "setName", bonus.SetName },
+                    { "pieceCount", bonus.PieceCount },
+                    { "bonusIndex", bonus.BonusIndex }
+                });
+            }
+
+            return new Dictionary
+            {
+                { "equippedSets", equippedSetsData },
+                { "activeSetBonuses", activeBonusesData }
+            };
+        }
+
+        /// <summary>
+        /// 导入保存数据 - 实现 BaseSystem 持久化接口
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            _equippedSets.Clear();
+            if (data.Contains("equippedSets"))
+            {
+                var equippedSetsData = data["equippedSets"] as Dictionary;
+                foreach (string setIdStr in equippedSetsData.Keys)
+                {
+                    if (int.TryParse(setIdStr, out var setId))
+                    {
+                        var equipmentList = equippedSetsData[setIdStr] as Godot.Collections.Array;
+                        var equipIds = new List<int>();
+                        foreach (var equipId in equipmentList)
+                        {
+                            equipIds.Add(Convert.ToInt32(equipId));
+                        }
+                        _equippedSets[setId] = equipIds;
+                    }
+                }
+            }
+
+            _activeSetBonuses.Clear();
+            if (data.Contains("activeSetBonuses"))
+            {
+                var activeBonusesData = data["activeSetBonuses"] as Godot.Collections.Array;
+                foreach (Dictionary bonusDict in activeBonusesData)
+                {
+                    var bonus = new ActiveSetBonus
+                    {
+                        SetId = Convert.ToInt32(bonusDict["setId"]),
+                        SetName = bonusDict["setName"].ToString(),
+                        PieceCount = Convert.ToInt32(bonusDict["pieceCount"]),
+                        BonusIndex = Convert.ToInt32(bonusDict["bonusIndex"])
+                    };
+                    _activeSetBonuses.Add(bonus);
+                }
+            }
+        }
     }
 }
