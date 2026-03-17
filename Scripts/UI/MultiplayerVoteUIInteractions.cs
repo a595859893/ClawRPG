@@ -1,15 +1,15 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
 namespace ClawRPG.Modules.MultiplayerVote
 {
     /// <summary>
-    /// UI Interactions - MultiplayerVoteUI 交互逻辑
+    /// UI Interactions - Button clicks, event handling
     /// </summary>
     public partial class MultiplayerVoteUI
     {
-        #region Event Handlers
-
         private void OnCreatePartyPressed()
         {
             var partyName = $" {_currentPlayerName}'s Party";
@@ -87,7 +87,5 @@ namespace ClawRPG.Modules.MultiplayerVote
                 }
             }
         }
-
-        #endregion
     }
 }
