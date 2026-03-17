@@ -383,7 +383,7 @@ namespace ClawRPG.Scripts
         /// <summary>
         /// 导出存档数据
         /// </summary>
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
             return new Dictionary<string, object>
             {
@@ -399,7 +399,7 @@ namespace ClawRPG.Scripts
         /// <summary>
         /// 导入存档数据
         /// </summary>
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data.ContainsKey("unlocked_summons"))
                 _playerData.UnlockedSummons = (List<UnlockedSummon>)data["unlocked_summons"];

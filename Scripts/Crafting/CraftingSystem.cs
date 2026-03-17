@@ -316,7 +316,6 @@ namespace ClawRPG.Scripts.Crafting {
         private RecipeDatabase _recipeDatabase;
         
         // 持久化数据
-        private List<int> _unlockedRecipes = new List<int>();
         private Dictionary<string, object> _craftingStats = new Dictionary<string, object>();
         
         public override void _Ready()
@@ -326,25 +325,29 @@ namespace ClawRPG.Scripts.Crafting {
             _recipeDatabase = RecipeDatabase.Instance;
             
             // 初始化持久化数据
-            _unlockedRecipes = new List<int>();
-            _craftingStats = new Dictionary<string, object>
-            {
-                { "total_crafts", 0 },
-                { "successful_crafts", 0 },
-                { "failed_crafts", 0 },
-                { "recipes_crafted", new Dictionary<int, int>() }
-            };
+            InitializeCraftingStats();
             
             LoadData();
+        }
+        
+        private void InitializeCraftingStats()
+        {
+            _craftingStats = new Dictionary<string, object>
+            {
+                { "craft_count", 0 },
+                { "craft_count_by_recipe", new Dictionary<int, int>() },
+                { "unlocked_recipes", new List<int>() },
+                { "favorite_recipes", new HashSet<int>() },
+                { "highest_level_crafted", 0 },
+                { "successful_crafts", 0 },
+                { "failed_crafts", 0 }
+            };
         }
         
         protected override void Initialize()
         {
             GD.Print("[CraftingSystem] Initialized");
-            // 初始化统计数据
-            _craftingStats["total_crafts"] = 0;
-            _craftingStats["successful_crafts"] = 0;
-            _craftingStats["failed_crafts"] = 0;
+            InitializeCraftingStats();
         }
         
         /// <summary>
@@ -353,8 +356,23 @@ namespace ClawRPG.Scripts.Crafting {
         public override Dictionary ExportSaveData()
         {
             var data = new Dictionary();
-            data["unlocked_recipes"] = new Godot.Collections.Array(_unlockedRecipes);
-            data["crafting_stats"] = _craftingStats;
+            
+            // 序列化 _craftingStats 中的集合类型
+            var statsToSave = new Dictionary<string, object>(_craftingStats);
+            
+            // 转换 HashSet 为 Array 以支持序列化
+            if (statsToSave.ContainsKey("favorite_recipes") && statsToSave["favorite_recipes"] is HashSet<int> favoriteSet)
+            {
+                statsToSave["favorite_recipes"] = new Godot.Collections.Array(favoriteSet.ToList());
+            }
+            
+            // 转换 List 为 Array
+            if (statsToSave.ContainsKey("unlocked_recipes") && statsToSave["unlocked_recipes"] is List<int> unlockedList)
+            {
+                statsToSave["unlocked_recipes"] = new Godot.Collections.Array(unlockedList);
+            }
+            
+            data["crafting_stats"] = statsToSave;
             return data;
         }
         
@@ -365,15 +383,35 @@ namespace ClawRPG.Scripts.Crafting {
         {
             if (data == null) return;
             
-            if (data.ContainsKey("unlocked_recipes"))
-            {
-                var arr = (Godot.Collections.Array)data["unlocked_recipes"];
-                _unlockedRecipes = arr.Cast<int>().ToList();
-            }
-            
             if (data.ContainsKey("crafting_stats"))
             {
-                _craftingStats = (Dictionary<string, object>)data["crafting_stats"];
+                var loadedStats = (Dictionary<string, object>)data["crafting_stats"];
+                
+                // 合并加载的数据与默认结构，确保所有字段都存在
+                foreach (var key in loadedStats.Keys)
+                {
+                    _craftingStats[key] = loadedStats[key];
+                }
+                
+                // 反序列化 favorite_recipes
+                if (_craftingStats.ContainsKey("favorite_recipes"))
+                {
+                    var arr = _craftingStats["favorite_recipes"];
+                    if (arr is Godot.Collections.Array favoriteArr)
+                    {
+                        _craftingStats["favorite_recipes"] = new HashSet<int>(favoriteArr.Cast<int>().ToList());
+                    }
+                }
+                
+                // 反序列化 unlocked_recipes
+                if (_craftingStats.ContainsKey("unlocked_recipes"))
+                {
+                    var arr = _craftingStats["unlocked_recipes"];
+                    if (arr is Godot.Collections.Array unlockedArr)
+                    {
+                        _craftingStats["unlocked_recipes"] = unlockedArr.Cast<int>().ToList();
+                    }
+                }
             }
         }
         
@@ -428,7 +466,7 @@ namespace ClawRPG.Scripts.Crafting {
         public bool Craft(ClawRPG.Scripts.Items.Inventory inventory, int recipeId, int playerLevel = 1)
         {
             // 更新总制作次数
-            _craftingStats["total_crafts"] = (int)_craftingStats["total_crafts"] + 1;
+            _craftingStats["craft_count"] = (int)_craftingStats["craft_count"] + 1;
             
             if (!CanCraft(inventory, recipeId, playerLevel))
             {
@@ -448,13 +486,30 @@ namespace ClawRPG.Scripts.Crafting {
             inventory.AddItem(recipe.ResultItemId, recipe.ResultQuantity);
             
             // 记录已解锁的配方
-            if (!_unlockedRecipes.Contains(recipeId))
+            var unlockedRecipes = _craftingStats["unlocked_recipes"] as List<int>;
+            if (unlockedRecipes != null && !unlockedRecipes.Contains(recipeId))
             {
-                _unlockedRecipes.Add(recipeId);
+                unlockedRecipes.Add(recipeId);
             }
             
             // 更新成功制作次数
             _craftingStats["successful_crafts"] = (int)_craftingStats["successful_crafts"] + 1;
+            
+            // 更新各配方制作次数
+            var craftCountByRecipe = _craftingStats["craft_count_by_recipe"] as Dictionary<int, int>;
+            if (craftCountByRecipe != null)
+            {
+                if (!craftCountByRecipe.ContainsKey(recipeId))
+                    craftCountByRecipe[recipeId] = 0;
+                craftCountByRecipe[recipeId]++;
+            }
+            
+            // 更新最高制作等级
+            int currentHighest = (int)_craftingStats["highest_level_crafted"];
+            if (recipe.RequiredLevel > currentHighest)
+            {
+                _craftingStats["highest_level_crafted"] = recipe.RequiredLevel;
+            }
             
             // Track achievement progress
             AchievementManager.Instance.TrackCraft();
