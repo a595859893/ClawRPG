@@ -2,112 +2,29 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using Framework;
+using ClawRPG.Scripts.Combat;
 
 namespace ClawRPG.Scripts.Combat
 {
     /// <summary>
-    /// Combat log entry types
-    /// </summary>
-    public enum CombatLogType
-    {
-        Damage,
-        Healing,
-        Buff,
-        Debuff,
-        Kill,
-        Death,
-        SkillUsed,
-        ItemUsed,
-        EnemySpawn,
-        EnemyAggro,
-        Combo,
-        Critical,
-        Miss,
-        Block,
-        Dodge,
-        Parry,
-        Shield,
-        Mana,
-        Energy,
-        Experience,
-        LevelUp,
-        Info,
-        Warning,
-        Error
-    }
-
-    /// <summary>
-    /// Single combat log entry
-    /// </summary>
-    public class CombatLogEntry
-    {
-        public float Timestamp { get; set; }
-        public CombatLogType Type { get; set; }
-        public string Message { get; set; }
-        public float Value { get; set; }
-        public string Source { get; set; }
-        public string Target { get; set; }
-        public bool IsPlayerAction { get; set; }
-
-        public CombatLogEntry()
-        {
-            Timestamp = 0f;
-            Type = CombatLogType.Info;
-            Message = "";
-            Value = 0f;
-            Source = "";
-            Target = "";
-            IsPlayerAction = true;
-        }
-    }
-
-    /// <summary>
-    /// Combat log statistics
-    /// </summary>
-    public class CombatLogStatistics
-    {
-        public int TotalEntries { get; set; }
-        public int DamageEntries { get; set; }
-        public int HealingEntries { get; set; }
-        public int KillEntries { get; set; }
-        public int CriticalHits { get; set; }
-        public int Misses { get; set; }
-        public int Blocks { get; set; }
-        public int Dodges { get; set; }
-        public float TotalDamageDealt { get; set; }
-        public float TotalDamageTaken { get; set; }
-        public float TotalHealing { get; set; }
-
-        public CombatLogStatistics()
-        {
-            Reset();
-        }
-
-        public void Reset()
-        {
-            TotalEntries = 0;
-            DamageEntries = 0;
-            HealingEntries = 0;
-            KillEntries = 0;
-            CriticalHits = 0;
-            Misses = 0;
-            Blocks = 0;
-            Dodges = 0;
-            TotalDamageDealt = 0;
-            TotalDamageTaken = 0;
-            TotalHealing = 0;
-        }
-    }
-
-    /// <summary>
-    /// Combat Log System - Tracks and displays combat events
+    /// Combat Log System - 战斗日志系统协调者
+    /// 委托给子系统：Recorder（记录）、Formatter（格式化）、UI（显示）
+    /// 保留核心功能：统计、过滤、连击、持久化
     /// </summary>
     public class CombatLogSystem : BaseSystem
     {
         private static CombatLogSystem _instance;
         public static CombatLogSystem Instance => _instance;
 
-        // Log storage
+        // ========== 子系统引用 ==========
+        // 使用 NodePath 在运行时获取子系统，避免直接 new
+        private NodePath _recorderPath = new NodePath("../CombatLogRecorder");
+        private NodePath _formatterPath = new NodePath("../CombatLogFormatter");
+        
+        private CombatLogRecorder _recorder;
+        private CombatLogFormatter _formatter;
+        
+        // ========== 本地存储（协调数据） ==========
         private List<CombatLogEntry> _logEntries = new List<CombatLogEntry>();
         private List<CombatLogEntry> _filteredEntries = new List<CombatLogEntry>();
 
@@ -144,10 +61,27 @@ namespace ClawRPG.Scripts.Combat
         public static string SignalComboMilestone = "combo_milestone";
         public static string SignalKillStreak = "kill_streak";
 
-        public override void _Ready()
+        protected override void Initialize()
         {
             _instance = this;
-            GD.Print("[CombatLogSystem] Combat Log System initialized");
+            
+            // 获取子系统引用
+            _recorder = GetNodeOrNull<CombatLogRecorder>(_recorderPath);
+            _formatter = GetNodeOrNull<CombatLogFormatter>(_formatterPath);
+            
+            if (_recorder == null)
+            {
+                _recorder = new CombatLogRecorder();
+                AddChild(_recorder);
+            }
+            
+            if (_formatter == null)
+            {
+                _formatter = new CombatLogFormatter();
+                AddChild(_formatter);
+            }
+            
+            GD.Print("[CombatLogSystem] Combat Log System initialized as coordinator");
         }
 
         public override void _Process(float delta)
