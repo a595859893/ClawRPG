@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SkillTreeSystem
+public class SkillTreeSystem : BaseSystem
 {
     private static SkillTreeSystem _instance;
     public static SkillTreeSystem Instance => _instance ??= new SkillTreeSystem();
@@ -21,14 +21,78 @@ public class SkillTreeSystem
         Database = SkillTreeDatabase.Instance;
         PlayerData = new PlayerSkillTreeData();
     }
-    
-    public void Initialize()
+
+    protected override void Initialize()
     {
+        base.Initialize();
         // Give player initial skill points based on level if needed
         if (PlayerData.TotalSkillPoints == 0)
         {
             PlayerData.TotalSkillPoints = 10; // Starting points
         }
+    }
+
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Godot.Dictionary();
+        
+        // 保存已解锁的节点
+        var unlockedNodes = new Godot.Dictionary();
+        foreach (var kvp in PlayerData.UnlockedNodes)
+        {
+            unlockedNodes[kvp.Key] = kvp.Value;
+        }
+        data["unlocked_nodes"] = unlockedNodes;
+        
+        // 保存每个分类的技能点花费
+        var skillPointsSpent = new Godot.Dictionary();
+        foreach (var kvp in PlayerData.SkillPointsSpent)
+        {
+            skillPointsSpent[kvp.Key] = kvp.Value;
+        }
+        data["skill_points_spent"] = skillPointsSpent;
+        
+        // 保存技能点数据
+        data["total_skill_points"] = PlayerData.TotalSkillPoints;
+        data["used_skill_points"] = PlayerData.UsedSkillPoints;
+        
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 加载已解锁的节点
+        if (data.Contains("unlocked_nodes"))
+        {
+            PlayerData.UnlockedNodes.Clear();
+            var unlockedNodes = (Godot.Dictionary)data["unlocked_nodes"];
+            foreach (string key in unlockedNodes.Keys)
+            {
+                PlayerData.UnlockedNodes[key] = (int)unlockedNodes[key];
+            }
+        }
+        
+        // 加载每个分类的技能点花费
+        if (data.Contains("skill_points_spent"))
+        {
+            PlayerData.SkillPointsSpent.Clear();
+            var skillPointsSpent = (Godot.Dictionary)data["skill_points_spent"];
+            foreach (string key in skillPointsSpent.Keys)
+            {
+                PlayerData.SkillPointsSpent[key] = (int)skillPointsSpent[key];
+            }
+        }
+        
+        // 加载技能点数据
+        if (data.Contains("total_skill_points"))
+            PlayerData.TotalSkillPoints = (int)data["total_skill_points"];
+            
+        if (data.Contains("used_skill_points"))
+            PlayerData.UsedSkillPoints = (int)data["used_skill_points"];
+        
+        GD.Print($"[SkillTree] Loaded: {GetUnlockedNodeCount()} nodes unlocked, {GetAvailableSkillPoints()} points available");
     }
     
     public void AddSkillPoints(int amount)
@@ -170,53 +234,6 @@ public class SkillTreeSystem
             ["total_nodes"] = Database.AllNodes.Count,
             ["category_points"] = PlayerData.SkillPointsSpent
         };
-    }
-    
-    public void Save(Dictionary<string, object> data)
-    {
-        data["skill_tree_data"] = new Dictionary<string, object>
-        {
-            ["unlocked_nodes"] = PlayerData.UnlockedNodes,
-            ["skill_points_spent"] = PlayerData.SkillPointsSpent,
-            ["total_skill_points"] = PlayerData.TotalSkillPoints,
-            ["used_skill_points"] = PlayerData.UsedSkillPoints
-        };
-    }
-    
-    public void Load(Dictionary<string, object> data)
-    {
-        if (data.ContainsKey("skill_tree_data"))
-        {
-            var skillTreeData = (Dictionary<string, object>)data["skill_tree_data"];
-            
-            PlayerData.UnlockedNodes = new Dictionary<string, int>();
-            if (skillTreeData.ContainsKey("unlocked_nodes"))
-            {
-                var unlocked = (Dictionary<string, object>)skillTreeData["unlocked_nodes"];
-                foreach (var kvp in unlocked)
-                {
-                    PlayerData.UnlockedNodes[kvp.Key] = Convert.ToInt32(kvp.Value);
-                }
-            }
-            
-            PlayerData.SkillPointsSpent = new Dictionary<string, int>();
-            if (skillTreeData.ContainsKey("skill_points_spent"))
-            {
-                var spent = (Dictionary<string, object>)skillTreeData["skill_points_spent"];
-                foreach (var kvp in spent)
-                {
-                    PlayerData.SkillPointsSpent[kvp.Key] = Convert.ToInt32(kvp.Value);
-                }
-            }
-            
-            if (skillTreeData.ContainsKey("total_skill_points"))
-                PlayerData.TotalSkillPoints = Convert.ToInt32(skillTreeData["total_skill_points"]);
-                
-            if (skillTreeData.ContainsKey("used_skill_points"))
-                PlayerData.UsedSkillPoints = Convert.ToInt32(skillTreeData["used_skill_points"]);
-        }
-        
-        GD.Print($"[SkillTree] Loaded: {GetUnlockedNodeCount()} nodes unlocked, {GetAvailableSkillPoints()} points available");
     }
     
     public void Reset()

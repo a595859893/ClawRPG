@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Skill Mastery System - Manages skill mastery progression
     /// </summary>
-    public class SkillMasterySystem
+    public class SkillMasterySystem : BaseSystem
     {
         private static SkillMasterySystem _instance;
         public static SkillMasterySystem Instance => _instance ?? new SkillMasterySystem();
@@ -30,10 +30,79 @@ namespace ClawRPG.Scripts.Systems
             _playerData = new SkillMasteryData.PlayerSkillMasteryData();
         }
 
-        public void Initialize()
+        protected override void Initialize()
         {
+            base.Initialize();
             LoadData();
-            GD.Print("[SkillMasterySystem] Initialized");
+        }
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Godot.Dictionary();
+            
+            // 保存技能熟练度数据
+            var skillsData = new Godot.Dictionary();
+            foreach (var kvp in _playerData.Skills)
+            {
+                var skillData = new Godot.Dictionary();
+                skillData["current_points"] = kvp.Value.CurrentPoints;
+                skillData["total_points"] = kvp.Value.TotalPoints;
+                skillData["tier"] = kvp.Value.CurrentTier;
+                var bonuses = new Godot.Array();
+                foreach (int bonusId in kvp.Value.UnlockedBonusIds)
+                {
+                    bonuses.Add(bonusId);
+                }
+                skillData["unlocked_bonuses"] = bonuses;
+                skillsData[kvp.Key] = skillData;
+            }
+            data["skills"] = skillsData;
+            
+            // 保存全局数据
+            data["total_mastery_points"] = _playerData.TotalMasteryPoints;
+            data["total_uses"] = _playerData.TotalUses;
+            data["critical_uses"] = _playerData.CriticalUses;
+            
+            GD.Print($"[SkillMasterySystem] Saving {_playerData.Skills.Count} skills, {_playerData.TotalMasteryPoints} total points");
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载技能熟练度数据
+            if (data.Contains("skills"))
+            {
+                _playerData.Skills.Clear();
+                var skillsData = (Godot.Dictionary)data["skills"];
+                foreach (string skillId in skillsData.Keys)
+                {
+                    var skillData = (Godot.Dictionary)skillsData[skillId];
+                    var masteryData = new SkillMasteryData.SkillMasteryEntry
+                    {
+                        CurrentPoints = (int)skillData["current_points"],
+                        TotalPoints = (int)skillData["total_points"],
+                        CurrentTier = (int)skillData["tier"]
+                    };
+                    var bonuses = (Godot.Array)skillData["unlocked_bonuses"];
+                    foreach (int bonusId in bonuses)
+                    {
+                        masteryData.UnlockedBonusIds.Add(bonusId);
+                    }
+                    _playerData.Skills[skillId] = masteryData;
+                }
+            }
+            
+            // 加载全局数据
+            if (data.Contains("total_mastery_points"))
+                _playerData.TotalMasteryPoints = (int)data["total_mastery_points"];
+            if (data.Contains("total_uses"))
+                _playerData.TotalUses = (int)data["total_uses"];
+            if (data.Contains("critical_uses"))
+                _playerData.CriticalUses = (int)data["critical_uses"];
+            
+            GD.Print($"[SkillMasterySystem] Loaded {_playerData.Skills.Count} skills, {_playerData.TotalMasteryPoints} total points");
         }
 
         /// <summary>

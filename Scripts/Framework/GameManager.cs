@@ -6,7 +6,7 @@ using System.Linq;
 /// 游戏主管理器 - 统一管理所有系统
 /// 负责系统的初始化、更新和数据持久化
 /// </summary>
-public class GameManager : Node
+public class GameManager : BaseSystem
 {
     /// <summary>
     /// 单例实例
