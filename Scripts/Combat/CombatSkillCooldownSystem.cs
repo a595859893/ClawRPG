@@ -2,20 +2,13 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CombatSkillCooldownSystem
+public class CombatSkillCooldownSystem : BaseSystem
 {
 	private static CombatSkillCooldownSystem _instance;
-	public static CombatSkillCooldownSystem Instance
+	public static new CombatSkillCooldownSystem Instance
 	{
-		get
-		{
-			if (_instance == null)
-			{
-				_instance = new CombatSkillCooldownSystem();
-			}
-			return _instance;
-		}
-		private set { _instance = value; }
+		get => _instance;
+		private set => _instance = value;
 	}
 	
 	// 技能冷却数据
@@ -31,8 +24,10 @@ public class CombatSkillCooldownSystem
 	[Signal]
     public delegate void SkillUsed(string skillId, string skillName);
 	
-	public CombatSkillCooldownSystem()
+	public override void _Ready()
 	{
+		base._Ready();
+		Instance = this;
 		_playerCooldownData = new CombatSkillCooldownData.PlayerSkillCooldownData();
 	}
 	

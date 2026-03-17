@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using ClawRPG.Scripts.Data;
 using ClawRPG.Scripts.Database;
+using Godot;
 
 namespace ClawRPG.Scripts
 {
     /// <summary>
     /// 召唤系统 - 管理玩家的召唤物
     /// </summary>
-    public class SummonSystem
+    public class SummonSystem : BaseSystem
     {
         private static SummonSystem _instance;
-        public static SummonSystem Instance => _instance ?? (_instance = new SummonSystem());
+        public static new SummonSystem Instance
+        {
+            get => _instance;
+            private set => _instance = value;
+        }
 
         private PlayerSummonData _playerData;
         private SummonStatistics _statistics;
@@ -29,8 +34,10 @@ namespace ClawRPG.Scripts
         public PlayerSummonData PlayerData => _playerData;
         public SummonStatistics Statistics => _statistics;
 
-        private SummonSystem()
+        public override void _Ready()
         {
+            base._Ready();
+            Instance = this;
             _playerData = new PlayerSummonData
             {
                 UnlockedSummons = new List<UnlockedSummon>(),

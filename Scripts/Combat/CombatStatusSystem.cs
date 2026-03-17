@@ -8,18 +8,13 @@ namespace ClawRPG.Scripts.Combat
     /// <summary>
     /// Combat status tracking system - tracks real-time combat statistics
     /// </summary>
-    public class CombatStatusSystem
+    public class CombatStatusSystem : BaseSystem
     {
         private static CombatStatusSystem _instance;
-        public static CombatStatusSystem Instance
+        public static new CombatStatusSystem Instance
         {
-            get
-            {
-                if (_instance == null)
-                    _instance = new CombatStatusSystem();
-                return _instance;
-            }
-            private set { _instance = value; }
+            get => _instance;
+            private set => _instance = value;
         }
 
         // Current combat status
@@ -38,6 +33,12 @@ namespace ClawRPG.Scripts.Combat
         // Combat timeout (seconds)
         private const float COMBAT_TIMEOUT = 5.0f;
         private float _combatTimer;
+
+        public override void _Ready()
+        {
+            base._Ready();
+            Instance = this;
+        }
         
         // Max recent events to keep
         private const int MAX_RECENT_EVENTS = 20;

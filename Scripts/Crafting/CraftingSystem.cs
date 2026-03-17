@@ -298,10 +298,14 @@ namespace ClawRPG.Scripts.Crafting {
     /// <summary>
     /// Crafting manager - handles player crafting operations
     /// </summary>
-    public class CraftingManager
+    public class CraftingManager : BaseSystem
     {
         private static CraftingManager _instance;
-        public static CraftingManager Instance => _instance ??= new CraftingManager();
+        public static new CraftingManager Instance
+        {
+            get => _instance;
+            private set => _instance = value;
+        }
         
         // Event for crafting success
         public static event Action<CraftingRecipe, int> OnCraftingSuccess;
@@ -309,8 +313,10 @@ namespace ClawRPG.Scripts.Crafting {
         
         private RecipeDatabase _recipeDatabase;
         
-        public CraftingManager()
+        public override void _Ready()
         {
+            base._Ready();
+            Instance = this;
             _recipeDatabase = RecipeDatabase.Instance;
         }
         
