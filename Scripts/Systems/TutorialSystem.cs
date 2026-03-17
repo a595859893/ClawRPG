@@ -2,7 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TutorialSystem : BaseSystem
+    /// <summary>
+    /// Tutorial System - Manages player tutorials and guided gameplay
+    /// </summary>
+    public partial class TutorialSystem : BaseSystem
 {
     private TutorialData _data;
     private TutorialDatabase _database;
