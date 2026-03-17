@@ -1,10 +1,11 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Godot.Collections;
 
 namespace ClawRPG.Scripts.Systems
 {
-    public class PetSkillTreeSystem
+    public class PetSkillTreeSystem : BaseSystem
     {
         private static PetSkillTreeSystem _instance;
         public static PetSkillTreeSystem Instance => _instance ??= new PetSkillTreeSystem();
@@ -21,8 +22,10 @@ namespace ClawRPG.Scripts.Systems
         public event Action<string, string> OnSkillUnlocked;
         public event Action<string, int> OnSkillPointsChanged;
 
-        public PetSkillTreeSystem()
+        protected override void Initialize()
         {
+            base.Initialize();
+            _instance = this;
             LoadData();
         }
 
@@ -215,6 +218,117 @@ namespace ClawRPG.Scripts.Systems
                 { "nodes_unlocked", TotalNodesUnlocked },
                 { "ultimates_unlocked", TotalUltimatesUnlocked }
             };
+        }
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // 宠物技能树数据
+            var petTreesData = new Dictionary();
+            foreach (var kvp in PetSkillTrees)
+            {
+                var treeData = new Dictionary();
+                treeData["pet_id"] = kvp.Value.PetId;
+                treeData["pet_type"] = kvp.Value.PetType;
+                treeData["total_skill_points"] = kvp.Value.TotalSkillPoints;
+                treeData["used_skill_points"] = kvp.Value.UsedSkillPoints;
+                
+                // 保存已解锁节点
+                var unlockedNodeIds = new Array();
+                foreach (var node in kvp.Value.UnlockedNodes)
+                {
+                    unlockedNodeIds.Add(node.NodeId);
+                }
+                treeData["unlocked_nodes"] = unlockedNodeIds;
+                
+                // 保存节点状态
+                var nodeStatuses = new Dictionary();
+                foreach (var statusKvp in kvp.Value.NodeStatuses)
+                {
+                    nodeStatuses[statusKvp.Key] = (int)statusKvp.Value;
+                }
+                treeData["node_statuses"] = nodeStatuses;
+                
+                petTreesData[kvp.Key] = treeData;
+            }
+            data["pet_skill_trees"] = petTreesData;
+            
+            // 统计信息
+            data["total_skill_points_earned"] = TotalSkillPointsEarned;
+            data["total_skill_points_spent"] = TotalSkillPointsSpent;
+            data["total_nodes_unlocked"] = TotalNodesUnlocked;
+            data["total_ultimates_unlocked"] = TotalUltimatesUnlocked;
+            
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 导入统计信息
+            if (data.Contains("total_skill_points_earned"))
+                TotalSkillPointsEarned = (int)data["total_skill_points_earned"];
+            if (data.Contains("total_skill_points_spent"))
+                TotalSkillPointsSpent = (int)data["total_skill_points_spent"];
+            if (data.Contains("total_nodes_unlocked"))
+                TotalNodesUnlocked = (int)data["total_nodes_unlocked"];
+            if (data.Contains("total_ultimates_unlocked"))
+                TotalUltimatesUnlocked = (int)data["total_ultimates_unlocked"];
+            
+            // 导入宠物技能树数据
+            if (data.Contains("pet_skill_trees"))
+            {
+                var petTreesData = (Dictionary)data["pet_skill_trees"];
+                foreach (string petId in petTreesData.Keys)
+                {
+                    var treeData = (Dictionary)petTreesData[petId];
+                    var skillTree = new PetSkillTreeData.PetSkillTree
+                    {
+                        PetId = (string)treeData["pet_id"],
+                        PetType = (string)treeData["pet_type"],
+                        TotalSkillPoints = (int)treeData["total_skill_points"],
+                        UsedSkillPoints = (int)treeData["used_skill_points"],
+                        UnlockedNodes = new List<PetSkillTreeData.SkillNode>(),
+                        NodeStatuses = new Dictionary<string, PetSkillTreeData.SkillNodeStatus>()
+                    };
+                    
+                    // 恢复节点状态
+                    if (treeData.Contains("node_statuses"))
+                    {
+                        var nodeStatuses = (Dictionary)treeData["node_statuses"];
+                        foreach (string nodeId in nodeStatuses.Keys)
+                        {
+                            skillTree.NodeStatuses[nodeId] = (PetSkillTreeData.SkillNodeStatus)(int)nodeStatuses[nodeId];
+                        }
+                    }
+                    
+                    // 恢复已解锁节点
+                    if (treeData.Contains("unlocked_nodes"))
+                    {
+                        var db = PetSkillTreeDatabase.Instance;
+                        var unlockedNodeIds = (Array)treeData["unlocked_nodes"];
+                        foreach (string nodeId in unlockedNodeIds)
+                        {
+                            foreach (PetSkillTreeData.SkillTreeType treeType in Enum.GetValues(typeof(PetSkillTreeData.SkillTreeType)))
+                            {
+                                var nodes = db.GetSkillTree(skillTree.PetType, treeType);
+                                foreach (var node in nodes)
+                                {
+                                    if (node.NodeId == nodeId)
+                                    {
+                                        skillTree.UnlockedNodes.Add(node);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    PetSkillTrees[petId] = skillTree;
+                }
+            }
         }
     }
 }
