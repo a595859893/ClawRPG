@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// <summary>
     /// 宠物技能系统管理器
     /// </summary>
-    public class PetSkillSystem
+    public class PetSkillSystem : BaseSystem
     {
         private static PetSkillSystem _instance;
         public static PetSkillSystem Instance => _instance ??= new PetSkillSystem();
@@ -313,6 +313,95 @@ namespace ClawRPG.Scripts.Systems.Pets
             _globalSkillPoints = 0;
         }
 
+        #endregion
+
+        #region Save System
+        
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Godot.Dictionary();
+            
+            // 保存全局技能点
+            data["global_skill_points"] = _globalSkillPoints;
+            
+            // 保存每个宠物的技能数据
+            var petsData = new Godot.Dictionary();
+            foreach (var kvp in _playerPetSkills)
+            {
+                var petData = new Godot.Dictionary();
+                petData["available_skill_points"] = kvp.Value.AvailableSkillPoints;
+                
+                // 保存已学习的技能
+                var skillsData = new Godot.Dictionary();
+                foreach (var skillKvp in kvp.Value.LearnedSkills)
+                {
+                    var skillInstance = new Godot.Dictionary();
+                    skillInstance["level"] = skillKvp.Value;
+                    
+                    if (kvp.Value.SkillInstances.TryGetValue(skillKvp.Key, out var instance))
+                    {
+                        skillInstance["times_used"] = instance.TimesUsed;
+                    }
+                    skillsData[skillKvp.Key] = skillInstance;
+                }
+                petData["skills"] = skillsData;
+                
+                petsData[kvp.Key] = petData;
+            }
+            data["pets"] = petsData;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载全局技能点
+            if (data.Contains("global_skill_points"))
+                _globalSkillPoints = (int)data["global_skill_points"];
+            
+            // 加载宠物技能数据
+            _playerPetSkills.Clear();
+            if (data.Contains("pets"))
+            {
+                var petsData = (Godot.Dictionary)data["pets"];
+                foreach (string petId in petsData.Keys)
+                {
+                    var petData = (Godot.Dictionary)petsData[petId];
+                    var petSkillData = new PetSkillData();
+                    
+                    if (petData.Contains("available_skill_points"))
+                        petSkillData.AvailableSkillPoints = (int)petData["available_skill_points"];
+                    
+                    if (petData.Contains("skills"))
+                    {
+                        var skillsData = (Godot.Dictionary)petData["skills"];
+                        foreach (string skillId in skillsData.Keys)
+                        {
+                            var skillInstance = (Godot.Dictionary)skillsData[skillId];
+                            var level = (int)skillInstance["level"];
+                            petSkillData.LearnedSkills[skillId] = level;
+                            
+                            var learnedSkill = new LearnedPetSkill
+                            {
+                                SkillId = skillId,
+                                CurrentLevel = level
+                            };
+                            if (skillInstance.Contains("times_used"))
+                                learnedSkill.TimesUsed = (int)skillInstance["times_used"];
+                            
+                            petSkillData.SkillInstances[skillId] = learnedSkill;
+                        }
+                    }
+                    
+                    _playerPetSkills[petId] = petSkillData;
+                }
+            }
+            
+            GD.Print($"[PetSkill] Loaded: {_playerPetSkills.Count} pets, {_globalSkillPoints} global points");
+        }
+        
         #endregion
     }
 }

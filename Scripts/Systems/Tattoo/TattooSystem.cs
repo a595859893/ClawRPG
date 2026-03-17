@@ -224,33 +224,36 @@ public class TattooSystem : BaseSystem
     
     public override Dictionary ExportSaveData()
     {
-        var data = new Godot.Dictionary();
+        var data = new Dictionary();
         
-        // 保存已解锁的纹身
-        var unlockedTattoos = new Godot.Dictionary();
+        // 序列化已解锁纹身
+        var unlockedTattoos = new Array();
         foreach (var kvp in _data.UnlockedTattoos)
         {
-            unlockedTattoos[kvp.Key] = kvp.Value;
+            if (kvp.Value)
+            {
+                unlockedTattoos.Add(kvp.Key);
+            }
         }
         data["unlocked_tattoos"] = unlockedTattoos;
         
-        // 保存已装备的纹身
-        var appliedTattoos = new Godot.Dictionary();
+        // 序列化已装备纹身 (slot -> tattoo_id)
+        var equippedTattoos = new Dictionary();
         foreach (var kvp in _data.AppliedTattoos)
         {
-            appliedTattoos[kvp.Key] = kvp.Value;
+            equippedTattoos[kvp.Key] = kvp.Value;
         }
-        data["applied_tattoos"] = appliedTattoos;
+        data["equipped_tattoos"] = equippedTattoos;
         
-        // 保存纹身使用次数
-        var usageCount = new Godot.Dictionary();
+        // 序列化使用次数统计
+        var usageCount = new Dictionary();
         foreach (var kvp in _data.TattooUsageCount)
         {
             usageCount[kvp.Key] = kvp.Value;
         }
         data["tattoo_usage_count"] = usageCount;
         
-        // 保存统计信息
+        // 统计信息
         data["total_tattoos_applied"] = _data.TotalTattoosApplied;
         data["total_gold_spent"] = _data.TotalGoldSpent;
         
@@ -259,49 +262,82 @@ public class TattooSystem : BaseSystem
     
     public override void ImportSaveData(Dictionary data)
     {
-        if (data == null) return;
-        
-        // 加载已解锁的纹身
-        if (data.Contains("unlocked_tattoos"))
+        if (data == null)
         {
-            _data.UnlockedTattoos.Clear();
-            var unlockedTattoos = (Godot.Dictionary)data["unlocked_tattoos"];
-            foreach (string key in unlockedTattoos.Keys)
-            {
-                _data.UnlockedTattoos[key] = (bool)unlockedTattoos[key];
-            }
+            GD.Print("[TattooSystem] No save data to import");
+            return;
         }
         
-        // 加载已装备的纹身
-        if (data.Contains("applied_tattoos"))
+        try
         {
-            _data.AppliedTattoos.Clear();
-            var appliedTattoos = (Godot.Dictionary)data["applied_tattoos"];
-            foreach (string key in appliedTattoos.Keys)
-            {
-                _data.AppliedTattoos[key] = (string)appliedTattoos[key];
-            }
-        }
-        
-        // 加载使用次数
-        if (data.Contains("tattoo_usage_count"))
-        {
-            _data.TattooUsageCount.Clear();
-            var usageCount = (Godot.Dictionary)data["tattoo_usage_count"];
-            foreach (string key in usageCount.Keys)
-            {
-                _data.TattooUsageCount[key] = (int)usageCount[key];
-            }
-        }
-        
-        // 加载统计信息
-        if (data.Contains("total_tattoos_applied"))
-            _data.TotalTattoosApplied = (int)data["total_tattoos_applied"];
+            // 初始化数据
+            _data = new TattooData();
             
-        if (data.Contains("total_gold_spent"))
-            _data.TotalGoldSpent = (int)data["total_gold_spent"];
-        
-        GD.Print($"[Tattoo] Loaded: {_data.UnlockedTattoos.Count} unlocked, {_data.AppliedTattoos.Count} applied");
+            // 反序列化已解锁纹身
+            if (data.Contains("unlocked_tattoos"))
+            {
+                var unlockedArray = data["unlocked_tattoos"] as Array;
+                if (unlockedArray != null)
+                {
+                    foreach (string tattooId in unlockedArray)
+                    {
+                        _data.UnlockedTattoos[tattooId] = true;
+                    }
+                }
+            }
+            
+            // 反序列化已装备纹身 (兼容旧版本 applied_tattoos 和新版本 equipped_tattoos)
+            if (data.Contains("equipped_tattoos"))
+            {
+                var equippedDict = data["equipped_tattoos"] as Dictionary;
+                if (equippedDict != null)
+                {
+                    foreach (var kvp in equippedDict)
+                    {
+                        _data.AppliedTattoos[kvp.Key?.ToString()] = kvp.Value?.ToString();
+                    }
+                }
+            }
+            else if (data.Contains("applied_tattoos"))
+            {
+                // 兼容旧存档格式
+                var appliedDict = data["applied_tattoos"] as Dictionary;
+                if (appliedDict != null)
+                {
+                    foreach (var kvp in appliedDict)
+                    {
+                        _data.AppliedTattoos[kvp.Key?.ToString()] = kvp.Value?.ToString();
+                    }
+                }
+            }
+            
+            // 反序列化使用次数
+            if (data.Contains("tattoo_usage_count"))
+            {
+                var usageDict = data["tattoo_usage_count"] as Dictionary;
+                if (usageDict != null)
+                {
+                    foreach (var kvp in usageDict)
+                    {
+                        _data.TattooUsageCount[kvp.Key?.ToString()] = Convert.ToInt32(kvp.Value);
+                    }
+                }
+            }
+            
+            // 统计信息
+            if (data.Contains("total_tattoos_applied"))
+                _data.TotalTattoosApplied = Convert.ToInt32(data["total_tattoos_applied"]);
+            if (data.Contains("total_gold_spent"))
+                _data.TotalGoldSpent = Convert.ToInt32(data["total_gold_spent"]);
+            
+            GD.Print($"[TattooSystem] Data imported: {_data.UnlockedTattoos.Count} unlocked, {_data.AppliedTattoos.Count} equipped");
+        }
+        catch (Exception e)
+        {
+            GD.PrintErr($"[TattooSystem] Failed to import save data: {e.Message}");
+            _data = new TattooData();
+            InitializeDefaultTattoos();
+        }
     }
     
     #endregion
