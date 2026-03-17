@@ -297,11 +297,13 @@ namespace ClawRPG.Scripts.Crafting {
     
     /// <summary>
     /// Crafting manager - handles player crafting operations
+    /// <summary>
+    /// Crafting system - handles player crafting operations
     /// </summary>
-    public class CraftingManager : BaseSystem
+    public class CraftingSystem : BaseSystem
     {
-        private static CraftingManager _instance;
-        public static new CraftingManager Instance
+        private static CraftingSystem _instance;
+        public static new CraftingSystem Instance
         {
             get => _instance;
             private set => _instance = value;
@@ -318,6 +320,28 @@ namespace ClawRPG.Scripts.Crafting {
             base._Ready();
             Instance = this;
             _recipeDatabase = RecipeDatabase.Instance;
+            LoadData();
+        }
+        
+        protected override void Initialize()
+        {
+            GD.Print("[CraftingSystem] Initialized");
+        }
+        
+        /// <summary>
+        /// Export save data
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary();
+        }
+        
+        /// <summary>
+        /// Import save data
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
         }
         
         /// <summary>

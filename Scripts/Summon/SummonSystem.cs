@@ -58,6 +58,13 @@ namespace ClawRPG.Scripts
             };
             _activeSessions = new List<SummonSession>();
             _summonTimers = new Dictionary<string, System.Timers.Timer>();
+            LoadData();
+        }
+        
+        protected override void Initialize()
+        {
+            GD.Print("[SummonSystem] Initialized");
+        }
         }
 
         /// <summary>

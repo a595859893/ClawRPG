@@ -31,16 +31,16 @@ namespace ClawRPG.Scripts.UI {
         
         // References
         private Player _player;
-        private CraftingManager _craftingManager;
+        private CraftingSystem _craftingManager;
         
         public override void _Ready()
         {
             SetupUI();
-            _craftingManager = CraftingManager.Instance;
+            _craftingManager = CraftingSystem.Instance;
             
             // Subscribe to events
-            CraftingManager.OnCraftingSuccess += OnCraftingSuccess;
-            CraftingManager.OnCraftingFailed += OnCraftingFailed;
+            CraftingSystem.OnCraftingSuccess += OnCraftingSuccess;
+            CraftingSystem.OnCraftingFailed += OnCraftingFailed;
             
             Hide();
         }

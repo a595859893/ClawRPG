@@ -29,6 +29,31 @@ public class CombatSkillCooldownSystem : BaseSystem
 		base._Ready();
 		Instance = this;
 		_playerCooldownData = new CombatSkillCooldownData.PlayerSkillCooldownData();
+		LoadData();
+	}
+	
+	protected override void Initialize()
+	{
+		GD.Print("[CombatSkillCooldownSystem] Initialized");
+	}
+	
+	/// <summary>
+	/// Export save data
+	/// </summary>
+	public override Dictionary ExportSaveData()
+	{
+		return GetSaveData();
+	}
+	
+	/// <summary>
+	/// Import save data
+	/// </summary>
+	public override void ImportSaveData(Dictionary data)
+	{
+		if (data != null)
+		{
+			LoadSaveData(data);
+		}
 	}
 	
 	/// <summary>

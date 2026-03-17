@@ -38,15 +38,36 @@ namespace ClawRPG.Scripts.Combat
         {
             base._Ready();
             Instance = this;
+            _currentCombat = new CombatStatusData.PlayerCombatStatus();
+            _sessionStats = new CombatStatusData.SessionStats();
+            LoadData();
+        }
+        
+        protected override void Initialize()
+        {
+            GD.Print("[CombatStatusSystem] Initialized");
         }
         
         // Max recent events to keep
         private const int MAX_RECENT_EVENTS = 20;
-
-        public CombatStatusSystem()
+        
+        /// <summary>
+        /// Export save data
+        /// </summary>
+        public override Dictionary ExportSaveData()
         {
-            _currentCombat = new CombatStatusData.PlayerCombatStatus();
-            _sessionStats = new CombatStatusData.SessionStats();
+            return GetSaveData();
+        }
+        
+        /// <summary>
+        /// Import save data
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data != null)
+            {
+                LoadSaveData(data);
+            }
         }
 
         /// <summary>
