@@ -88,9 +88,9 @@ public class MultiplayerChatMain : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         // MultiplayerChatMain 是容器系统，无持久化状态
         return data;
     }
@@ -98,9 +98,10 @@ public class MultiplayerChatMain : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override bool ImportSaveData(Dictionary<string, object> data)
     {
-        if (data == null) return;
+        if (data == null) return false;
         // MultiplayerChatMain 是容器系统，无持久化状态
+        return true;
     }
 }

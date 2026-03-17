@@ -8,6 +8,9 @@ public class ConstellationDatabase : BaseSystem
     // All constellation configurations
     private Dictionary<string, ConstellationData.Constellation> _constellations = new Dictionary<string, ConstellationData.Constellation>();
     
+    // 已解锁的星座（用于持久化）
+    private HashSet<string> _unlockedConstellations = new HashSet<string>();
+    
     public override void _Ready()
     {
         InitializeConstellations();
@@ -430,5 +433,26 @@ public class ConstellationDatabase : BaseSystem
                 result.Add(kvp.Value);
         }
         return result;
+    }
+
+    // 持久化方法
+    public override Dictionary<string, object> ExportSaveData()
+    {
+        var data = new Dictionary<string, object>();
+        // ConstellationDatabase 主要存储静态配置数据，不需要持久化玩家状态
+        // 如需持久化玩家解锁状态，需要添加额外字段
+        data["constellations"] = _constellations;
+        return data;
+    }
+
+    public override bool ImportSaveData(Dictionary<string, object> data)
+    {
+        if (data == null) return false;
+        // 加载配置数据
+        if (data.ContainsKey("constellations"))
+        {
+            // 如有需要可在此处理玩家解锁状态
+        }
+        return true;
     }
 }
