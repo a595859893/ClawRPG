@@ -315,17 +315,40 @@ namespace ClawRPG.Scripts.Crafting {
         
         private RecipeDatabase _recipeDatabase;
         
+        // 持久化数据
+        private List<int> _unlockedRecipes = new List<int>();
+        private Dictionary<string, object> _craftingStats = new Dictionary<string, object>();
+        
+        // 持久化数据
+        private List<int> _unlockedRecipes = new();
+        private Dictionary<string, object> _craftingStats = new();
+        
         public override void _Ready()
         {
             base._Ready();
             Instance = this;
             _recipeDatabase = RecipeDatabase.Instance;
+            
+            // 初始化持久化数据
+            _unlockedRecipes = new List<int>();
+            _craftingStats = new Dictionary<string, object>
+            {
+                { "total_crafts", 0 },
+                { "successful_crafts", 0 },
+                { "failed_crafts", 0 },
+                { "recipes_crafted", new Dictionary<int, int>() }
+            };
+            
             LoadData();
         }
         
         protected override void Initialize()
         {
             GD.Print("[CraftingSystem] Initialized");
+            // 初始化统计数据
+            _craftingStats["total_crafts"] = 0;
+            _craftingStats["successful_crafts"] = 0;
+            _craftingStats["failed_crafts"] = 0;
         }
         
         /// <summary>
@@ -333,7 +356,10 @@ namespace ClawRPG.Scripts.Crafting {
         /// </summary>
         public override Dictionary ExportSaveData()
         {
-            return new Dictionary();
+            var data = new Dictionary();
+            data["unlocked_recipes"] = new Godot.Collections.Array(_unlockedRecipes);
+            data["crafting_stats"] = _craftingStats;
+            return data;
         }
         
         /// <summary>
@@ -342,6 +368,17 @@ namespace ClawRPG.Scripts.Crafting {
         public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
+            
+            if (data.ContainsKey("unlocked_recipes"))
+            {
+                var arr = (Godot.Collections.Array)data["unlocked_recipes"];
+                _unlockedRecipes = arr.Cast<int>().ToList();
+            }
+            
+            if (data.ContainsKey("crafting_stats"))
+            {
+                _craftingStats = (Dictionary<string, object>)data["crafting_stats"];
+            }
         }
         
         /// <summary>
@@ -394,8 +431,14 @@ namespace ClawRPG.Scripts.Crafting {
         /// </summary>
         public bool Craft(ClawRPG.Scripts.Items.Inventory inventory, int recipeId, int playerLevel = 1)
         {
+            // 更新总制作次数
+            _craftingStats["total_crafts"] = (int)_craftingStats["total_crafts"] + 1;
+            
             if (!CanCraft(inventory, recipeId, playerLevel))
+            {
+                _craftingStats["failed_crafts"] = (int)_craftingStats["failed_crafts"] + 1;
                 return false;
+            }
             
             var recipe = _recipeDatabase.GetRecipe(recipeId);
             
@@ -407,6 +450,15 @@ namespace ClawRPG.Scripts.Crafting {
             
             // Add result item
             inventory.AddItem(recipe.ResultItemId, recipe.ResultQuantity);
+            
+            // 记录已解锁的配方
+            if (!_unlockedRecipes.Contains(recipeId))
+            {
+                _unlockedRecipes.Add(recipeId);
+            }
+            
+            // 更新成功制作次数
+            _craftingStats["successful_crafts"] = (int)_craftingStats["successful_crafts"] + 1;
             
             // Track achievement progress
             AchievementManager.Instance.TrackCraft();
