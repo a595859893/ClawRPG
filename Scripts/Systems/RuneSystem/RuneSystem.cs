@@ -199,22 +199,6 @@ public class RuneSystem : BaseSystem
         return _data.EquippedRunes;
     }
     
-    /// <summary>
-    /// Export save data for persistence (inherited from BaseSystem)
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return Save();
-    }
-    
-    /// <summary>
-    /// Import save data for persistence (inherited from BaseSystem)
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        Load(data);
-    }
-    
     // Get history
     public List<RuneHistoryEntry> GetHistory()
     {
