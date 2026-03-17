@@ -2,18 +2,18 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetMorphSystem
+/// <summary>
+/// Pet Morph System - 宠物变形系统
+/// 允许宠物变换形态以获得属性加成和特殊效果
+/// </summary>
+public partial class PetMorphSystem : BaseSystem
 {
     private static PetMorphSystem _instance;
-    public static PetMorphSystem Instance
-    {
-        get
-        {
-            if (_instance == null)
-                _instance = new PetMorphSystem();
-            return _instance;
-        }
-    }
+    
+    /// <summary>
+    /// 获取单例实例
+    /// </summary>
+    public static PetMorphSystem Instance => _instance ??= new PetMorphSystem();
     
     private PetMorphData _data = new PetMorphData();
     private bool _isInitialized = false;
@@ -27,26 +27,38 @@ public class PetMorphSystem
     public static Signal<string, string> TransformationCompleted { get; } = new Signal<string, string>();
     public static Signal<string, string> TransformationFailed { get; } = new Signal<string, string>();
     
-    public void Initialize()
+    /// <summary>
+    /// 初始化系统
+    /// </summary>
+    protected override void Initialize()
     {
         if (_isInitialized) return;
         
         PetMorphDatabase.Initialize();
         _isInitialized = true;
+        IsInitialized = true;
         GD.Print("[PetMorphSystem] Initialized with " + PetMorphDatabase.GetAllMorphs().Count + " morphs");
     }
     
+    /// <summary>
+    /// 设置数据
+    /// </summary>
     public void SetData(PetMorphData data)
     {
         _data = data;
     }
     
+    /// <summary>
+    /// 获取数据
+    /// </summary>
     public PetMorphData GetData()
     {
         return _data;
     }
     
-    // 解锁形态
+    /// <summary>
+    /// 解锁形态
+    /// </summary>
     public bool UnlockMorph(string petId, string morphId)
     {
         Initialize();
@@ -100,7 +112,9 @@ public class PetMorphSystem
         return true;
     }
     
-    // 检查形态是否已解锁
+    /// <summary>
+    /// 检查形态是否已解锁
+    /// </summary>
     public bool IsMorphUnlocked(string petId, string morphId)
     {
         if (_data.PlayerMorphData.UnlockedMorphs.ContainsKey(petId))
@@ -110,7 +124,9 @@ public class PetMorphSystem
         return false;
     }
     
-    // 获取已解锁形态列表
+    /// <summary>
+    /// 获取已解锁形态列表
+    /// </summary>
     public List<string> GetUnlockedMorphs(string petId)
     {
         if (_data.PlayerMorphData.UnlockedMorphs.ContainsKey(petId))
@@ -120,7 +136,9 @@ public class PetMorphSystem
         return new List<string>();
     }
     
-    // 激活形态
+    /// <summary>
+    /// 激活形态
+    /// </summary>
     public bool ActivateMorph(string petId, string morphId)
     {
         Initialize();
@@ -170,7 +188,9 @@ public class PetMorphSystem
         return true;
     }
     
-    // 完成形态转换
+    /// <summary>
+    /// 完成形态转换
+    /// </summary>
     private void CompleteTransformation(string petId, string morphId)
     {
         if (_data.ActiveMorphs.ContainsKey(petId))
@@ -199,7 +219,9 @@ public class PetMorphSystem
         }
     }
     
-    // 取消形态
+    /// <summary>
+    /// 取消形态
+    /// </summary>
     public bool DeactivateMorph(string petId)
     {
         if (_data.ActiveMorphs.ContainsKey(petId))
@@ -224,13 +246,17 @@ public class PetMorphSystem
         return false;
     }
     
-    // 检查是否有激活的形态
+    /// <summary>
+    /// 检查是否有激活的形态
+    /// </summary>
     public bool HasActiveMorph(string petId)
     {
         return _data.PlayerMorphData.ActiveMorphs.ContainsKey(petId);
     }
     
-    // 获取当前激活的形态
+    /// <summary>
+    /// 获取当前激活的形态
+    /// </summary>
     public string GetActiveMorph(string petId)
     {
         if (_data.PlayerMorphData.ActiveMorphs.ContainsKey(petId))
@@ -240,22 +266,33 @@ public class PetMorphSystem
         return null;
     }
     
-    // 获取形态属性加成
+    /// <summary>
+    /// 获取形态攻击加成
+    /// </summary>
     public float GetMorphAttackBonus(string petId)
     {
         return GetMorphStatBonus(petId, "attack");
     }
     
+    /// <summary>
+    /// 获取形态防御加成
+    /// </summary>
     public float GetMorphDefenseBonus(string petId)
     {
         return GetMorphStatBonus(petId, "defense");
     }
     
+    /// <summary>
+    /// 获取形态生命加成
+    /// </summary>
     public float GetMorphHealthBonus(string petId)
     {
         return GetMorphStatBonus(petId, "health");
     }
     
+    /// <summary>
+    /// 获取形态速度加成
+    /// </summary>
     public float GetMorphSpeedBonus(string petId)
     {
         return GetMorphStatBonus(petId, "speed");
@@ -282,7 +319,9 @@ public class PetMorphSystem
         }
     }
     
-    // 应用/移除形态属性加成
+    /// <summary>
+    /// 应用/移除形态属性加成
+    /// </summary>
     private void ApplyMorphBonuses(string petId, string morphId, bool apply)
     {
         var morph = PetMorphDatabase.GetMorph(morphId);
@@ -295,7 +334,9 @@ public class PetMorphSystem
         // 实际应用中需要与 PetSystem 集成
     }
     
-    // 获取宠物好感度等级
+    /// <summary>
+    /// 获取宠物好感度等级
+    /// </summary>
     private int GetPetAffectionLevel(string petId)
     {
         // 这里应该调用宠物好感度系统
@@ -312,7 +353,9 @@ public class PetMorphSystem
         return 1;
     }
     
-    // 检查宠物是否有效
+    /// <summary>
+    /// 检查宠物是否有效
+    /// </summary>
     private bool IsValidPet(string petId)
     {
         // 检查宠物是否存在
@@ -327,14 +370,18 @@ public class PetMorphSystem
         return false;
     }
     
-    // 获取可用形态列表
+    /// <summary>
+    /// 获取可用形态列表
+    /// </summary>
     public List<PetMorph> GetAvailableMorphsForPet(string petId)
     {
         int affectionLevel = GetPetAffectionLevel(petId);
         return PetMorphDatabase.GetAvailableMorphs(affectionLevel);
     }
     
-    // 获取统计数据
+    /// <summary>
+    /// 获取统计数据
+    /// </summary>
     public Dictionary<string, int> GetStatistics()
     {
         var stats = new Dictionary<string, int>();
@@ -351,13 +398,15 @@ public class PetMorphSystem
         return stats;
     }
     
-    // 存档数据
-    public Dictionary<string, object> GetSaveData()
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
     {
-        var data = new Dictionary<string, object>();
+        var data = new Dictionary();
         
         // 序列化已解锁形态
-        var unlockedMorphs = new Dictionary<string, List<string>>();
+        var unlockedMorphs = new Dictionary();
         foreach (var kvp in _data.PlayerMorphData.UnlockedMorphs)
         {
             unlockedMorphs[kvp.Key] = kvp.Value;
@@ -365,7 +414,7 @@ public class PetMorphSystem
         data["unlocked_morphs"] = unlockedMorphs;
         
         // 序列化激活形态
-        var activeMorphs = new Dictionary<string, string>();
+        var activeMorphs = new Dictionary();
         foreach (var kvp in _data.PlayerMorphData.ActiveMorphs)
         {
             activeMorphs[kvp.Key] = kvp.Value;
@@ -376,37 +425,59 @@ public class PetMorphSystem
         data["total_transformations"] = _data.PlayerMorphData.TotalTransformations;
         data["morph_usage_count"] = _data.PlayerMorphData.MorphUsageCount;
         
+        GD.Print("[PetMorphSystem] ExportSaveData called");
         return data;
     }
     
-    public void LoadSaveData(Dictionary<string, object> data)
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         
         Initialize();
         
-        if (data.ContainsKey("unlocked_morphs"))
+        if (data.Contains("unlocked_morphs"))
         {
-            var unlockedMorphs = (Dictionary<string, List<string>>)data["unlocked_morphs"];
-            _data.PlayerMorphData.UnlockedMorphs = unlockedMorphs;
+            var unlockedMorphs = (Dictionary)data["unlocked_morphs"];
+            _data.PlayerMorphData.UnlockedMorphs = new Dictionary<string, List<string>>();
+            foreach (var key in unlockedMorphs.Keys)
+            {
+                var list = (Godot.Collections.Array)unlockedMorphs[key];
+                _data.PlayerMorphData.UnlockedMorphs[key.ToString()] = new List<string>();
+                foreach (var item in list)
+                {
+                    _data.PlayerMorphData.UnlockedMorphs[key.ToString()].Add(item.ToString());
+                }
+            }
         }
         
-        if (data.ContainsKey("active_morphs"))
+        if (data.Contains("active_morphs"))
         {
-            var activeMorphs = (Dictionary<string, string>)data["active_morphs"];
-            _data.PlayerMorphData.ActiveMorphs = activeMorphs;
+            var activeMorphs = (Dictionary)data["active_morphs"];
+            _data.PlayerMorphData.ActiveMorphs = new Dictionary<string, string>();
+            foreach (var kvp in activeMorphs)
+            {
+                _data.PlayerMorphData.ActiveMorphs[kvp.Key.ToString()] = kvp.Value.ToString();
+            }
         }
         
-        if (data.ContainsKey("total_transformations"))
+        if (data.Contains("total_transformations"))
         {
-            _data.PlayerMorphData.TotalTransformations = (int)data["total_transformations"];
+            _data.PlayerMorphData.TotalTransformations = Convert.ToInt32(data["total_transformations"]);
         }
         
-        if (data.ContainsKey("morph_usage_count"))
+        if (data.Contains("morph_usage_count"))
         {
-            _data.PlayerMorphData.MorphUsageCount = (Dictionary<string, int>)data["morph_usage_count"];
+            var morphUsageCount = (Dictionary)data["morph_usage_count"];
+            _data.PlayerMorphData.MorphUsageCount = new Dictionary<string, int>();
+            foreach (var kvp in morphUsageCount)
+            {
+                _data.PlayerMorphData.MorphUsageCount[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+            }
         }
         
-        GD.Print("[PetMorphSystem] Save data loaded");
+        GD.Print("[PetMorphSystem] ImportSaveData called - Total transformations: " + _data.PlayerMorphData.TotalTransformations);
     }
 }
