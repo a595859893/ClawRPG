@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TattooSystem
+public class TattooSystem : BaseSystem
 {
     private TattooData _data;
     private TattooDatabase _database;
@@ -219,4 +219,90 @@ public class TattooSystem
         if (data != null)
             _data = data;
     }
+    
+    #region Save System
+    
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Godot.Dictionary();
+        
+        // 保存已解锁的纹身
+        var unlockedTattoos = new Godot.Dictionary();
+        foreach (var kvp in _data.UnlockedTattoos)
+        {
+            unlockedTattoos[kvp.Key] = kvp.Value;
+        }
+        data["unlocked_tattoos"] = unlockedTattoos;
+        
+        // 保存已装备的纹身
+        var appliedTattoos = new Godot.Dictionary();
+        foreach (var kvp in _data.AppliedTattoos)
+        {
+            appliedTattoos[kvp.Key] = kvp.Value;
+        }
+        data["applied_tattoos"] = appliedTattoos;
+        
+        // 保存纹身使用次数
+        var usageCount = new Godot.Dictionary();
+        foreach (var kvp in _data.TattooUsageCount)
+        {
+            usageCount[kvp.Key] = kvp.Value;
+        }
+        data["tattoo_usage_count"] = usageCount;
+        
+        // 保存统计信息
+        data["total_tattoos_applied"] = _data.TotalTattoosApplied;
+        data["total_gold_spent"] = _data.TotalGoldSpent;
+        
+        return data;
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 加载已解锁的纹身
+        if (data.Contains("unlocked_tattoos"))
+        {
+            _data.UnlockedTattoos.Clear();
+            var unlockedTattoos = (Godot.Dictionary)data["unlocked_tattoos"];
+            foreach (string key in unlockedTattoos.Keys)
+            {
+                _data.UnlockedTattoos[key] = (bool)unlockedTattoos[key];
+            }
+        }
+        
+        // 加载已装备的纹身
+        if (data.Contains("applied_tattoos"))
+        {
+            _data.AppliedTattoos.Clear();
+            var appliedTattoos = (Godot.Dictionary)data["applied_tattoos"];
+            foreach (string key in appliedTattoos.Keys)
+            {
+                _data.AppliedTattoos[key] = (string)appliedTattoos[key];
+            }
+        }
+        
+        // 加载使用次数
+        if (data.Contains("tattoo_usage_count"))
+        {
+            _data.TattooUsageCount.Clear();
+            var usageCount = (Godot.Dictionary)data["tattoo_usage_count"];
+            foreach (string key in usageCount.Keys)
+            {
+                _data.TattooUsageCount[key] = (int)usageCount[key];
+            }
+        }
+        
+        // 加载统计信息
+        if (data.Contains("total_tattoos_applied"))
+            _data.TotalTattoosApplied = (int)data["total_tattoos_applied"];
+            
+        if (data.Contains("total_gold_spent"))
+            _data.TotalGoldSpent = (int)data["total_gold_spent"];
+        
+        GD.Print($"[Tattoo] Loaded: {_data.UnlockedTattoos.Count} unlocked, {_data.AppliedTattoos.Count} applied");
+    }
+    
+    #endregion
 }
