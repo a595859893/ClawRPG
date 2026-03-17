@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class RuneSystem
+public class RuneSystem : BaseSystem
 {
     private static RuneSystem _instance;
     public static RuneSystem Instance
@@ -28,8 +28,9 @@ public class RuneSystem
         _data = new RuneData();
     }
     
-    public void Initialize()
+    protected override void Initialize()
     {
+        base.Initialize();
         if (_data == null)
         {
             _data = new RuneData();
@@ -198,6 +199,22 @@ public class RuneSystem
         return _data.EquippedRunes;
     }
     
+    /// <summary>
+    /// Export save data for persistence (inherited from BaseSystem)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return Save();
+    }
+    
+    /// <summary>
+    /// Import save data for persistence (inherited from BaseSystem)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        Load(data);
+    }
+    
     // Get history
     public List<RuneHistoryEntry> GetHistory()
     {
@@ -262,6 +279,85 @@ public class RuneSystem
         }
         
         if (data.ContainsKey("statistics"))
+        {
+            var stats = (Godot.Collections.Dictionary)data["statistics"];
+            _data.Statistics = new RuneStatistics
+            {
+                TotalRunesUnlocked = stats.Contains("total_runes_unlocked") ? (int)stats["total_runes_unlocked"] : 0,
+                TotalRunesEquipped = stats.Contains("total_runes_equipped") ? (int)stats["total_runes_equipped"] : 0,
+                TotalGoldSpent = stats.Contains("total_gold_spent") ? (int)stats["total_gold_spent"] : 0,
+                TotalExpGained = stats.Contains("total_exp_gained") ? (int)stats["total_exp_gained"] : 0,
+                TimesEnhanced = stats.Contains("times_enhanced") ? (int)stats["times_enhanced"] : 0,
+                TimesRemoved = stats.Contains("times_removed") ? (int)stats["times_removed"] : 0
+            };
+        }
+    }
+    
+    /// <summary>
+    /// 导出保存数据 - 实现 BaseSystem 接口
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 保存已解锁的符文及其等级
+        var unlockedRunes = new Dictionary<string, int>();
+        foreach (var kvp in _data.UnlockedRunes)
+        {
+            unlockedRunes[kvp.Key] = kvp.Value;
+        }
+        data["unlocked_runes"] = unlockedRunes;
+        
+        // 保存已装备的符文
+        var equippedRunes = new Dictionary<string, string>();
+        foreach (var kvp in _data.EquippedRunes)
+        {
+            equippedRunes[kvp.Key] = kvp.Value;
+        }
+        data["equipped_runes"] = equippedRunes;
+        
+        // 保存统计数据
+        data["statistics"] = new Dictionary
+        {
+            { "total_runes_unlocked", _data.Statistics.TotalRunesUnlocked },
+            { "total_runes_equipped", _data.Statistics.TotalRunesEquipped },
+            { "total_gold_spent", _data.Statistics.TotalGoldSpent },
+            { "total_exp_gained", _data.Statistics.TotalExpGained },
+            { "times_enhanced", _data.Statistics.TimesEnhanced },
+            { "times_removed", _data.Statistics.TimesRemoved }
+        };
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据 - 实现 BaseSystem 接口
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("unlocked_runes"))
+        {
+            var unlocked = (Godot.Collections.Dictionary)data["unlocked_runes"];
+            _data.UnlockedRunes = new Dictionary<string, int>();
+            foreach (var key in unlocked.Keys)
+            {
+                _data.UnlockedRunes[key.ToString()] = (int)unlocked[key];
+            }
+        }
+        
+        if (data.Contains("equipped_runes"))
+        {
+            var equipped = (Godot.Collections.Dictionary)data["equipped_runes"];
+            _data.EquippedRunes = new Dictionary<string, string>();
+            foreach (var key in equipped.Keys)
+            {
+                _data.EquippedRunes[key.ToString()] = equipped[key].ToString();
+            }
+        }
+        
+        if (data.Contains("statistics"))
         {
             var stats = (Godot.Collections.Dictionary)data["statistics"];
             _data.Statistics = new RuneStatistics
