@@ -2,14 +2,17 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SeededRunSystem
+/// <summary>
+/// 种子跑系统 - 管理种子跑模式的数据和统计
+/// </summary>
+public class SeededRunSystem : BaseSystem
 {
     private static SeededRunSystem _instance;
     public static SeededRunSystem Instance
     {
         get
         {
-            if (_instance == null) _instance = new SeededRunSystem();
+            if (_instance == null) _instance = GetTree().Root.GetNode<SeededRunSystem>("SeededRunSystem");
             return _instance;
         }
     }
@@ -17,76 +20,135 @@ public class SeededRunSystem
     private SeededRunData _data;
     private Random _seededRandom;
     private string _currentSeed = "";
-    private bool _isInitialized = false;
     
     // Statistics
     public int TotalSeededRuns => _data?.TotalSeededRuns ?? 0;
     public string CurrentSeed => _currentSeed;
     public bool IsSeededModeActive => _data?.IsSeededModeActive ?? false;
     
-    public SeededRunSystem()
+    public override void _Ready()
     {
-        _data = new SeededRunData();
+        base._Ready();
+        // 确保节点在树中
+        if (GetParent() == null)
+        {
+            GD.PrintErr("[SeededRunSystem] Warning: Not added to scene tree!");
+        }
     }
     
-    public void Initialize()
+    protected override void Initialize()
     {
-        if (_isInitialized) return;
-        
-        LoadData();
+        _data = new SeededRunData();
         _isInitialized = true;
         GD.Print("[SeededRunSystem] Initialized - Total runs: " + TotalSeededRuns);
     }
     
-    private void LoadData()
+    public override Dictionary ExportSaveData()
     {
-        // Try to load from save file
-        string savePath = "user://seeded_run_data.json";
-        if (FileAccess.FileExists(savePath))
+        var data = new Dictionary();
+        
+        data["total_seeded_runs"] = _data.TotalSeededRuns;
+        data["last_used_seed"] = _data.LastUsedSeed ?? "";
+        data["is_seeded_mode_active"] = _data.IsSeededModeActive;
+        
+        // 序列化种子历史
+        var seedHistory = new Array();
+        if (_data.SeedHistory != null)
         {
-            try
+            foreach (var kvp in _data.SeedHistory)
             {
-                FileAccess file = FileAccess.Open(savePath, FileAccess.ModeFlags.Read);
-                string jsonString = file.GetAsText();
-                file.Close();
-                
-                // Simple JSON parsing would go here
-                // For now, we use default data
-                GD.Print("[SeededRunSystem] Data loaded from save");
-            }
-            catch (Exception e)
-            {
-                GD.Print("[SeededRunSystem] Failed to load data: " + e.Message);
+                var record = new Dictionary();
+                record["seed"] = kvp.Key;
+                record["run_count"] = kvp.Value.RunCount;
+                record["best_floor"] = kvp.Value.BestFloor;
+                record["best_score"] = kvp.Value.BestScore;
+                record["best_time"] = kvp.Value.BestTime;
+                record["total_gold"] = kvp.Value.TotalGold;
+                record["total_exp"] = kvp.Value.TotalExp;
+                record["enemies_defeated"] = kvp.Value.EnemiesDefeated;
+                record["bosses_defeated"] = kvp.Value.BossesDefeated;
+                record["completed"] = kvp.Value.Completed;
+                record["last_played"] = kvp.Value.LastPlayed ?? "";
+                seedHistory.Add(record);
             }
         }
+        data["seed_history"] = seedHistory;
+        
+        return data;
     }
     
-    public void SaveData()
+    public override void ImportSaveData(Dictionary data)
     {
+        if (data == null)
+        {
+            GD.Print("[SeededRunSystem] No save data to import");
+            return;
+        }
+        
         try
         {
-            string savePath = "user://seeded_run_data.json";
-            FileAccess file = FileAccess.Open(savePath, FileAccess.ModeFlags.Write);
+            _data = new SeededRunData();
             
-            // Serialize data to JSON
-            string jsonString = "{";
-            jsonString += "\"TotalSeededRuns\":" + _data.TotalSeededRuns + ",";
-            jsonString += "\"LastUsedSeed\":\"" + _data.LastUsedSeed + "\",";
-            jsonString += "\"IsSeededModeActive\":" + (_data.IsSeededModeActive ? "true" : "false");
-            jsonString += "}";
+            if (data.Contains("total_seeded_runs"))
+                _data.TotalSeededRuns = Convert.ToInt32(data["total_seeded_runs"]);
+            if (data.Contains("last_used_seed"))
+                _data.LastUsedSeed = data["last_used_seed"]?.ToString() ?? "";
+            if (data.Contains("is_seeded_mode_active"))
+                _data.IsSeededModeActive = Convert.ToBoolean(data["is_seeded_mode_active"]);
             
-            file.StoreString(jsonString);
-            file.Close();
-            GD.Print("[SeededRunSystem] Data saved");
+            // 反序列化种子历史
+            if (data.Contains("seed_history"))
+            {
+                var seedHistory = data["seed_history"] as Array;
+                if (seedHistory != null)
+                {
+                    _data.SeedHistory = new Dictionary<string, SeededRunRecord>();
+                    foreach (Dictionary record in seedHistory)
+                    {
+                        string seed = record["seed"]?.ToString() ?? "";
+                        if (!string.IsNullOrEmpty(seed))
+                        {
+                            var runRecord = new SeededRunRecord(seed);
+                            if (record.Contains("run_count"))
+                                runRecord.RunCount = Convert.ToInt32(record["run_count"]);
+                            if (record.Contains("best_floor"))
+                                runRecord.BestFloor = Convert.ToInt32(record["best_floor"]);
+                            if (record.Contains("best_score"))
+                                runRecord.BestScore = Convert.ToInt32(record["best_score"]);
+                            if (record.Contains("best_time"))
+                                runRecord.BestTime = Convert.ToSingle(record["best_time"]);
+                            if (record.Contains("total_gold"))
+                                runRecord.TotalGold = Convert.ToInt32(record["total_gold"]);
+                            if (record.Contains("total_exp"))
+                                runRecord.TotalExp = Convert.ToInt32(record["total_exp"]);
+                            if (record.Contains("enemies_defeated"))
+                                runRecord.EnemiesDefeated = Convert.ToInt32(record["enemies_defeated"]);
+                            if (record.Contains("bosses_defeated"))
+                                runRecord.BossesDefeated = Convert.ToInt32(record["bosses_defeated"]);
+                            if (record.Contains("completed"))
+                                runRecord.Completed = Convert.ToBoolean(record["completed"]);
+                            if (record.Contains("last_played"))
+                                runRecord.LastPlayed = record["last_played"]?.ToString() ?? "";
+                            
+                            _data.SeedHistory[seed] = runRecord;
+                        }
+                    }
+                }
+            }
+            
+            GD.Print("[SeededRunSystem] Data imported - Total runs: " + _data.TotalSeededRuns);
         }
         catch (Exception e)
         {
-            GD.Print("[SeededRunSystem] Failed to save data: " + e.Message);
+            GD.PrintErr("[SeededRunSystem] Failed to import save data: " + e.Message);
+            _data = new SeededRunData();
         }
     }
     
     public bool StartSeededRun(string seed)
     {
+        if (_data == null) _data = new SeededRunData();
+        
         if (!SeededRunDatabase.Instance.IsValidSeed(seed))
         {
             GD.Print("[SeededRunSystem] Invalid seed: " + seed);
@@ -113,10 +175,17 @@ public class SeededRunSystem
     
     public void EndSeededRun(int floor, int score, float time, int gold, int exp, int enemiesDefeated, int bossesDefeated, bool completed)
     {
+        if (_data == null) _data = new SeededRunData();
+        
         if (!_data.IsSeededModeActive || string.IsNullOrEmpty(_currentSeed))
         {
             GD.Print("[SeededRunSystem] No active seeded run to end");
             return;
+        }
+        
+        if (!_data.SeedHistory.ContainsKey(_currentSeed))
+        {
+            _data.SeedHistory[_currentSeed] = new SeededRunRecord(_currentSeed);
         }
         
         var record = _data.SeedHistory[_currentSeed];
@@ -141,14 +210,13 @@ public class SeededRunSystem
         _data.TotalSeededRuns++;
         _data.IsSeededModeActive = false;
         
-        // Save data
-        SaveData();
-        
         GD.Print("[SeededRunSystem] Ended seeded run - Floor: " + floor + ", Score: " + score + ", Seed: " + _currentSeed);
     }
     
     public void CancelSeededRun()
     {
+        if (_data == null) _data = new SeededRunData();
+        
         if (_data.IsSeededModeActive)
         {
             _data.IsSeededModeActive = false;
@@ -240,7 +308,7 @@ public class SeededRunSystem
     // Get statistics for a specific seed
     public SeededRunRecord GetSeedStatistics(string seed)
     {
-        if (_data.SeedHistory.ContainsKey(seed))
+        if (_data?.SeedHistory?.ContainsKey(seed) == true)
         {
             return _data.SeedHistory[seed];
         }
@@ -250,7 +318,7 @@ public class SeededRunSystem
     // Get all seed records
     public Dictionary<string, SeededRunRecord> GetAllSeedRecords()
     {
-        return _data.SeedHistory;
+        return _data?.SeedHistory ?? new Dictionary<string, SeededRunRecord>();
     }
     
     // Generate a new random seed
@@ -268,7 +336,7 @@ public class SeededRunSystem
     // Verify seed completion status
     public bool IsSeedCompleted(string seed)
     {
-        if (_data.SeedHistory.ContainsKey(seed))
+        if (_data?.SeedHistory?.ContainsKey(seed) == true)
         {
             return _data.SeedHistory[seed].Completed;
         }
@@ -278,7 +346,7 @@ public class SeededRunSystem
     // Get completion rate
     public float GetCompletionRate()
     {
-        if (_data.SeedHistory.Count == 0) return 0f;
+        if (_data?.SeedHistory == null || _data.SeedHistory.Count == 0) return 0f;
         
         int completed = 0;
         foreach (var record in _data.SeedHistory.Values)
