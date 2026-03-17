@@ -23,9 +23,16 @@ namespace ClawRPG.Scripts.Systems
         
         public event Action OnSetBonusChanged;
 
+        protected override void Initialize()
+        {
+            base.Initialize();
+            _instance = this;
+            LoadData();
+        }
+
         public RelicSetSystem()
         {
-            LoadData();
+            // 实际初始化在 Initialize() 中进行
         }
 
         #region Data Management
