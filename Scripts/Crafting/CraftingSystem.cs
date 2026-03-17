@@ -319,10 +319,6 @@ namespace ClawRPG.Scripts.Crafting {
         private List<int> _unlockedRecipes = new List<int>();
         private Dictionary<string, object> _craftingStats = new Dictionary<string, object>();
         
-        // 持久化数据
-        private List<int> _unlockedRecipes = new();
-        private Dictionary<string, object> _craftingStats = new();
-        
         public override void _Ready()
         {
             base._Ready();
