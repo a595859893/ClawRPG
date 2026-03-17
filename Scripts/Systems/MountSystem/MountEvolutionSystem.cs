@@ -416,4 +416,38 @@ public class MountEvolutionSystem : BaseSystem
         
         GD.Print($"[MountEvolutionSystem] Loaded evolution data for {_playerEvolutions.Count} mounts");
     }
+
+    /// <summary>
+    /// 导出保存数据 - 实现 BaseSystem 接口
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        return SaveData();
+    }
+
+    /// <summary>
+    /// 导入保存数据 - 实现 BaseSystem 接口
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 转换为所需的格式
+        var typedData = new Dictionary<string, Dictionary<string, object>>();
+        foreach (Dictionary key in data.Keys)
+        {
+            var keyStr = key.ToString();
+            if (data[key] is Dictionary valDict)
+            {
+                var converted = new Dictionary<string, object>();
+                foreach (Dictionary valKey in valDict.Keys)
+                {
+                    converted[valKey.ToString()] = valDict[valKey];
+                }
+                typedData[keyStr] = converted;
+            }
+        }
+        
+        LoadData(typedData);
+    }
 }
