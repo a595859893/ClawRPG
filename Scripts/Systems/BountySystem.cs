@@ -441,19 +441,77 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Export save data for persistence
+        /// Export save data for persistence - implements BaseSystem
         /// </summary>
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            return Serialize();
+            var data = new Dictionary();
+            data["activeBounties"] = ActiveBounties.Select(b => new Dictionary
+            {
+                ["id"] = b.Id,
+                ["title"] = b.Title,
+                ["description"] = b.Description,
+                ["type"] = (int)b.Type,
+                ["difficulty"] = (int)b.Difficulty,
+                ["targetId"] = b.TargetId,
+                ["targetCount"] = b.TargetCount,
+                ["currentProgress"] = b.CurrentProgress,
+                ["goldReward"] = b.GoldReward,
+                ["xpReward"] = b.XPReward,
+                ["itemRewardId"] = b.ItemRewardId,
+                ["isCompleted"] = b.IsCompleted,
+                ["isClaimed"] = b.IsClaimed,
+                ["createdAt"] = b.CreatedAt.ToString("o"),
+                ["expiresAt"] = b.ExpiresAt.ToString("o")
+            }).ToList();
+            data["lastRefreshTime"] = _lastRefreshTime.ToString("o");
+            return data;
         }
 
         /// <summary>
-        /// Import save data from persistence
+        /// Import save data from persistence - implements BaseSystem
         /// </summary>
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
-            Deserialize(data);
+            if (data == null) return;
+
+            ActiveBounties.Clear();
+            if (data.Contains("activeBounties"))
+            {
+                var bountiesObj = data["activeBounties"];
+                if (bountiesObj is IEnumerable bounties)
+                {
+                    foreach (var bObj in bounties)
+                    {
+                        if (bObj is not Dictionary bData) continue;
+
+                        var bounty = new Bounty
+                        {
+                            Id = Convert.ToInt32(bData["id"]),
+                            Title = bData["title"].ToString(),
+                            Description = bData["description"].ToString(),
+                            Type = (BountyType)Convert.ToInt32(bData["type"]),
+                            Difficulty = (BountyDifficulty)Convert.ToInt32(bData["difficulty"]),
+                            TargetId = Convert.ToInt32(bData["targetId"]),
+                            TargetCount = Convert.ToInt32(bData["targetCount"]),
+                            CurrentProgress = Convert.ToInt32(bData["currentProgress"]),
+                            GoldReward = Convert.ToInt32(bData["goldReward"]),
+                            XPReward = Convert.ToInt32(bData["xpReward"]),
+                            ItemRewardId = Convert.ToInt32(bData["itemRewardId"]),
+                            IsCompleted = Convert.ToBoolean(bData["isCompleted"]),
+                            IsClaimed = Convert.ToBoolean(bData["isClaimed"]),
+                            CreatedAt = DateTime.Parse(bData["createdAt"].ToString()),
+                            ExpiresAt = DateTime.Parse(bData["expiresAt"].ToString())
+                        };
+                        ActiveBounties.Add(bounty);
+                    }
+                }
+            }
+
+            if (data.Contains("lastRefreshTime"))
+            {
+                _lastRefreshTime = DateTime.Parse(data["lastRefreshTime"].ToString());
+            }
         }
     }
 }
