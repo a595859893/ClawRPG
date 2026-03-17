@@ -2,6 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Managers;
+using ClawRPG.Scripts.Combat;
+using ClawRPG.Scripts.Crafting;
+using CombatSkillCooldownSystem = global::CombatSkillCooldownSystem;
+using SummonSystem = global::ClawRPG.Scripts.SummonSystem;
 
 namespace ClawRPG.Scripts.Systems
 {
@@ -15,6 +19,12 @@ namespace ClawRPG.Scripts.Systems
         private SystemInitializationManager _systemInitializationManager;
         private UIManager _uiManager;
 
+        // 战斗相关系统引用
+        private CombatSkillCooldownSystem _combatSkillCooldownSystem;
+        private CombatStatusSystem _combatStatusSystem;
+        private CraftingSystem _craftingSystem;
+        private SummonSystem _summonSystem;
+
         public void Initialize(Main main)
         {
             _main = main;
@@ -25,6 +35,12 @@ namespace ClawRPG.Scripts.Systems
             _gameStateManager = gameStateManager;
             _systemInitializationManager = systemInitManager;
             _uiManager = uiManager;
+            
+            // 获取战斗相关系统引用
+            _combatSkillCooldownSystem = _main.GetNodeOrNull<CombatSkillCooldownSystem>("CombatSkillCooldownSystem");
+            _combatStatusSystem = _main.GetNodeOrNull<CombatStatusSystem>("CombatStatusSystem");
+            _craftingSystem = _main.GetNodeOrNull<CraftingSystem>("CraftingSystem");
+            _summonSystem = _main.GetNodeOrNull<SummonSystem>("SummonSystem");
         }
 
         /// <summary>
@@ -64,6 +80,27 @@ namespace ClawRPG.Scripts.Systems
                 allData["saveLoad"] = saveLoadManager.ExportSaveData();
             }
 
+            // 战斗系统持久化
+            if (_combatSkillCooldownSystem != null)
+            {
+                allData["combatSkillCooldown"] = _combatSkillCooldownSystem.ExportSaveData();
+            }
+
+            if (_combatStatusSystem != null)
+            {
+                allData["combatStatus"] = _combatStatusSystem.ExportSaveData();
+            }
+
+            if (_craftingSystem != null)
+            {
+                allData["crafting"] = _craftingSystem.ExportSaveData();
+            }
+
+            if (_summonSystem != null)
+            {
+                allData["summon"] = _summonSystem.ExportSaveData();
+            }
+
             return allData;
         }
 
@@ -93,6 +130,27 @@ namespace ClawRPG.Scripts.Systems
             {
                 var saveLoadManager = _main.GetNodeOrNull<SaveLoadManager>("SaveLoadManager");
                 saveLoadManager?.ImportSaveData(data["saveLoad"] as Dictionary);
+            }
+
+            // 战斗系统持久化
+            if (data.Contains("combatSkillCooldown"))
+            {
+                _combatSkillCooldownSystem?.ImportSaveData(data["combatSkillCooldown"] as Dictionary);
+            }
+
+            if (data.Contains("combatStatus"))
+            {
+                _combatStatusSystem?.ImportSaveData(data["combatStatus"] as Dictionary);
+            }
+
+            if (data.Contains("crafting"))
+            {
+                _craftingSystem?.ImportSaveData(data["crafting"] as Dictionary);
+            }
+
+            if (data.Contains("summon"))
+            {
+                _summonSystem?.ImportSaveData(data["summon"] as Dictionary);
             }
         }
 
