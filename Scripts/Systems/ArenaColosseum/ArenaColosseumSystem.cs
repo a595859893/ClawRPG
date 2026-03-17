@@ -7,8 +7,21 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 角斗场系统 - 玩家实时对战
     /// </summary>
-    public class ArenaColosseumSystem
+    public partial class ArenaColosseumSystem : BaseSystem
     {
+        private static ArenaColosseumSystem _instance;
+        public static ArenaColosseumSystem Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    _instance = new ArenaColosseumSystem();
+                return _instance;
+            }
+            private set { _instance = value; }
+        }
+
+        protected override string SystemName => "ArenaColosseumSystem";
         private static ArenaColosseumSystem _instance;
         public static ArenaColosseumSystem Instance
         {
@@ -645,19 +658,70 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// Export save data for persistence
+        /// Export save data for persistence (BaseSystem override)
         /// </summary>
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            return GetSaveData();
+            var data = new Dictionary();
+            
+            var playerDataList = new List<Dictionary<string, object>>();
+            foreach (var pd in _playerData)
+            {
+                playerDataList.Add(new Dictionary<string, object>
+                {
+                    { "playerId", pd.Key },
+                    { "totalMatches", pd.Value.TotalMatches },
+                    { "wins", pd.Value.Wins },
+                    { "losses", pd.Value.Losses },
+                    { "totalPrizeEarned", pd.Value.TotalPrizeEarned },
+                    { "totalEntryFees", pd.Value.TotalEntryFees },
+                    { "highestStreak", pd.Value.HighestStreak },
+                    { "currentStreak", pd.Value.CurrentStreak },
+                    { "highestDamage", pd.Value.HighestDamage },
+                    { "totalKills", pd.Value.TotalKills },
+                    { "rating", pd.Value.Rating }
+                });
+            }
+            
+            data["playerData"] = playerDataList;
+            return data;
         }
 
         /// <summary>
-        /// Import save data from persistence
+        /// Import save data from persistence (BaseSystem override)
         /// </summary>
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
-            LoadSaveData(data);
+            if (data == null) return;
+            
+            if (!data.Contains("playerData")) return;
+
+            var playerDataList = data["playerData"] as List<object>;
+            if (playerDataList == null) return;
+
+            foreach (var pdData in playerDataList)
+            {
+                var pd = pdData as Dictionary<string, object>;
+                if (pd == null) continue;
+
+                int playerId = Convert.ToInt32(pd["playerId"]);
+                var playerColosseumData = new ArenaColosseumData.PlayerColosseumData
+                {
+                    PlayerId = playerId,
+                    TotalMatches = Convert.ToInt32(pd["totalMatches"]),
+                    Wins = Convert.ToInt32(pd["wins"]),
+                    Losses = Convert.ToInt32(pd["losses"]),
+                    TotalPrizeEarned = Convert.ToInt32(pd["totalPrizeEarned"]),
+                    TotalEntryFees = Convert.ToInt32(pd["totalEntryFees"]),
+                    HighestStreak = Convert.ToInt32(pd["highestStreak"]),
+                    CurrentStreak = Convert.ToInt32(pd["currentStreak"]),
+                    HighestDamage = Convert.ToInt32(pd["highestDamage"]),
+                    TotalKills = Convert.ToInt32(pd["totalKills"]),
+                    Rating = Convert.ToInt32(pd["rating"])
+                };
+                
+                _playerData[playerId] = playerColosseumData;
+            }
         }
 
         #endregion

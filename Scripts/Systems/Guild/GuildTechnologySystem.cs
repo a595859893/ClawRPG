@@ -2,8 +2,12 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class GuildTechnologySystem
+public partial class GuildTechnologySystem : BaseSystem
 {
+    private static GuildTechnologySystem _instance;
+    public static GuildTechnologySystem Instance => _instance ??= new GuildTechnologySystem();
+
+    protected override string SystemName => "GuildTechnologySystem";
     private static GuildTechnologySystem _instance;
     public static GuildTechnologySystem Instance => _instance ??= new GuildTechnologySystem();
 
@@ -232,5 +236,38 @@ public class GuildTechnologySystem
             }
         }
         return null;
+    }
+    
+    /// <summary>
+    /// Export save data (BaseSystem override)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["availablePoints"] = Data.AvailablePoints;
+        data["totalResearched"] = Data.TotalResearched;
+        data["guildTechs"] = Data.GuildTechs;
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data (BaseSystem override)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("availablePoints"))
+        {
+            Data.AvailablePoints = (int)data["availablePoints"];
+        }
+        if (data.Contains("totalResearched"))
+        {
+            Data.TotalResearched = (int)data["totalResearched"];
+        }
+        if (data.Contains("guildTechs"))
+        {
+            Data.GuildTechs = (Dictionary<string, GuildTechnologyData.GuildTechnologyProgress>)data["guildTechs"];
+        }
     }
 }

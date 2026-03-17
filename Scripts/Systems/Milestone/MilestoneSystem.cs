@@ -2,8 +2,12 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MilestoneSystem
+public partial class MilestoneSystem : BaseSystem
 {
+    private static MilestoneSystem _instance;
+    public static MilestoneSystem Instance => _instance ?? (_instance = new MilestoneSystem());
+    
+    protected override string SystemName => "MilestoneSystem";
     private static MilestoneSystem _instance;
     public static MilestoneSystem Instance => _instance ?? (_instance = new MilestoneSystem());
     
@@ -376,5 +380,38 @@ public class MilestoneSystem
         UpdateProgress("gold_100000", gold);
         UpdateProgress("gold_1000000", gold);
         UpdateProgress("gold_10000000", gold);
+    }
+    
+    /// <summary>
+    /// Export save data (BaseSystem override)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["milestones"] = _data.Milestones;
+        data["categoryProgress"] = _data.CategoryProgress;
+        data["statistics"] = _data.Statistics;
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data (BaseSystem override)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("milestones"))
+        {
+            _data.Milestones = (Dictionary<string, MilestoneData.MilestoneEntry>)data["milestones"];
+        }
+        if (data.Contains("categoryProgress"))
+        {
+            _data.CategoryProgress = (Dictionary<string, int>)data["categoryProgress"];
+        }
+        if (data.Contains("statistics"))
+        {
+            _data.Statistics = (MilestoneData.MilestoneStatistics)data["statistics"];
+        }
     }
 }

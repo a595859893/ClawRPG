@@ -6,7 +6,19 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// Manages fate relics - roguelike-style collectible relics
     /// </summary>
-    public class FateRelicSystem {
+    public partial class FateRelicSystem : BaseSystem
+    {
+        private static FateRelicSystem _instance;
+        public static FateRelicSystem Instance {
+            get {
+                if (_instance == null) {
+                    _instance = new FateRelicSystem();
+                }
+                return _instance;
+            }
+        }
+        
+        protected override string SystemName => "FateRelicSystem";
         private static FateRelicSystem _instance;
         public static FateRelicSystem Instance {
             get {
@@ -296,6 +308,59 @@ namespace ClawRPG.Systems {
             stats["by_type"] = typeCounts;
             
             return stats;
+        }
+        
+        /// <summary>
+        /// Export save data (BaseSystem override)
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["ownedRelics"] = _playerData.OwnedRelicIds.ToList();
+            data["equippedRelics"] = _playerData.EquippedRelics;
+            data["relicStacks"] = _playerData.RelicStacks;
+            data["maxSlots"] = _playerData.MaxRelicSlots;
+            data["goldSpent"] = _playerData.GoldSpentOnRelics;
+            data["discovered"] = _playerData.RelicsDiscovered;
+            data["completed"] = _playerData.RelicsCompleted;
+            return data;
+        }
+        
+        /// <summary>
+        /// Import save data (BaseSystem override)
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("ownedRelics"))
+            {
+                _playerData.OwnedRelicIds = new HashSet<string>((List<string>)data["ownedRelics"]);
+            }
+            if (data.Contains("equippedRelics"))
+            {
+                _playerData.EquippedRelics = (Dictionary<string, bool>)data["equippedRelics"];
+            }
+            if (data.Contains("relicStacks"))
+            {
+                _playerData.RelicStacks = (Dictionary<string, int>)data["relicStacks"];
+            }
+            if (data.Contains("maxSlots"))
+            {
+                _playerData.MaxRelicSlots = (int)data["maxSlots"];
+            }
+            if (data.Contains("goldSpent"))
+            {
+                _playerData.GoldSpentOnRelics = (int)data["goldSpent"];
+            }
+            if (data.Contains("discovered"))
+            {
+                _playerData.RelicsDiscovered = (int)data["discovered"];
+            }
+            if (data.Contains("completed"))
+            {
+                _playerData.RelicsCompleted = (int)data["completed"];
+            }
         }
     }
 }

@@ -3,8 +3,19 @@ using System.Collections.Generic;
 using Godot;
 using Yields;
 
-public class PetEvolutionSystem
+public partial class PetEvolutionSystem : BaseSystem
 {
+    private static PetEvolutionSystem _instance;
+    public static PetEvolutionSystem Instance
+    {
+        get
+        {
+            if (_instance == null) _instance = new PetEvolutionSystem();
+            return _instance;
+        }
+    }
+
+    protected override string SystemName => "PetEvolutionSystem";
     private static PetEvolutionSystem _instance;
     public static PetEvolutionSystem Instance
     {
@@ -448,4 +459,63 @@ public class EvolutionProgress
     public int ProgressPercent { get; set; }
     public bool CanEvolve { get; set; }
     public bool IsMaxEvolution { get; set; }
+}
+
+/// <summary>
+/// PetEvolutionSystem partial class for BaseSystem integration
+/// </summary>
+public partial class PetEvolutionSystem
+{
+    /// <summary>
+    /// Export save data (BaseSystem override)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["evolvedPets"] = _data.EvolvedPets;
+        data["totalEvolutions"] = _data.TotalEvolutions;
+        data["legendaryEvolutions"] = _data.LegendaryEvolutions;
+        data["epicEvolutions"] = _data.EpicEvolutions;
+        data["rareEvolutions"] = _data.RareEvolutions;
+        data["totalEvolutionPoints"] = _data.TotalEvolutionPoints;
+        data["evolutionHistory"] = _data.EvolutionHistory;
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data (BaseSystem override)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("evolvedPets"))
+        {
+            _data.EvolvedPets = (Dictionary<int, PetEvolutionRecord>)data["evolvedPets"];
+        }
+        if (data.Contains("totalEvolutions"))
+        {
+            _data.TotalEvolutions = (int)data["totalEvolutions"];
+        }
+        if (data.Contains("legendaryEvolutions"))
+        {
+            _data.LegendaryEvolutions = (int)data["legendaryEvolutions"];
+        }
+        if (data.Contains("epicEvolutions"))
+        {
+            _data.EpicEvolutions = (int)data["epicEvolutions"];
+        }
+        if (data.Contains("rareEvolutions"))
+        {
+            _data.RareEvolutions = (int)data["rareEvolutions"];
+        }
+        if (data.Contains("totalEvolutionPoints"))
+        {
+            _data.TotalEvolutionPoints = (int)data["totalEvolutionPoints"];
+        }
+        if (data.Contains("evolutionHistory"))
+        {
+            _data.EvolutionHistory = (List<EvolutionHistoryEntry>)data["evolutionHistory"];
+        }
+    }
 }

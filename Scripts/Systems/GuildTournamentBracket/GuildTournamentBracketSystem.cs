@@ -8,7 +8,20 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
     /// <summary>
     /// 公会锦标赛赛程系统
     /// </summary>
-    public class GuildTournamentBracketSystem {
+    public partial class GuildTournamentBracketSystem : BaseSystem
+    {
+        // 单例
+        private static GuildTournamentBracketSystem _instance;
+        public static GuildTournamentBracketSystem Instance {
+            get {
+                if (_instance == null) {
+                    _instance = new GuildTournamentBracketSystem();
+                }
+                return _instance;
+            }
+        }
+        
+        protected override string SystemName => "GuildTournamentBracketSystem";
         // 单例
         private static GuildTournamentBracketSystem _instance;
         public static GuildTournamentBracketSystem Instance {
@@ -348,6 +361,29 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
         public void ResetTournament() {
             _currentTournament = new GuildTournamentBracketData();
             GD.Print("[GuildTournamentBracket] Tournament reset");
+        }
+        
+        /// <summary>
+        /// Export save data (BaseSystem override)
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["currentTournament"] = _currentTournament;
+            return data;
+        }
+        
+        /// <summary>
+        /// Import save data (BaseSystem override)
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("currentTournament"))
+            {
+                _currentTournament = (GuildTournamentBracketData)data["currentTournament"];
+            }
         }
     }
     

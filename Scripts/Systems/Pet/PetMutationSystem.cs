@@ -7,8 +7,12 @@ namespace ClawRPG.Systems;
 /// <summary>
 /// 宠物变异系统 - 为宠物添加随机变异机制
 /// </summary>
-public class PetMutationSystem
+public partial class PetMutationSystem : BaseSystem
 {
+    private static PetMutationSystem _instance;
+    public static PetMutationSystem Instance => _instance ??= new PetMutationSystem();
+    
+    protected override string SystemName => "PetMutationSystem";
     private static PetMutationSystem _instance;
     public static PetMutationSystem Instance => _instance ??= new PetMutationSystem();
     
@@ -446,5 +450,62 @@ public class PetMutationSystem
         }
         
         return petData;
+    }
+    
+    /// <summary>
+    /// Export save data (BaseSystem override)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        var petMutationsData = new Dictionary<string, object>();
+        foreach (var kvp in _petMutations)
+        {
+            petMutationsData[kvp.Key.ToString()] = SerializePetMutationData(kvp.Value);
+        }
+        data["petMutations"] = petMutationsData;
+        data["totalMutationAttempts"] = _totalMutationAttempts;
+        data["successfulMutations"] = _successfulMutations;
+        data["rerollUsed"] = _rerollUsed;
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data (BaseSystem override)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("petMutations"))
+        {
+            var petMutationsData = data["petMutations"] as Dictionary<string, object>;
+            if (petMutationsData != null)
+            {
+                foreach (var kvp in petMutationsData)
+                {
+                    if (int.TryParse(kvp.Key, out int petId))
+                    {
+                        var petData = DeserializePetMutationData(kvp.Value as Dictionary<string, object>);
+                        if (petData != null)
+                        {
+                            _petMutations[petId] = petData;
+                        }
+                    }
+                }
+            }
+        }
+        if (data.Contains("totalMutationAttempts"))
+        {
+            _totalMutationAttempts = (int)data["totalMutationAttempts"];
+        }
+        if (data.Contains("successfulMutations"))
+        {
+            _successfulMutations = (int)data["successfulMutations"];
+        }
+        if (data.Contains("rerollUsed"))
+        {
+            _rerollUsed = (int)data["rerollUsed"];
+        }
     }
 }

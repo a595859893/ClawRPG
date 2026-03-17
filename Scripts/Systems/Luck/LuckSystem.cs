@@ -2,8 +2,12 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class LuckSystem
+public partial class LuckSystem : BaseSystem
 {
+    private static LuckSystem _instance;
+    public static LuckSystem Instance => _instance;
+    
+    protected override string SystemName => "LuckSystem";
     private static LuckSystem _instance;
     public static LuckSystem Instance => _instance;
     
@@ -303,5 +307,53 @@ public class LuckSystem
         // JSON 反序列化
         // var json = File.ReadAllText(...);
         // _data = JsonSerializer.Deserialize<LuckData>(json);
+    }
+    
+    /// <summary>
+    /// Export save data (BaseSystem override)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["baseLuck"] = _data.BaseLuck;
+        data["activeModifiers"] = _data.ActiveModifiers;
+        data["totalLuckyRolls"] = _data.TotalLuckyRolls;
+        data["criticalLuckRolls"] = _data.CriticalLuckRolls;
+        data["failedLuckRolls"] = _data.FailedLuckRolls;
+        data["history"] = _data.History;
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data (BaseSystem override)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("baseLuck"))
+        {
+            _data.BaseLuck = (int)data["baseLuck"];
+        }
+        if (data.Contains("activeModifiers"))
+        {
+            _data.ActiveModifiers = (List<LuckModifier>)data["activeModifiers"];
+        }
+        if (data.Contains("totalLuckyRolls"))
+        {
+            _data.TotalLuckyRolls = (int)data["totalLuckyRolls"];
+        }
+        if (data.Contains("criticalLuckRolls"))
+        {
+            _data.CriticalLuckRolls = (int)data["criticalLuckRolls"];
+        }
+        if (data.Contains("failedLuckRolls"))
+        {
+            _data.FailedLuckRolls = (int)data["failedLuckRolls"];
+        }
+        if (data.Contains("history"))
+        {
+            _data.History = (List<LuckEvent>)data["history"];
+        }
     }
 }

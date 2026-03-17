@@ -7,7 +7,17 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
     /// 宠物互动系统 - 核心逻辑
     /// 基于 Audio Design Patterns 学习成果
     /// </summary>
-    public class PetInteractionSystem {
+    public partial class PetInteractionSystem : BaseSystem
+    {
+        private static PetInteractionSystem _instance;
+        public static PetInteractionSystem Instance {
+            get {
+                if (_instance == null) _instance = new PetInteractionSystem();
+                return _instance;
+            }
+        }
+
+        protected override string SystemName => "PetInteractionSystem";
         private static PetInteractionSystem _instance;
         public static PetInteractionSystem Instance {
             get {
@@ -366,6 +376,49 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
 
             if (data.Contains("pet_interaction_last_time"))
                 _data.lastInteractionTime = DateTime.Parse((string)data["pet_interaction_last_time"]);
+        }
+        
+        /// <summary>
+        /// Export save data (BaseSystem override)
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["totalInteractions"] = _data.totalInteractions;
+            data["specialInteractions"] = _data.specialInteractions;
+            data["petInteractions"] = _data.petInteractions;
+            data["interactionTypeCount"] = _data.interactionTypeCount;
+            data["lastInteractionTime"] = _data.lastInteractionTime;
+            return data;
+        }
+        
+        /// <summary>
+        /// Import save data (BaseSystem override)
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            if (data.Contains("totalInteractions"))
+            {
+                _data.totalInteractions = (int)data["totalInteractions"];
+            }
+            if (data.Contains("specialInteractions"))
+            {
+                _data.specialInteractions = (int)data["specialInteractions"];
+            }
+            if (data.Contains("petInteractions"))
+            {
+                _data.petInteractions = (Dictionary<string, PetInteractionRecord>)data["petInteractions"];
+            }
+            if (data.Contains("interactionTypeCount"))
+            {
+                _data.interactionTypeCount = (Dictionary<InteractionType, int>)data["interactionTypeCount"];
+            }
+            if (data.Contains("lastInteractionTime"))
+            {
+                _data.lastInteractionTime = (DateTime)data["lastInteractionTime"];
+            }
         }
     }
 }

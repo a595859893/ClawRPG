@@ -2,14 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ClawRPG.Scripts.Systems;
+using Godot;
 
 namespace ClawRPG.Scripts.Systems.CoopSession
 {
     /// <summary>
     /// 合作冒险会话系统 - 管理多人合作冒险
     /// </summary>
-    public class CoopSessionSystem
+    public partial class CoopSessionSystem : BaseSystem
     {
+        private static CoopSessionSystem _instance;
+        public static CoopSessionSystem Instance => _instance ??= new CoopSessionSystem();
+
+        protected override string SystemName => "CoopSessionSystem";
         private static CoopSessionSystem _instance;
         public static CoopSessionSystem Instance => _instance ??= new CoopSessionSystem();
 
@@ -499,11 +504,11 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         }
 
         /// <summary>
-        /// 存档支持
+        /// 存档支持 (BaseSystem override)
         /// </summary>
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            var data = new Dictionary<string, object>();
+            var data = new Dictionary();
             data["ActiveSessions"] = _activeSessions.Values.ToList();
             data["PlayerHistories"] = _playerHistories.Values.ToList();
             data["CurrentSessionId"] = _currentSessionId;
@@ -511,9 +516,9 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         }
 
         /// <summary>
-        /// 读档支持
+        /// 读档支持 (BaseSystem override)
         /// </summary>
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             _activeSessions.Clear();
             _playerHistories.Clear();

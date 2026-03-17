@@ -2,8 +2,12 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class GameGuideSystem
+public partial class GameGuideSystem : BaseSystem
 {
+    private static GameGuideData _data;
+    private static GameGuideSystem _instance;
+    
+    protected override string SystemName => "GameGuideSystem";
     private static GameGuideData _data;
     private static GameGuideSystem _instance;
     
@@ -203,10 +207,12 @@ public class GameGuideSystem
         return GameGuideDatabase.Categories.GetValueOrDefault(categoryId);
     }
     
-    // 存档支持
-    public Dictionary<string, object> Save()
+    /// <summary>
+    /// Export save data (BaseSystem override)
+    /// </summary>
+    public override Dictionary ExportSaveData()
     {
-        var saveData = new Dictionary<string, object>();
+        var saveData = new Dictionary();
         saveData["unlocked_categories"] = Data.UnlockedCategories;
         saveData["read_guides"] = new List<string>(Data.ReadGuides);
         saveData["completed_tutorials"] = new List<string>(Data.CompletedTutorials);
@@ -217,41 +223,44 @@ public class GameGuideSystem
         return saveData;
     }
     
-    public void Load(Dictionary<string, object> data)
+    /// <summary>
+    /// Import save data (BaseSystem override)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         
-        if (data.ContainsKey("unlocked_categories"))
+        if (data.Contains("unlocked_categories"))
         {
             Data.UnlockedCategories = (Dictionary<string, bool>)data["unlocked_categories"];
         }
         
-        if (data.ContainsKey("read_guides"))
+        if (data.Contains("read_guides"))
         {
             Data.ReadGuides = new HashSet<string>((List<string>)data["read_guides"]);
         }
         
-        if (data.ContainsKey("completed_tutorials"))
+        if (data.Contains("completed_tutorials"))
         {
             Data.CompletedTutorials = new HashSet<string>((List<string>)data["completed_tutorials"]);
         }
         
-        if (data.ContainsKey("read_history"))
+        if (data.Contains("read_history"))
         {
             Data.ReadHistory = (List<GuideReadHistory>)data["read_history"];
         }
         
-        if (data.ContainsKey("total_guides_read"))
+        if (data.Contains("total_guides_read"))
         {
             Data.TotalGuidesRead = (int)data["total_guides_read"];
         }
         
-        if (data.ContainsKey("total_tutorials_completed"))
+        if (data.Contains("total_tutorials_completed"))
         {
             Data.TotalTutorialsCompleted = (int)data["total_tutorials_completed"];
         }
         
-        if (data.ContainsKey("categories_unlocked"))
+        if (data.Contains("categories_unlocked"))
         {
             Data.CategoriesUnlocked = (int)data["categories_unlocked"];
         }

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using Godot;
 
 namespace ClawRPG.Core.Systems
 {
@@ -133,7 +134,7 @@ namespace ClawRPG.Core.Systems
     /// <summary>
     /// World Event System - Manages random world events
     /// </summary>
-    public class WorldEventSystem
+    public partial class WorldEventSystem : BaseSystem
     {
         private Dictionary<string, WorldEventConfig> _eventConfigs;
         private PlayerWorldEventData _playerData;
@@ -142,6 +143,8 @@ namespace ClawRPG.Core.Systems
         private float _spawnChance;
         private int _baseEventInterval; // seconds
         private DateTime _lastEventCheck;
+        
+        protected override string SystemName => "WorldEventSystem";
         
         // Event signals
         public event Action<ActiveWorldEvent> OnEventSpawned;
@@ -546,41 +549,40 @@ namespace ClawRPG.Core.Systems
         }
         
         /// <summary>
-        /// Export save data
+        /// Export save data (BaseSystem override)
         /// </summary>
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            return new Dictionary<string, object>
-            {
-                ["totalEventsParticipated"] = _playerData.TotalEventsParticipated,
-                ["eventsCompleted"] = _playerData.EventsCompleted,
-                ["eventsFailed"] = _playerData.EventsFailed,
-                ["goldEarned"] = _playerData.GoldEarned,
-                ["experienceEarned"] = _playerData.ExperienceEarned,
-                ["eventsByType"] = _playerData.EventsByType,
-                ["eventsByRarity"] = _playerData.EventsByRarity,
-                ["eventHistory"] = _playerData.EventHistory,
-                ["activeEvents"] = _activeEvents
-            };
+            var data = new Dictionary();
+            data["totalEventsParticipated"] = _playerData.TotalEventsParticipated;
+            data["eventsCompleted"] = _playerData.EventsCompleted;
+            data["eventsFailed"] = _playerData.EventsFailed;
+            data["goldEarned"] = _playerData.GoldEarned;
+            data["experienceEarned"] = _playerData.ExperienceEarned;
+            data["eventsByType"] = _playerData.EventsByType;
+            data["eventsByRarity"] = _playerData.EventsByRarity;
+            data["eventHistory"] = _playerData.EventHistory;
+            data["activeEvents"] = _activeEvents;
+            return data;
         }
         
         /// <summary>
-        /// Import save data
+        /// Import save data (BaseSystem override)
         /// </summary>
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
             
-            if (data.ContainsKey("totalEventsParticipated"))
-                _playerData.TotalEventsParticipated = Convert.ToInt32(data["totalEventsParticipated"]);
-            if (data.ContainsKey("eventsCompleted"))
-                _playerData.EventsCompleted = Convert.ToInt32(data["eventsCompleted"]);
-            if (data.ContainsKey("eventsFailed"))
-                _playerData.EventsFailed = Convert.ToInt32(data["eventsFailed"]);
-            if (data.ContainsKey("goldEarned"))
-                _playerData.GoldEarned = Convert.ToInt32(data["goldEarned"]);
-            if (data.ContainsKey("experienceEarned"))
-                _playerData.ExperienceEarned = Convert.ToInt32(data["experienceEarned"]);
+            if (data.Contains("totalEventsParticipated"))
+                _playerData.TotalEventsParticipated = (int)data["totalEventsParticipated"];
+            if (data.Contains("eventsCompleted"))
+                _playerData.EventsCompleted = (int)data["eventsCompleted"];
+            if (data.Contains("eventsFailed"))
+                _playerData.EventsFailed = (int)data["eventsFailed"];
+            if (data.Contains("goldEarned"))
+                _playerData.GoldEarned = (int)data["goldEarned"];
+            if (data.Contains("experienceEarned"))
+                _playerData.ExperienceEarned = (int)data["experienceEarned"];
         }
     }
 }

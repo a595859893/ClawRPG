@@ -2,7 +2,12 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetFusionSystem {
+public partial class PetFusionSystem : BaseSystem
+{
+    private PetFusionData _data;
+    private const string SAVE_PATH = "user://pet_fusion_save.json";
+    
+    protected override string SystemName => "PetFusionSystem";
     private PetFusionData _data;
     private const string SAVE_PATH = "user://pet_fusion_save.json";
     
@@ -240,6 +245,50 @@ public class PetFusionSystem {
                     _data.UnlockedFusionTypes.Add(type);
                 }
             }
+        }
+    }
+    
+    /// <summary>
+    /// Export save data (BaseSystem override)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        data["totalFusions"] = _data.TotalFusions;
+        data["successfulFusions"] = _data.SuccessfulFusions;
+        data["legendaryFusions"] = _data.LegendaryFusions;
+        data["totalGoldSpent"] = _data.TotalGoldSpent;
+        data["unlockedFusionTypes"] = _data.UnlockedFusionTypes.ToList();
+        data["fusionHistory"] = _data.FusionHistory.Values.ToList();
+        return data;
+    }
+    
+    /// <summary>
+    /// Import save data (BaseSystem override)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        if (data.Contains("totalFusions"))
+        {
+            _data.TotalFusions = (int)data["totalFusions"];
+        }
+        if (data.Contains("successfulFusions"))
+        {
+            _data.SuccessfulFusions = (int)data["successfulFusions"];
+        }
+        if (data.Contains("legendaryFusions"))
+        {
+            _data.LegendaryFusions = (int)data["legendaryFusions"];
+        }
+        if (data.Contains("totalGoldSpent"))
+        {
+            _data.TotalGoldSpent = (int)data["totalGoldSpent"];
+        }
+        if (data.Contains("unlockedFusionTypes"))
+        {
+            _data.UnlockedFusionTypes = new HashSet<string>((List<string>)data["unlockedFusionTypes"]);
         }
     }
 }
