@@ -10,8 +10,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// </summary>
     public partial class PetCombatAI : BaseSystem
     {
-        private static PetCombatAI _instance;
-        public static PetCombatAI Instance => _instance ??= new PetCombatAI();
+        public static PetCombatAI Instance { get; private set; }
 
         // 子系统
         private PetAIDecision _decisionSystem;
@@ -38,8 +37,8 @@ namespace ClawRPG.Scripts.Systems.Pets
         
         public override void _Ready()
         {
+            Instance = this;
             base._Ready();
-            _instance = this;
             
             // 初始化子系统
             _decisionSystem = new PetAIDecision();

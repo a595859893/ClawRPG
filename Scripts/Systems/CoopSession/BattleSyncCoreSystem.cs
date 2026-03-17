@@ -10,8 +10,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
     public class BattleSyncCoreSystem : BaseSystem
     {
         // 单例
-        private static BattleSyncCoreSystem _instance;
-        public static BattleSyncCoreSystem Instance => _instance ??= new BattleSyncCoreSystem();
+        public static BattleSyncCoreSystem Instance { get; private set; }
 
         // 线程安全锁
         protected readonly object _lock = new object();
@@ -130,7 +129,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         public override void _Ready()
         {
             base._Ready();
-            _instance = this;
+            Instance = this;
             
             // 默认配置
             _config = new BattleSyncData.BattleSyncConfig();

@@ -126,8 +126,7 @@ public class SkillTreeResetDatabase
 
 public partial class SkillTreeResetSystem : BaseSystem
 {
-    private static SkillTreeResetSystem _instance;
-    public static SkillTreeResetSystem Instance => _instance;
+    public static SkillTreeResetSystem Instance { get; private set; }
     
     [Export] private int _playerGold = 10000;
     [Export] private int _playerLevel = 1;
@@ -139,7 +138,7 @@ public partial class SkillTreeResetSystem : BaseSystem
     
     public override void _Ready()
     {
-        _instance = this;
+        Instance = this;
         _categoryPointsSpent = new Dictionary<string, int>
         {
             ["combat"] = 3,

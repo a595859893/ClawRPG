@@ -9,20 +9,11 @@ using System.Linq;
 /// </summary>
 public class MarketTrendSystem : BaseSystem
 {
-    private static MarketTrendSystem _instance;
-    
     /// <summary>
     /// Gets the singleton instance of the MarketTrendSystem.
     /// </summary>
     /// <value>The global instance for market trend operations.</value>
-    public static MarketTrendSystem Instance
-    {
-        get
-        {
-            if (_instance == null) _instance = new MarketTrendSystem();
-            return _instance;
-        }
-    }
+    public static MarketTrendSystem Instance { get; private set; }
     
     private MarketTrendData _data;
     private RandomNumberGenerator _rng = new RandomNumberGenerator();
@@ -36,6 +27,7 @@ public class MarketTrendSystem : BaseSystem
     
     public override void _Ready()
     {
+        Instance = this;
         _rng.Randomize();
         
         // Get or create data

@@ -11,8 +11,7 @@ namespace ClawRPG.Scripts.Systems
     public partial class SurvivalChallengeSystem : BaseSystem
     {
         // 单例
-        private static SurvivalChallengeSystem _instance;
-        public static SurvivalChallengeSystem Instance => _instance ??= new SurvivalChallengeSystem();
+        public static SurvivalChallengeSystem Instance { get; private set; }
         
         // 玩家数据
         private SurvivalChallengeData.PlayerChallengeData _playerData = new();
@@ -43,13 +42,13 @@ namespace ClawRPG.Scripts.Systems
 
         public override void _Ready()
         {
+            Instance = this;
             base._Ready();
             Initialize();
         }
 
         protected override void Initialize()
         {
-            _instance = this;
             LoadData();
             IsInitialized = true;
             GD.Print("生存挑战系统已初始化");

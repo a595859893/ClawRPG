@@ -10,8 +10,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// </summary>
     public class PetTrainingSystem : BaseSystem
     {
-        private static PetTrainingSystem _instance;
-        public static PetTrainingSystem Instance => _instance ??= new PetTrainingSystem();
+        public static PetTrainingSystem Instance { get; private set; }
 
         // 玩家训练数据
         private PetTrainingData.PlayerTrainingData _playerData = new();
@@ -29,7 +28,7 @@ namespace ClawRPG.Scripts.Systems.Pets
 
         public override void _Ready()
         {
-            _instance = this;
+            Instance = this;
             PetTrainingDatabase.Initialize();
             GD.Print("宠物训练系统已初始化");
         }

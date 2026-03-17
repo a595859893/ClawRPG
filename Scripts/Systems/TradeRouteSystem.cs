@@ -7,15 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 public partial class TradeRouteSystem : BaseSystem
 {
-    private static TradeRouteSystem _instance;
-    public static TradeRouteSystem Instance
-    {
-        get
-        {
-            if (_instance == null) _instance = new TradeRouteSystem();
-            return _instance;
-        }
-    }
+    public static TradeRouteSystem Instance { get; private set; }
 
     private TradeRouteData _data;
     private Random _random = new Random();
@@ -33,12 +25,14 @@ public partial class TradeRouteSystem : BaseSystem
 
     private TradeRouteSystem()
     {
+        Instance = this;
         _data = new TradeRouteData();
         InitializeDatabase();
     }
 
     public override void _Ready()
     {
+        Instance = this;
         base._Ready();
         Initialize();
     }

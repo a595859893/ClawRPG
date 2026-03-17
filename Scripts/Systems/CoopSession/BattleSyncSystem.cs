@@ -13,7 +13,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
     public class BattleSyncSystem : BaseSystem
     {
         private static BattleSyncSystem _instance;
-        public static BattleSyncSystem Instance => _instance ??= new BattleSyncSystem();
+        public static BattleSyncSystem Instance { get; private set; }
 
         // 子系统实例
         private BattleSyncCoreSystem _coreSystem;
@@ -152,7 +152,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         public override void _Ready()
         {
             base._Ready();
-            _instance = this;
+            Instance = this;
             
             // 初始化子系统
             InitializeSubsystems();

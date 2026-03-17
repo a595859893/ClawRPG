@@ -7,8 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 public partial class RandomQuestSystem : BaseSystem
 {
-    private static RandomQuestSystem _instance;
-    public static RandomQuestSystem Instance => _instance ??= new RandomQuestSystem();
+    public static RandomQuestSystem Instance { get; private set; }
     
     private RandomQuestData _data;
     private RandomQuestDatabase _database;
@@ -32,6 +31,7 @@ public partial class RandomQuestSystem : BaseSystem
 
     public override void _Ready()
     {
+        Instance = this;
         base._Ready();
         Initialize(new RandomQuestData());
     }

@@ -375,8 +375,7 @@ namespace ClawRPG.Scripts.Systems
     /// </summary>
     public partial class CompanionInteractionSystem : BaseSystem
     {
-        private static CompanionInteractionSystem _instance;
-        public static CompanionInteractionSystem Instance => _instance;
+        public static CompanionInteractionSystem Instance { get; private set; }
 
         [Signal]
         public delegate void InteractionStartedEventHandler(string entityId, InteractionType entityType, InteractionAction action);
@@ -395,7 +394,7 @@ namespace ClawRPG.Scripts.Systems
 
         public override void _Ready()
         {
-            _instance = this;
+            Instance = this;
             _activeInteractions = new Dictionary<string, InteractionInstance>();
             _playerData = new PlayerInteractionData();
             _processTimer = 0f;

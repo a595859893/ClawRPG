@@ -8,20 +8,11 @@ using System.Collections.Generic;
 /// </summary>
 public partial class LootDropSystem : BaseSystem
 {
-    private static LootDropSystem _instance;
-    
     /// <summary>
     /// Gets the singleton instance of the LootDropSystem.
     /// </summary>
     /// <value>The global instance for loot drop operations.</value>
-    public static LootDropSystem Instance
-    {
-        get
-        {
-            if (_instance == null) _instance = new LootDropSystem();
-            return _instance;
-        }
-    }
+    public static LootDropSystem Instance { get; private set; }
 
     private LootDropData.PlayerLootData _playerData = new LootDropData.PlayerLootData();
     
@@ -72,6 +63,7 @@ public partial class LootDropSystem : BaseSystem
 
     public override void _Ready()
     {
+        Instance = this;
         base._Ready();
     }
 
@@ -80,7 +72,6 @@ public partial class LootDropSystem : BaseSystem
     /// </summary>
     protected override void Initialize()
     {
-        _instance = this;
         LoadPlayerData();
         InitializePitySystem();
         GD.Print("[LootDropSystem] Initialized");

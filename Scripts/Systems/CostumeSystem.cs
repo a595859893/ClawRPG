@@ -10,8 +10,7 @@ namespace ClawRPG.Scripts.Systems {
     /// </summary>
     public class CostumeSystem : BaseSystem
     {
-        private static CostumeSystem _instance;
-        public static CostumeSystem Instance => _instance ??= new CostumeSystem();
+        public static CostumeSystem Instance { get; private set; }
         
         private PlayerCostumeData _playerData = new();
         private CostumeDatabase _database;
@@ -23,12 +22,12 @@ namespace ClawRPG.Scripts.Systems {
         
         public CostumeSystem()
         {
-            _instance = this;
             _database = CostumeDatabase.Instance;
         }
         
         public override void _Ready()
         {
+            Instance = this;
             LoadCostumeData();
         }
         

@@ -11,8 +11,7 @@ namespace ClawRPG.Scripts.Systems
     /// </summary>
     public partial class PetGuardianSystem : BaseSystem
     {
-        private static PetGuardianSystem _instance;
-        public static PetGuardianSystem Instance => _instance ??= new PetGuardianSystem();
+        public static PetGuardianSystem Instance { get; private set; }
 
         // 数据
         private PetGuardianData.PlayerGuardianData _playerData = new();
@@ -36,7 +35,7 @@ namespace ClawRPG.Scripts.Systems
         
         public override void _Ready()
         {
-            _instance = this;
+            Instance = this;
             GD.Print("宠物守护系统已初始化");
         }
         
