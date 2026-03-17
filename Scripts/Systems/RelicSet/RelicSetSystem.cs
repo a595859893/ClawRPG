@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 遗物套装系统 - 提供套装加成功能
     /// </summary>
-    public class RelicSetSystem
+    public class RelicSetSystem : BaseSystem
     {
         private static RelicSetSystem _instance;
         public static RelicSetSystem Instance => _instance ??= new RelicSetSystem();
@@ -273,6 +273,92 @@ namespace ClawRPG.Scripts.Systems
             return description.ToString();
         }
 
+        #endregion
+
+        #region Save System
+        
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Godot.Dictionary();
+            
+            // 保存已装备的遗物ID列表
+            var equippedRelics = new Godot.Array();
+            foreach (var relicId in _data.EquippedRelicIds)
+            {
+                equippedRelics.Add(relicId);
+            }
+            data["equipped_relics"] = equippedRelics;
+            
+            // 保存已解锁的套装ID列表
+            var unlockedSets = new Godot.Array();
+            foreach (var setId in _data.UnlockedSetIds)
+            {
+                unlockedSets.Add(setId);
+            }
+            data["unlocked_sets"] = unlockedSets;
+            
+            // 保存套装完成次数
+            var setCompletionCounts = new Godot.Dictionary();
+            foreach (var kvp in _data.SetCompletionCounts)
+            {
+                setCompletionCounts[kvp.Key] = kvp.Value;
+            }
+            data["set_completion_counts"] = setCompletionCounts;
+            
+            // 保存统计信息
+            data["total_sets_completed"] = _totalSetsCompleted;
+            data["total_pieces_equipped"] = _totalPiecesEquipped;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载已装备的遗物
+            if (data.Contains("equipped_relics"))
+            {
+                _data.EquippedRelicIds.Clear();
+                var equippedRelics = (Godot.Array)data["equipped_relics"];
+                foreach (string relicId in equippedRelics)
+                {
+                    _data.EquippedRelicIds.Add(relicId);
+                }
+            }
+            
+            // 加载已解锁的套装
+            if (data.Contains("unlocked_sets"))
+            {
+                _data.UnlockedSetIds.Clear();
+                var unlockedSets = (Godot.Array)data["unlocked_sets"];
+                foreach (string setId in unlockedSets)
+                {
+                    _data.UnlockedSetIds.Add(setId);
+                }
+            }
+            
+            // 加载套装完成次数
+            if (data.Contains("set_completion_counts"))
+            {
+                _data.SetCompletionCounts.Clear();
+                var setCompletionCounts = (Godot.Dictionary)data["set_completion_counts"];
+                foreach (string setId in setCompletionCounts.Keys)
+                {
+                    _data.SetCompletionCounts[setId] = (int)setCompletionCounts[setId];
+                }
+            }
+            
+            // 加载统计信息
+            if (data.Contains("total_sets_completed"))
+                _totalSetsCompleted = (int)data["total_sets_completed"];
+            if (data.Contains("total_pieces_equipped"))
+                _totalPiecesEquipped = (int)data["total_pieces_equipped"];
+            
+            RecalculateBonuses();
+            GD.Print($"[RelicSet] Loaded: {_data.EquippedRelicIds.Count} relics equipped, {_data.UnlockedSetIds.Count} sets unlocked");
+        }
+        
         #endregion
     }
 }
