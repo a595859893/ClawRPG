@@ -4,9 +4,15 @@ using System.Collections;
 /// <summary>
 /// 所有游戏系统的基类
 /// 提供统一的生命周期管理和数据持久化接口
+/// 支持单例模式 (通过 Instance 属性访问)
 /// </summary>
 public abstract class BaseSystem : Node
 {
+    /// <summary>
+    /// 单例实例 (子类需要实现)
+    /// </summary>
+    public static BaseSystem Instance { get; protected set; }
+    
     /// <summary>
     /// 系统是否已初始化
     /// </summary>
