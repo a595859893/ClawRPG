@@ -1,7 +1,12 @@
+using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetAchievementSystem
+/// <summary>
+/// 宠物成就系统
+/// 管理宠物成就的解锁、进度追踪和奖励发放
+/// </summary>
+public class PetAchievementSystem : BaseSystem
 {
     private static PetAchievementSystem _instance;
     public static PetAchievementSystem Instance
@@ -9,7 +14,24 @@ public class PetAchievementSystem
         get
         {
             if (_instance == null)
-                _instance = new PetAchievementSystem();
+            {
+                // Try to get from scene tree first (Godot way)
+                var nodes = GetTree().GetNodesInGroup("systems");
+                foreach (var node in nodes)
+                {
+                    if (node is PetAchievementSystem system)
+                    {
+                        _instance = system;
+                        break;
+                    }
+                }
+                
+                // Fallback: create new instance (shouldn't happen in normal use)
+                if (_instance == null)
+                {
+                    GD.PrintErr("[PetAchievementSystem] Instance not found in scene tree!");
+                }
+            }
             return _instance;
         }
     }
@@ -34,11 +56,19 @@ public class PetAchievementSystem
     
     public event Action<string, PetAchievementData.Achievement> OnAchievementUnlocked;
     
-    public PetAchievementSystem()
+    /// <summary>
+    /// 初始化系统
+    /// </summary>
+    protected override void Initialize()
     {
+        base.Initialize();
+        
         Data = new PetAchievementData();
         Database = new PetAchievementDatabase();
         InitializeAchievements();
+        
+        AddToGroup("systems");
+        GD.Print($"[PetAchievementSystem] Initialized");
     }
     
     private void InitializeAchievements()
@@ -377,5 +407,236 @@ public class PetAchievementSystem
                 return achievement.IsUnlocked;
         }
         return false;
+    }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // Export pet achievements
+        var petAchievementsData = new Dictionary<string, Dictionary[]>();
+        foreach (var kvp in Data.PetAchievements)
+        {
+            var achievementsList = new List<Dictionary>();
+            foreach (var achievement in kvp.Value)
+            {
+                achievementsList.Add(AchievementToDict(achievement));
+            }
+            petAchievementsData[kvp.Key] = achievementsList.ToArray();
+        }
+        data["pet_achievements"] = petAchievementsData;
+        
+        // Export global achievements
+        var globalAchievementsList = new List<Dictionary>();
+        foreach (var achievement in Data.GlobalAchievements)
+        {
+            globalAchievementsList.Add(AchievementToDict(achievement));
+        }
+        data["global_achievements"] = globalAchievementsList.ToArray();
+        
+        // Export statistics
+        data["total_unlocked"] = Data.TotalAchievementsUnlocked;
+        data["total_achievements"] = Data.TotalAchievements;
+        data["total_rewards_claimed"] = Data.TotalRewardsClaimed;
+        data["total_gold_earned"] = Data.TotalGoldEarned;
+        
+        // Export rarity breakdown
+        var rarityBreakdown = new Dictionary<string, int>();
+        foreach (var kvp in Data.RarityBreakdown)
+        {
+            rarityBreakdown[kvp.Key.ToString()] = kvp.Value;
+        }
+        data["rarity_breakdown"] = rarityBreakdown;
+        
+        // Export tracking counters
+        data["battle_wins"] = ConvertDictToArray(_battleWins);
+        data["enemy_kills"] = ConvertDictToArray(_enemyKills);
+        data["boss_kills"] = ConvertDictToArray(_bossKills);
+        data["locations_visited"] = ConvertDictToArray(_locationsVisited);
+        data["floor_reached"] = ConvertDictToArray(_floorReached);
+        data["gold_earned"] = ConvertDictToArray(_goldEarned);
+        data["pet_level"] = ConvertDictToArray(_petLevel);
+        data["items_collected"] = ConvertDictToArray(_itemsCollected);
+        data["critical_hits"] = ConvertDictToArray(_criticalHits);
+        data["max_combo"] = ConvertDictToArray(_maxCombo);
+        data["perfect_battles"] = ConvertDictToArray(_perfectBattles);
+        data["survival_wins"] = ConvertDictToArray(_survivalWins);
+        data["no_damage_wins"] = ConvertDictToArray(_noDamageWins);
+        
+        return data;
+    }
+    
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // Import pet achievements
+        if (data.Contains("pet_achievements") && data["pet_achievements"] is Dictionary petAchievementsData)
+        {
+            Data.PetAchievements = new Dictionary<string, List<PetAchievementData.Achievement>>();
+            foreach (var kvp in petAchievementsData)
+            {
+                var achievementsList = new List<PetAchievementData.Achievement>();
+                if (kvp.Value is Dictionary[] achievementsArray)
+                {
+                    foreach (var achievementDict in achievementsArray)
+                    {
+                        achievementsList.Add(DictToAchievement(achievementDict));
+                    }
+                }
+                Data.PetAchievements[kvp.Key.ToString()] = achievementsList;
+            }
+        }
+        
+        // Import global achievements
+        if (data.Contains("global_achievements") && data["global_achievements"] is Dictionary[] globalArray)
+        {
+            Data.GlobalAchievements = new List<PetAchievementData.Achievement>();
+            foreach (var achievementDict in globalArray)
+            {
+                Data.GlobalAchievements.Add(DictToAchievement(achievementDict));
+            }
+        }
+        
+        // Import statistics
+        if (data.Contains("total_unlocked"))
+            Data.TotalAchievementsUnlocked = Convert.ToInt32(data["total_unlocked"]);
+        if (data.Contains("total_achievements"))
+            Data.TotalAchievements = Convert.ToInt32(data["total_achievements"]);
+        if (data.Contains("total_rewards_claimed"))
+            Data.TotalRewardsClaimed = Convert.ToInt32(data["total_rewards_claimed"]);
+        if (data.Contains("total_gold_earned"))
+            Data.TotalGoldEarned = Convert.ToInt32(data["total_gold_earned"]);
+        
+        // Import rarity breakdown
+        if (data.Contains("rarity_breakdown") && data["rarity_breakdown"] is Dictionary rarityDict)
+        {
+            Data.RarityBreakdown = new Dictionary<PetAchievementData.AchievementRarity, int>();
+            foreach (PetAchievementData.AchievementRarity rarity in Enum.GetValues(typeof(PetAchievementData.AchievementRarity)))
+            {
+                if (rarityDict.ContainsKey(rarity.ToString()))
+                    Data.RarityBreakdown[rarity] = Convert.ToInt32(rarityDict[rarity.ToString()]);
+                else
+                    Data.RarityBreakdown[rarity] = 0;
+            }
+        }
+        
+        // Import tracking counters
+        _battleWins = ConvertArrayToDict(data, "battle_wins");
+        _enemyKills = ConvertArrayToDict(data, "enemy_kills");
+        _bossKills = ConvertArrayToDict(data, "boss_kills");
+        _locationsVisited = ConvertArrayToDict(data, "locations_visited");
+        _floorReached = ConvertArrayToDict(data, "floor_reached");
+        _goldEarned = ConvertArrayToDict(data, "gold_earned");
+        _petLevel = ConvertArrayToDict(data, "pet_level");
+        _itemsCollected = ConvertArrayToDict(data, "items_collected");
+        _criticalHits = ConvertArrayToDict(data, "critical_hits");
+        _maxCombo = ConvertArrayToDict(data, "max_combo");
+        _perfectBattles = ConvertArrayToDict(data, "perfect_battles");
+        _survivalWins = ConvertArrayToDict(data, "survival_wins");
+        _noDamageWins = ConvertArrayToDict(data, "no_damage_wins");
+        
+        GD.Print($"[PetAchievementSystem] Loaded save data");
+    }
+    
+    /// <summary>
+    /// 重置系统数据
+    /// </summary>
+    public override void Reset()
+    {
+        base.Reset();
+        
+        Data = new PetAchievementData();
+        _battleWins.Clear();
+        _enemyKills.Clear();
+        _bossKills.Clear();
+        _locationsVisited.Clear();
+        _floorReached.Clear();
+        _goldEarned.Clear();
+        _petLevel.Clear();
+        _itemsCollected.Clear();
+        _criticalHits.Clear();
+        _maxCombo.Clear();
+        _perfectBattles.Clear();
+        _survivalWins.Clear();
+        _noDamageWins.Clear();
+        
+        InitializeAchievements();
+    }
+    
+    // Helper: Convert achievement to dictionary
+    private Dictionary AchievementToDict(PetAchievementData.Achievement achievement)
+    {
+        var dict = new Dictionary();
+        dict["id"] = achievement.Id;
+        dict["name"] = achievement.Name;
+        dict["description"] = achievement.Description;
+        dict["type"] = achievement.Type.ToString();
+        dict["rarity"] = achievement.Rarity.ToString();
+        dict["required_value"] = achievement.RequiredValue;
+        dict["current_value"] = achievement.CurrentValue;
+        dict["is_unlocked"] = achievement.IsUnlocked;
+        dict["unlocked_at"] = achievement.UnlockedAt?.ToString("o") ?? "";
+        return dict;
+    }
+    
+    // Helper: Convert dictionary to achievement
+    private PetAchievementData.Achievement DictToAchievement(Dictionary dict)
+    {
+        var achievement = new PetAchievementData.Achievement();
+        achievement.Id = dict.Contains("id") ? dict["id"].ToString() : "";
+        achievement.Name = dict.Contains("name") ? dict["name"].ToString() : "";
+        achievement.Description = dict.Contains("description") ? dict["description"].ToString() : "";
+        
+        if (dict.Contains("type") && Enum.TryParse<PetAchievementData.AchievementType>(dict["type"].ToString(), out var type))
+            achievement.Type = type;
+        if (dict.Contains("rarity") && Enum.TryParse<PetAchievementData.AchievementRarity>(dict["rarity"].ToString(), out var rarity))
+            achievement.Rarity = rarity;
+        
+        achievement.RequiredValue = dict.Contains("required_value") ? Convert.ToInt32(dict["required_value"]) : 0;
+        achievement.CurrentValue = dict.Contains("current_value") ? Convert.ToInt32(dict["current_value"]) : 0;
+        achievement.IsUnlocked = dict.Contains("is_unlocked") && Convert.ToBoolean(dict["is_unlocked"]);
+        
+        if (dict.Contains("unlocked_at") && !string.IsNullOrEmpty(dict["unlocked_at"].ToString()))
+            achievement.UnlockedAt = DateTime.Parse(dict["unlocked_at"].ToString());
+        
+        return achievement;
+    }
+    
+    // Helper: Convert Dictionary<string, int> to Godot Dictionary array
+    private Godot.Collections.Array ConvertDictToArray(Dictionary<string, int> dict)
+    {
+        var array = new Godot.Collections.Array();
+        foreach (var kvp in dict)
+        {
+            var item = new Dictionary();
+            item["key"] = kvp.Key;
+            item["value"] = kvp.Value;
+            array.Add(item);
+        }
+        return array;
+    }
+    
+    // Helper: Convert Godot Dictionary array to Dictionary<string, int>
+    private Dictionary<string, int> ConvertArrayToDict(Dictionary data, string key)
+    {
+        var result = new Dictionary<string, int>();
+        if (data.Contains(key) && data[key] is Godot.Collections.Array array)
+        {
+            foreach (var item in array)
+            {
+                if (item is Dictionary dict && dict.Contains("key") && dict.Contains("value"))
+                {
+                    result[dict["key"].ToString()] = Convert.ToInt32(dict["value"]);
+                }
+            }
+        }
+        return result;
     }
 }
