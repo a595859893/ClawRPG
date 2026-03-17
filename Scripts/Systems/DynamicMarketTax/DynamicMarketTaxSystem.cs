@@ -443,31 +443,33 @@ public class DynamicMarketTaxSystem : BaseSystem
     /// </summary>
     public override bool ImportSaveData(Dictionary<string, object> data)
     {
-        if (data == null) return;
+        if (data == null) return false;
         
-        if (data.Contains("base_tax_rate")) _data.BaseTaxRate = (float)data["base_tax_rate"];
-        if (data.Contains("current_dynamic_tax_rate")) _data.CurrentDynamicTaxRate = (float)data["current_dynamic_tax_rate"];
-        if (data.Contains("market_activity")) _data.MarketActivity = (float)data["market_activity"];
+        if (data.ContainsKey("base_tax_rate")) _data.BaseTaxRate = Convert.ToSingle(data["base_tax_rate"]);
+        if (data.ContainsKey("current_dynamic_tax_rate")) _data.CurrentDynamicTaxRate = Convert.ToSingle(data["current_dynamic_tax_rate"]);
+        if (data.ContainsKey("market_activity")) _data.MarketActivity = Convert.ToSingle(data["market_activity"]);
         
-        if (data.Contains("total_transactions")) _data.TotalTransactions = (int)data["total_transactions"];
-        if (data.Contains("total_tax_collected")) _data.TotalTaxCollected = Convert.ToInt64(data["total_tax_collected"]);
-        if (data.Contains("total_volume")) _data.TotalVolume = Convert.ToInt64(data["total_volume"]);
-        if (data.Contains("average_transaction_value")) _data.AverageTransactionValue = (float)data["average_transaction_value"];
-        if (data.Contains("peak_volume")) _data.PeakVolume = (float)data["peak_volume"];
+        if (data.ContainsKey("total_transactions")) _data.TotalTransactions = Convert.ToInt32(data["total_transactions"]);
+        if (data.ContainsKey("total_tax_collected")) _data.TotalTaxCollected = Convert.ToInt64(data["total_tax_collected"]);
+        if (data.ContainsKey("total_volume")) _data.TotalVolume = Convert.ToInt64(data["total_volume"]);
+        if (data.ContainsKey("average_transaction_value")) _data.AverageTransactionValue = Convert.ToSingle(data["average_transaction_value"]);
+        if (data.ContainsKey("peak_volume")) _data.PeakVolume = Convert.ToSingle(data["peak_volume"]);
         
-        if (data.Contains("market_trend")) _data.MarketTrend = (string)data["market_trend"];
-        if (data.Contains("consecutive_high_activity")) _data.ConsecutiveHighActivity = (int)data["consecutive_high_activity"];
-        if (data.Contains("consecutive_low_activity")) _data.ConsecutiveLowActivity = (int)data["consecutive_low_activity"];
+        if (data.ContainsKey("market_trend")) _data.MarketTrend = data["market_trend"].ToString();
+        if (data.ContainsKey("consecutive_high_activity")) _data.ConsecutiveHighActivity = Convert.ToInt32(data["consecutive_high_activity"]);
+        if (data.ContainsKey("consecutive_low_activity")) _data.ConsecutiveLowActivity = Convert.ToInt32(data["consecutive_low_activity"]);
         
         // 活动历史
         _activityHistory.Clear();
-        if (data.Contains("activity_history"))
+        if (data.ContainsKey("activity_history"))
         {
             var activityHistoryArray = (Array)data["activity_history"];
             foreach (var activity in activityHistoryArray)
             {
-                _activityHistory.Add((float)activity);
+                _activityHistory.Add(Convert.ToSingle(activity));
             }
         }
+        
+        return true;
     }
 }
