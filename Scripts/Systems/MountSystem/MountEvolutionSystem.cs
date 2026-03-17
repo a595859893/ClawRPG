@@ -1,8 +1,9 @@
 using Godot;
+using Godot.Collections;
 using System;
 using System.Collections.Generic;
 
-public class MountEvolutionSystem
+public class MountEvolutionSystem : BaseSystem
 {
     private static MountEvolutionSystem _instance;
     public static MountEvolutionSystem Instance => _instance ??= new MountEvolutionSystem();
@@ -20,12 +21,70 @@ public class MountEvolutionSystem
         _playerEvolutions = new Dictionary<string, MountEvolutionData.PlayerMountEvolution>();
     }
 
-    /// <summary>
-    /// 初始化
-    /// </summary>
-    public void Initialize()
+    protected override void Initialize()
     {
         GD.Print("[MountEvolutionSystem] Initialized");
+        IsInitialized = true;
+    }
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        foreach (var kvp in _playerEvolutions)
+        {
+            var evolution = kvp.Value;
+            data[kvp.Key] = new Dictionary
+            {
+                { "currentStage", (int)evolution.CurrentStage },
+                { "evolvedType", (int)evolution.EvolvedType },
+                { "totalBattleExp", evolution.TotalBattleExp },
+                { "evolutionCount", evolution.EvolutionCount },
+                { "lastEvolutionTime", evolution.LastEvolutionTime.ToString("o") }
+            };
+        }
+        
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        _playerEvolutions.Clear();
+        
+        foreach (var key in data.Keys)
+        {
+            var mountId = key.ToString();
+            var mountData = data[key] as Dictionary;
+            
+            if (mountData == null) continue;
+            
+            var evolution = new MountEvolutionData.PlayerMountEvolution
+            {
+                MountId = mountId,
+                CurrentStage = (MountEvolutionData.EvolutionStage)Convert.ToInt32(mountData["currentStage"]),
+                EvolvedType = (MountEvolutionData.EvolutionType)Convert.ToInt32(mountData["evolvedType"]),
+                TotalBattleExp = Convert.ToInt32(mountData["totalBattleExp"]),
+                EvolutionCount = Convert.ToInt32(mountData["evolutionCount"])
+            };
+            
+            if (mountData.ContainsKey("lastEvolutionTime"))
+            {
+                DateTime.TryParse(mountData["lastEvolutionTime"].ToString(), out var lastTime);
+                evolution.LastEvolutionTime = lastTime;
+            }
+            
+            _playerEvolutions[mountId] = evolution;
+        }
+        
+        GD.Print($"[MountEvolutionSystem] Loaded evolution data for {_playerEvolutions.Count} mounts");
     }
 
     /// <summary>
