@@ -8,20 +8,50 @@ namespace ClawRPG.Scripts.Database
     /// </summary>
     public abstract class DatabaseBase : IDatabase
     {
-        private static Dictionary<Type, object> _instances = new Dictionary<Type, object>();
-
+        /// <summary>
+        /// 子类实例的静态引用
+        /// </summary>
         public abstract object Instance { get; }
+
+        /// <summary>
+        /// 初始化数据库
+        /// </summary>
         public abstract void Initialize();
+
+        /// <summary>
+        /// 验证数据完整性
+        /// </summary>
         public virtual bool ValidateData() => true;
 
         /// <summary>
-        /// 通用的实例获取模式
+        /// 通用的数据存储字典（子类可复用）
         /// </summary>
-        protected static T GetOrCreate<T>() where T : new()
+        protected Dictionary<string, object> _dataStore = new Dictionary<string, object>();
+
+        /// <summary>
+        /// 通过 key 获取数据（IDatabase 实现）
+        /// </summary>
+        public virtual T GetData<T>(string key) where T : class
         {
-            if (!_instances.ContainsKey(typeof(T)))
-                _instances[typeof(T)] = new T();
-            return (T)_instances[typeof(T)];
+            if (_dataStore.TryGetValue(key, out var value) && value is T typedValue)
+                return typedValue;
+            return null;
+        }
+
+        /// <summary>
+        /// 获取所有数据的 key（IDatabase 实现）
+        /// </summary>
+        public virtual IEnumerable<string> GetAllKeys()
+        {
+            return _dataStore.Keys;
+        }
+
+        /// <summary>
+        /// 获取数据总数（IDatabase 实现）
+        /// </summary>
+        public virtual int GetDataCount()
+        {
+            return _dataStore.Count;
         }
     }
 }

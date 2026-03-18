@@ -7,25 +7,31 @@ namespace ClawRPG.Scripts.Database
     /// <summary>
     /// Achievement database - stores all achievement templates
     /// </summary>
-    public class AchievementDatabase : IDatabase
+    public class AchievementDatabase : DatabaseBase
     {
-        private static AchievementDatabase _instance;
-        public static AchievementDatabase Instance => _instance ??= new AchievementDatabase();
-
-        object IDatabase.Instance => Instance;
-
-        public void Initialize() { }
-
-        public bool ValidateData() => _achievements.Count > 0;
-
         private Dictionary<string, Achievement> _achievements;
-        
-        private AchievementDatabase()
+
+        /// <summary>
+        /// 静态实例引用（兼容原有访问模式）
+        /// </summary>
+        public static AchievementDatabase Instance { get; private set; }
+
+        public override object Instance => Instance;
+
+        public AchievementDatabase()
         {
+            Instance = this;
             _achievements = new Dictionary<string, Achievement>();
+            Initialize();
+        }
+
+        public override void Initialize()
+        {
             InitializeAchievements();
         }
-        
+
+        public override bool ValidateData() => _achievements.Count > 0;
+
         private void InitializeAchievements()
         {
             // Kill achievements
@@ -40,7 +46,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 50,
                 RewardExp = 100
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "kill_100",
@@ -52,7 +58,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 200,
                 RewardExp = 500
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "kill_500",
@@ -64,7 +70,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 1000,
                 RewardExp = 2000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "kill_1000",
@@ -76,7 +82,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 5000,
                 RewardExp = 10000
             });
-            
+
             // Level achievements
             AddAchievement(new Achievement
             {
@@ -89,7 +95,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 100,
                 RewardExp = 0
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "level_10",
@@ -101,7 +107,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 300,
                 RewardExp = 0
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "level_20",
@@ -113,7 +119,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 1000,
                 RewardExp = 0
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "level_50",
@@ -125,7 +131,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 10000,
                 RewardExp = 0
             });
-            
+
             // Gold achievements
             AddAchievement(new Achievement
             {
@@ -137,7 +143,7 @@ namespace ClawRPG.Scripts.Database
                 RequiredValue = 1000,
                 RewardExp = 200
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "gold_10000",
@@ -148,7 +154,7 @@ namespace ClawRPG.Scripts.Database
                 RequiredValue = 10000,
                 RewardExp = 1000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "gold_100000",
@@ -159,7 +165,7 @@ namespace ClawRPG.Scripts.Database
                 RequiredValue = 100000,
                 RewardExp = 5000
             });
-            
+
             // Boss achievements
             AddAchievement(new Achievement
             {
@@ -172,7 +178,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 500,
                 RewardExp = 1000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "boss_5",
@@ -184,7 +190,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 2000,
                 RewardExp = 3000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "boss_all",
@@ -196,7 +202,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 10000,
                 RewardExp = 20000
             });
-            
+
             // Craft achievements
             AddAchievement(new Achievement
             {
@@ -209,7 +215,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 100,
                 RewardExp = 200
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "craft_10",
@@ -221,7 +227,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 500,
                 RewardExp = 1000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "craft_50",
@@ -233,7 +239,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 3000,
                 RewardExp = 5000
             });
-            
+
             // Quest achievements
             AddAchievement(new Achievement
             {
@@ -246,7 +252,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 100,
                 RewardExp = 200
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "quest_10",
@@ -258,7 +264,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 500,
                 RewardExp = 1500
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "quest_all",
@@ -270,7 +276,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 5000,
                 RewardExp = 10000
             });
-            
+
             // Combo achievements
             AddAchievement(new Achievement
             {
@@ -283,7 +289,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 100,
                 RewardExp = 300
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "combo_50",
@@ -295,7 +301,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 500,
                 RewardExp = 1000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "combo_100",
@@ -307,7 +313,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 2000,
                 RewardExp = 3000
             });
-            
+
             // Survival achievements
             AddAchievement(new Achievement
             {
@@ -320,7 +326,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 50,
                 RewardExp = 100
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "survive_10min",
@@ -332,7 +338,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 300,
                 RewardExp = 500
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "survive_1hour",
@@ -344,7 +350,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 2000,
                 RewardExp = 3000
             });
-            
+
             // Damage achievements
             AddAchievement(new Achievement
             {
@@ -357,7 +363,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 200,
                 RewardExp = 300
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "damage_10000",
@@ -369,7 +375,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 1000,
                 RewardExp = 2000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "damage_100000",
@@ -381,7 +387,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 5000,
                 RewardExp = 10000
             });
-            
+
             // Skill achievements
             AddAchievement(new Achievement
             {
@@ -394,7 +400,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 200,
                 RewardExp = 500
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "skill_learn_15",
@@ -406,7 +412,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 1000,
                 RewardExp = 2000
             });
-            
+
             // Explore achievements
             AddAchievement(new Achievement
             {
@@ -419,7 +425,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 100,
                 RewardExp = 200
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "explore_all",
@@ -431,7 +437,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 2000,
                 RewardExp = 5000
             });
-            
+
             // Enrage kill achievements - Boss狂暴击杀成就
             AddAchievement(new Achievement
             {
@@ -444,7 +450,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 1000,
                 RewardExp = 2000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "enrage_kill_5",
@@ -456,7 +462,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 3000,
                 RewardExp = 5000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "enrage_kill_10",
@@ -468,7 +474,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 8000,
                 RewardExp = 15000
             });
-            
+
             // Perfect block achievements - 完美格挡成就
             AddAchievement(new Achievement
             {
@@ -481,7 +487,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 200,
                 RewardExp = 500
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "perfect_block_50",
@@ -493,7 +499,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 800,
                 RewardExp = 1500
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "perfect_block_100",
@@ -505,7 +511,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 2000,
                 RewardExp = 3000
             });
-            
+
             // Counter attack achievements - 反击成就
             AddAchievement(new Achievement
             {
@@ -518,7 +524,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 300,
                 RewardExp = 500
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "counter_25",
@@ -530,7 +536,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 1000,
                 RewardExp = 2000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "counter_50",
@@ -542,7 +548,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 2500,
                 RewardExp = 5000
             });
-            
+
             // No-hit boss achievements - 无伤Boss成就
             AddAchievement(new Achievement
             {
@@ -555,7 +561,7 @@ namespace ClawRPG.Scripts.Database
                 RewardGold = 2000,
                 RewardExp = 3000
             });
-            
+
             AddAchievement(new Achievement
             {
                 Id = "nohit_boss_3",
@@ -568,22 +574,29 @@ namespace ClawRPG.Scripts.Database
                 RewardExp = 8000
             });
         }
-        
+
         private void AddAchievement(Achievement achievement)
         {
             _achievements[achievement.Id] = achievement;
+            _dataStore[achievement.Id] = achievement;
         }
-        
+
+        /// <summary>
+        /// 通过 ID 获取成就
+        /// </summary>
         public Achievement GetAchievement(string id)
         {
             return _achievements.ContainsKey(id) ? _achievements[id] : null;
         }
-        
+
+        /// <summary>
+        /// 获取所有成就
+        /// </summary>
         public List<Achievement> GetAllAchievements()
         {
             return new List<Achievement>(_achievements.Values);
         }
-        
+
         public List<Achievement> GetAchievementsByType(AchievementType type)
         {
             List<Achievement> result = new List<Achievement>();
@@ -596,12 +609,75 @@ namespace ClawRPG.Scripts.Database
             }
             return result;
         }
-        
+
         public int GetTotalCount() => _achievements.Count;
-        
+
         public int GetUnlockedCount(List<Achievement> unlockedAchievements)
         {
             return unlockedAchievements.Count;
         }
+
+        // IDatabase overrides
+        public override T GetData<T>(string key)
+        {
+            if (_achievements.TryGetValue(key, out var value) && value is T typedValue)
+                return typedValue;
+            return null;
+        }
+
+        public override int GetDataCount() => _achievements.Count;
+
+        public override IEnumerable<string> GetAllKeys() => _achievements.Keys;
+    }
+
+    // ==================== 数据类型定义 ====================
+
+    /// <summary>
+    /// 成就类型
+    /// </summary>
+    public enum AchievementType
+    {
+        Kill,
+        LevelUp,
+        Gold,
+        Boss,
+        Craft,
+        Quest,
+        Combo,
+        Survival,
+        Damage,
+        Skill,
+        Explore,
+        EnrageKill,
+        PerfectBlock,
+        CounterAttack,
+        NoHitBoss
+    }
+
+    /// <summary>
+    /// 成就难度
+    /// </summary>
+    public enum AchievementDifficulty
+    {
+        Easy,
+        Normal,
+        Hard,
+        Epic,
+        Legendary
+    }
+
+    /// <summary>
+    /// 成就数据
+    /// </summary>
+    public class Achievement
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public AchievementType Type { get; set; }
+        public AchievementDifficulty Difficulty { get; set; }
+        public int RequiredValue { get; set; }
+        public int RewardGold { get; set; }
+        public int RewardExp { get; set; }
     }
 }
