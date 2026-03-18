@@ -7,10 +7,10 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// <summary>
     /// 宠物管理器 - 管理玩家拥有的宠物
     /// </summary>
-    public class PetManager
+    public class PetManager : BaseSystem
     {
         private static PetManager _instance;
-        public static PetManager Instance => _instance ??= new PetManager();
+        public static new PetManager Instance => _instance ??= new PetManager();
 
         // 玩家宠物列表
         private List<Pet> _ownedPets = new List<Pet>();
@@ -231,7 +231,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// <summary>
         /// 序列化宠物数据
         /// </summary>
-        public Dictionary<string, object> Serialize()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, object>();
             
@@ -257,7 +257,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// <summary>
         /// 反序列化宠物数据
         /// </summary>
-        public void Deserialize(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             _ownedPets.Clear();
             
