@@ -1,33 +1,44 @@
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Database;
 
 namespace ClawRPG.Scripts.Systems.Enchantment
 {
     /// <summary>
     /// 附魔配置数据库
     /// </summary>
-    public static class EnchantmentDatabase
+    public class EnchantmentDatabase : IDatabase
     {
+        private static EnchantmentDatabase _instance;
+        public static EnchantmentDatabase Instance => _instance ??= new EnchantmentDatabase();
+
         // 附魔记录缓存
-        private static Dictionary<string, EnchantmentRecord> _enchantments;
-        private static Dictionary<EnchantmentTier, List<string>> _tierCache;
-        private static Dictionary<EnchantmentType, List<string>> _typeCache;
-        
+        private Dictionary<string, EnchantmentRecord> _enchantments;
+        private Dictionary<EnchantmentTier, List<string>> _tierCache;
+        private Dictionary<EnchantmentType, List<string>> _typeCache;
+
+        public object Instance => Instance;
+
         /// <summary>
         /// 初始化附魔数据库
         /// </summary>
-        public static void Initialize()
+        public void Initialize()
         {
             _enchantments = new Dictionary<string, EnchantmentRecord>();
             _tierCache = new Dictionary<EnchantmentTier, List<string>>();
             _typeCache = new Dictionary<EnchantmentType, List<string>>();
-            
+
             InitializeTierCache();
             InitializeTypeCache();
             LoadDefaultEnchantments();
         }
-        
-        private static void InitializeTierCache()
+
+        public bool ValidateData()
+        {
+            return _enchantments != null && _enchantments.Count > 0;
+        }
+
+        private void InitializeTierCache()
         {
             _tierCache[EnchantmentTier.Common] = new List<string>();
             _tierCache[EnchantmentTier.Uncommon] = new List<string>();
@@ -35,19 +46,19 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             _tierCache[EnchantmentTier.Epic] = new List<string>();
             _tierCache[EnchantmentTier.Legendary] = new List<string>();
         }
-        
-        private static void InitializeTypeCache()
+
+        private void InitializeTypeCache()
         {
             _typeCache[EnchantmentType.Weapon] = new List<string>();
             _typeCache[EnchantmentType.Armor] = new List<string>();
             _typeCache[EnchantmentType.Accessory] = new List<string>();
             _typeCache[EnchantmentType.Universal] = new List<string>();
         }
-        
+
         /// <summary>
         /// 加载默认附魔配置
         /// </summary>
-        private static void LoadDefaultEnchantments()
+        private void LoadDefaultEnchantments()
         {
             // 武器附魔 - 普通
             AddEnchantment(new EnchantmentRecord
@@ -64,7 +75,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加5点攻击力",
                 IconName = "sword"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "weapon_sharp_2",
@@ -79,7 +90,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加10点攻击力",
                 IconName = "sword"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "weapon_sharp_3",
@@ -94,7 +105,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加18点攻击力",
                 IconName = "sword"
             });
-            
+
             // 武器附魔 - 暴击
             AddEnchantment(new EnchantmentRecord
             {
@@ -110,7 +121,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加3%暴击率",
                 IconName = "skull"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "weapon_crit_2",
@@ -125,7 +136,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加6%暴击率",
                 IconName = "skull"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "weapon_crit_3",
@@ -140,7 +151,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加10%暴击率",
                 IconName = "skull"
             });
-            
+
             // 武器附魔 - 暴伤
             AddEnchantment(new EnchantmentRecord
             {
@@ -156,7 +167,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加15%暴击伤害",
                 IconName = "explosion"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "weapon_critdmg_2",
@@ -171,7 +182,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加30%暴击伤害",
                 IconName = "explosion"
             });
-            
+
             // 武器附魔 - 攻击速度
             AddEnchantment(new EnchantmentRecord
             {
@@ -187,7 +198,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加5%攻击速度",
                 IconName = "lightning"
             });
-            
+
             // 武器附魔 - 生命偷取
             AddEnchantment(new EnchantmentRecord
             {
@@ -203,7 +214,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "3%生命偷取",
                 IconName = "drop"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "weapon_lifesteal_2",
@@ -218,7 +229,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "5%生命偷取",
                 IconName = "drop"
             });
-            
+
             // 武器附魔 - 传奇
             AddEnchantment(new EnchantmentRecord
             {
@@ -236,7 +247,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加50点攻击力和15%暴击率",
                 IconName = "crown"
             });
-            
+
             // 护甲附魔 - 防御
             AddEnchantment(new EnchantmentRecord
             {
@@ -252,7 +263,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加8点防御力",
                 IconName = "shield"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "armor_defense_2",
@@ -267,7 +278,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加15点防御力",
                 IconName = "shield"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "armor_defense_3",
@@ -282,7 +293,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加25点防御力",
                 IconName = "shield"
             });
-            
+
             // 护甲附魔 - 生命
             AddEnchantment(new EnchantmentRecord
             {
@@ -298,7 +309,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加50点最大生命",
                 IconName = "heart"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "armor_health_2",
@@ -313,7 +324,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加100点最大生命",
                 IconName = "heart"
             });
-            
+
             // 护甲附魔 - 抗性
             AddEnchantment(new EnchantmentRecord
             {
@@ -329,7 +340,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加10%火焰抗性",
                 IconName = "fire"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "armor_ice_1",
@@ -344,7 +355,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加10%冰霜抗性",
                 IconName = "snowflake"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "armor_lightning_1",
@@ -359,7 +370,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加10%闪电抗性",
                 IconName = "bolt"
             });
-            
+
             // 护甲附魔 - 闪避
             AddEnchantment(new EnchantmentRecord
             {
@@ -375,7 +386,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加3%闪避率",
                 IconName = "dodge"
             });
-            
+
             // 护甲附魔 - 传奇
             AddEnchantment(new EnchantmentRecord
             {
@@ -393,7 +404,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加300点生命和50点防御",
                 IconName = "crown"
             });
-            
+
             // 饰品附魔 - 全属性
             AddEnchantment(new EnchantmentRecord
             {
@@ -409,7 +420,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加5点所有属性",
                 IconName = "star"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "accessory_allattr_2",
@@ -424,7 +435,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加10点所有属性",
                 IconName = "star"
             });
-            
+
             // 饰品附魔 - 幸运
             AddEnchantment(new EnchantmentRecord
             {
@@ -440,7 +451,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加5点幸运值",
                 IconName = "clover"
             });
-            
+
             // 饰品附魔 - 法力
             AddEnchantment(new EnchantmentRecord
             {
@@ -456,7 +467,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加30点最大法力",
                 IconName = "mana"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "accessory_manaregen_1",
@@ -471,7 +482,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加2点/秒法力回复",
                 IconName = "mana_regen"
             });
-            
+
             // 通用附魔 - 速度
             AddEnchantment(new EnchantmentRecord
             {
@@ -487,7 +498,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加3%移动速度",
                 IconName = "boot"
             });
-            
+
             // 通用附魔 - 力量
             AddEnchantment(new EnchantmentRecord
             {
@@ -503,7 +514,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加8点力量",
                 IconName = "muscle"
             });
-            
+
             AddEnchantment(new EnchantmentRecord
             {
                 Id = "universal_str_2",
@@ -518,7 +529,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加15点力量",
                 IconName = "muscle"
             });
-            
+
             // 通用附魔 - 智力
             AddEnchantment(new EnchantmentRecord
             {
@@ -534,7 +545,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加8点智力",
                 IconName = "brain"
             });
-            
+
             // 通用附魔 - 敏捷
             AddEnchantment(new EnchantmentRecord
             {
@@ -550,7 +561,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 Description = "增加8点敏捷",
                 IconName = "agility"
             });
-            
+
             // 通用附魔 - 体力
             AddEnchantment(new EnchantmentRecord
             {
@@ -567,39 +578,39 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 IconName = "health"
             });
         }
-        
+
         /// <summary>
         /// 添加附魔配置
         /// </summary>
-        private static void AddEnchantment(EnchantmentRecord record)
+        private void AddEnchantment(EnchantmentRecord record)
         {
             _enchantments[record.Id] = record;
             _tierCache[record.Tier].Add(record.Id);
             _typeCache[record.Type].Add(record.Id);
         }
-        
+
         /// <summary>
         /// 获取所有附魔
         /// </summary>
-        public static List<EnchantmentRecord> GetAllEnchantments()
+        public List<EnchantmentRecord> GetAllEnchantments()
         {
             return new List<EnchantmentRecord>(_enchantments.Values);
         }
-        
+
         /// <summary>
         /// 根据ID获取附魔
         /// </summary>
-        public static EnchantmentRecord GetEnchantmentById(string id)
+        public EnchantmentRecord GetEnchantmentById(string id)
         {
             if (_enchantments.ContainsKey(id))
                 return _enchantments[id];
             return null;
         }
-        
+
         /// <summary>
         /// 根据类型获取附魔
         /// </summary>
-        public static List<EnchantmentRecord> GetEnchantmentsByType(EnchantmentType type)
+        public List<EnchantmentRecord> GetEnchantmentsByType(EnchantmentType type)
         {
             List<EnchantmentRecord> result = new List<EnchantmentRecord>();
             if (_typeCache.ContainsKey(type))
@@ -611,11 +622,11 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             }
             return result;
         }
-        
+
         /// <summary>
         /// 根据等级获取附魔
         /// </summary>
-        public static List<EnchantmentRecord> GetEnchantmentsByTier(EnchantmentTier tier)
+        public List<EnchantmentRecord> GetEnchantmentsByTier(EnchantmentTier tier)
         {
             List<EnchantmentRecord> result = new List<EnchantmentRecord>();
             if (_tierCache.ContainsKey(tier))
@@ -627,11 +638,11 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             }
             return result;
         }
-        
+
         /// <summary>
         /// 根据玩家等级获取可用附魔
         /// </summary>
-        public static List<EnchantmentRecord> GetAvailableEnchantments(int playerLevel)
+        public List<EnchantmentRecord> GetAvailableEnchantments(int playerLevel)
         {
             List<EnchantmentRecord> result = new List<EnchantmentRecord>();
             foreach (var enchantment in _enchantments.Values)
@@ -643,11 +654,11 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             }
             return result;
         }
-        
+
         /// <summary>
         /// 获取附魔总数
         /// </summary>
-        public static int GetTotalCount()
+        public int GetTotalCount()
         {
             return _enchantments.Count;
         }

@@ -17,12 +17,12 @@ namespace ClawRPG.Systems.Emote {
 
         public override void _Ready() {
             Instance = this;
-            EmoteDatabase.Initialize();
+            EmoteDatabase.Instance.Initialize();
             UnlockDefaultEmotes();
         }
 
         private void UnlockDefaultEmotes() {
-            var defaultEmotes = EmoteDatabase.GetDefaultEmotes();
+            var defaultEmotes = EmoteDatabase.Instance.GetDefaultEmotes();
             foreach (var emote in defaultEmotes) {
                 if (!playerData.UnlockedEmotes.Contains(emote.Id)) {
                     playerData.UnlockedEmotes.Add(emote.Id);
@@ -31,7 +31,7 @@ namespace ClawRPG.Systems.Emote {
         }
 
         public bool UnlockEmote(string emoteId, bool free = false) {
-            var emote = EmoteDatabase.GetEmote(emoteId);
+            var emote = EmoteDatabase.Instance.GetEmote(emoteId);
             if (emote == null) return false;
             
             if (playerData.UnlockedEmotes.Contains(emoteId)) return true;
@@ -54,7 +54,7 @@ namespace ClawRPG.Systems.Emote {
         public bool UseEmote(string emoteId) {
             if (!playerData.UnlockedEmotes.Contains(emoteId)) return false;
             
-            var emote = EmoteDatabase.GetEmote(emoteId);
+            var emote = EmoteDatabase.Instance.GetEmote(emoteId);
             if (emote == null) return false;
             
             // Update usage count
@@ -105,20 +105,20 @@ namespace ClawRPG.Systems.Emote {
 
         public List<Emote> GetUnlockedEmotes() {
             return playerData.UnlockedEmotes
-                .Select(id => EmoteDatabase.GetEmote(id))
+                .Select(id => EmoteDatabase.Instance.GetEmote(id))
                 .Where(e => e != null)
                 .ToList();
         }
 
         public List<Emote> GetFavoriteEmotes() {
             return playerData.FavoriteEmotes
-                .Select(id => EmoteDatabase.GetEmote(id))
+                .Select(id => EmoteDatabase.Instance.GetEmote(id))
                 .Where(e => e != null)
                 .ToList();
         }
 
         public List<Emote> GetShopEmotes() {
-            return EmoteDatabase.GetShopEmotes()
+            return EmoteDatabase.Instance.GetShopEmotes()
                 .Where(e => !playerData.UnlockedEmotes.Contains(e.Id))
                 .ToList();
         }

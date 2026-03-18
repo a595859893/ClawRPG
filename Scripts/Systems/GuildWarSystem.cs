@@ -136,7 +136,7 @@ namespace ClawRPG.Core.Systems.GuildWar
 
         private void InitializeTerritories()
         {
-            foreach (var config in GuildWarDatabase.TerritoryConfigs)
+            foreach (var config in GuildWarDatabase.Instance.TerritoryConfigs)
             {
                 _territories.Add(new TerritoryControl
                 {
@@ -158,7 +158,7 @@ namespace ClawRPG.Core.Systems.GuildWar
         /// </summary>
         public GuildWar CreateWar(string name, string description, GuildWarType type, int duration, int maxGuilds, int minGuildLevel, int entryFee, string mapId)
         {
-            var config = GuildWarDatabase.GetConfig(type);
+            var config = GuildWarDatabase.Instance.GetConfig(type);
             var warId = GenerateWarId();
             
             var war = new GuildWar
@@ -539,7 +539,7 @@ namespace ClawRPG.Core.Systems.GuildWar
             for (int i = 0; i < Math.Min(war.Participants.Count, 10); i++)
             {
                 var participant = war.Participants[i];
-                var reward = GuildWarDatabase.GetReward(i + 1);
+                var reward = GuildWarDatabase.Instance.GetReward(i + 1);
                 if (reward == null) continue;
                 
                 var stats = _guildStatistics[participant.GuildId];
@@ -601,7 +601,7 @@ namespace ClawRPG.Core.Systems.GuildWar
         public List<WarScheduleConfig> GetTodaysScheduledWars()
         {
             int dayOfWeek = (int)DateTime.Now.DayOfWeek;
-            return GuildWarDatabase.WeeklySchedule.Where(s => s.DayOfWeek == dayOfWeek).ToList();
+            return GuildWarDatabase.Instance.WeeklySchedule.Where(s => s.DayOfWeek == dayOfWeek).ToList();
         }
 
         /// <summary>
@@ -612,7 +612,7 @@ namespace ClawRPG.Core.Systems.GuildWar
             var scheduled = GetTodaysScheduledWars();
             foreach (var schedule in scheduled)
             {
-                var config = GuildWarDatabase.GetConfig(schedule.WarType);
+                var config = GuildWarDatabase.Instance.GetConfig(schedule.WarType);
                 var name = $"{config.Name} - {DateTime.Now:MM/dd}";
                 CreateWar(name, config.Description, schedule.WarType, schedule.Duration, 0, 0, 0, "default");
             }

@@ -233,7 +233,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         {
             _enchantmentList.Clear();
             
-            var enchantments = EnchantmentDatabase.GetAllEnchantments();
+            var enchantments = EnchantmentDatabase.Instance.GetAllEnchantments();
             
             foreach (var enchantment in enchantments)
             {
@@ -307,7 +307,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             var items = _enchantmentList.GetItemText((int)index);
             
             // 查找对应的附魔
-            var enchantments = EnchantmentDatabase.GetAllEnchantments();
+            var enchantments = EnchantmentDatabase.Instance.GetAllEnchantments();
             foreach (var enchantment in enchantments)
             {
                 if (items.Contains(enchantment.Name))
@@ -435,7 +435,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             // 已解锁附魔
             var unlocked = EnchantmentSystem.Instance.GetUnlockedEnchantments(_playerId);
             var unlockedLabel = new Label();
-            unlockedLabel.Text = $"\n已解锁附魔: {unlocked.Count} / {EnchantmentDatabase.GetTotalCount()}";
+            unlockedLabel.Text = $"\n已解锁附魔: {unlocked.Count} / {EnchantmentDatabase.Instance.GetTotalCount()}";
             statsBox.AddChild(unlockedLabel);
         }
         

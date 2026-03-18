@@ -60,9 +60,9 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             _activeSessions = new Dictionary<string, EnchantmentSession>();
             
             // 初始化数据库
-            EnchantmentDatabase.Initialize();
+            EnchantmentDatabase.Instance.Initialize();
             
-            GD.Print("EnchantmentSystem: Initialized with " + EnchantmentDatabase.GetTotalCount() + " enchantments");
+            GD.Print("EnchantmentSystem: Initialized with " + EnchantmentDatabase.Instance.GetTotalCount() + " enchantments");
         }
         
         /// <summary>
@@ -83,7 +83,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         public EnchantmentSession StartEnchantment(string playerId, string equipmentId, string enchantmentId)
         {
             var progress = GetOrCreateProgress(playerId);
-            var enchantment = EnchantmentDatabase.GetEnchantmentById(enchantmentId);
+            var enchantment = EnchantmentDatabase.Instance.GetEnchantmentById(enchantmentId);
             
             if (enchantment == null)
             {
@@ -150,7 +150,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             
             var session = _activeSessions[sessionId];
             var progress = GetOrCreateProgress(session.PlayerId);
-            var enchantment = EnchantmentDatabase.GetEnchantmentById(session.EnchantmentId);
+            var enchantment = EnchantmentDatabase.Instance.GetEnchantmentById(session.EnchantmentId);
             
             if (enchantment == null)
             {
@@ -300,7 +300,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             
             if (equipmentEnchantment != null)
             {
-                var enchantment = EnchantmentDatabase.GetEnchantmentById(equipmentEnchantment.EnchantmentId);
+                var enchantment = EnchantmentDatabase.Instance.GetEnchantmentById(equipmentEnchantment.EnchantmentId);
                 if (enchantment != null)
                 {
                     effects[enchantment.PrimaryEffect] = enchantment.PrimaryEffectValue * equipmentEnchantment.EnchantmentLevel;
@@ -352,7 +352,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             
             foreach (var unlocked in progress.UnlockedEnchantments)
             {
-                var enchantment = EnchantmentDatabase.GetEnchantmentById(unlocked.EnchantmentId);
+                var enchantment = EnchantmentDatabase.Instance.GetEnchantmentById(unlocked.EnchantmentId);
                 if (enchantment != null)
                 {
                     result.Add(enchantment);

@@ -1,19 +1,34 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Database;
 
-namespace ClawRPG.Scripts.Systems {
+namespace ClawRPG.Scripts.Systems
+{
     /// <summary>
     /// 事件选择数据库 - 管理所有随机事件
     /// </summary>
-    public static class ChoiceEventDatabase {
-        private static Dictionary<string, ChoiceEventData> _events = new Dictionary<string, ChoiceEventData>();
-        
-        static ChoiceEventDatabase() {
+    public class ChoiceEventDatabase : IDatabase
+    {
+        private static ChoiceEventDatabase _instance;
+        public static ChoiceEventDatabase Instance => _instance ??= new ChoiceEventDatabase();
+
+        private Dictionary<string, ChoiceEventData> _events = new Dictionary<string, ChoiceEventData>();
+
+        public object Instance => Instance;
+
+        public void Initialize()
+        {
             InitializeEvents();
         }
-        
-        private static void InitializeEvents() {
+
+        public bool ValidateData()
+        {
+            return _events != null && _events.Count > 0;
+        }
+
+        private void InitializeEvents()
+        {
             // === 战斗类事件 ===
             AddEvent(new ChoiceEventData {
                 EventId = "ambush",
@@ -51,7 +66,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             AddEvent(new ChoiceEventData {
                 EventId = "monster_den",
                 Title = "怪物巢穴",
@@ -87,7 +102,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             // === 探索类事件 ===
             AddEvent(new ChoiceEventData {
                 EventId = "ancient_ruins",
@@ -124,7 +139,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             AddEvent(new ChoiceEventData {
                 EventId = "hidden_chest",
                 Title = "隐藏宝箱",
@@ -148,7 +163,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             // === 神秘类事件 ===
             AddEvent(new ChoiceEventData {
                 EventId = "mysterious_merchant",
@@ -183,7 +198,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             AddEvent(new ChoiceEventData {
                 EventId = "strange_portal",
                 Title = "奇怪传送门",
@@ -222,7 +237,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             // === 祝福类事件 ===
             AddEvent(new ChoiceEventData {
                 EventId = "shrine",
@@ -258,7 +273,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             AddEvent(new ChoiceEventData {
                 EventId = "healing_spring",
                 Title = "治愈之泉",
@@ -285,7 +300,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             // === 诅咒类事件 ===
             AddEvent(new ChoiceEventData {
                 EventId = "cursed_artifact",
@@ -324,7 +339,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             AddEvent(new ChoiceEventData {
                 EventId = "dark_ritual",
                 Title = "黑暗仪式",
@@ -362,7 +377,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             // === 更多探索事件 ===
             AddEvent(new ChoiceEventData {
                 EventId = "abandoned_camp",
@@ -398,7 +413,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             AddEvent(new ChoiceEventData {
                 EventId = "traveling_merchant",
                 Title = "旅行商人",
@@ -432,7 +447,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             // === 战斗类事件2 ===
             AddEvent(new ChoiceEventData {
                 EventId = "bandit_leader",
@@ -471,7 +486,7 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }
             });
-            
+
             // === 神秘事件2 ===
             AddEvent(new ChoiceEventData {
                 EventId = "dream_world",
@@ -511,87 +526,102 @@ namespace ClawRPG.Scripts.Systems {
                 }
             });
         }
-        
-        private static void AddEvent(ChoiceEventData eventData) {
+
+        private void AddEvent(ChoiceEventData eventData)
+        {
             _events[eventData.EventId] = eventData;
         }
-        
+
         /// <summary>
         /// 获取所有事件
         /// </summary>
-        public static Dictionary<string, ChoiceEventData> GetAllEvents() {
+        public Dictionary<string, ChoiceEventData> GetAllEvents()
+        {
             return new Dictionary<string, ChoiceEventData>(_events);
         }
-        
+
         /// <summary>
         /// 根据ID获取事件
         /// </summary>
-        public static ChoiceEventData GetEvent(string eventId) {
-            if (_events.ContainsKey(eventId)) {
+        public ChoiceEventData GetEvent(string eventId)
+        {
+            if (_events.ContainsKey(eventId))
+            {
                 return _events[eventId];
             }
             return null;
         }
-        
+
         /// <summary>
         /// 获取随机事件（基于玩家等级和区域）
         /// </summary>
-        public static ChoiceEventData GetRandomEvent(int playerLevel, string region = "") {
+        public ChoiceEventData GetRandomEvent(int playerLevel, string region = "")
+        {
             var validEvents = new List<ChoiceEventData>();
-            
-            foreach (var evt in _events.Values) {
-                if (evt.MinPlayerLevel <= playerLevel) {
-                    if (string.IsNullOrEmpty(evt.RequiredRegion) || evt.RequiredRegion == region) {
+
+            foreach (var evt in _events.Values)
+            {
+                if (evt.MinPlayerLevel <= playerLevel)
+                {
+                    if (string.IsNullOrEmpty(evt.RequiredRegion) || evt.RequiredRegion == region)
+                    {
                         validEvents.Add(evt);
                     }
                 }
             }
-            
+
             if (validEvents.Count == 0) return null;
-            
+
             // 加权随机选择
             return GetWeightedRandomEvent(validEvents);
         }
-        
+
         /// <summary>
         /// 根据类别获取随机事件
         /// </summary>
-        public static ChoiceEventData GetRandomEventByCategory(string category, int playerLevel) {
+        public ChoiceEventData GetRandomEventByCategory(string category, int playerLevel)
+        {
             var validEvents = new List<ChoiceEventData>();
-            
-            foreach (var evt in _events.Values) {
-                if (evt.Category == category && evt.MinPlayerLevel <= playerLevel) {
+
+            foreach (var evt in _events.Values)
+            {
+                if (evt.Category == category && evt.MinPlayerLevel <= playerLevel)
+                {
                     validEvents.Add(evt);
                 }
             }
-            
+
             if (validEvents.Count == 0) return null;
-            
+
             return GetWeightedRandomEvent(validEvents);
         }
-        
+
         /// <summary>
         /// 加权随机选择
         /// </summary>
-        private static ChoiceEventData GetWeightedRandomEvent(List<ChoiceEventData> events) {
+        private ChoiceEventData GetWeightedRandomEvent(List<ChoiceEventData> events)
+        {
             if (events.Count == 0) return null;
             if (events.Count == 1) return events[0];
-            
+
             float totalWeight = 0;
-            foreach (var evt in events) {
+            foreach (var evt in events)
+            {
                 totalWeight += 1.0f; // 简单等权重
             }
-            
+
             float randomValue = (float)GD.RandDouble() * totalWeight;
             float currentWeight = 0;
-            
-            foreach (var evt in events) {
+
+            foreach (var evt in events)
+            {
                 currentWeight += 1.0f;
-                if (randomValue <= currentWeight) {
+                if (randomValue <= currentWeight)
+                {
                     return evt;
                 }
             }
-            
+
             return events[0];
         }
     }

@@ -208,13 +208,13 @@ namespace ClawRPG.Systems.Emote {
             statsText += $"Favorite Emotes: {EmoteSystem.Instance.GetFavoriteEmotes().Count}\n\n";
             
             if (mostUsed != null) {
-                var emote = ClawRPG.Systems.Emote.EmoteDatabase.GetEmote(mostUsed);
+                var emote = ClawRPG.Systems.Emote.EmoteDatabase.Instance.GetEmote(mostUsed);
                 statsText += $"Most Used: {emote?.Name ?? "Unknown"}\n";
             }
             
             statsText += "\n=== Usage Count ===\n";
             foreach (var kvp in stats.OrderByDescending(k => k.Value).Take(10)) {
-                var e = ClawRPG.Systems.Emote.EmoteDatabase.GetEmote(kvp.Key);
+                var e = ClawRPG.Systems.Emote.EmoteDatabase.Instance.GetEmote(kvp.Key);
                 statsText += $"{e?.Name ?? kvp.Key}: {kvp.Value} uses\n";
             }
             
