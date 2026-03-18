@@ -9,7 +9,7 @@ using System.Text;
 
 namespace ClawRPG.Systems.Relics
 {
-    public class RelicCollectionSystem
+    public class RelicCollectionSystem : BaseSystem
     {
         // 玩家遗物收集数据
         private PlayerRelicCollection _playerCollection = new PlayerRelicCollection
@@ -302,7 +302,7 @@ namespace ClawRPG.Systems.Relics
         }
 
         // 导出存档数据
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary<string, object>
             {
@@ -314,7 +314,7 @@ namespace ClawRPG.Systems.Relics
         }
 
         // 导入存档数据
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 
