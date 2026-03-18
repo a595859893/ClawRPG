@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Achievement manager - tracks progress and handles unlocking
     /// </summary>
-    public class AchievementManager
+    public class AchievementManager : BaseSystem : BaseSystem
     {
         private static AchievementManager _instance;
         public static AchievementManager Instance => _instance ??= new AchievementManager();
@@ -409,7 +409,7 @@ namespace ClawRPG.Scripts.Systems
             LoadAchievements();
         }
         
-        public Dictionary<string, object> Serialize()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary<string, object>
             {
@@ -427,7 +427,7 @@ namespace ClawRPG.Scripts.Systems
             };
         }
         
-        public void Deserialize(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             
