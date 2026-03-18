@@ -11,11 +11,10 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
     
     public class ContractBountySystem : BaseSystem
     {
-        private static ContractBountySystem _instance;
-        public static new ContractBountySystem Instance => _instance ??= new ContractBountySystem();
+        public static ContractBountySystem Instance { get; private set; }
         
         private ContractBountyData _data = new ContractBountyData();
-        private ContractBountyDatabase _database = ContractBountyDatabase.Instance;
+        private ContractBountyDatabase _database;
         
         // 事件
         public event Action<Contract> OnContractAccepted;
@@ -25,8 +24,10 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
         
         public ContractBountyData Data => _data;
         
-        public ContractBountySystem()
+        public override void _Ready()
         {
+            Instance = this;
+            _database = ContractBountyDatabase.Instance;
             InitializeContracts();
         }
         
@@ -44,7 +45,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             _data.availableContracts.Clear();
             
             // 随机生成5-8个合同
-            int contractCount = UnityEngine.Random.Range(5, 9);
+            int contractCount = (int)GD.RandRange(5, 9);
             
             for (int i = 0; i < contractCount; i++)
             {
@@ -81,7 +82,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
                     targetDescription = template.targetDescription,
                     requiredKills = template.requiredKills,
                     currentKills = 0,
-                    level = template.baseLevel + UnityEngine.Random.Range(-2, 3),
+                    level = template.baseLevel + (int)GD.RandRange(-2, 3),
                     difficulty = template.difficulty
                 },
                 reward = new ContractReward
@@ -359,9 +360,9 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public override Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            var data = new Dictionary<string, object>();
+            var data = new Dictionary();
             data["total_completed"] = _data.totalCompleted;
             data["total_failed"] = _data.totalFailed;
             data["total_gold_earned"] = _data.totalGoldEarned;
@@ -370,12 +371,43 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             data["best_streak"] = _data.bestStreak;
             
             // Serialize completion counts
-            var completionCounts = new Dictionary<string, int>();
+            var completionCounts = new Dictionary();
             foreach (var kvp in _data.contractCompletionCount)
             {
                 completionCounts[kvp.Key] = kvp.Value;
             }
             data["contract_completion_count"] = completionCounts;
+
+            // Serialize active contracts (ongoing contracts)
+            var activeContractsData = new List<Dictionary>();
+            foreach (var contract in _data.activeContracts)
+            {
+                var contractData = new Dictionary();
+                contractData["contract_id"] = contract.contractId;
+                contractData["title"] = contract.title;
+                contractData["description"] = contract.description;
+                contractData["client_name"] = contract.clientName;
+                contractData["type"] = (int)contract.type;
+                contractData["difficulty"] = (int)contract.difficulty;
+                contractData["status"] = (int)contract.status;
+                contractData["target_id"] = contract.target.targetId;
+                contractData["target_name"] = contract.target.targetName;
+                contractData["target_description"] = contract.target.targetDescription;
+                contractData["required_kills"] = contract.target.requiredKills;
+                contractData["current_kills"] = contract.target.currentKills;
+                contractData["level"] = contract.target.level;
+                contractData["target_difficulty"] = (int)contract.target.difficulty;
+                contractData["gold"] = contract.reward.gold;
+                contractData["experience"] = contract.reward.experience;
+                contractData["reputation"] = contract.reward.reputation;
+                contractData["time_limit"] = contract.timeLimit;
+                contractData["start_time"] = contract.startTime.ToString("o");
+                contractData["expiration_time"] = contract.expirationTime.ToString("o");
+                contractData["location"] = contract.location;
+                contractData["tips"] = contract.tips;
+                activeContractsData.Add(contractData);
+            }
+            data["active_contracts"] = activeContractsData;
             
             return data;
         }
@@ -383,7 +415,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
             
@@ -402,11 +434,54 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             
             if (data.ContainsKey("contract_completion_count"))
             {
-                var counts = (Dictionary<object, object>)data["contract_completion_count"];
+                var counts = (Dictionary)data["contract_completion_count"];
                 _data.contractCompletionCount.Clear();
                 foreach (var kvp in counts)
                 {
                     _data.contractCompletionCount[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
+                }
+            }
+
+            // Deserialize active contracts
+            if (data.ContainsKey("active_contracts"))
+            {
+                _data.activeContracts.Clear();
+                var activeContractsData = (IList)data["active_contracts"];
+                foreach (Dictionary contractData in activeContractsData)
+                {
+                    var contract = new Contract
+                    {
+                        contractId = contractData["contract_id"].ToString(),
+                        title = contractData["title"].ToString(),
+                        description = contractData["description"].ToString(),
+                        clientName = contractData["client_name"].ToString(),
+                        type = (ContractType)Convert.ToInt32(contractData["type"]),
+                        difficulty = (ContractDifficulty)Convert.ToInt32(contractData["difficulty"]),
+                        status = (ContractStatus)Convert.ToInt32(contractData["status"]),
+                        target = new ContractTarget
+                        {
+                            targetId = contractData["target_id"].ToString(),
+                            targetName = contractData["target_name"].ToString(),
+                            targetDescription = contractData["target_description"].ToString(),
+                            requiredKills = Convert.ToInt32(contractData["required_kills"]),
+                            currentKills = Convert.ToInt32(contractData["current_kills"]),
+                            level = Convert.ToInt32(contractData["level"]),
+                            difficulty = (ContractDifficulty)Convert.ToInt32(contractData["target_difficulty"])
+                        },
+                        reward = new ContractReward
+                        {
+                            gold = Convert.ToInt32(contractData["gold"]),
+                            experience = Convert.ToInt32(contractData["experience"]),
+                            items = new List<string>(),
+                            reputation = Convert.ToInt32(contractData["reputation"])
+                        },
+                        timeLimit = Convert.ToInt32(contractData["time_limit"]),
+                        startTime = DateTime.Parse(contractData["start_time"].ToString()),
+                        expirationTime = DateTime.Parse(contractData["expiration_time"].ToString()),
+                        location = contractData["location"].ToString(),
+                        tips = contractData["tips"].ToString()
+                    };
+                    _data.activeContracts.Add(contract);
                 }
             }
         }
