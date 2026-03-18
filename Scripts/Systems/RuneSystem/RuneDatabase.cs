@@ -1,7 +1,8 @@
 using Godot;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Database;
 
-public class RuneDatabase
+public class RuneDatabase : IDatabase
 {
     private static RuneDatabase _instance;
     public static RuneDatabase Instance
@@ -12,6 +13,12 @@ public class RuneDatabase
             return _instance;
         }
     }
+
+    object IDatabase.Instance => Instance;
+
+    public void Initialize() { }
+
+    public bool ValidateData() => Runes.Count > 0;
     
     // Rune Types
     public enum RuneType { Power, Defense, Support, Special }

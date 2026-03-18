@@ -1,15 +1,35 @@
+// BossMechanicsDatabase.cs - Boss 机制系统配置数据库
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Database;
 
-public class BossMechanicsDatabase
+public class BossMechanicsDatabase : IDatabase
 {
-    private static Dictionary<string, BossConfig> _bossConfigs;
-    private static Dictionary<string, BossPhaseConfig> _phaseConfigs;
-    private static Dictionary<string, BossSkillConfig> _skillConfigs;
-    private static bool _initialized = false;
+    private static BossMechanicsDatabase _instance;
+    public static BossMechanicsDatabase Instance
+    {
+        get
+        {
+            if (_instance == null) _instance = new BossMechanicsDatabase();
+            return _instance;
+        }
+    }
 
-    public static void Initialize()
+    object IDatabase.Instance => Instance;
+
+    // Instance fields
+    private Dictionary<string, BossConfig> _bossConfigs;
+    private Dictionary<string, BossPhaseConfig> _phaseConfigs;
+    private Dictionary<string, BossSkillConfig> _skillConfigs;
+    private bool _initialized = false;
+
+    private BossMechanicsDatabase()
+    {
+        // Initialization is lazy; call Initialize() explicitly if needed immediately
+    }
+
+    public void Initialize()
     {
         if (_initialized) return;
 
@@ -23,7 +43,9 @@ public class BossMechanicsDatabase
         _initialized = true;
     }
 
-    private static void InitializeSkills()
+    public bool ValidateData() => _bossConfigs != null && _bossConfigs.Count > 0;
+
+    private void InitializeSkills()
     {
         // 近战技能
         _skillConfigs["boss_melee_slash"] = new BossSkillConfig
@@ -281,7 +303,7 @@ public class BossMechanicsDatabase
         };
     }
 
-    private static void InitializeBossConfigs()
+    private void InitializeBossConfigs()
     {
         // 森林之王 - 精英Boss
         var forestKing = new BossConfig
@@ -501,34 +523,43 @@ public class BossMechanicsDatabase
         _bossConfigs["element_king"] = elementKing;
     }
 
-    public static BossConfig GetBossConfig(string bossId)
+    // Instance query methods
+    public BossConfig GetBossConfig(string bossId)
     {
         Initialize();
         return _bossConfigs.ContainsKey(bossId) ? _bossConfigs[bossId] : null;
     }
 
-    public static Dictionary<string, BossConfig> GetAllBossConfigs()
+    public BossConfig GetBoss(string bossId) => GetBossConfig(bossId);
+
+    public Dictionary<string, BossConfig> GetAllBossConfigs()
     {
         Initialize();
         return new Dictionary<string, BossConfig>(_bossConfigs);
     }
 
-    public static BossSkillConfig GetSkillConfig(string skillId)
+    public List<string> GetAllBossIds()
+    {
+        Initialize();
+        return new List<string>(_bossConfigs.Keys);
+    }
+
+    public BossSkillConfig GetSkillConfig(string skillId)
     {
         Initialize();
         return _skillConfigs.ContainsKey(skillId) ? _skillConfigs[skillId] : null;
     }
 
-    public static Dictionary<string, BossSkillConfig> GetAllSkillConfigs()
+    public Dictionary<string, BossSkillConfig> GetAllSkillConfigs()
     {
         Initialize();
         return new Dictionary<string, BossSkillConfig>(_skillConfigs);
     }
 
-    public static List<BossConfig> GetBossConfigsByType(BossType type)
+    public List<BossConfig> GetBossConfigsByType(BossType type)
     {
         Initialize();
-        List<BossConfig> result = new List<BossConfig>();
+        var result = new List<BossConfig>();
         foreach (var config in _bossConfigs.Values)
         {
             if (config.Type == type)
@@ -537,10 +568,10 @@ public class BossMechanicsDatabase
         return result;
     }
 
-    public static List<BossConfig> GetBossConfigsByDifficulty(DifficultyLevel difficulty)
+    public List<BossConfig> GetBossConfigsByDifficulty(DifficultyLevel difficulty)
     {
         Initialize();
-        List<BossConfig> result = new List<BossConfig>();
+        var result = new List<BossConfig>();
         foreach (var config in _bossConfigs.Values)
         {
             if (config.Difficulty == difficulty)
@@ -548,4 +579,13 @@ public class BossMechanicsDatabase
         }
         return result;
     }
+
+    // Backward-compatible static methods (delegate to Instance)
+    public static void StaticInitialize() => Instance.Initialize();
+    public static BossConfig GetBossConfigStatic(string bossId) => Instance.GetBossConfig(bossId);
+    public static Dictionary<string, BossConfig> GetAllBossConfigsStatic() => Instance.GetAllBossConfigs();
+    public static BossSkillConfig GetSkillConfigStatic(string skillId) => Instance.GetSkillConfig(skillId);
+    public static Dictionary<string, BossSkillConfig> GetAllSkillConfigsStatic() => Instance.GetAllSkillConfigs();
+    public static List<BossConfig> GetBossConfigsByTypeStatic(BossType type) => Instance.GetBossConfigsByType(type);
+    public static List<BossConfig> GetBossConfigsByDifficultyStatic(DifficultyLevel difficulty) => Instance.GetBossConfigsByDifficulty(difficulty);
 }
