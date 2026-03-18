@@ -8,12 +8,18 @@ using ClawRPG.Scripts.Systems;
 namespace ClawRPG.Scripts.Systems.ProceduralDungeon
 {
     /// <summary>
-    /// 程序化地下城生成系统
+    /// 程序化地下城生成系统 - 协调者
+    /// 委托给子系统：DungeonGeneratorSystem, RoomLayoutSystem, DungeonDifficultySystem
     /// </summary>
     public class ProceduralDungeonSystem : BaseSystem
     {
         private static ProceduralDungeonSystem _instance;
         public static ProceduralDungeonSystem Instance => _instance;
+        
+        // 子系统引用
+        private DungeonGeneratorSystem _generatorSystem;
+        private RoomLayoutSystem _layoutSystem;
+        private DungeonDifficultySystem _difficultySystem;
         
         // 当前地下城实例
         public GeneratedDungeon CurrentDungeon { get; private set; }
@@ -33,14 +39,12 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         public static Signal TreasureFound => new("treasure_found");
         public static Signal SecretDiscovered => new("secret_discovered");
         
-        private Random _random;
         private ProceduralDungeonDatabase _database;
         private GameModeConfig _gameModeConfig;
         
         public ProceduralDungeonSystem()
         {
             _instance = this;
-            _random = new Random();
             _database = ProceduralDungeonDatabase.Instance;
             _gameModeConfig = GameModeConfig.Instance;
             Statistics = new DungeonStatistics();
@@ -48,6 +52,16 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         
         public override void _Ready()
         {
+            // 初始化子系统
+            _generatorSystem = new DungeonGeneratorSystem();
+            _layoutSystem = new RoomLayoutSystem();
+            _difficultySystem = new DungeonDifficultySystem();
+            
+            // 将子系统添加为子节点
+            AddChild(_generatorSystem);
+            AddChild(_layoutSystem);
+            AddChild(_difficultySystem);
+            
             GD.Print("Procedural Dungeon System initialized");
         }
         
@@ -56,21 +70,16 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         /// </summary>
         public GeneratedDungeon GenerateDungeon(string dungeonTypeId, int seed = -1)
         {
-            if (seed > 0)
-            {
-                _random = new Random(seed);
-            }
-            else
-            {
-                _random = new Random();
-            }
-            
             var config = _database.GetDungeonType(dungeonTypeId);
             if (config == null)
             {
                 GD.PrintErr($"Unknown dungeon type: {dungeonTypeId}");
                 return null;
             }
+            
+            // 设置子系统种子
+            _layoutSystem.SetSeed(seed);
+            _difficultySystem.SetSeed(seed);
             
             CurrentDungeon = new GeneratedDungeon
             {
@@ -87,12 +96,13 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
                 StartTime = DateTime.Now
             };
             
-            // 生成每一层
-            for (int floor = 1; floor <= config.TotalFloors; floor++)
-            {
-                var dungeonFloor = GenerateFloor(floor, config, floor == config.TotalFloors);
-                CurrentDungeon.Floors.Add(dungeonFloor);
-            }
+            // 委托给生成系统
+            CurrentDungeon = _generatorSystem.GenerateDungeon(dungeonTypeId, seed);
+            
+            // 恢复进度数据
+            CurrentProgress.DungeonId = CurrentDungeon.DungeonId;
+            CurrentProgress.CurrentFloor = 1;
+            CurrentProgress.StartTime = DateTime.Now;
             
             // 设置初始房间
             if (CurrentDungeon.Floors.Count > 0 && CurrentDungeon.Floors[0].Rooms.Count > 0)
@@ -112,305 +122,13 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         }
         
         /// <summary>
-        /// 生成单个楼层
-        /// </summary>
-        private DungeonFloor GenerateFloor(int floorNumber, DungeonTypeConfig config, bool isBossFloor)
-        {
-            var floorConfig = _database.FloorConfigs.FirstOrDefault(f => f.FloorNumber == floorNumber) 
-                ?? new DungeonFloorConfig { FloorNumber = floorNumber };
-            
-            var floor = new DungeonFloor
-            {
-                FloorNumber = floorNumber,
-                FloorName = $"{config.DisplayName} - {floorConfig.FloorName}"
-            };
-            
-            // 决定房间数量 - 支持快速模式
-            int roomCount;
-            bool quickMode = GameModeManager.Instance?.IsQuickMode() ?? false;
-            
-            if (quickMode)
-            {
-                // 快速模式：减少房间数量
-                var gameConfig = GameModeManager.Instance;
-                var (min, max) = gameConfig.GetRoomRange(floorConfig.MinRooms, floorConfig.MaxRooms);
-                roomCount = _random.Next(min, max + 1);
-                GD.Print($"[QuickMode] Room count reduced: {floorConfig.MinRooms}-{floorConfig.MaxRooms} -> {min}-{max}");
-            }
-            else
-            {
-                roomCount = _random.Next(floorConfig.MinRooms, floorConfig.MaxRooms + 1);
-            }
-            
-            // 生成房间布局
-            var rooms = GenerateRoomLayout(roomCount, config, floorNumber, isBossFloor);
-            
-            // 连接房间
-            ConnectRooms(rooms);
-            
-            floor.Rooms = rooms;
-            
-            // 设置入口和出口
-            floor.EntranceRoom = rooms.FirstOrDefault(r => r.Type == RoomType.Entrance) ?? rooms.FirstOrDefault();
-            floor.ExitRoom = isBossFloor 
-                ? rooms.FirstOrDefault(r => r.Type == RoomType.Boss) 
-                : rooms.LastOrDefault(r => r.Type != RoomType.Entrance);
-            
-            return floor;
-        }
-        
-        /// <summary>
-        /// 生成房间布局
-        /// </summary>
-        private List<DungeonRoom> GenerateRoomLayout(int count, DungeonTypeConfig config, int floorNumber, bool isBossFloor)
-        {
-            var rooms = new List<DungeonRoom>();
-            var usedPositions = new HashSet<(int, int)>();
-            
-            // 入口房间
-            var entrance = CreateRoom(RoomType.Entrance, config, floorNumber, 0, 0);
-            rooms.Add(entrance);
-            usedPositions.Add((0, 0));
-            
-            // 生成其他房间
-            for (int i = 1; i < count; i++)
-            {
-                RoomType roomType;
-                
-                if (isBossFloor && i == count - 1)
-                {
-                    roomType = RoomType.Boss;
-                }
-                else
-                {
-                    // 根据概率选择房间类型
-                    roomType = SelectRoomType(config);
-                }
-                
-                // 找到可用位置
-                var (x, y) = FindAvailablePosition(usedPositions, i);
-                usedPositions.Add((x, y));
-                
-                var room = CreateRoom(roomType, config, floorNumber, x, y);
-                rooms.Add(room);
-            }
-            
-            return rooms;
-        }
-        
-        /// <summary>
-        /// 选择房间类型
-        /// </summary>
-        private RoomType SelectRoomType(DungeonTypeConfig config)
-        {
-            var allowedTypes = config.AllowedRoomTypes;
-            
-            // 基础概率分布
-            var weights = new Dictionary<RoomType, int>
-            {
-                [RoomType.Combat] = 40,
-                [RoomType.Treasure] = 15,
-                [RoomType.Elite] = 10,
-                [RoomType.Rest] = 10,
-                [RoomType.Event] = 10,
-                [RoomType.Secret] = (int)(config.SecretChance * 100),
-                [RoomType.Trap] = 5,
-                [RoomType.Merchant] = 5,
-                [RoomType.Puzzle] = 5
-            };
-            
-            // 过滤允许的类型
-            var availableWeights = weights.Where(w => allowedTypes.Contains(w.Key)).ToDictionary(w => w.Key, w => w.Value);
-            
-            int totalWeight = availableWeights.Values.Sum();
-            int roll = _random.Next(totalWeight);
-            
-            int current = 0;
-            foreach (var kvp in availableWeights)
-            {
-                current += kvp.Value;
-                if (roll < current)
-                {
-                    return kvp.Key;
-                }
-            }
-            
-            return RoomType.Combat;
-        }
-        
-        /// <summary>
-        /// 创建房间
-        /// </summary>
-        private DungeonRoom CreateRoom(RoomType type, DungeonTypeConfig config, int floor, int gridX, int gridY)
-        {
-            var templates = _database.GetRoomTemplates(type);
-            var template = templates.Count > 0 ? templates[_random.Next(templates.Count)] : null;
-            
-            var room = new DungeonRoom
-            {
-                RoomId = Guid.NewGuid().ToString(),
-                Type = type,
-                Difficulty = CalculateDifficulty(floor, config),
-                Width = template?.Width ?? 15,
-                Height = template?.Height ?? 15,
-                GridX = gridX,
-                GridY = gridY
-            };
-            
-            // 根据房间类型生成内容
-            switch (type)
-            {
-                case RoomType.Combat:
-                case RoomType.Elite:
-                    room.Enemies = GenerateEnemyList(room.Difficulty, type == RoomType.Elite);
-                    break;
-                case RoomType.Boss:
-                    room.Enemies = GenerateBossEnemy(floor);
-                    break;
-                case RoomType.Treasure:
-                    room.TreasureId = SelectTreasure();
-                    break;
-                case RoomType.Event:
-                    room.EventId = SelectEvent();
-                    break;
-                case RoomType.Secret:
-                    room.TreasureId = SelectTreasure();
-                    break;
-            }
-            
-            // 添加房间修正因子
-            room.RoomModifiers["enemy_strength"] = config.EnemyStrengthMultiplier;
-            room.RoomModifiers["treasure_value"] = config.TreasureMultiplier;
-            
-            return room;
-        }
-        
-        /// <summary>
-        /// 计算房间难度
-        /// </summary>
-        private RoomDifficulty CalculateDifficulty(int floor, DungeonTypeConfig config)
-        {
-            float difficulty = floor * config.ThemeModifier;
-            
-            if (difficulty < 2) return RoomDifficulty.Easy;
-            if (difficulty < 4) return RoomDifficulty.Normal;
-            if (difficulty < 6) return RoomDifficulty.Hard;
-            if (difficulty < 8) return RoomDifficulty.Nightmare;
-            return RoomDifficulty.Legendary;
-        }
-        
-        /// <summary>
-        /// 生成敌人列表
-        /// </summary>
-        private List<string> GenerateEnemyList(RoomDifficulty difficulty, bool isElite)
-        {
-            var enemies = new List<string>();
-            int count = isElite ? 1 : _random.Next(2, 5);
-            
-            string enemyType = isElite ? "Elite" : "Basic";
-            
-            for (int i = 0; i < count; i++)
-            {
-                enemies.Add($"{enemyType}_{difficulty}_{i}");
-            }
-            
-            return enemies;
-        }
-        
-        /// <summary>
-        /// 生成Boss敌人
-        /// </summary>
-        private List<string> GenerateBossEnemy(int floor)
-        {
-            return new List<string> { $"Boss_Floor{floor}" };
-        }
-        
-        /// <summary>
-        /// 选择宝藏
-        /// </summary>
-        private string SelectTreasure()
-        {
-            var treasures = _database.Treasures;
-            float roll = (float)_random.NextDouble();
-            
-            foreach (var treasure in treasures.OrderByDescending(t => t.Rarity))
-            {
-                if (roll < treasure.Rarity)
-                {
-                    return treasure.TreasureId;
-                }
-            }
-            
-            return treasures[0].TreasureId;
-        }
-        
-        /// <summary>
-        /// 选择事件
-        /// </summary>
-        private string SelectEvent()
-        {
-            var events = _database.Events;
-            return events[_random.Next(events.Count)].EventId;
-        }
-        
-        /// <summary>
-        /// 找到可用位置
-        /// </summary>
-        private (int, int) FindAvailablePosition(HashSet<(int, int)> used, int attempt)
-        {
-            // 使用螺旋式搜索找到空闲位置
-            for (int radius = 1; radius < 20; radius++)
-            {
-                for (int angle = 0; angle < 8 * radius; angle++)
-                {
-                    double rad = angle * Math.PI / (4 * radius);
-                    int x = (int)(radius * Math.Cos(rad));
-                    int y = (int)(radius * Math.Sin(rad));
-                    
-                    if (!used.Contains((x, y)))
-                    {
-                        return (x, y);
-                    }
-                }
-            }
-            
-            return (attempt, 0);
-        }
-        
-        /// <summary>
-        /// 连接房间
-        /// </summary>
-        private void ConnectRooms(List<DungeonRoom> rooms)
-        {
-            // 简单的邻居连接算法
-            for (int i = 0; i < rooms.Count; i++)
-            {
-                var room = rooms[i];
-                
-                // 找到最近的邻居
-                var neighbors = rooms
-                    .Where(r => r != room)
-                    .OrderBy(r => Math.Abs(r.GridX - room.GridX) + Math.Abs(r.GridY - room.GridY))
-                    .Take(2);
-                
-                foreach (var neighbor in neighbors)
-                {
-                    if (!room.ConnectedRooms.Contains(neighbor.RoomId))
-                    {
-                        room.ConnectedRooms.Add(neighbor.RoomId);
-                    }
-                }
-            }
-        }
-        
-        /// <summary>
         /// 进入房间
         /// </summary>
         public bool EnterRoom(string roomId)
         {
             if (CurrentDungeon == null) return false;
             
-            var room = FindRoomById(roomId);
+            var room = _generatorSystem.FindRoomById(CurrentDungeon, roomId);
             if (room == null) return false;
             
             CurrentDungeon.CurrentRoom = room;
@@ -532,36 +250,13 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         }
         
         /// <summary>
-        /// 通过ID查找房间
-        /// </summary>
-        private DungeonRoom FindRoomById(string roomId)
-        {
-            if (CurrentDungeon == null) return null;
-            
-            foreach (var floor in CurrentDungeon.Floors)
-            {
-                var room = floor.Rooms.FirstOrDefault(r => r.RoomId == roomId);
-                if (room != null) return room;
-            }
-            
-            return null;
-        }
-        
-        /// <summary>
         /// 获取当前可用的连接房间
         /// </summary>
         public List<DungeonRoom> GetConnectedRooms()
         {
             if (CurrentDungeon?.CurrentRoom == null) return new List<DungeonRoom>();
             
-            var connected = new List<DungeonRoom>();
-            foreach (var roomId in CurrentDungeon.CurrentRoom.ConnectedRooms)
-            {
-                var room = FindRoomById(roomId);
-                if (room != null) connected.Add(room);
-            }
-            
-            return connected;
+            return _generatorSystem.GetConnectedRooms(CurrentDungeon, CurrentDungeon.CurrentRoom);
         }
         
         /// <summary>
