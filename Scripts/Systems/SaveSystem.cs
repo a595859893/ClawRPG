@@ -6,26 +6,27 @@ using GameSystems;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
-    /// Enhanced Save and Load system with auto-save, backup, and metadata
-    /// Coordinates SaveDataManager, SaveFileManager, and SaveEncryption
+    /// SaveSystem - 存档系统协调器
+    /// 协调 SaveSerializer, SaveSlotManager, CloudSaveSystem 三个子系统
+    /// 提供统一的存档接口
     /// </summary>
     public partial class SaveSystem : BaseSystem
     {
-        // Module instances
-        private SaveFileManager _fileManager;
-        private SaveEncryption _encryption;
+        // 子系统实例
+        private SaveSerializer _serializer;
+        private SaveSlotManager _slotManager;
+        private CloudSaveSystem _cloudSystem;
         
-        // Auto-save state
-        private float _autoSaveTimer = 0f;
-        private bool _autoSaveEnabled = true;
+        // 向后兼容的属性
+        public static SaveSystem Instance { get; private set; }
         
-        // Constants
-        private const float AutoSaveInterval = 300f; // 5 minutes
-        
-        // Signals
+        // Signals - 转发自子系统
         [Signal] public delegate void OnSaveCompleteEventHandler(int slot, bool success);
         [Signal] public delegate void OnLoadCompleteEventHandler(int slot, bool success);
         [Signal] public delegate void OnAutoSaveEventHandler(int slot);
+        [Signal] public delegate void OnCloudSyncStartEventHandler();
+        [Signal] public delegate void OnCloudSyncCompleteEventHandler(bool success);
+        [Signal] public delegate void OnCloudSyncErrorEventHandler(string error);
         
         // Type aliases for backward compatibility
         public class SaveData : SaveDataManager.SaveData { }
@@ -33,289 +34,205 @@ namespace ClawRPG.Scripts.Systems {
         
         public override void _Ready()
         {
-            // Initialize modules
-            _fileManager = new SaveFileManager();
-            _encryption = new SaveEncryption();
+            Instance = this;
+            
+            // 初始化子系统
+            InitializeSubsystems();
+            
+            // 转发子系统信号
+            ForwardSubsystemSignals();
         }
         
         public override void _Process(double delta)
         {
-            // Auto-save timer
-            if (_autoSaveEnabled)
+            // 处理自动保存计时（转发到 SlotManager）
+            _slotManager?.ProcessAutoSaveTimer(delta);
+            
+            // 检查是否需要触发自动保存
+            if (_slotManager != null && _slotManager.IsAutoSaveEnabled())
             {
-                _autoSaveTimer += (float)delta;
-                if (_autoSaveTimer >= AutoSaveInterval)
+                float timer = _slotManager.GetAutoSaveTimer();
+                if (timer <= 0) // 计时器归零表示到达保存间隔
                 {
-                    _autoSaveTimer = 0f;
                     PerformAutoSave();
                 }
             }
         }
         
         /// <summary>
-        /// Check if a save slot has data
+        /// 初始化所有子系统
+        /// </summary>
+        private void InitializeSubsystems()
+        {
+            // 初始化或获取子系统实例
+            if (SaveSerializer.Instance == null)
+            {
+                _serializer = new SaveSerializer();
+                AddChild(_serializer);
+            }
+            else
+            {
+                _serializer = SaveSerializer.Instance;
+            }
+            
+            if (SaveSlotManager.Instance == null)
+            {
+                _slotManager = new SaveSlotManager();
+                AddChild(_slotManager);
+            }
+            else
+            {
+                _slotManager = SaveSlotManager.Instance;
+            }
+            
+            if (CloudSaveSystem.Instance == null)
+            {
+                _cloudSystem = new CloudSaveSystem();
+                AddChild(_cloudSystem);
+            }
+            else
+            {
+                _cloudSystem = CloudSaveSystem.Instance;
+            }
+            
+            // 设置序列化器的系统引用
+            _serializer.SetSystemReferences(this);
+            
+            GD.Print("[SaveSystem] All subsystems initialized");
+        }
+        
+        /// <summary>
+        /// 转发子系统信号
+        /// </summary>
+        private void ForwardSubsystemSignals()
+        {
+            // 转发 SlotManager 信号
+            if (_slotManager != null)
+            {
+                _slotManager.Connect("OnSaveComplete", Callable.From((int slot, bool success) => 
+                    EmitSignal(SignalName.OnSaveComplete, slot, success)));
+                _slotManager.Connect("OnLoadComplete", Callable.From((int slot, bool success) => 
+                    EmitSignal(SignalName.OnLoadComplete, slot, success)));
+                _slotManager.Connect("OnAutoSave", Callable.From((int slot) => 
+                    EmitSignal(SignalName.OnAutoSave, slot)));
+            }
+            
+            // 转发 CloudSystem 信号
+            if (_cloudSystem != null)
+            {
+                _cloudSystem.Connect("OnCloudSyncStart", Callable.From(() => 
+                    EmitSignal(SignalName.OnCloudSyncStart)));
+                _cloudSystem.Connect("OnCloudSyncComplete", Callable.From((bool success) => 
+                    EmitSignal(SignalName.OnCloudSyncComplete, success)));
+                _cloudSystem.Connect("OnCloudSyncError", Callable.From((string error) => 
+                    EmitSignal(SignalName.OnCloudSyncError, error)));
+            }
+        }
+        
+        // ========== 槽位管理操作 (转发到 SaveSlotManager) ==========
+        
+        /// <summary>
+        /// 检查存档槽是否有数据
         /// </summary>
         public bool HasSave(int slot)
         {
-            return _fileManager.HasSave(slot);
+            return _slotManager?.HasSave(slot) ?? false;
         }
         
         /// <summary>
-        /// Save game to a slot
+        /// 保存游戏到槽位
         /// </summary>
         public void SaveGame(int slot, SaveData data, bool createBackup = true)
         {
-            if (slot < 0 || slot >= SaveFileManager.MaxSaveSlots)
-            {
-                GD.PrintErr("Invalid save slot: " + slot);
-                EmitSignal(SignalName.OnSaveComplete, slot, false);
-                return;
-            }
+            _slotManager?.SaveGame(slot, data, createBackup);
             
-            bool success = _fileManager.SaveGame(slot, data, createBackup);
-            EmitSignal(SignalName.OnSaveComplete, slot, success);
+            // 云同步（如果启用）
+            if (_cloudSystem?.IsCloudSyncEnabled() == true && data != null)
+            {
+                _cloudSystem.SyncSlotToCloud(slot, data);
+            }
         }
         
         /// <summary>
-        /// Load game from a slot
+        /// 加载游戏从槽位
         /// </summary>
         public SaveData LoadGame(int slot)
         {
-            if (slot < 0 || slot >= SaveFileManager.MaxSaveSlots)
-            {
-                GD.PrintErr("Invalid save slot: " + slot);
-                EmitSignal(SignalName.OnLoadComplete, slot, false);
-                return null;
-            }
-            
-            var data = _fileManager.LoadGame(slot);
-            bool success = data != null;
-            
-            if (!success)
-            {
-                // Try to load from backup
-                data = _fileManager.LoadFromBackup(slot);
-                success = data != null;
-            }
-            
-            EmitSignal(SignalName.OnLoadComplete, slot, success);
-            return data;
+            return _slotManager?.LoadGame(slot);
         }
         
         /// <summary>
-        /// Get all saves
+        /// 获取所有存档
         /// </summary>
         public SaveData[] GetAllSaves()
         {
-            return _fileManager.GetAllSaves();
+            return _slotManager?.GetAllSaves();
         }
         
         /// <summary>
-        /// Get all slot info
+        /// 获取所有槽位信息
         /// </summary>
         public SaveSlotInfo[] GetAllSlotInfo()
         {
-            return _fileManager.GetAllSlotInfo();
+            return _slotManager?.GetAllSlotInfo();
         }
         
         /// <summary>
-        /// Get slot info
+        /// 获取槽位信息
         /// </summary>
         public SaveSlotInfo GetSlotInfo(int slot)
         {
-            return _fileManager.GetSlotInfo(slot);
+            return _slotManager?.GetSlotInfo(slot);
         }
         
         /// <summary>
-        /// Delete a save slot
+        /// 删除存档槽
         /// </summary>
         public void DeleteSave(int slot)
         {
-            _fileManager.DeleteSave(slot);
+            _slotManager?.DeleteSave(slot);
+            
+            // 同时删除云端存档
+            if (_cloudSystem?.IsCloudSyncEnabled() == true)
+            {
+                _cloudSystem.DeleteCloudSlot(slot, null);
+            }
         }
         
+        // ========== 自动保存和快速保存 ==========
+        
         /// <summary>
-        /// Perform auto-save
+        /// 执行自动保存
         /// </summary>
         private void PerformAutoSave()
         {
-            // Get player data from game state
             var player = GetTree().GetFirstNodeInGroup("player") as Node;
             if (player == null) return;
             
-            var data = CreateSaveDataFromPlayer(player);
+            var data = _serializer?.CreateSaveDataFromPlayer(player);
+            if (data == null) return;
+            
             data.SaveName = "Auto Save";
-            data.LocationName = GetCurrentAreaName();
+            data.LocationName = _serializer?.GetCurrentAreaName() ?? "Unknown Area";
             
-            SaveGame(0, data, false); // Use slot 0 for auto-save without backup
+            SaveGame(0, data, false);
             GD.Print("Auto-save completed");
-            
-            EmitSignal(SignalName.OnAutoSave, 0);
         }
         
         /// <summary>
-        /// Create save data from player node
-        /// </summary>
-        private SaveData CreateSaveDataFromPlayer(Node player)
-        {
-            var data = new SaveData();
-            
-            // Get player properties
-            data.Level = 1;
-            data.Experience = 0;
-            data.CurrentHealth = 100;
-            data.MaxHealth = 100;
-            data.CurrentMana = 50;
-            data.MaxMana = 50;
-            data.Gold = 0;
-            data.X = player?.Position.X ?? 0;
-            data.Y = player?.Position.Y ?? 0;
-            data.CurrentArea = "forest";
-            
-            // Save quick slot data
-            if (QuickSlotSystem.Instance != null)
-            {
-                var quickSlotData = QuickSlotSystem.Instance.Serialize();
-                if (quickSlotData != null)
-                {
-                    for (int i = 0; i < 9; i++)
-                    {
-                        data.QuickSlotItemIds[i] = quickSlotData.ContainsKey($"slot_{i}_item") ? (string)quickSlotData[$"slot_{i}_item"] : "";
-                        data.QuickSlotQuantities[i] = quickSlotData.ContainsKey($"slot_{i}_qty") ? (int)quickSlotData[$"slot_{i}_qty"] : 0;
-                    }
-                }
-            }
-            
-            // Save mount data
-            if (MountManager.Instance != null)
-            {
-                data.MountData = MountManager.Instance.Serialize();
-            }
-            
-            // Save bookmark data
-            if (BookmarkSystem.Instance != null)
-            {
-                data.BookmarkData = BookmarkSystem.Instance.Serialize();
-            }
-            
-            // Save auto bookmark data
-            var autoBookmarkSystem = GetNodeOrNull<Systems.AutoBookmarkSystem>("AutoBookmarkSystem");
-            if (autoBookmarkSystem != null)
-            {
-                data.AutoBookmarkData = autoBookmarkSystem.Serialize();
-            }
-            
-            // Save enhancement data
-            var enhancementSystem = GetNodeOrNull<Systems.Enhancement.EnhancementSystem>("EnhancementSystem");
-            if (enhancementSystem != null)
-            {
-                data.EnhancementData = enhancementSystem.Serialize();
-            }
-            
-            // Save auto potion data
-            var autoPotionSystem = GetNodeOrNull<Systems.AutoPotionSystem>("AutoPotionSystem");
-            if (autoPotionSystem != null)
-            {
-                data.AutoPotionData = autoPotionSystem.Serialize();
-            }
-            
-            // Save enchantment data
-            data.EnchantmentData = ClawRPG.Scripts.Systems.Enchantment.EnchantmentSystem.Instance.Serialize();
-            
-            // Save bounty data
-            data.BountyData = BountyManager.Instance.Serialize();
-            
-            // Save weather data
-            var weatherSystem = GetNodeOrNull<WeatherSystem>("WeatherSystem");
-            if (weatherSystem != null)
-            {
-                data.WeatherData = weatherSystem.Serialize();
-            }
-            
-            // Save equipment visuals data
-            var equipVisuals = GetNodeOrNull<UI.EquipmentVisuals>("EquipmentVisuals");
-            if (equipVisuals != null)
-            {
-                data.EquipmentVisualsData = equipVisuals.Serialize();
-                data.UnlockedVisuals = equipVisuals.GetUnlockedVisualsData();
-            }
-            
-            // Save combo system data
-            var comboSystem = GetNodeOrNull<Systems.ComboSystem>("ComboSystem");
-            if (comboSystem != null)
-            {
-                data.ComboData = comboSystem.Serialize();
-            }
-            
-            // Save keybinding data
-            var keybindingSystem = GetNodeOrNull<Systems.KeybindingSystem>("KeybindingSystem");
-            if (keybindingSystem != null)
-            {
-                data.KeybindingData = keybindingSystem.Serialize();
-            }
-            
-            // Save pet story data
-            var petStorySystem = GetNodeOrNull<PetStorySystem>("PetStorySystem");
-            if (petStorySystem != null)
-            {
-                data.PetStoryData = petStorySystem.Serialize();
-            }
-            
-            // Save emote data
-            var emoteSystem = GetNodeOrNull<Systems.Emote.EmoteSystem>("EmoteSystem");
-            if (emoteSystem != null)
-            {
-                var emoteData = new Dictionary<string, object>();
-                emoteSystem.SaveData(emoteData);
-                data.EmoteData = emoteData;
-            }
-            
-            // Save sealed tower data
-            var sealedTowerManager = GetNodeOrNull<Systems.SealedTowerManager>("SealedTowerManager");
-            if (sealedTowerManager != null)
-            {
-                var sealedTowerData = sealedTowerManager.SaveData();
-                data.SealedTowerData = sealedTowerData;
-            }
-            
-            // Save prestige data
-            var prestigeSystem = GetNodeOrNull<Systems.PrestigeSystem>("PrestigeSystem");
-            if (prestigeSystem != null)
-            {
-                var prestigeData = prestigeSystem.SaveData();
-                data.PrestigeData = prestigeData;
-            }
-            
-            // Save quick mode reward data
-            var quickModeRewardSystem = GetNodeOrNull<Systems.QuickModeRewardSystem>("QuickModeRewardSystem");
-            if (quickModeRewardSystem != null)
-            {
-                data.QuickModeRewardData = quickModeRewardSystem.ExportSaveData();
-            }
-            
-            return data;
-        }
-        
-        /// <summary>
-        /// Get current area name
-        /// </summary>
-        private string GetCurrentAreaName()
-        {
-            return "Unknown Area";
-        }
-        
-        /// <summary>
-        /// Quick save
+        /// 快速保存
         /// </summary>
         public void QuickSave(Node player)
         {
-            var data = CreateSaveDataFromPlayer(player);
+            var data = _serializer?.CreateSaveDataFromPlayer(player);
+            if (data == null) return;
+            
             data.SaveName = "Quick Save";
             SaveGame(0, data);
         }
         
         /// <summary>
-        /// Quick load
+        /// 快速加载
         /// </summary>
         public SaveData QuickLoad()
         {
@@ -323,214 +240,277 @@ namespace ClawRPG.Scripts.Systems {
         }
         
         /// <summary>
-        /// Enable/disable auto-save
+        /// 启用/禁用自动保存
         /// </summary>
         public void EnableAutoSave(bool enable)
         {
-            _autoSaveEnabled = enable;
-            if (enable)
-            {
-                _autoSaveTimer = 0f; // Reset timer when re-enabled
-            }
+            _slotManager?.EnableAutoSave(enable);
         }
         
         /// <summary>
-        /// Check if auto-save is enabled
+        /// 检查自动保存是否启用
         /// </summary>
         public bool IsAutoSaveEnabled()
         {
-            return _autoSaveEnabled;
+            return _slotManager?.IsAutoSaveEnabled() ?? false;
+        }
+        
+        // ========== 数据序列化 ==========
+        
+        /// <summary>
+        /// 从玩家节点创建保存数据
+        /// </summary>
+        public SaveData CreateSaveDataFromPlayer(Node player)
+        {
+            return _serializer?.CreateSaveDataFromPlayer(player);
         }
         
         /// <summary>
-        /// Export save to external file
+        /// 获取当前区域名称
+        /// </summary>
+        public string GetCurrentAreaName()
+        {
+            return _serializer?.GetCurrentAreaName() ?? "Unknown Area";
+        }
+        
+        /// <summary>
+        /// 序列化宠物栖息地数据
+        /// </summary>
+        public Dictionary<string, object> SerializePetHabitatData(PlayerHabitatData data)
+        {
+            return _serializer?.SerializePetHabitatData(data);
+        }
+        
+        /// <summary>
+        /// 反序列化宠物栖息地数据
+        /// </summary>
+        public PlayerHabitatData DeserializePetHabitatData(Dictionary<string, object> dict)
+        {
+            return _serializer?.DeserializePetHabitatData(dict);
+        }
+        
+        // ========== 文件操作 ==========
+        
+        /// <summary>
+        /// 导出存档到外部文件
         /// </summary>
         public bool ExportSave(int slot, string exportPath)
         {
-            return _fileManager.ExportSave(slot, exportPath);
+            return _slotManager?.ExportSave(slot, exportPath) ?? false;
         }
         
         /// <summary>
-        /// Import save from external file
+        /// 从外部文件导入存档
         /// </summary>
         public bool ImportSave(string importPath, int slot)
         {
-            return _fileManager.ImportSave(importPath, slot);
+            return _slotManager?.ImportSave(importPath, slot) ?? false;
         }
         
         /// <summary>
-        /// Get save file size
+        /// 获取存档文件大小
         /// </summary>
         public long GetSaveFileSize(int slot)
         {
-            return _fileManager.GetSaveFileSize(slot);
+            return _slotManager?.GetSaveFileSize(slot) ?? 0;
         }
         
         /// <summary>
-        /// Check if save is corrupted
+        /// 检查存档是否损坏
         /// </summary>
         public bool IsSaveCorrupted(int slot)
         {
-            return _fileManager.IsSaveCorrupted(slot);
+            return _slotManager?.IsSaveCorrupted(slot) ?? true;
         }
         
+        // ========== 加密操作 ==========
+        
         /// <summary>
-        /// Enable encryption
+        /// 启用加密
         /// </summary>
         public void EnableEncryption()
         {
-            _encryption.Enable();
+            _slotManager?.GetFileManager()?.EnableEncryption();
         }
         
         /// <summary>
-        /// Disable encryption
+        /// 禁用加密
         /// </summary>
         public void DisableEncryption()
         {
-            _encryption.Disable();
+            _slotManager?.GetFileManager()?.DisableEncryption();
         }
         
-        // ===== Pet Talent System Save/Load =====
+        // ========== 云同步操作 ==========
+        
+        /// <summary>
+        /// 启用云同步
+        /// </summary>
+        public void EnableCloudSync(string provider = "local")
+        {
+            _cloudSystem?.EnableCloudSync(provider);
+        }
+        
+        /// <summary>
+        /// 禁用云同步
+        /// </summary>
+        public void DisableCloudSync()
+        {
+            _cloudSystem?.DisableCloudSync();
+        }
+        
+        /// <summary>
+        /// 检查云同步是否启用
+        /// </summary>
+        public bool IsCloudSyncEnabled()
+        {
+            return _cloudSystem?.IsCloudSyncEnabled() ?? false;
+        }
+        
+        /// <summary>
+        /// 同步所有存档到云端
+        /// </summary>
+        public void SyncAllToCloud()
+        {
+            var saves = GetAllSaves();
+            _cloudSystem?.SyncAllToCloud(saves);
+        }
+        
+        /// <summary>
+        /// 从云端同步所有存档
+        /// </summary>
+        public void SyncAllFromCloud(Action<SaveData[]> callback)
+        {
+            _cloudSystem?.SyncAllFromCloud(callback);
+        }
+        
+        /// <summary>
+        /// 获取上次同步时间
+        /// </summary>
+        public DateTime GetLastCloudSyncTime()
+        {
+            return _cloudSystem?.GetLastSyncTime() ?? DateTime.MinValue;
+        }
+        
+        // ========== 宠物相关数据保存/加载 ==========
         
         public void SavePetTalentData(PlayerPetTalentData data)
         {
-            _fileManager.SaveDataWithLogging("user://pet_talent_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://pet_talent_data.json", data, "SaveSystem");
         }
 
         public PlayerPetTalentData LoadPetTalentData()
         {
-            return _fileManager.LoadDataWithLogging<PlayerPetTalentData>("user://pet_talent_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<PlayerPetTalentData>("user://pet_talent_data.json", "SaveSystem");
         }
         
-        // ===== Loot Drop System Save/Load =====
+        // ========== 战利品掉落数据保存/加载 ==========
         
         public void SaveLootDropData(LootDropData.PlayerLootData data)
         {
-            _fileManager.SaveDataWithLogging("user://loot_drop_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://loot_drop_data.json", data, "SaveSystem");
         }
 
         public LootDropData.PlayerLootData LoadLootDropData()
         {
-            return _fileManager.LoadDataWithLogging<LootDropData.PlayerLootData>("user://loot_drop_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<LootDropData.PlayerLootData>("user://loot_drop_data.json", "SaveSystem");
         }
         
-        // ===== Equipment Durability System Save/Load =====
+        // ========== 装备耐久度数据保存/加载 ==========
         
         public void SaveEquipmentDurabilityData(Dictionary<string, object> data)
         {
-            _fileManager.SaveDataWithLogging("user://equipment_durability_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://equipment_durability_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadEquipmentDurabilityData()
         {
-            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://equipment_durability_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, object>>("user://equipment_durability_data.json", "SaveSystem");
         }
 
-        // ===== Collectible System Save/Load =====
+        // ========== 收藏品数据保存/加载 ==========
 
         public void SaveCollectibleData(Dictionary<string, object> data)
         {
-            _fileManager.SaveDataWithLogging("user://collectible_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://collectible_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadCollectibleData()
         {
-            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://collectible_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, object>>("user://collectible_data.json", "SaveSystem");
         }
 
-        // ===== Seasonal Event System Save/Load =====
+        // ========== 季节活动数据保存/加载 ==========
 
         public void SaveSeasonalEventData(Dictionary<string, object> data)
         {
-            _fileManager.SaveDataWithLogging("user://seasonal_event_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://seasonal_event_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadSeasonalEventData()
         {
-            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://seasonal_event_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, object>>("user://seasonal_event_data.json", "SaveSystem");
         }
 
         public void SaveMountRaceData(Dictionary<string, object> data)
         {
-            _fileManager.SaveDataWithLogging("user://mount_race_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://mount_race_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadMountRaceData()
         {
-            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://mount_race_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, object>>("user://mount_race_data.json", "SaveSystem");
         }
 
         public void SaveMountBattleArenaData(Dictionary<string, object> data)
         {
-            _fileManager.SaveDataWithLogging("user://mount_battle_arena_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://mount_battle_arena_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadMountBattleArenaData()
         {
-            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://mount_battle_arena_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, object>>("user://mount_battle_arena_data.json", "SaveSystem");
         }
 
         public void SavePlayerTalentData(Dictionary<string, object> data)
         {
-            _fileManager.SaveDataWithLogging("user://player_talent_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://player_talent_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadPlayerTalentData()
         {
-            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://player_talent_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, object>>("user://player_talent_data.json", "SaveSystem");
         }
 
         public void SavePetExpeditionData(Dictionary<string, object> data)
         {
-            _fileManager.SaveDataWithLogging("user://pet_expedition_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://pet_expedition_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadPetExpeditionData()
         {
-            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://pet_expedition_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, object>>("user://pet_expedition_data.json", "SaveSystem");
         }
 
         public void SavePetTrainingData(Dictionary<string, Variant> data)
         {
-            _fileManager.SaveDataWithLogging("user://pet_training_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://pet_training_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, Variant> LoadPetTrainingData()
         {
-            return _fileManager.LoadDataWithLogging<Dictionary<string, Variant>>("user://pet_training_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, Variant>>("user://pet_training_data.json", "SaveSystem");
         }
 
         public void SavePetHabitatData(PlayerHabitatData data)
         {
             try
             {
-                var dict = new Dictionary<string, object>();
-                
-                dict["current_habitat_id"] = data.CurrentHabitatId;
-                dict["total_comfort"] = data.TotalComfort;
-                dict["total_attraction"] = data.TotalAttraction;
-                dict["decorations_purchased"] = data.DecorationsPurchased;
-                dict["gold_spent_on_decorations"] = data.GoldSpentOnDecorations;
-                dict["habitat_visits"] = data.HabitatVisits;
-                dict["pets_attracted"] = data.PetsAttracted;
-                
-                // Serialize placed decorations
-                var placedList = new List<Dictionary<string, object>>();
-                foreach (var dec in data.PlacedDecorations)
+                var dict = SerializePetHabitatData(data);
+                if (dict != null)
                 {
-                    placedList.Add(new Dictionary<string, object>
-                    {
-                        ["decoration_id"] = dec.DecorationId,
-                        ["slot"] = dec.Slot,
-                        ["placed_at"] = dec.PlacedAt.ToString("o")
-                    });
+                    _slotManager?.GetFileManager()?.SaveDataWithLogging("user://pet_habitat_data.json", dict, "SaveSystem");
                 }
-                dict["placed_decorations"] = placedList;
-                
-                // Serialize decoration counts
-                dict["decoration_counts"] = data.DecorationCounts;
-                
-                _fileManager.SaveDataWithLogging("user://pet_habitat_data.json", dict, "SaveSystem");
             }
             catch (Exception e)
             {
@@ -542,52 +522,12 @@ namespace ClawRPG.Scripts.Systems {
         {
             try
             {
-                string path = "user://pet_habitat_data.json";
-                if (File.Exists(path))
+                var dict = _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, object>>("user://pet_habitat_data.json", "SaveSystem");
+                if (dict != null)
                 {
-                    string json = File.ReadAllText(path);
-                    var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    if (dict != null)
-                    {
-                        var data = new PlayerHabitatData();
-                        
-                        data.CurrentHabitatId = dict.ContainsKey("current_habitat_id") ? (string)dict["current_habitat_id"] : "meadow";
-                        data.TotalComfort = dict.ContainsKey("total_comfort") ? Convert.ToInt32(dict["total_comfort"]) : 0;
-                        data.TotalAttraction = dict.ContainsKey("total_attraction") ? Convert.ToInt32(dict["total_attraction"]) : 0;
-                        data.DecorationsPurchased = dict.ContainsKey("decorations_purchased") ? Convert.ToInt32(dict["decorations_purchased"]) : 0;
-                        data.GoldSpentOnDecorations = dict.ContainsKey("gold_spent_on_decorations") ? Convert.ToInt32(dict["gold_spent_on_decorations"]) : 0;
-                        data.HabitatVisits = dict.ContainsKey("habitat_visits") ? Convert.ToInt32(dict["habitat_visits"]) : 0;
-                        data.PetsAttracted = dict.ContainsKey("pets_attracted") ? Convert.ToInt32(dict["pets_attracted"]) : 0;
-                        
-                        // Deserialize placed decorations
-                        if (dict.ContainsKey("placed_decorations") && dict["placed_decorations"] != null)
-                        {
-                            var placedList = (System.Text.Json.JsonElement)dict["placed_decorations"];
-                            foreach (var item in placedList.EnumerateArray())
-                            {
-                                var dec = new PlacedDecoration
-                                {
-                                    DecorationId = item.GetProperty("decoration_id").GetString(),
-                                    Slot = item.GetProperty("slot").GetInt32(),
-                                    PlacedAt = DateTime.Parse(item.GetProperty("placed_at").GetString())
-                                };
-                                data.PlacedDecorations.Add(dec);
-                            }
-                        }
-                        
-                        // Deserialize decoration counts
-                        if (dict.ContainsKey("decoration_counts") && dict["decoration_counts"] != null)
-                        {
-                            var counts = (System.Text.Json.JsonElement)dict["decoration_counts"];
-                            foreach (var item in counts.EnumerateObject())
-                            {
-                                data.DecorationCounts[item.Name] = item.Value.GetInt32();
-                            }
-                        }
-                        
-                        GD.Print("[SaveSystem] Pet habitat data loaded");
-                        return data;
-                    }
+                    var data = DeserializePetHabitatData(dict);
+                    GD.Print("[SaveSystem] Pet habitat data loaded");
+                    return data;
                 }
             }
             catch (Exception e)
@@ -599,19 +539,16 @@ namespace ClawRPG.Scripts.Systems {
 
         public void SaveMountExpeditionData(Dictionary<string, object> data)
         {
-            _fileManager.SaveDataWithLogging("user://mount_expedition_data.json", data, "SaveSystem");
+            _slotManager?.GetFileManager()?.SaveDataWithLogging("user://mount_expedition_data.json", data, "SaveSystem");
         }
 
         public Dictionary<string, object> LoadMountExpeditionData()
         {
-            return _fileManager.LoadDataWithLogging<Dictionary<string, object>>("user://mount_expedition_data.json", "SaveSystem");
+            return _slotManager?.GetFileManager()?.LoadDataWithLogging<Dictionary<string, object>>("user://mount_expedition_data.json", "SaveSystem");
         }
 
-        // ============ Quick Mode Reward Data ============
+        // ========== 快速模式奖励数据 ==========
         
-        /// <summary>
-        /// Save quick mode reward system data (standalone, not part of main save)
-        /// </summary>
         public void SaveQuickModeData(Dictionary<string, object> data)
         {
             try
@@ -622,7 +559,7 @@ namespace ClawRPG.Scripts.Systems {
                     quickModeData[kvp.Key] = kvp.Value;
                 }
                 
-                // Also save to main save data
+                // 同时保存到主存档
                 var mainSave = LoadGame(0);
                 if (mainSave != null)
                 {
@@ -638,9 +575,6 @@ namespace ClawRPG.Scripts.Systems {
             }
         }
         
-        /// <summary>
-        /// Load quick mode reward system data
-        /// </summary>
         public Dictionary<string, object> LoadQuickModeData()
         {
             try
@@ -659,37 +593,52 @@ namespace ClawRPG.Scripts.Systems {
             return new Dictionary<string, object>();
         }
         
+        // ========== BaseSystem 接口实现 ==========
+        
         /// <summary>
         /// 获取系统唯一ID
         /// </summary>
         public override string GetId() => "SaveSystem";
         
         /// <summary>
-        /// 导出保存数据 - 实现 BaseSystem 接口
+        /// 导出保存数据
         /// </summary>
         public override Dictionary ExportSaveData()
         {
             var data = new Dictionary();
-            data["auto_save_enabled"] = _autoSaveEnabled;
-            data["auto_save_timer"] = _autoSaveTimer;
+            
+            // 导出各子系统数据
+            if (_slotManager != null)
+            {
+                var slotData = _slotManager.ExportSaveData();
+                foreach (var kvp in slotData)
+                {
+                    data[kvp.Key] = kvp.Value;
+                }
+            }
+            
+            if (_cloudSystem != null)
+            {
+                var cloudData = _cloudSystem.ExportSaveData();
+                foreach (var kvp in cloudData)
+                {
+                    data[kvp.Key] = kvp.Value;
+                }
+            }
+            
             return data;
         }
         
         /// <summary>
-        /// 导入保存数据 - 实现 BaseSystem 接口
+        /// 导入保存数据
         /// </summary>
         public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
             
-            if (data.Contains("auto_save_enabled"))
-            {
-                _autoSaveEnabled = (bool)data["auto_save_enabled"];
-            }
-            if (data.Contains("auto_save_timer"))
-            {
-                _autoSaveTimer = (float)data["auto_save_timer"];
-            }
+            // 转发到各子系统
+            _slotManager?.ImportSaveData(data);
+            _cloudSystem?.ImportSaveData(data);
         }
     }
 }
