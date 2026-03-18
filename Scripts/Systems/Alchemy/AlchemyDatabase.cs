@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace ClawRPG.Systems.Alchemy
 {
     /// <summary>
-    /// 炼金数据库主控制器 - 协调各子模块
+    /// 炼金数据库主控制器 - 协调各子模块，管理炼金系统
     /// </summary>
     public partial class AlchemyDatabase : BaseSystem
     {
@@ -23,19 +23,17 @@ namespace ClawRPG.Systems.Alchemy
             }
             if (!_instance.IsInitialized)
             {
-                _instance._recipeDB = new AlchemyRecipeDB();
-                _instance._crafting = new AlchemyCrafting();
-                _instance._effects = new AlchemyEffects();
+                _instance._recipeStore = new AlchemyRecipeStore();
+                _instance._effectCalc = new AlchemyEffectCalc();
                 _instance._inventory = new AlchemyInventorySystem();
                 _instance._inventory.InitializeMaterials();
                 _instance.IsInitialized = true;
             }
         }
         
-        // 子系统
-        private AlchemyRecipeDB _recipeDB;
-        private AlchemyCrafting _crafting;
-        private AlchemyEffects _effects;
+        // 子系统引用
+        private AlchemyRecipeStore _recipeStore;
+        private AlchemyEffectCalc _effectCalc;
         private AlchemyInventorySystem _inventory;
         
         // Signals
@@ -49,11 +47,39 @@ namespace ClawRPG.Systems.Alchemy
             _instance = this;
             
             // 初始化子系统
-            _recipeDB = new AlchemyRecipeDB();
-            _crafting = new AlchemyCrafting();
-            _effects = new AlchemyEffects();
-            _inventory = new AlchemyInventorySystem();
+            _recipeStore = GetNodeOrNull<AlchemyRecipeStore>("AlchemyRecipeStore");
+            _effectCalc = GetNodeOrNull<AlchemyEffectCalc>("AlchemyEffectCalc");
+            _inventory = GetNodeOrNull<AlchemyInventorySystem>("AlchemyInventorySystem");
+            
+            // 如果节点不存在，创建默认实现
+            if (_recipeStore == null)
+            {
+                _recipeStore = new AlchemyRecipeStore();
+                AddChild(_recipeStore);
+            }
+            
+            if (_effectCalc == null)
+            {
+                _effectCalc = new AlchemyEffectCalc();
+                AddChild(_effectCalc);
+            }
+            
+            if (_inventory == null)
+            {
+                _inventory = new AlchemyInventorySystem();
+                AddChild(_inventory);
+            }
+            
             _inventory.InitializeMaterials();
+            
+            // 连接信号
+            if (_recipeStore != null)
+            {
+                _recipeStore.Connect(SignalName.CraftSuccess, Callable.From((int rId, int itemId, int qty) => 
+                    EmitSignal(SignalName.CraftSuccess, rId, itemId, qty)));
+                _recipeStore.Connect(SignalName.CraftFailed, Callable.From((int rId, string reason) => 
+                    EmitSignal(SignalName.CraftFailed, rId, reason)));
+            }
         }
         
         protected override string SystemName => "AlchemyDatabase";
@@ -65,7 +91,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         private void AddMaterial(AlchemyMaterial material)
         {
-            _inventory.AddMaterial(material);
+            _inventory?.AddMaterial(material);
         }
         
         /// <summary>
@@ -73,7 +99,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public AlchemyMaterial GetMaterial(int id)
         {
-            return _inventory.GetMaterial(id);
+            return _inventory?.GetMaterial(id);
         }
         
         /// <summary>
@@ -81,7 +107,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public List<AlchemyMaterial> GetAllMaterials()
         {
-            return _inventory.GetAllMaterials();
+            return _inventory?.GetAllMaterials() ?? new List<AlchemyMaterial>();
         }
         
         /// <summary>
@@ -89,7 +115,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public List<AlchemyMaterial> GetMaterialsByType(AlchemyMaterialType type)
         {
-            return _inventory.GetMaterialsByType(type);
+            return _inventory?.GetMaterialsByType(type) ?? new List<AlchemyMaterial>();
         }
         
         /// <summary>
@@ -97,7 +123,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public List<AlchemyMaterial> GetMaterialsByRarity(AlchemyMaterialRarity rarity)
         {
-            return _inventory.GetMaterialsByRarity(rarity);
+            return _inventory?.GetMaterialsByRarity(rarity) ?? new List<AlchemyMaterial>();
         }
         
         /// <summary>
@@ -105,7 +131,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public AlchemyMaterial GetRandomMaterialByRarity(AlchemyMaterialRarity rarity)
         {
-            return _inventory.GetRandomMaterialByRarity(rarity);
+            return _inventory?.GetRandomMaterialByRarity(rarity);
         }
         
         /// <summary>
@@ -113,7 +139,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public AlchemyMaterial GetRandomMaterial()
         {
-            return _inventory.GetRandomMaterial();
+            return _inventory?.GetRandomMaterial();
         }
         
         #endregion
@@ -125,7 +151,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public AlchemyRecipe GetRecipe(int id)
         {
-            return _recipeDB.GetRecipe(id);
+            return _recipeStore?.GetRecipe(id);
         }
         
         /// <summary>
@@ -133,7 +159,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public List<AlchemyRecipe> GetAllRecipes()
         {
-            return _recipeDB.GetAllRecipes();
+            return _recipeStore?.GetAllRecipes() ?? new List<AlchemyRecipe>();
         }
         
         /// <summary>
@@ -141,7 +167,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public List<AlchemyRecipe> GetRecipesByLevel(int playerLevel)
         {
-            return _recipeDB.GetRecipesByLevel(playerLevel);
+            return _recipeStore?.GetRecipesByLevel(playerLevel) ?? new List<AlchemyRecipe>();
         }
         
         #endregion
@@ -151,20 +177,10 @@ namespace ClawRPG.Systems.Alchemy
         /// <summary>
         /// 尝试合成
         /// </summary>
-        public AlchemyCrafting.CraftResult TryCraft(int recipeId, Dictionary<int, int> availableMaterials, int playerLevel, int gold)
+        public AlchemyRecipeStore.CraftResult TryCraft(int recipeId, Dictionary<int, int> availableMaterials, int playerLevel, int gold)
         {
-            var result = _crafting.TryCraft(recipeId, availableMaterials, playerLevel, gold);
-            
-            if (result.Success)
-            {
-                EmitSignal(SignalName.CraftSuccess, recipeId, result.ResultItemId, result.ResultQuantity);
-            }
-            else
-            {
-                EmitSignal(SignalName.CraftFailed, recipeId, result.Message);
-            }
-            
-            return result;
+            return _recipeStore?.TryCraft(recipeId, availableMaterials, playerLevel, gold) 
+                ?? new AlchemyRecipeStore.CraftResult { Success = false, Message = "Recipe store not available" };
         }
         
         /// <summary>
@@ -172,7 +188,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public bool CanCraft(int recipeId, Dictionary<int, int> availableMaterials, int playerLevel, int gold)
         {
-            return _crafting.CanCraft(recipeId, availableMaterials, playerLevel, gold);
+            return _recipeStore?.CanCraft(recipeId, availableMaterials, playerLevel, gold) ?? false;
         }
         
         /// <summary>
@@ -180,7 +196,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public int CalculateGoldCost(int recipeId)
         {
-            return _crafting.CalculateGoldCost(recipeId);
+            return _recipeStore?.CalculateGoldCost(recipeId) ?? 0;
         }
         
         /// <summary>
@@ -188,7 +204,7 @@ namespace ClawRPG.Systems.Alchemy
         /// </summary>
         public List<AlchemyRecipeRequirement> GetRequirements(int recipeId)
         {
-            return _crafting.GetRequirements(recipeId);
+            return _recipeStore?.GetRequirements(recipeId) ?? new List<AlchemyRecipeRequirement>();
         }
         
         #endregion
@@ -198,41 +214,57 @@ namespace ClawRPG.Systems.Alchemy
         /// <summary>
         /// 应用即时效果
         /// </summary>
-        public void ApplyInstantEffect(string targetId, AlchemyEffects.EffectType type, float value)
+        public void ApplyInstantEffect(string targetId, AlchemyEffectCalc.EffectType type, float value)
         {
-            _effects.ApplyInstantEffect(targetId, type, value);
+            _effectCalc?.ApplyInstantEffect(targetId, type, value);
         }
         
         /// <summary>
         /// 应用持续效果
         /// </summary>
-        public void ApplyDurationEffect(string targetId, AlchemyEffects.EffectType type, float value, float duration)
+        public void ApplyDurationEffect(string targetId, AlchemyEffectCalc.EffectType type, float value, float duration)
         {
-            _effects.ApplyDurationEffect(targetId, type, value, duration);
+            _effectCalc?.ApplyDurationEffect(targetId, type, value, duration);
         }
         
         /// <summary>
         /// 移除效果
         /// </summary>
-        public void RemoveEffect(string targetId, AlchemyEffects.EffectType type)
+        public void RemoveEffect(string targetId, AlchemyEffectCalc.EffectType type)
         {
-            _effects.RemoveEffect(targetId, type);
+            _effectCalc?.RemoveEffect(targetId, type);
         }
         
         /// <summary>
         /// 获取活跃效果
         /// </summary>
-        public List<AlchemyEffects.ActiveEffect> GetActiveEffects(string targetId)
+        public List<AlchemyEffectCalc.ActiveEffect> GetActiveEffects(string targetId)
         {
-            return _effects.GetActiveEffects(targetId);
+            return _effectCalc?.GetActiveEffects(targetId) ?? new List<AlchemyEffectCalc.ActiveEffect>();
         }
         
         /// <summary>
         /// 根据物品ID获取效果
         /// </summary>
-        public List<AlchemyEffects.PotionEffect> GetEffectsFromItemId(int itemId)
+        public List<AlchemyEffectCalc.PotionEffect> GetEffectsFromItemId(int itemId)
         {
-            return _effects.GetEffectsFromItemId(itemId);
+            return _effectCalc?.GetEffectsFromItemId(itemId) ?? new List<AlchemyEffectCalc.PotionEffect>();
+        }
+        
+        /// <summary>
+        /// 使用物品
+        /// </summary>
+        public void UseItem(int itemId, string targetId)
+        {
+            _effectCalc?.UseItem(itemId, targetId);
+        }
+        
+        /// <summary>
+        /// 是否有特定效果
+        /// </summary>
+        public bool HasEffect(string targetId, AlchemyEffectCalc.EffectType type)
+        {
+            return _effectCalc?.HasEffect(targetId, type) ?? false;
         }
         
         #endregion
@@ -241,10 +273,13 @@ namespace ClawRPG.Systems.Alchemy
         
         public override Dictionary ExportSaveData()
         {
-            var data = new Dictionary
+            var data = new Dictionary();
+            
+            if (_inventory != null)
             {
-                ["inventory"] = _inventory.ExportSaveData()
-            };
+                data["inventory"] = _inventory.ExportSaveData();
+            }
+            
             return data;
         }
         
@@ -252,10 +287,23 @@ namespace ClawRPG.Systems.Alchemy
         {
             if (data == null) return;
             
-            if (data.Contains("inventory"))
+            if (data.Contains("inventory") && _inventory != null)
             {
                 _inventory.ImportSaveData((Dictionary)data["inventory"]);
             }
+        }
+        
+        #endregion
+        
+        #region System Info
+        
+        /// <summary>
+        /// 获取系统状态信息
+        /// </summary>
+        public string GetSystemStatus()
+        {
+            return $"[AlchemyDatabase] Materials: {_inventory?.GetAllMaterials().Count ?? 0}, " +
+                   $"Recipes: {_recipeStore?.GetAllRecipes().Count ?? 0}";
         }
         
         #endregion

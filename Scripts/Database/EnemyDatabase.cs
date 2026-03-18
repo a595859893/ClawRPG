@@ -5,47 +5,66 @@ using Godot;
 namespace ClawRPG.Scripts.Database
 {
     /// <summary>
-    /// 敌人数据库 - 负责敌人数据的存储和管理
+    /// 敌人数据库主控制器 - 协调各子模块，管理敌人数据与实例
     /// </summary>
     public partial class EnemyDatabase : BaseSystem
     {
         private static EnemyDatabase _instance;
         public static EnemyDatabase Instance => _instance;
         
-        // 敌人类型存储
-        private Dictionary<string, EnemyType> _enemyTypes = new Dictionary<string, EnemyType>();
-        
-        // 敌人实例存储
-        private Dictionary<int, EnemyInstance> _enemyInstances = new Dictionary<int, EnemyInstance>();
-        
-        // ID 计数器
-        private int _nextInstanceId = 1;
+        // 子系统引用
+        private EnemyDataProvider _dataProvider;
+        private EnemySpawnLogic _spawnLogic;
+        private EnemyDataValidator _validator;
         
         public override void _Ready()
         {
             base._Ready();
             _instance = this;
-            LoadEnemyData();
+            InitializeSubsystems();
         }
         
         protected override string SystemName => "EnemyDatabase";
         
-        #region Enemy Type Management
-        
         /// <summary>
-        /// 注册敌人类型
+        /// 初始化子系统
         /// </summary>
-        public void RegisterEnemyType(EnemyType enemyType)
+        private void InitializeSubsystems()
         {
-            _enemyTypes[enemyType.Id] = enemyType;
+            _dataProvider = GetNodeOrNull<EnemyDataProvider>("EnemyDataProvider");
+            _spawnLogic = GetNodeOrNull<EnemySpawnLogic>("EnemySpawnLogic");
+            _validator = GetNodeOrNull<EnemyDataValidator>("EnemyDataValidator");
+            
+            // 如果节点不存在，创建默认实现
+            if (_dataProvider == null)
+            {
+                _dataProvider = new EnemyDataProvider();
+                AddChild(_dataProvider);
+            }
+            
+            if (_spawnLogic == null)
+            {
+                _spawnLogic = new EnemySpawnLogic();
+                AddChild(_spawnLogic);
+            }
+            
+            if (_validator == null)
+            {
+                _validator = new EnemyDataValidator();
+                AddChild(_validator);
+            }
+            
+            GD.Print($"[EnemyDatabase] Initialized with {_dataProvider.GetEnemyCount()} enemy types");
         }
+        
+        #region Delegated Operations - Data Provider
         
         /// <summary>
         /// 获取敌人类型
         /// </summary>
         public EnemyType GetEnemyType(string typeId)
         {
-            return _enemyTypes.ContainsKey(typeId) ? _enemyTypes[typeId] : null;
+            return _dataProvider?.GetEnemyType(typeId);
         }
         
         /// <summary>
@@ -53,42 +72,67 @@ namespace ClawRPG.Scripts.Database
         /// </summary>
         public Dictionary<string, EnemyType> GetAllEnemyTypes()
         {
-            return new Dictionary<string, EnemyType>(_enemyTypes);
+            return _dataProvider?.GetAllEnemyTypes() ?? new Dictionary<string, EnemyType>();
         }
         
         /// <summary>
-        /// 移除敌人类型
+        /// 注册敌人类型
         /// </summary>
-        public bool RemoveEnemyType(string typeId)
+        public void RegisterEnemyType(EnemyType enemyType)
         {
-            return _enemyTypes.Remove(typeId);
+            _dataProvider?.RegisterEnemyType(enemyType);
+        }
+        
+        /// <summary>
+        /// 检查敌人类型是否存在
+        /// </summary>
+        public bool HasEnemyType(string typeId)
+        {
+            return _dataProvider?.HasEnemyType(typeId) ?? false;
+        }
+        
+        /// <summary>
+        /// 获取敌人类型列表
+        /// </summary>
+        public List<EnemyType> GetEnemyTypeList()
+        {
+            return _dataProvider?.GetEnemyTypeList() ?? new List<EnemyType>();
+        }
+        
+        /// <summary>
+        /// 根据区域获取敌人
+        /// </summary>
+        public List<EnemyType> GetEnemiesByRegion(string region)
+        {
+            return _dataProvider?.GetEnemiesByRegion(region) ?? new List<EnemyType>();
+        }
+        
+        /// <summary>
+        /// 根据玩家等级获取合适敌人
+        /// </summary>
+        public List<EnemyType> GetEnemiesForLevel(int playerLevel)
+        {
+            return _dataProvider?.GetEnemiesForLevel(playerLevel) ?? new List<EnemyType>();
         }
         
         #endregion
         
-        #region Enemy Instance Management
+        #region Delegated Operations - Spawn Logic
         
         /// <summary>
         /// 创建敌人实例
         /// </summary>
         public EnemyInstance CreateEnemyInstance(string typeId)
         {
-            var enemyType = GetEnemyType(typeId);
-            if (enemyType == null)
-                return null;
-            
-            var instance = new EnemyInstance
-            {
-                InstanceId = _nextInstanceId++,
-                TypeId = typeId,
-                CurrentHp = enemyType.MaxHp,
-                MaxHp = enemyType.MaxHp,
-                Level = enemyType.DefaultLevel,
-                IsAlive = true
-            };
-            
-            _enemyInstances[instance.InstanceId] = instance;
-            return instance;
+            return _spawnLogic?.CreateEnemyInstance(typeId);
+        }
+        
+        /// <summary>
+        /// 创建带等级的敌人实例
+        /// </summary>
+        public EnemyInstance CreateEnemyInstanceWithLevel(string typeId, int level)
+        {
+            return _spawnLogic?.CreateEnemyInstanceWithLevel(typeId, level);
         }
         
         /// <summary>
@@ -96,7 +140,7 @@ namespace ClawRPG.Scripts.Database
         /// </summary>
         public EnemyInstance GetEnemyInstance(int instanceId)
         {
-            return _enemyInstances.ContainsKey(instanceId) ? _enemyInstances[instanceId] : null;
+            return _spawnLogic?.GetEnemyInstance(instanceId);
         }
         
         /// <summary>
@@ -104,23 +148,31 @@ namespace ClawRPG.Scripts.Database
         /// </summary>
         public bool RemoveEnemyInstance(int instanceId)
         {
-            return _enemyInstances.Remove(instanceId);
+            return _spawnLogic?.RemoveEnemyInstance(instanceId) ?? false;
         }
         
         /// <summary>
-        /// 获取所有活跃敌人实例
+        /// 获取所有活跃敌人
         /// </summary>
         public List<EnemyInstance> GetActiveEnemies()
         {
-            var result = new List<EnemyInstance>();
-            foreach (var instance in _enemyInstances.Values)
-            {
-                if (instance.IsAlive)
-                {
-                    result.Add(instance);
-                }
-            }
-            return result;
+            return _spawnLogic?.GetActiveEnemies() ?? new List<EnemyInstance>();
+        }
+        
+        /// <summary>
+        /// 获取敌人实例数量
+        /// </summary>
+        public int GetEnemyCount()
+        {
+            return _spawnLogic?.GetEnemyCount() ?? 0;
+        }
+        
+        /// <summary>
+        /// 获取活跃敌人数量
+        /// </summary>
+        public int GetActiveEnemyCount()
+        {
+            return _spawnLogic?.GetActiveEnemyCount() ?? 0;
         }
         
         /// <summary>
@@ -128,26 +180,96 @@ namespace ClawRPG.Scripts.Database
         /// </summary>
         public void ClearAllInstances()
         {
-            _enemyInstances.Clear();
+            _spawnLogic?.ClearAllInstances();
+        }
+        
+        /// <summary>
+        /// 击杀敌人
+        /// </summary>
+        public bool KillEnemy(int instanceId)
+        {
+            return _spawnLogic?.KillEnemy(instanceId) ?? false;
+        }
+        
+        /// <summary>
+        /// 对敌人造成伤害
+        /// </summary>
+        public bool DamageEnemy(int instanceId, float damage)
+        {
+            return _spawnLogic?.DamageEnemy(instanceId, damage) ?? false;
+        }
+        
+        /// <summary>
+        /// 治疗敌人
+        /// </summary>
+        public bool HealEnemy(int instanceId, float healAmount)
+        {
+            return _spawnLogic?.HealEnemy(instanceId, healAmount) ?? false;
+        }
+        
+        /// <summary>
+        /// 批量创建敌人波次
+        /// </summary>
+        public List<EnemyInstance> CreateEnemyWave(string[] typeIds)
+        {
+            return _spawnLogic?.CreateEnemyWave(typeIds) ?? new List<EnemyInstance>();
+        }
+        
+        /// <summary>
+        /// 设置刷新冷却
+        /// </summary>
+        public void SetSpawnCooldown(float cooldown)
+        {
+            _spawnLogic?.SetSpawnCooldown(cooldown);
+        }
+        
+        #endregion
+        
+        #region Delegated Operations - Validator
+        
+        /// <summary>
+        /// 验证敌人类型
+        /// </summary>
+        public EnemyDataValidator.ValidationResult ValidateEnemyType(EnemyType enemyType)
+        {
+            return _validator?.ValidateEnemyType(enemyType) ?? new EnemyDataValidator.ValidationResult { IsValid = false };
+        }
+        
+        /// <summary>
+        /// 验证敌人实例
+        /// </summary>
+        public EnemyDataValidator.ValidationResult ValidateEnemyInstance(EnemyInstance instance)
+        {
+            return _validator?.ValidateEnemyInstance(instance) ?? new EnemyDataValidator.ValidationResult { IsValid = false };
+        }
+        
+        /// <summary>
+        /// 设置验证严格模式
+        /// </summary>
+        public void SetValidationStrictMode(bool strict)
+        {
+            _validator?.SetStrictMode(strict);
+        }
+        
+        /// <summary>
+        /// 检查数据一致性
+        /// </summary>
+        public List<string> CheckDataConsistency()
+        {
+            return _validator?.CheckDataConsistency() ?? new List<string>();
         }
         
         #endregion
         
         #region Data Loading
         
-        private void LoadEnemyData()
-        {
-            // Load enemy types from data files
-            // This is a placeholder - actual implementation would load from JSON/CSV
-            GD.Print($"[EnemyDatabase] Loaded {_enemyTypes.Count} enemy types");
-        }
-        
         /// <summary>
         /// 从数据源加载敌人类型
         /// </summary>
         public void LoadEnemyTypesFromData(string dataPath)
         {
-            // Implementation for loading from file
+            GD.Print($"[EnemyDatabase] Loading enemy types from {dataPath}");
+            // Implementation would load from JSON/CSV file
         }
         
         #endregion
@@ -158,15 +280,11 @@ namespace ClawRPG.Scripts.Database
         {
             var data = new Dictionary();
             
-            // Export enemy instances
-            var instancesArray = new Array();
-            foreach (var instance in _enemyInstances.Values)
+            // 导出子系统数据
+            if (_spawnLogic != null)
             {
-                instancesArray.Add(JsonSerializer.Serialize(instance));
+                data["spawnLogic"] = _spawnLogic.ExportSaveData();
             }
-            data["enemyInstances"] = instancesArray;
-            
-            data["nextInstanceId"] = _nextInstanceId;
             
             return data;
         }
@@ -175,41 +293,26 @@ namespace ClawRPG.Scripts.Database
         {
             if (data == null) return;
             
-            _enemyInstances.Clear();
-            
-            if (data.Contains("enemyInstances"))
+            if (data.Contains("spawnLogic") && _spawnLogic != null)
             {
-                var instancesArray = (Array)data["enemyInstances"];
-                foreach (string instanceJson in instancesArray)
-                {
-                    var instance = JsonSerializer.Deserialize<EnemyInstance>(instanceJson);
-                    if (instance != null)
-                    {
-                        _enemyInstances[instance.InstanceId] = instance;
-                    }
-                }
-            }
-            
-            if (data.Contains("nextInstanceId"))
-            {
-                _nextInstanceId = Convert.ToInt32(data["nextInstanceId"]);
+                _spawnLogic.ImportSaveData((Dictionary)data["spawnLogic"]);
             }
         }
         
         #endregion
-    }
-    
-    /// <summary>
-    /// 敌人实例
-    /// </summary>
-    public class EnemyInstance
-    {
-        public int InstanceId { get; set; }
-        public string TypeId { get; set; }
-        public float CurrentHp { get; set; }
-        public float MaxHp { get; set; }
-        public int Level { get; set; }
-        public bool IsAlive { get; set; }
-        public Vector3 Position { get; set; }
+        
+        #region System Info
+        
+        /// <summary>
+        /// 获取系统状态信息
+        /// </summary>
+        public string GetSystemStatus()
+        {
+            return $"[EnemyDatabase] Types: {_dataProvider?.GetEnemyCount() ?? 0}, " +
+                   $"Instances: {_spawnLogic?.GetEnemyCount() ?? 0}, " +
+                   $"Active: {_spawnLogic?.GetActiveEnemyCount() ?? 0}";
+        }
+        
+        #endregion
     }
 }
