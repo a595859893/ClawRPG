@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 
 namespace ClawRPG.Scripts.Systems.ContractBounty
 {
@@ -8,10 +9,10 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
     /// Contract Bounty System - 委托赏金核心系统
     /// </summary>
     
-    public class ContractBountySystem
+    public class ContractBountySystem : BaseSystem
     {
         private static ContractBountySystem _instance;
-        public static ContractBountySystem Instance => _instance ??= new ContractBountySystem();
+        public static new ContractBountySystem Instance => _instance ??= new ContractBountySystem();
         
         private ContractBountyData _data = new ContractBountyData();
         private ContractBountyDatabase _database = ContractBountyDatabase.Instance;
@@ -358,7 +359,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, object>();
             data["total_completed"] = _data.totalCompleted;
@@ -382,7 +383,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             
