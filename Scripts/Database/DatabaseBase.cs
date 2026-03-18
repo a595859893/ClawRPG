@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 
 namespace ClawRPG.Scripts.Database
 {
@@ -8,6 +9,9 @@ namespace ClawRPG.Scripts.Database
     /// </summary>
     public abstract class DatabaseBase : IDatabase
     {
+        private const string SAVE_VERSION = "1.0";
+        private const string KEY_SAVE_VERSION = "_saveVersion";
+
         /// <summary>
         /// 子类实例的静态引用
         /// </summary>
@@ -52,6 +56,43 @@ namespace ClawRPG.Scripts.Database
         public virtual int GetDataCount()
         {
             return _dataStore.Count;
+        }
+
+        /// <summary>
+        /// 导出存档数据（返回 Godot Dictionary 兼容 BaseSystem）
+        /// </summary>
+        public virtual Godot.Collections.Dictionary ExportSaveData()
+        {
+            var saveData = new Godot.Collections.Dictionary
+            {
+                [KEY_SAVE_VERSION] = SAVE_VERSION
+            };
+            OnExportSaveData(saveData);
+            return saveData;
+        }
+
+        /// <summary>
+        /// 导入存档数据
+        /// </summary>
+        public virtual void ImportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            if (saveData == null || saveData.Count == 0)
+                return;
+            OnImportSaveData(saveData);
+        }
+
+        /// <summary>
+        /// 子类重写：导出子类特定数据
+        /// </summary>
+        protected virtual void OnExportSaveData(Godot.Collections.Dictionary saveData)
+        {
+        }
+
+        /// <summary>
+        /// 子类重写：导入子类特定数据
+        /// </summary>
+        protected virtual void OnImportSaveData(Godot.Collections.Dictionary saveData)
+        {
         }
     }
 }

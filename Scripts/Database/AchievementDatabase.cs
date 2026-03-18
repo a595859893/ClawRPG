@@ -628,6 +628,60 @@ namespace ClawRPG.Scripts.Database
         public override int GetDataCount() => _achievements.Count;
 
         public override IEnumerable<string> GetAllKeys() => _achievements.Keys;
+
+        #region 存档持久化
+
+        private const string KEY_ACHIEVEMENTS = "achievements";
+
+        protected override void OnExportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            base.OnExportSaveData(saveData);
+
+            var achievementsArray = new Godot.Collections.Array();
+            foreach (var kvp in _achievements)
+            {
+                var ach = kvp.Value;
+                achievementsArray.Add(new Godot.Collections.Dictionary
+                {
+                    ["id"] = ach.Id,
+                    ["name"] = ach.Name,
+                    ["description"] = ach.Description,
+                    ["type"] = (int)ach.Type,
+                    ["difficulty"] = (int)ach.Difficulty,
+                    ["requiredValue"] = ach.RequiredValue,
+                    ["rewardGold"] = ach.RewardGold,
+                    ["rewardExp"] = ach.RewardExp
+                });
+            }
+            saveData[KEY_ACHIEVEMENTS] = achievementsArray;
+        }
+
+        protected override void OnImportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            base.OnImportSaveData(saveData);
+
+            if (!saveData.ContainsKey(KEY_ACHIEVEMENTS))
+                return;
+
+            var achievementsArray = (Godot.Collections.Array)saveData[KEY_ACHIEVEMENTS];
+            foreach (Godot.Collections.Dictionary achDict in achievementsArray)
+            {
+                var achievement = new Achievement
+                {
+                    Id = (string)achDict["id"],
+                    Name = (string)achDict["name"],
+                    Description = (string)achDict["description"],
+                    Type = (AchievementType)(int)achDict["type"],
+                    Difficulty = (AchievementDifficulty)(int)achDict["difficulty"],
+                    RequiredValue = (int)achDict["requiredValue"],
+                    RewardGold = (int)achDict["rewardGold"],
+                    RewardExp = (int)achDict["rewardExp"]
+                };
+                _achievements[achievement.Id] = achievement;
+            }
+        }
+
+        #endregion
     }
 
     // ==================== 数据类型定义 ====================

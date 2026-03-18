@@ -660,6 +660,83 @@ namespace ClawRPG.Scripts.Database
         public override int GetDataCount() => _runes.Count;
 
         public override IEnumerable<string> GetAllKeys() => _runeIndex.Keys;
+
+        #region 存档持久化
+
+        private const string KEY_RUNES = "runes";
+
+        protected override void OnExportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            base.OnExportSaveData(saveData);
+
+            var runesArray = new Godot.Collections.Array();
+            foreach (var kvp in _runeIndex)
+            {
+                var rune = kvp.Value;
+                runesArray.Add(new Godot.Collections.Dictionary
+                {
+                    ["id"] = rune.Id,
+                    ["name"] = rune.Name,
+                    ["description"] = rune.Description,
+                    ["type"] = (int)rune.Type,
+                    ["rarity"] = (int)rune.Rarity,
+                    ["slotType"] = (int)rune.SlotType,
+                    ["attackBonus"] = rune.AttackBonus,
+                    ["defenseBonus"] = rune.DefenseBonus,
+                    ["healthBonus"] = rune.HealthBonus,
+                    ["critRateBonus"] = rune.CritRateBonus,
+                    ["critDamageBonus"] = rune.CritDamageBonus,
+                    ["lifeStealBonus"] = rune.LifeStealBonus,
+                    ["dodgeBonus"] = rune.DodgeBonus,
+                    ["speedBonus"] = rune.SpeedBonus,
+                    ["blockBonus"] = rune.BlockBonus,
+                    ["specialEffect"] = rune.SpecialEffect ?? string.Empty,
+                    ["specialEffectValue"] = rune.SpecialEffectValue,
+                    ["requiredLevel"] = rune.RequiredLevel
+                });
+            }
+            saveData[KEY_RUNES] = runesArray;
+        }
+
+        protected override void OnImportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            base.OnImportSaveData(saveData);
+
+            if (!saveData.ContainsKey(KEY_RUNES))
+                return;
+
+            var runesArray = (Godot.Collections.Array)saveData[KEY_RUNES];
+            foreach (Godot.Collections.Dictionary runeDict in runesArray)
+            {
+                var rune = new RuneData
+                {
+                    Id = (string)runeDict["id"],
+                    Name = (string)runeDict["name"],
+                    Description = (string)runeDict["description"],
+                    Type = (RuneType)(int)runeDict["type"],
+                    Rarity = (RuneRarity)(int)runeDict["rarity"],
+                    SlotType = (RuneSlotType)(int)runeDict["slotType"],
+                    AttackBonus = (float)runeDict["attackBonus"],
+                    DefenseBonus = (float)runeDict["defenseBonus"],
+                    HealthBonus = (float)runeDict["healthBonus"],
+                    CritRateBonus = (float)runeDict["critRateBonus"],
+                    CritDamageBonus = (float)runeDict["critDamageBonus"],
+                    LifeStealBonus = (float)runeDict["lifeStealBonus"],
+                    DodgeBonus = (float)runeDict["dodgeBonus"],
+                    SpeedBonus = (float)runeDict["speedBonus"],
+                    BlockBonus = (float)runeDict["blockBonus"],
+                    SpecialEffect = (string)runeDict["specialEffect"],
+                    SpecialEffectValue = (float)runeDict["specialEffectValue"],
+                    RequiredLevel = (int)runeDict["requiredLevel"]
+                };
+                _runeIndex[rune.Id] = rune;
+                // Also add to list if not already present
+                if (!_runes.Exists(r => r.Id == rune.Id))
+                    _runes.Add(rune);
+            }
+        }
+
+        #endregion
     }
 
     // ==================== 数据类型定义 ====================

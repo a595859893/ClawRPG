@@ -721,6 +721,226 @@ namespace ClawRPG.Scripts.Database
         public override IEnumerable<string> GetAllKeys() => _bossConfigs.Keys;
 
         #endregion
+
+        #region 存档持久化
+
+        private const string KEY_BOSS_CONFIGS = "bossConfigs";
+        private const string KEY_SKILL_CONFIGS = "skillConfigs";
+        private const string KEY_LOOT_TABLES = "lootTables";
+        private const string KEY_AI_CONFIGS = "aiConfigs";
+
+        protected override void OnExportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            base.OnExportSaveData(saveData);
+
+            // Export boss configs
+            var bossConfigsArray = new Godot.Collections.Array();
+            foreach (var kvp in _bossConfigs)
+            {
+                var cfg = kvp.Value;
+                bossConfigsArray.Add(new Godot.Collections.Dictionary
+                {
+                    ["bossId"] = cfg.BossId,
+                    ["bossName"] = cfg.BossName,
+                    ["description"] = cfg.Description,
+                    ["type"] = (int)cfg.Type,
+                    ["difficulty"] = (int)cfg.Difficulty,
+                    ["maxHealth"] = cfg.MaxHealth,
+                    ["attackDamage"] = cfg.AttackDamage,
+                    ["defense"] = cfg.Defense,
+                    ["moveSpeed"] = cfg.MoveSpeed,
+                    ["level"] = cfg.Level,
+                    ["phaseCount"] = cfg.PhaseCount,
+                    ["enrageThreshold"] = cfg.EnrageThreshold,
+                    ["goldReward"] = cfg.GoldReward,
+                    ["expReward"] = cfg.ExpReward,
+                    ["skills"] = new Godot.Collections.Array(cfg.Skills)
+                });
+            }
+            saveData[KEY_BOSS_CONFIGS] = bossConfigsArray;
+
+            // Export skill configs
+            var skillConfigsArray = new Godot.Collections.Array();
+            foreach (var kvp in _skillConfigs)
+            {
+                var sk = kvp.Value;
+                skillConfigsArray.Add(new Godot.Collections.Dictionary
+                {
+                    ["skillId"] = sk.SkillId,
+                    ["skillName"] = sk.SkillName,
+                    ["description"] = sk.Description,
+                    ["skillType"] = (int)sk.SkillType,
+                    ["damage"] = sk.Damage,
+                    ["range"] = sk.Range,
+                    ["areaRadius"] = sk.AreaRadius,
+                    ["cooldown"] = sk.Cooldown,
+                    ["castTime"] = sk.CastTime,
+                    ["duration"] = sk.Duration,
+                    ["healAmount"] = sk.HealAmount,
+                    ["shieldAmount"] = sk.ShieldAmount,
+                    ["damageMultiplier"] = sk.DamageMultiplier,
+                    ["knockbackForce"] = sk.KnockbackForce,
+                    ["stunDuration"] = sk.StunDuration,
+                    ["defenseReduction"] = sk.DefenseReduction,
+                    ["summonCount"] = sk.SummonCount,
+                    ["phaseUnlock"] = sk.PhaseUnlock
+                });
+            }
+            saveData[KEY_SKILL_CONFIGS] = skillConfigsArray;
+
+            // Export loot tables
+            var lootTablesArray = new Godot.Collections.Array();
+            foreach (var kvp in _lootTables)
+            {
+                var lootList = new Godot.Collections.Array();
+                foreach (var loot in kvp.Value)
+                {
+                    lootList.Add(new Godot.Collections.Dictionary
+                    {
+                        ["itemId"] = loot.ItemId,
+                        ["itemName"] = loot.ItemName,
+                        ["dropRate"] = loot.DropRate,
+                        ["minQuantity"] = loot.MinQuantity,
+                        ["maxQuantity"] = loot.MaxQuantity,
+                        ["lootType"] = (int)loot.LootType,
+                        ["isGuaranteed"] = loot.IsGuaranteed
+                    });
+                }
+                lootTablesArray.Add(new Godot.Collections.Dictionary
+                {
+                    ["bossId"] = kvp.Key,
+                    ["loots"] = lootList
+                });
+            }
+            saveData[KEY_LOOT_TABLES] = lootTablesArray;
+
+            // Export AI configs
+            var aiConfigsArray = new Godot.Collections.Array();
+            foreach (var kvp in _aiConfigs)
+            {
+                var ai = kvp.Value;
+                aiConfigsArray.Add(new Godot.Collections.Dictionary
+                {
+                    ["behavior"] = ai.Behavior,
+                    ["aggressionLevel"] = ai.AggressionLevel,
+                    ["defensiveThreshold"] = ai.DefensiveThreshold,
+                    ["skillUsageRate"] = ai.SkillUsageRate,
+                    ["ultimateThreshold"] = ai.UltimateThreshold,
+                    ["retreatThreshold"] = ai.RetreatThreshold
+                });
+            }
+            saveData[KEY_AI_CONFIGS] = aiConfigsArray;
+        }
+
+        protected override void OnImportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            base.OnImportSaveData(saveData);
+
+            // Import boss configs
+            if (saveData.ContainsKey(KEY_BOSS_CONFIGS))
+            {
+                var bossConfigsArray = (Godot.Collections.Array)saveData[KEY_BOSS_CONFIGS];
+                foreach (Godot.Collections.Dictionary cfgDict in bossConfigsArray)
+                {
+                    var cfg = new BossConfigData
+                    {
+                        BossId = (string)cfgDict["bossId"],
+                        BossName = (string)cfgDict["bossName"],
+                        Description = (string)cfgDict["description"],
+                        Type = (BossType)(int)cfgDict["type"],
+                        Difficulty = (Difficulty)(int)cfgDict["difficulty"],
+                        MaxHealth = (float)cfgDict["maxHealth"],
+                        AttackDamage = (float)cfgDict["attackDamage"],
+                        Defense = (float)cfgDict["defense"],
+                        MoveSpeed = (float)cfgDict["moveSpeed"],
+                        Level = (int)cfgDict["level"],
+                        PhaseCount = (int)cfgDict["phaseCount"],
+                        EnrageThreshold = (float)cfgDict["enrageThreshold"],
+                        GoldReward = (float)cfgDict["goldReward"],
+                        ExpReward = (float)cfgDict["expReward"],
+                        Skills = new List<string>((Godot.Collections.Array)cfgDict["skills"])
+                    };
+                    _bossConfigs[cfg.BossId] = cfg;
+                }
+            }
+
+            // Import skill configs
+            if (saveData.ContainsKey(KEY_SKILL_CONFIGS))
+            {
+                var skillConfigsArray = (Godot.Collections.Array)saveData[KEY_SKILL_CONFIGS];
+                foreach (Godot.Collections.Dictionary skDict in skillConfigsArray)
+                {
+                    var sk = new BossSkillData
+                    {
+                        SkillId = (string)skDict["skillId"],
+                        SkillName = (string)skDict["skillName"],
+                        Description = (string)skDict["description"],
+                        SkillType = (BossSkillType)(int)skDict["skillType"],
+                        Damage = (float)skDict["damage"],
+                        Range = (float)skDict["range"],
+                        AreaRadius = (float)skDict["areaRadius"],
+                        Cooldown = (float)skDict["cooldown"],
+                        CastTime = (float)skDict["castTime"],
+                        Duration = (float)skDict["duration"],
+                        HealAmount = (float)skDict["healAmount"],
+                        ShieldAmount = (float)skDict["shieldAmount"],
+                        DamageMultiplier = (float)skDict["damageMultiplier"],
+                        KnockbackForce = (float)skDict["knockbackForce"],
+                        StunDuration = (float)skDict["stunDuration"],
+                        DefenseReduction = (float)skDict["defenseReduction"],
+                        SummonCount = (int)skDict["summonCount"],
+                        PhaseUnlock = (int)skDict["phaseUnlock"]
+                    };
+                    _skillConfigs[sk.SkillId] = sk;
+                }
+            }
+
+            // Import loot tables
+            if (saveData.ContainsKey(KEY_LOOT_TABLES))
+            {
+                var lootTablesArray = (Godot.Collections.Array)saveData[KEY_LOOT_TABLES];
+                foreach (Godot.Collections.Dictionary lootTableDict in lootTablesArray)
+                {
+                    var bossId = (string)lootTableDict["bossId"];
+                    var lootList = new List<BossLootData>();
+                    foreach (Godot.Collections.Dictionary lootDict in (Godot.Collections.Array)lootTableDict["loots"])
+                    {
+                        lootList.Add(new BossLootData
+                        {
+                            ItemId = (string)lootDict["itemId"],
+                            ItemName = (string)lootDict["itemName"],
+                            DropRate = (float)lootDict["dropRate"],
+                            MinQuantity = (int)lootDict["minQuantity"],
+                            MaxQuantity = (int)lootDict["maxQuantity"],
+                            LootType = (LootType)(int)lootDict["lootType"],
+                            IsGuaranteed = (bool)lootDict["isGuaranteed"]
+                        });
+                    }
+                    _lootTables[bossId] = lootList;
+                }
+            }
+
+            // Import AI configs
+            if (saveData.ContainsKey(KEY_AI_CONFIGS))
+            {
+                var aiConfigsArray = (Godot.Collections.Array)saveData[KEY_AI_CONFIGS];
+                foreach (Godot.Collections.Dictionary aiDict in aiConfigsArray)
+                {
+                    var ai = new BossAIConfigData
+                    {
+                        Behavior = (string)aiDict["behavior"],
+                        AggressionLevel = (float)aiDict["aggressionLevel"],
+                        DefensiveThreshold = (float)aiDict["defensiveThreshold"],
+                        SkillUsageRate = (float)aiDict["skillUsageRate"],
+                        UltimateThreshold = (float)aiDict["ultimateThreshold"],
+                        RetreatThreshold = (float)aiDict["retreatThreshold"]
+                    };
+                    _aiConfigs[ai.Behavior] = ai;
+                }
+            }
+        }
+
+        #endregion
     }
 
     // ==================== 数据类型定义 ====================
