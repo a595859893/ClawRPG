@@ -40,7 +40,7 @@ public class CombatSkillCooldownSystem : BaseSystem
 	/// <summary>
 	/// Export save data
 	/// </summary>
-	public override Dictionary ExportSaveData()
+	public override Dictionary<string, object> ExportSaveData()
 	{
 		return GetSaveData();
 	}
@@ -48,12 +48,14 @@ public class CombatSkillCooldownSystem : BaseSystem
 	/// <summary>
 	/// Import save data
 	/// </summary>
-	public override void ImportSaveData(Dictionary data)
+	public override bool ImportSaveData(Dictionary<string, object> data)
 	{
 		if (data != null)
 		{
 			LoadSaveData(data);
+			return true;
 		}
+		return false;
 	}
 	
 	/// <summary>

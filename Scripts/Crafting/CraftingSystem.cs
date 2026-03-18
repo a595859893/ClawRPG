@@ -353,9 +353,9 @@ namespace ClawRPG.Scripts.Crafting {
         /// <summary>
         /// Export save data
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 序列化 _craftingStats 中的集合类型
             var statsToSave = new Dictionary<string, object>(_craftingStats);
@@ -379,9 +379,9 @@ namespace ClawRPG.Scripts.Crafting {
         /// <summary>
         /// Import save data
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override bool ImportSaveData(Dictionary<string, object> data)
         {
-            if (data == null) return;
+            if (data == null) return false;
             
             if (data.ContainsKey("crafting_stats"))
             {
@@ -413,6 +413,7 @@ namespace ClawRPG.Scripts.Crafting {
                     }
                 }
             }
+            return true;
         }
         
         /// <summary>
