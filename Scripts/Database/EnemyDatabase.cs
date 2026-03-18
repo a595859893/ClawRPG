@@ -1,196 +1,215 @@
-using Godot;
 using System;
 using System.Collections.Generic;
+using Godot;
 
-namespace ClawRPG.Scripts.Database {
+namespace ClawRPG.Scripts.Database
+{
     /// <summary>
-    /// Enemy type definition for data-driven enemy spawning
+    /// 敌人数据库 - 负责敌人数据的存储和管理
     /// </summary>
-    [Serializable]
-    public class EnemyType {
-        public string Id;
-        public string Name;
-        public string Description;
-        
-        // Combat stats
-        public int MaxHealth;
-        public float MoveSpeed;
-        public float AttackDamage;
-        public float AttackRange;
-        public float AttackCooldown;
-        public float ChaseRange;
-        public float DetectionRange;
-        
-        // Combat stats
-        public float CriticalChance = 0.05f;
-        public float CriticalDamage = 1.5f;
-        
-        // Rewards
-        public int ExperienceReward;
-        public int GoldReward;
-        
-        // Visual
-        public string SpritePath;
-        public Color SpriteModulate = Colors.White;
-        
-        // Loot table (itemId -> dropChance)
-        public Dictionary<string, float> DropTable = new();
-        
-        // AI behavior
-        public bool CanChase = true;
-        public bool CanAttack = true;
-        public bool IsAggressive = true;
-        
-        // Status effect vulnerability
-        public Dictionary<string, float> StatusEffectVulnerability = new();
-        
-        public EnemyType() {
-            Id = "";
-            Name = "Unknown";
-            Description = "";
-        }
-        
-        public EnemyType(string id, string name, int hp, float speed, float damage) {
-            Id = id;
-            Name = name;
-            MaxHealth = hp;
-            MoveSpeed = speed;
-            AttackDamage = damage;
-        }
-    }
-    
-    /// <summary>
-    /// Database of all enemy types in the game
-    /// 敌人数据库主控制器 - 委托给专用类处理具体逻辑
-    /// </summary>
-    public class EnemyDatabase {
+    public partial class EnemyDatabase : BaseSystem
+    {
         private static EnemyDatabase _instance;
-        private EnemyDataProvider _dataProvider;
-        private EnemySpawnManager _spawnManager;
-        private EnemyDifficultyScaler _difficultyScaler;
+        public static EnemyDatabase Instance => _instance;
         
-        public static EnemyDatabase Instance {
-            get {
-                if (_instance == null) {
-                    _instance = new EnemyDatabase();
-                    _instance.LoadEnemies();
+        // 敌人类型存储
+        private Dictionary<string, EnemyType> _enemyTypes = new Dictionary<string, EnemyType>();
+        
+        // 敌人实例存储
+        private Dictionary<int, EnemyInstance> _enemyInstances = new Dictionary<int, EnemyInstance>();
+        
+        // ID 计数器
+        private int _nextInstanceId = 1;
+        
+        public override void _Ready()
+        {
+            base._Ready();
+            _instance = this;
+            LoadEnemyData();
+        }
+        
+        protected override string SystemName => "EnemyDatabase";
+        
+        #region Enemy Type Management
+        
+        /// <summary>
+        /// 注册敌人类型
+        /// </summary>
+        public void RegisterEnemyType(EnemyType enemyType)
+        {
+            _enemyTypes[enemyType.Id] = enemyType;
+        }
+        
+        /// <summary>
+        /// 获取敌人类型
+        /// </summary>
+        public EnemyType GetEnemyType(string typeId)
+        {
+            return _enemyTypes.ContainsKey(typeId) ? _enemyTypes[typeId] : null;
+        }
+        
+        /// <summary>
+        /// 获取所有敌人类型
+        /// </summary>
+        public Dictionary<string, EnemyType> GetAllEnemyTypes()
+        {
+            return new Dictionary<string, EnemyType>(_enemyTypes);
+        }
+        
+        /// <summary>
+        /// 移除敌人类型
+        /// </summary>
+        public bool RemoveEnemyType(string typeId)
+        {
+            return _enemyTypes.Remove(typeId);
+        }
+        
+        #endregion
+        
+        #region Enemy Instance Management
+        
+        /// <summary>
+        /// 创建敌人实例
+        /// </summary>
+        public EnemyInstance CreateEnemyInstance(string typeId)
+        {
+            var enemyType = GetEnemyType(typeId);
+            if (enemyType == null)
+                return null;
+            
+            var instance = new EnemyInstance
+            {
+                InstanceId = _nextInstanceId++,
+                TypeId = typeId,
+                CurrentHp = enemyType.MaxHp,
+                MaxHp = enemyType.MaxHp,
+                Level = enemyType.DefaultLevel,
+                IsAlive = true
+            };
+            
+            _enemyInstances[instance.InstanceId] = instance;
+            return instance;
+        }
+        
+        /// <summary>
+        /// 获取敌人实例
+        /// </summary>
+        public EnemyInstance GetEnemyInstance(int instanceId)
+        {
+            return _enemyInstances.ContainsKey(instanceId) ? _enemyInstances[instanceId] : null;
+        }
+        
+        /// <summary>
+        /// 移除敌人实例
+        /// </summary>
+        public bool RemoveEnemyInstance(int instanceId)
+        {
+            return _enemyInstances.Remove(instanceId);
+        }
+        
+        /// <summary>
+        /// 获取所有活跃敌人实例
+        /// </summary>
+        public List<EnemyInstance> GetActiveEnemies()
+        {
+            var result = new List<EnemyInstance>();
+            foreach (var instance in _enemyInstances.Values)
+            {
+                if (instance.IsAlive)
+                {
+                    result.Add(instance);
                 }
-                return _instance;
+            }
+            return result;
+        }
+        
+        /// <summary>
+        /// 清除所有敌人实例
+        /// </summary>
+        public void ClearAllInstances()
+        {
+            _enemyInstances.Clear();
+        }
+        
+        #endregion
+        
+        #region Data Loading
+        
+        private void LoadEnemyData()
+        {
+            // Load enemy types from data files
+            // This is a placeholder - actual implementation would load from JSON/CSV
+            GD.Print($"[EnemyDatabase] Loaded {_enemyTypes.Count} enemy types");
+        }
+        
+        /// <summary>
+        /// 从数据源加载敌人类型
+        /// </summary>
+        public void LoadEnemyTypesFromData(string dataPath)
+        {
+            // Implementation for loading from file
+        }
+        
+        #endregion
+        
+        #region Persistence
+        
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            
+            // Export enemy instances
+            var instancesArray = new Array();
+            foreach (var instance in _enemyInstances.Values)
+            {
+                instancesArray.Add(JsonSerializer.Serialize(instance));
+            }
+            data["enemyInstances"] = instancesArray;
+            
+            data["nextInstanceId"] = _nextInstanceId;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            _enemyInstances.Clear();
+            
+            if (data.Contains("enemyInstances"))
+            {
+                var instancesArray = (Array)data["enemyInstances"];
+                foreach (string instanceJson in instancesArray)
+                {
+                    var instance = JsonSerializer.Deserialize<EnemyInstance>(instanceJson);
+                    if (instance != null)
+                    {
+                        _enemyInstances[instance.InstanceId] = instance;
+                    }
+                }
+            }
+            
+            if (data.Contains("nextInstanceId"))
+            {
+                _nextInstanceId = Convert.ToInt32(data["nextInstanceId"]);
             }
         }
         
-        /// <summary>
-        /// 初始化数据库和子系统
-        /// </summary>
-        public void LoadEnemies() {
-            _dataProvider = new EnemyDataProvider();
-            _dataProvider.Initialize();
-            
-            _spawnManager = new EnemySpawnManager();
-            _spawnManager.Initialize();
-            
-            _difficultyScaler = new EnemyDifficultyScaler();
-            _difficultyScaler.Initialize();
-            
-            GD.Print("[EnemyDatabase] Loaded enemy subsystems");
-        }
-        
-        /// <summary>
-        /// 获取敌人数据提供者
-        /// </summary>
-        public EnemyDataProvider GetDataProvider() {
-            return _dataProvider;
-        }
-        
-        /// <summary>
-        /// 获取生成管理器
-        /// </summary>
-        public EnemySpawnManager GetSpawnManager() {
-            return _spawnManager;
-        }
-        
-        /// <summary>
-        /// 获取难度缩放器
-        /// </summary>
-        public EnemyDifficultyScaler GetDifficultyScaler() {
-            return _difficultyScaler;
-        }
-        
-        /// <summary>
-        /// 获取敌人 (兼容旧API)
-        /// </summary>
-        public EnemyType GetEnemy(string id) {
-            return _dataProvider?.GetEnemyById(id);
-        }
-        
-        /// <summary>
-        /// 获取所有敌人 (兼容旧API)
-        /// </summary>
-        public List<EnemyType> GetAllEnemies() {
-            return _dataProvider?.GetEnemyData() ?? new List<EnemyType>();
-        }
-        
-        /// <summary>
-        /// 根据区域获取敌人 (兼容旧API)
-        /// </summary>
-        public List<EnemyType> GetEnemiesByRegion(string region) {
-            return _dataProvider?.GetEnemiesByRegion(region) ?? new List<EnemyType>();
-        }
-        
-        /// <summary>
-        /// 根据玩家等级获取敌人 (兼容旧API)
-        /// </summary>
-        public List<EnemyType> GetEnemiesForLevel(int playerLevel) {
-            return _dataProvider?.GetEnemiesForLevel(playerLevel) ?? new List<EnemyType>();
-        }
-        
-        /// <summary>
-        /// 检查敌人是否存在 (兼容旧API)
-        /// </summary>
-        public bool HasEnemy(string id) {
-            return _dataProvider?.HasEnemyType(id) ?? false;
-        }
-        
-        /// <summary>
-        /// 获取敌人数量 (兼容旧API)
-        /// </summary>
-        public int GetEnemyCount() {
-            return _dataProvider?.GetEnemyCount() ?? 0;
-        }
-        
-        /// <summary>
-        /// 获取敌人类型 (兼容旧API - Flyweight Factory)
-        /// </summary>
-        public EnemyType GetEnemyType(string id) {
-            return _dataProvider?.GetEnemyType(id);
-        }
-        
-        /// <summary>
-        /// 生成敌人 (委托给SpawnManager)
-        /// </summary>
-        public Node SpawnEnemy(string enemyId, Vector2 position, string zoneId = "default") {
-            return _spawnManager?.SpawnEnemy(enemyId, position, zoneId);
-        }
-        
-        /// <summary>
-        /// 缩放敌人难度 (委托给DifficultyScaler)
-        /// </summary>
-        public EnemyType ScaleDifficulty(EnemyType baseEnemy) {
-            return _difficultyScaler?.ScaleDifficulty(baseEnemy);
-        }
-        
-        /// <summary>
-        /// 获取缩放后的属性 (委托给DifficultyScaler)
-        /// </summary>
-        public (int health, float damage, float speed) GetScaledStats(int baseHealth, float baseDamage, float baseSpeed) {
-            return _difficultyScaler?.GetScaledStats(baseHealth, baseDamage, baseSpeed) ?? (baseHealth, baseDamage, baseSpeed);
-        }
-        
-        /// <summary>
-        /// 计算等级乘数 (委托给DifficultyScaler)
-        /// </summary>
-        public float CalculateLevelMultiplier(int enemyLevel, int playerLevel) {
-            return _difficultyScaler?.CalculateLevelMultiplier(enemyLevel, playerLevel) ?? 1.0f;
-        }
+        #endregion
+    }
+    
+    /// <summary>
+    /// 敌人实例
+    /// </summary>
+    public class EnemyInstance
+    {
+        public int InstanceId { get; set; }
+        public string TypeId { get; set; }
+        public float CurrentHp { get; set; }
+        public float MaxHp { get; set; }
+        public int Level { get; set; }
+        public bool IsAlive { get; set; }
+        public Vector3 Position { get; set; }
     }
 }
