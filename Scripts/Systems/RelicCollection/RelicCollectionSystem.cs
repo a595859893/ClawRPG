@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ClawRPG.Systems.Relics
+namespace ClawRPG.Scripts.Systems
 {
     public class RelicCollectionSystem : BaseSystem
     {
@@ -33,7 +33,7 @@ namespace ClawRPG.Systems.Relics
         private const int MaxEquippedRelics = 6;
 
         // 初始化玩家数据
-        public void Initialize()
+        protected override void Initialize()
         {
             // 解锁所有普通遗物作为起始遗物
             foreach (var relic in RelicCollectionDatabase.Relics.Values)
