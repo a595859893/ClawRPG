@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ClawRPG.Core.Systems
 {
-    public class ArtifactSystem
+    public class ArtifactSystem : BaseSystem
     {
         private PlayerArtifactData _playerData;
         private ArtifactStatistics _statistics;
@@ -294,7 +294,7 @@ namespace ClawRPG.Core.Systems
 
         #region Save/Load
 
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary<string, object>
             {
@@ -307,7 +307,7 @@ namespace ClawRPG.Core.Systems
             };
         }
 
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 
