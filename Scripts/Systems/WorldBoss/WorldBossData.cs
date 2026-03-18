@@ -64,15 +64,23 @@ namespace ClawRPG.Scripts.Systems.WorldBoss
         {
             public string InstanceId { get; set; } = Guid.NewGuid().ToString();
             public string BossId { get; set; } = "";
-            public string BossName { get; set; } = "";
+            public string Name { get; set; } = "";
             public BossRarity Rarity { get; set; } = BossRarity.Elite;
+            public int Level { get; set; } = 1;
             public int CurrentHealth { get; set; } = 1000;
             public int MaxHealth { get; set; } = 1000;
             public float X { get; set; } = 0;
             public float Y { get; set; } = 0;
+            public Godot.Vector2 Position 
+            { 
+                get => new Godot.Vector2(X, Y);
+                set { X = value.X; Y = value.Y; }
+            }
             public DateTime SpawnTime { get; set; } = DateTime.Now;
             public int LifeTimeMinutes { get; set; } = 30;
-            public bool IsDefeated { get; set; } = false; 
+            public bool IsDefeated { get; set; } = false;
+            public bool IsElite { get; set; } = false;
+            public bool IsMega { get; set; } = false;
             public int TotalDamageDealt { get; set; } = 0;
             public int PlayerCount { get; set; } = 0;
         }
@@ -84,10 +92,13 @@ namespace ClawRPG.Scripts.Systems.WorldBoss
         {
             public string PlayerId { get; set; } = "";
             public string PlayerName { get; set; } = "";
+            public int TotalDamage { get; set; } = 0;
             public int DamageDealt { get; set; } = 0;
             public float DamagePercent { get; set; } = 0f;
+            public DateTime FirstHitTime { get; set; } = DateTime.Now;
             public DateTime LastHitTime { get; set; } = DateTime.Now;
-            public bool HasClaimed { get; set; } = false; 
+            public int HitCount { get; set; } = 0;
+            public bool HasClaimed { get; set; } = false;
         }
         
         /// <summary>
@@ -113,10 +124,25 @@ namespace ClawRPG.Scripts.Systems.WorldBoss
             public string PlayerId { get; set; } = "";
             public int TotalBossesKilled { get; set; } = 0;
             public int TotalDamageDealt { get; set; } = 0;
+            public int TotalDamageTaken { get; set; } = 0;
+            public int HighestDamage { get; set; } = 0;
             public int TotalGoldEarned { get; set; } = 0;
             public int TotalExpEarned { get; set; } = 0;
+            public int BossesDamaged { get; set; } = 0;
+            public int BossesKilled { get; set; } = 0;
             public Dictionary<string, int> BossKillCount { get; set; } = new Dictionary<string, int>();
             public Dictionary<string, int> RarityKillCount { get; set; } = new Dictionary<string, int>();
+        }
+        
+        /// <summary>
+        /// Boss reward configuration
+        /// </summary>
+        public class BossReward
+        {
+            public string ItemId { get; set; } = "";
+            public int MinAmount { get; set; } = 1;
+            public int MaxAmount { get; set; } = 1;
+            public float DropChance { get; set; } = 100f;
         }
     }
 }
