@@ -224,5 +224,55 @@ public class PetTalentSystem : BaseSystem
 
     public override Dictionary ExportSaveData() => new();
     public override void ImportSaveData(Dictionary data) { }
+    
+    // 导出单个宠物的天赋数据（供 PetManager 使用）
+    public Dictionary<string, object> ExportPetTalentData(string petId)
+    {
+        int key = petId.GetHashCode();
+        if (PetTalents.TryGetValue(key, out var talentData))
+        {
+            return new Dictionary<string, object>
+            {
+                { "availablePoints", talentData.AvailablePoints },
+                { "totalEarned", talentData.TotalPointsEarned },
+                { "totalSpent", talentData.TotalPointsSpent },
+                { "unlockedTalents", new Dictionary<string, int>(talentData.UnlockedTalents) },
+                { "allocatedPoints", new Dictionary<string, int>(talentData.AllocatedPoints) }
+            };
+        }
+        return null;
+    }
+    
+    // 导入单个宠物的天赋数据（供 PetManager 使用）
+    public void ImportPetTalentData(string petId, Dictionary talentData)
+    {
+        if (talentData == null) return;
+        
+        int key = petId.GetHashCode();
+        var data = new PetTalentData
+        {
+            AvailablePoints = Convert.ToInt32(talentData.GetValueOrDefault("availablePoints", 0)),
+            TotalPointsEarned = Convert.ToInt32(talentData.GetValueOrDefault("totalEarned", 0)),
+            TotalPointsSpent = Convert.ToInt32(talentData.GetValueOrDefault("totalSpent", 0))
+        };
+        
+        if (talentData.TryGetValue("unlockedTalents", out var unlockedObj) && unlockedObj is Dictionary unlocked)
+        {
+            foreach (string talentId in unlocked.Keys)
+            {
+                data.UnlockedTalents[talentId] = Convert.ToInt32(unlocked[talentId]);
+            }
+        }
+        
+        if (talentData.TryGetValue("allocatedPoints", out var allocatedObj) && allocatedObj is Dictionary allocated)
+        {
+            foreach (string category in allocated.Keys)
+            {
+                data.AllocatedPoints[category] = Convert.ToInt32(allocated[category]);
+            }
+        }
+        
+        PetTalents[key] = data;
+    }
 
 }

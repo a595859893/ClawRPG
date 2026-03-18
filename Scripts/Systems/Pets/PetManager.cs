@@ -9,9 +9,6 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// </summary>
     public class PetManager : BaseSystem
     {
-        private static PetManager _instance;
-        public static new PetManager Instance => _instance ??= new PetManager();
-
         // 玩家宠物列表
         private List<Pet> _ownedPets = new List<Pet>();
         private Pet _activePet = null;
@@ -38,7 +35,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         public Pet ActivePet => _activePet;
         public int MaxPets => _maxPets;
 
-        public void Initialize()
+        protected override void Initialize()
         {
             // 初始化
         }
@@ -238,12 +235,18 @@ namespace ClawRPG.Scripts.Systems.Pets
             var petDataList = new List<Dictionary<string, object>>();
             foreach (var pet in _ownedPets)
             {
+                var talentData = PetTalentSystem.Instance != null 
+                    ? PetTalentSystem.Instance.ExportPetTalentData(pet.Id) 
+                    : null;
+                    
                 petDataList.Add(new Dictionary<string, object>
                 {
                     { "petId", pet.PetId },
+                    { "petName", pet.PetName },
                     { "level", pet.Level },
                     { "experience", pet.Experience },
-                    { "loyalty", pet.Loyalty }
+                    { "loyalty", pet.Loyalty },
+                    { "talents", talentData }
                 });
             }
             data["pets"] = petDataList;
@@ -268,6 +271,7 @@ namespace ClawRPG.Scripts.Systems.Pets
                     if (petData is Dictionary<string, object> petDict)
                     {
                         string petId = petDict.GetValueOrDefault("petId", "").ToString();
+                        string petName = petDict.GetValueOrDefault("petName", "").ToString();
                         int level = Convert.ToInt32(petDict.GetValueOrDefault("level", 1));
                         int experience = Convert.ToInt32(petDict.GetValueOrDefault("experience", 0));
                         int loyalty = Convert.ToInt32(petDict.GetValueOrDefault("loyalty", 50));
@@ -278,7 +282,7 @@ namespace ClawRPG.Scripts.Systems.Pets
                             var pet = new Pet
                             {
                                 PetId = template.PetId,
-                                PetName = template.PetName,
+                                PetName = string.IsNullOrEmpty(petName) ? template.PetName : petName,
                                 Type = template.Type,
                                 Rarity = template.Rarity,
                                 HealthBonus = template.HealthBonus,
@@ -293,6 +297,13 @@ namespace ClawRPG.Scripts.Systems.Pets
                                 Loyalty = loyalty
                             };
                             _ownedPets.Add(pet);
+                            
+                            // 恢复宠物天赋数据
+                            if (petDict.TryGetValue("talents", out var talentsObj) && 
+                                PetTalentSystem.Instance != null)
+                            {
+                                PetTalentSystem.Instance.ImportPetTalentData(pet.Id, talentsObj as Dictionary);
+                            }
                         }
                     }
                 }
