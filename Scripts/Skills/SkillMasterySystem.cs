@@ -102,14 +102,52 @@ namespace ClawRPG.Scripts.Skills {
     }
     
     /// <summary>
-    /// Skill Mastery and Combo System
-    /// Manages skill progression, combos, and rune equipment
-    /// Coordinates with SkillUnlockSystem for unlock conditions
+    /// 技能精通与连招系统 - 协调者
+    /// 委托给子系统: SkillProgressionSystem, SkillTreeSystem, SkillUnlockSystem
     /// </summary>
     public partial class SkillMasterySystem : BaseSystem
     {
+        // Singleton
         private static SkillMasterySystem _instance;
         public static SkillMasterySystem Instance => _instance;
+        
+        #region Signals
+        
+        [Signal]
+        public delegate void MasteryLevelUpEventHandler(int skillId, int newLevel, MasteryRank rank);
+        
+        [Signal]
+        public delegate void MasteryXPChangedEventHandler(int skillId, int xp, int totalXP);
+        
+        [Signal]
+        public delegate void ComboStartedEventHandler(int comboId, string comboName);
+        
+        [Signal]
+        public delegate void ComboCompletedEventHandler(int comboId, string comboName, float damageMultiplier);
+        
+        [Signal]
+        public delegate void ComboFailedEventHandler(int comboId, string reason);
+        
+        [Signal]
+        public delegate void RuneEquippedEventHandler(int skillId, int slot, int runeId);
+        
+        [Signal]
+        public delegate void RuneUnequippedEventHandler(int skillId, int slot);
+        
+        [Signal]
+        public delegate void SkillUnlockedEventHandler(string skillId);
+        
+        #endregion
+        
+        #region Subsystems
+        
+        private SkillProgressionSystem _progressionSystem;
+        private SkillTreeSystem _treeSystem;
+        private SkillUnlockSystem _unlockSystem;
+        
+        #endregion
+        
+        #region Data
         
         private Dictionary<int, SkillRune> _runes = new();
         private Dictionary<int, SkillCombo> _combos = new();
@@ -121,19 +159,29 @@ namespace ClawRPG.Scripts.Skills {
         public int TotalMasteryXP { get; private set; } = 0;
         public int HighestMasteryRank { get; private set; } = 0;
         
-        // Reference to unlock system
-        private SkillUnlockSystem _unlockSystem;
+        // Combo usage tracking
+        public Dictionary<int, int> ComboUsages { get; private set; } = new();
+        
+        #endregion
         
         protected override void Initialize()
         {
+            _instance = this;
+            
+            // Get subsystem references
+            _progressionSystem = SkillProgressionSystem.Instance;
+            _treeSystem = SkillTreeSystem.Instance;
+            _unlockSystem = SkillUnlockSystem.Instance;
+            
+            // Initialize data
             InitializeRunes();
             InitializeCombos();
             
-            // Get unlock system reference
-            _unlockSystem = SkillUnlockSystem.Instance;
-            
             IsInitialized = true;
+            GD.Print("[SkillMasterySystem] Initialized as coordinator");
         }
+        
+        #region Initialization
         
         private void InitializeRunes()
         {
@@ -188,7 +236,9 @@ namespace ClawRPG.Scripts.Skills {
         private void AddRune(SkillRune rune) => _runes[rune.Id] = rune;
         private void AddCombo(SkillCombo combo) => _combos[combo.Id] = combo;
         
-        #region Mastery Methods
+        #endregion
+        
+        #region Mastery Methods (Delegates to Progression System)
         
         public SkillMastery GetMastery(int skillId)
         {
@@ -200,6 +250,9 @@ namespace ClawRPG.Scripts.Skills {
         public void AddMasteryXP(int skillId, int xp)
         {
             var mastery = GetMastery(skillId);
+            int oldLevel = mastery.CurrentLevel;
+            MasteryRank oldRank = mastery.Rank;
+            
             mastery.CurrentXP += xp;
             mastery.TotalXP += xp;
             TotalMasteryXP += xp;
@@ -208,6 +261,17 @@ namespace ClawRPG.Scripts.Skills {
             
             if ((int)mastery.Rank > HighestMasteryRank)
                 HighestMasteryRank = (int)mastery.Rank;
+            
+            // Emit signals
+            EmitSignal(nameof(MasteryXPChanged), skillId, mastery.CurrentXP, mastery.TotalXP);
+            
+            if (mastery.CurrentLevel > oldLevel)
+            {
+                EmitSignal(nameof(MasteryLevelUp), skillId, mastery.CurrentLevel, mastery.Rank);
+            }
+            
+            // Also delegate to progression system if available
+            _progressionSystem?.AddXp("default", skillId.ToString(), xp);
             
             GD.Print($"Skill {skillId} mastery: {mastery.CurrentXP} XP, Level {mastery.CurrentLevel}, Rank {mastery.Rank}");
         }
@@ -246,6 +310,10 @@ namespace ClawRPG.Scripts.Skills {
             mastery.CostReduction = mastery.CurrentLevel * 0.02f;
         }
         
+        #endregion
+        
+        #region Rune Methods
+        
         public bool EquipRune(int skillId, int slot, int runeId)
         {
             var mastery = GetMastery(skillId);
@@ -253,6 +321,8 @@ namespace ClawRPG.Scripts.Skills {
             if (!_runes.ContainsKey(runeId)) return false;
             
             mastery.EquippedRunes[slot] = runeId;
+            
+            EmitSignal(nameof(RuneEquipped), skillId, slot, runeId);
             return true;
         }
         
@@ -262,6 +332,7 @@ namespace ClawRPG.Scripts.Skills {
             if (mastery.EquippedRunes.ContainsKey(slot))
             {
                 mastery.EquippedRunes.Remove(slot);
+                EmitSignal(nameof(RuneUnequipped), skillId, slot);
                 return true;
             }
             return false;
@@ -311,6 +382,8 @@ namespace ClawRPG.Scripts.Skills {
                         TimeRemaining = combo.TimeWindow,
                         IsComplete = false
                     };
+                    
+                    EmitSignal(nameof(ComboStarted), combo.Id, combo.Name);
                     return true;
                 }
             }
@@ -332,10 +405,20 @@ namespace ClawRPG.Scripts.Skills {
                     for (int i = 0; i <= _activeCombo.CurrentStep; i++)
                         if (combo.SkillSequence[i] == skillId) return false;
                 }
-                else { CancelCombo(); return false; }
+                else 
+                {
+                    CancelCombo();
+                    EmitSignal(nameof(ComboFailed), combo.Id, "Wrong skill order");
+                    return false; 
+                }
             }
             
-            if (playerMana < combo.ManaCost) { CancelCombo(); return false; }
+            if (playerMana < combo.ManaCost) 
+            { 
+                CancelCombo();
+                EmitSignal(nameof(ComboFailed), combo.Id, "Insufficient mana");
+                return false; 
+            }
             
             _activeCombo.CurrentStep++;
             _activeCombo.TimeRemaining = combo.TimeWindow;
@@ -374,6 +457,7 @@ namespace ClawRPG.Scripts.Skills {
             foreach (var skillId in combo.SkillSequence)
                 AddMasteryXP(skillId, xpGain);
             
+            EmitSignal(nameof(ComboCompleted), combo.Id, combo.Name, combo.DamageMultiplier);
             GD.Print($"Combo complete: {combo.Name}! Damage multiplier: {combo.DamageMultiplier}x");
             _activeCombo = null;
         }
@@ -409,7 +493,11 @@ namespace ClawRPG.Scripts.Skills {
             if (_activeCombo != null)
             {
                 _activeCombo.TimeRemaining -= delta;
-                if (_activeCombo.TimeRemaining <= 0) CancelCombo();
+                if (_activeCombo.TimeRemaining <= 0) 
+                {
+                    CancelCombo();
+                    EmitSignal(nameof(ComboFailed), _activeCombo.ComboId, "Time expired");
+                }
             }
             
             foreach (var key in _comboCooldowns.Keys)
@@ -423,10 +511,40 @@ namespace ClawRPG.Scripts.Skills {
         public override Dictionary ExportSaveData()
         {
             var data = new Dictionary();
-            data["masteries"] = _masteries;
-            data["comboUsages"] = ComboUsages;
+            
+            // Mastery data
+            var masteriesArray = new Array();
+            foreach (var kvp in _masteries)
+            {
+                var m = new Dictionary
+                {
+                    ["skillId"] = kvp.Key,
+                    ["currentLevel"] = kvp.Value.CurrentLevel,
+                    ["currentXP"] = kvp.Value.CurrentXP,
+                    ["totalXP"] = kvp.Value.TotalXP,
+                    ["rank"] = (int)kvp.Value.Rank,
+                    ["runeSlots"] = kvp.Value.RuneSlots,
+                    ["equippedRunes"] = kvp.Value.EquippedRunes,
+                    ["damageBonus"] = kvp.Value.DamageBonus,
+                    ["cooldownReduction"] = kvp.Value.CooldownReduction,
+                    ["rangeBonus"] = kvp.Value.RangeBonus,
+                    ["costReduction"] = kvp.Value.CostReduction
+                };
+                masteriesArray.Add(m);
+            }
+            data["masteries"] = masteriesArray;
+            
+            // Combo usages
+            var comboUsagesArray = new Array();
+            foreach (var kvp in ComboUsages)
+            {
+                comboUsagesArray.Add(new Dictionary { ["comboId"] = kvp.Key, ["usages"] = kvp.Value });
+            }
+            data["comboUsages"] = comboUsagesArray;
+            
             data["totalMasteryXP"] = TotalMasteryXP;
             data["highestMasteryRank"] = HighestMasteryRank;
+            
             return data;
         }
         
@@ -434,26 +552,59 @@ namespace ClawRPG.Scripts.Skills {
         {
             if (data == null) return;
             
+            // Import masteries
             if (data.TryGetValue("masteries", out var m))
             {
                 _masteries.Clear();
-                var dict = m as Dictionary<object, object>;
-                if (dict != null)
-                    foreach (var kvp in dict)
+                var arr = m as Array;
+                if (arr != null)
+                {
+                    foreach (Dictionary entry in arr)
                     {
-                        var mastery = kvp.Value as SkillMastery;
-                        if (mastery != null)
-                            _masteries[Convert.ToInt32(kvp.Key)] = mastery;
+                        int skillId = Convert.ToInt32(entry["skillId"]);
+                        _masteries[skillId] = new SkillMastery
+                        {
+                            SkillId = skillId,
+                            CurrentLevel = Convert.ToInt32(entry["currentLevel"]),
+                            CurrentXP = Convert.ToInt32(entry["currentXP"]),
+                            TotalXP = Convert.ToInt32(entry["totalXP"]),
+                            Rank = (MasteryRank)Convert.ToInt32(entry["rank"]),
+                            RuneSlots = Convert.ToInt32(entry["runeSlots"]),
+                            EquippedRunes = new Dictionary<int, int>(),
+                            DamageBonus = Convert.ToSingle(entry["damageBonus"]),
+                            CooldownReduction = Convert.ToSingle(entry["cooldownReduction"]),
+                            RangeBonus = Convert.ToSingle(entry["rangeBonus"]),
+                            CostReduction = Convert.ToSingle(entry["costReduction"])
+                        };
+                        
+                        if (entry.Contains("equippedRunes"))
+                        {
+                            var runesDict = entry["equippedRunes"] as Dictionary<object, object>;
+                            if (runesDict != null)
+                            {
+                                foreach (var runeKvp in runesDict)
+                                {
+                                    _masteries[skillId].EquippedRunes[Convert.ToInt32(runeKvp.Key)] = Convert.ToInt32(runeKvp.Value);
+                                }
+                            }
+                        }
                     }
+                }
             }
             
+            // Import combo usages
             if (data.TryGetValue("comboUsages", out var cu))
             {
                 ComboUsages.Clear();
-                var dict = cu as Dictionary<object, object>;
-                if (dict != null)
-                    foreach (var kvp in dict)
-                        ComboUsages[Convert.ToInt32(kvp.Key)] = Convert.ToInt32(kvp.Value);
+                var arr = cu as Array;
+                if (arr != null)
+                {
+                    foreach (Dictionary entry in arr)
+                    {
+                        int comboId = Convert.ToInt32(entry["comboId"]);
+                        ComboUsages[comboId] = Convert.ToInt32(entry["usages"]);
+                    }
+                }
             }
             
             if (data.TryGetValue("totalMasteryXP", out var tm))
@@ -480,8 +631,21 @@ namespace ClawRPG.Scripts.Skills {
         
         public Dictionary<int, SkillMastery> GetAllMasteries() => _masteries;
         
+        /// <summary>
+        /// 获取进度系统引用 (用于委托)
+        /// </summary>
+        public SkillProgressionSystem GetProgressionSystem() => _progressionSystem;
+        
+        /// <summary>
+        /// 获取技能树系统引用 (用于委托)
+        /// </summary>
+        public SkillTreeSystem GetTreeSystem() => _treeSystem;
+        
+        /// <summary>
+        /// 获取解锁系统引用 (用于委托)
+        /// </summary>
+        public SkillUnlockSystem GetUnlockSystem() => _unlockSystem;
+        
         #endregion
     }
-    
-    public Dictionary<int, int> ComboUsages { get; private set; } = new Dictionary<int, int>();
 }
