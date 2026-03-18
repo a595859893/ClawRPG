@@ -10,7 +10,27 @@ namespace ClawRPG.Systems.Alchemy
     public partial class AlchemyDatabase : BaseSystem
     {
         private static AlchemyDatabase _instance;
-        public static AlchemyDatabase Instance => _instance;
+        public static AlchemyDatabase Instance => _instance ??= new AlchemyDatabase();
+        
+        /// <summary>
+        /// 静态初始化方法，用于在数据库节点添加到场景树前初始化数据
+        /// </summary>
+        public static void Initialize()
+        {
+            if (_instance == null)
+            {
+                _instance = new AlchemyDatabase();
+            }
+            if (!_instance.IsInitialized)
+            {
+                _instance._recipeDB = new AlchemyRecipeDB();
+                _instance._crafting = new AlchemyCrafting();
+                _instance._effects = new AlchemyEffects();
+                _instance._inventory = new AlchemyInventorySystem();
+                _instance._inventory.InitializeMaterials();
+                _instance.IsInitialized = true;
+            }
+        }
         
         // 子系统
         private AlchemyRecipeDB _recipeDB;

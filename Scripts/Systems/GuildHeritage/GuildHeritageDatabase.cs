@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class GuildHeritageDatabase : Godot.Object
 {
+    private static GuildHeritageDatabase _instance;
+    public static GuildHeritageDatabase Instance => _instance ??= new GuildHeritageDatabase();
+
     // Transfer Type Configurations
     public Dictionary<string, TransferTypeConfig> TransferTypes { get; set; } = new Dictionary<string, TransferTypeConfig>();
     

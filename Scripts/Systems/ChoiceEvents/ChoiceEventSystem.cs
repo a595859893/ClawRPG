@@ -34,7 +34,8 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
         
         public override void _Ready()
         {
-            _database = new ChoiceEventDatabase();
+            _database = ChoiceEventDatabase.Instance;
+            _database.Initialize();
             _playerData = new PlayerChoiceData();
             GD.Print("ChoiceEventSystem initialized");
         }

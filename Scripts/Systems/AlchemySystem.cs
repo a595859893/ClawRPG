@@ -60,9 +60,12 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Initialize the alchemy system and unlock basic recipes.
         /// </summary>
-        public void Initialize()
+        public override void Initialize()
         {
             if (_isInitialized) return;
+            
+            // 确保数据库已初始化
+            AlchemyDatabase.Initialize();
             
             // 初始解锁一些基础配方
             UnlockRecipe(2001); // 小生命药水

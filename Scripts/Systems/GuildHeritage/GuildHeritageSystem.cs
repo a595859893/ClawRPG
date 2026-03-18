@@ -26,7 +26,7 @@ public class GuildHeritageSystem : BaseSystem
     public GuildHeritageSystem()
     {
         _data = new GuildHeritageData();
-        _database = new GuildHeritageDatabase();
+        _database = GuildHeritageDatabase.Instance;
     }
     
     public void Initialize()

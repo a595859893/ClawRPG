@@ -26,6 +26,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
         public override void _Ready() {
             _instance = this;
             _database = FateWeavingDatabase.Instance;
+            _database.Initialize();
             LoadData();
         }
 
