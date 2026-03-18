@@ -9,8 +9,8 @@ namespace ClawRPG.Scripts.Systems
     /// </summary>
     public class AchievementManager : BaseSystem
     {
-        private List<Achievement> _unlockedAchievements = new List<Achievement>();
-        private Dictionary<string, Achievement> _trackedAchievements = new Dictionary<string, Achievement>();
+        private List<Achievement> _unlockedAchievements;
+        private Dictionary<string, Achievement> _trackedAchievements;
         
         // Tutorial tracking
         private bool _hasTriggeredFirstAchievement = false; 
@@ -38,6 +38,7 @@ namespace ClawRPG.Scripts.Systems
         
         protected override void Initialize()
         {
+            base.Initialize();
             _unlockedAchievements = new List<Achievement>();
             _trackedAchievements = new Dictionary<string, Achievement>();
             LoadAchievements();
@@ -282,28 +283,22 @@ namespace ClawRPG.Scripts.Systems
         
         private void GrantRewards(Achievement achievement)
         {
-            var player = GetPlayer();
-            if (player != null)
+            var tree = GetTree();
+            if (tree?.CurrentScene != null)
             {
-                if (achievement.RewardGold > 0)
+                var player = tree.CurrentScene.GetNodeOrNull<Node>("%Player");
+                if (player != null)
                 {
-                    player.AddGold(achievement.RewardGold);
-                }
-                if (achievement.RewardExp > 0)
-                {
-                    player.AddExperience(achievement.RewardExp);
+                    if (achievement.RewardGold > 0)
+                    {
+                        player.Call("AddGold", achievement.RewardGold);
+                    }
+                    if (achievement.RewardExp > 0)
+                    {
+                        player.Call("AddExperience", achievement.RewardExp);
+                    }
                 }
             }
-        }
-        
-        private Node GetPlayer()
-        {
-            return GetTree()?.CurrentScene?.GetNodeOrNull<Node>("%Player");
-        }
-        
-        private Tree GetTree()
-        {
-            return Engine.GetMainLoop() as Tree;
         }
         
         /// <summary>
