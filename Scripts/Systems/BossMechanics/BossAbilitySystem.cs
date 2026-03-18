@@ -1,0 +1,456 @@
+using Godot;
+using System;
+using System.Collections.Generic;
+
+/// <summary>
+/// Boss技能系统 - 负责Boss技能/机制（伤害、治疗、护盾、召唤等）
+/// </summary>
+public class BossAbilitySystem : BaseSystem
+{
+    public static BossAbilitySystem Instance { get; private set; }
+
+    // 信号 - 技能相关
+    public static signal BossSkillInitiated(string instanceId, string skillId, string skillName);
+    public static signal BossSkillExecuted(string instanceId, string skillId, string skillName);
+    public static signal BossSkillCompleted(string instanceId, string skillId);
+    public static signal BossHealed(string instanceId, float amount);
+    public static signal BossShielded(string instanceId, float amount);
+    public static signal MonstersSummoned(string instanceId, List<string> monsterIds);
+
+    private Random _random = new Random();
+
+    public override void _Ready()
+    {
+        Instance = this;
+    }
+
+    /// <summary>
+    /// 初始化技能系统
+    /// </summary>
+    public void InitializeAbilities(BossBattleInstance battle)
+    {
+        battle.SkillCooldowns.Clear();
+        battle.ActiveEffects.Clear();
+        
+        // 初始化技能冷却
+        if (battle.Config.Skills != null)
+        {
+            foreach (var skill in battle.Config.Skills)
+            {
+                battle.SkillCooldowns[skill.Id] = _random.Next(0, (int)skill.Cooldown);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 更新技能冷却（每帧调用）
+    /// </summary>
+    public void UpdateAbilities(BossBattleInstance battle, float delta)
+    {
+        if (!battle.IsAlive) return;
+
+        battle.TimeSinceLastSkill += delta;
+
+        // 更新技能冷却
+        foreach (var skillCooldown in battle.SkillCooldowns)
+        {
+            battle.SkillCooldowns[skillCooldown.Key] = Mathf.Max(0, skillCooldown.Value - delta);
+        }
+    }
+
+    /// <summary>
+    /// 选择可用技能
+    /// </summary>
+    public BossSkillConfig SelectSkill(BossBattleInstance battle)
+    {
+        if (battle.Config.Skills == null || battle.Config.Skills.Count == 0)
+            return null;
+
+        List<BossSkillConfig> availableSkills = new List<BossSkillConfig>();
+        
+        foreach (var skill in battle.Config.Skills)
+        {
+            // 检查冷却
+            if (battle.SkillCooldowns.ContainsKey(skill.Id) && battle.SkillCooldowns[skill.Id] > 0)
+                continue;
+                
+            // 检查狂暴状态限制
+            if (skill.IsEnragedOnly && !battle.IsEnraged)
+                continue;
+                
+            // 检查阶段要求
+            if (skill.PhaseRequired > battle.CurrentPhase)
+                continue;
+                
+            // 检查执行概率
+            if (_random.NextDouble() > skill.ExecuteProbability)
+                continue;
+                
+            availableSkills.Add(skill);
+        }
+        
+        if (availableSkills.Count == 0)
+            return null;
+            
+        return availableSkills[_random.Next(availableSkills.Count)];
+    }
+
+    /// <summary>
+    /// 执行Boss技能
+    /// </summary>
+    public void ExecuteSkill(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        if (skill == null || battle == null) return;
+
+        // 设置冷却
+        battle.SkillCooldowns[skill.Id] = skill.Cooldown;
+        battle.TimeSinceLastSkill = 0;
+
+        // 发出技能开始信号
+        BossSkillInitiated?.Emit(battle.InstanceId, skill.Id, skill.Name);
+
+        // 执行技能效果
+        switch (skill.SkillType)
+        {
+            case BossSkillType.MeleeAttack:
+            case BossSkillType.RangedAttack:
+            case BossSkillType.Projectile:
+                ApplyDirectDamage(battle, skill);
+                break;
+                
+            case BossSkillType.AreaOfEffect:
+                ApplyAreaDamage(battle, skill);
+                break;
+                
+            case BossSkillType.Summon:
+                SummonMonsters(battle, skill);
+                break;
+                
+            case BossSkillType.Heal:
+                ApplySelfHeal(battle, skill);
+                break;
+                
+            case BossSkillType.Shield:
+                ApplyShield(battle, skill);
+                break;
+                
+            case BossSkillType.Debuff:
+                ApplyDebuff(battle, skill);
+                break;
+                
+            case BossSkillType.Teleport:
+                PerformTeleport(battle);
+                break;
+                
+            case BossSkillType.Stun:
+                ApplyStun(battle, skill);
+                break;
+                
+            case BossSkillType.Knockback:
+                ApplyKnockback(battle, skill);
+                break;
+                
+            case BossSkillType.Charge:
+                PerformCharge(battle, skill);
+                break;
+                
+            case BossSkillType.SpinAttack:
+                ApplySpinAttack(battle, skill);
+                break;
+                
+            case BossSkillType.LaserBeam:
+                ApplyLaserBeam(battle, skill);
+                break;
+                
+            case BossSkillType.Enrage:
+                ApplyEnrageEffect(battle, skill);
+                break;
+        }
+
+        // 发出技能执行完成信号
+        BossSkillExecuted?.Emit(battle.InstanceId, skill.Id, skill.Name);
+        BossSkillCompleted?.Emit(battle.InstanceId, skill.Id);
+    }
+
+    /// <summary>
+    /// 应用直接伤害
+    /// </summary>
+    public float ApplyDirectDamage(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        float damage = skill.Damage * battle.CurrentDamageMultiplier;
+        
+        if (_random.NextDouble() < battle.Config.CriticalChance)
+        {
+            damage *= battle.Config.CriticalDamage;
+        }
+        
+        // 返回实际伤害值，供外部使用
+        return damage;
+    }
+
+    /// <summary>
+    /// 应用范围伤害
+    /// </summary>
+    public float ApplyAreaDamage(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        float damage = skill.Damage * battle.CurrentDamageMultiplier;
+        
+        if (_random.NextDouble() < battle.Config.CriticalChance)
+        {
+            damage *= battle.Config.CriticalDamage;
+        }
+        
+        // 范围信息可以通过技能配置的AreaRadius获取
+        return damage;
+    }
+
+    /// <summary>
+    /// 召唤怪物
+    /// </summary>
+    public void SummonMonsters(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        if (string.IsNullOrEmpty(skill.SummonMonsterId)) return;
+
+        List<string> summonedIds = new List<string>();
+        
+        for (int i = 0; i < skill.SummonCount; i++)
+        {
+            string summonId = $"{skill.SummonMonsterId}_{battle.InstanceId}_{i}";
+            battle.SummonedMonsters.Add(summonId);
+            summonedIds.Add(summonId);
+        }
+        
+        MonstersSummoned?.Emit(battle.InstanceId, summonedIds);
+    }
+
+    /// <summary>
+    /// 自我治疗
+    /// </summary>
+    public void ApplySelfHeal(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        float healAmount = skill.HealAmount;
+        float oldHealth = battle.CurrentHealth;
+        
+        battle.CurrentHealth = Mathf.Min(battle.Config.MaxHealth, battle.CurrentHealth + healAmount);
+        
+        float actualHeal = battle.CurrentHealth - oldHealth;
+        if (actualHeal > 0)
+        {
+            BossHealed?.Emit(battle.InstanceId, actualHeal);
+        }
+    }
+
+    /// <summary>
+    /// 应用护盾
+    /// </summary>
+    public void ApplyShield(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        string shieldEffect = $"shield_{skill.ShieldAmount}";
+        
+        // 移除旧护盾，添加新护盾
+        battle.ActiveEffects.RemoveAll(e => e.StartsWith("shield_"));
+        battle.ActiveEffects.Add(shieldEffect);
+        
+        BossShielded?.Emit(battle.InstanceId, skill.ShieldAmount);
+    }
+
+    /// <summary>
+    /// 应用Debuff
+    /// </summary>
+    public void ApplyDebuff(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        if (skill.DebuffIds == null) return;
+        
+        foreach (var debuffId in skill.DebuffIds)
+        {
+            battle.ActiveEffects.Add(debuffId);
+        }
+    }
+
+    /// <summary>
+    /// 传送
+    /// </summary>
+    public void PerformTeleport(BossBattleInstance battle)
+    {
+        battle.ActiveEffects.Add("teleporting");
+        // 实际的传送逻辑由其他系统处理
+    }
+
+    /// <summary>
+    /// 眩晕
+    /// </summary>
+    public void ApplyStun(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        battle.ActiveEffects.Add($"stun_{skill.StunDuration}");
+    }
+
+    /// <summary>
+    /// 击退
+    /// </summary>
+    public void ApplyKnockback(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        battle.ActiveEffects.Add($"knockback_{skill.KnockbackForce}");
+    }
+
+    /// <summary>
+    /// 冲锋
+    /// </summary>
+    public void PerformCharge(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        battle.ActiveEffects.Add("charging");
+    }
+
+    /// <summary>
+    /// 旋转攻击
+    /// </summary>
+    public void ApplySpinAttack(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        float damage = skill.Damage * battle.CurrentDamageMultiplier;
+        battle.ActiveEffects.Add("spin_attack");
+    }
+
+    /// <summary>
+    /// 激光束
+    /// </summary>
+    public void ApplyLaserBeam(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        battle.ActiveEffects.Add("laser_beam");
+    }
+
+    /// <summary>
+    /// 狂暴效果
+    /// </summary>
+    public void ApplyEnrageEffect(BossBattleInstance battle, BossSkillConfig skill)
+    {
+        // 狂暴效果由PhaseSystem处理
+        if (!battle.IsEnraged)
+        {
+            BossPhaseSystem.Instance.TriggerEnrage(battle);
+        }
+    }
+
+    /// <summary>
+    /// 检查技能是否可用
+    /// </summary>
+    public bool IsSkillReady(BossBattleInstance battle, string skillId)
+    {
+        if (!battle.SkillCooldowns.ContainsKey(skillId))
+            return false;
+            
+        return battle.SkillCooldowns[skillId] <= 0;
+    }
+
+    /// <summary>
+    /// 获取技能剩余冷却时间
+    /// </summary>
+    public float GetSkillCooldown(BossBattleInstance battle, string skillId)
+    {
+        if (!battle.SkillCooldowns.ContainsKey(skillId))
+            return 0;
+            
+        return battle.SkillCooldowns[skillId];
+    }
+
+    /// <summary>
+    /// 查找技能配置
+    /// </summary>
+    public BossSkillConfig FindSkill(BossBattleInstance battle, string skillId)
+    {
+        if (battle.Config.Skills == null) return null;
+        
+        foreach (var skill in battle.Config.Skills)
+        {
+            if (skill.Id == skillId)
+                return skill;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 应用伤害减免（护盾）
+    /// </summary>
+    public float ApplyShieldReduction(BossBattleInstance battle, float damage)
+    {
+        float remainingDamage = damage;
+        
+        for (int i = battle.ActiveEffects.Count - 1; i >= 0; i--)
+        {
+            if (battle.ActiveEffects[i].StartsWith("shield_"))
+            {
+                float shieldAmount = float.Parse(battle.ActiveEffects[i].Split('_')[1]);
+                if (shieldAmount >= remainingDamage)
+                {
+                    battle.ActiveEffects[i] = $"shield_{shieldAmount - remainingDamage}";
+                    remainingDamage = 0;
+                }
+                else
+                {
+                    remainingDamage -= shieldAmount;
+                    battle.ActiveEffects.RemoveAt(i);
+                }
+                break;
+            }
+        }
+        
+        return remainingDamage;
+    }
+
+    /// <summary>
+    /// 导出技能系统数据
+    /// </summary>
+    public Dictionary ExportSaveData(BossBattleInstance battle)
+    {
+        var data = new Dictionary();
+        
+        if (battle != null)
+        {
+            // 导出技能冷却
+            var cooldownArray = new Godot.Collections.Array();
+            foreach (var kvp in battle.SkillCooldowns)
+            {
+                cooldownArray.Add(new Godot.Collections.Array { kvp.Key, kvp.Value });
+            }
+            data["skillCooldowns"] = cooldownArray;
+            
+            // 导出召唤的小怪
+            var summonArray = new Godot.Collections.Array();
+            foreach (var monsterId in battle.SummonedMonsters)
+            {
+                summonArray.Add(monsterId);
+            }
+            data["summonedMonsters"] = summonArray;
+        }
+        
+        return data;
+    }
+
+    /// <summary>
+    /// 导入技能系统数据
+    /// </summary>
+    public void ImportSaveData(BossBattleInstance battle, Dictionary data)
+    {
+        if (battle == null || data == null) return;
+        
+        // 导入技能冷却
+        if (data.Contains("skillCooldowns"))
+        {
+            battle.SkillCooldowns.Clear();
+            var cooldownArray = (Godot.Collections.Array)data["skillCooldowns"];
+            foreach (Godot.Collections.Array entry in cooldownArray)
+            {
+                battle.SkillCooldowns[(string)entry[0]] = (float)entry[1];
+            }
+        }
+        
+        // 导入召唤的小怪
+        if (data.Contains("summonedMonsters"))
+        {
+            battle.SummonedMonsters.Clear();
+            var summonArray = (Godot.Collections.Array)data["summonedMonsters"];
+            foreach (string monsterId in summonArray)
+            {
+                battle.SummonedMonsters.Add(monsterId);
+            }
+        }
+    }
+}
