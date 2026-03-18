@@ -1,17 +1,30 @@
 using Godot;
+using Godot.Collections;
 using System;
 using System.Collections.Generic;
 
-public partial class TitleCollectionDatabase : Node
+public partial class TitleCollectionDatabase : BaseSystem
 {
     public static TitleCollectionDatabase Instance { get; private set; }
     
     private Dictionary<string, TitleCollectionData.Title> _titles = new();
     
-    public override void _Ready()
+    protected override void Initialize()
     {
         Instance = this;
         InitializeTitles();
+        IsInitialized = true;
+        GD.Print($"[TitleCollectionDatabase] Initialized with {_titles.Count} titles");
+    }
+    
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary();
+    }
+    
+    public override void ImportSaveData(Dictionary data)
+    {
+        // 称号数据是只读的，无状态需要持久化
     }
     
     private void InitializeTitles()
