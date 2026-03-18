@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Achievement manager - tracks progress and handles unlocking
     /// </summary>
-    public class AchievementManager : BaseSystem : BaseSystem
+    public class AchievementManager : BaseSystem
     {
         private static AchievementManager _instance;
         public static AchievementManager Instance => _instance ??= new AchievementManager();
