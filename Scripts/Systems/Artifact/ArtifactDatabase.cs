@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ClawRPG.Core.Databases
+namespace ClawRPG.Systems.Artifact
 {
     public static class ArtifactDatabase
     {

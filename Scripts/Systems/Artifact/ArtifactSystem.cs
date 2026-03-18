@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ClawRPG.Core.Systems
+namespace ClawRPG.Systems.Artifact
 {
     public class ArtifactSystem : BaseSystem
     {
