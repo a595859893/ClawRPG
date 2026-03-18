@@ -1,9 +1,28 @@
 using Godot;
+using Godot.Collections;
 using System;
 using System.Collections.Generic;
 
-public partial class RandomDungeonEventDatabase : Node
+public partial class RandomDungeonEventDatabase : BaseSystem
 {
+    public static RandomDungeonEventDatabase Instance { get; private set; }
+
+    protected override void Initialize()
+    {
+        Instance = this;
+        IsInitialized = true;
+        GD.Print($"[RandomDungeonEventDatabase] Initialized");
+    }
+
+    public override Dictionary ExportSaveData()
+    {
+        return new Dictionary(); // Configuration only, no runtime state to persist
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        // No runtime state to restore
+    }
     // Event rarity weights by floor
     public Dictionary<string, float> GetRarityWeights(int floor)
     {
