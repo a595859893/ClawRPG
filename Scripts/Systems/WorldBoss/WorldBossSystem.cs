@@ -7,31 +7,18 @@ using ClawRPG.Scripts.Database;
 namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
-    /// World boss system manager - handles world boss spawning and combat
+    /// World boss system coordinator - delegates to spawner, damage tracker, and reward system
     /// </summary>
     public partial class WorldBossSystem : BaseSystem
     {
         public static WorldBossSystem Instance { get; private set; }
         
-        // Active world bosses
-        private List<WorldBossData.ActiveWorldBoss> _activeBosses = new List<WorldBossData.ActiveWorldBoss>();
+        // Subsystems
+        private WorldBossSpawner _spawner;
+        private WorldBossDamageTracker _damageTracker;
+        private WorldBossRewardSystem _rewardSystem;
         
-        // Player damage records for each boss
-        private Dictionary<string, List<WorldBossData.PlayerDamageRecord>> _bossDamageRecords = new Dictionary<string, List<WorldBossData.PlayerDamageRecord>>();
-        
-        // Player statistics
-        private Dictionary<string, WorldBossData.PlayerWorldBossStats> _playerStats = new Dictionary<string, WorldBossData.PlayerWorldBossStats>();
-        
-        // Boss kill history
-        private List<WorldBossData.BossKillRecord> _killHistory = new List<WorldBossData.BossKillRecord>();
-        
-        // Spawn timers for each boss type
-        private Dictionary<string, DateTime> _nextSpawnTime = new Dictionary<string, DateTime>();
-        
-        // Random for boss spawning
-        private Random _random = new Random();
-        
-        // Signals
+        // Signals (forwarded from subsystems)
         [Signal] public delegate void BossSpawnedEventHandler(WorldBossData.ActiveWorldBoss boss);
         [Signal] public delegate void BossDamagedEventHandler(string bossInstanceId, string playerId, int damage);
         [Signal] public delegate void BossDefeatedEventHandler(WorldBossData.ActiveWorldBoss boss);
@@ -41,199 +28,172 @@ namespace ClawRPG.Scripts.Systems
         {
             Instance = this;
             WorldBossDatabase.Initialize();
-            InitializeSpawnTimers();
-        }
-        
-        private void InitializeSpawnTimers()
-        {
-            var bosses = WorldBossDatabase.GetAllBosses();
-            foreach (var boss in bosses)
-            {
-                // Schedule first spawn
-                int delayMinutes = _random.Next(0, (int)boss.SpawnIntervalMinutes);
-                _nextSpawnTime[boss.Id] = DateTime.Now.AddMinutes(delayMinutes);
-            }
-        }
-        
-        public override void _Process(double delta)
-        {
-            CheckBossSpawning();
-            ProcessActiveBosses(delta);
-        }
-        
-        private void CheckBossSpawning()
-        {
-            var bosses = WorldBossDatabase.GetAllBosses();
-            foreach (var boss in bosses)
-            {
-                if (boss.SpawnType == WorldBossData.SpawnCondition.Timer)
-                {
-                    if (!_nextSpawnTime.ContainsKey(boss.Id))
-                    {
-                        _nextSpawnTime[boss.Id] = DateTime.Now;
-                    }
-                    
-                    if (DateTime.Now >= _nextSpawnTime[boss.Id] && !IsBossActive(boss.Id))
-                    {
-                        // Check if boss can spawn based on player level
-                        var player = GetTree().CurrentScene?.GetNode<Player>("Player");
-                        if (player != null && player.Level >= boss.Level - 10)
-                        {
-                            SpawnBoss(boss.Id);
-                            _nextSpawnTime[boss.Id] = DateTime.Now.AddMinutes(boss.SpawnIntervalMinutes);
-                        }
-                    }
-                }
-                else if (boss.SpawnType == WorldBossData.SpawnCondition.Random)
-                {
-                    // Random spawn chance
-                    if (_random.NextDouble() < 0.001 && !IsBossActive(boss.Id)) // ~1.7% per minute
-                    {
-                        var player = GetTree().CurrentScene?.GetNode<Player>("Player");
-                        if (player != null && player.Level >= boss.Level - 10)
-                        {
-                            SpawnBoss(boss.Id);
-                        }
-                    }
-                }
-            }
-        }
-        
-        private bool IsBossActive(string bossId)
-        {
-            foreach (var boss in _activeBosses)
-            {
-                if (boss.BossId == bossId && !boss.IsDefeated)
-                    return true;
-            }
-            return false;
-        }
-        
-        private void ProcessActiveBosses(double delta)
-        {
-            List<WorldBossData.ActiveWorldBoss> bossesToRemove = new List<WorldBossData.ActiveWorldBoss>();
             
-            foreach (var boss in _activeBosses)
+            // Get or create subsystems
+            _spawner = GetNode<WorldBossSpawner>("WorldBossSpawner") ?? GetParent()?.GetNode<WorldBossSpawner>("WorldBossSpawner");
+            _damageTracker = GetNode<WorldBossDamageTracker>("WorldBossDamageTracker") ?? GetParent()?.GetNode<WorldBossDamageTracker>("WorldBossDamageTracker");
+            _rewardSystem = GetNode<WorldBossRewardSystem>("WorldBossRewardSystem") ?? GetParent()?.GetNode<WorldBossRewardSystem>("WorldBossRewardSystem");
+            
+            // Connect subsystem signals
+            ConnectToSubsystems();
+        }
+        
+        private void ConnectToSubsystems()
+        {
+            if (_spawner != null)
             {
-                if (boss.IsDefeated) continue;
-                
-                // Check lifetime
-                var elapsed = DateTime.Now - boss.SpawnTime;
-                if (elapsed.TotalMinutes >= boss.LifeTimeMinutes)
-                {
-                    // Boss escaped
-                    bossesToRemove.Add(boss);
-                    EmitSignal(SignalName.BossEscaped, boss);
-                    continue;
-                }
-                
-                // Check if all players left
-                if (boss.PlayerCount == 0)
-                {
-                    bossesToRemove.Add(boss);
-                    EmitSignal(SignalName.BossEscaped, boss);
-                }
+                _spawner.BossSpawned += OnBossSpawned;
+                _spawner.BossEscaped += OnBossEscaped;
+                _spawner.BossDefeated += OnBossDefeated;
             }
             
-            foreach (var boss in bossesToRemove)
+            if (_damageTracker != null)
             {
-                _activeBosses.Remove(boss);
+                _damageTracker.BossDamaged += OnBossDamaged;
             }
         }
+        
+        private void OnBossSpawned(WorldBossData.ActiveWorldBoss boss)
+        {
+            EmitSignal(SignalName.BossSpawned, boss);
+        }
+        
+        private void OnBossEscaped(WorldBossData.ActiveWorldBoss boss)
+        {
+            EmitSignal(SignalName.BossEscaped, boss);
+        }
+        
+        private void OnBossDefeated(WorldBossData.ActiveWorldBoss boss)
+        {
+            EmitSignal(SignalName.BossDefeated, boss);
+        }
+        
+        private void OnBossDamaged(string bossInstanceId, string playerId, int damage)
+        {
+            EmitSignal(SignalName.BossDamaged, bossInstanceId, playerId, damage);
+        }
+        
+        /// <summary>
+        /// Get the spawner subsystem
+        /// </summary>
+        public WorldBossSpawner GetSpawner()
+        {
+            return _spawner;
+        }
+        
+        /// <summary>
+        /// Get the damage tracker subsystem
+        /// </summary>
+        public WorldBossDamageTracker GetDamageTracker()
+        {
+            return _damageTracker;
+        }
+        
+        /// <summary>
+        /// Get the reward system subsystem
+        /// </summary>
+        public WorldBossRewardSystem GetRewardSystem()
+        {
+            return _rewardSystem;
+        }
+        
+        // ==================== Spawner API ====================
         
         /// <summary>
         /// Spawn a world boss
         /// </summary>
         public WorldBossData.ActiveWorldBoss SpawnBoss(string bossId)
         {
-            var bossTemplate = WorldBossDatabase.GetBoss(bossId);
-            if (bossTemplate == null) return null;
+            if (_spawner == null) return null;
             
-            // Get player position for spawn location
-            Vector2 spawnPos = new Vector2(0, 0);
-            var player = GetTree().CurrentScene?.GetNode<Player>("Player");
-            if (player != null)
+            var boss = _spawner.SpawnBoss(bossId);
+            if (boss != null)
             {
-                float angle = (float)(_random.NextDouble() * Math.PI * 2);
-                float distance = (float)(bossTemplate.SpawnRadius * (0.5 + _random.NextDouble() * 0.5));
-                spawnPos = player.GlobalPosition + new Vector2(
-                    Mathf.Cos(angle) * distance,
-                    Mathf.Sin(angle) * distance
-                );
+                _damageTracker?.InitializeBossDamageRecords(boss.InstanceId);
             }
-            
-            var activeBoss = new WorldBossData.ActiveWorldBoss
-            {
-                BossId = bossId,
-                BossName = bossTemplate.Name,
-                Rarity = bossTemplate.Rarity,
-                CurrentHealth = bossTemplate.Health,
-                MaxHealth = bossTemplate.Health,
-                X = spawnPos.x,
-                Y = spawnPos.y,
-                SpawnTime = DateTime.Now,
-                LifeTimeMinutes = bossTemplate.SpawnIntervalMinutes > 0 ? bossTemplate.SpawnIntervalMinutes : 30,
-                IsDefeated = false,
-                TotalDamageDealt = 0,
-                PlayerCount = 1
-            };
-            
-            _activeBosses.Add(activeBoss);
-            _bossDamageRecords[activeBoss.InstanceId] = new List<WorldBossData.PlayerDamageRecord>();
-            
-            // Notify player of boss spawn
-            if (player != null)
-            {
-                // Could show notification here
-            }
-            
-            EmitSignal(SignalName.BossSpawned, activeBoss);
-            
-            GD.Print($"[WorldBoss] {bossTemplate.Name} spawned at ({spawnPos.x}, {spawnPos.y})!");
-            
-            return activeBoss;
+            return boss;
         }
+        
+        /// <summary>
+        /// Get all active bosses
+        /// </summary>
+        public List<WorldBossData.ActiveWorldBoss> GetActiveBosses()
+        {
+            if (_spawner != null)
+                return _spawner.GetActiveBosses();
+            return new List<WorldBossData.ActiveWorldBoss>();
+        }
+        
+        /// <summary>
+        /// Check if there are any active bosses
+        /// </summary>
+        public bool HasActiveBosses()
+        {
+            if (_spawner != null)
+                return _spawner.HasActiveBosses();
+            return false;
+        }
+        
+        /// <summary>
+        /// Get next spawn time for a boss
+        /// </summary>
+        public DateTime? GetNextSpawnTime(string bossId)
+        {
+            if (_spawner != null)
+                return _spawner.GetNextSpawnTime(bossId);
+            return null;
+        }
+        
+        /// <summary>
+        /// Get all spawn timers
+        /// </summary>
+        public Dictionary<string, DateTime> GetAllSpawnTimers()
+        {
+            if (_spawner != null)
+                return _spawner.GetAllSpawnTimers();
+            return new Dictionary<string, DateTime>();
+        }
+        
+        /// <summary>
+        /// Force spawn a boss (for testing or events)
+        /// </summary>
+        public WorldBossData.ActiveWorldBoss ForceSpawnBoss(string bossId)
+        {
+            if (_spawner == null) return null;
+            
+            var boss = _spawner.ForceSpawnBoss(bossId);
+            if (boss != null)
+            {
+                _damageTracker?.InitializeBossDamageRecords(boss.InstanceId);
+            }
+            return boss;
+        }
+        
+        /// <summary>
+        /// Update player count for a boss
+        /// </summary>
+        public void UpdatePlayerCount(string bossInstanceId, int count)
+        {
+            _spawner?.UpdatePlayerCount(bossInstanceId, count);
+        }
+        
+        // ==================== Damage Tracker API ====================
         
         /// <summary>
         /// Deal damage to a world boss
         /// </summary>
         public void DealDamage(string bossInstanceId, string playerId, string playerName, int damage)
         {
-            var boss = GetBossByInstanceId(bossInstanceId);
+            if (_spawner == null || _damageTracker == null) return;
+            
+            var boss = _spawner.GetBossByInstanceId(bossInstanceId);
             if (boss == null || boss.IsDefeated) return;
             
-            boss.CurrentHealth -= damage;
-            boss.TotalDamageDealt += damage;
+            // Update boss health via spawner
+            _spawner.UpdateBossHealth(bossInstanceId, damage);
             
-            // Update player damage record
-            if (!_bossDamageRecords.ContainsKey(bossInstanceId))
-                _bossDamageRecords[bossInstanceId] = new List<WorldBossData.PlayerDamageRecord>();
-            
-            var records = _bossDamageRecords[bossInstanceId];
-            var playerRecord = records.Find(r => r.PlayerId == playerId);
-            
-            if (playerRecord == null)
-            {
-                playerRecord = new WorldBossData.PlayerDamageRecord
-                {
-                    PlayerId = playerId,
-                    PlayerName = playerName,
-                    DamageDealt = 0
-                };
-                records.Add(playerRecord);
-            }
-            
-            playerRecord.DamageDealt += damage;
-            playerRecord.LastHitTime = DateTime.Now;
-            
-            // Update damage percentage
-            float totalDamage = boss.TotalDamageDealt;
-            foreach (var record in records)
-            {
-                record.DamagePercent = totalDamage > 0 ? (float)record.DamageDealt / totalDamage * 100f : 0f;
-            }
-            
-            EmitSignal(SignalName.BossDamaged, bossInstanceId, playerId, damage);
+            // Update damage record via damage tracker
+            _damageTracker.DealDamage(bossInstanceId, playerId, playerName, damage, boss.TotalDamageDealt);
             
             // Check if boss is defeated
             if (boss.CurrentHealth <= 0)
@@ -244,81 +204,21 @@ namespace ClawRPG.Scripts.Systems
         
         private void DefeatBoss(WorldBossData.ActiveWorldBoss boss)
         {
-            boss.IsDefeated = true;
+            if (_spawner == null || _damageTracker == null || _rewardSystem == null) return;
             
-            var bossTemplate = WorldBossDatabase.GetBoss(boss.BossId);
-            if (bossTemplate == null) return;
+            // Mark boss as defeated
+            _spawner.MarkBossDefeated(boss.InstanceId);
             
-            // Calculate rewards
-            var damageRecords = _bossDamageRecords.ContainsKey(boss.InstanceId) 
-                ? _bossDamageRecords[boss.InstanceId] 
-                : new List<WorldBossData.PlayerDamageRecord>();
+            // Get damage records
+            var damageRecords = _damageTracker.GetDamageRecords(boss.InstanceId);
             
-            float rarityMultiplier = WorldBossDatabase.GetRarityMultiplier(boss.Rarity);
+            // Distribute rewards
+            _rewardSystem.DistributeRewards(boss.InstanceId, boss.BossId, boss.Rarity, damageRecords);
             
-            foreach (var record in damageRecords)
-            {
-                if (record.DamageDealt > 0)
-                {
-                    int goldReward = (int)(bossTemplate.GoldReward * (record.DamagePercent / 100f) * rarityMultiplier);
-                    int expReward = (int)(bossTemplate.ExpReward * (record.DamagePercent / 100f) * rarityMultiplier);
-                    
-                    // Add to player stats
-                    AddPlayerStats(record.PlayerId, goldReward, expReward, boss.BossId, boss.Rarity);
-                }
-            }
-            
-            // Record kill history
-            var killRecord = new WorldBossData.BossKillRecord
-            {
-                BossId = boss.BossId,
-                BossName = boss.BossName,
-                Rarity = boss.Rarity,
-                KillTime = DateTime.Now,
-                TotalDamage = boss.TotalDamageDealt,
-                KillerCount = damageRecords.Count,
-                TotalGoldReward = (int)(bossTemplate.GoldReward * rarityMultiplier),
-                TotalExpReward = (int)(bossTemplate.ExpReward * rarityMultiplier)
-            };
-            _killHistory.Add(killRecord);
-            
-            // Limit history size
-            if (_killHistory.Count > 100)
-                _killHistory.RemoveAt(0);
-            
-            EmitSignal(SignalName.BossDefeated, boss);
+            // Clear damage records
+            _damageTracker.ClearDamageRecords(boss.InstanceId);
             
             GD.Print($"[WorldBoss] {boss.BossName} defeated! Total damage: {boss.TotalDamageDealt}, Killers: {damageRecords.Count}");
-        }
-        
-        /// <summary>
-        /// Update player count for a boss
-        /// </summary>
-        public void UpdatePlayerCount(string bossInstanceId, int count)
-        {
-            var boss = GetBossByInstanceId(bossInstanceId);
-            if (boss != null)
-            {
-                boss.PlayerCount = count;
-            }
-        }
-        
-        private WorldBossData.ActiveWorldBoss GetBossByInstanceId(string instanceId)
-        {
-            foreach (var boss in _activeBosses)
-            {
-                if (boss.InstanceId == instanceId)
-                    return boss;
-            }
-            return null;
-        }
-        
-        /// <summary>
-        /// Get all active bosses
-        /// </summary>
-        public List<WorldBossData.ActiveWorldBoss> GetActiveBosses()
-        {
-            return new List<WorldBossData.ActiveWorldBoss>(_activeBosses);
         }
         
         /// <summary>
@@ -326,63 +226,41 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public List<WorldBossData.PlayerDamageRecord> GetDamageRecords(string bossInstanceId)
         {
-            if (_bossDamageRecords.ContainsKey(bossInstanceId))
-                return new List<WorldBossData.PlayerDamageRecord>(_bossDamageRecords[bossInstanceId]);
+            if (_damageTracker != null)
+                return _damageTracker.GetDamageRecords(bossInstanceId);
             return new List<WorldBossData.PlayerDamageRecord>();
         }
+        
+        /// <summary>
+        /// Get damage rankings for a boss
+        /// </summary>
+        public List<WorldBossData.PlayerDamageRecord> GetDamageRankings(string bossInstanceId)
+        {
+            if (_damageTracker != null)
+                return _damageTracker.GetDamageRankings(bossInstanceId);
+            return new List<WorldBossData.PlayerDamageRecord>();
+        }
+        
+        /// <summary>
+        /// Get player rank for a boss
+        /// </summary>
+        public int GetPlayerRank(string bossInstanceId, string playerId)
+        {
+            if (_damageTracker != null)
+                return _damageTracker.GetPlayerRank(bossInstanceId, playerId);
+            return -1;
+        }
+        
+        // ==================== Reward System API ====================
         
         /// <summary>
         /// Get player statistics
         /// </summary>
         public WorldBossData.PlayerWorldBossStats GetPlayerStats(string playerId)
         {
-            if (!_playerStats.ContainsKey(playerId))
-            {
-                _playerStats[playerId] = new WorldBossData.PlayerWorldBossStats { PlayerId = playerId };
-            }
-            return _playerStats[playerId];
-        }
-        
-        /// <summary>
-        /// Get kill history
-        /// </summary>
-        public List<WorldBossData.BossKillRecord> GetKillHistory()
-        {
-            return new List<WorldBossData.BossKillRecord>(_killHistory);
-        }
-        
-        /// <summary>
-        /// Get next spawn time for a boss
-        /// </summary>
-        public DateTime? GetNextSpawnTime(string bossId)
-        {
-            if (_nextSpawnTime.ContainsKey(bossId))
-                return _nextSpawnTime[bossId];
+            if (_rewardSystem != null)
+                return _rewardSystem.GetPlayerStats(playerId);
             return null;
-        }
-        
-        /// <summary>
-        /// Get all spawn timers
-        /// </summary>
-        public Dictionary<string, DateTime> GetAllSpawnTimers()
-        {
-            return new Dictionary<string, DateTime>(_nextSpawnTime);
-        }
-        
-        private void AddPlayerStats(string playerId, int gold, int exp, string bossId, WorldBossData.BossRarity rarity)
-        {
-            var stats = GetPlayerStats(playerId);
-            stats.TotalGoldEarned += gold;
-            stats.TotalExpEarned += exp;
-            
-            if (!stats.BossKillCount.ContainsKey(bossId))
-                stats.BossKillCount[bossId] = 0;
-            stats.BossKillCount[bossId]++;
-            
-            string rarityKey = rarity.ToString();
-            if (!stats.RarityKillCount.ContainsKey(rarityKey))
-                stats.RarityKillCount[rarityKey] = 0;
-            stats.RarityKillCount[rarityKey]++;
         }
         
         /// <summary>
@@ -390,20 +268,19 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public Dictionary<string, WorldBossData.PlayerWorldBossStats> GetAllPlayerStats()
         {
-            return new Dictionary<string, WorldBossData.PlayerWorldBossStats>(_playerStats);
+            if (_rewardSystem != null)
+                return _rewardSystem.GetAllPlayerStats();
+            return new Dictionary<string, WorldBossData.PlayerWorldBossStats>();
         }
         
         /// <summary>
-        /// Check if there are any active bosses
+        /// Get kill history
         /// </summary>
-        public bool HasActiveBosses()
+        public List<WorldBossData.BossKillRecord> GetKillHistory()
         {
-            foreach (var boss in _activeBosses)
-            {
-                if (!boss.IsDefeated)
-                    return true;
-            }
-            return false;
+            if (_rewardSystem != null)
+                return _rewardSystem.GetKillHistory();
+            return new List<WorldBossData.BossKillRecord>();
         }
         
         /// <summary>
@@ -411,150 +288,42 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public int GetTotalBossesKilled()
         {
-            return _killHistory.Count;
+            if (_rewardSystem != null)
+                return _rewardSystem.GetTotalBossesKilled();
+            return 0;
         }
         
         /// <summary>
-        /// Force spawn a boss (for testing or events)
+        /// Get leaderboard by total bosses killed
         /// </summary>
-        public WorldBossData.ActiveWorldBoss ForceSpawnBoss(string bossId)
+        public List<WorldBossData.PlayerWorldBossStats> GetLeaderboardByKills(int limit = 10)
         {
-            var boss = WorldBossDatabase.GetBoss(bossId);
-            if (boss == null) return null;
-            
-            // Update spawn timer
-            _nextSpawnTime[bossId] = DateTime.Now.AddMinutes(boss.SpawnIntervalMinutes);
-            
-            return SpawnBoss(bossId);
+            if (_rewardSystem != null)
+                return _rewardSystem.GetLeaderboardByKills(limit);
+            return new List<WorldBossData.PlayerWorldBossStats>();
         }
         
         /// <summary>
-        /// Get save data
+        /// Get leaderboard by total damage dealt
         /// </summary>
-        public Dictionary<string, object> GetSaveData()
+        public List<WorldBossData.PlayerWorldBossStats> GetLeaderboardByDamage(int limit = 10)
         {
-            var data = new Dictionary<string, object>();
-            
-            // Save spawn timers
-            var timers = new Dictionary<string, string>();
-            foreach (var kvp in _nextSpawnTime)
-            {
-                timers[kvp.Key] = kvp.Value.ToString("o");
-            }
-            data["spawn_timers"] = timers;
-            
-            // Save kill history
-            var history = new List<Dictionary<string, object>>();
-            foreach (var record in _killHistory)
-            {
-                history.Add(new Dictionary<string, object>
-                {
-                    { "boss_id", record.BossId },
-                    { "boss_name", record.BossName },
-                    { "rarity", (int)record.Rarity },
-                    { "kill_time", record.KillTime.ToString("o") },
-                    { "total_damage", record.TotalDamage },
-                    { "killer_count", record.KillerCount },
-                    { "total_gold", record.TotalGoldReward },
-                    { "total_exp", record.TotalExpReward }
-                });
-            }
-            data["kill_history"] = history;
-            
-            // Save player stats
-            var stats = new Dictionary<string, Dictionary<string, object>>();
-            foreach (var kvp in _playerStats)
-            {
-                stats[kvp.Key] = new Dictionary<string, object>
-                {
-                    { "total_killed", kvp.Value.TotalBossesKilled },
-                    { "total_damage", kvp.Value.TotalDamageDealt },
-                    { "total_gold", kvp.Value.TotalGoldEarned },
-                    { "total_exp", kvp.Value.TotalExpEarned }
-                };
-            }
-            data["player_stats"] = stats;
-            
-            return data;
+            if (_rewardSystem != null)
+                return _rewardSystem.GetLeaderboardByDamage(limit);
+            return new List<WorldBossData.PlayerWorldBossStats>();
         }
         
         /// <summary>
-        /// Load save data
+        /// Get leaderboard by total gold earned
         /// </summary>
-        public void LoadSaveData(Dictionary<string, object> data)
+        public List<WorldBossData.PlayerWorldBossStats> GetLeaderboardByGold(int limit = 10)
         {
-            if (data == null) return;
-            
-            // Load spawn timers
-            if (data.ContainsKey("spawn_timers"))
-            {
-                var timers = data["spawn_timers"] as Dictionary<string, object>;
-                if (timers != null)
-                {
-                    foreach (var kvp in timers)
-                    {
-                        if (DateTime.TryParse(kvp.Value?.ToString(), out DateTime dt))
-                        {
-                            _nextSpawnTime[kvp.Key] = dt;
-                        }
-                    }
-                }
-            }
-            
-            // Load kill history
-            if (data.ContainsKey("kill_history"))
-            {
-                var history = data["kill_history"] as Array;
-                if (history != null)
-                {
-                    _killHistory.Clear();
-                    foreach (var item in history)
-                    {
-                        var dict = item as Dictionary<string, object>;
-                        if (dict != null)
-                        {
-                            var record = new WorldBossData.BossKillRecord
-                            {
-                                BossId = dict.GetValueOrDefault("boss_id", "")?.ToString() ?? "",
-                                BossName = dict.GetValueOrDefault("boss_name", "")?.ToString() ?? "",
-                                Rarity = (WorldBossData.BossRarity)(dict.GetValueOrDefault("rarity", 0)),
-                                KillTime = DateTime.TryParse(dict.GetValueOrDefault("kill_time", "")?.ToString(), out DateTime kt) ? kt : DateTime.Now,
-                                TotalDamage = Convert.ToInt32(dict.GetValueOrDefault("total_damage", 0)),
-                                KillerCount = Convert.ToInt32(dict.GetValueOrDefault("killer_count", 0)),
-                                TotalGoldReward = Convert.ToInt32(dict.GetValueOrDefault("total_gold", 0)),
-                                TotalExpReward = Convert.ToInt32(dict.GetValueOrDefault("total_exp", 0))
-                            };
-                            _killHistory.Add(record);
-                        }
-                    }
-                }
-            }
-            
-            // Load player stats
-            if (data.ContainsKey("player_stats"))
-            {
-                var stats = data["player_stats"] as Dictionary<string, object>;
-                if (stats != null)
-                {
-                    _playerStats.Clear();
-                    foreach (var kvp in stats)
-                    {
-                        var dict = kvp.Value as Dictionary<string, object>;
-                        if (dict != null)
-                        {
-                            _playerStats[kvp.Key] = new WorldBossData.PlayerWorldBossStats
-                            {
-                                PlayerId = kvp.Key,
-                                TotalBossesKilled = Convert.ToInt32(dict.GetValueOrDefault("total_killed", 0)),
-                                TotalDamageDealt = Convert.ToInt32(dict.GetValueOrDefault("total_damage", 0)),
-                                TotalGoldEarned = Convert.ToInt32(dict.GetValueOrDefault("total_gold", 0)),
-                                TotalExpEarned = Convert.ToInt32(dict.GetValueOrDefault("total_exp", 0))
-                            };
-                        }
-                    }
-                }
-            }
+            if (_rewardSystem != null)
+                return _rewardSystem.GetLeaderboardByGold(limit);
+            return new List<WorldBossData.PlayerWorldBossStats>();
         }
+        
+        // ==================== Save Data ====================
         
         /// <summary>
         /// 导出保存数据
@@ -563,47 +332,24 @@ namespace ClawRPG.Scripts.Systems
         {
             var data = new Dictionary();
             
-            // 保存生成计时器
-            var timers = new Dictionary();
-            foreach (var kvp in _nextSpawnTime)
+            // Export from subsystems
+            if (_spawner != null)
             {
-                timers[kvp.Key] = kvp.Value.ToString("o");
-            }
-            data["spawn_timers"] = timers;
-            
-            // 保存击杀历史
-            var history = new Array();
-            foreach (var record in _killHistory)
-            {
-                var recordDict = new Dictionary
+                var spawnerData = _spawner.ExportSaveData();
+                foreach (var kvp in spawnerData)
                 {
-                    { "boss_id", record.BossId },
-                    { "boss_name", record.BossName },
-                    { "rarity", (int)record.Rarity },
-                    { "kill_time", record.KillTime.ToString("o") },
-                    { "total_damage", record.TotalDamage },
-                    { "killer_count", record.KillerCount },
-                    { "total_gold", record.TotalGoldReward },
-                    { "total_exp", record.TotalExpReward }
-                };
-                history.Add(recordDict);
+                    data[kvp.Key] = kvp.Value;
+                }
             }
-            data["kill_history"] = history;
             
-            // 保存玩家统计
-            var stats = new Dictionary();
-            foreach (var kvp in _playerStats)
+            if (_rewardSystem != null)
             {
-                var statsDict = new Dictionary
+                var rewardData = _rewardSystem.ExportSaveData();
+                foreach (var kvp in rewardData)
                 {
-                    { "total_killed", kvp.Value.TotalBossesKilled },
-                    { "total_damage", kvp.Value.TotalDamageDealt },
-                    { "total_gold", kvp.Value.TotalGoldEarned },
-                    { "total_exp", kvp.Value.TotalExpEarned }
-                };
-                stats[kvp.Key] = statsDict;
+                    data[kvp.Key] = kvp.Value;
+                }
             }
-            data["player_stats"] = stats;
             
             return data;
         }
@@ -615,75 +361,15 @@ namespace ClawRPG.Scripts.Systems
         {
             if (data == null) return;
             
-            // 加载生成计时器
-            if (data.Contains("spawn_timers"))
+            // Import to subsystems
+            if (_spawner != null)
             {
-                var timers = data["spawn_timers"] as Dictionary;
-                if (timers != null)
-                {
-                    _nextSpawnTime.Clear();
-                    foreach (var kvp in timers)
-                    {
-                        if (DateTime.TryParse(kvp.Value?.ToString(), out DateTime dt))
-                        {
-                            _nextSpawnTime[kvp.Key] = dt;
-                        }
-                    }
-                }
+                _spawner.ImportSaveData(data);
             }
             
-            // 加载击杀历史
-            if (data.Contains("kill_history"))
+            if (_rewardSystem != null)
             {
-                var history = data["kill_history"] as Array;
-                if (history != null)
-                {
-                    _killHistory.Clear();
-                    foreach (var item in history)
-                    {
-                        var dict = item as Dictionary;
-                        if (dict != null)
-                        {
-                            var record = new WorldBossData.BossKillRecord
-                            {
-                                BossId = (string)dict.GetValueOrDefault("boss_id", ""),
-                                BossName = (string)dict.GetValueOrDefault("boss_name", ""),
-                                Rarity = (WorldBossData.BossRarity)(dict.GetValueOrDefault("rarity", 0)),
-                                KillTime = DateTime.TryParse(dict.GetValueOrDefault("kill_time", "")?.ToString(), out DateTime kt) ? kt : DateTime.Now,
-                                TotalDamage = Convert.ToInt32(dict.GetValueOrDefault("total_damage", 0)),
-                                KillerCount = Convert.ToInt32(dict.GetValueOrDefault("killer_count", 0)),
-                                TotalGoldReward = Convert.ToInt32(dict.GetValueOrDefault("total_gold", 0)),
-                                TotalExpReward = Convert.ToInt32(dict.GetValueOrDefault("total_exp", 0))
-                            };
-                            _killHistory.Add(record);
-                        }
-                    }
-                }
-            }
-            
-            // 加载玩家统计
-            if (data.Contains("player_stats"))
-            {
-                var stats = data["player_stats"] as Dictionary;
-                if (stats != null)
-                {
-                    _playerStats.Clear();
-                    foreach (var kvp in stats)
-                    {
-                        var dict = kvp.Value as Dictionary;
-                        if (dict != null)
-                        {
-                            _playerStats[kvp.Key] = new WorldBossData.PlayerWorldBossStats
-                            {
-                                PlayerId = kvp.Key,
-                                TotalBossesKilled = Convert.ToInt32(dict.GetValueOrDefault("total_killed", 0)),
-                                TotalDamageDealt = Convert.ToInt32(dict.GetValueOrDefault("total_damage", 0)),
-                                TotalGoldEarned = Convert.ToInt32(dict.GetValueOrDefault("total_gold", 0)),
-                                TotalExpEarned = Convert.ToInt32(dict.GetValueOrDefault("total_exp", 0))
-                            };
-                        }
-                    }
-                }
+                _rewardSystem.ImportSaveData(data);
             }
             
             GD.Print("[WorldBossSystem] Save data imported");
