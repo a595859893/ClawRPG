@@ -99,7 +99,6 @@ namespace ClawRPG.Scripts.Systems.Pets
         public void UpdateDecision(Node2D target, float delta)
         {
             _stateTimer += delta;
-            _previousState = CurrentState;
             
             if (target == null)
             {

@@ -38,10 +38,6 @@ namespace ClawRPG.Scripts.Systems.Pets
         public Action OnPetAttack;
         public Action<string> OnPetSpecialAbility;
         
-        // 配置
-        private float _attackCooldown = 1.5f;
-        private float _lastAttackTime = 0f;
-        
         public bool IsEnabled { get; set; } = true;
         public bool IsVisible { get; set; } = true;
 
