@@ -37,6 +37,47 @@ public class MarketTaxData : BaseSystem
     {
         LastTaxUpdate = OS.GetSystemTimeMsecs();
     }
+    
+    // ==================== 持久化接口 ====================
+    public override Dictionary<string, object> ExportSaveData()
+    {
+        return new Dictionary<string, object>
+        {
+            { "baseTaxRate", BaseTaxRate },
+            { "currentDynamicTaxRate", CurrentDynamicTaxRate },
+            { "marketActivity", MarketActivity },
+            { "totalTransactions", TotalTransactions },
+            { "totalTaxCollected", TotalTaxCollected },
+            { "totalVolume", TotalVolume },
+            { "averageTransactionValue", AverageTransactionValue },
+            { "peakVolume", PeakVolume },
+            { "lastTaxUpdate", LastTaxUpdate },
+            { "marketTrend", MarketTrend },
+            { "consecutiveHighActivity", ConsecutiveHighActivity },
+            { "consecutiveLowActivity", ConsecutiveLowActivity }
+        };
+    }
+
+    public override bool ImportSaveData(Dictionary<string, object> data)
+    {
+        if (data == null) return false;
+        
+        if (data.ContainsKey("baseTaxRate")) BaseTaxRate = Convert.ToSingle(data["baseTaxRate"]);
+        if (data.ContainsKey("currentDynamicTaxRate")) CurrentDynamicTaxRate = Convert.ToSingle(data["currentDynamicTaxRate"]);
+        if (data.ContainsKey("marketActivity")) MarketActivity = Convert.ToSingle(data["marketActivity"]);
+        if (data.ContainsKey("totalTransactions")) TotalTransactions = Convert.ToInt32(data["totalTransactions"]);
+        if (data.ContainsKey("totalTaxCollected")) TotalTaxCollected = Convert.ToInt64(data["totalTaxCollected"]);
+        if (data.ContainsKey("totalVolume")) TotalVolume = Convert.ToInt64(data["totalVolume"]);
+        if (data.ContainsKey("averageTransactionValue")) AverageTransactionValue = Convert.ToSingle(data["averageTransactionValue"]);
+        if (data.ContainsKey("peakVolume")) PeakVolume = Convert.ToSingle(data["peakVolume"]);
+        if (data.ContainsKey("lastTaxUpdate")) LastTaxUpdate = Convert.ToInt64(data["lastTaxUpdate"]);
+        if (data.ContainsKey("marketTrend")) MarketTrend = data["marketTrend"]?.ToString();
+        if (data.ContainsKey("consecutiveHighActivity")) ConsecutiveHighActivity = Convert.ToInt32(data["consecutiveHighActivity"]);
+        if (data.ContainsKey("consecutiveLowActivity")) ConsecutiveLowActivity = Convert.ToInt32(data["consecutiveLowActivity"]);
+        
+        return true;
+    }
+    // ==================== 持久化接口结束 ====================
 }
 
 public class TaxRecord
