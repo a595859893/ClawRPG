@@ -102,24 +102,14 @@ namespace ClawRPG.Scripts.Skills {
     }
     
     /// <summary>
-    /// Skill progression data
-    /// </summary>
-    public class SkillProgressionData
-    {
-        public Dictionary<int, SkillMastery> Masteries { get; set; } = new(); // skill id -> mastery
-        public Dictionary<int, int> ComboUsages { get; set; } = new(); // combo id -> usage count
-        public int TotalMasteryXP { get; set; } = 0;
-        public int HighestMasteryRank { get; set; } = 0; // 0=Novice, 4=GrandMaster
-    }
-    
-    /// <summary>
     /// Skill Mastery and Combo System
     /// Manages skill progression, combos, and rune equipment
+    /// Coordinates with SkillUnlockSystem for unlock conditions
     /// </summary>
     public partial class SkillMasterySystem : BaseSystem
     {
         private static SkillMasterySystem _instance;
-        public static SkillMasterySystem Instance => _instance ??= new SkillMasterySystem();
+        public static SkillMasterySystem Instance => _instance;
         
         private Dictionary<int, SkillRune> _runes = new();
         private Dictionary<int, SkillCombo> _combos = new();
@@ -131,10 +121,17 @@ namespace ClawRPG.Scripts.Skills {
         public int TotalMasteryXP { get; private set; } = 0;
         public int HighestMasteryRank { get; private set; } = 0;
         
+        // Reference to unlock system
+        private SkillUnlockSystem _unlockSystem;
+        
         protected override void Initialize()
         {
             InitializeRunes();
             InitializeCombos();
+            
+            // Get unlock system reference
+            _unlockSystem = SkillUnlockSystem.Instance;
+            
             IsInitialized = true;
         }
         
@@ -178,158 +175,28 @@ namespace ClawRPG.Scripts.Skills {
         
         private void InitializeCombos()
         {
-            // Sequential combos
-            AddCombo(new SkillCombo
-            {
-                Id = 1,
-                Name = "闪电连击",
-                Description = "闪电箭 → 链式闪电",
-                Type = ComboType.Sequential,
-                SkillSequence = new List<int> { 1, 10 },
-                TimeWindow = 4f,
-                ManaCost = 35,
-                DamageMultiplier = 1.8f,
-                Cooldown = 20f,
-                RequiredMasteryLevel = 3,
-                RequiredSkillIds = new List<int> { 1, 10 }
-            });
-            
-            AddCombo(new SkillCombo
-            {
-                Id = 2,
-                Name = "冰火两重天",
-                Description = "燃烧弹 → 冰霜新星",
-                Type = ComboType.Sequential,
-                SkillSequence = new List<int> { 7, 8 },
-                TimeWindow = 4f,
-                ManaCost = 35,
-                DamageMultiplier = 2.0f,
-                Cooldown = 25f,
-                RequiredMasteryLevel = 4,
-                RequiredSkillIds = new List<int> { 7, 8 }
-            });
-            
-            AddCombo(new SkillCombo
-            {
-                Id = 3,
-                Name = "暗影爆发",
-                Description = "暗影箭 → 暗影之刺",
-                Type = ComboType.Sequential,
-                SkillSequence = new List<int> { 4, 9 },
-                TimeWindow = 3f,
-                ManaCost = 30,
-                DamageMultiplier = 1.6f,
-                Cooldown = 18f,
-                RequiredMasteryLevel = 2,
-                RequiredSkillIds = new List<int> { 4, 9 }
-            });
-            
-            // Chain combos
-            AddCombo(new SkillCombo
-            {
-                Id = 4,
-                Name = "治疗链",
-                Description = "治疗术 → 群体治疗 → 再生",
-                Type = ComboType.Chain,
-                SkillSequence = new List<int> { 101, 102, 103 },
-                TimeWindow = 6f,
-                ManaCost = 50,
-                DamageMultiplier = 2.5f, // Healing multiplier
-                Cooldown = 30f,
-                RequiredMasteryLevel = 5,
-                RequiredSkillIds = new List<int> { 101, 102, 103 }
-            });
-            
-            AddCombo(new SkillCombo
-            {
-                Id = 5,
-                Name = "护盾链",
-                Description = "魔法护盾 → 圣光护盾",
-                Type = ComboType.Chain,
-                SkillSequence = new List<int> { 203, 204 },
-                TimeWindow = 5f,
-                ManaCost = 55,
-                DamageMultiplier = 1.4f,
-                Cooldown = 35f,
-                RequiredMasteryLevel = 4,
-                RequiredSkillIds = new List<int> { 203, 204 }
-            });
-            
-            // Parallel combos
-            AddCombo(new SkillCombo
-            {
-                Id = 6,
-                Name = "元素风暴",
-                Description = "在时间窗口内使用3个元素技能",
-                Type = ComboType.Parallel,
-                SkillSequence = new List<int> { 1, 4, 7 }, // Lightning, Shadow, Fire
-                TimeWindow = 5f,
-                ManaCost = 45,
-                DamageMultiplier = 2.2f,
-                Cooldown = 40f,
-                RequiredMasteryLevel = 4,
-                RequiredSkillIds = new List<int> { 1, 4, 7 }
-            });
-            
-            // Fusion combos
-            AddCombo(new SkillCombo
-            {
-                Id = 7,
-                Name = "终极陨石",
-                Description = "燃烧弹 + 陨石 = 毁灭性打击",
-                Type = ComboType.Fusion,
-                SkillSequence = new List<int> { 7, 2 },
-                TimeWindow = 3f,
-                ManaCost = 60,
-                DamageMultiplier = 3.0f,
-                Cooldown = 60f,
-                RequiredMasteryLevel = 5,
-                RequiredSkillIds = new List<int> { 7, 2 }
-            });
-            
-            AddCombo(new SkillCombo
-            {
-                Id = 8,
-                Name = "圣光审判",
-                Description = "圣光打击 + 治疗术 = 审判",
-                Type = ComboType.Fusion,
-                SkillSequence = new List<int> { 3, 101 },
-                TimeWindow = 3f,
-                ManaCost = 40,
-                DamageMultiplier = 2.5f,
-                Cooldown = 45f,
-                RequiredMasteryLevel = 5,
-                RequiredSkillIds = new List<int> { 3, 101 }
-            });
+            AddCombo(new SkillCombo { Id = 1, Name = "闪电连击", Description = "闪电箭 → 链式闪电", Type = ComboType.Sequential, SkillSequence = new List<int> { 1, 10 }, TimeWindow = 4f, ManaCost = 35, DamageMultiplier = 1.8f, Cooldown = 20f, RequiredMasteryLevel = 3, RequiredSkillIds = new List<int> { 1, 10 } });
+            AddCombo(new SkillCombo { Id = 2, Name = "冰火两重天", Description = "燃烧弹 → 冰霜新星", Type = ComboType.Sequential, SkillSequence = new List<int> { 7, 8 }, TimeWindow = 4f, ManaCost = 35, DamageMultiplier = 2.0f, Cooldown = 25f, RequiredMasteryLevel = 4, RequiredSkillIds = new List<int> { 7, 8 } });
+            AddCombo(new SkillCombo { Id = 3, Name = "暗影爆发", Description = "暗影箭 → 暗影之刺", Type = ComboType.Sequential, SkillSequence = new List<int> { 4, 9 }, TimeWindow = 3f, ManaCost = 30, DamageMultiplier = 1.6f, Cooldown = 18f, RequiredMasteryLevel = 2, RequiredSkillIds = new List<int> { 4, 9 } });
+            AddCombo(new SkillCombo { Id = 4, Name = "治疗链", Description = "治疗术 → 群体治疗 → 再生", Type = ComboType.Chain, SkillSequence = new List<int> { 101, 102, 103 }, TimeWindow = 6f, ManaCost = 50, DamageMultiplier = 2.5f, Cooldown = 30f, RequiredMasteryLevel = 5, RequiredSkillIds = new List<int> { 101, 102, 103 } });
+            AddCombo(new SkillCombo { Id = 5, Name = "护盾链", Description = "魔法护盾 → 圣光护盾", Type = ComboType.Chain, SkillSequence = new List<int> { 203, 204 }, TimeWindow = 5f, ManaCost = 55, DamageMultiplier = 1.4f, Cooldown = 35f, RequiredMasteryLevel = 4, RequiredSkillIds = new List<int> { 203, 204 } });
+            AddCombo(new SkillCombo { Id = 6, Name = "元素风暴", Description = "在时间窗口内使用3个元素技能", Type = ComboType.Parallel, SkillSequence = new List<int> { 1, 4, 7 }, TimeWindow = 5f, ManaCost = 45, DamageMultiplier = 2.2f, Cooldown = 40f, RequiredMasteryLevel = 4, RequiredSkillIds = new List<int> { 1, 4, 7 } });
+            AddCombo(new SkillCombo { Id = 7, Name = "终极陨石", Description = "燃烧弹 + 陨石 = 毁灭性打击", Type = ComboType.Fusion, SkillSequence = new List<int> { 7, 2 }, TimeWindow = 3f, ManaCost = 60, DamageMultiplier = 3.0f, Cooldown = 60f, RequiredMasteryLevel = 5, RequiredSkillIds = new List<int> { 7, 2 } });
+            AddCombo(new SkillCombo { Id = 8, Name = "圣光审判", Description = "圣光打击 + 治疗术 = 审判", Type = ComboType.Fusion, SkillSequence = new List<int> { 3, 101 }, TimeWindow = 3f, ManaCost = 40, DamageMultiplier = 2.5f, Cooldown = 45f, RequiredMasteryLevel = 5, RequiredSkillIds = new List<int> { 3, 101 } });
         }
         
-        private void AddRune(SkillRune rune)
-        {
-            _runes[rune.Id] = rune;
-        }
-        
-        private void AddCombo(SkillCombo combo)
-        {
-            _combos[combo.Id] = combo;
-        }
+        private void AddRune(SkillRune rune) => _runes[rune.Id] = rune;
+        private void AddCombo(SkillCombo combo) => _combos[combo.Id] = combo;
         
         #region Mastery Methods
         
-        /// <summary>
-        /// Get or create mastery for a skill
-        /// </summary>
         public SkillMastery GetMastery(int skillId)
         {
             if (!_masteries.ContainsKey(skillId))
-            {
                 _masteries[skillId] = new SkillMastery { SkillId = skillId };
-            }
             return _masteries[skillId];
         }
         
-        /// <summary>
-        /// Add XP to skill mastery
-        /// </summary>
         public void AddMasteryXP(int skillId, int xp)
         {
             var mastery = GetMastery(skillId);
@@ -337,21 +204,16 @@ namespace ClawRPG.Scripts.Skills {
             mastery.TotalXP += xp;
             TotalMasteryXP += xp;
             
-            // Check for level up
             CheckMasteryLevelUp(mastery);
             
-            // Update highest rank
             if ((int)mastery.Rank > HighestMasteryRank)
-            {
                 HighestMasteryRank = (int)mastery.Rank;
-            }
             
             GD.Print($"Skill {skillId} mastery: {mastery.CurrentXP} XP, Level {mastery.CurrentLevel}, Rank {mastery.Rank}");
         }
         
         private void CheckMasteryLevelUp(SkillMastery mastery)
         {
-            int[] xpThresholds = { 100, 500, 1500, 5000 };
             int[] levelUpXP = { 100, 400, 1000, 3500 };
             
             while (mastery.CurrentLevel < 10)
@@ -362,18 +224,13 @@ namespace ClawRPG.Scripts.Skills {
                     mastery.CurrentLevel++;
                     ApplyMasteryBonuses(mastery);
                     
-                    // Unlock rune slot at levels 3, 6, 9
                     if (mastery.CurrentLevel == 3) mastery.RuneSlots = 1;
                     if (mastery.CurrentLevel == 6) mastery.RuneSlots = 2;
                     if (mastery.CurrentLevel == 9) mastery.RuneSlots = 3;
                 }
-                else
-                {
-                    break;
-                }
+                else break;
             }
             
-            // Update rank based on total XP
             if (mastery.TotalXP >= 5000) mastery.Rank = MasteryRank.GrandMaster;
             else if (mastery.TotalXP >= 1500) mastery.Rank = MasteryRank.Master;
             else if (mastery.TotalXP >= 500) mastery.Rank = MasteryRank.Expert;
@@ -383,47 +240,25 @@ namespace ClawRPG.Scripts.Skills {
         
         private void ApplyMasteryBonuses(SkillMastery mastery)
         {
-            // Level-based bonuses
-            mastery.DamageBonus = mastery.CurrentLevel * 0.05f; // +5% per level
-            mastery.CooldownReduction = Math.Min(0.30f, mastery.CurrentLevel * 0.03f); // +3% per level, max 30%
-            mastery.RangeBonus = mastery.CurrentLevel * 0.02f; // +2% per level
-            mastery.CostReduction = mastery.CurrentLevel * 0.02f; // +2% per level
-            
-            GD.Print($"Mastery bonuses for skill {mastery.SkillId}: Damage +{mastery.DamageBonus*100}%, " +
-                    $"CDR -{mastery.CooldownReduction*100}%, Range +{mastery.RangeBonus*100}%, Cost -{mastery.CostReduction*100}%");
+            mastery.DamageBonus = mastery.CurrentLevel * 0.05f;
+            mastery.CooldownReduction = Math.Min(0.30f, mastery.CurrentLevel * 0.03f);
+            mastery.RangeBonus = mastery.CurrentLevel * 0.02f;
+            mastery.CostReduction = mastery.CurrentLevel * 0.02f;
         }
         
-        /// <summary>
-        /// Equip a rune to a skill mastery slot
-        /// </summary>
         public bool EquipRune(int skillId, int slot, int runeId)
         {
             var mastery = GetMastery(skillId);
-            
-            if (slot < 0 || slot >= mastery.RuneSlots)
-            {
-                GD.Print($"Invalid slot {slot}. Available slots: {mastery.RuneSlots}");
-                return false;
-            }
-            
-            if (!_runes.ContainsKey(runeId))
-            {
-                GD.Print($"Rune {runeId} not found");
-                return false;
-            }
+            if (slot < 0 || slot >= mastery.RuneSlots) return false;
+            if (!_runes.ContainsKey(runeId)) return false;
             
             mastery.EquippedRunes[slot] = runeId;
-            GD.Print($"Equipped rune {runeId} to skill {skillId} slot {slot}");
             return true;
         }
         
-        /// <summary>
-        /// Unequip a rune from a skill mastery slot
-        /// </summary>
         public bool UnequipRune(int skillId, int slot)
         {
             var mastery = GetMastery(skillId);
-            
             if (mastery.EquippedRunes.ContainsKey(slot))
             {
                 mastery.EquippedRunes.Remove(slot);
@@ -432,9 +267,6 @@ namespace ClawRPG.Scripts.Skills {
             return false;
         }
         
-        /// <summary>
-        /// Calculate total bonuses from mastery and runes
-        /// </summary>
         public (float damage, float cdr, float range, float cost) GetTotalBonuses(int skillId)
         {
             var mastery = GetMastery(skillId);
@@ -443,7 +275,6 @@ namespace ClawRPG.Scripts.Skills {
             float range = mastery.RangeBonus;
             float cost = mastery.CostReduction;
             
-            // Add rune bonuses
             foreach (var kvp in mastery.EquippedRunes)
             {
                 var rune = _runes[kvp.Value];
@@ -463,16 +294,12 @@ namespace ClawRPG.Scripts.Skills {
         
         #region Combo Methods
         
-        /// <summary>
-        /// Start a combo by using first skill
-        /// </summary>
         public bool StartCombo(int skillId, int playerMana)
         {
             foreach (var combo in _combos.Values)
             {
                 if (combo.SkillSequence.Count > 0 && combo.SkillSequence[0] == skillId)
                 {
-                    // Check requirements
                     if (!HasComboRequirements(combo)) continue;
                     if (IsComboOnCooldown(combo.Id)) continue;
                     if (playerMana < combo.ManaCost) continue;
@@ -484,90 +311,52 @@ namespace ClawRPG.Scripts.Skills {
                         TimeRemaining = combo.TimeWindow,
                         IsComplete = false
                     };
-                    
-                    GD.Print($"Started combo: {combo.Name}");
                     return true;
                 }
             }
             return false;
         }
         
-        /// <summary>
-        /// Continue combo with next skill
-        /// </summary>
         public bool ContinueCombo(int skillId, int playerMana)
         {
             if (_activeCombo == null || _activeCombo.IsComplete) return false;
             
             var combo = _combos[_activeCombo.ComboId];
-            
-            // Check if this is the correct next skill
             int expectedSkillId = combo.SkillSequence[_activeCombo.CurrentStep + 1];
+            
             if (skillId != expectedSkillId)
             {
-                // For parallel combos, check if skill is in sequence
                 if (combo.Type == ComboType.Parallel)
                 {
                     if (!combo.SkillSequence.Contains(skillId)) return false;
-                    // Check if already used in this combo
                     for (int i = 0; i <= _activeCombo.CurrentStep; i++)
-                    {
-                        if (combo.SkillSequence[i] == skillId)
-                        {
-                            GD.Print("Skill already used in parallel combo");
-                            return false;
-                        }
-                    }
+                        if (combo.SkillSequence[i] == skillId) return false;
                 }
-                else
-                {
-                    GD.Print($"Wrong skill for combo. Expected {expectedSkillId}, got {skillId}");
-                    CancelCombo();
-                    return false;
-                }
+                else { CancelCombo(); return false; }
             }
             
-            // Check mana
-            if (playerMana < combo.ManaCost)
-            {
-                GD.Print("Not enough mana for combo");
-                CancelCombo();
-                return false;
-            }
+            if (playerMana < combo.ManaCost) { CancelCombo(); return false; }
             
             _activeCombo.CurrentStep++;
-            _activeCombo.TimeRemaining = combo.TimeWindow; // Reset timer
+            _activeCombo.TimeRemaining = combo.TimeWindow;
             
-            // Check if combo complete
             if (_activeCombo.CurrentStep >= combo.SkillSequence.Count - 1)
             {
                 CompleteCombo();
                 return true;
             }
-            
-            GD.Print($"Combo progress: {_activeCombo.CurrentStep + 1}/{combo.SkillSequence.Count}");
             return true;
         }
         
         private bool HasComboRequirements(SkillCombo combo)
         {
             var skillManager = new SkillManager();
-            
             foreach (var reqSkillId in combo.RequiredSkillIds)
-            {
-                if (!skillManager.HasLearned(reqSkillId))
-                {
-                    return false;
-                }
-            }
-            
+                if (!skillManager.HasLearned(reqSkillId)) return false;
             return true;
         }
         
-        private bool IsComboOnCooldown(int comboId)
-        {
-            return _comboCooldowns.ContainsKey(comboId) && _comboCooldowns[comboId] > 0;
-        }
+        private bool IsComboOnCooldown(int comboId) => _comboCooldowns.ContainsKey(comboId) && _comboCooldowns[comboId] > 0;
         
         private void CompleteCombo()
         {
@@ -575,24 +364,17 @@ namespace ClawRPG.Scripts.Skills {
             
             var combo = _combos[_activeCombo.ComboId];
             _activeCombo.IsComplete = true;
-            
-            // Start combo cooldown
             _comboCooldowns[_activeCombo.ComboId] = combo.Cooldown;
             
-            // Track usage
             if (!ComboUsages.ContainsKey(_activeCombo.ComboId))
                 ComboUsages[_activeCombo.ComboId] = 0;
             ComboUsages[_activeCombo.ComboId]++;
             
-            // Grant mastery XP
             int xpGain = 50 * combo.SkillSequence.Count;
             foreach (var skillId in combo.SkillSequence)
-            {
                 AddMasteryXP(skillId, xpGain);
-            }
             
             GD.Print($"Combo complete: {combo.Name}! Damage multiplier: {combo.DamageMultiplier}x");
-            
             _activeCombo = null;
         }
         
@@ -605,37 +387,18 @@ namespace ClawRPG.Scripts.Skills {
             }
         }
         
-        /// <summary>
-        /// Get current active combo info
-        /// </summary>
         public ActiveCombo GetActiveCombo() => _activeCombo;
         
-        /// <summary>
-        /// Get all available combos for player
-        /// </summary>
         public List<SkillCombo> GetAvailableCombos()
         {
             var result = new List<SkillCombo>();
             var skillManager = new SkillManager();
-            
             foreach (var combo in _combos.Values)
-            {
-                if (HasComboRequirements(combo))
-                {
-                    result.Add(combo);
-                }
-            }
-            
+                if (HasComboRequirements(combo)) result.Add(combo);
             return result;
         }
         
-        /// <summary>
-        /// Get combo by ID
-        /// </summary>
-        public SkillCombo GetCombo(int comboId)
-        {
-            return _combos.ContainsKey(comboId) ? _combos[comboId] : null;
-        }
+        public SkillCombo GetCombo(int comboId) => _combos.ContainsKey(comboId) ? _combos[comboId] : null;
         
         #endregion
         
@@ -643,128 +406,82 @@ namespace ClawRPG.Scripts.Skills {
         
         public void Update(float delta)
         {
-            // Update combo timer
             if (_activeCombo != null)
             {
                 _activeCombo.TimeRemaining -= delta;
-                if (_activeCombo.TimeRemaining <= 0)
-                {
-                    CancelCombo();
-                }
+                if (_activeCombo.TimeRemaining <= 0) CancelCombo();
             }
             
-            // Update combo cooldowns
             foreach (var key in _comboCooldowns.Keys)
-            {
                 _comboCooldowns[key] = Math.Max(0, _comboCooldowns[key] - delta);
-            }
         }
         
         #endregion
         
         #region Save/Load
         
-        public override Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            var data = new Dictionary<string, object>();
-            
-            // 精通数据
+            var data = new Dictionary();
             data["masteries"] = _masteries;
-            
-            // Combo 使用次数
             data["comboUsages"] = ComboUsages;
-            
-            // 精通总经验
             data["totalMasteryXP"] = TotalMasteryXP;
-            
-            // 最高精通等级
             data["highestMasteryRank"] = HighestMasteryRank;
-            
             return data;
         }
         
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
             
-            // 精通数据
             if (data.TryGetValue("masteries", out var m))
             {
                 _masteries.Clear();
                 var dict = m as Dictionary<object, object>;
                 if (dict != null)
-                {
                     foreach (var kvp in dict)
                     {
                         var mastery = kvp.Value as SkillMastery;
                         if (mastery != null)
-                        {
                             _masteries[Convert.ToInt32(kvp.Key)] = mastery;
-                        }
                     }
-                }
             }
             
-            // Combo 使用次数
             if (data.TryGetValue("comboUsages", out var cu))
             {
                 ComboUsages.Clear();
                 var dict = cu as Dictionary<object, object>;
                 if (dict != null)
-                {
                     foreach (var kvp in dict)
-                    {
                         ComboUsages[Convert.ToInt32(kvp.Key)] = Convert.ToInt32(kvp.Value);
-                    }
-                }
             }
             
-            // 精通总经验
             if (data.TryGetValue("totalMasteryXP", out var tm))
                 TotalMasteryXP = Convert.ToInt32(tm);
-            
-            // 最高精通等级
             if (data.TryGetValue("highestMasteryRank", out var hmr))
                 HighestMasteryRank = Convert.ToInt32(hmr);
         }
         
         #endregion
         
-        /// <summary>
-        /// Get all runes of a specific type
-        /// </summary>
+        #region Public API
+        
         public List<SkillRune> GetRunesByType(RuneSlotType type)
         {
             var result = new List<SkillRune>();
             foreach (var rune in _runes.Values)
-            {
-                if (rune.SlotType == type)
-                    result.Add(rune);
-            }
+                if (rune.SlotType == type) result.Add(rune);
             return result;
         }
         
-        /// <summary>
-        /// Get rune by ID
-        /// </summary>
-        public SkillRune GetRune(int runeId)
-        {
-            return _runes.ContainsKey(runeId) ? _runes[runeId] : null;
-        }
+        public SkillRune GetRune(int runeId) => _runes.ContainsKey(runeId) ? _runes[runeId] : null;
         
-        /// <summary>
-        /// Get all available combos
-        /// </summary>
         public List<SkillCombo> GetAllCombos() => new List<SkillCombo>(_combos.Values);
         
-        /// <summary>
-        /// Get mastery for all skills
-        /// </summary>
         public Dictionary<int, SkillMastery> GetAllMasteries() => _masteries;
+        
+        #endregion
     }
     
-    /// <summary>
-    /// Track combo usage statistics
-    /// </summary>
     public Dictionary<int, int> ComboUsages { get; private set; } = new Dictionary<int, int>();
 }
