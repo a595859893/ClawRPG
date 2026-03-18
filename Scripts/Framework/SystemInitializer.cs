@@ -36,6 +36,20 @@ public class SystemInitializer : BaseSystem
         GD.Print("=== All Systems Initialized ===");
     }
     
+    // ==================== BaseSystem 持久化接口 ====================
+    public override Dictionary<string, object> ExportSaveData()
+    {
+        // SystemInitializer 是初始化器，无持久化状态
+        return new Dictionary<string, object>();
+    }
+
+    public override bool ImportSaveData(Dictionary<string, object> data)
+    {
+        // SystemInitializer 是初始化器，无持久化状态
+        return true;
+    }
+    // ==================== 持久化接口结束 ====================
+    
     private void InitializeCombatSystems(Node parent)
     {
         // 武器专精系统
