@@ -8,8 +8,11 @@ namespace ClawRPG.Scripts.Combat
 {
     /// <summary>
     /// Combat Log System - 战斗日志系统协调者
-    /// 委托给子系统：Recorder（记录）、Formatter（格式化）、UI（显示）
-    /// 保留核心功能：统计、过滤、连击、持久化
+    /// 委托给子系统：
+    ///   - CombatLogRecorder: 日志记录
+    ///   - CombatLogFormatter: 格式化显示
+    ///   - CombatPersistenceSystem: 持久化和统计
+    /// 保留核心功能：协调、过滤、信号
     /// </summary>
     public class CombatLogSystem : BaseSystem
     {
@@ -17,44 +20,23 @@ namespace ClawRPG.Scripts.Combat
         public static CombatLogSystem Instance => _instance;
 
         // ========== 子系统引用 ==========
-        // 使用 NodePath 在运行时获取子系统，避免直接 new
-        private NodePath _recorderPath = new NodePath("../CombatLogRecorder");
-        private NodePath _formatterPath = new NodePath("../CombatLogFormatter");
+        // 使用 NodePath 在运行时获取子系统
+        private NodePath _recorderPath = new NodePath("../CombatLog/CombatLogRecorder");
+        private NodePath _formatterPath = new NodePath("../CombatLog/CombatLogFormatter");
+        private NodePath _persistencePath = new NodePath("../CombatLog/CombatPersistenceSystem");
         
         private CombatLogRecorder _recorder;
         private CombatLogFormatter _formatter;
+        private CombatPersistenceSystem _persistence;
         
-        // ========== 本地存储（协调数据） ==========
+        // ========== 本地存储（仅协调用） ==========
         private List<CombatLogEntry> _logEntries = new List<CombatLogEntry>();
         private List<CombatLogEntry> _filteredEntries = new List<CombatLogEntry>();
 
-        // Configuration
+        // Configuration (delegated to persistence)
         private int _maxEntries = 500;
-        private float _autoClearTime = 300f; // 5 minutes
+        private float _autoClearTime = 300f;
         private float _currentSessionTime = 0f;
-
-        // Statistics
-        private CombatLogStatistics _statistics = new CombatLogStatistics();
-
-        // Filters
-        private bool _showDamage = true;
-        private bool _showHealing = true;
-        private bool _showBuffs = true;
-        private bool _showSkills = true;
-        private bool _showCombat = true;
-        private bool _showInfo = true;
-        private bool _playerOnly = false;
-        private bool _enemyOnly = false;
-
-        // Combat state
-        private int _currentCombo = 0;
-        private float _comboTimer = 0f;
-        private float _comboTimeWindow = 3f;
-
-        // Recent kills tracking
-        private List<string> _recentKills = new List<string>();
-        private float _killStreakTimer = 0f;
-        private int _killStreak = 0;
 
         // Signals
         public static string SignalNewEntry = "new_combat_log_entry";
@@ -65,20 +47,30 @@ namespace ClawRPG.Scripts.Combat
         {
             _instance = this;
             
-            // 获取子系统引用
+            // 获取或创建子系统
             _recorder = GetNodeOrNull<CombatLogRecorder>(_recorderPath);
             _formatter = GetNodeOrNull<CombatLogFormatter>(_formatterPath);
+            _persistence = GetNodeOrNull<CombatPersistenceSystem>(_persistencePath);
             
             if (_recorder == null)
             {
                 _recorder = new CombatLogRecorder();
+                _recorder.Name = "CombatLogRecorder";
                 AddChild(_recorder);
             }
             
             if (_formatter == null)
             {
                 _formatter = new CombatLogFormatter();
+                _formatter.Name = "CombatLogFormatter";
                 AddChild(_formatter);
+            }
+            
+            if (_persistence == null)
+            {
+                _persistence = new CombatPersistenceSystem();
+                _persistence.Name = "CombatPersistenceSystem";
+                AddChild(_persistence);
             }
             
             GD.Print("[CombatLogSystem] Combat Log System initialized as coordinator");
@@ -87,8 +79,6 @@ namespace ClawRPG.Scripts.Combat
         public override void _Process(float delta)
         {
             _currentSessionTime += delta;
-            _comboTimer -= delta;
-            _killStreakTimer -= delta;
 
             // Update filtered entries
             ApplyFilters();
@@ -98,52 +88,25 @@ namespace ClawRPG.Scripts.Combat
             {
                 _logEntries.RemoveAt(0);
             }
-
-            // Clear combo if timer expired
-            if (_comboTimer <= 0 && _currentCombo > 0)
-            {
-                _currentCombo = 0;
-            }
-
-            // Reset kill streak if timer expired
-            if (_killStreakTimer <= 0 && _killStreak > 0)
-            {
-                _killStreak = 0;
-            }
         }
 
-        #region Public API
+        #region Public API - 委托给 Recorder
 
         /// <summary>
         /// Log a damage event
         /// </summary>
         public void LogDamage(float damage, string source, string target, bool isCritical = false, bool isPlayerSource = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = isCritical ? CombatLogType.Critical : CombatLogType.Damage,
-                Message = isCritical ? $"暴击! {source} 对 {target} 造成 {damage:F0} 伤害" : $"{source} 对 {target} 造成 {damage:F0} 伤害",
-                Value = damage,
-                Source = source,
-                Target = target,
-                IsPlayerAction = isPlayerSource
-            };
-
+            var entry = _recorder.LogDamage(damage, source, target, isCritical, isPlayerSource);
             AddEntry(entry);
-
-            // Update statistics
-            _statistics.DamageEntries++;
-            if (isCritical) _statistics.CriticalHits++;
-
+            
+            // Update persistence statistics
+            _persistence.RecordDamage(damage, isCritical, isPlayerSource);
+            
             if (isPlayerSource)
             {
-                _statistics.TotalDamageDealt += damage;
-                AddCombo(1);
-            }
-            else
-            {
-                _statistics.TotalDamageTaken += damage;
+                _persistence.AddCombo(1);
+                CheckComboMilestone();
             }
         }
 
@@ -152,22 +115,11 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogHealing(float amount, string source, string target, bool isPlayerSource = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Healing,
-                Message = $"{source} 为 {target} 恢复 {amount:F0} 生命",
-                Value = amount,
-                Source = source,
-                Target = target,
-                IsPlayerAction = isPlayerSource
-            };
-
+            var entry = _recorder.LogHealing(amount, source, target, isPlayerSource);
             AddEntry(entry);
-
-            // Update statistics
-            _statistics.HealingEntries++;
-            _statistics.TotalHealing += amount;
+            
+            // Update persistence statistics
+            _persistence.RecordHealing(amount);
         }
 
         /// <summary>
@@ -175,18 +127,10 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogMiss(string source, string target, string missType = "Miss", bool isPlayerSource = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Miss,
-                Message = $"{source} 的攻击未命中 {target}",
-                Source = source,
-                Target = target,
-                IsPlayerAction = isPlayerSource
-            };
-
+            var entry = _recorder.LogMiss(source, target, missType, isPlayerSource);
             AddEntry(entry);
-            _statistics.Misses++;
+            
+            _persistence.RecordMiss();
         }
 
         /// <summary>
@@ -194,19 +138,10 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogBlock(string source, string target, float blockedDamage, bool isPlayerSource = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Block,
-                Message = $"{source} 格挡了 {target} 的 {blockedDamage:F0} 伤害",
-                Value = blockedDamage,
-                Source = source,
-                Target = target,
-                IsPlayerAction = isPlayerSource
-            };
-
+            var entry = _recorder.LogBlock(source, target, blockedDamage, isPlayerSource);
             AddEntry(entry);
-            _statistics.Blocks++;
+            
+            _persistence.RecordBlock();
         }
 
         /// <summary>
@@ -214,18 +149,10 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogDodge(string source, string target, bool isPlayerSource = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Dodge,
-                Message = $"{target} 闪避了 {source} 的攻击",
-                Source = source,
-                Target = target,
-                IsPlayerAction = isPlayerSource
-            };
-
+            var entry = _recorder.LogDodge(source, target, isPlayerSource);
             AddEntry(entry);
-            _statistics.Dodges++;
+            
+            _persistence.RecordDodge();
         }
 
         /// <summary>
@@ -233,16 +160,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogParry(string source, string target, bool isPlayerSource = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Parry,
-                Message = $"{source} 招架了 {target} 的攻击",
-                Source = source,
-                Target = target,
-                IsPlayerAction = isPlayerSource
-            };
-
+            var entry = _recorder.LogParry(source, target, isPlayerSource);
             AddEntry(entry);
         }
 
@@ -251,46 +169,16 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogKill(string killer, string target, bool isPlayerKiller = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Kill,
-                Message = isPlayerKiller ? $"☠️ 击杀 {target}!" : $"你被 {target} 击败",
-                Source = killer,
-                Target = target,
-                IsPlayerAction = isPlayerKiller
-            };
-
+            var entry = _recorder.LogKill(killer, target, isPlayerKiller);
             AddEntry(entry);
-
-            // Update statistics
-            _statistics.KillEntries++;
-
-            // Track kill streak
+            
+            // Update persistence
+            _persistence.RecordKill();
+            
             if (isPlayerKiller)
             {
-                _killStreak++;
-                _killStreakTimer = 5f;
-
-                if (_killStreak >= 3)
-                {
-                    EmitSignal(SignalKillStreak, _killStreak);
-                    var streakEntry = new CombatLogEntry
-                    {
-                        Timestamp = _currentSessionTime,
-                        Type = CombatLogType.Combo,
-                        Message = $"🔥 击杀 streak x{_killStreak}!",
-                        Value = _killStreak,
-                        IsPlayerAction = true
-                    };
-                    AddEntry(streakEntry);
-                }
-            }
-
-            _recentKills.Add(target);
-            if (_recentKills.Count > 10)
-            {
-                _recentKills.RemoveAt(0);
+                _persistence.AddKillStreak(target);
+                CheckKillStreak();
             }
         }
 
@@ -299,16 +187,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogDeath(string target, string killer)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Death,
-                Message = $"💀 {target} 被击败",
-                Source = killer,
-                Target = target,
-                IsPlayerAction = false
-            };
-
+            var entry = _recorder.LogDeath(target, killer);
             AddEntry(entry);
         }
 
@@ -317,16 +196,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogBuff(string target, string buffName, float duration, bool isPlayerTarget = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Buff,
-                Message = $"✨ {target} 获得 buff: {buffName} ({duration:F1}秒)",
-                Source = buffName,
-                Target = target,
-                IsPlayerAction = isPlayerTarget
-            };
-
+            var entry = _recorder.LogBuff(target, buffName, duration, isPlayerTarget);
             AddEntry(entry);
         }
 
@@ -335,16 +205,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogDebuff(string target, string debuffName, float duration, bool isPlayerTarget = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Debuff,
-                Message = $"⛔ {target} 受到 debuff: {debuffName} ({duration:F1}秒)",
-                Source = debuffName,
-                Target = target,
-                IsPlayerAction = isPlayerTarget
-            };
-
+            var entry = _recorder.LogDebuff(target, debuffName, duration, isPlayerTarget);
             AddEntry(entry);
         }
 
@@ -353,20 +214,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogSkill(string skillName, string user, string target = "", bool isPlayerUser = true)
         {
-            var message = string.IsNullOrEmpty(target)
-                ? $"⚔️ {user} 使用 {skillName}"
-                : $"⚔️ {user} 使用 {skillName} 对 {target}";
-
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.SkillUsed,
-                Message = message,
-                Source = user,
-                Target = target,
-                IsPlayerAction = isPlayerUser
-            };
-
+            var entry = _recorder.LogSkill(skillName, user, target, isPlayerUser);
             AddEntry(entry);
         }
 
@@ -375,20 +223,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogItem(string itemName, string user, string effect = "", bool isPlayerUser = true)
         {
-            var message = string.IsNullOrEmpty(effect)
-                ? $"🎒 {user} 使用 {itemName}"
-                : $"🎒 {user} 使用 {itemName} - {effect}";
-
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.ItemUsed,
-                Message = message,
-                Source = user,
-                Target = effect,
-                IsPlayerAction = isPlayerUser
-            };
-
+            var entry = _recorder.LogItem(itemName, user, effect, isPlayerUser);
             AddEntry(entry);
         }
 
@@ -397,19 +232,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogResource(string resourceType, float amount, string target, bool isGain = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Mana,
-                Message = isGain
-                    ? $"💎 {target} 恢复 {amount:F0} {resourceType}"
-                    : $"💎 {target} 消耗 {amount:F0} {resourceType}",
-                Value = amount,
-                Source = resourceType,
-                Target = target,
-                IsPlayerAction = true
-            };
-
+            var entry = _recorder.LogResource(resourceType, amount, target, isGain);
             AddEntry(entry);
         }
 
@@ -418,17 +241,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogExperience(float amount, string target, string source = "战斗")
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Experience,
-                Message = $"⭐ {target} 从 {source} 获得 {amount:F0} 经验",
-                Value = amount,
-                Source = source,
-                Target = target,
-                IsPlayerAction = true
-            };
-
+            var entry = _recorder.LogExperience(amount, target, source);
             AddEntry(entry);
         }
 
@@ -437,16 +250,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogLevelUp(string target, int newLevel)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.LevelUp,
-                Message = $"🎉 {target} 升级到 {newLevel} 级!",
-                Value = newLevel,
-                Target = target,
-                IsPlayerAction = true
-            };
-
+            var entry = _recorder.LogLevelUp(target, newLevel);
             AddEntry(entry);
         }
 
@@ -455,14 +259,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogInfo(string message, bool isPlayerAction = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Info,
-                Message = $"ℹ️ {message}",
-                IsPlayerAction = isPlayerAction
-            };
-
+            var entry = _recorder.LogInfo(message, isPlayerAction);
             AddEntry(entry);
         }
 
@@ -471,14 +268,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogWarning(string message, bool isPlayerAction = true)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.Warning,
-                Message = $"⚠️ {message}",
-                IsPlayerAction = isPlayerAction
-            };
-
+            var entry = _recorder.LogWarning(message, isPlayerAction);
             AddEntry(entry);
         }
 
@@ -487,16 +277,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogEnemySpawn(string enemyName, int waveNumber)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.EnemySpawn,
-                Message = $"👹 第 {waveNumber} 波: {enemyName} 出现!",
-                Source = enemyName,
-                Value = waveNumber,
-                IsPlayerAction = false
-            };
-
+            var entry = _recorder.LogEnemySpawn(enemyName, waveNumber);
             AddEntry(entry);
         }
 
@@ -505,16 +286,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void LogEnemyAggro(string enemyName, string target)
         {
-            var entry = new CombatLogEntry
-            {
-                Timestamp = _currentSessionTime,
-                Type = CombatLogType.EnemyAggro,
-                Message = $"👁️ {enemyName} 锁定 {target}",
-                Source = enemyName,
-                Target = target,
-                IsPlayerAction = false
-            };
-
+            var entry = _recorder.LogEnemyAggro(enemyName, target);
             AddEntry(entry);
         }
 
@@ -525,8 +297,7 @@ namespace ClawRPG.Scripts.Combat
         private void AddEntry(CombatLogEntry entry)
         {
             _logEntries.Add(entry);
-            _statistics.TotalEntries++;
-
+            
             // Emit signal for UI update
             EmitSignal(SignalNewEntry, entry);
 
@@ -540,76 +311,29 @@ namespace ClawRPG.Scripts.Combat
 
             foreach (var entry in _logEntries)
             {
-                bool include = true;
-
-                // Type filter
-                switch (entry.Type)
+                if (_persistence != null)
                 {
-                    case CombatLogType.Damage:
-                    case CombatLogType.Critical:
-                        include = _showDamage && _showCombat;
-                        break;
-                    case CombatLogType.Healing:
-                        include = _showHealing;
-                        break;
-                    case CombatLogType.Buff:
-                    case CombatLogType.Debuff:
-                        include = _showBuffs;
-                        break;
-                    case CombatLogType.SkillUsed:
-                    case CombatLogType.ItemUsed:
-                        include = _showSkills;
-                        break;
-                    case CombatLogType.Kill:
-                    case CombatLogType.Death:
-                    case CombatLogType.Miss:
-                    case CombatLogType.Block:
-                    case CombatLogType.Dodge:
-                    case CombatLogType.Parry:
-                    case CombatLogType.Shield:
-                        include = _showCombat;
-                        break;
-                    case CombatLogType.Experience:
-                    case CombatLogType.LevelUp:
-                        include = _showInfo;
-                        break;
-                    default:
-                        include = _showInfo;
-                        break;
+                    if (_persistence.ShouldIncludeEntry(entry))
+                    {
+                        _filteredEntries.Add(entry);
+                    }
                 }
-
-                // Player/Enemy filter
-                if (include)
+                else
                 {
-                    if (_playerOnly && !entry.IsPlayerAction) include = false;
-                    if (_enemyOnly && entry.IsPlayerAction) include = false;
-                }
-
-                if (include)
-                {
+                    // Fallback if persistence not available
                     _filteredEntries.Add(entry);
                 }
             }
         }
 
-        private void AddCombo(int hits)
-        {
-            _currentCombo += hits;
-            _comboTimer = _comboTimeWindow;
-
-            if (_currentCombo >= 5)
-            {
-                CheckComboMilestone();
-            }
-        }
-
         private void CheckComboMilestone()
         {
+            int combo = _persistence != null ? _persistence.GetCurrentCombo() : 0;
             int[] milestones = { 5, 10, 15, 20, 25, 30, 40, 50, 75, 100 };
 
             foreach (int milestone in milestones)
             {
-                if (_currentCombo == milestone)
+                if (combo == milestone)
                 {
                     var entry = new CombatLogEntry
                     {
@@ -624,6 +348,26 @@ namespace ClawRPG.Scripts.Combat
                     EmitSignal(SignalComboMilestone, milestone);
                     break;
                 }
+            }
+        }
+
+        private void CheckKillStreak()
+        {
+            if (_persistence == null) return;
+            
+            int streak = _persistence.GetKillStreak();
+            if (streak >= 3)
+            {
+                EmitSignal(SignalKillStreak, streak);
+                var entry = new CombatLogEntry
+                {
+                    Timestamp = _currentSessionTime,
+                    Type = CombatLogType.Combo,
+                    Message = $"🔥 击杀 streak x{streak}!",
+                    Value = streak,
+                    IsPlayerAction = true
+                };
+                AddEntry(entry);
             }
         }
 
@@ -683,7 +427,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public int GetCurrentCombo()
         {
-            return _currentCombo;
+            return _persistence != null ? _persistence.GetCurrentCombo() : 0;
         }
 
         /// <summary>
@@ -691,7 +435,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public int GetKillStreak()
         {
-            return _killStreak;
+            return _persistence != null ? _persistence.GetKillStreak() : 0;
         }
 
         /// <summary>
@@ -699,7 +443,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public CombatLogStatistics GetStatistics()
         {
-            return _statistics;
+            return _persistence != null ? _persistence.GetStatistics() : new CombatLogStatistics();
         }
 
         /// <summary>
@@ -715,19 +459,27 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public List<string> GetRecentKills()
         {
-            return new List<string>(_recentKills);
+            return _persistence != null ? _persistence.GetRecentKills() : new List<string>();
+        }
+
+        /// <summary>
+        /// Get formatter instance
+        /// </summary>
+        public CombatLogFormatter GetFormatter()
+        {
+            return _formatter;
         }
 
         #endregion
 
-        #region Filter Control
+        #region Filter Control - 委托给 Persistence
 
         /// <summary>
         /// Set damage filter
         /// </summary>
         public void SetShowDamage(bool show)
         {
-            _showDamage = show;
+            _persistence?.SetShowDamage(show);
         }
 
         /// <summary>
@@ -735,7 +487,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void SetShowHealing(bool show)
         {
-            _showHealing = show;
+            _persistence?.SetShowHealing(show);
         }
 
         /// <summary>
@@ -743,7 +495,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void SetShowBuffs(bool show)
         {
-            _showBuffs = show;
+            _persistence?.SetShowBuffs(show);
         }
 
         /// <summary>
@@ -751,7 +503,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void SetShowSkills(bool show)
         {
-            _showSkills = show;
+            _persistence?.SetShowSkills(show);
         }
 
         /// <summary>
@@ -759,7 +511,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void SetShowCombat(bool show)
         {
-            _showCombat = show;
+            _persistence?.SetShowCombat(show);
         }
 
         /// <summary>
@@ -767,7 +519,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void SetShowInfo(bool show)
         {
-            _showInfo = show;
+            _persistence?.SetShowInfo(show);
         }
 
         /// <summary>
@@ -775,8 +527,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void SetPlayerOnly(bool playerOnly)
         {
-            _playerOnly = playerOnly;
-            if (playerOnly) _enemyOnly = false;
+            _persistence?.SetPlayerOnly(playerOnly);
         }
 
         /// <summary>
@@ -784,8 +535,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void SetEnemyOnly(bool enemyOnly)
         {
-            _enemyOnly = enemyOnly;
-            if (enemyOnly) _playerOnly = false;
+            _persistence?.SetEnemyOnly(enemyOnly);
         }
 
         /// <summary>
@@ -793,14 +543,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void ClearFilters()
         {
-            _showDamage = true;
-            _showHealing = true;
-            _showBuffs = true;
-            _showSkills = true;
-            _showCombat = true;
-            _showInfo = true;
-            _playerOnly = false;
-            _enemyOnly = false;
+            _persistence?.ClearFilters();
         }
 
         /// <summary>
@@ -810,8 +553,7 @@ namespace ClawRPG.Scripts.Combat
         {
             _logEntries.Clear();
             _filteredEntries.Clear();
-            _currentCombo = 0;
-            _killStreak = 0;
+            _recorder?.ClearLog();
         }
 
         /// <summary>
@@ -819,7 +561,7 @@ namespace ClawRPG.Scripts.Combat
         /// </summary>
         public void ResetStatistics()
         {
-            _statistics.Reset();
+            _persistence?.ResetStatistics();
         }
 
         /// <summary>
@@ -830,13 +572,12 @@ namespace ClawRPG.Scripts.Combat
             ClearLog();
             ResetStatistics();
             _currentSessionTime = 0f;
-            _currentCombo = 0;
-            _killStreak = 0;
+            _persistence?.FullReset();
         }
 
         #endregion
         
-        #region 数据持久化
+        #region 数据持久化 - 委托给子系统
 
         /// <summary>
         /// 导出保存数据
@@ -847,72 +588,23 @@ namespace ClawRPG.Scripts.Combat
 
             // 会话时间
             data["sessionTime"] = _currentSessionTime;
+            data["maxEntries"] = _maxEntries;
 
-            // 统计信息
-            var stats = new Dictionary
+            // 委托给子系统
+            if (_persistence != null)
             {
-                { "totalEntries", _statistics.TotalEntries },
-                { "damageEntries", _statistics.DamageEntries },
-                { "healingEntries", _statistics.HealingEntries },
-                { "killEntries", _statistics.KillEntries },
-                { "criticalHits", _statistics.CriticalHits },
-                { "misses", _statistics.Misses },
-                { "blocks", _statistics.Blocks },
-                { "dodges", _statistics.Dodges },
-                { "totalDamageDealt", _statistics.TotalDamageDealt },
-                { "totalDamageTaken", _statistics.TotalDamageTaken },
-                { "totalHealing", _statistics.TotalHealing }
-            };
-            data["statistics"] = stats;
-
-            // 筛选器设置
-            var filters = new Dictionary
-            {
-                { "showDamage", _showDamage },
-                { "showHealing", _showHealing },
-                { "showBuffs", _showBuffs },
-                { "showSkills", _showSkills },
-                { "showCombat", _showCombat },
-                { "showInfo", _showInfo },
-                { "playerOnly", _playerOnly },
-                { "enemyOnly", _enemyOnly }
-            };
-            data["filters"] = filters;
-
-            // 连击状态
-            var combo = new Dictionary
-            {
-                { "currentCombo", _currentCombo },
-                { "comboTimer", _comboTimer }
-            };
-            data["combo"] = combo;
-
-            // 击杀streak
-            var killStreak = new Dictionary
-            {
-                { "killStreak", _killStreak },
-                { "killStreakTimer", _killStreakTimer }
-            };
-            data["killStreak"] = killStreak;
-
-            // 日志条目（只保存最后100条，避免存档过大）
-            var entries = new ArrayList();
-            var startIndex = Math.Max(0, _logEntries.Count - 100);
-            for (int i = startIndex; i < _logEntries.Count; i++)
-            {
-                var entry = _logEntries[i];
-                entries.Add(new Dictionary
-                {
-                    { "timestamp", entry.Timestamp },
-                    { "type", (int)entry.Type },
-                    { "message", entry.Message ?? "" },
-                    { "value", entry.Value },
-                    { "source", entry.Source ?? "" },
-                    { "target", entry.Target ?? "" },
-                    { "isPlayerAction", entry.IsPlayerAction }
-                });
+                data["persistence"] = _persistence.ExportSaveData();
             }
-            data["logEntries"] = entries;
+            
+            if (_recorder != null)
+            {
+                data["recorder"] = _recorder.ExportSaveData();
+            }
+            
+            if (_formatter != null)
+            {
+                data["formatter"] = _formatter.ExportSaveData();
+            }
 
             return data;
         }
@@ -928,90 +620,33 @@ namespace ClawRPG.Scripts.Combat
             if (data.Contains("sessionTime"))
                 _currentSessionTime = Convert.ToSingle(data["sessionTime"]);
 
-            // 恢复统计信息
-            if (data.Contains("statistics"))
+            // 恢复最大条目数
+            if (data.Contains("maxEntries"))
+                _maxEntries = Convert.ToInt32(data["maxEntries"]);
+
+            // 委托给子系统
+            if (data.Contains("persistence") && _persistence != null)
             {
-                var stats = data["statistics"] as Dictionary;
-                if (stats != null)
-                {
-                    if (stats.Contains("totalEntries")) _statistics.TotalEntries = Convert.ToInt32(stats["totalEntries"]);
-                    if (stats.Contains("damageEntries")) _statistics.DamageEntries = Convert.ToInt32(stats["damageEntries"]);
-                    if (stats.Contains("healingEntries")) _statistics.HealingEntries = Convert.ToInt32(stats["healingEntries"]);
-                    if (stats.Contains("killEntries")) _statistics.KillEntries = Convert.ToInt32(stats["killEntries"]);
-                    if (stats.Contains("criticalHits")) _statistics.CriticalHits = Convert.ToInt32(stats["criticalHits"]);
-                    if (stats.Contains("misses")) _statistics.Misses = Convert.ToInt32(stats["misses"]);
-                    if (stats.Contains("blocks")) _statistics.Blocks = Convert.ToInt32(stats["blocks"]);
-                    if (stats.Contains("dodges")) _statistics.Dodges = Convert.ToInt32(stats["dodges"]);
-                    if (stats.Contains("totalDamageDealt")) _statistics.TotalDamageDealt = Convert.ToSingle(stats["totalDamageDealt"]);
-                    if (stats.Contains("totalDamageTaken")) _statistics.TotalDamageTaken = Convert.ToSingle(stats["totalDamageTaken"]);
-                    if (stats.Contains("totalHealing")) _statistics.TotalHealing = Convert.ToSingle(stats["totalHealing"]);
-                }
+                _persistence.ImportSaveData(data["persistence"] as Dictionary);
+            }
+            
+            if (data.Contains("recorder") && _recorder != null)
+            {
+                _recorder.ImportSaveData(data["recorder"] as Dictionary);
+            }
+            
+            if (data.Contains("formatter") && _formatter != null)
+            {
+                _formatter.ImportSaveData(data["formatter"] as Dictionary);
             }
 
-            // 恢复筛选器设置
-            if (data.Contains("filters"))
+            // 重新加载日志
+            if (_recorder != null)
             {
-                var filters = data["filters"] as Dictionary;
-                if (filters != null)
-                {
-                    if (filters.Contains("showDamage")) _showDamage = Convert.ToBoolean(filters["showDamage"]);
-                    if (filters.Contains("showHealing")) _showHealing = Convert.ToBoolean(filters["showHealing"]);
-                    if (filters.Contains("showBuffs")) _showBuffs = Convert.ToBoolean(filters["showBuffs"]);
-                    if (filters.Contains("showSkills")) _showSkills = Convert.ToBoolean(filters["showSkills"]);
-                    if (filters.Contains("showCombat")) _showCombat = Convert.ToBoolean(filters["showCombat"]);
-                    if (filters.Contains("showInfo")) _showInfo = Convert.ToBoolean(filters["showInfo"]);
-                    if (filters.Contains("playerOnly")) _playerOnly = Convert.ToBoolean(filters["playerOnly"]);
-                    if (filters.Contains("enemyOnly")) _enemyOnly = Convert.ToBoolean(filters["enemyOnly"]);
-                }
+                _logEntries = _recorder.GetAllEntries();
             }
-
-            // 恢复连击状态
-            if (data.Contains("combo"))
-            {
-                var combo = data["combo"] as Dictionary;
-                if (combo != null)
-                {
-                    if (combo.Contains("currentCombo")) _currentCombo = Convert.ToInt32(combo["currentCombo"]);
-                    if (combo.Contains("comboTimer")) _comboTimer = Convert.ToSingle(combo["comboTimer"]);
-                }
-            }
-
-            // 恢复击杀streak
-            if (data.Contains("killStreak"))
-            {
-                var killStreak = data["killStreak"] as Dictionary;
-                if (killStreak != null)
-                {
-                    if (killStreak.Contains("killStreak")) _killStreak = Convert.ToInt32(killStreak["killStreak"]);
-                    if (killStreak.Contains("killStreakTimer")) _killStreakTimer = Convert.ToSingle(killStreak["killStreakTimer"]);
-                }
-            }
-
-            // 恢复日志条目
-            if (data.Contains("logEntries"))
-            {
-                _logEntries.Clear();
-                var entries = data["logEntries"] as ArrayList;
-                if (entries != null)
-                {
-                    foreach (Dictionary entryData in entries)
-                    {
-                        var entry = new CombatLogEntry
-                        {
-                            Timestamp = entryData.Contains("timestamp") ? Convert.ToSingle(entryData["timestamp"]) : 0f,
-                            Type = entryData.Contains("type") ? (CombatLogType)Convert.ToInt32(entryData["type"]) : CombatLogType.Info,
-                            Message = entryData.Contains("message") ? entryData["message"].ToString() : "",
-                            Value = entryData.Contains("value") ? Convert.ToSingle(entryData["value"]) : 0f,
-                            Source = entryData.Contains("source") ? entryData["source"].ToString() : "",
-                            Target = entryData.Contains("target") ? entryData["target"].ToString() : "",
-                            IsPlayerAction = entryData.Contains("isPlayerAction") && Convert.ToBoolean(entryData["isPlayerAction"])
-                        };
-                        _logEntries.Add(entry);
-                    }
-                }
-                // 重新应用筛选器
-                ApplyFilters();
-            }
+            
+            ApplyFilters();
 
             GD.Print("[CombatLogSystem] Save data imported successfully");
         }
