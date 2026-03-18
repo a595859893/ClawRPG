@@ -1,16 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 namespace ClawRPG.Systems.MultiplayerVote
 {
     /// <summary>
-    /// 多人投票持久化系统 - 负责所有投票和队伍数据的持久化
+    /// 多人投票持久化系统 - 负责整体数据的保存和加载
+    /// 继承 BaseSystem 实现数据持久化接口
     /// </summary>
     public partial class MultiplayerVotePersistenceSystem : BaseSystem
     {
         private static MultiplayerVotePersistenceSystem _instance;
         public static MultiplayerVotePersistenceSystem Instance => _instance;
+        
+        // 外部依赖
+        private PartyManagementSystem _partySystem;
+        private VoteProcessingSystem _voteSystem;
+        private VoteTimer _voteTimer;
         
         public override void _Ready()
         {
@@ -21,114 +28,92 @@ namespace ClawRPG.Systems.MultiplayerVote
         protected override string SystemName => "MultiplayerVotePersistence";
         
         /// <summary>
-        /// 导出所有持久化数据
+        /// 初始化依赖
         /// </summary>
-        public Dictionary ExportSaveData()
+        public void Initialize(PartyManagementSystem partySystem, VoteProcessingSystem voteSystem, VoteTimer voteTimer)
         {
-            var data = new Dictionary();
-            
-            // Export from PartyManagementSystem
-            if (PartyManagementSystem.Instance != null)
-            {
-                var partyData = PartyManagementSystem.Instance.ExportSaveData();
-                foreach (var key in partyData.Keys)
-                {
-                    data[key] = partyData[key];
-                }
-            }
-            
-            // Export from VoteProcessingSystem
-            if (VoteProcessingSystem.Instance != null)
-            {
-                var voteData = VoteProcessingSystem.Instance.ExportSaveData();
-                foreach (var key in voteData.Keys)
-                {
-                    data["vote_" + key] = voteData[key];
-                }
-            }
-            
-            return data;
+            _partySystem = partySystem;
+            _voteSystem = voteSystem;
+            _voteTimer = voteTimer;
         }
         
         /// <summary>
-        /// 导入所有持久化数据
+        /// 设置子系统引用
         /// </summary>
-        public void ImportSaveData(Dictionary data)
+        public void SetSystems(PartyManagementSystem partySystem, VoteProcessingSystem voteSystem, VoteTimer voteTimer)
+        {
+            _partySystem = partySystem;
+            _voteSystem = voteSystem;
+            _voteTimer = voteTimer;
+        }
+
+        #region Save/Load
+
+        public override Dictionary ExportSaveData()
+        {
+            var saveData = new Dictionary();
+            
+            // 导出 PartyManagementSystem 数据
+            if (_partySystem != null)
+            {
+                saveData["party_system"] = _partySystem.ExportSaveData();
+            }
+            
+            // 导出 VoteProcessingSystem 数据
+            if (_voteSystem != null)
+            {
+                saveData["vote_system"] = _voteSystem.ExportSaveData();
+            }
+            
+            // 导出 VoteTimer 数据
+            if (_voteTimer != null)
+            {
+                saveData["vote_timer"] = _voteTimer.ExportSaveData();
+            }
+            
+            return saveData;
+        }
+
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
             
-            // Import to PartyManagementSystem
-            if (PartyManagementSystem.Instance != null)
+            // 导入 PartyManagementSystem 数据
+            if (data.Contains("party_system"))
             {
-                var partyData = new Dictionary();
-                foreach (var key in data.Keys)
-                {
-                    if (!key.ToString().StartsWith("vote_"))
-                    {
-                        partyData[key] = data[key];
-                    }
-                }
-                PartyManagementSystem.Instance.ImportSaveData(partyData);
+                var partyData = (Dictionary)data["party_system"];
+                _partySystem?.ImportSaveData(partyData);
             }
             
-            // Import to VoteProcessingSystem
-            if (VoteProcessingSystem.Instance != null)
+            // 导入 VoteProcessingSystem 数据
+            if (data.Contains("vote_system"))
             {
-                var voteData = new Dictionary();
-                foreach (var key in data.Keys)
-                {
-                    if (key.ToString().StartsWith("vote_"))
-                    {
-                        var newKey = key.ToString().Substring(5);
-                        voteData[newKey] = data[key];
-                    }
-                }
-                VoteProcessingSystem.Instance.ImportSaveData(voteData);
+                var voteData = (Dictionary)data["vote_system"];
+                _voteSystem?.ImportSaveData(voteData);
+            }
+            
+            // 导入 VoteTimer 数据
+            if (data.Contains("vote_timer"))
+            {
+                var timerData = (Dictionary)data["vote_timer"];
+                _voteTimer?.ImportSaveData(timerData);
             }
         }
+
+        #endregion
         
         /// <summary>
-        /// 保存数据到文件
+        /// 重置所有数据
         /// </summary>
-        public bool SaveToFile(string filePath)
+        public void ResetAll()
         {
-            try
-            {
-                var data = ExportSaveData();
-                var json = JsonSerializer.Serialize(data);
-                FileAccess.File(filePath, FileAccess.ModeFlags.Write);
-                return true;
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr($"Failed to save MultiplayerVote data: {e.Message}");
-                return false;
-            }
+            // 重置各子系统数据
+            _partySystem?.ImportSaveData(new Dictionary());
+            _voteSystem?.ImportSaveData(new Dictionary());
+            
+            GD.Print($"[{SystemName}] All data reset");
         }
-        
-        /// <summary>
-        /// 从文件加载数据
-        /// </summary>
-        public bool LoadFromFile(string filePath)
-        {
-            try
-            {
-                if (!FileAccess.FileExists(filePath))
-                    return false;
-                
-                var file = FileAccess.File(filePath, FileAccess.ModeFlags.Read);
-                var json = file.GetAsText();
-                file.Close();
-                
-                var data = JsonSerializer.Deserialize<Dictionary>(json);
-                ImportSaveData(data);
-                return true;
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr($"Failed to load MultiplayerVote data: {e.Message}");
-                return false;
-            }
-        }
+
+        #endregion
     }
 }

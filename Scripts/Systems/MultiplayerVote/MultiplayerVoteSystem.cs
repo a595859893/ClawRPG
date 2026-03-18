@@ -6,24 +6,22 @@ using Godot;
 namespace ClawRPG.Systems.MultiplayerVote
 {
     /// <summary>
-    /// 多人投票系统主控制器 - 负责协调投票和队伍管理
+    /// 多人投票系统主控制器 - 负责协调投票和队伍管理的子系统
+    /// 保留向后兼容性，所有功能通过委托给子系统实现
     /// </summary>
     public partial class MultiplayerVoteSystem : BaseSystem
     {
         private static MultiplayerVoteSystem _instance;
         public static MultiplayerVoteSystem Instance => _instance;
 
-        // 子系统引用
+        // 子系统
+        private PartyManagementSystem _partySystem;
+        private VoteProcessingSystem _voteSystem;
         private VoteTimer _voteTimer;
         private VoteResults _voteResults;
+        private MultiplayerVotePersistenceSystem _persistenceSystem;
         
-        // 数据存储
-        private Dictionary<string, ActiveVote> _activeVotes = new Dictionary<string, ActiveVote>();
-        private Dictionary<string, Party> _activeParties = new Dictionary<string, Party>();
-        private Dictionary<string, PlayerPartyData> _playerPartyData = new Dictionary<string, PlayerPartyData>();
-        private Dictionary<string, PartyStatistics> _playerStatistics = new Dictionary<string, PartyStatistics>();
-        
-        // Signals
+        // 向后兼容的 Signals
         [Signal] public delegate void VoteStartedEventHandler(ActiveVote vote);
         [Signal] public delegate void VoteEndedEventHandler(ActiveVote vote, bool passed);
         [Signal] public delegate void VoteUpdatedEventHandler(ActiveVote vote);
@@ -38,57 +36,96 @@ namespace ClawRPG.Systems.MultiplayerVote
             base._Ready();
             _instance = this;
             
-            // 初始化子系统
+            // 初始化基础组件
             _voteTimer = new VoteTimer();
             _voteResults = new VoteResults();
+            
+            // 初始化子系统
+            InitializeSubsystems();
+            
+            // 连接子系统信号
+            ConnectSubsystemSignals();
+        }
+        
+        /// <summary>
+        /// 初始化子系统
+        /// </summary>
+        private void InitializeSubsystems()
+        {
+            // 创建并初始化 PartyManagementSystem
+            _partySystem = new PartyManagementSystem();
+            AddChild(_partySystem);
+            
+            // 创建并初始化 VoteProcessingSystem
+            _voteSystem = new VoteProcessingSystem();
+            AddChild(_voteSystem);
+            _voteSystem.Initialize(_voteTimer, _voteResults);
+            
+            // 设置 VoteProcessingSystem 的回调函数
+            _voteSystem.SetCallbacks(
+                _partySystem.GetPlayerPartyData,
+                _partySystem.GetPlayerParty,
+                _partySystem.GetAllParties,
+                OnKickPlayerFromVote,
+                OnLeaderChangedFromVote,
+                _partySystem.GetPlayerStatistics
+            );
+            
+            // 创建并初始化 PersistenceSystem
+            _persistenceSystem = new MultiplayerVotePersistenceSystem();
+            AddChild(_persistenceSystem);
+            _persistenceSystem.SetSystems(_partySystem, _voteSystem, _voteTimer);
+        }
+        
+        /// <summary>
+        /// 连接子系统信号
+        /// </summary>
+        private void ConnectSubsystemSignals()
+        {
+            // PartyManagementSystem signals
+            _partySystem.Connect(SignalName.PartyCreated, new Callable(this, nameof(OnPartyCreated)));
+            _partySystem.Connect(SignalName.PartyJoined, new Callable(this, nameof(OnPartyJoined)));
+            _partySystem.Connect(SignalName.PartyLeft, new Callable(this, nameof(OnPartyLeft)));
+            _partySystem.Connect(SignalName.PartyMemberKicked, new Callable(this, nameof(OnPartyMemberKicked)));
+            _partySystem.Connect(SignalName.PartyLeaderChanged, new Callable(this, nameof(OnPartyLeaderChanged)));
+            
+            // VoteProcessingSystem signals
+            _voteSystem.Connect(SignalName.VoteStarted, new Callable(this, nameof(OnVoteStarted)));
+            _voteSystem.Connect(SignalName.VoteEnded, new Callable(this, nameof(OnVoteEnded)));
+            _voteSystem.Connect(SignalName.VoteUpdated, new Callable(this, nameof(OnVoteUpdated)));
+        }
+        
+        // 信号转发处理
+        private void OnPartyCreated(Party party) => EmitSignal(SignalName.PartyCreated, party);
+        private void OnPartyJoined(string partyId, PartyMember member) => EmitSignal(SignalName.PartyJoined, partyId, member);
+        private void OnPartyLeft(string partyId, string playerId) => EmitSignal(SignalName.PartyLeft, partyId, playerId);
+        private void OnPartyMemberKicked(string partyId, string playerId) => EmitSignal(SignalName.PartyMemberKicked, partyId, playerId);
+        private void OnPartyLeaderChanged(string partyId, string newLeaderId) => EmitSignal(SignalName.PartyLeaderChanged, partyId, newLeaderId);
+        private void OnVoteStarted(ActiveVote vote) => EmitSignal(SignalName.VoteStarted, vote);
+        private void OnVoteEnded(ActiveVote vote, bool passed) => EmitSignal(SignalName.VoteEnded, vote, passed);
+        private void OnVoteUpdated(ActiveVote vote) => EmitSignal(SignalName.VoteUpdated, vote);
+        
+        // 投票效果回调
+        private void OnKickPlayerFromVote(string leaderId, string targetId)
+        {
+            _partySystem.KickPlayer(leaderId, targetId);
+        }
+        
+        private void OnLeaderChangedFromVote(string partyId, string newLeaderId)
+        {
+            // 已通过 VoteProcessingSystem 处理
         }
         
         protected override string SystemName => "MultiplayerVote";
 
-        #region Party Management
+        #region Party Management - 委托给 PartyManagementSystem
 
         /// <summary>
         /// 创建队伍
         /// </summary>
         public Party CreateParty(string leaderId, string leaderName, string partyName = "", bool isPublic = true, string password = "", string gameMode = "", int maxMembers = 4)
         {
-            if (string.IsNullOrEmpty(partyName))
-            {
-                partyName = $"{leaderName}'s Party";
-            }
-
-            var party = new Party
-            {
-                PartyId = Guid.NewGuid().ToString(),
-                PartyName = partyName,
-                LeaderId = leaderId,
-                IsPublic = isPublic,
-                Password = password,
-                GameMode = gameMode,
-                MaxMembers = maxMembers > 0 ? maxMembers : 4,
-                CreateTime = OS.GetUnixTime()
-            };
-
-            var leaderMember = new PartyMember
-            {
-                PlayerId = leaderId,
-                PlayerName = leaderName,
-                IsLeader = true,
-                IsReady = true,
-                Role = "Leader",
-                JoinTime = OS.GetUnixTime()
-            };
-            party.Members.Add(leaderMember);
-
-            _activeParties[party.PartyId] = party;
-
-            GetOrCreatePlayerPartyData(leaderId);
-            _playerPartyData[leaderId].CurrentPartyId = party.PartyId;
-            _playerPartyData[leaderId].TotalPartiesCreated++;
-            GetOrCreatePlayerStatistics(leaderId).PartiesCreated++;
-
-            EmitSignal(SignalName.PartyCreated, party);
-            return party;
+            return _partySystem.CreateParty(leaderId, leaderName, partyName, isPublic, password, gameMode, maxMembers);
         }
 
         /// <summary>
@@ -96,44 +133,7 @@ namespace ClawRPG.Systems.MultiplayerVote
         /// </summary>
         public bool JoinParty(string playerId, string playerName, int level, int power, string partyId, string password = "")
         {
-            if (!_activeParties.ContainsKey(partyId))
-                return false;
-
-            var party = _activeParties[partyId];
-
-            if (party.Members.Count >= party.MaxMembers)
-                return false;
-            
-            if (!party.IsPublic && party.Password != password)
-                return false;
-            
-            if (level < party.MinLevel || level > party.MaxLevel)
-                return false;
-
-            if (party.Members.Any(m => m.PlayerId == playerId))
-                return false;
-
-            var member = new PartyMember
-            {
-                PlayerId = playerId,
-                PlayerName = playerName,
-                Level = level,
-                Power = power,
-                IsLeader = false,
-                IsReady = false,
-                Role = "Member",
-                JoinTime = OS.GetUnixTime()
-            };
-
-            party.Members.Add(member);
-
-            GetOrCreatePlayerPartyData(playerId);
-            _playerPartyData[playerId].CurrentPartyId = partyId;
-            _playerPartyData[playerId].TotalPartiesJoined++;
-            GetOrCreatePlayerStatistics(playerId).PartiesJoined++;
-
-            EmitSignal(SignalName.PartyJoined, partyId, member);
-            return true;
+            return _partySystem.JoinParty(playerId, playerName, level, power, partyId, password);
         }
 
         /// <summary>
@@ -141,41 +141,7 @@ namespace ClawRPG.Systems.MultiplayerVote
         /// </summary>
         public bool LeaveParty(string playerId)
         {
-            var playerData = GetPlayerPartyData(playerId);
-            if (playerData == null || string.IsNullOrEmpty(playerData.CurrentPartyId))
-                return false;
-
-            var partyId = playerData.CurrentPartyId;
-            if (!_activeParties.ContainsKey(partyId))
-                return false;
-
-            var party = _activeParties[partyId];
-            var member = party.Members.FirstOrDefault(m => m.PlayerId == playerId);
-            
-            if (member == null)
-                return false;
-
-            party.Members.Remove(member);
-
-            if (member.IsLeader && party.Members.Count > 0)
-            {
-                var newLeader = party.Members.First();
-                newLeader.IsLeader = true;
-                newLeader.Role = "Leader";
-                party.LeaderId = newLeader.PlayerId;
-                EmitSignal(SignalName.PartyLeaderChanged, partyId, newLeader.PlayerId);
-            }
-
-            if (party.Members.Count == 0)
-            {
-                _activeParties.Remove(partyId);
-            }
-
-            playerData.CurrentPartyId = "";
-            playerData.PastPartyIds.Add(partyId);
-
-            EmitSignal(SignalName.PartyLeft, partyId, playerId);
-            return true;
+            return _partySystem.LeaveParty(playerId);
         }
 
         /// <summary>
@@ -183,33 +149,7 @@ namespace ClawRPG.Systems.MultiplayerVote
         /// </summary>
         public bool KickPlayer(string kickerId, string targetId)
         {
-            var kickerData = GetPlayerPartyData(kickerId);
-            if (kickerData == null || string.IsNullOrEmpty(kickerData.CurrentPartyId))
-                return false;
-
-            var party = _activeParties[kickerData.CurrentPartyId];
-            
-            if (party.LeaderId != kickerId)
-                return false;
-
-            var targetMember = party.Members.FirstOrDefault(m => m.PlayerId == targetId);
-            if (targetMember == null || targetMember.IsLeader)
-                return false;
-
-            party.Members.Remove(targetMember);
-
-            var targetData = GetPlayerPartyData(targetId);
-            if (targetData != null)
-            {
-                targetData.CurrentPartyId = "";
-                targetData.PastPartyIds.Add(party.PartyId);
-            }
-
-            GetOrCreatePlayerStatistics(targetId).TimesKicked++;
-            GetOrCreatePlayerStatistics(kickerId).TimesKickedOthers++;
-
-            EmitSignal(SignalName.PartyMemberKicked, party.PartyId, targetId);
-            return true;
+            return _partySystem.KickPlayer(kickerId, targetId);
         }
 
         /// <summary>
@@ -217,18 +157,7 @@ namespace ClawRPG.Systems.MultiplayerVote
         /// </summary>
         public bool SetReady(string playerId, bool ready)
         {
-            var playerData = GetPlayerPartyData(playerId);
-            if (playerData == null || string.IsNullOrEmpty(playerData.CurrentPartyId))
-                return false;
-
-            var party = _activeParties[playerData.CurrentPartyId];
-            var member = party.Members.FirstOrDefault(m => m.PlayerId == playerId);
-            
-            if (member == null)
-                return false;
-
-            member.IsReady = ready;
-            return true;
+            return _partySystem.SetReady(playerId, ready);
         }
 
         /// <summary>
@@ -236,86 +165,19 @@ namespace ClawRPG.Systems.MultiplayerVote
         /// </summary>
         public bool UpdatePartySettings(string playerId, bool? isPublic = null, string password = null, string gameMode = null, int? maxMembers = null, int? minLevel = null, int? maxLevel = null)
         {
-            var playerData = GetPlayerPartyData(playerId);
-            if (playerData == null || string.IsNullOrEmpty(playerData.CurrentPartyId))
-                return false;
-
-            var party = _activeParties[playerData.CurrentPartyId];
-            
-            if (party.LeaderId != playerId)
-                return false;
-
-            if (isPublic.HasValue) party.IsPublic = isPublic.Value;
-            if (password != null) party.Password = password;
-            if (gameMode != null) party.GameMode = gameMode;
-            if (maxMembers.HasValue) party.MaxMembers = Math.Max(2, Math.Min(maxMembers.Value, 10));
-            if (minLevel.HasValue) party.MinLevel = minLevel.Value;
-            if (maxLevel.HasValue) party.MaxLevel = maxLevel.Value;
-
-            return true;
+            return _partySystem.UpdatePartySettings(playerId, isPublic, password, gameMode, maxMembers, minLevel, maxLevel);
         }
 
         #endregion
 
-        #region Vote System
+        #region Vote System - 委托给 VoteProcessingSystem
 
         /// <summary>
         /// 发起投票
         /// </summary>
         public ActiveVote InitiateVote(string initiatorId, VoteResults.VoteType voteType, string targetId = "", string targetName = "", string reason = "")
         {
-            var initiatorData = GetPlayerPartyData(initiatorId);
-            if (initiatorData == null || string.IsNullOrEmpty(initiatorData.CurrentPartyId))
-                return null;
-
-            var partyId = initiatorData.CurrentPartyId;
-            if (!_activeParties.ContainsKey(partyId))
-                return null;
-
-            var party = _activeParties[partyId];
-
-            var activePartyVotes = _activeVotes.Values.Where(v => GetPartyIdByVote(v.VoteId) == partyId && v.Status == VoteResults.VoteStatus.Pending).ToList();
-            if (activePartyVotes.Count >= 5)
-                return null;
-
-            var config = _voteResults.GetVoteConfig(voteType.ToString());
-            if (config == null)
-                return null;
-
-            var initiatorMember = party.Members.FirstOrDefault(m => m.PlayerId == initiatorId);
-            if (initiatorMember == null)
-                return null;
-
-            int currentTime = OS.GetUnixTime();
-            var vote = new ActiveVote
-            {
-                VoteId = Guid.NewGuid().ToString(),
-                Type = voteType,
-                InitiatorId = initiatorId,
-                InitiatorName = initiatorMember.PlayerName,
-                TargetId = targetId,
-                TargetName = targetName,
-                Reason = reason,
-                StartTime = currentTime,
-                EndTime = currentTime + config.DurationSeconds,
-                Status = VoteResults.VoteStatus.Pending
-            };
-
-            vote.Votes.Add(new VoteResults.VoteRecord
-            {
-                PlayerId = initiatorId,
-                PlayerName = initiatorMember.PlayerName,
-                VotedYes = true,
-                VoteTime = currentTime
-            });
-
-            _activeVotes[vote.VoteId] = vote;
-            _voteTimer.SetVoteTimeout(vote.VoteId, config.DurationSeconds);
-
-            GetOrCreatePlayerStatistics(initiatorId).VotesInitiated++;
-
-            EmitSignal(SignalName.VoteStarted, vote);
-            return vote;
+            return _voteSystem.InitiateVote(initiatorId, voteType, targetId, targetName, reason);
         }
 
         /// <summary>
@@ -323,41 +185,7 @@ namespace ClawRPG.Systems.MultiplayerVote
         /// </summary>
         public bool CastVote(string voterId, string voteId, bool yes)
         {
-            if (!_activeVotes.ContainsKey(voteId))
-                return false;
-
-            var vote = _activeVotes[voteId];
-            if (vote.Status != VoteResults.VoteStatus.Pending)
-                return false;
-
-            if (_voteTimer.IsVoteExpired(voteId))
-            {
-                EndVote(voteId);
-                return false;
-            }
-
-            var voterData = GetPlayerPartyData(voterId);
-            if (voterData == null || string.IsNullOrEmpty(voterData.CurrentPartyId))
-                return false;
-
-            var partyId = voterData.CurrentPartyId;
-            if (GetPartyIdByVote(voteId) != partyId)
-                return false;
-
-            var party = _activeParties[partyId];
-            var member = party.Members.FirstOrDefault(m => m.PlayerId == voterId);
-            if (member == null)
-                return false;
-
-            _voteResults.AddVoteRecord(voteId, voterId, member.PlayerName, yes);
-
-            GetOrCreatePlayerStatistics(voterId).VotesCast++;
-
-            EmitSignal(SignalName.VoteUpdated, vote);
-            
-            CheckVoteCompletion(voteId, party.Members.Count);
-            
-            return true;
+            return _voteSystem.CastVote(voterId, voteId, yes);
         }
 
         /// <summary>
@@ -365,227 +193,78 @@ namespace ClawRPG.Systems.MultiplayerVote
         /// </summary>
         public bool CancelVote(string voteId, string cancellerId)
         {
-            if (!_activeVotes.ContainsKey(voteId))
-                return false;
-
-            var vote = _activeVotes[voteId];
-            if (vote.Status != VoteResults.VoteStatus.Pending)
-                return false;
-
-            var voterData = GetPlayerPartyData(cancellerId);
-            if (voterData == null || string.IsNullOrEmpty(voterData.CurrentPartyId))
-                return false;
-
-            var party = _activeParties[voterData.CurrentPartyId];
-            if (vote.InitiatorId != cancellerId && party.LeaderId != cancellerId)
-                return false;
-
-            vote.Status = VoteResults.VoteStatus.Cancelled;
-            _voteTimer.SetVoteStatus(voteId, VoteResults.VoteStatus.Cancelled);
-            EmitSignal(SignalName.VoteEnded, vote, false);
-            return true;
-        }
-
-        /// <summary>
-        /// 结束投票
-        /// </summary>
-        private void EndVote(string voteId)
-        {
-            if (!_activeVotes.ContainsKey(voteId))
-                return;
-
-            var vote = _activeVotes[voteId];
-            if (vote.Status != VoteResults.VoteStatus.Pending)
-                return;
-
-            var partyId = GetPartyIdByVote(voteId);
-            if (partyId == null || !_activeParties.ContainsKey(partyId))
-                return;
-
-            var party = _activeParties[partyId];
-            bool passed = _voteResults.CalculateVoteResult(voteId, vote.Type.ToString(), party.Members.Count);
-
-            vote.Status = passed ? VoteResults.VoteStatus.Passed : VoteResults.VoteStatus.Failed;
-            _voteTimer.SetVoteStatus(voteId, vote.Status);
-
-            if (vote.InitiatorId != "")
-            {
-                var stats = GetOrCreatePlayerStatistics(vote.InitiatorId);
-                if (passed)
-                    stats.VotesPassed++;
-                else
-                    stats.VotesFailed++;
-            }
-
-            if (passed)
-            {
-                ExecuteVoteEffects(vote);
-            }
-
-            EmitSignal(SignalName.VoteEnded, vote, passed);
-        }
-
-        /// <summary>
-        /// 检查投票是否完成
-        /// </summary>
-        private void CheckVoteCompletion(string voteId, int totalPlayers)
-        {
-            if (!_activeVotes.ContainsKey(voteId))
-                return;
-
-            var vote = _activeVotes[voteId];
-            var config = _voteResults.GetVoteConfig(vote.Type.ToString());
-
-            if (_voteResults.AllPlayersVoted(voteId, totalPlayers))
-            {
-                EndVote(voteId);
-                return;
-            }
-
-            if (config != null && config.PassThreshold == 1.0f)
-            {
-                var (yesVotes, noVotes) = _voteResults.GetVoteStats(voteId);
-                int remaining = totalPlayers - yesVotes - noVotes;
-                if (noVotes > 0 || remaining > 0)
-                {
-                    return;
-                }
-                EndVote(voteId);
-            }
-        }
-
-        /// <summary>
-        /// 执行投票效果
-        /// </summary>
-        private void ExecuteVoteEffects(ActiveVote vote)
-        {
-            var partyId = GetPartyIdByVote(vote.VoteId);
-            if (partyId == null || !_activeParties.ContainsKey(partyId))
-                return;
-
-            var party = _activeParties[partyId];
-
-            switch (vote.Type)
-            {
-                case VoteResults.VoteType.KickPlayer:
-                    KickPlayer(party.LeaderId, vote.TargetId);
-                    break;
-                    
-                case VoteResults.VoteType.PromoteLeader:
-                    var newLeader = party.Members.FirstOrDefault(m => m.PlayerId == vote.TargetId);
-                    if (newLeader != null)
-                    {
-                        var oldLeader = party.Members.FirstOrDefault(m => m.IsLeader);
-                        if (oldLeader != null)
-                        {
-                            oldLeader.IsLeader = false;
-                            oldLeader.Role = "Member";
-                        }
-                        newLeader.IsLeader = true;
-                        newLeader.Role = "Leader";
-                        party.LeaderId = newLeader.PlayerId;
-                        EmitSignal(SignalName.PartyLeaderChanged, partyId, newLeader.PlayerId);
-                    }
-                    break;
-            }
+            return _voteSystem.CancelVote(voteId, cancellerId);
         }
 
         #endregion
 
-        #region Query Methods
-
-        private string GetPartyIdByVote(string voteId)
-        {
-            foreach (var party in _activeParties.Values)
-            {
-                foreach (var member in party.Members)
-                {
-                    // 查找发起者所在的队伍
-                }
-            }
-            
-            var vote = _activeVotes.ContainsKey(voteId) ? _activeVotes[voteId] : null;
-            if (vote != null)
-            {
-                var initiatorData = GetPlayerPartyData(vote.InitiatorId);
-                if (initiatorData != null)
-                    return initiatorData.CurrentPartyId;
-            }
-            return null;
-        }
+        #region Query Methods - 委托给相应子系统
 
         public Party GetParty(string partyId)
         {
-            return _activeParties.ContainsKey(partyId) ? _activeParties[partyId] : null;
+            return _partySystem.GetParty(partyId);
         }
 
         public Party GetPlayerParty(string playerId)
         {
-            var playerData = GetPlayerPartyData(playerId);
-            if (playerData == null || string.IsNullOrEmpty(playerData.CurrentPartyId))
-                return null;
-
-            return _activeParties.ContainsKey(playerData.CurrentPartyId) 
-                ? _activeParties[playerData.CurrentPartyId] 
-                : null;
+            return _partySystem.GetPlayerParty(playerId);
         }
 
         public ActiveVote GetVote(string voteId)
         {
-            return _activeVotes.ContainsKey(voteId) ? _activeVotes[voteId] : null;
+            return _voteSystem.GetVote(voteId);
         }
 
         public List<Party> GetPublicParties()
         {
-            return _activeParties.Values
-                .Where(p => p.IsPublic && p.Members.Count < p.MaxMembers)
-                .OrderByDescending(p => p.Members.Count)
-                .ToList();
+            return _partySystem.GetPublicParties();
         }
 
         public List<ActiveVote> GetPartyVotes(string partyId)
         {
-            var result = new List<ActiveVote>();
-            foreach (var vote in _activeVotes.Values)
-            {
-                if (vote.Status == VoteResults.VoteStatus.Pending)
-                {
-                    var initiatorData = GetPlayerPartyData(vote.InitiatorId);
-                    if (initiatorData != null && initiatorData.CurrentPartyId == partyId)
-                    {
-                        result.Add(vote);
-                    }
-                }
-            }
-            return result;
+            return _voteSystem.GetPartyVotes(partyId);
         }
 
         public PlayerPartyData GetPlayerPartyData(string playerId)
         {
-            return _playerPartyData.ContainsKey(playerId) ? _playerPartyData[playerId] : null;
+            return _partySystem.GetPlayerPartyData(playerId);
         }
 
         public PartyStatistics GetPlayerStatistics(string playerId)
         {
-            return _playerStatistics.ContainsKey(playerId) ? _playerStatistics[playerId] : null;
+            return _partySystem.GetPlayerStatistics(playerId);
         }
-
-        private PlayerPartyData GetOrCreatePlayerPartyData(string playerId)
+        
+        /// <summary>
+        /// 获取投票计时器（向后兼容）
+        /// </summary>
+        public VoteTimer GetVoteTimer()
         {
-            if (!_playerPartyData.ContainsKey(playerId))
-            {
-                _playerPartyData[playerId] = new PlayerPartyData { PlayerId = playerId };
-            }
-            return _playerPartyData[playerId];
+            return _voteTimer;
         }
-
-        private PartyStatistics GetOrCreatePlayerStatistics(string playerId)
+        
+        /// <summary>
+        /// 获取投票结果计算器（向后兼容）
+        /// </summary>
+        public VoteResults GetVoteResults()
         {
-            if (!_playerStatistics.ContainsKey(playerId))
-            {
-                _playerStatistics[playerId] = new PartyStatistics();
-            }
-            return _playerStatistics[playerId];
+            return _voteResults;
+        }
+        
+        /// <summary>
+        /// 获取队伍管理系统（向后兼容）
+        /// </summary>
+        public PartyManagementSystem GetPartySystem()
+        {
+            return _partySystem;
+        }
+        
+        /// <summary>
+        /// 获取投票处理系统（向后兼容）
+        /// </summary>
+        public VoteProcessingSystem GetVoteSystem()
+        {
+            return _voteSystem;
         }
 
         #endregion
@@ -594,12 +273,8 @@ namespace ClawRPG.Systems.MultiplayerVote
 
         public override void _Process(double delta)
         {
-            // 检查过期投票
-            var expiredVotes = _voteTimer.GetExpiredVotes();
-            foreach (var voteId in expiredVotes)
-            {
-                EndVote(voteId);
-            }
+            // 处理过期投票
+            _voteSystem.ProcessExpiredVotes();
         }
 
         #endregion
@@ -608,121 +283,14 @@ namespace ClawRPG.Systems.MultiplayerVote
 
         public override Dictionary ExportSaveData()
         {
-            var saveData = new Dictionary();
-            
-            // 导出队伍
-            var partiesData = new List<Dictionary>();
-            foreach (var party in _activeParties.Values)
-            {
-                partiesData.Add(new Dictionary
-                {
-                    { "party_id", party.PartyId },
-                    { "party_name", party.PartyName },
-                    { "leader_id", party.LeaderId },
-                    { "is_public", party.IsPublic },
-                    { "password", party.Password },
-                    { "game_mode", party.GameMode },
-                    { "max_members", party.MaxMembers },
-                    { "min_level", party.MinLevel },
-                    { "max_level", party.MaxLevel },
-                    { "create_time", party.CreateTime }
-                });
-            }
-            saveData["parties"] = partiesData;
-
-            return saveData;
+            return _persistenceSystem.ExportSaveData();
         }
 
         public override void ImportSaveData(Dictionary data)
         {
-            if (data == null) return;
+            _persistenceSystem.ImportSaveData(data);
         }
 
         #endregion
     }
-    
-    #region Data Classes
-    
-    /// <summary>
-    /// 活跃投票
-    /// </summary>
-    public class ActiveVote
-    {
-        public string VoteId { get; set; }
-        public VoteResults.VoteType Type { get; set; }
-        public string InitiatorId { get; set; }
-        public string InitiatorName { get; set; }
-        public string TargetId { get; set; }
-        public string TargetName { get; set; }
-        public string Reason { get; set; }
-        public int StartTime { get; set; }
-        public int EndTime { get; set; }
-        public VoteResults.VoteStatus Status { get; set; }
-        public List<VoteResults.VoteRecord> Votes { get; set; } = new List<VoteResults.VoteRecord>();
-    }
-    
-    /// <summary>
-    /// 队伍
-    /// </summary>
-    public class Party
-    {
-        public string PartyId { get; set; }
-        public string PartyName { get; set; }
-        public string LeaderId { get; set; }
-        public bool IsPublic { get; set; }
-        public string Password { get; set; }
-        public string GameMode { get; set; }
-        public int MaxMembers { get; set; } = 4;
-        public int MinLevel { get; set; } = 1;
-        public int MaxLevel { get; set; } = 100;
-        public int CreateTime { get; set; }
-        public List<PartyMember> Members { get; set; } = new List<PartyMember>();
-    }
-    
-    /// <summary>
-    /// 队伍成员
-    /// </summary>
-    public class PartyMember
-    {
-        public string PlayerId { get; set; }
-        public string PlayerName { get; set; }
-        public int Level { get; set; }
-        public int Power { get; set; }
-        public bool IsLeader { get; set; }
-        public bool IsReady { get; set; }
-        public string Role { get; set; }
-        public int JoinTime { get; set; }
-    }
-    
-    /// <summary>
-    /// 玩家队伍数据
-    /// </summary>
-    public class PlayerPartyData
-    {
-        public string PlayerId { get; set; }
-        public string CurrentPartyId { get; set; }
-        public List<string> PendingInvites { get; set; } = new List<string>();
-        public List<string> PastPartyIds { get; set; } = new List<string>();
-        public int TotalPartiesJoined { get; set; }
-        public int TotalPartiesCreated { get; set; }
-        public int VotesCast { get; set; }
-        public int VotesInitiated { get; set; }
-    }
-    
-    /// <summary>
-    /// 队伍统计
-    /// </summary>
-    public class PartyStatistics
-    {
-        public int TotalVotes { get; set; }
-        public int VotesPassed { get; set; }
-        public int VotesFailed { get; set; }
-        public int PartiesCreated { get; set; }
-        public int PartiesJoined { get; set; }
-        public int TimesKicked { get; set; }
-        public int TimesKickedOthers { get; set; }
-        public int VotesInitiated { get; set; }
-    }
-    
-    #endregion
 }
