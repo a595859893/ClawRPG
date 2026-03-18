@@ -5,41 +5,50 @@ using System.Collections.Generic;
 namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
-    /// LobbySystem - 负责大堂管理（房间列表、玩家大厅等）
+    /// LobbySystem - 负责大堂管理
+    /// 房间创建、加入、离开、玩家列表管理等
     /// </summary>
     public partial class LobbySystem : BaseSystem
     {
         public static LobbySystem Instance { get; private set; }
         
-        // 大堂玩家信息
-        public class LobbyPlayerInfo
+        // 玩家信息
+        public class LobbyPlayer
         {
             public int PlayerId { get; set; }
             public string PlayerName { get; set; }
             public bool IsReady { get; set; }
             public bool IsHost { get; set; }
-            public int TeamId { get; set; }
-            public DateTime JoinedTime { get; set; }
+            public int Ping { get; set; }
+            public DateTime JoinTime { get; set; }
         }
         
-        // 大堂房间信息
+        // 房间信息
         public class LobbyRoomInfo
         {
             public string RoomId { get; set; }
             public string RoomName { get; set; }
             public string HostName { get; set; }
-            public int PlayerCount { get; set; }
             public int MaxPlayers { get; set; }
-            public bool HasPassword { get; set; }
+            public int CurrentPlayers { get; set; }
+            public bool IsPasswordProtected { get; set; }
+            public bool IsStarted { get; set; }
             public string GameMode { get; set; }
-            public int Ping { get; set; }
+            public DateTime CreatedTime { get; set; }
         }
         
-        // 状态
+        // 大堂状态
         private bool _isInLobby = false;
-        private string _lobbyId = "";
-        private Dictionary<int, LobbyPlayerInfo> _lobbyPlayers = new Dictionary<int, LobbyPlayerInfo>();
-        private List<LobbyRoomInfo> _availableRooms = new List<LobbyRoomInfo>();
+        private string _currentLobbyId = "";
+        private bool _isLobbyHost = false;
+        
+        // 当前大堂的玩家列表
+        private Dictionary<int, LobbyPlayer> _lobbyPlayers = new Dictionary<int, LobbyPlayer>();
+        private readonly object _playersLock = new object();
+        
+        // 本地玩家信息
+        private int _localPlayerId = -1;
+        private string _localPlayerName = "Player";
         
         // 信号
         [Signal] public delegate void LobbyJoinedEventHandler(string lobbyId);
@@ -47,11 +56,14 @@ namespace ClawRPG.Scripts.Systems
         [Signal] public delegate void PlayerJoinedLobbyEventHandler(int playerId, string playerName);
         [Signal] public delegate void PlayerLeftLobbyEventHandler(int playerId);
         [Signal] public delegate void PlayerReadyEventHandler(int playerId, bool isReady);
-        [Signal] public delegate void RoomListUpdatedEventHandler();
-        [Signal] public delegate void LobbyChatMessageEventHandler(int playerId, string message);
+        [Signal] public delegate void HostChangedEventHandler(int newHostId);
+        [Signal] public delegate void LobbyFullEventHandler();
+        [Signal] public delegate void LobbyErrorEventHandler(string error);
         
         public bool IsInLobby => _isInLobby;
-        public string LobbyId => _lobbyId;
+        public bool IsHost => _isLobbyHost;
+        public int LocalPlayerId => _localPlayerId;
+        public string LocalPlayerName => _localPlayerName;
         public int PlayerCount => _lobbyPlayers.Count;
         
         public override void _Ready()
@@ -59,200 +71,362 @@ namespace ClawRPG.Scripts.Systems
             Instance = this;
         }
         
-        #region 大堂管理
+        #region 公共接口
         
-        public void JoinLobby(string lobbyId)
+        /// <summary>
+        /// 创建大堂
+        /// </summary>
+        public void CreateLobby(string lobbyName, int maxPlayers = 4, string password = "", string gameMode = "survival")
         {
-            _lobbyId = lobbyId;
+            _currentLobbyId = Guid.NewGuid().ToString();
+            _isLobbyHost = true;
             _isInLobby = true;
-            _lobbyPlayers.Clear();
+            
+            // 添加房主到玩家列表
+            var hostPlayer = new LobbyPlayer
+            {
+                PlayerId = _localPlayerId,
+                PlayerName = _localPlayerName,
+                IsReady = false,
+                IsHost = true,
+                Ping = 0,
+                JoinTime = DateTime.Now
+            };
+            
+            lock (_playersLock)
+            {
+                _lobbyPlayers[_localPlayerId] = hostPlayer;
+            }
+            
+            GD.Print($"[LobbySystem] Lobby created: {lobbyName}, ID: {_currentLobbyId}");
+            EmitSignal(SignalName.LobbyJoined, _currentLobbyId);
+        }
+        
+        /// <summary>
+        /// 加入大堂
+        /// </summary>
+        public void JoinLobby(string lobbyId, string password = "")
+        {
+            _currentLobbyId = lobbyId;
+            _isLobbyHost = false;
+            _isInLobby = true;
             
             GD.Print($"[LobbySystem] Joined lobby: {lobbyId}");
             EmitSignal(SignalName.LobbyJoined, lobbyId);
         }
         
+        /// <summary>
+        /// 离开大堂
+        /// </summary>
         public void LeaveLobby()
         {
-            _lobbyId = "";
-            _isInLobby = false;
-            _lobbyPlayers.Clear();
+            if (!_isInLobby) return;
             
-            GD.Print("[LobbySystem] Left lobby");
+            lock (_playersLock)
+            {
+                _lobbyPlayers.Clear();
+            }
+            
+            string leftLobbyId = _currentLobbyId;
+            _currentLobbyId = "";
+            _isInLobby = false;
+            _isLobbyHost = false;
+            
+            GD.Print($"[LobbySystem] Left lobby: {leftLobbyId}");
             EmitSignal(SignalName.LobbyLeft);
         }
         
-        #endregion
-        
-        #region 玩家管理
-        
-        public void AddPlayer(int playerId, string playerName, bool isHost = false)
+        /// <summary>
+        /// 设置玩家准备状态
+        /// </summary>
+        public void SetPlayerReady(int playerId, bool ready)
         {
-            var playerInfo = new LobbyPlayerInfo
+            lock (_playersLock)
             {
-                PlayerId = playerId,
-                PlayerName = playerName,
-                IsReady = false,
-                IsHost = isHost,
-                TeamId = 0,
-                JoinedTime = DateTime.Now
-            };
-            
-            _lobbyPlayers[playerId] = playerInfo;
-            
-            GD.Print($"[LobbySystem] Player joined: {playerName} (ID: {playerId})");
-            EmitSignal(SignalName.PlayerJoinedLobby, playerId, playerName);
-        }
-        
-        public void RemovePlayer(int playerId)
-        {
-            if (_lobbyPlayers.ContainsKey(playerId))
-            {
-                var playerName = _lobbyPlayers[playerId].PlayerName;
-                _lobbyPlayers.Remove(playerId);
-                
-                GD.Print($"[LobbySystem] Player left: {playerName} (ID: {playerId})");
-                EmitSignal(SignalName.PlayerLeftLobby, playerId);
-            }
-        }
-        
-        public void SetPlayerReady(int playerId, bool isReady)
-        {
-            if (_lobbyPlayers.ContainsKey(playerId))
-            {
-                _lobbyPlayers[playerId].IsReady = isReady;
-                
-                GD.Print($"[LobbySystem] Player {playerId} ready: {isReady}");
-                EmitSignal(SignalName.PlayerReady, playerId, isReady);
-            }
-        }
-        
-        public void SetPlayerTeam(int playerId, int teamId)
-        {
-            if (_lobbyPlayers.ContainsKey(playerId))
-            {
-                _lobbyPlayers[playerId].TeamId = teamId;
-            }
-        }
-        
-        public LobbyPlayerInfo GetPlayerInfo(int playerId)
-        {
-            return _lobbyPlayers.GetValueOrDefault(playerId);
-        }
-        
-        public Dictionary<int, LobbyPlayerInfo> GetAllPlayers()
-        {
-            return new Dictionary<int, LobbyPlayerInfo>(_lobbyPlayers);
-        }
-        
-        public bool AreAllPlayersReady()
-        {
-            foreach (var player in _lobbyPlayers.Values)
-            {
-                if (!player.IsHost && !player.IsReady)
+                if (_lobbyPlayers.ContainsKey(playerId))
                 {
-                    return false;
+                    _lobbyPlayers[playerId].IsReady = ready;
+                    GD.Print($"[LobbySystem] Player {playerId} ready: {ready}");
+                    EmitSignal(SignalName.PlayerReady, playerId, ready);
                 }
             }
-            return _lobbyPlayers.Count > 0;
         }
         
-        #endregion
-        
-        #region 房间列表
-        
-        public void UpdateRoomList(List<LobbyRoomInfo> rooms)
+        /// <summary>
+        /// 切换准备状态（本地玩家）
+        /// </summary>
+        public void ToggleReady()
         {
-            _availableRooms = rooms;
+            if (_localPlayerId <= 0) return;
             
-            GD.Print($"[LobbySystem] Room list updated: {rooms.Count} rooms");
-            EmitSignal(SignalName.RoomListUpdated);
+            bool currentReady = false;
+            lock (_playersLock)
+            {
+                if (_lobbyPlayers.ContainsKey(_localPlayerId))
+                {
+                    currentReady = _lobbyPlayers[_localPlayerId].IsReady;
+                }
+            }
+            
+            SetPlayerReady(_localPlayerId, !currentReady);
         }
         
-        public void AddRoom(LobbyRoomInfo room)
+        /// <summary>
+        /// 添加玩家到大堂
+        /// </summary>
+        public void AddPlayer(int playerId, string playerName)
         {
-            _availableRooms.Add(room);
-            EmitSignal(SignalName.RoomListUpdated);
+            lock (_playersLock)
+            {
+                if (!_lobbyPlayers.ContainsKey(playerId))
+                {
+                    _lobbyPlayers[playerId] = new LobbyPlayer
+                    {
+                        PlayerId = playerId,
+                        PlayerName = playerName,
+                        IsReady = false,
+                        IsHost = false,
+                        Ping = 0,
+                        JoinTime = DateTime.Now
+                    };
+                    
+                    GD.Print($"[LobbySystem] Player joined: {playerName} (ID: {playerId})");
+                    EmitSignal(SignalName.PlayerJoinedLobby, playerId, playerName);
+                }
+            }
         }
         
-        public void RemoveRoom(string roomId)
+        /// <summary>
+        /// 从大堂移除玩家
+        /// </summary>
+        public void RemovePlayer(int playerId)
         {
-            _availableRooms.RemoveAll(r => r.RoomId == roomId);
-            EmitSignal(SignalName.RoomListUpdated);
+            lock (_playersLock)
+            {
+                if (_lobbyPlayers.ContainsKey(playerId))
+                {
+                    string playerName = _lobbyPlayers[playerId].PlayerName;
+                    bool wasHost = _lobbyPlayers[playerId].IsHost;
+                    _lobbyPlayers.Remove(playerId);
+                    
+                    GD.Print($"[LobbySystem] Player left: {playerName} (ID: {playerId})");
+                    EmitSignal(SignalName.PlayerLeftLobby, playerId);
+                    
+                    // 如果离开的是房主，转移房主权限
+                    if (wasHost && _lobbyPlayers.Count > 0)
+                    {
+                        int newHostId = GetNextHost();
+                        if (newHostId > 0)
+                        {
+                            _lobbyPlayers[newHostId].IsHost = true;
+                            _isLobbyHost = true;
+                            GD.Print($"[LobbySystem] New host: {newHostId}");
+                            EmitSignal(SignalName.HostChanged, newHostId);
+                        }
+                    }
+                }
+            }
         }
         
-        public List<LobbyRoomInfo> GetAvailableRooms()
+        /// <summary>
+        /// 获取玩家信息
+        /// </summary>
+        public LobbyPlayer GetPlayer(int playerId)
         {
-            return new List<LobbyRoomInfo>(_availableRooms);
+            lock (_playersLock)
+            {
+                return _lobbyPlayers.ContainsKey(playerId) ? _lobbyPlayers[playerId] : null;
+            }
         }
         
-        public LobbyRoomInfo GetRoomInfo(string roomId)
+        /// <summary>
+        ///获取所有玩家列表
+        /// </summary>
+        public List<LobbyPlayer> GetPlayerList()
         {
-            return _availableRooms.Find(r => r.RoomId == roomId);
+            lock (_playersLock)
+            {
+                return new List<LobbyPlayer>(_lobbyPlayers.Values);
+            }
+        }
+        
+        /// <summary>
+        /// 获取玩家数量
+        /// </summary>
+        public int GetPlayerCount()
+        {
+            lock (_playersLock)
+            {
+                return _lobbyPlayers.Count;
+            }
+        }
+        
+        /// <summary>
+        /// 检查玩家是否在大堂中
+        /// </summary>
+        public bool HasPlayer(int playerId)
+        {
+            lock (_playersLock)
+            {
+                return _lobbyPlayers.ContainsKey(playerId);
+            }
+        }
+        
+        /// <summary>
+        /// 检查是否所有玩家都准备完毕
+        /// </summary>
+        public bool AreAllPlayersReady()
+        {
+            lock (_playersLock)
+            {
+                if (_lobbyPlayers.Count <= 1) return true;
+                
+                foreach (var player in _lobbyPlayers.Values)
+                {
+                    if (!player.IsReady) return false;
+                }
+                return true;
+            }
+        }
+        
+        /// <summary>
+        /// 设置本地玩家ID
+        /// </summary>
+        public void SetLocalPlayerId(int playerId)
+        {
+            _localPlayerId = playerId;
+        }
+        
+        /// <summary>
+        /// 设置本地玩家名称
+        /// </summary>
+        public void SetLocalPlayerName(string name)
+        {
+            _localPlayerName = name;
+            
+            lock (_playersLock)
+            {
+                if (_lobbyPlayers.ContainsKey(_localPlayerId))
+                {
+                    _lobbyPlayers[_localPlayerId].PlayerName = name;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 更新玩家延迟
+        /// </summary>
+        public void UpdatePlayerPing(int playerId, int ping)
+        {
+            lock (_playersLock)
+            {
+                if (_lobbyPlayers.ContainsKey(playerId))
+                {
+                    _lobbyPlayers[playerId].Ping = ping;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 清空大堂
+        /// </summary>
+        public void ClearLobby()
+        {
+            lock (_playersLock)
+            {
+                _lobbyPlayers.Clear();
+            }
+            _currentLobbyId = "";
+            _isInLobby = false;
+            _isLobbyHost = false;
         }
         
         #endregion
         
-        #region 大堂聊天
+        #region 私有方法
         
-        public void SendChatMessage(int playerId, string message)
+        /// <summary>
+        /// 获取下一个房主人选
+        /// </summary>
+        private int GetNextHost()
         {
-            GD.Print($"[LobbySystem] Chat from {playerId}: {message}");
-            EmitSignal(SignalName.LobbyChatMessage, playerId, message);
+            lock (_playersLock)
+            {
+                foreach (var player in _lobbyPlayers.Values)
+                {
+                    if (!player.IsHost)
+                    {
+                        return player.PlayerId;
+                    }
+                }
+            }
+            return -1;
         }
         
         #endregion
         
-        #region 持久化
+        #region 数据持久化
         
-        public Dictionary ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
             var data = new Dictionary();
             
             data["is_in_lobby"] = _isInLobby;
-            data["lobby_id"] = _lobbyId;
+            data["current_lobby_id"] = _currentLobbyId;
+            data["is_lobby_host"] = _isLobbyHost;
+            data["local_player_id"] = _localPlayerId;
+            data["local_player_name"] = _localPlayerName;
             
-            // 保存玩家信息
-            var playersData = new Array();
-            foreach (var player in _lobbyPlayers.Values)
+            lock (_playersLock)
             {
-                var playerDict = new Dictionary();
-                playerDict["player_id"] = player.PlayerId;
-                playerDict["player_name"] = player.PlayerName;
-                playerDict["is_ready"] = player.IsReady;
-                playerDict["is_host"] = player.IsHost;
-                playerDict["team_id"] = player.TeamId;
-                playersData.Add(playerDict);
+                var playersData = new Dictionary();
+                foreach (var kvp in _lobbyPlayers)
+                {
+                    playersData[kvp.Key.ToString()] = new Dictionary
+                    {
+                        ["player_name"] = kvp.Value.PlayerName,
+                        ["is_ready"] = kvp.Value.IsReady,
+                        ["is_host"] = kvp.Value.IsHost,
+                        ["ping"] = kvp.Value.Ping
+                    };
+                }
+                data["players"] = playersData;
             }
-            data["lobby_players"] = playersData;
             
             return data;
         }
         
-        public void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
             
             _isInLobby = Convert.ToBoolean(data.GetValueOrDefault("is_in_lobby", false));
-            _lobbyId = data.GetValueOrDefault("lobby_id", "")?.ToString() ?? "";
+            _currentLobbyId = data.GetValueOrDefault("current_lobby_id", "")?.ToString() ?? "";
+            _isLobbyHost = Convert.ToBoolean(data.GetValueOrDefault("is_lobby_host", false));
+            _localPlayerId = Convert.ToInt32(data.GetValueOrDefault("local_player_id", -1));
+            _localPlayerName = data.GetValueOrDefault("local_player_name", "Player")?.ToString() ?? "Player";
             
-            // 恢复玩家信息
-            _lobbyPlayers.Clear();
-            if (data.Contains("lobby_players"))
+            lock (_playersLock)
             {
-                var playersData = data["lobby_players"] as Array;
-                if (playersData != null)
+                _lobbyPlayers.Clear();
+                
+                if (data.Contains("players"))
                 {
-                    foreach (Dictionary playerDict in playersData)
+                    var playersData = (Dictionary)data["players"];
+                    foreach (string key in playersData.Keys)
                     {
-                        var player = new LobbyPlayerInfo
+                        int playerId = int.Parse(key);
+                        var playerData = (Dictionary)playersData[key];
+                        
+                        _lobbyPlayers[playerId] = new LobbyPlayer
                         {
-                            PlayerId = Convert.ToInt32(playerDict.GetValueOrDefault("player_id", 0)),
-                            PlayerName = playerDict.GetValueOrDefault("player_name", "")?.ToString() ?? "",
-                            IsReady = Convert.ToBoolean(playerDict.GetValueOrDefault("is_ready", false)),
-                            IsHost = Convert.ToBoolean(playerDict.GetValueOrDefault("is_host", false)),
-                            TeamId = Convert.ToInt32(playerDict.GetValueOrDefault("team_id", 0))
+                            PlayerId = playerId,
+                            PlayerName = playerData.GetValueOrDefault("player_name", "")?.ToString() ?? "",
+                            IsReady = Convert.ToBoolean(playerData.GetValueOrDefault("is_ready", false)),
+                            IsHost = Convert.ToBoolean(playerData.GetValueOrDefault("is_host", false)),
+                            Ping = Convert.ToInt32(playerData.GetValueOrDefault("ping", 0)),
+                            JoinTime = DateTime.Now
                         };
-                        _lobbyPlayers[player.PlayerId] = player;
                     }
                 }
             }
