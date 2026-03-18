@@ -6,6 +6,7 @@ namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
     /// 角斗场系统 - 玩家实时对战
+    /// 协调者：委托给子系统处理具体逻辑
     /// </summary>
     public partial class ArenaColosseumSystem : BaseSystem
     {
@@ -22,19 +23,8 @@ namespace ClawRPG.Scripts.Systems
         }
 
         protected override string SystemName => "ArenaColosseumSystem";
-        private static ArenaColosseumSystem _instance;
-        public static ArenaColosseumSystem Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = new ArenaColosseumSystem();
-                return _instance;
-            }
-            private set { _instance = value; }
-        }
 
-        // 信号系统
+        // 信号系统 - 转发子系统的信号
         public event Action<ArenaColosseumData.ActiveColosseum> OnColosseumStarted;
         public event Action<ArenaColosseumData.ActiveColosseum> OnColosseumEnded;
         public event Action<ArenaColosseumData.ActiveColosseum, ArenaColosseumData.Participant> OnPlayerJoined;
@@ -45,86 +35,68 @@ namespace ClawRPG.Scripts.Systems
         public event Action<ArenaColosseumData.ActiveColosseum> OnCountdownStarted;
         public event Action<ArenaColosseumData.ActiveColosseum> OnCountdownEnded;
 
-        // 数据
-        private List<ArenaColosseumData.Colosseum> _colosseums;
+        // 子系统
+        private ArenaMatchmakingSystem _matchmakingSystem;
+        private ArenaSeasonSystem _seasonSystem;
+        private ArenaRewardSystem _rewardSystem;
+
+        // 内部数据（战斗进行中的实时状态）
         private List<ArenaColosseumData.ActiveColosseum> _activeColosseums;
-        private Dictionary<int, ArenaColosseumData.PlayerColosseumData> _playerData;
-        private int _nextInstanceId = 1;
 
         public ArenaColosseumSystem()
         {
-            _colosseums = ArenaColosseumDatabase.GetDefaultColosseums();
             _activeColosseums = new List<ArenaColosseumData.ActiveColosseum>();
-            _playerData = new Dictionary<int, ArenaColosseumData.PlayerColosseumData>();
         }
 
-        public void Initialize()
+        protected override void Initialize()
         {
+            // 初始化子系统
+            _matchmakingSystem = ArenaMatchmakingSystem.Instance;
+            _seasonSystem = ArenaSeasonSystem.Instance;
+            _rewardSystem = ArenaRewardSystem.Instance;
+
+            // 订阅子系统事件
+            SubscribeToSubsystems();
+
+            _matchmakingSystem.Initialize();
+            _seasonSystem.Initialize();
+            _rewardSystem.Initialize();
+
             GD.Print("[ArenaColosseumSystem] Initialized");
+            IsInitialized = true;
         }
 
-        #region 公开接口
+        private void SubscribeToSubsystems()
+        {
+            // 转发匹配系统事件
+            _matchmakingSystem.OnPlayerJoined += (ac, p) => OnPlayerJoined?.Invoke(ac, p);
+            _matchmakingSystem.OnPlayerLeft += (ac, p) => OnPlayerLeft?.Invoke(ac, p);
+            _matchmakingSystem.OnMatchFound += (ac, p) => OnMatchFound?.Invoke(ac, p);
+            _matchmakingSystem.OnCountdownStarted += (ac) => OnCountdownStarted?.Invoke(ac);
+            _matchmakingSystem.OnCountdownEnded += (ac) => OnCountdownEnded?.Invoke(ac);
+            _matchmakingSystem.OnColosseumStarted += (ac) => 
+            {
+                _activeColosseums.Add(ac);
+                OnColosseumStarted?.Invoke(ac);
+            };
+
+            // 转发奖励系统事件
+            _rewardSystem.OnColosseumEnded += (ac, winnerId) => 
+            {
+                _activeColosseums.Remove(ac);
+                OnColosseumEnded?.Invoke(ac);
+            };
+        }
+
+        #region 公开接口（保持向后兼容）
 
         /// <summary>
         /// 加入角斗场
         /// </summary>
-        public bool JoinColosseum(int playerId, int colosseumId, string playerName, int level, 
+        public bool JoinColosseum(int playerId, int colosseumId, string playerName, int level,
             int health, int damage, int wins, int losses)
         {
-            var colosseum = GetColosseum(colosseumId);
-            if (colosseum == null)
-            {
-                GD.PrintErr($"[ArenaColosseumSystem] Colosseum {colosseumId} not found");
-                return false;
-            }
-
-            if (level < colosseum.MinLevel)
-            {
-                GD.PrintErr($"[ArenaColosseumSystem] Player level {level} too low, required {colosseum.MinLevel}");
-                return false;
-            }
-
-            // 查找等待中的竞技场
-            var activeColosseum = FindWaitingColosseum(colosseumId);
-            if (activeColosseum == null)
-            {
-                // 创建新的竞技场实例
-                activeColosseum = CreateColosseum(colosseumId);
-                _activeColosseums.Add(activeColosseum);
-            }
-
-            // 添加参与者
-            var participant = new ArenaColosseumData.Participant
-            {
-                PlayerId = playerId,
-                PlayerName = playerName,
-                Level = level,
-                Health = health,
-                MaxHealth = health,
-                Damage = damage,
-                Wins = wins,
-                Losses = losses,
-                IsReady = false,
-                Position = Vector2.Zero,
-                IsAlive = true,
-                Score = 0
-            };
-
-            activeColosseum.Participants.Add(participant);
-            OnPlayerJoined?.Invoke(activeColosseum, participant);
-
-            // 检查是否满员
-            if (activeColosseum.Participants.Count >= colosseum.MaxPlayers)
-            {
-                // 开始匹配
-                StartMatching(activeColosseum);
-            }
-            else
-            {
-                activeColosseum.State = ArenaColosseumData.ColosseumState.Waiting;
-            }
-
-            return true;
+            return _matchmakingSystem.JoinColosseum(playerId, colosseumId, playerName, level, health, damage, wins, losses);
         }
 
         /// <summary>
@@ -132,27 +104,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public void LeaveColosseum(int playerId)
         {
-            foreach (var activeColosseum in _activeColosseums)
-            {
-                var participant = GetParticipant(activeColosseum, playerId);
-                if (participant != null)
-                {
-                    activeColosseum.Participants.Remove(participant);
-                    OnPlayerLeft?.Invoke(activeColosseum, participant);
-
-                    if (activeColosseum.Participants.Count == 0)
-                    {
-                        activeColosseum.State = ArenaColosseumData.ColosseumState.Cancelled;
-                        _activeColosseums.Remove(activeColosseum);
-                    }
-                    else if (activeColosseum.State == ArenaColosseumData.ColosseumState.InProgress)
-                    {
-                        // 剩余玩家自动获胜
-                        EndColosseum(activeColosseum, -1);
-                    }
-                    break;
-                }
-            }
+            _matchmakingSystem.LeaveColosseum(playerId);
         }
 
         /// <summary>
@@ -160,16 +112,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public void SetReady(int playerId, bool ready)
         {
-            foreach (var activeColosseum in _activeColosseums)
-            {
-                var participant = GetParticipant(activeColosseum, playerId);
-                if (participant != null)
-                {
-                    participant.IsReady = ready;
-                    CheckAllReady(activeColosseum);
-                    break;
-                }
-            }
+            _matchmakingSystem.SetReady(playerId, ready);
         }
 
         /// <summary>
@@ -182,8 +125,8 @@ namespace ClawRPG.Scripts.Systems
                 if (activeColosseum.State != ArenaColosseumData.ColosseumState.InProgress)
                     continue;
 
-                var attacker = GetParticipant(activeColosseum, playerId);
-                var target = GetParticipant(activeColosseum, targetId);
+                var attacker = _matchmakingSystem.GetParticipant(activeColosseum, playerId);
+                var target = _matchmakingSystem.GetParticipant(activeColosseum, targetId);
 
                 if (attacker != null && target != null && target.IsAlive)
                 {
@@ -197,7 +140,7 @@ namespace ClawRPG.Scripts.Systems
                         target.Health = 0;
                         target.IsAlive = false;
                         attacker.Score += 100; // 击杀奖励
-                        
+
                         OnPlayerEliminated?.Invoke(activeColosseum, targetId);
 
                         CheckWinner(activeColosseum);
@@ -214,7 +157,7 @@ namespace ClawRPG.Scripts.Systems
         {
             foreach (var activeColosseum in _activeColosseums)
             {
-                var participant = GetParticipant(activeColosseum, playerId);
+                var participant = _matchmakingSystem.GetParticipant(activeColosseum, playerId);
                 if (participant != null)
                 {
                     participant.Position = position;
@@ -236,13 +179,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public ArenaColosseumData.ActiveColosseum GetPlayerColosseum(int playerId)
         {
-            foreach (var activeColosseum in _activeColosseums)
-            {
-                var participant = GetParticipant(activeColosseum, playerId);
-                if (participant != null)
-                    return activeColosseum;
-            }
-            return null;
+            return _matchmakingSystem.GetPlayerColosseum(playerId);
         }
 
         /// <summary>
@@ -250,7 +187,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public List<ArenaColosseumData.Colosseum> GetColosseumList()
         {
-            return new List<ArenaColosseumData.Colosseum>(_colosseums);
+            return _matchmakingSystem.GetColosseumList();
         }
 
         /// <summary>
@@ -258,11 +195,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public ArenaColosseumData.Colosseum GetColosseum(int id)
         {
-            foreach (var c in _colosseums)
-            {
-                if (c.Id == id) return c;
-            }
-            return null;
+            return _matchmakingSystem.GetColosseum(id);
         }
 
         /// <summary>
@@ -270,54 +203,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public ArenaColosseumData.PlayerColosseumData GetPlayerData(int playerId)
         {
-            if (!_playerData.ContainsKey(playerId))
-            {
-                _playerData[playerId] = new ArenaColosseumData.PlayerColosseumData
-                {
-                    PlayerId = playerId,
-                    TotalMatches = 0,
-                    Wins = 0,
-                    Losses = 0,
-                    TotalPrizeEarned = 0,
-                    TotalEntryFees = 0,
-                    HighestStreak = 0,
-                    CurrentStreak = 0,
-                    HighestDamage = 0,
-                    TotalKills = 0,
-                    Rating = 1000
-                };
-            }
-            return _playerData[playerId];
-        }
-
-        /// <summary>
-        /// 更新玩家数据
-        /// </summary>
-        public void UpdatePlayerStats(int playerId, bool isWinner, int damage, int kills, int prize)
-        {
-            var data = GetPlayerData(playerId);
-            data.TotalMatches++;
-            data.TotalEntryFees += prize;
-
-            if (isWinner)
-            {
-                data.Wins++;
-                data.CurrentStreak++;
-                data.HighestStreak = Math.Max(data.HighestStreak, data.CurrentStreak);
-                data.TotalPrizeEarned += prize;
-            }
-            else
-            {
-                data.Losses++;
-                data.CurrentStreak = 0;
-            }
-
-            data.HighestDamage = Math.Max(data.HighestDamage, damage);
-            data.TotalKills += kills;
-
-            // 更新rating
-            int ratingChange = isWinner ? 25 : -15;
-            data.Rating = Math.Max(100, data.Rating + ratingChange);
+            return _seasonSystem.GetPlayerData(playerId);
         }
 
         /// <summary>
@@ -325,149 +211,68 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public Dictionary<string, object> GetStatistics()
         {
-            return new Dictionary<string, object>
-            {
-                { "activeColosseums", _activeColosseums.Count },
-                { "waitingColosseums", CountWaitingColosseums() },
-                { "totalPlayers", GetTotalPlayers() },
-                { "totalMatches", GetTotalMatches() }
-            };
+            var stats = _seasonSystem.GetStatistics();
+            stats["activeColosseums"] = _activeColosseums.Count;
+            return stats;
+        }
+
+        /// <summary>
+        /// 获取排名
+        /// </summary>
+        public int GetRank(int playerId)
+        {
+            return _seasonSystem.GetRank(playerId);
+        }
+
+        /// <summary>
+        /// 获取排行榜
+        /// </summary>
+        public List<ArenaColosseumData.PlayerColosseumData> GetRankings(int limit = 100)
+        {
+            return _seasonSystem.GetRankings(limit);
+        }
+
+        /// <summary>
+        /// 获取段位
+        /// </summary>
+        public string GetRankTier(int playerId)
+        {
+            return _seasonSystem.GetRankTier(playerId);
         }
 
         #endregion
 
         #region 内部方法
 
-        private ArenaColosseumData.ActiveColosseum FindWaitingColosseum(int colosseumId)
-        {
-            foreach (var ac in _activeColosseums)
-            {
-                if (ac.ColosseumId == colosseumId && 
-                    ac.State == ArenaColosseumData.ColosseumState.Waiting)
-                {
-                    var colosseum = GetColosseum(ac.ColosseumId);
-                    if (colosseum != null && ac.Participants.Count < colosseum.MaxPlayers)
-                        return ac;
-                }
-            }
-            return null;
-        }
-
-        private ArenaColosseumData.ActiveColosseum CreateColosseum(int colosseumId)
-        {
-            return new ArenaColosseumData.ActiveColosseum
-            {
-                InstanceId = _nextInstanceId++,
-                ColosseumId = colosseumId,
-                State = ArenaColosseumData.ColosseumState.Waiting,
-                TimeRemaining = 0,
-                CountdownTime = 5f,
-                Round = 1,
-                WinnerId = -1,
-                StartTime = DateTime.Now
-            };
-        }
-
-        private ArenaColosseumData.Participant GetParticipant(ArenaColosseumData.ActiveColosseum ac, int playerId)
-        {
-            foreach (var p in ac.Participants)
-            {
-                if (p.PlayerId == playerId) return p;
-            }
-            return null;
-        }
-
-        private void StartMatching(ArenaColosseumData.ActiveColosseum ac)
-        {
-            ac.State = ArenaColosseumData.ColosseumState.Matching;
-            
-            // 模拟匹配时间
-            var colosseum = GetColosseum(ac.ColosseumId);
-            
-            // 通知所有参与者匹配成功
-            foreach (var p in ac.Participants)
-            {
-                OnMatchFound?.Invoke(ac, p);
-            }
-
-            // 开始倒计时
-            StartCountdown(ac);
-        }
-
-        private void StartCountdown(ArenaColosseumData.ActiveColosseum ac)
-        {
-            ac.State = ArenaColosseumData.ColosseumState.Countdown;
-            OnCountdownStarted?.Invoke(ac);
-        }
-
+        /// <summary>
+        /// 更新倒计时和战斗时间
+        /// </summary>
         public void UpdateCountdown(float delta)
         {
+            // 更新匹配系统倒计时
+            _matchmakingSystem.UpdateCountdown(delta);
+
+            // 更新战斗中的竞技场时间
             foreach (var ac in _activeColosseums)
             {
-                if (ac.State == ArenaColosseumData.ColosseumState.Countdown)
-                {
-                    ac.CountdownTime -= delta;
-                    if (ac.CountdownTime <= 0)
-                    {
-                        StartColosseum(ac);
-                    }
-                }
-                else if (ac.State == ArenaColosseumData.ColosseumState.InProgress)
+                if (ac.State == ArenaColosseumData.ColosseumState.InProgress)
                 {
                     ac.TimeRemaining -= delta;
                     if (ac.TimeRemaining <= 0)
                     {
-                        // 时间到，根据得分或存活判定胜利
+                        // 时间到，根据得分判定胜利
                         DetermineWinner(ac);
                     }
                 }
             }
         }
 
-        private void StartColosseum(ArenaColosseumData.ActiveColosseum ac)
-        {
-            ac.State = ArenaColosseumData.ColosseumState.InProgress;
-            
-            var colosseum = GetColosseum(ac.ColosseumId);
-            if (colosseum != null)
-            {
-                ac.TimeRemaining = colosseum.Duration;
-            }
-
-            // 重置玩家状态
-            foreach (var p in ac.Participants)
-            {
-                p.IsAlive = true;
-                p.Health = p.MaxHealth;
-                p.Score = 0;
-                p.Position = Vector2.Zero;
-            }
-
-            OnCountdownEnded?.Invoke(ac);
-            OnColosseumStarted?.Invoke(ac);
-        }
-
-        private void CheckAllReady(ArenaColosseumData.ActiveColosseum ac)
-        {
-            bool allReady = true;
-            foreach (var p in ac.Participants)
-            {
-                if (!p.IsReady)
-                {
-                    allReady = false;
-                    break;
-                }
-            }
-
-            if (allReady && ac.State == ArenaColosseumData.ColosseumState.Waiting)
-            {
-                StartMatching(ac);
-            }
-        }
-
+        /// <summary>
+        /// 检查胜利者
+        /// </summary>
         private void CheckWinner(ArenaColosseumData.ActiveColosseum ac)
         {
-            var colosseum = GetColosseum(ac.ColosseumId);
+            var colosseum = _matchmakingSystem.GetColosseum(ac.ColosseumId);
             if (colosseum == null) return;
 
             int aliveCount = 0;
@@ -482,15 +287,16 @@ namespace ClawRPG.Scripts.Systems
                 }
             }
 
-            // 大乱斗：最后存活者获胜
-            if (colosseum.Type == ArenaColosseumData.ColosseumType.FreeForAll)
+            // 大乱斗或1v1：最后存活者获胜
+            if (colosseum.Type == ArenaColosseumData.ColosseumType.FreeForAll ||
+                colosseum.Type == ArenaColosseumData.ColosseumType.SoloDuel)
             {
                 if (aliveCount <= 1)
                 {
                     EndColosseum(ac, lastAlive?.PlayerId ?? -1);
                 }
             }
-            // 1v1 或团队战
+            // 团队战
             else
             {
                 if (aliveCount <= 1)
@@ -500,9 +306,12 @@ namespace ClawRPG.Scripts.Systems
             }
         }
 
+        /// <summary>
+        /// 时间到，判定胜利者
+        /// </summary>
         private void DetermineWinner(ArenaColosseumData.ActiveColosseum ac)
         {
-            var colosseum = GetColosseum(ac.ColosseumId);
+            var colosseum = _matchmakingSystem.GetColosseum(ac.ColosseumId);
             if (colosseum == null) return;
 
             // 根据得分确定胜利者
@@ -521,169 +330,52 @@ namespace ClawRPG.Scripts.Systems
             EndColosseum(ac, winner?.PlayerId ?? -1);
         }
 
+        /// <summary>
+        /// 结束角斗场
+        /// </summary>
         private void EndColosseum(ArenaColosseumData.ActiveColosseum ac, int winnerId)
         {
-            ac.State = ArenaColosseumData.ColosseumState.Completed;
-            ac.WinnerId = winnerId;
-
-            var colosseum = GetColosseum(ac.ColosseumId);
-            if (colosseum != null)
+            var colosseum = _matchmakingSystem.GetColosseum(ac.ColosseumId);
+            
+            // 使用奖励系统结束角斗场
+            _rewardSystem.EndColosseum(ac, winnerId, colosseum, (playerId, isWinner, score, kills, prize) =>
             {
-                // 发放奖励
-                foreach (var p in ac.Participants)
-                {
-                    bool isWinner = (p.PlayerId == winnerId);
-                    int prize = isWinner ? colosseum.WinnerReward : colosseum.LoserReward;
-                    
-                    UpdatePlayerStats(p.PlayerId, isWinner, p.Score, isWinner ? 1 : 0, prize);
+                // 更新玩家数据
+                _seasonSystem.UpdatePlayerStats(playerId, isWinner, score, kills, prize);
 
-                    // 记录历史
-                    var data = GetPlayerData(p.PlayerId);
-                    data.History.Add(new ArenaColosseumData.ColosseumRecord
+                // 记录历史
+                if (colosseum != null)
+                {
+                    var record = new ArenaColosseumData.ColosseumRecord
                     {
                         ColosseumId = colosseum.Id,
                         Type = colosseum.Type,
                         IsWinner = isWinner,
-                        DamageDealt = p.Score,
-                        Kills = isWinner ? 1 : 0,
+                        DamageDealt = score,
+                        Kills = kills,
                         PrizeEarned = prize,
                         Timestamp = DateTime.Now
-                    });
-
-                    // 保持历史记录不超过50条
-                    if (data.History.Count > 50)
-                        data.History.RemoveAt(0);
+                    };
+                    _seasonSystem.AddColosseumRecord(playerId, record);
                 }
-            }
+            });
 
-            OnColosseumEnded?.Invoke(ac);
-            
             // 移除竞技场
             _activeColosseums.Remove(ac);
-        }
-
-        private int CountWaitingColosseums()
-        {
-            int count = 0;
-            foreach (var ac in _activeColosseums)
-            {
-                if (ac.State == ArenaColosseumData.ColosseumState.Waiting)
-                    count++;
-            }
-            return count;
-        }
-
-        private int GetTotalPlayers()
-        {
-            int count = 0;
-            foreach (var ac in _activeColosseums)
-            {
-                count += ac.Participants.Count;
-            }
-            return count;
-        }
-
-        private int GetTotalMatches()
-        {
-            int total = 0;
-            foreach (var data in _playerData.Values)
-            {
-                total += data.TotalMatches;
-            }
-            return total;
         }
 
         #endregion
 
         #region 存档支持
 
-        public Dictionary<string, object> GetSaveData()
-        {
-            var data = new Dictionary<string, object>();
-            
-            var playerDataList = new List<Dictionary<string, object>>();
-            foreach (var pd in _playerData)
-            {
-                playerDataList.Add(new Dictionary<string, object>
-                {
-                    { "playerId", pd.Key },
-                    { "totalMatches", pd.Value.TotalMatches },
-                    { "wins", pd.Value.Wins },
-                    { "losses", pd.Value.Losses },
-                    { "totalPrizeEarned", pd.Value.TotalPrizeEarned },
-                    { "totalEntryFees", pd.Value.TotalEntryFees },
-                    { "highestStreak", pd.Value.HighestStreak },
-                    { "currentStreak", pd.Value.CurrentStreak },
-                    { "highestDamage", pd.Value.HighestDamage },
-                    { "totalKills", pd.Value.TotalKills },
-                    { "rating", pd.Value.Rating }
-                });
-            }
-            
-            data["playerData"] = playerDataList;
-            return data;
-        }
-
-        public void LoadSaveData(Dictionary<string, object> saveData)
-        {
-            if (saveData == null || !saveData.ContainsKey("playerData"))
-                return;
-
-            var playerDataList = saveData["playerData"] as List<object>;
-            if (playerDataList == null) return;
-
-            foreach (var pdData in playerDataList)
-            {
-                var pd = pdData as Dictionary<string, object>;
-                if (pd == null) continue;
-
-                int playerId = Convert.ToInt32(pd["playerId"]);
-                var data = new ArenaColosseumData.PlayerColosseumData
-                {
-                    PlayerId = playerId,
-                    TotalMatches = Convert.ToInt32(pd["totalMatches"]),
-                    Wins = Convert.ToInt32(pd["wins"]),
-                    Losses = Convert.ToInt32(pd["losses"]),
-                    TotalPrizeEarned = Convert.ToInt32(pd["totalPrizeEarned"]),
-                    TotalEntryFees = Convert.ToInt32(pd["totalEntryFees"]),
-                    HighestStreak = Convert.ToInt32(pd["highestStreak"]),
-                    CurrentStreak = Convert.ToInt32(pd["currentStreak"]),
-                    HighestDamage = Convert.ToInt32(pd["highestDamage"]),
-                    TotalKills = Convert.ToInt32(pd["totalKills"]),
-                    Rating = Convert.ToInt32(pd["rating"])
-                };
-                
-                _playerData[playerId] = data;
-            }
-        }
-
         /// <summary>
         /// Export save data for persistence (BaseSystem override)
         /// </summary>
         public override Dictionary ExportSaveData()
         {
+            // 委托给子系统
             var data = new Dictionary();
-            
-            var playerDataList = new List<Dictionary<string, object>>();
-            foreach (var pd in _playerData)
-            {
-                playerDataList.Add(new Dictionary<string, object>
-                {
-                    { "playerId", pd.Key },
-                    { "totalMatches", pd.Value.TotalMatches },
-                    { "wins", pd.Value.Wins },
-                    { "losses", pd.Value.Losses },
-                    { "totalPrizeEarned", pd.Value.TotalPrizeEarned },
-                    { "totalEntryFees", pd.Value.TotalEntryFees },
-                    { "highestStreak", pd.Value.HighestStreak },
-                    { "currentStreak", pd.Value.CurrentStreak },
-                    { "highestDamage", pd.Value.HighestDamage },
-                    { "totalKills", pd.Value.TotalKills },
-                    { "rating", pd.Value.Rating }
-                });
-            }
-            
-            data["playerData"] = playerDataList;
+            data["seasonSystem"] = _seasonSystem.ExportSaveData();
             return data;
         }
 
@@ -693,34 +385,11 @@ namespace ClawRPG.Scripts.Systems
         public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
-            
-            if (!data.Contains("playerData")) return;
 
-            var playerDataList = data["playerData"] as List<object>;
-            if (playerDataList == null) return;
-
-            foreach (var pdData in playerDataList)
+            // 从子系统导入数据
+            if (data.Contains("seasonSystem"))
             {
-                var pd = pdData as Dictionary<string, object>;
-                if (pd == null) continue;
-
-                int playerId = Convert.ToInt32(pd["playerId"]);
-                var playerColosseumData = new ArenaColosseumData.PlayerColosseumData
-                {
-                    PlayerId = playerId,
-                    TotalMatches = Convert.ToInt32(pd["totalMatches"]),
-                    Wins = Convert.ToInt32(pd["wins"]),
-                    Losses = Convert.ToInt32(pd["losses"]),
-                    TotalPrizeEarned = Convert.ToInt32(pd["totalPrizeEarned"]),
-                    TotalEntryFees = Convert.ToInt32(pd["totalEntryFees"]),
-                    HighestStreak = Convert.ToInt32(pd["highestStreak"]),
-                    CurrentStreak = Convert.ToInt32(pd["currentStreak"]),
-                    HighestDamage = Convert.ToInt32(pd["highestDamage"]),
-                    TotalKills = Convert.ToInt32(pd["totalKills"]),
-                    Rating = Convert.ToInt32(pd["rating"])
-                };
-                
-                _playerData[playerId] = playerColosseumData;
+                _seasonSystem.ImportSaveData(data["seasonSystem"] as Dictionary);
             }
         }
 
