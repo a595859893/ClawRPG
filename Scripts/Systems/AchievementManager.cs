@@ -9,11 +9,8 @@ namespace ClawRPG.Scripts.Systems
     /// </summary>
     public class AchievementManager : BaseSystem
     {
-        private static AchievementManager _instance;
-        public static AchievementManager Instance => _instance ??= new AchievementManager();
-        
-        private List<Achievement> _unlockedAchievements;
-        private Dictionary<string, Achievement> _trackedAchievements;
+        private List<Achievement> _unlockedAchievements = new List<Achievement>();
+        private Dictionary<string, Achievement> _trackedAchievements = new Dictionary<string, Achievement>();
         
         // Tutorial tracking
         private bool _hasTriggeredFirstAchievement = false; 
@@ -39,7 +36,7 @@ namespace ClawRPG.Scripts.Systems
         public Action<Achievement> OnAchievementUnlocked;
         public Action<Achievement> OnAchievementProgressUpdated;
         
-        private AchievementManager()
+        protected override void Initialize()
         {
             _unlockedAchievements = new List<Achievement>();
             _trackedAchievements = new Dictionary<string, Achievement>();
