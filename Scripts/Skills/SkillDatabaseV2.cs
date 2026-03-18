@@ -1,25 +1,28 @@
-using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Database;
 using ClawRPG.Scripts.Skills;
 
 namespace ClawRPG.Scripts.Systems {
+    // ⚠️ 警告: 此数据库疑似未被使用，可能为废弃代码
     /// <summary>
     /// Skill Database V2 - Modular skill system using SkillData and SkillEffect
     /// </summary>
-    public class SkillDatabaseV2
+    public class SkillDatabaseV2 : IDatabase
     {
         private static SkillDatabaseV2 _instance;
-        public static SkillDatabaseV2 Instance => _instance ??= new SkillDatabaseV2();
-        
+        public static SkillDatabaseV2 StaticInstance => _instance ??= new SkillDatabaseV2();
+
+        public object Instance => StaticInstance;
+
         private Dictionary<int, SkillData> _skills = new();
-        
+
         public SkillDatabaseV2()
         {
             Initialize();
         }
-        
-        private void Initialize()
+
+        public void Initialize()
         {
             // ===== OFFENSIVE SKILL TREE =====
             // Lightning Arrow - Thunder element
@@ -566,6 +569,21 @@ namespace ClawRPG.Scripts.Systems {
                     result.Add(skill);
             }
             return result;
+        }
+
+        public bool ValidateData()
+        {
+            if (_skills.Count == 0)
+                return false;
+
+            foreach (var skill in _skills.Values)
+            {
+                if (string.IsNullOrEmpty(skill.Name))
+                    return false;
+                if (skill.Id <= 0)
+                    return false;
+            }
+            return true;
         }
     }
 }

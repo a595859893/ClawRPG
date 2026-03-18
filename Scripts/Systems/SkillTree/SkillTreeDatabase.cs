@@ -1,25 +1,32 @@
-using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Database;
 
-public class SkillTreeDatabase
+/// <summary>
+/// Skill Tree Database - stores all skill tree node configurations
+/// </summary>
+public class SkillTreeDatabase : IDatabase
 {
     private static SkillTreeDatabase _instance;
-    public static SkillTreeDatabase Instance => _instance ??= new SkillTreeDatabase();
-    
+    public static SkillTreeDatabase StaticInstance => _instance ??= new SkillTreeDatabase();
+
+    public object Instance => StaticInstance;
+
     public Dictionary<string, SkillTreeNode> AllNodes { get; private set; }
     public Dictionary<string, SkillTreeCategory> Categories { get; private set; }
-    
+
     public SkillTreeDatabase()
     {
         AllNodes = new Dictionary<string, SkillTreeNode>();
         Categories = new Dictionary<string, SkillTreeCategory>();
+        Initialize();
+    }
+
+    public void Initialize()
+    {
         InitializeCategories();
         InitializeNodes();
     }
-    
-    private void InitializeCategories()
-    {
         Categories["combat"] = new SkillTreeCategory
         {
             CategoryId = "combat",
@@ -558,6 +565,22 @@ public class SkillTreeDatabase
                 return false;
         }
         
+        return true;
+    }
+
+    public bool ValidateData()
+    {
+        if (AllNodes.Count == 0 || Categories.Count == 0)
+            return false;
+
+        foreach (var node in AllNodes.Values)
+        {
+            if (string.IsNullOrEmpty(node.NodeId))
+                return false;
+            if (string.IsNullOrEmpty(node.SkillTreeCategory))
+                return false;
+        }
+
         return true;
     }
 }
