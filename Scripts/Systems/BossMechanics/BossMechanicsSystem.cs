@@ -11,6 +11,11 @@ public class BossMechanicsSystem : BaseSystem
     private PlayerBossStats _playerStats = new PlayerBossStats();
     private Random _random = new Random();
 
+    // 子系统
+    private BossPhaseManager _phaseManager;
+    private BossAI _ai;
+    private BossAbilityDatabase _abilityDb;
+
     // Boss状态管理
     private Dictionary<string, float> _bossHealthBars = new Dictionary<string, float>();
     private Dictionary<string, int> _comboCounters = new Dictionary<string, int>();
@@ -30,7 +35,25 @@ public class BossMechanicsSystem : BaseSystem
     {
         Instance = this;
         BossMechanicsDatabase.Initialize();
+        
+        // 初始化子系统
+        _phaseManager = new BossPhaseManager(this);
+        _ai = new BossAI(this);
+        _abilityDb = new BossAbilityDatabase(this);
+        
+        // 订阅子系统事件
+        SubscribeToSubsystems();
+        
         LoadPlayerStats();
+    }
+
+    private void SubscribeToSubsystems()
+    {
+        // 转发子系统事件
+        _phaseManager.OnPhaseTransition += (state, phase) => 
+        {
+            BossPhaseChanged?.Emit(state.InstanceId, phase.PhaseNumber);
+        };
     }
 
     public override void _Process(float delta)
@@ -54,34 +77,23 @@ public class BossMechanicsSystem : BaseSystem
                 battle.SkillCooldowns[skillCooldown.Key] = Mathf.Max(0, skillCooldown.Value - delta);
             }
 
-            // 检查狂暴
+            // 检查狂暴 - 委托给阶段管理器
             if (battle.Config.EnrageTimer > 0 && battle.TimeInCombat >= battle.Config.EnrageTimer && !battle.IsEnraged)
             {
                 TriggerEnrage(battle);
             }
 
-            // 检查阶段转换
+            // 检查阶段转换 - 委托给阶段管理器
             float healthPercent = battle.CurrentHealth / battle.Config.MaxHealth;
-            int targetPhase = GetPhaseFromHealth(healthPercent, battle.Config.PhaseCount);
+            int targetPhase = _phaseManager.GetPhaseFromHealth(healthPercent, battle.Config.PhaseCount);
             if (targetPhase > battle.CurrentPhase)
             {
-                TransitionToPhase(battle, targetPhase);
+                _phaseManager.TransitionToPhase(battle, targetPhase);
             }
 
-            // AI决策
-            MakeBossDecision(battle, delta);
+            // AI决策 - 委托给AI系统
+            _ai.Update(battle, delta);
         }
-    }
-
-    private int GetPhaseFromHealth(float healthPercent, int totalPhases)
-    {
-        float phaseThreshold = 1.0f / totalPhases;
-        for (int i = totalPhases - 1; i >= 0; i--)
-        {
-            if (healthPercent <= (i + 1) * phaseThreshold)
-                return totalPhases - i;
-        }
-        return 1;
     }
 
     private void TriggerEnrage(BossBattleInstance battle)
@@ -92,7 +104,7 @@ public class BossMechanicsSystem : BaseSystem
         battle.CurrentSpeedMultiplier *= 1.5f;
         
         // 使用狂暴技能
-        var enrageSkill = FindSkill(battle, "boss_enrage");
+        var enrageSkill = _abilityDb.FindSkill(battle, "boss_enrage");
         if (enrageSkill != null)
         {
             BossSkillUsed?.Emit(battle.InstanceId, enrageSkill.Id, enrageSkill.Name);
@@ -101,507 +113,224 @@ public class BossMechanicsSystem : BaseSystem
         BossEnraged?.Emit(battle.InstanceId);
     }
 
-    private void TransitionToPhase(BossBattleInstance battle, int newPhase)
-    {
-        battle.CurrentPhase = newPhase;
-        battle.Phase = BossPhase.Transition;
-        
-        // 应用阶段加成
-        float phaseMultiplier = 1.0f + (newPhase - 1) * 0.25f;
-        battle.CurrentDamageMultiplier *= phaseMultiplier;
-        
-        BossPhaseChanged?.Emit(battle.InstanceId, newPhase);
-        
-        // 延迟恢复战斗状态
-        GetTree().CreateTimer(2.0f).Connect("timeout", this, nameof(OnPhaseTransitionComplete), new Godot.Collections.Array { battle.InstanceId });
-    }
-
-    private void OnPhaseTransitionComplete(string instanceId)
-    {
-        if (_activeBossBattles.ContainsKey(instanceId))
-        {
-            _activeBossBattles[instanceId].Phase = BossPhase.Active;
-        }
-    }
-
-    private void MakeBossDecision(BossBattleInstance battle, float delta)
-    {
-        // 基础攻击
-        float attackInterval = 1.0f / battle.Config.AttackSpeed;
-        if (battle.TimeSinceLastAttack >= attackInterval)
-        {
-            PerformBasicAttack(battle);
-            battle.TimeSinceLastAttack = 0;
-        }
-
-        // 技能决策
-        if (battle.TimeSinceLastSkill >= 3.0f)
-        {
-            var skill = SelectSkill(battle);
-            if (skill != null)
-            {
-                ExecuteSkill(battle, skill);
-                battle.TimeSinceLastSkill = 0;
-            }
-        }
-    }
-
-    private void PerformBasicAttack(BossBattleInstance battle)
-    {
-        float damage = battle.Config.AttackPower * battle.CurrentDamageMultiplier;
-        
-        // 添加暴击
-        if (_random.NextDouble() < battle.Config.CriticalChance)
-        {
-            damage *= battle.Config.CriticalDamage;
-        }
-
-        // 应用到所有玩家
-        foreach (var playerDamage in battle.PlayerDamageDealt.Keys)
-        {
-            // 实际战斗系统会处理伤害
-        }
-
-        battle.LastTargetPosition = Vector3.Zero; // 更新目标位置
-    }
-
-    private BossSkillConfig SelectSkill(BossBattleInstance battle)
-    {
-        List<BossSkillConfig> availableSkills = new List<BossSkillConfig>();
-        
-        foreach (var skill in battle.Config.Skills)
-        {
-            // 检查冷却
-            if (battle.SkillCooldowns.ContainsKey(skill.Id) && battle.SkillCooldowns[skill.Id] > 0)
-                continue;
-                
-            // 检查狂暴状态
-            if (skill.IsEnragedOnly && !battle.IsEnraged)
-                continue;
-                
-            // 检查阶段
-            if (skill.PhaseRequired > battle.CurrentPhase)
-                continue;
-                
-            // 检查概率
-            if (_random.NextDouble() > skill.ExecuteProbability)
-                continue;
-                
-            availableSkills.Add(skill);
-        }
-        
-        if (availableSkills.Count == 0)
-            return null;
-            
-        return availableSkills[_random.Next(availableSkills.Count)];
-    }
-
-    private void ExecuteSkill(BossBattleInstance battle, BossSkillConfig skill)
-    {
-        battle.SkillCooldowns[skill.Id] = skill.Cooldown;
-        
-        // 执行技能效果
-        switch (skill.SkillType)
-        {
-            case BossSkillType.MeleeAttack:
-            case BossSkillType.RangedAttack:
-            case BossSkillType.Projectile:
-                ApplyDirectDamage(battle, skill);
-                break;
-                
-            case BossSkillType.AreaOfEffect:
-                ApplyAreaDamage(battle, skill);
-                break;
-                
-            case BossSkillType.Summon:
-                SummonMonsters(battle, skill);
-                break;
-                
-            case BossSkillType.Heal:
-                ApplySelfHeal(battle, skill);
-                break;
-                
-            case BossSkillType.Shield:
-                ApplyShield(battle, skill);
-                break;
-                
-            case BossSkillType.Debuff:
-                ApplyDebuff(battle, skill);
-                break;
-                
-            case BossSkillType.Teleport:
-                PerformTeleport(battle);
-                break;
-                
-            case BossSkillType.Stun:
-                ApplyStun(battle, skill);
-                break;
-                
-            case BossSkillType.Knockback:
-                ApplyKnockback(battle, skill);
-                break;
-        }
-        
-        BossSkillUsed?.Emit(battle.InstanceId, skill.Id, skill.Name);
-    }
-
-    private void ApplyDirectDamage(BossBattleInstance battle, BossSkillConfig skill)
-    {
-        float damage = skill.Damage * battle.CurrentDamageMultiplier;
-        
-        if (_random.NextDouble() < battle.Config.CriticalChance)
-        {
-            damage *= battle.Config.CriticalDamage;
-        }
-    }
-
-    private void ApplyAreaDamage(BossBattleInstance battle, BossSkillConfig skill)
-    {
-        float damage = skill.Damage * battle.CurrentDamageMultiplier;
-        
-        // 范围伤害逻辑
-        if (_random.NextDouble() < battle.Config.CriticalChance)
-        {
-            damage *= battle.Config.CriticalDamage;
-        }
-    }
-
-    private void SummonMonsters(BossBattleInstance battle, BossSkillConfig skill)
-    {
-        if (!string.IsNullOrEmpty(skill.SummonMonsterId))
-        {
-            for (int i = 0; i < skill.SummonCount; i++)
-            {
-                battle.SummonedMonsters.Add(skill.SummonMonsterId);
-            }
-        }
-    }
-
-    private void ApplySelfHeal(BossBattleInstance battle, BossSkillConfig skill)
-    {
-        float healAmount = skill.HealAmount;
-        battle.CurrentHealth = Mathf.Min(battle.Config.MaxHealth, battle.CurrentHealth + healAmount);
-    }
-
-    private void ApplyShield(BossBattleInstance battle, BossSkillConfig skill)
-    {
-        battle.ActiveEffects.Add($"shield_{skill.ShieldAmount}");
-    }
-
-    private void ApplyDebuff(BossBattleInstance battle, BossSkillConfig skill)
-    {
-        foreach (var debuffId in skill.DebuffIds)
-        {
-            battle.ActiveEffects.Add(debuffId);
-        }
-    }
-
-    private void PerformTeleport(BossBattleInstance battle)
-    {
-        battle.ActiveEffects.Add("teleporting");
-    }
-
-    private void ApplyStun(BossBattleInstance battle, BossSkillConfig skill)
-    {
-        battle.ActiveEffects.Add($"stun_{skill.StunDuration}");
-    }
-
-    private void ApplyKnockback(BossBattleInstance battle, BossSkillConfig skill)
-    {
-        battle.ActiveEffects.Add($"knockback_{skill.KnockbackForce}");
-    }
-
-    private BossSkillConfig FindSkill(BossBattleInstance battle, string skillId)
-    {
-        foreach (var skill in battle.Config.Skills)
-        {
-            if (skill.Id == skillId)
-                return skill;
-        }
-        return null;
-    }
-
-    // 公开API
+    /// <summary>
+    /// 开始Boss战斗
+    /// </summary>
     public void StartBossBattle(string bossId, string playerId)
     {
-        var config = BossMechanicsDatabase.GetBossConfig(bossId);
-        if (config == null) return;
+        var bossData = BossMechanicsDatabase.Instance.GetBoss(bossId);
+        if (bossData == null)
+        {
+            GD.PrintErr($"Boss not found: {bossId}");
+            return;
+        }
 
-        string instanceId = Guid.NewGuid().ToString();
+        var bossConfig = BossMechanicsDatabase.Instance.GetBossConfig(bossId);
+        
         var battle = new BossBattleInstance
         {
-            InstanceId = instanceId,
-            BossConfigId = bossId,
-            Config = config,
-            CurrentHealth = config.MaxHealth,
+            InstanceId = Guid.NewGuid().ToString(),
+            BossId = bossId,
+            PlayerId = playerId,
+            Config = bossConfig,
+            CurrentHealth = bossConfig.MaxHealth,
+            MaxHealth = bossConfig.MaxHealth,
             CurrentPhase = 1,
-            Phase = BossPhase.Active,
+            IsAlive = true,
             TimeInCombat = 0,
             TimeSinceLastAttack = 0,
-            TimeSinceLastSkill = 2.0f,
-            CurrentPattern = config.DefaultPattern,
-            IsEnraged = false,
-            EnrageProgress = 0,
-            CurrentDamageMultiplier = 1.0f,
-            CurrentSpeedMultiplier = 1.0f,
-            TargetsInCombat = 1
+            TimeSinceLastSkill = 0,
+            SkillCooldowns = new Dictionary<string, float>()
         };
 
         // 初始化技能冷却
-        foreach (var skill in config.Skills)
+        foreach (var skill in bossConfig.Skills)
         {
-            battle.SkillCooldowns[skill.Id] = _random.Next(0, (int)skill.Cooldown);
+            battle.SkillCooldowns[skill.Id] = 0;
         }
 
-        // 初始化玩家伤害记录
-        battle.PlayerDamageDealt[playerId] = 0;
-        battle.PlayerHealingDone[playerId] = 0;
+        _activeBossBattles[battle.InstanceId] = battle;
+        _bossHealthBars[battle.InstanceId] = 1.0f;
+        _comboCounters[playerId] = 0;
+        _lastAttackTimes[playerId] = DateTime.Now;
+        
+        // 初始化阶段管理器
+        _phaseManager.InitializeBattle(battle);
+        
+        // 初始化AI
+        _ai.InitializeBattle(battle);
 
-        _activeBossBattles[instanceId] = battle;
-        _playerBattleRecords[playerId] = new BossBattleRecord
-        {
-            BossId = bossId,
-            BossName = config.Name,
-            BattleStartTime = DateTime.Now,
-            RewardsReceived = new List<string>()
-        };
+        BossSpawned?.Emit(bossId, bossData.DisplayName, bossData.Type);
 
-        BossSpawned?.Emit(bossId, config.Name, config.Type);
+        GD.Print($"Boss battle started: {bossData.DisplayName}");
     }
 
+    /// <summary>
+    /// 对Boss造成伤害
+    /// </summary>
     public void DealDamageToBoss(string instanceId, string playerId, float damage)
     {
-        if (!_activeBossBattles.ContainsKey(instanceId)) return;
-        
-        var battle = _activeBossBattles[instanceId];
-        float actualDamage = damage * battle.CurrentDamageMultiplier;
-        
-        // 检查护盾
-        float shieldAmount = 0;
-        for (int i = battle.ActiveEffects.Count - 1; i >= 0; i--)
-        {
-            if (battle.ActiveEffects[i].StartsWith("shield_"))
-            {
-                shieldAmount = float.Parse(battle.ActiveEffects[i].Split('_')[1]);
-                if (shieldAmount >= actualDamage)
-                {
-                    battle.ActiveEffects[i] = $"shield_{shieldAmount - actualDamage}";
-                    actualDamage = 0;
-                }
-                else
-                {
-                    actualDamage -= shieldAmount;
-                    battle.ActiveEffects.RemoveAt(i);
-                }
-                break;
-            }
-        }
-
-        battle.CurrentHealth -= actualDamage;
-        
-        if (battle.PlayerDamageDealt.ContainsKey(playerId))
-            battle.PlayerDamageDealt[playerId] += actualDamage;
-        
-        if (_playerBattleRecords.ContainsKey(playerId))
-            _playerBattleRecords[playerId].TotalDamageDealt += actualDamage;
+        if (!_activeBossBattles.TryGetValue(instanceId, out var battle))
+            return;
 
         // 更新连击
         UpdateCombo(playerId);
 
-        // 检查Boss死亡
-        if (!battle.IsAlive)
+        // 计算伤害
+        float actualDamage = damage * battle.CurrentDamageMultiplier;
+        battle.CurrentHealth -= actualDamage;
+        battle.TotalDamageDealt += actualDamage;
+        _playerStats.TotalDamageDealt += actualDamage;
+
+        // 更新血条
+        _bossHealthBars[instanceId] = battle.CurrentHealth / battle.MaxHealth;
+
+        // 检查是否击败
+        if (battle.CurrentHealth <= 0)
         {
-            CompleteBossBattle(instanceId, playerId);
+            battle.IsAlive = false;
+            battle.CurrentHealth = 0;
+            DefeatBoss(instanceId, playerId);
         }
     }
 
+    /// <summary>
+    /// 击败Boss
+    /// </summary>
+    private void DefeatBoss(string instanceId, string playerId)
+    {
+        var battle = _activeBossBattles[instanceId];
+        var bossData = BossMechanicsDatabase.Instance.GetBoss(battle.BossId);
+        
+        bool isFirstBlood = !_playerBattleRecords.ContainsKey(playerId) || 
+            !_playerBattleRecords[playerId].DefeatedBosses.Contains(battle.BossId);
+        
+        // 发放奖励
+        var rewards = new List<string>();
+        if (bossData.RewardItems != null)
+        {
+            rewards.AddRange(bossData.RewardItems);
+        }
+        
+        // 更新统计
+        _playerStats.TotalBossesDefeated++;
+        _playerStats.TotalDamageDealt += battle.TotalDamageDealt;
+        
+        if (battle.Config.Type == BossType.WorldBoss)
+            _playerStats.WorldBossKills++;
+        if (battle.Config.Type == BossType.Legendary)
+            _playerStats.LegendaryBossKills++;
+        
+        if (isFirstBlood)
+            _playerStats.FirstBloods++;
+        
+        // 记录
+        if (!_playerBattleRecords.ContainsKey(playerId))
+        {
+            _playerBattleRecords[playerId] = new BossBattleRecord();
+        }
+        
+        var record = new BossBattleRecord
+        {
+            BossId = battle.BossId,
+            InstanceId = battle.InstanceId,
+            DamageDealt = battle.TotalDamageDealt,
+            SurvivalTime = battle.TimeInCombat,
+            IsFirstBlood = isFirstBlood,
+            Timestamp = DateTime.Now
+        };
+        
+        _playerBattleRecords[playerId].DefeatedBosses.Add(battle.BossId);
+        _playerBattleRecords[playerId].Records.Add(record);
+        
+        BattleRecordUpdated?.Emit(playerId, record);
+        BossDefeated?.Emit(battle.BossId, bossData?.DisplayName ?? battle.BossId, isFirstBlood, rewards);
+
+        // 清理
+        _activeBossBattles.Remove(instanceId);
+        _bossHealthBars.Remove(instanceId);
+    }
+
+    /// <summary>
+    /// 更新连击
+    /// </summary>
     private void UpdateCombo(string playerId)
     {
-        if (!_comboCounters.ContainsKey(playerId))
-            _comboCounters[playerId] = 0;
-            
-        var lastAttack = _lastAttackTimes.ContainsKey(playerId) ? _lastAttackTimes[playerId] : DateTime.MinValue;
-        
-        if ((DateTime.Now - lastAttack).TotalSeconds < 3.0)
+        var now = DateTime.Now;
+        if (_lastAttackTimes.TryGetValue(playerId, out var lastTime))
         {
-            _comboCounters[playerId]++;
+            var gap = (now - lastTime).TotalSeconds;
+            if (gap < 3.0)
+            {
+                _comboCounters[playerId]++;
+            }
+            else
+            {
+                _comboCounters[playerId] = 1;
+            }
         }
         else
         {
             _comboCounters[playerId] = 1;
         }
         
-        _lastAttackTimes[playerId] = DateTime.Now;
+        _lastAttackTimes[playerId] = now;
         
-        // 更新统计
-        if (_comboCounters[playerId] > _playerStats.BestCombo)
-            _playerStats.BestCombo = _comboCounters[playerId];
-            
-        PlayerComboChanged?.Emit(playerId, _comboCounters[playerId]);
+        var combo = _comboCounters[playerId];
+        if (combo > _playerStats.BestCombo)
+            _playerStats.BestCombo = combo;
+        
+        _playerStats.TotalComboScore += combo;
+        
+        PlayerComboChanged?.Emit(playerId, combo);
     }
 
-    private void CompleteBossBattle(string instanceId, string playerId)
+    /// <summary>
+    /// 获取Boss战斗实例
+    /// </summary>
+    public BossBattleInstance GetBattleInstance(string instanceId)
     {
-        if (!_activeBossBattles.ContainsKey(instanceId)) return;
-        
-        var battle = _activeBossBattles[instanceId];
-        battle.Phase = BossPhase.Defeated;
-        
-        // 生成掉落
-        List<string> rewards = GenerateRewards(battle);
-        
-        // 检查首杀
-        bool isFirstBlood = !_playerStats.BossKillCount.ContainsKey(battle.BossConfigId);
-        
-        // 更新统计
-        _playerStats.TotalBossesDefeated++;
-        
-        if (battle.Config.Type == BossType.World)
-            _playerStats.WorldBossKills++;
-        if (battle.Config.Type == BossType.Legendary)
-            _playerStats.LegendaryBossKills++;
-            
-        if (isFirstBlood)
-        {
-            _playerStats.FirstBloods++;
-            rewards.Add($"首杀奖励: {battle.Config.GoldReward * 0.5f} 金币");
-        }
-        
-        // 更新击杀计数
-        if (_playerStats.BossKillCount.ContainsKey(battle.BossConfigId))
-            _playerStats.BossKillCount[battle.BossConfigId]++;
-        else
-            _playerStats.BossKillCount[battle.BossConfigId] = 1;
-        
-        // 记录战斗
-        if (_playerBattleRecords.ContainsKey(playerId))
-        {
-            var record = _playerBattleRecords[playerId];
-            record.IsVictory = true;
-            record.BattleEndTime = DateTime.Now;
-            record.RewardsReceived = rewards;
-            
-            // 更新最佳生存时间
-            string bossKey = battle.BossConfigId;
-            float survivalTime = (float)(record.BattleEndTime.Value - record.BattleStartTime).TotalSeconds;
-            
-            if (!_playerStats.BestSurvivalTimes.ContainsKey(bossKey) || 
-                survivalTime > _playerStats.BestSurvivalTimes[bossKey])
-            {
-                _playerStats.BestSurvivalTimes[bossKey] = survivalTime;
-            }
-            
-            // 更新最佳DPS
-            float dps = record.TotalDamageDealt / survivalTime;
-            if (!_playerStats.BestDPS.ContainsKey(bossKey) || dps > _playerStats.BestDPS[bossKey])
-            {
-                _playerStats.BestDPS[bossKey] = dps;
-            }
-            
-            // 添加到历史记录
-            if (!_playerStats.BattleHistory.ContainsKey(bossKey))
-                _playerStats.BattleHistory[bossKey] = new List<BossBattleRecord>();
-            _playerStats.BattleHistory[bossKey].Add(record);
-            
-            BattleRecordUpdated?.Emit(playerId, record);
-        }
-        
-        // 发放奖励
-        foreach (var reward in rewards)
-        {
-            // 实际奖励发放逻辑
-        }
-        
-        // 更新总计
-        _playerStats.TotalDamageDealt += (int)battle.PlayerDamageDealt.GetValueOrDefault(playerId, 0);
-        _playerStats.TotalSurvivalTime += (float)(DateTime.Now - _playerBattleRecords[playerId].BattleStartTime).TotalSeconds;
-        
-        // 发出信号
-        BossDefeated?.Emit(battle.BossConfigId, battle.Config.Name, isFirstBlood, rewards);
-        
-        // 清理
-        _activeBossBattles.Remove(instanceId);
-        
-        SavePlayerStats();
+        return _activeBossBattles.GetValueOrDefault(instanceId);
     }
 
-    private List<string> GenerateRewards(BossBattleInstance battle)
+    /// <summary>
+    /// 获取玩家战斗记录
+    /// </summary>
+    public BossBattleRecord GetPlayerRecord(string playerId)
     {
-        List<string> rewards = new List<string>();
-        
-        // 基础奖励
-        rewards.Add($"金币: {battle.Config.GoldReward}");
-        rewards.Add($"经验: {battle.Config.ExpReward}");
-        if (battle.Config.PointReward > 0)
-            rewards.Add($"积分: {battle.Config.PointReward}");
-            
-        // 掉落
-        foreach (var drop in battle.Config.DropTable)
-        {
-            float roll = (float)_random.NextDouble();
-            float adjustedChance = drop.DropChance;
-            
-            // 稀有加成
-            if (drop.RareBonusChance > 0)
-                adjustedChance += drop.RareBonusChance;
-                
-            if (roll <= adjustedChance || drop.IsGuaranteed)
-            {
-                int quantity = _random.Next(drop.MinQuantity, drop.MaxQuantity + 1);
-                rewards.Add($"{drop.ItemId} x{quantity}");
-            }
-        }
-        
-        // 称号奖励
-        if (!string.IsNullOrEmpty(battle.Config.TitleReward))
-        {
-            rewards.Add($"称号: {battle.Config.TitleReward}");
-        }
-        
-        return rewards;
+        return _playerBattleRecords.GetValueOrDefault(playerId);
     }
 
-    public BossBattleInstance GetActiveBattle(string instanceId)
-    {
-        return _activeBossBattles.ContainsKey(instanceId) ? _activeBossBattles[instanceId] : null;
-    }
-
-    public List<BossBattleInstance> GetAllActiveBattles()
-    {
-        return new List<BossBattleInstance>(_activeBossBattles.Values);
-    }
-
+    /// <summary>
+    /// 获取玩家统计
+    /// </summary>
     public PlayerBossStats GetPlayerStats()
     {
         return _playerStats;
     }
 
-    public int GetCombo(string playerId)
+    /// <summary>
+    /// 获取Boss血条百分比
+    /// </summary>
+    public float GetBossHealthPercent(string instanceId)
     {
-        return _comboCounters.ContainsKey(playerId) ? _comboCounters[playerId] : 0;
+        return _bossHealthBars.GetValueOrDefault(instanceId, 0);
     }
 
-    public Dictionary<string, BossConfig> GetAllBossConfigs()
-    {
-        return BossMechanicsDatabase.GetAllBossConfigs();
-    }
-
-    public List<BossConfig> GetBossConfigsByType(BossType type)
-    {
-        return BossMechanicsDatabase.GetBossConfigsByType(type);
-    }
-
-    public List<BossConfig> GetBossConfigsByDifficulty(DifficultyLevel difficulty)
-    {
-        return BossMechanicsDatabase.GetBossConfigsByDifficulty(difficulty);
-    }
-
-    // 存档支持
-    public Dictionary ExportSaveData()
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
     {
         var data = new Dictionary();
         
-        // 导出统计数据
+        // 委托给子系统
+        if (_phaseManager != null)
+            data["phaseManager"] = _phaseManager.ExportSaveData();
+        if (_ai != null)
+            data["ai"] = _ai.ExportSaveData();
+        
+        // 导出玩家统计数据
         data["totalBossesDefeated"] = _playerStats.TotalBossesDefeated;
         data["worldBossKills"] = _playerStats.WorldBossKills;
         data["legendaryBossKills"] = _playerStats.LegendaryBossKills;
@@ -612,37 +341,23 @@ public class BossMechanicsSystem : BaseSystem
         data["bestCombo"] = _playerStats.BestCombo;
         data["totalComboScore"] = _playerStats.TotalComboScore;
         
-        // 导出击杀计数
-        var killCountArray = new Godot.Collections.Array();
-        foreach (var kvp in _playerStats.BossKillCount)
-        {
-            killCountArray.Add(new Godot.Collections.Array { kvp.Key, kvp.Value });
-        }
-        data["bossKillCount"] = killCountArray;
-        
-        // 导出最佳生存时间
-        var survivalArray = new Godot.Collections.Array();
-        foreach (var kvp in _playerStats.BestSurvivalTimes)
-        {
-            survivalArray.Add(new Godot.Collections.Array { kvp.Key, kvp.Value });
-        }
-        data["bestSurvivalTimes"] = survivalArray;
-        
-        // 导出最佳DPS
-        var dpsArray = new Godot.Collections.Array();
-        foreach (var kvp in _playerStats.BestDPS)
-        {
-            dpsArray.Add(new Godot.Collections.Array { kvp.Key, kvp.Value });
-        }
-        data["bestDPS"] = dpsArray;
-        
         return data;
     }
 
-    public void ImportSaveData(Dictionary data)
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         
+        // 委托给子系统
+        if (_phaseManager != null && data.Contains("phaseManager"))
+            _phaseManager.ImportSaveData(data["phaseManager"] as Dictionary);
+        if (_ai != null && data.Contains("ai"))
+            _ai.ImportSaveData(data["ai"] as Dictionary);
+        
+        // 导入玩家统计数据
         _playerStats.TotalBossesDefeated = data.GetValueOrDefault("totalBossesDefeated", 0);
         _playerStats.WorldBossKills = data.GetValueOrDefault("worldBossKills", 0);
         _playerStats.LegendaryBossKills = data.GetValueOrDefault("legendaryBossKills", 0);
@@ -652,48 +367,13 @@ public class BossMechanicsSystem : BaseSystem
         _playerStats.FirstBloods = data.GetValueOrDefault("firstBloods", 0);
         _playerStats.BestCombo = data.GetValueOrDefault("bestCombo", 0);
         _playerStats.TotalComboScore = data.GetValueOrDefault("totalComboScore", 0);
-        
-        // 导入击杀计数
-        if (data.Contains("bossKillCount"))
-        {
-            _playerStats.BossKillCount.Clear();
-            var killCountArray = (Godot.Collections.Array)data["bossKillCount"];
-            foreach (Godot.Collections.Array entry in killCountArray)
-            {
-                _playerStats.BossKillCount[(string)entry[0]] = (int)entry[1];
-            }
-        }
-        
-        // 导入最佳生存时间
-        if (data.Contains("bestSurvivalTimes"))
-        {
-            _playerStats.BestSurvivalTimes.Clear();
-            var survivalArray = (Godot.Collections.Array)data["bestSurvivalTimes"];
-            foreach (Godot.Collections.Array entry in survivalArray)
-            {
-                _playerStats.BestSurvivalTimes[(string)entry[0]] = (float)entry[1];
-            }
-        }
-        
-        // 导入最佳DPS
-        if (data.Contains("bestDPS"))
-        {
-            _playerStats.BestDPS.Clear();
-            var dpsArray = (Godot.Collections.Array)data["bestDPS"];
-            foreach (Godot.Collections.Array entry in dpsArray)
-            {
-                _playerStats.BestDPS[(string)entry[0]] = (float)entry[1];
-            }
-        }
     }
 
     private void LoadPlayerStats()
     {
-        // 从存档加载玩家数据
     }
 
     private void SavePlayerStats()
     {
-        // 保存玩家数据
     }
 }
