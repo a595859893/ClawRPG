@@ -118,7 +118,116 @@ public class SkillSynergyData : BaseSystem
             TotalBonusHealing = (float)data["total_bonus_healing"];
     }
 
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary<string, Variant>();
 
+        // 保存激活的协同效果
+        var synergiesList = new List<Dictionary<string, Variant>>();
+        foreach (var kvp in ActiveSynergies)
+        {
+            synergiesList.Add(new Dictionary<string, Variant>
+            {
+                ["synergy_id"] = kvp.Value.SynergyId ?? "",
+                ["synergy_name"] = kvp.Value.SynergyName ?? "",
+                ["trigger_count"] = kvp.Value.TriggerCount,
+                ["max_stacks"] = kvp.Value.MaxStacks,
+                ["duration"] = kvp.Value.Duration,
+                ["current_duration"] = kvp.Value.CurrentDuration
+            });
+        }
+        data["active_synergies"] = synergiesList;
+
+        // 保存解锁进度
+        var unlockProgress = new Dictionary<string, int>();
+        foreach (var kvp in SynergyUnlockProgress)
+        {
+            unlockProgress[kvp.Key] = kvp.Value;
+        }
+        data["synergy_unlock_progress"] = unlockProgress;
+
+        // 保存触发历史
+        var triggerHistory = new Dictionary<string, int>();
+        foreach (var kvp in SynergyTriggerHistory)
+        {
+            triggerHistory[kvp.Key] = kvp.Value;
+        }
+        data["synergy_trigger_history"] = triggerHistory;
+
+        // 保存统计数据
+        data["total_synergies_triggered"] = TotalSynergiesTriggered;
+        data["unique_synergies_discovered"] = UniqueSynergiesDiscovered;
+        data["max_combo_chain"] = MaxComboChain;
+        data["total_bonus_damage"] = TotalBonusDamage;
+        data["total_bonus_healing"] = TotalBonusHealing;
+
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        // 加载激活的协同效果
+        if (data.TryGetValue("active_synergies", out var synergiesData))
+        {
+            ActiveSynergies = new Dictionary<string, SynergyRecord>();
+            var synergiesList = (List<Variant>)synergiesData;
+            foreach (var synergyVar in synergiesList)
+            {
+                var synergyDict = (Dictionary<string, Variant>)synergyVar;
+                var record = new SynergyRecord();
+
+                if (synergyDict.TryGetValue("synergy_id", out var synergyId))
+                    record.SynergyId = (string)synergyId;
+                if (synergyDict.TryGetValue("synergy_name", out var synergyName))
+                    record.SynergyName = (string)synergyName;
+                if (synergyDict.TryGetValue("trigger_count", out var triggerCount))
+                    record.TriggerCount = (int)triggerCount;
+                if (synergyDict.TryGetValue("max_stacks", out var maxStacks))
+                    record.MaxStacks = (int)maxStacks;
+                if (synergyDict.TryGetValue("duration", out var duration))
+                    record.Duration = (float)duration;
+                if (synergyDict.TryGetValue("current_duration", out var currentDuration))
+                    record.CurrentDuration = (float)currentDuration;
+
+                if (!string.IsNullOrEmpty(record.SynergyId))
+                    ActiveSynergies[record.SynergyId] = record;
+            }
+        }
+
+        // 加载解锁进度
+        if (data.TryGetValue("synergy_unlock_progress", out var unlockData))
+        {
+            SynergyUnlockProgress = new Dictionary<string, int>();
+            var unlockDict = (Dictionary<string, Variant>)unlockData;
+            foreach (var kvp in unlockDict)
+            {
+                SynergyUnlockProgress[kvp.Key] = (int)kvp.Value;
+            }
+        }
+
+        // 加载触发历史
+        if (data.TryGetValue("synergy_trigger_history", out var historyData))
+        {
+            SynergyTriggerHistory = new Dictionary<string, int>();
+            var historyDict = (Dictionary<string, Variant>)historyData;
+            foreach (var kvp in historyDict)
+            {
+                SynergyTriggerHistory[kvp.Key] = (int)kvp.Value;
+            }
+        }
+
+        // 加载统计数据
+        if (data.TryGetValue("total_synergies_triggered", out var totalTriggered))
+            TotalSynergiesTriggered = (int)totalTriggered;
+        if (data.TryGetValue("unique_synergies_discovered", out var uniqueDiscovered))
+            UniqueSynergiesDiscovered = (int)uniqueDiscovered;
+        if (data.TryGetValue("max_combo_chain", out var maxCombo))
+            MaxComboChain = (int)maxCombo;
+        if (data.TryGetValue("total_bonus_damage", out var bonusDamage))
+            TotalBonusDamage = (float)bonusDamage;
+        if (data.TryGetValue("total_bonus_healing", out var bonusHealing))
+            TotalBonusHealing = (float)bonusHealing;
+    }
 }
