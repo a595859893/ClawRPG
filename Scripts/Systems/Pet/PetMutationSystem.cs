@@ -13,8 +13,6 @@ public partial class PetMutationSystem : BaseSystem
     public static PetMutationSystem Instance => _instance ??= new PetMutationSystem();
     
     protected override string SystemName => "PetMutationSystem";
-    private static PetMutationSystem _instance;
-    public static PetMutationSystem Instance => _instance ??= new PetMutationSystem();
     
     private Dictionary<int, PetMutationData> _petMutations = new();
     private Random _random = new();
