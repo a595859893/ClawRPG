@@ -330,5 +330,21 @@ namespace ClawRPG.Scripts.Systems
         }
 
         #endregion
+
+        #region 存档支持
+
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            // 赛程数据由 TournamentPersistenceSystem 统一管理
+            // 本系统为无状态协调器，无独立数据需要持久化
+            return new Dictionary<string, object>();
+        }
+
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            // 无自有状态，无需导入
+        }
+
+        #endregion
     }
 }
