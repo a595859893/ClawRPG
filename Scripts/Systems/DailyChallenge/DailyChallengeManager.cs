@@ -30,6 +30,8 @@ namespace ClawRPG.Scripts.Systems {
         private int _regionsExplored;
         private HashSet<string> _exploredRegionIds = new();
         private int _survivalTimeSeconds;
+        private int _autoSaveTimer;
+        private const int AutoSaveInterval = 60; // Save every 60 seconds
         
         // New challenge tracking
         private int _totalFishCaught;
@@ -87,12 +89,170 @@ namespace ClawRPG.Scripts.Systems {
         }
         
         private List<DailyChallenge> GetStoredChallenges(string key) {
-            // This would integrate with SaveSystem in a full implementation
-            return null;
+            try {
+                var file = new File();
+                var path = $"user://{key}.json";
+                
+                if (!file.FileExists(path)) {
+                    return null;
+                }
+                
+                file.Open(path, File.ModeFlags.Read);
+                var json = file.GetAsText();
+                file.Close();
+                
+                if (string.IsNullOrEmpty(json)) {
+                    return null;
+                }
+                
+                var result = JSON.Parse(json);
+                if (result.Error != Error.Ok) {
+                    GD.PrintErr($"[DailyChallengeManager] Failed to parse stored challenges: {result.ErrorString}");
+                    return null;
+                }
+                
+                var data = result.Result as Dictionary;
+                if (data == null) {
+                    return null;
+                }
+                
+                var challenges = new List<DailyChallenge>();
+                
+                if (data.Contains("challenges")) {
+                    var challengeList = (Array)data["challenges"];
+                    foreach (var item in challengeList) {
+                        var challengeDict = item as Dictionary;
+                        if (challengeDict != null) {
+                            var challenge = new DailyChallenge {
+                                Id = challengeDict.GetValueOrDefault("Id", "").ToString(),
+                                Name = challengeDict.GetValueOrDefault("Name", "").ToString(),
+                                Description = challengeDict.GetValueOrDefault("Description", "").ToString(),
+                                Type = (ChallengeType)(int)challengeDict.GetValueOrDefault("Type", 0),
+                                Difficulty = (ChallengeDifficulty)(int)challengeDict.GetValueOrDefault("Difficulty", 0),
+                                TargetCount = (int)challengeDict.GetValueOrDefault("TargetCount", 0),
+                                CurrentProgress = (int)challengeDict.GetValueOrDefault("CurrentProgress", 0),
+                                IsCompleted = (bool)challengeDict.GetValueOrDefault("IsCompleted", false),
+                                GoldReward = (int)challengeDict.GetValueOrDefault("GoldReward", 0),
+                                ExpReward = (int)challengeDict.GetValueOrDefault("ExpReward", 0),
+                                ExpireTime = DateTime.Parse(challengeDict.GetValueOrDefault("ExpireTime", DateTime.Now.ToString()).ToString())
+                            };
+                            
+                            // Load item rewards
+                            if (challengeDict.Contains("ItemRewardIds")) {
+                                var itemRewards = (Array)challengeDict["ItemRewardIds"];
+                                challenge.ItemRewardIds = new List<int>();
+                                foreach (var itemId in itemRewards) {
+                                    challenge.ItemRewardIds.Add(Convert.ToInt32(itemId));
+                                }
+                            }
+                            
+                            challenges.Add(challenge);
+                        }
+                    }
+                }
+                
+                // Restore statistics
+                if (data.Contains("totalKills")) _totalKills = (int)data["totalKills"];
+                if (data.Contains("totalDamageDealt")) _totalDamageDealt = (int)data["totalDamageDealt"];
+                if (data.Contains("totalGoldEarned")) _totalGoldEarned = (int)data["totalGoldEarned"];
+                if (data.Contains("totalSkillsUsed")) _totalSkillsUsed = (int)data["totalSkillsUsed"];
+                if (data.Contains("totalQuestsCompleted")) _totalQuestsCompleted = (int)data["totalQuestsCompleted"];
+                if (data.Contains("regionsExplored")) _regionsExplored = (int)data["regionsExplored"];
+                if (data.Contains("survivalTimeSeconds")) _survivalTimeSeconds = (int)data["survivalTimeSeconds"];
+                
+                // Restore explored region IDs
+                if (data.Contains("exploredRegionIds")) {
+                    var regionIds = (Array)data["exploredRegionIds"];
+                    _exploredRegionIds = new HashSet<string>();
+                    foreach (var regionId in regionIds) {
+                        _exploredRegionIds.Add(regionId.ToString());
+                    }
+                }
+                
+                // Restore new challenge tracking stats
+                if (data.Contains("totalFishCaught")) _totalFishCaught = (int)data["totalFishCaught"];
+                if (data.Contains("totalAlchemyCrafted")) _totalAlchemyCrafted = (int)data["totalAlchemyCrafted"];
+                if (data.Contains("totalMountKills")) _totalMountKills = (int)data["totalMountKills"];
+                if (data.Contains("totalMountSkillsUsed")) _totalMountSkillsUsed = (int)data["totalMountSkillsUsed"];
+                if (data.Contains("totalPetKills")) _totalPetKills = (int)data["totalPetKills"];
+                if (data.Contains("totalItemsSold")) _totalItemsSold = (int)data["totalItemsSold"];
+                if (data.Contains("totalItemsCrafted")) _totalItemsCrafted = (int)data["totalItemsCrafted"];
+                if (data.Contains("totalReputationGained")) _totalReputationGained = (int)data["totalReputationGained"];
+                if (data.Contains("totalBossesKilled")) _totalBossesKilled = (int)data["totalBossesKilled"];
+                if (data.Contains("totalCriticalHits")) _totalCriticalHits = (int)data["totalCriticalHits"];
+                if (data.Contains("totalDodges")) _totalDodges = (int)data["totalDodges"];
+                if (data.Contains("totalHealed")) _totalHealed = (int)data["totalHealed"];
+                
+                GD.Print($"[DailyChallengeManager] Loaded {challenges.Count} challenges from storage");
+                return challenges;
+            }
+            catch (Exception e) {
+                GD.PrintErr($"[DailyChallengeManager] Failed to load stored challenges: {e.Message}");
+                return null;
+            }
         }
         
         private void SaveDailyChallenges(string key) {
-            // This would integrate with SaveSystem in a full implementation
+            try {
+                var file = new File();
+                var path = $"user://{key}.json";
+                
+                var data = new Dictionary {
+                    ["challenges"] = BuildChallengeArray(),
+                    ["totalKills"] = _totalKills,
+                    ["totalDamageDealt"] = _totalDamageDealt,
+                    ["totalGoldEarned"] = _totalGoldEarned,
+                    ["totalSkillsUsed"] = _totalSkillsUsed,
+                    ["totalQuestsCompleted"] = _totalQuestsCompleted,
+                    ["regionsExplored"] = _regionsExplored,
+                    ["survivalTimeSeconds"] = _survivalTimeSeconds,
+                    ["exploredRegionIds"] = new Array(_exploredRegionIds),
+                    ["totalFishCaught"] = _totalFishCaught,
+                    ["totalAlchemyCrafted"] = _totalAlchemyCrafted,
+                    ["totalMountKills"] = _totalMountKills,
+                    ["totalMountSkillsUsed"] = _totalMountSkillsUsed,
+                    ["totalPetKills"] = _totalPetKills,
+                    ["totalItemsSold"] = _totalItemsSold,
+                    ["totalItemsCrafted"] = _totalItemsCrafted,
+                    ["totalReputationGained"] = _totalReputationGained,
+                    ["totalBossesKilled"] = _totalBossesKilled,
+                    ["totalCriticalHits"] = _totalCriticalHits,
+                    ["totalDodges"] = _totalDodges,
+                    ["totalHealed"] = _totalHealed,
+                    ["savedAt"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+                
+                var json = JSON.Print(data);
+                file.Open(path, File.ModeFlags.Write);
+                file.StoreString(json);
+                file.Close();
+                
+                GD.Print($"[DailyChallengeManager] Saved {_dailyChallenges.Count} challenges to storage");
+            }
+            catch (Exception e) {
+                GD.PrintErr($"[DailyChallengeManager] Failed to save challenges: {e.Message}");
+            }
+        }
+        
+        private Array BuildChallengeArray() {
+            var challengeArray = new Array();
+            foreach (var challenge in _dailyChallenges) {
+                challengeArray.Add(new Dictionary {
+                    ["Id"] = challenge.Id,
+                    ["Name"] = challenge.Name,
+                    ["Description"] = challenge.Description,
+                    ["Type"] = (int)challenge.Type,
+                    ["Difficulty"] = (int)challenge.Difficulty,
+                    ["TargetCount"] = challenge.TargetCount,
+                    ["CurrentProgress"] = challenge.CurrentProgress,
+                    ["IsCompleted"] = challenge.IsCompleted,
+                    ["GoldReward"] = challenge.GoldReward,
+                    ["ExpReward"] = challenge.ExpReward,
+                    ["ItemRewardIds"] = new Array(challenge.ItemRewardIds),
+                    ["ExpireTime"] = challenge.ExpireTime.ToString("yyyy-MM-dd HH:mm:ss")
+                });
+            }
+            return challengeArray;
         }
         
         private void StartSurvivalTimer() {
@@ -105,6 +265,15 @@ namespace ClawRPG.Scripts.Systems {
             // Update survival time challenge
             _survivalTimeSeconds++;
             UpdateChallengeProgress(ChallengeType.SurvivalTime, _survivalTimeSeconds);
+            
+            // Auto-save periodically
+            _autoSaveTimer++;
+            if (_autoSaveTimer >= AutoSaveInterval * 60) { // Assuming 60 FPS
+                _autoSaveTimer = 0;
+                var today = DateTime.Today;
+                var saveKey = $"daily_challenges_{today:yyyyMMdd}";
+                SaveDailyChallenges(saveKey);
+            }
         }
         
         /// <summary>
@@ -377,6 +546,7 @@ namespace ClawRPG.Scripts.Systems {
             _regionsExplored = 0;
             _exploredRegionIds.Clear();
             _survivalTimeSeconds = 0;
+            _autoSaveTimer = 0;
             
             // Reset new challenge tracking
             _totalFishCaught = 0;
