@@ -8,24 +8,231 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 事件选择数据库 - 管理所有随机事件
     /// </summary>
-    public class ChoiceEventDatabase : IDatabase
+    public class ChoiceEventDatabase : DatabaseBase
     {
         private static ChoiceEventDatabase _instance;
         public static ChoiceEventDatabase Instance => _instance ??= new ChoiceEventDatabase();
 
         private Dictionary<string, ChoiceEventData> _events = new Dictionary<string, ChoiceEventData>();
 
-        public object Instance => Instance;
+        // 玩家选择记录（按玩家ID索引）
+        private Dictionary<string, PlayerEventRecord> _playerRecords = new Dictionary<string, PlayerEventRecord>();
 
-        public void Initialize()
+        // 事件冷却数据（按玩家ID索引）
+        private Dictionary<string, Dictionary<string, DateTime>> _eventCooldowns = new Dictionary<string, Dictionary<string, DateTime>>();
+
+        public override object Instance => Instance;
+
+        public override void Initialize()
         {
             InitializeEvents();
         }
 
-        public bool ValidateData()
+        public override bool ValidateData()
         {
             return _events != null && _events.Count > 0;
         }
+
+        #region 玩家数据管理
+
+        /// <summary>
+        /// 记录玩家选择
+        /// </summary>
+        public void RecordPlayerChoice(string playerId, string eventId, string optionId)
+        {
+            if (!_playerRecords.ContainsKey(playerId))
+            {
+                _playerRecords[playerId] = new PlayerEventRecord { PlayerId = playerId };
+            }
+
+            var record = _playerRecords[playerId];
+            record.ChoicesMade++;
+
+            if (!record.EventChoiceHistory.ContainsKey(eventId))
+            {
+                record.EventChoiceHistory[eventId] = new List<string>();
+            }
+            record.EventChoiceHistory[eventId].Add(optionId);
+        }
+
+        /// <summary>
+        /// 解锁事件
+        /// </summary>
+        public void UnlockEvent(string playerId, string eventId)
+        {
+            if (!_playerRecords.ContainsKey(playerId))
+            {
+                _playerRecords[playerId] = new PlayerEventRecord { PlayerId = playerId };
+            }
+
+            if (!_playerRecords[playerId].UnlockedEvents.Contains(eventId))
+            {
+                _playerRecords[playerId].UnlockedEvents.Add(eventId);
+            }
+        }
+
+        /// <summary>
+        /// 检查事件是否解锁
+        /// </summary>
+        public bool IsEventUnlocked(string playerId, string eventId)
+        {
+            if (_playerRecords.TryGetValue(playerId, out var record))
+            {
+                return record.UnlockedEvents.Contains(eventId);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 设置事件冷却
+        /// </summary>
+        public void SetEventCooldown(string playerId, string eventId, TimeSpan cooldown)
+        {
+            if (!_eventCooldowns.ContainsKey(playerId))
+            {
+                _eventCooldowns[playerId] = new Dictionary<string, DateTime>();
+            }
+
+            _eventCooldowns[playerId][eventId] = DateTime.Now + cooldown;
+        }
+
+        /// <summary>
+        /// 检查事件是否在冷却中
+        /// </summary>
+        public bool IsEventOnCooldown(string playerId, string eventId)
+        {
+            if (_eventCooldowns.TryGetValue(playerId, out var cooldowns))
+            {
+                if (cooldowns.TryGetValue(eventId, out var cooldownEnd))
+                {
+                    return DateTime.Now < cooldownEnd;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 获取玩家事件记录
+        /// </summary>
+        public PlayerEventRecord GetPlayerRecord(string playerId)
+        {
+            if (_playerRecords.TryGetValue(playerId, out var record))
+            {
+                return record;
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region 持久化
+
+        protected override void OnExportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            // 导出玩家选择记录
+            var playerRecordsData = new Godot.Collections.Dictionary();
+            foreach (var kvp in _playerRecords)
+            {
+                var recordDict = new Godot.Collections.Dictionary
+                {
+                    ["playerId"] = kvp.Value.PlayerId,
+                    ["choicesMade"] = kvp.Value.ChoicesMade,
+                    ["eventChoiceHistory"] = new Godot.Collections.Dictionary()
+                };
+
+                var historyDict = (Godot.Collections.Dictionary)recordDict["eventChoiceHistory"];
+                foreach (var historyKvp in kvp.Value.EventChoiceHistory)
+                {
+                    historyDict[historyKvp.Key] = new Godot.Collections.Array(historyKvp.Value);
+                }
+
+                recordDict["unlockedEvents"] = new Godot.Collections.Array(kvp.Value.UnlockedEvents);
+                playerRecordsData[kvp.Key] = recordDict;
+            }
+            saveData["playerRecords"] = playerRecordsData;
+
+            // 导出事件冷却数据
+            var cooldownsData = new Godot.Collections.Dictionary();
+            foreach (var playerKvp in _eventCooldowns)
+            {
+                var playerCooldowns = new Godot.Collections.Dictionary();
+                foreach (var cooldownKvp in playerKvp.Value)
+                {
+                    playerCooldowns[cooldownKvp.Key] = cooldownKvp.Value.Ticks;
+                }
+                cooldownsData[playerKvp.Key] = playerCooldowns;
+            }
+            saveData["eventCooldowns"] = cooldownsData;
+        }
+
+        protected override void OnImportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            // 导入玩家选择记录
+            if (saveData.TryGetValue("playerRecords", out var recordsObj) && recordsObj is Godot.Collections.Dictionary recordsData)
+            {
+                foreach (var playerKvp in recordsData)
+                {
+                    if (playerKvp.Value is Godot.Collections.Dictionary recordDict)
+                    {
+                        var playerId = playerKvp.Key.ToString();
+                        var record = new PlayerEventRecord
+                        {
+                            PlayerId = playerId
+                        };
+
+                        if (recordDict.TryGetValue("choicesMade", out var choicesMade))
+                            record.ChoicesMade = Convert.ToInt32(choicesMade);
+
+                        if (recordDict.TryGetValue("unlockedEvents", out var unlockedObj) && unlockedObj is Godot.Collections.Array unlockedArray)
+                        {
+                            foreach (var item in unlockedArray)
+                                record.UnlockedEvents.Add(item.ToString());
+                        }
+
+                        if (recordDict.TryGetValue("eventChoiceHistory", out var historyObj) && historyObj is Godot.Collections.Dictionary historyDict)
+                        {
+                            foreach (var historyKvp in historyDict)
+                            {
+                                if (historyKvp.Value is Godot.Collections.Array choiceArray)
+                                {
+                                    var choices = new List<string>();
+                                    foreach (var choice in choiceArray)
+                                        choices.Add(choice.ToString());
+                                    record.EventChoiceHistory[historyKvp.Key.ToString()] = choices;
+                                }
+                            }
+                        }
+
+                        _playerRecords[playerId] = record;
+                    }
+                }
+            }
+
+            // 导入事件冷却数据
+            if (saveData.TryGetValue("eventCooldowns", out var cooldownsObj) && cooldownsObj is Godot.Collections.Dictionary cooldownsData)
+            {
+                foreach (var playerKvp in cooldownsData)
+                {
+                    if (playerKvp.Value is Godot.Collections.Dictionary playerCooldowns)
+                    {
+                        var playerId = playerKvp.Key.ToString();
+                        var cooldownDict = new Dictionary<string, DateTime>();
+
+                        foreach (var cooldownKvp in playerCooldowns)
+                        {
+                            if (Convert.ToInt64(cooldownKvp.Value) > DateTime.Now.Ticks)
+                            {
+                                cooldownDict[cooldownKvp.Key.ToString()] = new DateTime(Convert.ToInt64(cooldownKvp.Value));
+                            }
+                        }
+
+                        _eventCooldowns[playerId] = cooldownDict;
+                    }
+                }
+            }
+        }
+
+        #endregion
 
         private void InitializeEvents()
         {
@@ -623,6 +830,23 @@ namespace ClawRPG.Scripts.Systems
             }
 
             return events[0];
+        }
+    }
+
+    /// <summary>
+    /// 玩家事件记录（用于持久化）
+    /// </summary>
+    public class PlayerEventRecord
+    {
+        public string PlayerId { get; set; }
+        public int ChoicesMade { get; set; }
+        public Dictionary<string, List<string>> EventChoiceHistory { get; set; }  // eventId -> chosen optionIds
+        public List<string> UnlockedEvents { get; set; }
+
+        public PlayerEventRecord()
+        {
+            EventChoiceHistory = new Dictionary<string, List<string>>();
+            UnlockedEvents = new List<string>();
         }
     }
 }
