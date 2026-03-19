@@ -7,7 +7,7 @@ namespace ClawRPG.Core.Systems.GuildWar
     /// <summary>
     /// Guild War Configuration Database
     /// </summary>
-    public class GuildWarDatabase : IDatabase
+    public class GuildWarDatabase : DatabaseBase
     {
         private static GuildWarDatabase _instance;
         public static GuildWarDatabase Instance => _instance ??= new GuildWarDatabase();
@@ -21,13 +21,13 @@ namespace ClawRPG.Core.Systems.GuildWar
         // Territory configurations
         private List<TerritoryConfig> _territoryConfigs;
 
-        // Guild level requirements
+        // Guild level requirements (runtime-modifiable, persisted)
         private Dictionary<int, GuildLevelRequirement> _guildLevelRequirements;
 
         // Weekly war schedule
         private List<WarScheduleConfig> _weeklySchedule;
 
-        public object Instance => Instance;
+        public override object Instance => _instance ??= new GuildWarDatabase();
 
         public void Initialize()
         {
@@ -159,6 +159,53 @@ namespace ClawRPG.Core.Systems.GuildWar
             return _warTypeConfigs != null && _warTypeConfigs.Count > 0
                 && _rewardConfigs != null && _rewardConfigs.Count > 0
                 && _territoryConfigs != null && _territoryConfigs.Count > 0;
+        }
+
+        protected override void OnExportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            base.OnExportSaveData(saveData);
+
+            // 导出公会等级要求数据（runtime-modifiable）
+            if (_guildLevelRequirements != null && _guildLevelRequirements.Count > 0)
+            {
+                var levelReqList = new Godot.Collections.Array();
+                foreach (var kvp in _guildLevelRequirements)
+                {
+                    var entry = new Godot.Collections.Dictionary
+                    {
+                        ["level"] = kvp.Key,
+                        ["minLevel"] = kvp.Value.MinLevel,
+                        ["maxGuilds"] = kvp.Value.MaxGuilds,
+                        ["entryFee"] = kvp.Value.EntryFee
+                    };
+                    levelReqList.Add(entry);
+                }
+                saveData["guildLevelRequirements"] = levelReqList;
+            }
+        }
+
+        protected override void OnImportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            base.OnImportSaveData(saveData);
+
+            // 导入公会等级要求数据
+            if (saveData.TryGetValue("guildLevelRequirements", out var levelReqData) && levelReqData is Godot.Collections.Array levelReqList)
+            {
+                foreach (Godot.Collections.Dictionary entry in levelReqList)
+                {
+                    if (entry.TryGetValue("level", out var levelVal) && entry.TryGetValue("minLevel", out var minLevelVal)
+                        && entry.TryGetValue("maxGuilds", out var maxGuildsVal) && entry.TryGetValue("entryFee", out var entryFeeVal))
+                    {
+                        int level = Convert.ToInt32(levelVal);
+                        _guildLevelRequirements[level] = new GuildLevelRequirement
+                        {
+                            MinLevel = Convert.ToInt32(minLevelVal),
+                            MaxGuilds = Convert.ToInt32(maxGuildsVal),
+                            EntryFee = Convert.ToInt32(entryFeeVal)
+                        };
+                    }
+                }
+            }
         }
 
         // Public accessors for backward compatibility
