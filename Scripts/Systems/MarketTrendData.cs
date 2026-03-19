@@ -57,19 +57,78 @@ public class MarketTrendData : BaseSystem
     }
 
     /// <summary>
-    /// Export save data for persistence
+    /// Export save data for persistence.
+    /// Persists market summary stats and current trends. Price history and predictions are not persisted
+    /// as they are regenerated dynamically based on market activity.
     /// </summary>
     public override Dictionary ExportSaveData()
     {
-        return new Dictionary();
+        Dictionary<string, object> data = new Dictionary<string, object>();
+
+        // Persist global market stats
+        data["market_sentiment"] = MarketSentiment;
+        data["total_trend_updates"] = TotalTrendUpdates;
+        data["total_predictions_made"] = TotalPredictionsMade;
+        data["correct_predictions"] = CorrectPredictions;
+        data["last_update_time"] = LastUpdateTime;
+
+        // Persist current trends (small dict, meaningful accumulated state)
+        List<object> trendsData = new List<object>();
+        foreach (var kvp in CurrentTrends)
+        {
+            trendsData.Add(new Dictionary<string, object>
+            {
+                { "category", kvp.Key },
+                { "direction", (int)kvp.Value.Direction },
+                { "change_percent", kvp.Value.ChangePercent },
+                { "volatility", kvp.Value.Volatility },
+                { "trend_strength", kvp.Value.TrendStrength },
+                { "duration", kvp.Value.Duration }
+            });
+        }
+        data["current_trends"] = trendsData;
+
+        return new Dictionary(data);
     }
 
     /// <summary>
-    /// Import save data from persistence
+    /// Import save data from persistence.
     /// </summary>
     public override void ImportSaveData(Dictionary data)
     {
-        // No persistent data needed
+        if (data == null) return;
+
+        if (data.Contains("market_sentiment"))
+            MarketSentiment = (int)data["market_sentiment"];
+        if (data.Contains("total_trend_updates"))
+            TotalTrendUpdates = (int)data["total_trend_updates"];
+        if (data.Contains("total_predictions_made"))
+            TotalPredictionsMade = (int)data["total_predictions_made"];
+        if (data.Contains("correct_predictions"))
+            CorrectPredictions = (int)data["correct_predictions"];
+        if (data.Contains("last_update_time"))
+            LastUpdateTime = (double)data["last_update_time"];
+
+        // Restore current trends
+        if (data.Contains("current_trends"))
+        {
+            CurrentTrends.Clear();
+            var trendsData = (Godot.Collections.Array)data["current_trends"];
+            foreach (var t in trendsData)
+            {
+                var tdict = (Dictionary)t;
+                string category = (string)tdict["category"];
+                var trend = new MarketTrend(category)
+                {
+                    Direction = (TrendDirection)(int)tdict["direction"],
+                    ChangePercent = (float)tdict["change_percent"],
+                    Volatility = (float)tdict["volatility"],
+                    TrendStrength = (double)tdict["trend_strength"],
+                    Duration = (int)tdict["duration"]
+                };
+                CurrentTrends[category] = trend;
+            }
+        }
     }
 }
 
@@ -79,48 +138,15 @@ public class MarketTrendData : BaseSystem
 [System.Serializable]
 public class PriceRecord
 {
-    /// <summary>
-    /// Unix timestamp when this price was recorded.
-    /// </summary>
     public double Timestamp;
-    
-    /// <summary>
-    /// The recorded price value.
-    /// </summary>
     public float Price;
-    
-    /// <summary>
-    /// Trading volume at this price point.
-    /// </summary>
     public int Volume;
-    
-    /// <summary>
-    /// Creates a new price record with the specified values.
-    /// </summary>
-    /// <param name="timestamp">Unix timestamp of the record.</param>
-    /// <param name="price">The price value.</param>
-    /// <param name="volume">Trading volume at this price.</param>
+
     public PriceRecord(double timestamp, float price, int volume)
     {
         Timestamp = timestamp;
         Price = price;
         Volume = volume;
-    }
-
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
-
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
     }
 }
 
@@ -130,40 +156,13 @@ public class PriceRecord
 [System.Serializable]
 public class MarketTrend
 {
-    /// <summary>
-    /// The item category this trend represents.
-    /// </summary>
     public string Category;
-    
-    /// <summary>
-    /// Current direction of the trend (Rising, Falling, Stable, or Volatile).
-    /// </summary>
     public TrendDirection Direction;
-    
-    /// <summary>
-    /// Percentage change in price over the tracking period.
-    /// </summary>
     public float ChangePercent;
-    
-    /// <summary>
-    /// Volatility indicator showing how unstable the price is.
-    /// </summary>
     public float Volatility;
-    
-    /// <summary>
-    /// Strength of the trend from 0 to 100.
-    /// </summary>
     public double TrendStrength;
-    
-    /// <summary>
-    /// Duration in update cycles that this trend has been active.
-    /// </summary>
     public int Duration;
-    
-    /// <summary>
-    /// Creates a new market trend for the specified category.
-    /// </summary>
-    /// <param name="category">The item category to track.</param>
+
     public MarketTrend(string category)
     {
         Category = category;
@@ -173,22 +172,6 @@ public class MarketTrend
         TrendStrength = 0;
         Duration = 0;
     }
-
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
-
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
-    }
 }
 
 /// <summary>
@@ -197,43 +180,13 @@ public class MarketTrend
 [System.Serializable]
 public class MarketPrediction
 {
-    /// <summary>
-    /// The item category this prediction is for.
-    /// </summary>
     public string Category;
-    
-    /// <summary>
-    /// Predicted direction of price movement.
-    /// </summary>
     public TrendDirection PredictedDirection;
-    
-    /// <summary>
-    /// Predicted percentage change in price.
-    /// </summary>
     public float PredictedChange;
-    
-    /// <summary>
-    /// Unix timestamp when this prediction was made.
-    /// </summary>
     public double PredictionTime;
-    
-    /// <summary>
-    /// Whether the prediction was correct (updated after the prediction period).
-    /// </summary>
     public bool IsCorrect;
-    
-    /// <summary>
-    /// Confidence level of the prediction from 0 to 100.
-    /// </summary>
     public double Confidence;
-    
-    /// <summary>
-    /// Creates a new market prediction.
-    /// </summary>
-    /// <param name="category">The item category being predicted.</param>
-    /// <param name="direction">Predicted trend direction.</param>
-    /// <param name="change">Predicted percentage change.</param>
-    /// <param name="confidence">Confidence level from 0 to 100.</param>
+
     public MarketPrediction(string category, TrendDirection direction, float change, double confidence)
     {
         Category = category;
@@ -243,22 +196,6 @@ public class MarketPrediction
         IsCorrect = false;
         Confidence = confidence;
     }
-
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
-
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
-    }
 }
 
 /// <summary>
@@ -266,39 +203,8 @@ public class MarketPrediction
 /// </summary>
 public enum TrendDirection
 {
-    /// <summary>
-    /// Price is trending upward.
-    /// </summary>
     Rising,
-    
-    /// <summary>
-    /// Price is trending downward.
-    /// </summary>
     Falling,
-    
-    /// <summary>
-    /// Price is relatively stable with minimal change.
-    /// </summary>
     Stable,
-    
-    /// <summary>
-    /// Price is highly volatile with significant fluctuations.
-    /// </summary>
     Volatile
-
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
-
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
-    }
 }

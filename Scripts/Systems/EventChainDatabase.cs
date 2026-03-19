@@ -203,21 +203,22 @@ namespace ClawRPG.Scripts.Systems {
             if (available.Count == 0) return null;
             return available[GD.Randi() % available.Count];
         }
-    }
 
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
+        /// <summary>
+        /// EventChainDatabase is a pure configuration database that holds event chain templates.
+        /// It contains no player-specific progress data, so no persistence is needed.
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary();
+        }
 
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            // No player-specific data to restore - this is a config-only database.
+        }
     }
 }

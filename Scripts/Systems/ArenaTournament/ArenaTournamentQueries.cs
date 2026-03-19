@@ -453,9 +453,13 @@ namespace ClawRPG.Scripts.Systems
 
         /// <summary>
         /// 导出保存数据
+        /// ArenaTournamentQueries 是查询缓存系统，30秒过期，缓存数据来自 ArenaTournamentCoreSystem。
+        /// 无玩家特有数据需要持久化，实际数据由 ArenaTournamentCoreSystem 管理。
         /// </summary>
         public override Dictionary ExportSaveData()
         {
+            // Query cache system - no player-specific data to persist.
+            // All tournament data is cached from ArenaTournamentCoreSystem with 30-second expiry.
             return new Dictionary();
         }
 
@@ -464,6 +468,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public override void ImportSaveData(Dictionary data)
         {
+            // No player-specific data to restore - queries always pull fresh from ArenaTournamentCoreSystem.
         }
 
         #endregion

@@ -355,7 +355,42 @@ public class ProceduralChallengeSystem : BaseSystem
     /// </summary>
     public override Dictionary ExportSaveData()
     {
-        return new Dictionary();
+        Dictionary<string, object> data = new Dictionary<string, object>();
+
+        // Export active challenges
+        List<object> challengeData = new List<object>();
+        foreach (var challenge in _activeChallenges)
+        {
+            challengeData.Add(new Dictionary<string, object>
+            {
+                { "instance_id", challenge.InstanceId },
+                { "template_id", challenge.TemplateId },
+                { "type", (int)challenge.Type },
+                { "rarity", (int)challenge.Rarity },
+                { "current_progress", challenge.CurrentProgress },
+                { "target_progress", challenge.TargetProgress },
+                { "time_remaining", challenge.TimeRemaining },
+                { "time_limit", challenge.TimeLimit },
+                { "status", (int)challenge.Status },
+                { "gold_reward", challenge.GoldReward },
+                { "exp_reward", challenge.ExpReward }
+            });
+        }
+        data["active_challenges"] = challengeData;
+
+        // Export player stats
+        data["player_data"] = new Dictionary<string, object>
+        {
+            { "total_completed", _playerData.TotalChallengesCompleted },
+            { "total_gold", _playerData.TotalGoldEarned },
+            { "total_exp", _playerData.TotalExpEarned }
+        };
+
+        // Export settings
+        data["max_active_challenges"] = _maxActiveChallenges;
+        data["last_refresh"] = _lastRefreshTime;
+
+        return new Dictionary(data);
     }
 
     /// <summary>
@@ -363,6 +398,53 @@ public class ProceduralChallengeSystem : BaseSystem
     /// </summary>
     public override void ImportSaveData(Dictionary data)
     {
-        // No persistent data needed
+        if (data == null) return;
+
+        // Import active challenges
+        if (data.Contains("active_challenges"))
+        {
+            var challengeList = (Godot.Collections.Array)data["active_challenges"];
+            _activeChallenges.Clear();
+
+            foreach (var c in challengeList)
+            {
+                var cdict = (Dictionary)c;
+                var challenge = new ProceduralChallengeData.ActiveChallenge
+                {
+                    InstanceId = (string)cdict["instance_id"],
+                    TemplateId = (string)cdict["template_id"],
+                    Type = (ProceduralChallengeData.ChallengeType)(int)cdict["type"],
+                    Rarity = (ProceduralChallengeData.ChallengeRarity)(int)cdict["rarity"],
+                    CurrentProgress = (int)cdict["current_progress"],
+                    TargetProgress = (int)cdict["target_progress"],
+                    TimeRemaining = (int)cdict["time_remaining"],
+                    TimeLimit = (int)cdict["time_limit"],
+                    Status = (ProceduralChallengeData.ChallengeStatus)(int)cdict["status"],
+                    GoldReward = (int)cdict["gold_reward"],
+                    ExpReward = (int)cdict["exp_reward"],
+                    BonusItems = new List<string>()
+                };
+                _activeChallenges.Add(challenge);
+            }
+        }
+
+        // Import player stats
+        if (data.Contains("player_data"))
+        {
+            var pdata = (Dictionary)data["player_data"];
+            _playerData.TotalChallengesCompleted = (int)pdata["total_completed"];
+            _playerData.TotalGoldEarned = (int)pdata["total_gold"];
+            _playerData.TotalExpEarned = (int)pdata["total_exp"];
+        }
+
+        if (data.Contains("max_active_challenges"))
+        {
+            _maxActiveChallenges = (int)data["max_active_challenges"];
+        }
+
+        if (data.Contains("last_refresh"))
+        {
+            _lastRefreshTime = (float)data["last_refresh"];
+        }
     }
 }
