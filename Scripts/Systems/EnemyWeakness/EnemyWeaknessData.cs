@@ -90,6 +90,165 @@ public class EnemyWeaknessData : BaseSystem
         // 保存数据到 JSON
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary<string, Variant>();
+
+        // 保存敌人弱点数据
+        var enemyWeaknessesData = new Dictionary<string, Dictionary<string, Variant>>();
+        foreach (var kvp in EnemyWeaknesses)
+        {
+            var weaknessesList = new List<Dictionary<string, Variant>>();
+            foreach (var weakness in kvp.Value.Weaknesses)
+            {
+                weaknessesList.Add(new Dictionary<string, Variant>
+                {
+                    ["type"] = (int)weakness.Type,
+                    ["element"] = (int)weakness.Element,
+                    ["damage_multiplier"] = weakness.DamageMultiplier,
+                    ["resistance_multiplier"] = weakness.ResistanceMultiplier,
+                    ["description"] = weakness.Description ?? ""
+                });
+            }
+            enemyWeaknessesData[kvp.Key] = new Dictionary<string, Variant>
+            {
+                ["enemy_type"] = kvp.Value.EnemyType ?? "",
+                ["weaknesses"] = weaknessesList
+            };
+        }
+        data["enemy_weaknesses"] = enemyWeaknessesData;
+
+        // 保存激活历史
+        var activationHistory = new List<Dictionary<string, Variant>>();
+        foreach (var record in ActivationHistory)
+        {
+            activationHistory.Add(new Dictionary<string, Variant>
+            {
+                ["enemy_type"] = record.EnemyType ?? "",
+                ["weakness_type"] = (int)record.WeaknessType,
+                ["element"] = (int)record.Element,
+                ["damage_bonus"] = record.DamageBonus,
+                ["timestamp"] = record.Timestamp
+            });
+        }
+        data["activation_history"] = activationHistory;
+
+        // 保存统计
+        data["total_weakness_activations"] = TotalWeaknessActivations;
+        data["total_bonus_damage"] = TotalBonusDamage;
+
+        // 保存弱点类型使用统计
+        var weaknessTypeUsage = new Dictionary<string, int>();
+        foreach (var kvp in WeaknessTypeUsage)
+        {
+            weaknessTypeUsage[kvp.Key] = kvp.Value;
+        }
+        data["weakness_type_usage"] = weaknessTypeUsage;
+
+        // 保存元素使用统计
+        var elementUsage = new Dictionary<string, int>();
+        foreach (var kvp in ElementUsage)
+        {
+            elementUsage[kvp.Key] = kvp.Value;
+        }
+        data["element_usage"] = elementUsage;
+
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        // 加载敌人弱点数据
+        if (data.TryGetValue("enemy_weaknesses", out var enemyData))
+        {
+            EnemyWeaknesses = new Dictionary<string, EnemyWeaknessRecord>();
+            var enemyDict = (Dictionary<string, Variant>)enemyData;
+            foreach (var kvp in enemyDict)
+            {
+                var recordData = (Dictionary<string, Variant>)kvp.Value;
+                var record = new EnemyWeaknessRecord { EnemyType = (string)recordData["enemy_type"] };
+
+                if (recordData.TryGetValue("weaknesses", out var weaknessesData))
+                {
+                    record.Weaknesses = new List<Weakness>();
+                    var weaknessesList = (List<Variant>)weaknessesData;
+                    foreach (var wVar in weaknessesList)
+                    {
+                        var wDict = (Dictionary<string, Variant>)wVar;
+                        var weakness = new Weakness();
+
+                        if (wDict.TryGetValue("type", out var type))
+                            weakness.Type = (WeaknessType)(int)type;
+                        if (wDict.TryGetValue("element", out var element))
+                            weakness.Element = (ElementType)(int)element;
+                        if (wDict.TryGetValue("damage_multiplier", out var dmgMult))
+                            weakness.DamageMultiplier = (float)dmgMult;
+                        if (wDict.TryGetValue("resistance_multiplier", out var resMult))
+                            weakness.ResistanceMultiplier = (float)resMult;
+                        if (wDict.TryGetValue("description", out var desc))
+                            weakness.Description = (string)desc;
+
+                        record.Weaknesses.Add(weakness);
+                    }
+                }
+
+                EnemyWeaknesses[kvp.Key] = record;
+            }
+        }
+
+        // 加载激活历史
+        if (data.TryGetValue("activation_history", out var historyData))
+        {
+            ActivationHistory = new List<WeaknessActivationRecord>();
+            var historyList = (List<Variant>)historyData;
+            foreach (var recordVar in historyList)
+            {
+                var recordDict = (Dictionary<string, Variant>)recordVar;
+                var record = new WeaknessActivationRecord();
+
+                if (recordDict.TryGetValue("enemy_type", out var enemyType))
+                    record.EnemyType = (string)enemyType;
+                if (recordDict.TryGetValue("weakness_type", out var weaknessType))
+                    record.WeaknessType = (WeaknessType)(int)weaknessType;
+                if (recordDict.TryGetValue("element", out var element))
+                    record.Element = (ElementType)(int)element;
+                if (recordDict.TryGetValue("damage_bonus", out var damageBonus))
+                    record.DamageBonus = (float)damageBonus;
+                if (recordDict.TryGetValue("timestamp", out var timestamp))
+                    record.Timestamp = (long)timestamp;
+
+                ActivationHistory.Add(record);
+            }
+        }
+
+        // 加载统计
+        if (data.TryGetValue("total_weakness_activations", out var totalActivations))
+            TotalWeaknessActivations = (int)totalActivations;
+        if (data.TryGetValue("total_bonus_damage", out var totalBonus))
+            TotalBonusDamage = (float)totalBonus;
+
+        // 加载弱点类型使用统计
+        if (data.TryGetValue("weakness_type_usage", out var usageData))
+        {
+            WeaknessTypeUsage = new Dictionary<string, int>();
+            var usageDict = (Dictionary<string, Variant>)usageData;
+            foreach (var kvp in usageDict)
+            {
+                WeaknessTypeUsage[kvp.Key] = (int)kvp.Value;
+            }
+        }
+
+        // 加载元素使用统计
+        if (data.TryGetValue("element_usage", out var elemData))
+        {
+            ElementUsage = new Dictionary<string, int>();
+            var elemDict = (Dictionary<string, Variant>)elemData;
+            foreach (var kvp in elemDict)
+            {
+                ElementUsage[kvp.Key] = (int)kvp.Value;
+            }
+        }
+    }
 }
