@@ -222,8 +222,63 @@ public class PetTalentSystem : BaseSystem
         }
     }
 
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        var saveData = new Godot.Collections.Dictionary();
+
+        foreach (var kvp in PetTalents)
+        {
+            var petData = new Godot.Collections.Dictionary
+            {
+                ["availablePoints"] = kvp.Value.AvailablePoints,
+                ["totalEarned"] = kvp.Value.TotalPointsEarned,
+                ["totalSpent"] = kvp.Value.TotalPointsSpent,
+                ["unlockedTalents"] = new Godot.Collections.Dictionary(kvp.Value.UnlockedTalents),
+                ["allocatedPoints"] = new Godot.Collections.Dictionary(kvp.Value.AllocatedPoints)
+            };
+            saveData[kvp.Key.ToString()] = petData;
+        }
+
+        return saveData;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        PetTalents.Clear();
+
+        foreach (var kvp in (Godot.Collections.Dictionary)data)
+        {
+            int petId = Convert.ToInt32(kvp.Key);
+            var petDataDict = (Godot.Collections.Dictionary)kvp.Value;
+
+            var petData = new PetTalentData
+            {
+                AvailablePoints = Convert.ToInt32(petDataDict.GetValueOrDefault("availablePoints", 0)),
+                TotalPointsEarned = Convert.ToInt32(petDataDict.GetValueOrDefault("totalEarned", 0)),
+                TotalPointsSpent = Convert.ToInt32(petDataDict.GetValueOrDefault("totalSpent", 0))
+            };
+
+            if (petDataDict.TryGetValue("unlockedTalents", out var unlockedObj) && unlockedObj is Godot.Collections.Dictionary unlocked)
+            {
+                foreach (string talentId in unlocked.Keys)
+                {
+                    petData.UnlockedTalents[talentId] = Convert.ToInt32(unlocked[talentId]);
+                }
+            }
+
+            if (petDataDict.TryGetValue("allocatedPoints", out var allocatedObj) && allocatedObj is Godot.Collections.Dictionary allocated)
+            {
+                foreach (string category in allocated.Keys)
+                {
+                    petData.AllocatedPoints[category] = Convert.ToInt32(allocated[category]);
+                }
+            }
+
+            PetTalents[petId] = petData;
+        }
+    }
     
     // 导出单个宠物的天赋数据（供 PetManager 使用）
     public Dictionary<string, object> ExportPetTalentData(string petId)

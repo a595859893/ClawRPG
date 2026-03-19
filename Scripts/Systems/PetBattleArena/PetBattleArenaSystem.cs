@@ -476,7 +476,7 @@ public class PetBattleArenaSystem : BaseSystem
             saveSystem.SaveGameData("pet_battle_arena", data);
         }
     }
-    
+
     private void LoadData()
     {
         var saveSystem = GetNode<SaveSystem>("/root/Main/SaveSystem");
@@ -487,6 +487,64 @@ public class PetBattleArenaSystem : BaseSystem
         }
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        // 导出战斗状态和玩家数据
+        return new Godot.Collections.Dictionary
+        {
+            ["currentState"] = (int)_currentState,
+            ["currentWave"] = _currentWave,
+            ["playerCurrentHealth"] = _playerCurrentHealth,
+            ["playerMaxHealth"] = _playerMaxHealth,
+            ["totalDamageDealt"] = _totalDamageDealt,
+            ["totalDamageTaken"] = _totalDamageTaken,
+            ["enemiesDefeated"] = _enemiesDefeated,
+            ["highestCombo"] = _highestCombo,
+            ["currentCombo"] = _currentCombo,
+            ["battleTimer"] = _battleTimer,
+            ["waveInProgress"] = _waveInProgress,
+            ["playerData"] = Save()
+        };
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        if (data.TryGetValue("currentState", out var stateObj))
+            _currentState = (BattleState)Convert.ToInt32(stateObj);
+
+        if (data.TryGetValue("currentWave", out var waveObj))
+            _currentWave = Convert.ToInt32(waveObj);
+
+        if (data.TryGetValue("playerCurrentHealth", out var healthObj))
+            _playerCurrentHealth = Convert.ToInt32(healthObj);
+
+        if (data.TryGetValue("playerMaxHealth", out var maxHealthObj))
+            _playerMaxHealth = Convert.ToInt32(maxHealthObj);
+
+        if (data.TryGetValue("totalDamageDealt", out var dmgDealtObj))
+            _totalDamageDealt = Convert.ToInt32(dmgDealtObj);
+
+        if (data.TryGetValue("totalDamageTaken", out var dmgTakenObj))
+            _totalDamageTaken = Convert.ToInt32(dmgTakenObj);
+
+        if (data.TryGetValue("enemiesDefeated", out var enemiesObj))
+            _enemiesDefeated = Convert.ToInt32(enemiesObj);
+
+        if (data.TryGetValue("highestCombo", out var highComboObj))
+            _highestCombo = Convert.ToInt32(highComboObj);
+
+        if (data.TryGetValue("currentCombo", out var comboObj))
+            _currentCombo = Convert.ToInt32(comboObj);
+
+        if (data.TryGetValue("battleTimer", out var timerObj))
+            _battleTimer = (float)Convert.ToDouble(timerObj);
+
+        if (data.TryGetValue("waveInProgress", out var waveProgObj))
+            _waveInProgress = (bool)waveProgObj;
+
+        if (data.TryGetValue("playerData", out var playerDataObj) && playerDataObj is Godot.Collections.Dictionary playerDataDict)
+            Load(playerDataDict);
+    }
 }

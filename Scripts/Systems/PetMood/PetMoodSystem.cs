@@ -285,8 +285,48 @@ namespace ClawRPG.Scripts.Systems.PetMood {
                 }
             }
         }
-    }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            // 保存衰减计时器状态
+            double currentTime = Time.GetUnixTimeFromSystem();
+            double timeSinceLastDecay = currentTime - _lastDecayTime;
+
+            return new Godot.Collections.Dictionary
+            {
+                ["mood_data"] = _data,
+                ["last_decay_time_offset"] = timeSinceLastDecay,
+                ["mood_decay_interval"] = _moodDecayInterval,
+                ["mood_change_chance"] = _moodChangeChance
+            };
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            if (data.TryGetValue("mood_data", out var moodDataObj) && moodDataObj is PetMoodData moodData)
+            {
+                _data = moodData;
+            }
+
+            if (data.TryGetValue("last_decay_time_offset", out var offsetObj))
+            {
+                double offset = Convert.ToDouble(offsetObj);
+                _lastDecayTime = Time.GetUnixTimeFromSystem() - offset;
+            }
+
+            if (data.TryGetValue("mood_decay_interval", out var intervalObj))
+            {
+                _moodDecayInterval = Convert.ToDouble(intervalObj);
+            }
+
+            if (data.TryGetValue("mood_change_chance", out var chanceObj))
+            {
+                _moodChangeChance = Convert.ToDouble(chanceObj);
+            }
+
+            SaveData();
+        }
+    }
 }

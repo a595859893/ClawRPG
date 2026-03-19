@@ -309,8 +309,87 @@ namespace ClawRPG.Scripts.Systems.PetFoster
             var saveSystem = GetTree().GetFirstNodeInGroup("SaveSystem") as Node;
             saveSystem?.Set("pet_foster_data", _playerData);
         }
-    }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            // 使用 JSON 序列化 PlayerFosterData
+            string jsonStr = Godot.JSON.Stringify(_playerData);
+            var parsed = (Godot.Collections.Dictionary)Godot.JSON.Parse(jsonStr).Result;
+
+            return new Godot.Collections.Dictionary
+            {
+                ["playerData"] = parsed,
+                ["initialized"] = _initialized
+            };
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            if (data.TryGetValue("initialized", out var initObj))
+                _initialized = (bool)initObj;
+
+            if (data.TryGetValue("playerData", out var playerDataObj))
+            {
+                // 使用 JSON 反序列化
+                string jsonStr = Godot.JSON.Stringify(playerDataObj);
+                var result = Godot.JSON.Parse(jsonStr);
+                if (result.Error == Godot.Error.Ok && result.Result != null)
+                {
+                    var dict = (Godot.Collections.Dictionary)result.Result;
+
+                    _playerData = new PlayerFosterData
+                    {
+                        TotalFosters = Convert.ToInt32(dict.GetValueOrDefault("TotalFosters", 0)),
+                        TotalExpGained = Convert.ToInt32(dict.GetValueOrDefault("TotalExpGained", 0)),
+                        TotalGoldEarned = Convert.ToInt32(dict.GetValueOrDefault("TotalGoldEarned", 0)),
+                        TotalMaterialsGained = Convert.ToInt32(dict.GetValueOrDefault("TotalMaterialsGained", 0))
+                    };
+
+                    if (dict.TryGetValue("ActiveFosters", out var fostersObj) && fostersObj is Godot.Collections.Dictionary fosters)
+                    {
+                        _playerData.ActiveFosters = new Dictionary<string, ActiveFoster>();
+                        foreach (string petId in fosters.Keys)
+                        {
+                            var fosterDict = (Godot.Collections.Dictionary)fosters[petId];
+                            _playerData.ActiveFosters[petId] = new ActiveFoster
+                            {
+                                PetId = Convert.ToString(fosterDict.GetValueOrDefault("PetId", "")),
+                                ConfigId = Convert.ToString(fosterDict.GetValueOrDefault("ConfigId", "")),
+                                Type = Convert.ToString(fosterDict.GetValueOrDefault("Type", "")),
+                                StartTime = Convert.ToInt64(fosterDict.GetValueOrDefault("StartTime", 0L)),
+                                Duration = Convert.ToInt32(fosterDict.GetValueOrDefault("Duration", 0)),
+                                Status = (FosterStatus)Convert.ToInt32(fosterDict.GetValueOrDefault("Status", 0)),
+                                ExpReward = Convert.ToInt32(fosterDict.GetValueOrDefault("ExpReward", 0)),
+                                GoldReward = Convert.ToInt32(fosterDict.GetValueOrDefault("GoldReward", 0)),
+                                AffectionReward = Convert.ToInt32(fosterDict.GetValueOrDefault("AffectionReward", 0))
+                            };
+                        }
+                    }
+
+                    if (dict.TryGetValue("History", out var historyObj) && historyObj is Godot.Collections.Array history)
+                    {
+                        _playerData.History = new List<FosterRecord>();
+                        foreach (var recordObj in history)
+                        {
+                            var recordDict = (Godot.Collections.Dictionary)recordObj;
+                            _playerData.History.Add(new FosterRecord
+                            {
+                                PetId = Convert.ToString(recordDict.GetValueOrDefault("PetId", "")),
+                                PetName = Convert.ToString(recordDict.GetValueOrDefault("PetName", "")),
+                                Type = Convert.ToString(recordDict.GetValueOrDefault("Type", "")),
+                                CompletedTime = Convert.ToInt64(recordDict.GetValueOrDefault("CompletedTime", 0L)),
+                                ExpGained = Convert.ToInt32(recordDict.GetValueOrDefault("ExpGained", 0)),
+                                GoldEarned = Convert.ToInt32(recordDict.GetValueOrDefault("GoldEarned", 0)),
+                                AffectionGained = Convert.ToInt32(recordDict.GetValueOrDefault("AffectionGained", 0))
+                            });
+                        }
+                    }
+                }
+            }
+
+            SaveData();
+        }
+    }
 }

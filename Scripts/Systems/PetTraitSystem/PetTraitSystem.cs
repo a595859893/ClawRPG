@@ -508,11 +508,65 @@ namespace ClawRPG.Scripts.Systems
                 default: return 1;
             }
         }
-        
-        #endregion
-    }
 
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
+        #endregion
+
+        public override Dictionary ExportSaveData()
+        {
+            return new Godot.Collections.Dictionary
+            {
+                ["unlockedTraits"] = _data.UnlockedTraits,
+                ["traitLevels"] = _data.TraitLevels,
+                ["activeTraits"] = _data.ActiveTraits,
+                ["totalTraitsUnlocked"] = _totalTraitsUnlocked,
+                ["totalTraitsActivated"] = _totalTraitsActivated
+            };
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            if (data.TryGetValue("unlockedTraits", out var unlockedObj) && unlockedObj is Godot.Collections.Dictionary unlocked)
+            {
+                _data.UnlockedTraits.Clear();
+                foreach (string traitId in unlocked.Keys)
+                {
+                    _data.UnlockedTraits[traitId] = (bool)unlocked[traitId];
+                }
+            }
+
+            if (data.TryGetValue("traitLevels", out var levelsObj) && levelsObj is Godot.Collections.Dictionary levels)
+            {
+                _data.TraitLevels.Clear();
+                foreach (string key in levels.Keys)
+                {
+                    _data.TraitLevels[key] = Convert.ToInt32(levels[key]);
+                }
+            }
+
+            if (data.TryGetValue("activeTraits", out var activeObj) && activeObj is Godot.Collections.Array activeArray)
+            {
+                _data.ActiveTraits.Clear();
+                foreach (string traitId in activeArray)
+                {
+                    if (!_data.ActiveTraits.Contains(traitId))
+                        _data.ActiveTraits.Add(traitId);
+                }
+            }
+
+            if (data.TryGetValue("totalTraitsUnlocked", out var unlockedCountObj))
+            {
+                _totalTraitsUnlocked = Convert.ToInt32(unlockedCountObj);
+            }
+
+            if (data.TryGetValue("totalTraitsActivated", out var activatedCountObj))
+            {
+                _totalTraitsActivated = Convert.ToInt32(activatedCountObj);
+            }
+
+            SaveData();
+        }
+    }
 
 }
