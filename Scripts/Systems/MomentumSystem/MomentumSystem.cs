@@ -311,6 +311,74 @@ public partial class MomentumSystem : BaseSystem
         }
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+            
+            // 保存玩家动量数据统计
+            data["totalMomentumGained"] = _playerData.TotalMomentumGained;
+            data["maxMomentumReached"] = _playerData.MaxMomentumReached;
+            data["overchargeCount"] = _playerData.OverchargeCount;
+            data["momentumLostToDecay"] = _playerData.MomentumLostToDecay;
+            
+            // 保存每个动量实例的状态
+            var momentaData = new Dictionary<string, Variant>();
+            foreach (var kvp in _activeMomenta)
+            {
+                var typeKey = kvp.Key.ToString();
+                var instance = kvp.Value;
+                momentaData[typeKey] = new Dictionary<string, Variant>
+                {
+                    { "charge", instance.Charge },
+                    { "level", instance.Level },
+                    { "state", (int)instance.State },
+                    { "consecutiveKills", instance.ConsecutiveKills },
+                    { "multiplier", instance.Multiplier }
+                };
+            }
+            data["momenta"] = momentaData;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载玩家动量数据统计
+            if (data.TryGetValue("totalMomentumGained", out var totalGained))
+                _playerData.TotalMomentumGained = (int)totalGained;
+            if (data.TryGetValue("maxMomentumReached", out var maxReached))
+                _playerData.MaxMomentumReached = (int)maxReached;
+            if (data.TryGetValue("overchargeCount", out var overchargeCount))
+                _playerData.OverchargeCount = (int)overchargeCount;
+            if (data.TryGetValue("momentumLostToDecay", out var lostToDecay))
+                _playerData.MomentumLostToDecay = (int)lostToDecay;
+            
+            // 加载每个动量实例的状态
+            if (data.TryGetValue("momenta", out var momentaData))
+            {
+                var momenta = (Dictionary<string, Variant>)momentaData;
+                foreach (var kvp in momenta)
+                {
+                    if (Enum.TryParse<MomentumData.MomentumType>(kvp.Key, out var type) && 
+                        _activeMomenta.ContainsKey(type))
+                    {
+                        var instanceData = (Dictionary<string, Variant>)kvp.Value;
+                        var instance = _activeMomenta[type];
+                        
+                        if (instanceData.TryGetValue("charge", out var charge))
+                            instance.Charge = (float)charge;
+                        if (instanceData.TryGetValue("level", out var level))
+                            instance.Level = (int)level;
+                        if (instanceData.TryGetValue("state", out var state))
+                            instance.State = (MomentumData.MomentumState)(int)state;
+                        if (instanceData.TryGetValue("consecutiveKills", out var conKills))
+                            instance.ConsecutiveKills = (int)conKills;
+                        if (instanceData.TryGetValue("multiplier", out var multiplier))
+                            instance.Multiplier = (float)multiplier;
+                    }
+                }
+            }
+        }
 }

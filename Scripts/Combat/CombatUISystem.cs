@@ -606,8 +606,77 @@ namespace ClawRPG.Scripts.Combat
 
         #region BaseSystem Persistence
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+            
+            // 保存UI偏好设置
+            data["showDamageNumbers"] = _uiPreferences.ShowDamageNumbers;
+            data["showHealthBars"] = _uiPreferences.ShowHealthBars;
+            data["showComboCounter"] = _uiPreferences.ShowComboCounter;
+            data["showCombatIndicators"] = _uiPreferences.ShowCombatIndicators;
+            data["showDPS"] = _uiPreferences.ShowDPS;
+            data["uiScale"] = _uiPreferences.UIScale;
+            data["damageNumberPosition"] = _uiPreferences.DamageNumberPosition;
+            
+            // 保存当前会话统计（作为累积数据）
+            data["totalDamageDealt"] = _currentSessionStats.TotalDamageDealt;
+            data["totalDamageTaken"] = _currentSessionStats.TotalDamageTaken;
+            data["totalHealing"] = _currentSessionStats.TotalHealing;
+            data["enemiesKilled"] = _currentSessionStats.EnemiesKilled;
+            data["criticalHits"] = _currentSessionStats.CriticalHits;
+            data["blocks"] = _currentSessionStats.Blocks;
+            data["dodges"] = _currentSessionStats.Dodges;
+            data["highestDamage"] = _currentSessionStats.HighestDamage;
+            
+            // 保存最大连击记录
+            data["maxCombo"] = _currentCombo.MaxCombo;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载UI偏好设置
+            if (data.TryGetValue("showDamageNumbers", out var showDamage))
+                _uiPreferences.ShowDamageNumbers = (bool)showDamage;
+            if (data.TryGetValue("showHealthBars", out var showHealth))
+                _uiPreferences.ShowHealthBars = (bool)showHealth;
+            if (data.TryGetValue("showComboCounter", out var showCombo))
+                _uiPreferences.ShowComboCounter = (bool)showCombo;
+            if (data.TryGetValue("showCombatIndicators", out var showIndicators))
+                _uiPreferences.ShowCombatIndicators = (bool)showIndicators;
+            if (data.TryGetValue("showDPS", out var showDps))
+                _uiPreferences.ShowDPS = (bool)showDps;
+            if (data.TryGetValue("uiScale", out var uiScale))
+                _uiPreferences.UIScale = (float)uiScale;
+            if (data.TryGetValue("damageNumberPosition", out var dmgPos))
+                _uiPreferences.DamageNumberPosition = (string)dmgPos;
+            
+            // 加载统计累积数据
+            if (data.TryGetValue("totalDamageDealt", out var totalDmg))
+                _currentSessionStats.TotalDamageDealt = (int)totalDmg;
+            if (data.TryGetValue("totalDamageTaken", out var takenDmg))
+                _currentSessionStats.TotalDamageTaken = (int)takenDmg;
+            if (data.TryGetValue("totalHealing", out var totalHeal))
+                _currentSessionStats.TotalHealing = (int)totalHeal;
+            if (data.TryGetValue("enemiesKilled", out var killed))
+                _currentSessionStats.EnemiesKilled = (int)killed;
+            if (data.TryGetValue("criticalHits", out var crits))
+                _currentSessionStats.CriticalHits = (int)crits;
+            if (data.TryGetValue("blocks", out var blocks))
+                _currentSessionStats.Blocks = (int)blocks;
+            if (data.TryGetValue("dodges", out var dodges))
+                _currentSessionStats.Dodges = (int)dodges;
+            if (data.TryGetValue("highestDamage", out var highest))
+                _currentSessionStats.HighestDamage = (int)highest;
+            
+            // 加载最大连击记录
+            if (data.TryGetValue("maxCombo", out var maxCombo))
+                _currentCombo.MaxCombo = (int)maxCombo;
+        }
 
         #endregion
     }

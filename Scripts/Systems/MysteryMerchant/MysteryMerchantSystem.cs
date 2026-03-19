@@ -399,6 +399,136 @@ namespace ClawRPG.Scripts.Systems
         }
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+            
+            // 保存玩家数据统计
+            data["totalVisits"] = _playerData.TotalVisits;
+            data["totalPurchases"] = _playerData.TotalPurchases;
+            data["totalGoldSpent"] = _playerData.TotalGoldSpent;
+            data["totalItemsBought"] = _playerData.TotalItemsBought;
+            data["luckyPurchases"] = _playerData.LuckyPurchases;
+            data["secretItemsFound"] = _playerData.SecretItemsFound;
+            data["unlockedMerchantTypes"] = new List<Variant>(_playerData.UnlockedMerchantTypes);
+            
+            // 保存购买统计（按稀有度）
+            var purchasesByRarity = new Dictionary<string, Variant>();
+            foreach (var kvp in _playerData.PurchasesByRarity)
+            {
+                purchasesByRarity[kvp.Key] = kvp.Value;
+            }
+            data["purchasesByRarity"] = purchasesByRarity;
+            
+            // 保存购买统计（按商人类型）
+            var purchasesByType = new Dictionary<string, Variant>();
+            foreach (var kvp in _playerData.PurchasesByType)
+            {
+                purchasesByType[kvp.Key] = kvp.Value;
+            }
+            data["purchasesByType"] = purchasesByType;
+            
+            // 保存访问历史
+            var visitHistory = new Dictionary<string, Variant>();
+            foreach (var kvp in _playerData.VisitHistory)
+            {
+                visitHistory[kvp.Key] = kvp.Value;
+            }
+            data["visitHistory"] = visitHistory;
+            
+            // 保存活跃商店状态（用于恢复剩余时间）
+            var activeMerchantsData = new List<Dictionary<string, Variant>>();
+            foreach (var merchant in _activeMerchants)
+            {
+                activeMerchantsData.Add(new Dictionary<string, Variant>
+                {
+                    { "merchantId", merchant.MerchantId },
+                    { "merchantType", (int)merchant.MerchantType },
+                    { "merchantName", merchant.MerchantName },
+                    { "remainingTime", merchant.RemainingTime },
+                    { "expireTime", merchant.ExpireTime.Ticks }
+                });
+            }
+            data["activeMerchants"] = activeMerchantsData;
+            
+            // 保存生成计时器
+            data["spawnTimer"] = _spawnTimer;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载玩家数据统计
+            if (data.TryGetValue("totalVisits", out var totalVisits))
+                _playerData.TotalVisits = (int)totalVisits;
+            if (data.TryGetValue("totalPurchases", out var totalPurchases))
+                _playerData.TotalPurchases = (int)totalPurchases;
+            if (data.TryGetValue("totalGoldSpent", out var totalGoldSpent))
+                _playerData.TotalGoldSpent = (int)totalGoldSpent;
+            if (data.TryGetValue("totalItemsBought", out var totalItemsBought))
+                _playerData.TotalItemsBought = (int)totalItemsBought;
+            if (data.TryGetValue("luckyPurchases", out var luckyPurchases))
+                _playerData.LuckyPurchases = (int)luckyPurchases;
+            if (data.TryGetValue("secretItemsFound", out var secretItemsFound))
+                _playerData.SecretItemsFound = (int)secretItemsFound;
+            if (data.TryGetValue("unlockedMerchantTypes", out var unlockedTypes))
+                _playerData.UnlockedMerchantTypes = new List<string>((IEnumerable<string>)unlockedTypes);
+            
+            // 加载购买统计（按稀有度）
+            if (data.TryGetValue("purchasesByRarity", out var purchasesByRarity))
+            {
+                var pbr = (Dictionary<string, Variant>)purchasesByRarity;
+                foreach (var kvp in pbr)
+                {
+                    _playerData.PurchasesByRarity[kvp.Key] = (int)kvp.Value;
+                }
+            }
+            
+            // 加载购买统计（按商人类型）
+            if (data.TryGetValue("purchasesByType", out var purchasesByType))
+            {
+                var pbt = (Dictionary<string, Variant>)purchasesByType;
+                foreach (var kvp in pbt)
+                {
+                    _playerData.PurchasesByType[kvp.Key] = (int)kvp.Value;
+                }
+            }
+            
+            // 加载访问历史
+            if (data.TryGetValue("visitHistory", out var visitHistory))
+            {
+                var vh = (Dictionary<string, Variant>)visitHistory;
+                foreach (var kvp in vh)
+                {
+                    _playerData.VisitHistory[kvp.Key] = (int)kvp.Value;
+                }
+            }
+            
+            // 加载活跃商店状态
+            if (data.TryGetValue("activeMerchants", out var activeMerchantsData))
+            {
+                var merchantsList = (List<Variant>)activeMerchantsData;
+                foreach (var merchantVar in merchantsList)
+                {
+                    var mData = (Dictionary<string, Variant>)merchantVar;
+                    var merchant = new MysteryMerchant
+                    {
+                        MerchantId = (string)mData["merchantId"],
+                        MerchantType = (MysteryMerchantType)(int)mData["merchantType"],
+                        MerchantName = (string)mData["merchantName"],
+                        RemainingTime = (float)mData["remainingTime"],
+                        ExpireTime = new DateTime((long)mData["expireTime"]),
+                        IsActive = true
+                    };
+                    _activeMerchants.Add(merchant);
+                }
+            }
+            
+            // 加载生成计时器
+            if (data.TryGetValue("spawnTimer", out var spawnTimer))
+                _spawnTimer = (float)spawnTimer;
+        }
 }

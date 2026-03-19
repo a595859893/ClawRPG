@@ -304,6 +304,97 @@ namespace ClawRPG.Systems
         }
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+            
+            // 保存玩家数据统计
+            data["successfulExpeditions"] = _playerData.SuccessfulExpeditions;
+            data["failedExpeditions"] = _playerData.FailedExpeditions;
+            data["totalExpeditions"] = _playerData.TotalExpeditions;
+            data["goldEarned"] = _playerData.GoldEarned;
+            data["experienceGained"] = _playerData.ExperienceGained;
+            data["highestRarityFound"] = _playerData.HighestRarityFound;
+            
+            // 保存已获得物品列表
+            data["itemsEarned"] = new List<Variant>(_playerData.ItemsEarned);
+            
+            // 保存活跃探险（需要恢复开始时间和持续时间以计算剩余时间）
+            var activeExpeditionsData = new List<Dictionary<string, Variant>>();
+            foreach (var expedition in _activeExpeditions)
+            {
+                activeExpeditionsData.Add(new Dictionary<string, Variant>
+                {
+                    { "petId", expedition.PetId },
+                    { "petName", expedition.PetName },
+                    { "type", (int)expedition.Type },
+                    { "startTime", expedition.StartTime.Ticks },
+                    { "durationMinutes", expedition.DurationMinutes },
+                    { "completed", expedition.Completed },
+                    { "success", expedition.Success },
+                    { "goldReward", expedition.GoldReward },
+                    { "expReward", expedition.ExpReward },
+                    { "itemReward", expedition.ItemReward ?? "" }
+                });
+            }
+            data["activeExpeditions"] = activeExpeditionsData;
+            
+            // 保存已领取奖励的探险ID集合
+            data["collectedRewards"] = new List<Variant>(CollectedRewards);
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载玩家数据统计
+            if (data.TryGetValue("successfulExpeditions", out var successful))
+                _playerData.SuccessfulExpeditions = (int)successful;
+            if (data.TryGetValue("failedExpeditions", out var failed))
+                _playerData.FailedExpeditions = (int)failed;
+            if (data.TryGetValue("totalExpeditions", out var total))
+                _playerData.TotalExpeditions = (int)total;
+            if (data.TryGetValue("goldEarned", out var goldEarned))
+                _playerData.GoldEarned = (int)goldEarned;
+            if (data.TryGetValue("experienceGained", out var expGained))
+                _playerData.ExperienceGained = (int)expGained;
+            if (data.TryGetValue("highestRarityFound", out var highestRarity))
+                _playerData.HighestRarityFound = (int)highestRarity;
+            
+            // 加载已获得物品列表
+            if (data.TryGetValue("itemsEarned", out var itemsEarned))
+                _playerData.ItemsEarned = new List<string>((IEnumerable<string>)itemsEarned);
+            
+            // 加载活跃探险
+            if (data.TryGetValue("activeExpeditions", out var activeExpeditionsData))
+            {
+                var expeditionsList = (List<Variant>)activeExpeditionsData;
+                foreach (var expVar in expeditionsList)
+                {
+                    var eData = (Dictionary<string, Variant>)expVar;
+                    var expedition = new ActiveExpedition
+                    {
+                        PetId = (string)eData["petId"],
+                        PetName = (string)eData["petName"],
+                        Type = (ExpeditionType)(int)eData["type"],
+                        StartTime = new DateTime((long)eData["startTime"]),
+                        DurationMinutes = (int)eData["durationMinutes"],
+                        Completed = (bool)eData["completed"],
+                        Success = (bool)eData["success"],
+                        GoldReward = (int)eData["goldReward"],
+                        ExpReward = (int)eData["expReward"]
+                    };
+                    var itemReward = (string)eData["itemReward"];
+                    expedition.ItemReward = string.IsNullOrEmpty(itemReward) ? null : itemReward;
+                    
+                    _activeExpeditions.Add(expedition);
+                }
+            }
+            
+            // 加载已领取奖励的探险ID集合
+            if (data.TryGetValue("collectedRewards", out var collectedRewards))
+                CollectedRewards = new HashSet<string>((IEnumerable<string>)collectedRewards);
+        }
 }

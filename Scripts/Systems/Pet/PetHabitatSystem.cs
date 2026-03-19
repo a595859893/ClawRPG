@@ -389,6 +389,100 @@ namespace GameSystems
         }
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+            
+            // 保存当前栖息地ID
+            data["currentHabitatId"] = PlayerData.CurrentHabitatId;
+            
+            // 保存已放置的装饰品
+            var placedDecorationsData = new List<Dictionary<string, Variant>>();
+            foreach (var decoration in PlayerData.PlacedDecorations)
+            {
+                placedDecorationsData.Add(new Dictionary<string, Variant>
+                {
+                    { "decorationId", decoration.DecorationId },
+                    { "slot", decoration.Slot },
+                    { "placedAt", decoration.PlacedAt.Ticks }
+                });
+            }
+            data["placedDecorations"] = placedDecorationsData;
+            
+            // 保存装饰品计数
+            var decorationCounts = new Dictionary<string, Variant>();
+            foreach (var kvp in PlayerData.DecorationCounts)
+            {
+                decorationCounts[kvp.Key] = kvp.Value;
+            }
+            data["decorationCounts"] = decorationCounts;
+            
+            // 保存统计信息
+            data["totalComfort"] = PlayerData.TotalComfort;
+            data["totalAttraction"] = PlayerData.TotalAttraction;
+            data["decorationsPurchased"] = PlayerData.DecorationsPurchased;
+            data["goldSpentOnDecorations"] = PlayerData.GoldSpentOnDecorations;
+            data["habitatVisits"] = PlayerData.HabitatVisits;
+            data["petsAttracted"] = PlayerData.PetsAttracted;
+            
+            if (PlayerData.LastVisit != default)
+                data["lastVisit"] = PlayerData.LastVisit.Ticks;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载当前栖息地ID
+            if (data.TryGetValue("currentHabitatId", out var habitatId))
+                PlayerData.CurrentHabitatId = (string)habitatId;
+            
+            // 加载已放置的装饰品
+            if (data.TryGetValue("placedDecorations", out var placedDecorationsData))
+            {
+                var decorationsList = (List<Variant>)placedDecorationsData;
+                foreach (var decVar in decorationsList)
+                {
+                    var dData = (Dictionary<string, Variant>)decVar;
+                    var decoration = new PlacedDecoration
+                    {
+                        DecorationId = (string)dData["decorationId"],
+                        Slot = (int)dData["slot"],
+                        PlacedAt = new DateTime((long)dData["placedAt"])
+                    };
+                    PlayerData.PlacedDecorations.Add(decoration);
+                }
+            }
+            
+            // 加载装饰品计数
+            if (data.TryGetValue("decorationCounts", out var decorationCounts))
+            {
+                var dc = (Dictionary<string, Variant>)decorationCounts;
+                foreach (var kvp in dc)
+                {
+                    PlayerData.DecorationCounts[kvp.Key] = (int)kvp.Value;
+                }
+            }
+            
+            // 加载统计信息
+            if (data.TryGetValue("totalComfort", out var totalComfort))
+                PlayerData.TotalComfort = (int)totalComfort;
+            if (data.TryGetValue("totalAttraction", out var totalAttraction))
+                PlayerData.TotalAttraction = (int)totalAttraction;
+            if (data.TryGetValue("decorationsPurchased", out var decorationsPurchased))
+                PlayerData.DecorationsPurchased = (int)decorationsPurchased;
+            if (data.TryGetValue("goldSpentOnDecorations", out var goldSpent))
+                PlayerData.GoldSpentOnDecorations = (int)goldSpent;
+            if (data.TryGetValue("habitatVisits", out var habitatVisits))
+                PlayerData.HabitatVisits = (int)habitatVisits;
+            if (data.TryGetValue("petsAttracted", out var petsAttracted))
+                PlayerData.PetsAttracted = (int)petsAttracted;
+            if (data.TryGetValue("lastVisit", out var lastVisit))
+                PlayerData.LastVisit = new DateTime((long)lastVisit);
+            
+            // 重新计算统计
+            RecalculateStats();
+        }
 }

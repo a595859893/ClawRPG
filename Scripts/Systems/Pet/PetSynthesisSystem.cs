@@ -314,6 +314,92 @@ public class PetSynthesisSystem : BaseSystem
     
     #endregion
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+            
+            // 保存合成统计
+            data["totalSyntheses"] = _data.TotalSyntheses;
+            data["successfulSyntheses"] = _data.SuccessfulSyntheses;
+            data["legendarySyntheses"] = _data.LegendarySyntheses;
+            data["totalGoldSpent"] = _data.TotalGoldSpent;
+            
+            // 保存已解锁的配方
+            data["unlockedRecipes"] = new List<Variant>(_data.UnlockedRecipes);
+            
+            // 保存合成历史
+            var historyData = new Dictionary<string, Variant>();
+            foreach (var kvp in _data.SynthesisHistory)
+            {
+                var records = new List<Dictionary<string, Variant>>();
+                foreach (var record in kvp.Value)
+                {
+                    records.Add(new Dictionary<string, Variant>
+                    {
+                        { "pet1Id", record.Pet1Id },
+                        { "pet2Id", record.Pet2Id },
+                        { "resultPetId", record.ResultPetId },
+                        { "resultPetType", record.ResultPetType },
+                        { "resultRarity", record.ResultRarity },
+                        { "wasSuccessful", record.WasSuccessful },
+                        { "goldCost", record.GoldCost },
+                        { "timestamp", record.Timestamp }
+                    });
+                }
+                historyData[kvp.Key.ToString()] = records;
+            }
+            data["synthesisHistory"] = historyData;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载合成统计
+            if (data.TryGetValue("totalSyntheses", out var totalSyntheses))
+                _data.TotalSyntheses = (int)totalSyntheses;
+            if (data.TryGetValue("successfulSyntheses", out var successfulSyntheses))
+                _data.SuccessfulSyntheses = (int)successfulSyntheses;
+            if (data.TryGetValue("legendarySyntheses", out var legendarySyntheses))
+                _data.LegendarySyntheses = (int)legendarySyntheses;
+            if (data.TryGetValue("totalGoldSpent", out var totalGoldSpent))
+                _data.TotalGoldSpent = (int)totalGoldSpent;
+            
+            // 加载已解锁的配方
+            if (data.TryGetValue("unlockedRecipes", out var unlockedRecipes))
+                _data.UnlockedRecipes = new HashSet<string>((IEnumerable<string>)unlockedRecipes);
+            
+            // 加载合成历史
+            if (data.TryGetValue("synthesisHistory", out var historyData))
+            {
+                var hd = (Dictionary<string, Variant>)historyData;
+                foreach (var kvp in hd)
+                {
+                    if (int.TryParse(kvp.Key, out var pet1Id))
+                    {
+                        var records = new List<PetSynthesisRecord>();
+                        var recordsList = (List<Variant>)kvp.Value;
+                        foreach (var recordVar in recordsList)
+                        {
+                            var rData = (Dictionary<string, Variant>)recordVar;
+                            var record = new PetSynthesisRecord
+                            {
+                                Pet1Id = (int)rData["pet1Id"],
+                                Pet2Id = (int)rData["pet2Id"],
+                                ResultPetId = (int)rData["resultPetId"],
+                                ResultPetType = (string)rData["resultPetType"],
+                                ResultRarity = (string)rData["resultRarity"],
+                                WasSuccessful = (bool)rData["wasSuccessful"],
+                                GoldCost = (int)rData["goldCost"],
+                                Timestamp = (long)rData["timestamp"]
+                            };
+                            records.Add(record);
+                        }
+                        _data.SynthesisHistory[pet1Id] = records;
+                    }
+                }
+            }
+        }
 }

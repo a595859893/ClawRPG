@@ -523,6 +523,169 @@ namespace ClawRPG.Systems.Meditation
         }
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+            
+            // 保存所有玩家的冥想进度
+            var progressData = new Dictionary<string, Variant>();
+            foreach (var kvp in _playerProgress)
+            {
+                var progress = kvp.Value;
+                progressData[kvp.Key] = new Dictionary<string, Variant>
+                {
+                    { "currentFocus", progress.CurrentFocus },
+                    { "maxFocus", progress.MaxFocus },
+                    { "totalSessions", progress.TotalSessions },
+                    { "totalMeditationTime", progress.TotalMeditationTime },
+                    { "dailySessions", progress.DailySessions },
+                    { "dailyResetTime", progress.DailyResetTime.Ticks },
+                    { "lastMeditationTime", progress.LastMeditationTime.Ticks },
+                    { "unlockedAbilities", new List<Variant>(progress.UnlockedAbilities) }
+                };
+                
+                // 保存各类型会话计数
+                var sessionsByType = new Dictionary<string, Variant>();
+                foreach (var st in progress.SessionsByType)
+                {
+                    sessionsByType[st.Key.ToString()] = st.Value;
+                }
+                ((Dictionary<string, Variant>)progressData[kvp.Key])["sessionsByType"] = sessionsByType;
+            }
+            data["progress"] = progressData;
+            
+            // 保存活跃buff（需要恢复过期时间）
+            var buffsData = new Dictionary<string, Variant>();
+            foreach (var kvp in _activeBuffs)
+            {
+                var playerBuffs = new List<Dictionary<string, Variant>>();
+                foreach (var buff in kvp.Value)
+                {
+                    playerBuffs.Add(new Dictionary<string, Variant>
+                    {
+                        { "buffId", buff.BuffId },
+                        { "type", (int)buff.Type },
+                        { "statAffected", buff.StatAffected },
+                        { "value", buff.Value },
+                        { "startTime", buff.StartTime.Ticks },
+                        { "duration", buff.Duration },
+                        { "isPermanent", buff.IsPermanent }
+                    });
+                }
+                buffsData[kvp.Key] = playerBuffs;
+            }
+            data["buffs"] = buffsData;
+            
+            // 保存冷却时间
+            var cooldownsData = new Dictionary<string, Variant>();
+            foreach (var playerKvp in _cooldowns)
+            {
+                var playerCooldowns = new Dictionary<string, Variant>();
+                foreach (var cdKvp in playerKvp.Value)
+                {
+                    playerCooldowns[cdKvp.Key.ToString()] = cdKvp.Value.Ticks;
+                }
+                cooldownsData[playerKvp.Key] = playerCooldowns;
+            }
+            data["cooldowns"] = cooldownsData;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 加载玩家冥想进度
+            if (data.TryGetValue("progress", out var progressData))
+            {
+                var progressDict = (Dictionary<string, Variant>)progressData;
+                foreach (var kvp in progressDict)
+                {
+                    var playerId = kvp.Key;
+                    var pData = (Dictionary<string, Variant>)kvp.Value;
+                    
+                    var progress = new MeditationProgress { PlayerId = playerId };
+                    
+                    if (pData.TryGetValue("currentFocus", out var currentFocus))
+                        progress.CurrentFocus = (int)currentFocus;
+                    if (pData.TryGetValue("maxFocus", out var maxFocus))
+                        progress.MaxFocus = (int)maxFocus;
+                    if (pData.TryGetValue("totalSessions", out var totalSessions))
+                        progress.TotalSessions = (int)totalSessions;
+                    if (pData.TryGetValue("totalMeditationTime", out var totalTime))
+                        progress.TotalMeditationTime = (int)totalTime;
+                    if (pData.TryGetValue("dailySessions", out var dailySessions))
+                        progress.DailySessions = (int)dailySessions;
+                    if (pData.TryGetValue("dailyResetTime", out var dailyReset))
+                        progress.DailyResetTime = new DateTime((long)dailyReset);
+                    if (pData.TryGetValue("lastMeditationTime", out var lastMed))
+                        progress.LastMeditationTime = new DateTime((long)lastMed);
+                    if (pData.TryGetValue("unlockedAbilities", out var abilities))
+                        progress.UnlockedAbilities = new List<string>((IEnumerable<string>)abilities);
+                    
+                    if (pData.TryGetValue("sessionsByType", out var sessionsByType))
+                    {
+                        var sbt = (Dictionary<string, Variant>)sessionsByType;
+                        foreach (var st in sbt)
+                        {
+                            if (Enum.TryParse<MeditationType>(st.Key, out var meditationType))
+                                progress.SessionsByType[meditationType] = (int)st.Value;
+                        }
+                    }
+                    
+                    _playerProgress[playerId] = progress;
+                }
+            }
+            
+            // 加载活跃buff
+            if (data.TryGetValue("buffs", out var buffsData))
+            {
+                var buffsDict = (Dictionary<string, Variant>)buffsData;
+                foreach (var kvp in buffsDict)
+                {
+                    var playerId = kvp.Key;
+                    var playerBuffs = new List<MeditationBuff>();
+                    
+                    var buffsList = (List<Variant>)kvp.Value;
+                    foreach (var buffVar in buffsList)
+                    {
+                        var buffDict = (Dictionary<string, Variant>)buffVar;
+                        var buff = new MeditationBuff
+                        {
+                            BuffId = (string)buffDict["buffId"],
+                            Type = (MeditationType)(int)buffDict["type"],
+                            StatAffected = (string)buffDict["statAffected"],
+                            Value = (float)buffDict["value"],
+                            StartTime = new DateTime((long)buffDict["startTime"]),
+                            Duration = (int)buffDict["duration"],
+                            IsPermanent = (bool)buffDict["isPermanent"]
+                        };
+                        playerBuffs.Add(buff);
+                    }
+                    
+                    _activeBuffs[playerId] = playerBuffs;
+                }
+            }
+            
+            // 加载冷却时间
+            if (data.TryGetValue("cooldowns", out var cooldownsData))
+            {
+                var cdDict = (Dictionary<string, Variant>)cooldownsData;
+                foreach (var playerKvp in cdDict)
+                {
+                    var playerId = playerKvp.Key;
+                    var playerCooldowns = new Dictionary<MeditationType, DateTime>();
+                    
+                    var pcDict = (Dictionary<string, Variant>)playerKvp.Value;
+                    foreach (var cd in pcDict)
+                    {
+                        if (Enum.TryParse<MeditationType>(cd.Key, out var meditationType))
+                            playerCooldowns[meditationType] = new DateTime((long)cd.Value);
+                    }
+                    
+                    _cooldowns[playerId] = playerCooldowns;
+                }
+            }
+        }
 }
