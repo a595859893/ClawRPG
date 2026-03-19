@@ -14,10 +14,6 @@ public enum WeatherType
     Hail,
     Blizzard,
     Storm
-
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
-
 }
 
 public enum WeatherIntensity
@@ -529,6 +525,86 @@ public class WeatherSystem : BaseSystem
         UpdateWeatherEffects();
     }
 
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary<string, Variant>();
+
+        if (player_data == null) return data;
+
+        // 保存已解锁的天气类型
+        data["unlocked"] = new List<string>(player_data.unlocked_weather_types);
+
+        // 保存天气遭遇次数
+        var encounters = new Dictionary<string, int>();
+        foreach (var kvp in player_data.weather_encounters)
+        {
+            encounters[kvp.Key.ToString()] = kvp.Value;
+        }
+        data["encounters"] = encounters;
+
+        // 保存各天气花费的时间
+        var timeSpent = new Dictionary<string, float>();
+        foreach (var kvp in player_data.time_spent)
+        {
+            timeSpent[kvp.Key.ToString()] = kvp.Value;
+        }
+        data["time_spent"] = timeSpent;
+
+        data["total_changes"] = player_data.total_weather_changes;
+        data["favorite_weather"] = (int)player_data.favorite_weather;
+        data["favorite_time"] = player_data.favorite_weather_time;
+
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || player_data == null) return;
+
+        if (data.ContainsKey("unlocked"))
+        {
+            player_data.unlocked_weather_types = new List<string>((List<string>)data["unlocked"]);
+        }
+
+        if (data.ContainsKey("encounters"))
+        {
+            var encounters = (Dictionary<string, object>)data["encounters"];
+            foreach (var kvp in encounters)
+            {
+                WeatherType wt;
+                if (Enum.TryParse<WeatherType>(kvp.Key, out wt))
+                {
+                    player_data.weather_encounters[wt] = Convert.ToInt32(kvp.Value);
+                }
+            }
+        }
+
+        if (data.ContainsKey("time_spent"))
+        {
+            var timeSpent = (Dictionary<string, object>)data["time_spent"];
+            foreach (var kvp in timeSpent)
+            {
+                WeatherType wt;
+                if (Enum.TryParse<WeatherType>(kvp.Key, out wt))
+                {
+                    player_data.time_spent[wt] = Convert.ToSingle(kvp.Value);
+                }
+            }
+        }
+
+        if (data.ContainsKey("total_changes"))
+        {
+            player_data.total_weather_changes = Convert.ToInt32(data["total_changes"]);
+        }
+
+        if (data.ContainsKey("favorite_weather"))
+        {
+            player_data.favorite_weather = (WeatherType)(int)data["favorite_weather"];
+        }
+
+        if (data.ContainsKey("favorite_time"))
+        {
+            player_data.favorite_weather_time = Convert.ToSingle(data["favorite_time"]);
+        }
+    }
 }
