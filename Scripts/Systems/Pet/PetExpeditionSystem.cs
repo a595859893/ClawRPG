@@ -450,8 +450,138 @@ namespace GameSystems
                 saveSystem.SavePetExpeditionData(GetSaveData());
             }
         }
-    }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
-}
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+
+            if (PlayerData == null) return data;
+
+            // 保存活跃远征
+            var activeExpeditions = new List<Dictionary<string, Variant>>();
+            foreach (var exp in PlayerData.ActiveExpeditions)
+            {
+                activeExpeditions.Add(new Dictionary<string, Variant>
+                {
+                    ["expedition_id"] = exp.ExpeditionId ?? "",
+                    ["zone_id"] = exp.ZoneId ?? "",
+                    ["pet_id"] = exp.PetId ?? "",
+                    ["start_time"] = exp.StartTime.ToString("o"),
+                    ["duration_minutes"] = exp.DurationMinutes,
+                    ["completed"] = exp.Completed
+                });
+            }
+            data["active_expeditions"] = activeExpeditions;
+
+            // 保存远征历史
+            var history = new List<Dictionary<string, Variant>>();
+            foreach (var result in PlayerData.History)
+            {
+                var resultDict = new Dictionary<string, Variant>
+                {
+                    ["zone_id"] = result.ZoneId ?? "",
+                    ["success"] = result.Success,
+                    ["gold_earned"] = result.GoldEarned,
+                    ["exp_earned"] = result.ExpEarned,
+                    ["pet_id"] = result.PetId ?? ""
+                };
+                if (result.ItemsEarned != null)
+                    resultDict["items_earned"] = new List<string>(result.ItemsEarned);
+                history.Add(resultDict);
+            }
+            data["history"] = history;
+
+            // 保存统计数据
+            data["total_expeditions"] = PlayerData.TotalExpeditions;
+            data["total_gold_earned"] = PlayerData.TotalGoldEarned;
+            data["total_exp_earned"] = PlayerData.TotalExpEarned;
+
+            // 保存区域完成次数
+            var zoneCompletions = new Dictionary<string, int>();
+            foreach (var kvp in PlayerData.ZoneCompletions)
+            {
+                zoneCompletions[kvp.Key] = kvp.Value;
+            }
+            data["zone_completions"] = zoneCompletions;
+
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null || PlayerData == null) return;
+
+            // 加载活跃远征
+            if (data.TryGetValue("active_expeditions", out var activeData))
+            {
+                PlayerData.ActiveExpeditions = new List<ActiveExpedition>();
+                var activeList = (List<Variant>)activeData;
+                foreach (var expVar in activeList)
+                {
+                    var expDict = (Dictionary<string, Variant>)expVar;
+                    var exp = new ActiveExpedition();
+
+                    if (expDict.TryGetValue("expedition_id", out var expId))
+                        exp.ExpeditionId = (string)expId;
+                    if (expDict.TryGetValue("zone_id", out var zoneId))
+                        exp.ZoneId = (string)zoneId;
+                    if (expDict.TryGetValue("pet_id", out var petId))
+                        exp.PetId = (string)petId;
+                    if (expDict.TryGetValue("start_time", out var startTime) && DateTime.TryParse((string)startTime, out var parsed))
+                        exp.StartTime = parsed;
+                    if (expDict.TryGetValue("duration_minutes", out var duration))
+                        exp.DurationMinutes = (int)duration;
+                    if (expDict.TryGetValue("completed", out var completed))
+                        exp.Completed = (bool)completed;
+
+                    PlayerData.ActiveExpeditions.Add(exp);
+                }
+            }
+
+            // 加载远征历史
+            if (data.TryGetValue("history", out var historyData))
+            {
+                PlayerData.History = new List<ExpeditionResult>();
+                var historyList = (List<Variant>)historyData;
+                foreach (var resultVar in historyList)
+                {
+                    var resultDict = (Dictionary<string, Variant>)resultVar;
+                    var result = new ExpeditionResult();
+
+                    if (resultDict.TryGetValue("zone_id", out var zoneId))
+                        result.ZoneId = (string)zoneId;
+                    if (resultDict.TryGetValue("success", out var success))
+                        result.Success = (bool)success;
+                    if (resultDict.TryGetValue("gold_earned", out var gold))
+                        result.GoldEarned = (int)gold;
+                    if (resultDict.TryGetValue("exp_earned", out var exp))
+                        result.ExpEarned = (int)exp;
+                    if (resultDict.TryGetValue("pet_id", out var petId))
+                        result.PetId = (string)petId;
+                    if (resultDict.TryGetValue("items_earned", out var items))
+                        result.ItemsEarned = new List<string>((List<string>)items);
+
+                    PlayerData.History.Add(result);
+                }
+            }
+
+            // 加载统计数据
+            if (data.TryGetValue("total_expeditions", out var totalExp))
+                PlayerData.TotalExpeditions = (int)totalExp;
+            if (data.TryGetValue("total_gold_earned", out var totalGold))
+                PlayerData.TotalGoldEarned = (int)totalGold;
+            if (data.TryGetValue("total_exp_earned", out var totalExpEarned))
+                PlayerData.TotalExpEarned = (int)totalExpEarned;
+
+            // 加载区域完成次数
+            if (data.TryGetValue("zone_completions", out var zoneData))
+            {
+                PlayerData.ZoneCompletions = new Dictionary<string, int>();
+                var zoneDict = (Dictionary<string, Variant>)zoneData;
+                foreach (var kvp in zoneDict)
+                {
+                    PlayerData.ZoneCompletions[kvp.Key] = (int)kvp.Value;
+                }
+            }
+        }
+    }
