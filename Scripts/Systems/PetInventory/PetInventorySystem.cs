@@ -260,6 +260,183 @@ public class PetInventorySystem : BaseSystem {
         return _database.CategoryItems;
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary<string, Variant>();
+
+        if (_data == null) return data;
+
+        // 保存宠物背包数据
+        var inventoriesData = new Dictionary<string, List<Dictionary<string, Variant>>>();
+        if (_data.PetInventories != null)
+        {
+            foreach (var kvp in _data.PetInventories)
+            {
+                var itemsList = new List<Dictionary<string, Variant>>();
+                foreach (var item in kvp.Value)
+                {
+                    itemsList.Add(SerializePetInventoryItem(item));
+                }
+                inventoriesData[kvp.Key] = itemsList;
+            }
+        }
+        data["petInventories"] = inventoriesData;
+
+        data["totalSlots"] = _data.TotalSlots;
+
+        // 保存金币数据
+        var goldData = new Dictionary<string, int>();
+        if (_data.GoldByPet != null)
+        {
+            foreach (var kvp in _data.GoldByPet)
+            {
+                goldData[kvp.Key] = kvp.Value;
+            }
+        }
+        data["goldByPet"] = goldData;
+
+        // 保存已解锁分类
+        if (_data.UnlockedCategories != null)
+        {
+            data["unlockedCategories"] = new List<string>(_data.UnlockedCategories);
+        }
+
+        // 保存物品使用统计
+        var usageData = new Dictionary<string, int>();
+        if (_data.ItemUsageCount != null)
+        {
+            foreach (var kvp in _data.ItemUsageCount)
+            {
+                usageData[kvp.Key] = kvp.Value;
+            }
+        }
+        data["itemUsageCount"] = usageData;
+
+        data["totalItemsCollected"] = _data.TotalItemsCollected;
+        data["totalItemsUsed"] = _data.TotalItemsUsed;
+        data["totalGoldSpent"] = _data.TotalGoldSpent;
+
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || _data == null) return;
+
+        // 加载宠物背包数据
+        if (data.TryGetValue("petInventories", out var inventoriesData))
+        {
+            _data.PetInventories = new Dictionary<string, List<PetInventoryItem>>();
+            var invDict = (Dictionary<string, Variant>)inventoriesData;
+            foreach (var kvp in invDict)
+            {
+                var itemsList = new List<PetInventoryItem>();
+                var itemsVarList = (List<Variant>)kvp.Value;
+                foreach (var itemVar in itemsVarList)
+                {
+                    itemsList.Add(DeserializePetInventoryItem((Dictionary<string, Variant>)itemVar));
+                }
+                _data.PetInventories[kvp.Key] = itemsList;
+            }
+        }
+
+        if (data.TryGetValue("totalSlots", out var totalSlots))
+            _data.TotalSlots = (int)totalSlots;
+
+        if (data.TryGetValue("goldByPet", out var goldData))
+        {
+            _data.GoldByPet = new Dictionary<string, int>();
+            var goldDict = (Dictionary<string, Variant>)goldData;
+            foreach (var kvp in goldDict)
+            {
+                _data.GoldByPet[kvp.Key] = (int)kvp.Value;
+            }
+        }
+
+        if (data.TryGetValue("unlockedCategories", out var categoriesData))
+            _data.UnlockedCategories = new List<string>((List<string>)categoriesData);
+
+        if (data.TryGetValue("itemUsageCount", out var usageData))
+        {
+            _data.ItemUsageCount = new Dictionary<string, int>();
+            var usageDict = (Dictionary<string, Variant>)usageData;
+            foreach (var kvp in usageDict)
+            {
+                _data.ItemUsageCount[kvp.Key] = (int)kvp.Value;
+            }
+        }
+
+        if (data.TryGetValue("totalItemsCollected", out var totalCollected))
+            _data.TotalItemsCollected = (int)totalCollected;
+        if (data.TryGetValue("totalItemsUsed", out var totalUsed))
+            _data.TotalItemsUsed = (int)totalUsed;
+        if (data.TryGetValue("totalGoldSpent", out var totalGoldSpent))
+            _data.TotalGoldSpent = (int)totalGoldSpent;
+    }
+
+    private Dictionary<string, Variant> SerializePetInventoryItem(PetInventoryItem item)
+    {
+        var itemData = new Dictionary<string, Variant>();
+        itemData["itemId"] = item.ItemId ?? "";
+        itemData["itemName"] = item.ItemName ?? "";
+        itemData["description"] = item.Description ?? "";
+        itemData["quantity"] = item.Quantity;
+        itemData["rarity"] = item.Rarity ?? "";
+        itemData["category"] = item.Category ?? "";
+        itemData["value"] = item.Value;
+        itemData["specialEffect"] = item.SpecialEffect ?? "";
+
+        var statsData = new Dictionary<string, float>();
+        if (item.Stats != null)
+        {
+            foreach (var statKvp in item.Stats)
+            {
+                statsData[statKvp.Key] = statKvp.Value;
+            }
+        }
+        itemData["stats"] = statsData;
+
+        itemData["acquiredAt"] = item.AcquiredAt.ToString("o");
+        return itemData;
+    }
+
+    private PetInventoryItem DeserializePetInventoryItem(Dictionary<string, Variant> itemData)
+    {
+        var item = new PetInventoryItem();
+
+        if (itemData.TryGetValue("itemId", out var itemId))
+            item.ItemId = (string)itemId;
+        if (itemData.TryGetValue("itemName", out var itemName))
+            item.ItemName = (string)itemName;
+        if (itemData.TryGetValue("description", out var desc))
+            item.Description = (string)desc;
+        if (itemData.TryGetValue("quantity", out var qty))
+            item.Quantity = (int)qty;
+        if (itemData.TryGetValue("rarity", out var rarity))
+            item.Rarity = (string)rarity;
+        if (itemData.TryGetValue("category", out var cat))
+            item.Category = (string)cat;
+        if (itemData.TryGetValue("value", out var val))
+            item.Value = (int)val;
+        if (itemData.TryGetValue("specialEffect", out var effect))
+            item.SpecialEffect = (string)effect;
+
+        if (itemData.TryGetValue("stats", out var statsData))
+        {
+            item.Stats = new Dictionary<string, float>();
+            var statsDict = (Dictionary<string, Variant>)statsData;
+            foreach (var statKvp in statsDict)
+            {
+                item.Stats[statKvp.Key] = (float)statKvp.Value;
+            }
+        }
+
+        if (itemData.TryGetValue("acquiredAt", out var acquiredAtStr))
+        {
+            if (DateTime.TryParse((string)acquiredAtStr, out var parsedDate))
+                item.AcquiredAt = parsedDate;
+        }
+
+        return item;
+    }
 }
