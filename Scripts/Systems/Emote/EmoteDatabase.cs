@@ -1,17 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using ClawRPG.Scripts.Database;
 
 namespace ClawRPG.Systems.Emote
 {
-    public class EmoteDatabase : IDatabase
+    public class EmoteDatabase : DatabaseBase
     {
         private static EmoteDatabase _instance;
         public static EmoteDatabase Instance => _instance ??= new EmoteDatabase();
 
         private Dictionary<string, Emote> _emotes;
-
-        public object Instance => Instance;
 
         public void Initialize()
         {
@@ -94,6 +94,16 @@ namespace ClawRPG.Systems.Emote
         public List<Emote> GetShopEmotes()
         {
             return _emotes.Values.Where(e => !e.IsDefault).ToList();
+        }
+
+        protected override void OnExportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            // EmoteDatabase is static definition data — no per-player state to persist
+        }
+
+        protected override void OnImportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            // EmoteDatabase is static definition data — no per-player state to restore
         }
     }
 }
