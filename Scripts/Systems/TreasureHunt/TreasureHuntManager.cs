@@ -430,7 +430,87 @@ public class TreasureHuntManager : BaseSystem
         }
     }
 
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary<string, Variant>();
 
+        // 保存玩家寻宝数据
+        var allPlayerData = new Dictionary<string, Dictionary<string, Variant>>();
+        foreach (var kvp in playerHuntData)
+        {
+            var playerData = new Dictionary<string, Variant>
+            {
+                ["total_hunts"] = kvp.Value.totalHunts,
+                ["successful_hunts"] = kvp.Value.successfulHunts,
+                ["total_gold_earned"] = kvp.Value.totalGoldEarned,
+                ["total_exp_earned"] = kvp.Value.totalExpEarned,
+                ["current_energy"] = kvp.Value.currentEnergy,
+                ["max_energy"] = kvp.Value.maxEnergy,
+                ["last_energy_refresh"] = kvp.Value.lastEnergyRefresh.ToString("o"),
+                ["discovered_treasures"] = new List<string>(kvp.Value.discoveredTreasures)
+            };
+
+            // 保存区域狩猎次数
+            var regionCounts = new Dictionary<string, int>();
+            foreach (var regionKvp in kvp.Value.regionHuntCount)
+            {
+                regionCounts[regionKvp.Key] = regionKvp.Value;
+            }
+            playerData["region_hunt_count"] = regionCounts;
+
+            allPlayerData[kvp.Key.ToString()] = playerData;
+        }
+        data["player_hunt_data"] = allPlayerData;
+
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        // 加载玩家寻宝数据
+        if (data.TryGetValue("player_hunt_data", out var playerDataDict))
+        {
+            playerHuntData = new Dictionary<int, PlayerHuntData>();
+            var allData = (Dictionary<string, Variant>)playerDataDict;
+            foreach (var kvp in allData)
+            {
+                if (int.TryParse(kvp.Key, out var playerId))
+                {
+                    var pData = (Dictionary<string, Variant>)kvp.Value;
+                    var playerData = new PlayerHuntData();
+
+                    if (pData.TryGetValue("total_hunts", out var totalHunts))
+                        playerData.totalHunts = (int)totalHunts;
+                    if (pData.TryGetValue("successful_hunts", out var successfulHunts))
+                        playerData.successfulHunts = (int)successfulHunts;
+                    if (pData.TryGetValue("total_gold_earned", out var totalGold))
+                        playerData.totalGoldEarned = (int)totalGold;
+                    if (pData.TryGetValue("total_exp_earned", out var totalExp))
+                        playerData.totalExpEarned = (int)totalExp;
+                    if (pData.TryGetValue("current_energy", out var currentEnergy))
+                        playerData.currentEnergy = (int)currentEnergy;
+                    if (pData.TryGetValue("max_energy", out var maxEnergy))
+                        playerData.maxEnergy = (int)maxEnergy;
+                    if (pData.TryGetValue("last_energy_refresh", out var lastRefresh) && DateTime.TryParse((string)lastRefresh, out var parsed))
+                        playerData.lastEnergyRefresh = parsed;
+                    if (pData.TryGetValue("discovered_treasures", out var discovered))
+                        playerData.discoveredTreasures = new List<string>((List<string>)discovered);
+
+                    if (pData.TryGetValue("region_hunt_count", out var regionData))
+                    {
+                        playerData.regionHuntCount = new Dictionary<string, int>();
+                        var regionDict = (Dictionary<string, Variant>)regionData;
+                        foreach (var regionKvp in regionDict)
+                        {
+                            playerData.regionHuntCount[regionKvp.Key] = (int)regionKvp.Value;
+                        }
+                    }
+
+                    playerHuntData[playerId] = playerData;
+                }
+            }
+        }
+    }
 }
