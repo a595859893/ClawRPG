@@ -177,5 +177,12 @@ namespace ClawRPG.Scripts.Database
         }
         
         #endregion
+
+        #region BaseSystem Persistence
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
+
+        #endregion
     }
 }

@@ -105,6 +105,13 @@ namespace ClawRPG.Scripts.Database
                 enemies.Clear();
             }
         }
+
+        #region BaseSystem Persistence
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
+
+        #endregion
         
         /// <summary>
         /// 生成区域定义

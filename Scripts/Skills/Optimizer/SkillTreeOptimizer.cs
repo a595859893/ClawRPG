@@ -343,5 +343,12 @@ namespace ClawRPG.Scripts.Skills.Optimizer {
                 _progress.PresetUsageCount = new Dictionary<string, int>();
             }
         }
+
+        #region BaseSystem Persistence
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
+
+        #endregion
     }
 }

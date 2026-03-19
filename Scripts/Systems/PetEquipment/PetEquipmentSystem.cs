@@ -338,9 +338,6 @@ public partial class PetEquipmentSystem : BaseSystem
         // Load equipped slots
     }
 
-    public Dictionary ExportSaveData() => new();
-    public void ImportSaveData(Dictionary data) { }
-
-    public Dictionary ExportSaveData() => new();
-    public void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
 }

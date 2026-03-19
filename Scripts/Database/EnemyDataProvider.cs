@@ -806,5 +806,12 @@ namespace ClawRPG.Scripts.Database
             }
             return result;
         }
+
+        #region BaseSystem Persistence
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
+
+        #endregion
     }
 }

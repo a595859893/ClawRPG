@@ -734,5 +734,12 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             InitializeChoices();
             base.Reset();
         }
+
+        #region BaseSystem Persistence
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
+
+        #endregion
     }
 }

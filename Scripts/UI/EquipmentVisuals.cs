@@ -339,6 +339,13 @@ namespace ClawRPG.Scripts.UI {
                 }
             }
         }
+
+        #region BaseSystem Persistence
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
+
+        #endregion
     }
 
     /// <summary>
