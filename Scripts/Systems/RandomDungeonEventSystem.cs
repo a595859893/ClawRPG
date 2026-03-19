@@ -47,17 +47,86 @@ public partial class RandomDungeonEventData : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary();
+        return new Dictionary<string, object>
+        {
+            { "event_history", EventHistory },
+            { "event_triggers_today", EventTriggersToday },
+            { "active_event_effects", ActiveEventEffects },
+            { "applied_buffs", AppliedBuffs },
+            { "applied_debuffs", AppliedDebuffs },
+            { "player_floor", PlayerFloor },
+            { "total_events_triggered", TotalEventsTriggered },
+            { "positive_events", PositiveEvents },
+            { "negative_events", NegativeEvents },
+            { "neutral_events", NeutralEvents },
+            { "gold_gained_from_events", GoldGainedFromEvents },
+            { "gold_lost_from_events", GoldLostFromEvents },
+            { "exp_gained_from_events", ExpGainedFromEvents },
+            { "items_gained", ItemsGained },
+            { "items_lost", ItemsLost },
+            { "last_event_date", LastEventDate }
+        };
     }
 
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
-        // No persistent data needed
+        if (data == null) return;
+
+        if (data.ContainsKey("event_history") && data["event_history"] is Dictionary eventHistoryDict)
+            EventHistory = new Dictionary<string, int>(eventHistoryDict.Count > 0 ?
+                eventHistoryDict.ToDictionary(kv => kv.Key.ToString(), kv => Convert.ToInt32(kv.Value)) : new Dictionary<string, int>());
+
+        if (data.ContainsKey("event_triggers_today") && data["event_triggers_today"] is Dictionary triggersDict)
+            EventTriggersToday = new Dictionary<string, int>(triggersDict.Count > 0 ?
+                triggersDict.ToDictionary(kv => kv.Key.ToString(), kv => Convert.ToInt32(kv.Value)) : new Dictionary<string, int>());
+
+        if (data.ContainsKey("active_event_effects") && data["active_event_effects"] is Dictionary effectsDict)
+            ActiveEventEffects = new Dictionary<string, bool>(effectsDict.Count > 0 ?
+                effectsDict.ToDictionary(kv => kv.Key.ToString(), kv => Convert.ToBoolean(kv.Value)) : new Dictionary<string, bool>());
+
+        if (data.ContainsKey("applied_buffs") && data["applied_buffs"] is List buffsList)
+            AppliedBuffs = buffsList.ConvertAll(o => o.ToString());
+
+        if (data.ContainsKey("applied_debuffs") && data["applied_debuffs"] is List debuffsList)
+            AppliedDebuffs = debuffsList.ConvertAll(o => o.ToString());
+
+        if (data.ContainsKey("player_floor"))
+            PlayerFloor = Convert.ToInt32(data["player_floor"]);
+
+        if (data.ContainsKey("total_events_triggered"))
+            TotalEventsTriggered = Convert.ToInt32(data["total_events_triggered"]);
+
+        if (data.ContainsKey("positive_events"))
+            PositiveEvents = Convert.ToInt32(data["positive_events"]);
+
+        if (data.ContainsKey("negative_events"))
+            NegativeEvents = Convert.ToInt32(data["negative_events"]);
+
+        if (data.ContainsKey("neutral_events"))
+            NeutralEvents = Convert.ToInt32(data["neutral_events"]);
+
+        if (data.ContainsKey("gold_gained_from_events"))
+            GoldGainedFromEvents = Convert.ToInt32(data["gold_gained_from_events"]);
+
+        if (data.ContainsKey("gold_lost_from_events"))
+            GoldLostFromEvents = Convert.ToInt32(data["gold_lost_from_events"]);
+
+        if (data.ContainsKey("exp_gained_from_events"))
+            ExpGainedFromEvents = Convert.ToInt32(data["exp_gained_from_events"]);
+
+        if (data.ContainsKey("items_gained"))
+            ItemsGained = Convert.ToInt32(data["items_gained"]);
+
+        if (data.ContainsKey("items_lost"))
+            ItemsLost = Convert.ToInt32(data["items_lost"]);
+
+        if (data.ContainsKey("last_event_date") && data["last_event_date"] != null)
+            LastEventDate = data["last_event_date"].ToString();
     }
 }
 
@@ -73,22 +142,6 @@ public enum DungeonEventCategory
     Exploration,
     Trap,
     Reward
-
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
-
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
-    }
 }
 
 public enum DungeonEventRarity
@@ -98,22 +151,6 @@ public enum DungeonEventRarity
     Rare,
     Epic,
     Legendary
-
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
-
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
-    }
 }
 
 public enum DungeonEventOutcome
@@ -122,22 +159,6 @@ public enum DungeonEventOutcome
     Failure,
     Mixed,
     Nothing
-
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
-
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
-    }
 }
 
 [GlobalClass]
@@ -343,16 +364,17 @@ public partial class RandomDungeonEventSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary();
+        return SaveData();
     }
 
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
-        // No persistent data needed
+        if (data == null) return;
+        LoadData(data);
     }
 }

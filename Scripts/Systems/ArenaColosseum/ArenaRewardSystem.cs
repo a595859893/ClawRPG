@@ -236,13 +236,13 @@ namespace ClawRPG.Scripts.Systems
 
         #region 存档支持
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             // 奖励系统不需要持久化运行时状态
-            return new Dictionary();
+            return new Dictionary<string, object>();
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             // 奖励系统不需要持久化运行时状态
         }

@@ -250,18 +250,18 @@ public class StyleMasterySystem : BaseSystem
     }
 
     /// <summary>
-    /// Export save data for persistence
+    /// Export save data for persistence - delegates to StyleMasteryData
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary();
+        return new Dictionary<string, object>();
     }
 
     /// <summary>
-    /// Import save data from persistence
+    /// Import save data from persistence - delegates to StyleMasteryData
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
-        // No persistent data needed
+        // Delegates to StyleMasteryData which manages its own persistence
     }
 }

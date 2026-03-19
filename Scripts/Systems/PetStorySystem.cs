@@ -243,16 +243,17 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary();
+        return Serialize();
     }
 
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
-        // No persistent data needed
+        if (data == null) return;
+        Deserialize(data);
     }
 }
