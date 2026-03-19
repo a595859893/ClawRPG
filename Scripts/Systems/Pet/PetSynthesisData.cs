@@ -155,7 +155,117 @@ public enum SynthesisType
     ShadowFusion,
     CelestialFusion,
     ChaosFusion
+}
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+
+            // 保存合成历史
+            var historyList = new List<Dictionary<string, Variant>>();
+            foreach (var kvp in SynthesisHistory)
+            {
+                foreach (var record in kvp.Value)
+                {
+                    historyList.Add(new Dictionary<string, Variant>
+                    {
+                        ["pet1_id"] = record.Pet1Id,
+                        ["pet2_id"] = record.Pet2Id,
+                        ["result_pet_id"] = record.ResultPetId,
+                        ["result_pet_type"] = record.ResultPetType ?? "",
+                        ["result_rarity"] = record.ResultRarity ?? "",
+                        ["was_successful"] = record.WasSuccessful,
+                        ["gold_cost"] = record.GoldCost,
+                        ["timestamp"] = record.Timestamp
+                    });
+                }
+            }
+            data["synthesis_history"] = historyList;
+
+            // 保存已解锁配方
+            data["unlocked_recipes"] = new List<string>(UnlockedRecipes);
+
+            // 保存统计
+            data["total_syntheses"] = TotalSyntheses;
+            data["successful_syntheses"] = SuccessfulSyntheses;
+            data["legendary_syntheses"] = LegendarySyntheses;
+            data["total_gold_spent"] = TotalGoldSpent;
+
+            // 保存当前合成状态
+            data["is_synthesizing"] = IsSynthesizing;
+            data["synthesis_pet1_id"] = SynthesisPet1Id;
+            data["synthesis_pet2_id"] = SynthesisPet2Id;
+            data["synthesis_progress"] = SynthesisProgress;
+
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            // 加载合成历史
+            if (data.TryGetValue("synthesis_history", out var historyData))
+            {
+                var historyList = (List<Variant>)historyData;
+                foreach (var recordVar in historyList)
+                {
+                    var recordDict = (Dictionary<string, Variant>)recordVar;
+                    var record = new PetSynthesisRecord();
+
+                    if (recordDict.TryGetValue("pet1_id", out var pet1Id))
+                        record.Pet1Id = (int)pet1Id;
+                    if (recordDict.TryGetValue("pet2_id", out var pet2Id))
+                        record.Pet2Id = (int)pet2Id;
+                    if (recordDict.TryGetValue("result_pet_id", out var resultPetId))
+                        record.ResultPetId = (int)resultPetId;
+                    if (recordDict.TryGetValue("result_pet_type", out var resultPetType))
+                        record.ResultPetType = (string)resultPetType;
+                    if (recordDict.TryGetValue("result_rarity", out var resultRarity))
+                        record.ResultRarity = (string)resultRarity;
+                    if (recordDict.TryGetValue("was_successful", out var wasSuccessful))
+                        record.WasSuccessful = (bool)wasSuccessful;
+                    if (recordDict.TryGetValue("gold_cost", out var goldCost))
+                        record.GoldCost = (int)goldCost;
+                    if (recordDict.TryGetValue("timestamp", out var timestamp))
+                        record.Timestamp = (long)timestamp;
+
+                    if (!SynthesisHistory.ContainsKey(record.Pet1Id))
+                    {
+                        SynthesisHistory[record.Pet1Id] = new List<PetSynthesisRecord>();
+                    }
+                    SynthesisHistory[record.Pet1Id].Add(record);
+                }
+            }
+
+            // 加载已解锁配方
+            if (data.TryGetValue("unlocked_recipes", out var recipesData))
+            {
+                var recipeList = (List<string>)recipesData;
+                foreach (var recipe in recipeList)
+                {
+                    UnlockedRecipes.Add(recipe);
+                }
+            }
+
+            // 加载统计
+            if (data.TryGetValue("total_syntheses", out var totalSynth))
+                TotalSyntheses = (int)totalSynth;
+            if (data.TryGetValue("successful_syntheses", out var successSynth))
+                SuccessfulSyntheses = (int)successSynth;
+            if (data.TryGetValue("legendary_syntheses", out var legendarySynth))
+                LegendarySyntheses = (int)legendarySynth;
+            if (data.TryGetValue("total_gold_spent", out var goldSpent))
+                TotalGoldSpent = (int)goldSpent;
+
+            // 加载当前合成状态
+            if (data.TryGetValue("is_synthesizing", out var isSynth))
+                IsSynthesizing = (bool)isSynth;
+            if (data.TryGetValue("synthesis_pet1_id", out var pet1Id))
+                SynthesisPet1Id = (int)pet1Id;
+            if (data.TryGetValue("synthesis_pet2_id", out var pet2Id))
+                SynthesisPet2Id = (int)pet2Id;
+            if (data.TryGetValue("synthesis_progress", out var progress))
+                SynthesisProgress = (float)progress;
+        }
 }
