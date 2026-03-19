@@ -16,15 +16,6 @@ public partial class PetEvolutionSystem : BaseSystem
     }
 
     protected override string SystemName => "PetEvolutionSystem";
-    private static PetEvolutionSystem _instance;
-    public static PetEvolutionSystem Instance
-    {
-        get
-        {
-            if (_instance == null) _instance = new PetEvolutionSystem();
-            return _instance;
-        }
-    }
 
     private PetEvolutionData _data;
     
