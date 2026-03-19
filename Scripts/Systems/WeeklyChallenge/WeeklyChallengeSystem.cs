@@ -277,7 +277,74 @@ public partial class WeeklyChallengeSystem : BaseSystem
     [Signal]
     public delegate void RewardsClaimedEventHandler(int gold, int exp);
 
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary<string, Variant>();
+
+        if (Data == null) return data;
+
+        data["week"] = Data.WeekNumber;
+        data["year"] = Data.Year;
+        data["total_points"] = Data.TotalPoints;
+        data["completed"] = Data.CompletedChallenges;
+        data["rewards_claimed"] = Data.RewardsClaimed;
+        data["end_time"] = Data.EndTime.ToString("o");
+
+        // 保存已完成挑战的进度
+        var completedChallenges = new List<Dictionary<string, Variant>>();
+        if (Data.Challenges != null)
+        {
+            foreach (var kvp in Data.Challenges)
+            {
+                if (kvp.Value.IsCompleted)
+                {
+                    completedChallenges.Add(new Dictionary<string, Variant>
+                    {
+                        ["id"] = kvp.Key,
+                        ["current_value"] = kvp.Value.CurrentValue,
+                        ["is_completed"] = kvp.Value.IsCompleted
+                    });
+                }
+            }
+        }
+        data["completed_challenges"] = completedChallenges;
+
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || Data == null) return;
+
+        if (data.TryGetValue("week", out var week))
+            Data.WeekNumber = (int)week;
+        if (data.TryGetValue("year", out var year))
+            Data.Year = (int)year;
+        if (data.TryGetValue("total_points", out var totalPoints))
+            Data.TotalPoints = (int)totalPoints;
+        if (data.TryGetValue("completed", out var completed))
+            Data.CompletedChallenges = (int)completed;
+        if (data.TryGetValue("rewards_claimed", out var rewardsClaimed))
+            Data.RewardsClaimed = (bool)rewardsClaimed;
+        if (data.TryGetValue("end_time", out var endTimeStr) && DateTime.TryParse((string)endTimeStr, out var parsedEndTime))
+            Data.EndTime = parsedEndTime;
+
+        // 恢复已完成挑战的进度
+        if (data.TryGetValue("completed_challenges", out var completedData))
+        {
+            var completedList = (List<Variant>)completedData;
+            foreach (var challengeData in completedList)
+            {
+                var cd = (Dictionary<string, Variant>)challengeData;
+                if (cd.TryGetValue("id", out var id) && Data.Challenges.ContainsKey((string)id))
+                {
+                    if (cd.TryGetValue("current_value", out var currentValue))
+                        Data.Challenges[(string)id].CurrentValue = (int)currentValue;
+                    if (cd.TryGetValue("is_completed", out var isCompleted))
+                        Data.Challenges[(string)id].IsCompleted = (bool)isCompleted;
+                }
+            }
+        }
+    }
 
 }
