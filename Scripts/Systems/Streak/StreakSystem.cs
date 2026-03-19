@@ -441,7 +441,123 @@ public class StreakSystem : BaseSystem
         }
     }
 
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary<string, Variant>();
 
+        if (_data == null) return data;
+
+        // 保存当前连击数
+        data["streak_login"] = _data.LoginStreak;
+        data["streak_battle"] = _data.BattleStreak;
+        data["streak_quest"] = _data.QuestStreak;
+        data["streak_dungeon"] = _data.DungeonStreak;
+        data["streak_pet"] = _data.PetInteractionStreak;
+
+        // 保存最佳连击数
+        data["best_streak_login"] = _data.BestLoginStreak;
+        data["best_streak_battle"] = _data.BestBattleStreak;
+        data["best_streak_quest"] = _data.BestQuestStreak;
+        data["best_streak_dungeon"] = _data.BestDungeonStreak;
+        data["best_streak_pet"] = _data.BestPetInteractionStreak;
+
+        // 保存总天数
+        data["total_login_days"] = _data.TotalLoginDays;
+        data["total_battle_days"] = _data.TotalBattleDays;
+        data["total_quest_days"] = _data.TotalQuestDays;
+        data["total_dungeon_days"] = _data.TotalDungeonDays;
+        data["total_pet_days"] = _data.TotalPetInteractionDays;
+
+        // 保存冻结道具
+        data["streak_freeze_tokens"] = _data.StreakFreezeTokens;
+        data["total_freeze_used"] = _data.TotalStreakFreezeUsed;
+
+        // 保存最后活动时间
+        data["last_login_time"] = _data.LastLoginTime;
+        data["last_battle_time"] = _data.LastBattleTime;
+        data["last_quest_time"] = _data.LastQuestTime;
+        data["last_dungeon_time"] = _data.LastDungeonTime;
+        data["last_pet_time"] = _data.LastPetInteractionTime;
+
+        // 保存奖励统计
+        data["total_rewards_claimed"] = _data.TotalRewardsClaimed;
+        data["total_gold_from_streaks"] = _data.TotalGoldFromStreaks;
+        data["total_exp_from_streaks"] = _data.TotalExpFromStreaks;
+
+        // 保存连击历史
+        data["streak_history"] = new List<long>(_data.StreakHistory);
+
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || _data == null) return;
+
+        // 加载当前连击数
+        if (data.TryGetValue("streak_login", out var loginStreak))
+            _data.LoginStreak = (int)loginStreak;
+        if (data.TryGetValue("streak_battle", out var battleStreak))
+            _data.BattleStreak = (int)battleStreak;
+        if (data.TryGetValue("streak_quest", out var questStreak))
+            _data.QuestStreak = (int)questStreak;
+        if (data.TryGetValue("streak_dungeon", out var dungeonStreak))
+            _data.DungeonStreak = (int)dungeonStreak;
+        if (data.TryGetValue("streak_pet", out var petStreak))
+            _data.PetInteractionStreak = (int)petStreak;
+
+        // 加载最佳连击数
+        if (data.TryGetValue("best_streak_login", out var bestLogin))
+            _data.BestLoginStreak = (int)bestLogin;
+        if (data.TryGetValue("best_streak_battle", out var bestBattle))
+            _data.BestBattleStreak = (int)bestBattle;
+        if (data.TryGetValue("best_streak_quest", out var bestQuest))
+            _data.BestQuestStreak = (int)bestQuest;
+        if (data.TryGetValue("best_streak_dungeon", out var bestDungeon))
+            _data.BestDungeonStreak = (int)bestDungeon;
+        if (data.TryGetValue("best_streak_pet", out var bestPet))
+            _data.BestPetInteractionStreak = (int)bestPet;
+
+        // 加载总天数
+        if (data.TryGetValue("total_login_days", out var totalLogin))
+            _data.TotalLoginDays = (int)totalLogin;
+        if (data.TryGetValue("total_battle_days", out var totalBattle))
+            _data.TotalBattleDays = (int)totalBattle;
+        if (data.TryGetValue("total_quest_days", out var totalQuest))
+            _data.TotalQuestDays = (int)totalQuest;
+        if (data.TryGetValue("total_dungeon_days", out var totalDungeon))
+            _data.TotalDungeonDays = (int)totalDungeon;
+        if (data.TryGetValue("total_pet_days", out var totalPet))
+            _data.TotalPetInteractionDays = (int)totalPet;
+
+        // 加载冻结道具
+        if (data.TryGetValue("streak_freeze_tokens", out var freezeTokens))
+            _data.StreakFreezeTokens = (int)freezeTokens;
+        if (data.TryGetValue("total_freeze_used", out var freezeUsed))
+            _data.TotalStreakFreezeUsed = (int)freezeUsed;
+
+        // 加载最后活动时间
+        if (data.TryGetValue("last_login_time", out var lastLogin))
+            _data.LastLoginTime = (long)lastLogin;
+        if (data.TryGetValue("last_battle_time", out var lastBattle))
+            _data.LastBattleTime = (long)lastBattle;
+        if (data.TryGetValue("last_quest_time", out var lastQuest))
+            _data.LastQuestTime = (long)lastQuest;
+        if (data.TryGetValue("last_dungeon_time", out var lastDungeon))
+            _data.LastDungeonTime = (long)lastDungeon;
+        if (data.TryGetValue("last_pet_time", out var lastPet))
+            _data.LastPetInteractionTime = (long)lastPet;
+
+        // 加载奖励统计
+        if (data.TryGetValue("total_rewards_claimed", out var rewardsClaimed))
+            _data.TotalRewardsClaimed = (int)rewardsClaimed;
+        if (data.TryGetValue("total_gold_from_streaks", out var totalGold))
+            _data.TotalGoldFromStreaks = (int)totalGold;
+        if (data.TryGetValue("total_exp_from_streaks", out var totalExp))
+            _data.TotalExpFromStreaks = (int)totalExp;
+
+        // 加载连击历史
+        if (data.TryGetValue("streak_history", out var historyData))
+            _data.StreakHistory = new List<long>((List<long>)historyData);
+    }
 }
