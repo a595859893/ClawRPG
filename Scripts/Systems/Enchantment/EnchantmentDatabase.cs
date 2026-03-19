@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 using ClawRPG.Scripts.Database;
 
 namespace ClawRPG.Scripts.Systems.Enchantment
