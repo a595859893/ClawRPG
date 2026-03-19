@@ -17,10 +17,6 @@ public class SummonData
 	public int Cooldown { get; set; }
 	public string IconPath { get; set; }
 	public List<string> Abilities { get; set; }
-
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
-
 }
 
 public enum SummonType
@@ -588,7 +584,64 @@ public class SummonSystem : BaseSystem
 		
 		return stats;
 	}
-	
-	public override Dictionary ExportSaveData() => new();
-	public override void ImportSaveData(Dictionary data) { }
+
+	public override Dictionary ExportSaveData()
+	{
+		var data = new Dictionary<string, Variant>();
+
+		// 保存玩家召唤数据
+		var summonsData = new Dictionary<string, Dictionary<string, Variant>>();
+		foreach (var kvp in playerSummons)
+		{
+			summonsData[kvp.Key.ToString()] = new Dictionary<string, Variant>
+			{
+				["summon_id"] = kvp.Value.SummonId,
+				["level"] = kvp.Value.Level,
+				["experience"] = kvp.Value.Experience,
+				["is_unlocked"] = kvp.Value.IsUnlocked,
+				["times_summoned"] = kvp.Value.TimesSummoned
+			};
+		}
+		data["player_summons"] = summonsData;
+
+		data["active_summon_id"] = activeSummonId;
+
+		return data;
+	}
+
+	public override void ImportSaveData(Dictionary data)
+	{
+		if (data == null) return;
+
+		// 加载玩家召唤数据
+		if (data.TryGetValue("player_summons", out var summonsData))
+		{
+			playerSummons = new Dictionary<int, PlayerSummonData>();
+			var summonsDict = (Dictionary<string, Variant>)summonsData;
+			foreach (var kvp in summonsDict)
+			{
+				if (int.TryParse(kvp.Key, out var summonId))
+				{
+					var summonData = (Dictionary<string, Variant>)kvp.Value;
+					var playerData = new PlayerSummonData();
+
+					if (summonData.TryGetValue("summon_id", out var id))
+						playerData.SummonId = (int)id;
+					if (summonData.TryGetValue("level", out var level))
+						playerData.Level = (int)level;
+					if (summonData.TryGetValue("experience", out var exp))
+						playerData.Experience = (int)exp;
+					if (summonData.TryGetValue("is_unlocked", out var isUnlocked))
+						playerData.IsUnlocked = (bool)isUnlocked;
+					if (summonData.TryGetValue("times_summoned", out var timesSummoned))
+						playerData.TimesSummoned = (int)timesSummoned;
+
+					playerSummons[summonId] = playerData;
+				}
+			}
+		}
+
+		if (data.TryGetValue("active_summon_id", out var activeId))
+			activeSummonId = (int)activeId;
+	}
 }
