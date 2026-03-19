@@ -8,12 +8,12 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Skill Database V2 - Modular skill system using SkillData and SkillEffect
     /// </summary>
-    public class SkillDatabaseV2 : IDatabase
+    public class SkillDatabaseV2 : DatabaseBase
     {
         private static SkillDatabaseV2 _instance;
-        public static SkillDatabaseV2 StaticInstance => _instance ??= new SkillDatabaseV2();
+        public static new SkillDatabaseV2 StaticInstance => _instance ??= new SkillDatabaseV2();
 
-        public object Instance => StaticInstance;
+        public override object Instance => StaticInstance;
 
         private Dictionary<int, SkillData> _skills = new();
 
@@ -584,6 +584,16 @@ namespace ClawRPG.Scripts.Systems {
                     return false;
             }
             return true;
+        }
+
+        protected override void OnExportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            // SkillDatabaseV2 是静态配置数据库，玩家技能学习状态存储在 PlayerSkillTreeData 中
+        }
+
+        protected override void OnImportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            // SkillDatabaseV2 是静态配置数据库，玩家技能学习状态从 PlayerSkillTreeData 恢复
         }
     }
 }
