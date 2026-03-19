@@ -293,8 +293,134 @@ namespace ClawRPG.Scripts.Systems {
             
             GD.Print("[PetRecycleSystem] Data loaded");
         }
-    }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
-}
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+
+            if (_data == null) return data;
+
+            // 保存已解锁的宠物类型
+            data["unlocked_pet_types"] = new List<string>(_data.UnlockedPetTypes);
+
+            // 保存回收历史
+            var historyList = new List<Dictionary<string, Variant>>();
+            foreach (var record in _data.RecycleHistory)
+            {
+                var recordDict = new Dictionary<string, Variant>
+                {
+                    ["pet_type"] = record.PetType ?? "",
+                    ["pet_name"] = record.PetName ?? "",
+                    ["rarity"] = record.Rarity ?? "",
+                    ["level"] = record.Level,
+                    ["experience_gained"] = record.ExperienceGained,
+                    ["timestamp"] = record.Timestamp
+                };
+
+                // 保存材料奖励
+                var materialsList = new List<Dictionary<string, Variant>>();
+                foreach (var mat in record.Materials)
+                {
+                    materialsList.Add(new Dictionary<string, Variant>
+                    {
+                        ["material_id"] = mat.MaterialId ?? "",
+                        ["material_name"] = mat.MaterialName ?? "",
+                        ["quantity"] = mat.Quantity,
+                        ["value"] = mat.Value
+                    });
+                }
+                recordDict["materials"] = materialsList;
+                historyList.Add(recordDict);
+            }
+            data["recycle_history"] = historyList;
+
+            // 保存统计数据
+            data["total_recycled"] = _data.TotalRecycled;
+            data["common_recycled"] = _data.CommonRecycled;
+            data["uncommon_recycled"] = _data.UncommonRecycled;
+            data["rare_recycled"] = _data.RareRecycled;
+            data["epic_recycled"] = _data.EpicRecycled;
+            data["legendary_recycled"] = _data.LegendaryRecycled;
+            data["total_materials"] = _data.TotalMaterials;
+            data["total_experience"] = _data.TotalExperience;
+
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null || _data == null) return;
+
+            // 加载已解锁的宠物类型
+            if (data.TryGetValue("unlocked_pet_types", out var typesData))
+                _data.UnlockedPetTypes = new HashSet<string>((List<string>)typesData);
+
+            // 加载回收历史
+            if (data.TryGetValue("recycle_history", out var historyData))
+            {
+                _data.RecycleHistory = new List<PetRecycleRecord>();
+                var historyList = (List<Variant>)historyData;
+                foreach (var recordVar in historyList)
+                {
+                    var recordDict = (Dictionary<string, Variant>)recordVar;
+                    var record = new PetRecycleRecord();
+
+                    if (recordDict.TryGetValue("pet_type", out var petType))
+                        record.PetType = (string)petType;
+                    if (recordDict.TryGetValue("pet_name", out var petName))
+                        record.PetName = (string)petName;
+                    if (recordDict.TryGetValue("rarity", out var rarity))
+                        record.Rarity = (string)rarity;
+                    if (recordDict.TryGetValue("level", out var level))
+                        record.Level = (int)level;
+                    if (recordDict.TryGetValue("experience_gained", out var expGained))
+                        record.ExperienceGained = (int)expGained;
+                    if (recordDict.TryGetValue("timestamp", out var timestamp))
+                        record.Timestamp = (int)timestamp;
+
+                    // 加载材料奖励
+                    if (recordDict.TryGetValue("materials", out var materialsData))
+                    {
+                        record.Materials = new List<MaterialReward>();
+                        var materialsList = (List<Variant>)materialsData;
+                        foreach (var matVar in materialsList)
+                        {
+                            var matDict = (Dictionary<string, Variant>)matVar;
+                            var mat = new MaterialReward();
+
+                            if (matDict.TryGetValue("material_id", out var matId))
+                                mat.MaterialId = (string)matId;
+                            if (matDict.TryGetValue("material_name", out var matName))
+                                mat.MaterialName = (string)matName;
+                            if (matDict.TryGetValue("quantity", out var qty))
+                                mat.Quantity = (int)qty;
+                            if (matDict.TryGetValue("value", out var val))
+                                mat.Value = (int)val;
+
+                            record.Materials.Add(mat);
+                        }
+                    }
+
+                    _data.RecycleHistory.Add(record);
+                }
+            }
+
+            // 加载统计数据
+            if (data.TryGetValue("total_recycled", out var total))
+                _data.TotalRecycled = (int)total;
+            if (data.TryGetValue("common_recycled", out var common))
+                _data.CommonRecycled = (int)common;
+            if (data.TryGetValue("uncommon_recycled", out var uncommon))
+                _data.UncommonRecycled = (int)uncommon;
+            if (data.TryGetValue("rare_recycled", out var rare))
+                _data.RareRecycled = (int)rare;
+            if (data.TryGetValue("epic_recycled", out var epic))
+                _data.EpicRecycled = (int)epic;
+            if (data.TryGetValue("legendary_recycled", out var legendary))
+                _data.LegendaryRecycled = (int)legendary;
+            if (data.TryGetValue("total_materials", out var totalMat))
+                _data.TotalMaterials = (int)totalMat;
+            if (data.TryGetValue("total_experience", out var totalExp))
+                _data.TotalExperience = (int)totalExp;
+        }
+    }
