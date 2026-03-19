@@ -113,72 +113,7 @@ public class CharacterCreationData : BaseSystem
     {
         return Strength + Agility + Intelligence + Vitality + Luck;
     }
-    
-    /// <summary>
-    /// 导出保存数据
-    /// </summary>
-    public Dictionary ExportSaveData()
-    {
-        var data = new Dictionary();
-        
-        // Character Info
-        data["character_name"] = CharacterName;
-        data["selected_class"] = SelectedClass;
-        
-        // Attributes
-        data["strength"] = Strength;
-        data["agility"] = Agility;
-        data["intelligence"] = Intelligence;
-        data["vitality"] = Vitality;
-        data["luck"] = Luck;
-        data["available_points"] = AvailablePoints;
-        data["used_points"] = UsedPoints;
-        
-        // Background Story
-        data["selected_background"] = SelectedBackground;
-        
-        // Appearance
-        data["hair_style"] = HairStyle;
-        data["skin_color"] = SkinColor;
-        data["eye_color"] = EyeColor;
-        
-        // Statistics
-        data["characters_created"] = CharactersCreated;
-        data["most_common_class"] = MostCommonClass;
-        
-        return data;
-    }
-    
-    /// <summary>
-    /// 导入保存数据
-    /// </summary>
-    public void ImportSaveData(Dictionary data)
-    {
-        if (data == null) return;
-        
-        // Character Info
-        CharacterName = (string)data.GetValueOrDefault("character_name", "Hero");
-        SelectedClass = (string)data.GetValueOrDefault("selected_class", "Warrior");
-        
-        // Attributes
-        Strength = (int)data.GetValueOrDefault("strength", 10);
-        Agility = (int)data.GetValueOrDefault("agility", 10);
-        Intelligence = (int)data.GetValueOrDefault("intelligence", 10);
-        Vitality = (int)data.GetValueOrDefault("vitality", 10);
-        Luck = (int)data.GetValueOrDefault("luck", 10);
-        AvailablePoints = (int)data.GetValueOrDefault("available_points", 20);
-        UsedPoints = (int)data.GetValueOrDefault("used_points", 0);
-        
-        // Background Story
-        SelectedBackground = (string)data.GetValueOrDefault("selected_background", "Commoner");
-        
-        // Appearance
-        HairStyle = (int)data.GetValueOrDefault("hair_style", 0);
-        SkinColor = (int)data.GetValueOrDefault("skin_color", 0);
-        EyeColor = (int)data.GetValueOrDefault("eye_color", 0);
-        
-        // Statistics
-        CharactersCreated = (int)data.GetValueOrDefault("characters_created", 0);
-        MostCommonClass = (int)data.GetValueOrDefault("most_common_class", 0);
-    }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
 }

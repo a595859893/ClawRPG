@@ -216,82 +216,8 @@ namespace ClawRPG.Scripts.Systems
             // This would be retrieved from SessionManager
             return SessionManager.Instance?.LocalPlayerId ?? -1;
         }
-        
-        public Dictionary ExportSaveData()
-        {
-            var data = new Dictionary();
-            
-            lock (_playersLock)
-            {
-                var playersData = new Dictionary();
-                foreach (var kvp in _networkPlayers)
-                {
-                    playersData[kvp.Key.ToString()] = new Dictionary
-                    {
-                        ["player_name"] = kvp.Value.PlayerName,
-                        ["x"] = kvp.Value.Position.X,
-                        ["y"] = kvp.Value.Position.Y,
-                        ["velocity_x"] = kvp.Value.Velocity.X,
-                        ["velocity_y"] = kvp.Value.Velocity.Y,
-                        ["health"] = kvp.Value.Health,
-                        ["max_health"] = kvp.Value.MaxHealth,
-                        ["current_state"] = kvp.Value.CurrentState
-                    };
-                }
-                data["players"] = playersData;
-            }
-            
-            data["ready_states"] = new Dictionary(_playerReadyStates);
-            data["is_ready"] = _isReady;
-            data["sync_interval"] = _syncInterval;
-            
-            return data;
-        }
-        
-        public void ImportSaveData(Dictionary data)
-        {
-            if (data == null) return;
-            
-            lock (_playersLock)
-            {
-                _networkPlayers.Clear();
-                
-                if (data.Contains("players"))
-                {
-                    var playersData = (Dictionary)data["players"];
-                    foreach (string key in playersData.Keys)
-                    {
-                        int playerId = int.Parse(key);
-                        var playerData = (Dictionary)playersData[key];
-                        
-                        _networkPlayers[playerId] = new NetworkPlayer
-                        {
-                            PlayerId = playerId,
-                            PlayerName = playerData.GetValueOrDefault("player_name", "")?.ToString() ?? "",
-                            Position = new Vector2(
-                                Convert.ToSingle(playerData.GetValueOrDefault("x", 0f)),
-                                Convert.ToSingle(playerData.GetValueOrDefault("y", 0f))
-                            ),
-                            Velocity = new Vector2(
-                                Convert.ToSingle(playerData.GetValueOrDefault("velocity_x", 0f)),
-                                Convert.ToSingle(playerData.GetValueOrDefault("velocity_y", 0f))
-                            ),
-                            Health = Convert.ToInt32(playerData.GetValueOrDefault("health", 100)),
-                            MaxHealth = Convert.ToInt32(playerData.GetValueOrDefault("max_health", 100)),
-                            CurrentState = playerData.GetValueOrDefault("current_state", "idle")?.ToString() ?? "idle",
-                            LastUpdate = DateTime.Now
-                        };
-                    }
-                }
-            }
-            
-            if (data.Contains("ready_states"))
-            {
-                _playerReadyStates = (Dictionary<int, bool>)data["ready_states"];
-            }
-            
-            _isReady = Convert.ToBoolean(data.GetValueOrDefault("is_ready", false));
-            _syncInterval = Convert.ToSingle(data.GetValueOrDefault("sync_interval", 0.05f));
-        }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
     }
 }

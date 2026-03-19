@@ -241,6 +241,9 @@ namespace ClawRPG.Scripts.Leaderboard {
             }
             return null;
         }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
     }
 
     /// <summary>

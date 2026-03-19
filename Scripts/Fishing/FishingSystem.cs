@@ -503,7 +503,7 @@ namespace ClawRPG.Scripts.Fishing
         
         #region 存档支持
         
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, object>
             {
@@ -539,7 +539,7 @@ namespace ClawRPG.Scripts.Fishing
             return data;
         }
         
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

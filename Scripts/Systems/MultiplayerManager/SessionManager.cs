@@ -147,51 +147,8 @@ namespace ClawRPG.Scripts.Systems
                 _currentRoom.IsStarted = true;
             }
         }
-        
-        public Dictionary ExportSaveData()
-        {
-            var data = new Dictionary();
-            
-            data["is_host"] = _isHost;
-            data["current_room_id"] = _currentRoomId;
-            data["local_player_id"] = _localPlayerId;
-            data["player_name"] = _playerName;
-            data["room_password"] = _roomPassword;
-            data["needs_password"] = _needsPassword;
-            
-            if (_currentRoom != null)
-            {
-                data["room_name"] = _currentRoom.RoomName;
-                data["max_players"] = _currentRoom.MaxPlayers;
-                data["current_players"] = _currentRoom.CurrentPlayers;
-                data["is_started"] = _currentRoom.IsStarted;
-            }
-            
-            return data;
-        }
-        
-        public void ImportSaveData(Dictionary data)
-        {
-            if (data == null) return;
-            
-            _isHost = Convert.ToBoolean(data.GetValueOrDefault("is_host", false));
-            _currentRoomId = data.GetValueOrDefault("current_room_id", "")?.ToString() ?? "";
-            _localPlayerId = Convert.ToInt32(data.GetValueOrDefault("local_player_id", -1));
-            _playerName = data.GetValueOrDefault("player_name", "Player")?.ToString() ?? "Player";
-            _roomPassword = data.GetValueOrDefault("room_password", "")?.ToString() ?? "";
-            _needsPassword = Convert.ToBoolean(data.GetValueOrDefault("needs_password", false));
-            
-            if (data.Contains("room_name"))
-            {
-                _currentRoom = new RoomInfo
-                {
-                    RoomId = _currentRoomId,
-                    RoomName = data.GetValueOrDefault("room_name", "")?.ToString() ?? "",
-                    MaxPlayers = Convert.ToInt32(data.GetValueOrDefault("max_players", 4)),
-                    CurrentPlayers = Convert.ToInt32(data.GetValueOrDefault("current_players", 1)),
-                    IsStarted = Convert.ToBoolean(data.GetValueOrDefault("is_started", false))
-                };
-            }
-        }
+
+        public override Dictionary ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary data) { }
     }
 }

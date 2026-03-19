@@ -53,4 +53,7 @@ public abstract class ManagerBase : BaseSystem
         IsReady = true;
         OnInitialized?.Invoke(this);
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
 }

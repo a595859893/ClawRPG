@@ -165,8 +165,11 @@ public class GameManager : BaseSystem
         {
             system.Reset();
         }
-        
+
         _uis.Clear();
         GD.Print("[GameManager] All systems reset");
     }
+
+    public override Dictionary ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary data) { }
 }

@@ -264,9 +264,9 @@ namespace ClawRPG.Systems.SealedDungeon {
             }
         }
 
-        public Dictionary<string, object> ExportSaveData() {
+        public override Dictionary<string, object> ExportSaveData() {
             var data = new Dictionary<string, object>();
-            
+
             var dungeons = new List<Dictionary<string, object>>();
             foreach (var dungeon in _playerData.Dungeons) {
                 dungeons.Add(new Dictionary<string, object> {
@@ -286,9 +286,9 @@ namespace ClawRPG.Systems.SealedDungeon {
                     { "CompletedFloors", dungeon.CompletedFloors }
                 });
             }
-            
+
             data["Dungeons"] = dungeons;
-            
+
             var stats = new Dictionary<string, object> {
                 { "TotalAttempts", _playerData.Statistics.TotalAttempts },
                 { "TotalCompletions", _playerData.Statistics.TotalCompletions },
@@ -299,16 +299,16 @@ namespace ClawRPG.Systems.SealedDungeon {
                 { "CurrentStreak", _playerData.Statistics.CurrentStreak },
                 { "BestScore", _playerData.Statistics.BestScore }
             };
-            
+
             data["Statistics"] = stats;
             data["UnlockedZones"] = _playerData.UnlockedZones;
             data["HighestZoneUnlocked"] = _playerData.HighestZoneUnlocked;
             data["TotalStars"] = _playerData.TotalStars;
-            
+
             return data;
         }
 
-        public void ImportSaveData(Dictionary<string, object> data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
 
             _playerData = new PlayerSealedDungeonData();

@@ -389,7 +389,7 @@ public class BossMechanicsSystem : BaseSystem
     public BossPatternSystem GetPatternSystem() => _patternSystem;
 
     // 存档支持
-    public Dictionary ExportSaveData()
+    public override Dictionary ExportSaveData()
     {
         var data = new Dictionary();
         
@@ -447,7 +447,7 @@ public class BossMechanicsSystem : BaseSystem
         return data;
     }
 
-    public void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         

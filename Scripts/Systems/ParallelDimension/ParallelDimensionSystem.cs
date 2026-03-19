@@ -202,13 +202,13 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
         public List<DimensionEntry> GetAvailableDimensions() {
             return ParallelDimensionDatabase.GetUnlockedDimensions();
         }
-        
-        public Dictionary<string, Variant> ExportSaveData() {
-            var data = new Dictionary<string, Variant>();
-            
-            var dimensionStates = new List<Dictionary<string, Variant>>();
+
+        public override Dictionary ExportSaveData() {
+            var data = new Dictionary();
+
+            var dimensionStates = new List<Dictionary>();
             foreach (var dim in ParallelDimensionDatabase.GetAllDimensions()) {
-                dimensionStates.Add(new Dictionary<string, Variant> {
+                dimensionStates.Add(new Dictionary {
                     ["dimension_id"] = dim.DimensionId,
                     ["state"] = (int)dim.State,
                     ["current_floor"] = dim.CurrentFloor,
@@ -218,19 +218,19 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
                     ["last_entered"] = dim.LastEntered.ToString("o")
                 });
             }
-            
+
             data["dimension_states"] = dimensionStates;
             data["total_score"] = _playerData.TotalDimensionScore;
             data["dimensions_mastered"] = _playerData.DimensionsMastered;
-            
+
             return data;
         }
-        
-        public void ImportSaveData(Dictionary<string, Variant> data) {
+
+        public override void ImportSaveData(Dictionary data) {
             if (!data.Contains("dimension_states")) return;
-            
+
             var dimensionStates = (Godot.Collections.Array)data["dimension_states"];
-            foreach (Dictionary<string, Variant> dimData in dimensionStates) {
+            foreach (Dictionary dimData in dimensionStates) {
                 var dimId = (int)dimData["dimension_id"];
                 var dim = ParallelDimensionDatabase.GetDimension(dimId);
                 if (dim != null) {
@@ -239,17 +239,17 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
                     dim.BestScore = (int)dimData["best_score"];
                     dim.BestTime = (int)dimData["best_time"];
                     dim.TimesCompleted = (int)dimData["times_completed"];
-                    
+
                     var lastEnteredStr = (string)dimData["last_entered"];
                     if (DateTime.TryParse(lastEnteredStr, out var lastEntered)) {
                         dim.LastEntered = lastEntered;
                     }
                 }
             }
-            
+
             _playerData.TotalDimensionScore = (int)data["total_score"];
             _playerData.DimensionsMastered = (int)data["dimensions_mastered"];
-            
+
             GD.Print("[ParallelDimensionSystem] Save data imported successfully!");
         }
         

@@ -339,7 +339,7 @@ namespace ClawRPG.Scripts.Leaderboard {
         /// <summary>
         /// 导出存档数据
         /// </summary>
-        public Dictionary<string, object> ExportSaveData() {
+        public override Dictionary<string, object> ExportSaveData() {
             var data = new Dictionary<string, object>();
             var leaderboardData = new Dictionary<string, object>();
 
@@ -366,7 +366,7 @@ namespace ClawRPG.Scripts.Leaderboard {
         /// <summary>
         /// 导入存档数据
         /// </summary>
-        public void ImportSaveData(Dictionary<string, object> data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (!data.ContainsKey("leaderboards")) return;
 
             var leaderboardData = data["leaderboards"] as Dictionary<string, object>;

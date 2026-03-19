@@ -299,7 +299,7 @@ namespace ClawRPG.Scripts.Systems {
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public Dictionary<string, object> ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, object>();
             data["is_connected"] = _data.IsConnected;
@@ -314,7 +314,7 @@ namespace ClawRPG.Scripts.Systems {
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

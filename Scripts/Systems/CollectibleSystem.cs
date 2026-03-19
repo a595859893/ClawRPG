@@ -268,7 +268,7 @@ public class CollectibleSystem : BaseSystem
 	/// <summary>
 	/// Export save data for persistence
 	/// </summary>
-	public Dictionary<string, object> ExportSaveData()
+	public override Dictionary<string, object> ExportSaveData()
 	{
 		return GetSaveData();
 	}
@@ -276,7 +276,7 @@ public class CollectibleSystem : BaseSystem
 	/// <summary>
 	/// Import save data from persistence
 	/// </summary>
-	public void ImportSaveData(Dictionary<string, object> data)
+	public override void ImportSaveData(Dictionary<string, object> data)
 	{
 		LoadSaveData(data);
 	}

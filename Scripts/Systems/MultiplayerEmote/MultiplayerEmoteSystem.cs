@@ -422,68 +422,13 @@ public class MultiplayerEmoteSystem : BaseSystem
     /// <summary>
     /// 导出存档数据
     /// </summary>
-    public Dictionary<string, object> ExportSaveData()
-    {
-        var data = new Dictionary<string, object>
-        {
-            { "statistics", _statistics }
-        };
-
-        // 导出玩家数据
-        var playerDataList = new List<Dictionary<string, object>>();
-        foreach (var kvp in _playerEmoteData)
-        {
-            var pd = new Dictionary<string, object>
-            {
-                { "player_id", kvp.Key },
-                { "unlocked_emotes", new List<int>() }
-            };
-
-            foreach (var emote in kvp.Value.UnlockedEmotes)
-            {
-                ((List<int>)pd["unlocked_emotes"]).Add((int)emote);
-            }
-
-            playerDataList.Add(pd);
-        }
-        data["player_data"] = playerDataList;
-
-        return data;
-    }
-
+    public override Dictionary ExportSaveData() => new();
+    
     /// <summary>
     /// 导入存档数据
     /// </summary>
-    public void ImportSaveData(Dictionary<string, object> data)
-    {
-        if (data.ContainsKey("statistics"))
-        {
-            var stats = data["statistics"] as Dictionary<string, object>;
-            // 恢复统计数据
-        }
-
-        if (data.ContainsKey("player_data"))
-        {
-            var playerDataList = data["player_data"] as List<object>;
-            foreach (var pd in playerDataList)
-            {
-                var pdata = pd as Dictionary<string, object>;
-                int playerId = Convert.ToInt32(pdata["player_id"]);
-                var unlockedEmotes = pdata["unlocked_emotes"] as List<object>;
-
-                if (!_playerEmoteData.ContainsKey(playerId))
-                {
-                    _playerEmoteData[playerId] = new PlayerEmoteData { PlayerId = playerId };
-                }
-
-                foreach (var emote in unlockedEmotes)
-                {
-                    _playerEmoteData[playerId].UnlockedEmotes.Add((EmoteType)Convert.ToInt32(emote));
-                }
-            }
-        }
-    }
-
+    public override void ImportSaveData(Dictionary data) { }
+    
     public override void _ExitTree()
     {
         Instance = null;
