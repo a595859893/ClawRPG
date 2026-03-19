@@ -217,7 +217,49 @@ namespace ClawRPG.Scripts.Systems
             return SessionManager.Instance?.LocalPlayerId ?? -1;
         }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // 玩家准备状态
+            var readyStates = new List<Dictionary<string, object>>();
+            foreach (var kvp in _playerReadyStates)
+            {
+                readyStates.Add(new Dictionary<string, object>
+                {
+                    { "player_id", kvp.Key },
+                    { "ready", kvp.Value }
+                });
+            }
+            data["ready_states"] = readyStates;
+            
+            data["is_ready"] = _isReady;
+            data["sync_interval"] = _syncInterval;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 玩家准备状态
+            _playerReadyStates.Clear();
+            if (data.ContainsKey("ready_states") && data["ready_states"] is List<object> statesList)
+            {
+                foreach (var item in statesList)
+                {
+                    if (item is Dictionary<string, object> stateDict)
+                    {
+                        var playerId = (int)stateDict["player_id"];
+                        var ready = (bool)stateDict["ready"];
+                        _playerReadyStates[playerId] = ready;
+                    }
+                }
+            }
+            
+            _isReady = (bool)data.GetValueOrDefault("is_ready", false);
+            _syncInterval = (float)data.GetValueOrDefault("sync_interval", 0.05f);
+        }
     }
 }

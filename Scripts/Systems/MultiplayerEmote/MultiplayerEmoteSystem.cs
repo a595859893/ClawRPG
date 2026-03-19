@@ -422,12 +422,152 @@ public class MultiplayerEmoteSystem : BaseSystem
     /// <summary>
     /// 导出存档数据
     /// </summary>
-    public override Dictionary ExportSaveData() => new();
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        
+        // 统计数据
+        data["total_emotes_used"] = _statistics.TotalEmotesUsed;
+        data["max_combo"] = _statistics.MaxComboEmotes;
+        
+        // 分类使用统计
+        var categoryUsageList = new List<Dictionary<string, object>>();
+        foreach (var kvp in _statistics.CategoryUsage)
+        {
+            categoryUsageList.Add(new Dictionary<string, object>
+            {
+                { "category", (int)kvp.Key },
+                { "count", kvp.Value }
+            });
+        }
+        data["category_usage"] = categoryUsageList;
+        
+        // 表情使用统计
+        var emoteUsageList = new List<Dictionary<string, object>>();
+        foreach (var kvp in _statistics.EmoteUsage)
+        {
+            emoteUsageList.Add(new Dictionary<string, object>
+            {
+                { "emote", (int)kvp.Key },
+                { "count", kvp.Value }
+            });
+        }
+        data["emote_usage"] = emoteUsageList;
+        
+        // 玩家表情数据
+        var playerDataList = new List<Dictionary<string, object>>();
+        foreach (var kvp in _playerEmoteData)
+        {
+            var unlockedEmotes = new List<int>();
+            foreach (var emote in kvp.Value.UnlockedEmotes)
+            {
+                unlockedEmotes.Add((int)emote);
+            }
+            
+            var emoteCounts = new List<Dictionary<string, object>>();
+            foreach (var ec in kvp.Value.EmoteUsageCount)
+            {
+                emoteCounts.Add(new Dictionary<string, object>
+                {
+                    { "emote", (int)ec.Key },
+                    { "count", ec.Value }
+                });
+            }
+            
+            playerDataList.Add(new Dictionary<string, object>
+            {
+                { "player_id", kvp.Value.PlayerId },
+                { "unlocked_emotes", unlockedEmotes },
+                { "emote_usage", emoteCounts },
+                { "last_emote", kvp.Value.LastEmote.HasValue ? (int)kvp.Value.LastEmote.Value : -1 }
+            });
+        }
+        data["player_data"] = playerDataList;
+        
+        return data;
+    }
     
-    /// <summary>
-    /// 导入存档数据
-    /// </summary>
-    public override void ImportSaveData(Dictionary data) { }
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        
+        // 统计数据
+        _statistics.TotalEmotesUsed = (int)data.GetValueOrDefault("total_emotes_used", 0);
+        _statistics.MaxComboEmotes = (int)data.GetValueOrDefault("max_combo", 0);
+        
+        // 分类使用统计
+        if (data.ContainsKey("category_usage") && data["category_usage"] is List<object> categoryList)
+        {
+            _statistics.CategoryUsage.Clear();
+            foreach (var item in categoryList)
+            {
+                if (item is Dictionary<string, object> catDict)
+                {
+                    var category = (EmoteCategory)(int)catDict["category"];
+                    var count = (int)catDict["count"];
+                    _statistics.CategoryUsage[category] = count;
+                }
+            }
+        }
+        
+        // 表情使用统计
+        if (data.ContainsKey("emote_usage") && data["emote_usage"] is List<object> emoteList)
+        {
+            _statistics.EmoteUsage.Clear();
+            foreach (var item in emoteList)
+            {
+                if (item is Dictionary<string, object> emoteDict)
+                {
+                    var emote = (EmoteType)(int)emoteDict["emote"];
+                    var count = (int)emoteDict["count"];
+                    _statistics.EmoteUsage[emote] = count;
+                }
+            }
+        }
+        
+        // 玩家表情数据
+        if (data.ContainsKey("player_data") && data["player_data"] is List<object> playerList)
+        {
+            _playerEmoteData.Clear();
+            foreach (var item in playerList)
+            {
+                if (item is Dictionary<string, object> playerDict)
+                {
+                    var playerId = (int)playerDict["player_id"];
+                    var playerData = new PlayerEmoteData { PlayerId = playerId };
+                    
+                    if (playerDict.ContainsKey("unlocked_emotes") && playerDict["unlocked_emotes"] is List<object> unlockedList)
+                    {
+                        foreach (var emoteObj in unlockedList)
+                        {
+                            playerData.UnlockedEmotes.Add((EmoteType)(int)emoteObj);
+                        }
+                    }
+                    
+                    if (playerDict.ContainsKey("emote_usage") && playerDict["emote_usage"] is List<object> usageList)
+                    {
+                        foreach (var usage in usageList)
+                        {
+                            if (usage is Dictionary<string, object> usageDict)
+                            {
+                                var emote = (EmoteType)(int)usageDict["emote"];
+                                var count = (int)usageDict["count"];
+                                playerData.EmoteUsageCount[emote] = count;
+                            }
+                        }
+                    }
+                    
+                    var lastEmote = (int)playerDict.GetValueOrDefault("last_emote", -1);
+                    if (lastEmote >= 0)
+                    {
+                        playerData.LastEmote = (EmoteType)lastEmote;
+                    }
+                    
+                    _playerEmoteData[playerId] = playerData;
+                }
+            }
+        }
+    }
     
     public override void _ExitTree()
     {

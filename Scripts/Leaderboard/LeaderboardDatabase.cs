@@ -242,8 +242,48 @@ namespace ClawRPG.Scripts.Leaderboard {
             return null;
         }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, object>();
+            
+            // 导出排行榜配置（如果有任何运行时修改）
+            var configsData = new List<Dictionary<string, object>>();
+            foreach (var kvp in Configs)
+            {
+                configsData.Add(new Dictionary<string, object>
+                {
+                    { "type", (int)kvp.Key },
+                    { "max_entries", kvp.Value.MaxEntries },
+                    { "update_frequency", kvp.Value.UpdateFrequency }
+                });
+            }
+            data["configs"] = configsData;
+            
+            return data;
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            
+            // 导入排行榜配置
+            if (data.ContainsKey("configs") && data["configs"] is List<object> configsList)
+            {
+                foreach (var item in configsList)
+                {
+                    if (item is Dictionary<string, object> configDict)
+                    {
+                        var type = (LeaderboardType)(int)configDict["type"];
+                        if (Configs.ContainsKey(type))
+                        {
+                            var config = Configs[type];
+                            config.MaxEntries = (int)configDict.GetValueOrDefault("max_entries", config.MaxEntries);
+                            config.UpdateFrequency = (float)configDict.GetValueOrDefault("update_frequency", config.UpdateFrequency);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>
