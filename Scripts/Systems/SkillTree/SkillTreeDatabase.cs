@@ -5,12 +5,12 @@ using ClawRPG.Scripts.Database;
 /// <summary>
 /// Skill Tree Database - stores all skill tree node configurations
 /// </summary>
-public class SkillTreeDatabase : IDatabase
+public class SkillTreeDatabase : DatabaseBase
 {
     private static SkillTreeDatabase _instance;
-    public static SkillTreeDatabase StaticInstance => _instance ??= new SkillTreeDatabase();
+    public static new SkillTreeDatabase StaticInstance => _instance ??= new SkillTreeDatabase();
 
-    public object Instance => StaticInstance;
+    public override object Instance => StaticInstance;
 
     public Dictionary<string, SkillTreeNode> AllNodes { get; private set; }
     public Dictionary<string, SkillTreeCategory> Categories { get; private set; }
@@ -582,5 +582,15 @@ public class SkillTreeDatabase : IDatabase
         }
 
         return true;
+    }
+
+    protected override void OnExportSaveData(Godot.Collections.Dictionary saveData)
+    {
+        // SkillTreeDatabase 是静态配置数据库，玩家状态存储在 PlayerSkillTreeData 中
+    }
+
+    protected override void OnImportSaveData(Godot.Collections.Dictionary saveData)
+    {
+        // SkillTreeDatabase 是静态配置数据库，玩家状态从 PlayerSkillTreeData 恢复
     }
 }
