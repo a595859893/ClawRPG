@@ -802,5 +802,145 @@ namespace ClawRPG.Scripts.Database
         public string SpecialEffect { get; set; }
         public float SpecialEffectValue { get; set; }
         public int RequiredLevel { get; set; }
+
+        /// <summary>
+        /// 符文属性枚举（兼容原有代码）
+        /// </summary>
+        public enum RuneAttribute {
+            Damage, Defense, MaxHealth, MaxMana, CritChance, CritDamage,
+            AttackSpeed, MoveSpeed, HealthRegen, ManaRegen,
+            FireResistance, IceResistance, DarkResistance
+        }
+
+        /// <summary>
+        /// 符文套装类型（兼容原有代码）
+        /// </summary>
+        public enum RuneSet {
+            None, Attack, Defense, Life, Magic, Speed, Critical,
+            Balance, Dragon, Phoenix, Shadow
+        }
+
+        /// <summary>
+        /// 符文类（兼容原有代码 - RuneManager 使用）
+        /// </summary>
+        public class Rune {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public RuneType Type { get; set; }
+            public RuneRarity Rarity { get; set; }
+            public RuneSet Set { get; set; }
+            public Dictionary<RuneAttribute, float> Attributes { get; set; }
+            public int LevelRequired { get; set; }
+            public int Price { get; set; }
+            public string UniquePassive { get; set; }
+            public string IconPath { get; set; }
+
+            public Rune() {
+                Attributes = new Dictionary<RuneAttribute, float>();
+                Set = RuneSet.None;
+            }
+        }
+
+        /// <summary>
+        /// 从 RuneData 隐式转换为 Rune（供 RuneManager 使用）
+        /// </summary>
+        public static implicit operator Rune(RuneData data)
+        {
+            if (data == null) return null;
+            var rune = new Rune {
+                Id = data.Id,
+                Name = data.Name,
+                Description = data.Description,
+                Type = data.Type,
+                Rarity = data.Rarity,
+                LevelRequired = data.RequiredLevel,
+                Price = 100,
+                Set = RuneSet.None
+            };
+            if (data.AttackBonus != 0) rune.Attributes[RuneAttribute.Damage] = data.AttackBonus;
+            if (data.DefenseBonus != 0) rune.Attributes[RuneAttribute.Defense] = data.DefenseBonus;
+            if (data.HealthBonus != 0) rune.Attributes[RuneAttribute.MaxHealth] = data.HealthBonus;
+            if (data.CritRateBonus != 0) rune.Attributes[RuneAttribute.CritChance] = data.CritRateBonus;
+            if (data.CritDamageBonus != 0) rune.Attributes[RuneAttribute.CritDamage] = data.CritDamageBonus;
+            if (data.LifeStealBonus != 0) rune.Attributes[RuneAttribute.Damage] = data.LifeStealBonus; // lifeSteal mapped to damage
+            if (data.DodgeBonus != 0) rune.Attributes[RuneAttribute.MoveSpeed] = data.DodgeBonus; // dodge mapped to speed
+            if (data.SpeedBonus != 0) rune.Attributes[RuneAttribute.MoveSpeed] = data.SpeedBonus;
+            if (data.BlockBonus != 0) rune.Attributes[RuneAttribute.Defense] = data.BlockBonus; // block mapped to defense
+            return rune;
+        }
+
+        /// <summary>
+        /// 兼容性别名 - 原有代码使用 RuneDefinition
+        /// </summary>
+        public class RuneDefinition
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public RuneType Type { get; set; }
+            public RuneSlot Slot { get; set; }
+            public int BaseCost { get; set; }
+            public int EnhanceCost { get; set; }
+            public int RequiredLevel { get; set; }
+            public Dictionary<string, float> Attributes { get; set; }
+            public string SpecialEffect { get; set; }
+
+            public static implicit operator RuneDefinition(RuneData data)
+            {
+                if (data == null) return null;
+                var def = new RuneDefinition
+                {
+                    Id = data.Id,
+                    Name = data.Name,
+                    Description = data.Description,
+                    Type = data.Type,
+                    Slot = RuneDatabase.SlotToRuneSlot(data.SlotType),
+                    RequiredLevel = data.RequiredLevel,
+                    SpecialEffect = data.SpecialEffect,
+                    BaseCost = 100,
+                    EnhanceCost = 50,
+                    Attributes = new Dictionary<string, float>()
+                };
+                if (data.AttackBonus != 0) def.Attributes["attack"] = data.AttackBonus;
+                if (data.DefenseBonus != 0) def.Attributes["defense"] = data.DefenseBonus;
+                if (data.HealthBonus != 0) def.Attributes["health"] = data.HealthBonus;
+                if (data.CritRateBonus != 0) def.Attributes["critical"] = data.CritRateBonus;
+                if (data.CritDamageBonus != 0) def.Attributes["crit_damage"] = data.CritDamageBonus;
+                if (data.LifeStealBonus != 0) def.Attributes["life_steal"] = data.LifeStealBonus;
+                if (data.DodgeBonus != 0) def.Attributes["dodge"] = data.DodgeBonus;
+                if (data.SpeedBonus != 0) def.Attributes["speed"] = data.SpeedBonus;
+                if (data.BlockBonus != 0) def.Attributes["block"] = data.BlockBonus;
+                return def;
+            }
+        }
+
+        /// <summary>
+        /// 兼容性别名 - 原有代码使用 RuneSlot
+        /// </summary>
+        public enum RuneSlot
+        {
+            Helmet,
+            Chest,
+            Legs,
+            Weapon,
+            Accessory
+        }
+
+        /// <summary>
+        /// 将 RuneSlotType 映射到 RuneSlot（兼容性别名）
+        /// </summary>
+        public static RuneSlot SlotToRuneSlot(RuneSlotType slotType)
+        {
+            return slotType switch
+            {
+                RuneSlotType.Helmet => RuneSlot.Helmet,
+                RuneSlotType.Chestplate => RuneSlot.Chest,
+                RuneSlotType.Boots => RuneSlot.Legs,
+                RuneSlotType.Weapon => RuneSlot.Weapon,
+                RuneSlotType.Ring or RuneSlotType.Amulet => RuneSlot.Accessory,
+                _ => RuneSlot.Accessory
+            };
+        }
     }
 }

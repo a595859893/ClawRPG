@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Database;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
