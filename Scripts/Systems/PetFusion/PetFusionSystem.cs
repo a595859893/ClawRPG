@@ -8,8 +8,6 @@ public partial class PetFusionSystem : BaseSystem
     private const string SAVE_PATH = "user://pet_fusion_save.json";
     
     protected override string SystemName => "PetFusionSystem";
-    private PetFusionData _data;
-    private const string SAVE_PATH = "user://pet_fusion_save.json";
     
     public PetFusionSystem() {
         _data = new PetFusionData();
