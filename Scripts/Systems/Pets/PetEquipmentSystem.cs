@@ -315,7 +315,50 @@ namespace Game.Systems.Pets
         }
     }
 
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary<string, Variant>();
 
+        if (_playerData == null) return data;
+
+        // 保存拥有的装备
+        var ownedEquipment = new Dictionary<string, List<string>>();
+        foreach (var kvp in _playerData.OwnedEquipment)
+        {
+            ownedEquipment[kvp.Key] = new List<string>(kvp.Value);
+        }
+        data["owned_equipment"] = ownedEquipment;
+
+        // 保存已装备的装备
+        data["equipped_equipment"] = new Dictionary<string, string>(_playerData.EquippedEquipment);
+
+        return data;
+    }
+
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null || _playerData == null) return;
+
+        // 加载拥有的装备
+        if (data.TryGetValue("owned_equipment", out var ownedData))
+        {
+            _playerData.OwnedEquipment = new Dictionary<string, List<string>>();
+            var ownedDict = (Dictionary<string, Variant>)ownedData;
+            foreach (var kvp in ownedDict)
+            {
+                _playerData.OwnedEquipment[kvp.Key] = new List<string>((List<string>)kvp.Value);
+            }
+        }
+
+        // 加载已装备的装备
+        if (data.TryGetValue("equipped_equipment", out var equippedData))
+        {
+            _playerData.EquippedEquipment = new Dictionary<string, string>();
+            var equippedDict = (Dictionary<string, Variant>)equippedData;
+            foreach (var kvp in equippedDict)
+            {
+                _playerData.EquippedEquipment[kvp.Key] = (string)kvp.Value;
+            }
+        }
+    }
 }
