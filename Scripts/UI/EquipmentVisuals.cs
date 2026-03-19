@@ -342,8 +342,49 @@ namespace ClawRPG.Scripts.UI {
 
         #region BaseSystem Persistence
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+
+            // 保存当前装备的外观
+            data["weapon_visual_id"] = _weaponVisualId ?? "default_sword";
+            data["armor_visual_id"] = _armorVisualId ?? "default_armor";
+            data["accessory_visual_id"] = _accessoryVisualId ?? "default_accessory";
+
+            // 保存已解锁的外观
+            var unlockedVisualsData = new Dictionary<string, List<string>>();
+            foreach (var slotKvp in _unlockedVisuals)
+            {
+                unlockedVisualsData[slotKvp.Key] = new List<string>(slotKvp.Value);
+            }
+            data["unlocked_visuals"] = unlockedVisualsData;
+
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            // 加载当前装备的外观
+            if (data.TryGetValue("weapon_visual_id", out var weaponId))
+                _weaponVisualId = (string)weaponId;
+            if (data.TryGetValue("armor_visual_id", out var armorId))
+                _armorVisualId = (string)armorId;
+            if (data.TryGetValue("accessory_visual_id", out var accessoryId))
+                _accessoryVisualId = (string)accessoryId;
+
+            // 加载已解锁的外观
+            if (data.TryGetValue("unlocked_visuals", out var unlockedData))
+            {
+                _unlockedVisuals = new Dictionary<string, HashSet<string>>();
+                var unlockedDict = (Dictionary<string, Variant>)unlockedData;
+                foreach (var slotKvp in unlockedDict)
+                {
+                    _unlockedVisuals[slotKvp.Key] = new HashSet<string>((IEnumerable<string>)slotKvp.Value);
+                }
+            }
+        }
 
         #endregion
     }
