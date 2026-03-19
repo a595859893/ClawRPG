@@ -7,17 +7,17 @@ namespace ClawRPG.Scripts.Systems.Enchantment
     /// <summary>
     /// 附魔配置数据库
     /// </summary>
-    public class EnchantmentDatabase : IDatabase
+    public class EnchantmentDatabase : DatabaseBase
     {
         private static EnchantmentDatabase _instance;
-        public static EnchantmentDatabase Instance => _instance ??= new EnchantmentDatabase();
+        public static new EnchantmentDatabase Instance => _instance ??= new EnchantmentDatabase();
 
         // 附魔记录缓存
         private Dictionary<string, EnchantmentRecord> _enchantments;
         private Dictionary<EnchantmentTier, List<string>> _tierCache;
         private Dictionary<EnchantmentType, List<string>> _typeCache;
 
-        public object Instance => Instance;
+        public override object Instance => Instance;
 
         /// <summary>
         /// 初始化附魔数据库
@@ -661,6 +661,16 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         public int GetTotalCount()
         {
             return _enchantments.Count;
+        }
+
+        protected override void OnExportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            // EnchantmentDatabase 是静态配置数据库，无玩家状态需持久化
+        }
+
+        protected override void OnImportSaveData(Godot.Collections.Dictionary saveData)
+        {
+            // EnchantmentDatabase 是静态配置数据库，无玩家状态需恢复
         }
     }
 }
