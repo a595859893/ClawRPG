@@ -10,9 +10,9 @@ public class BossPatternSystem : BaseSystem
     public static BossPatternSystem Instance { get; private set; }
 
     // 信号 - 模式相关
-    public static signal BossPatternChanged(string instanceId, AttackPattern oldPattern, AttackPattern newPattern);
-    public static signal BossAttack Initiated(string instanceId, Vector3 targetPosition);
-    public static signal BossTargetChanged(string instanceId, string oldTargetId, string newTargetId);
+    public static Action<string, AttackPattern, AttackPattern> BossPatternChanged;
+    public static Action<string, Vector3> BossAttackInitiated;
+    public static Action<string, string, string> BossTargetChanged;
 
     private Random _random = new Random();
 
@@ -230,7 +230,7 @@ public class BossPatternSystem : BaseSystem
         if (_random.NextDouble() < 0.05f)
         {
             battle.CurrentPattern = AttackPattern.Aggressive;
-            BossPatternChanged?.Emit(battle.InstanceId, AttackPattern.Enraged, AttackPattern.Aggressive);
+            BossPatternChanged?.Invoke(battle.InstanceId, AttackPattern.Enraged, AttackPattern.Aggressive);
         }
     }
 
@@ -251,7 +251,7 @@ public class BossPatternSystem : BaseSystem
         battle.LastTargetPosition = Vector3.Zero;
         
         // 发出攻击信号
-        BossAttackInitiated?.Emit(battle.InstanceId, battle.LastTargetPosition);
+        BossAttackInitiated?.Invoke(battle.InstanceId, battle.LastTargetPosition);
     }
 
     /// <summary>
@@ -350,7 +350,7 @@ public class BossPatternSystem : BaseSystem
         {
             AttackPattern oldPattern = battle.CurrentPattern;
             battle.CurrentPattern = newPattern;
-            BossPatternChanged?.Emit(battle.InstanceId, oldPattern, newPattern);
+            BossPatternChanged?.Invoke(battle.InstanceId, oldPattern, newPattern);
         }
     }
 
@@ -363,7 +363,7 @@ public class BossPatternSystem : BaseSystem
         {
             AttackPattern oldPattern = battle.CurrentPattern;
             battle.CurrentPattern = newPattern;
-            BossPatternChanged?.Emit(battle.InstanceId, oldPattern, newPattern);
+            BossPatternChanged?.Invoke(battle.InstanceId, oldPattern, newPattern);
         }
     }
 

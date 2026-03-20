@@ -15,15 +15,15 @@ public class BossMechanicsSystem : BaseSystem
     private Dictionary<string, int> _comboCounters = new Dictionary<string, int>();
     private Dictionary<string, DateTime> _lastAttackTimes = new Dictionary<string, DateTime>();
 
-    // 信号事件（保留原有信号以保持兼容）
-    public static signal BossSpawned(string bossId, string bossName, BossType type);
-    public static signal BossDefeated(string bossId, string bossName, bool isFirstBlood, List<string> rewards);
-    public static signal BossEscaped(string bossId, string bossName);
-    public static signal BossPhaseChanged(string bossId, int newPhase);
-    public static signal BossEnraged(string bossId);
-    public static signal BossSkillUsed(string bossId, string skillId, string skillName);
-    public static signal PlayerComboChanged(string playerId, int newCombo);
-    public static signal BattleRecordUpdated(string playerId, BossBattleRecord record);
+    // 信号事件（C# Action 委托）
+    public static Action<string, string, BossType> BossSpawned;
+    public static Action<string, string, bool, List<string>> BossDefeated;
+    public static Action<string, string> BossEscaped;
+    public static Action<string, int> BossPhaseChanged;
+    public static Action<string> BossEnraged;
+    public static Action<string, string, string> BossSkillUsed;
+    public static Action<string, int> PlayerComboChanged;
+    public static Action<string, BossBattleRecord> BattleRecordUpdated;
 
     // 子系统实例
     private BossPhaseSystem _phaseSystem;
@@ -58,7 +58,7 @@ public class BossMechanicsSystem : BaseSystem
         BossPhaseSystem.Instance.Connect("boss_enraged", this, nameof(_OnBossEnraged));
         
         // 连接AbilitySystem信号
-        BossAbilitySystem.Instance.Connect("boss_skill_executed", this, nameof(_OnSkillExecuted"));
+        BossAbilitySystem.Instance.Connect("boss_skill_executed", this, nameof(_OnSkillExecuted));
         
         // 连接PatternSystem信号
         BossPatternSystem.Instance.Connect("boss_pattern_changed", this, nameof(_OnPatternChanged));
@@ -69,7 +69,7 @@ public class BossMechanicsSystem : BaseSystem
         // 转发阶段变化信号（保持兼容）
         if (_activeBossBattles.ContainsKey(instanceId))
         {
-            BossPhaseChanged?.Emit(_activeBossBattles[instanceId].BossConfigId, newPhase);
+            BossPhaseChanged?.Invoke(_activeBossBattles[instanceId].BossConfigId, newPhase);
         }
     }
 
@@ -78,7 +78,7 @@ public class BossMechanicsSystem : BaseSystem
         // 转发狂暴信号
         if (_activeBossBattles.ContainsKey(instanceId))
         {
-            BossEnraged?.Emit(_activeBossBattles[instanceId].BossConfigId);
+            BossEnraged?.Invoke(_activeBossBattles[instanceId].BossConfigId);
         }
     }
 
@@ -87,7 +87,7 @@ public class BossMechanicsSystem : BaseSystem
         // 转发技能使用信号
         if (_activeBossBattles.ContainsKey(instanceId))
         {
-            BossSkillUsed?.Emit(_activeBossBattles[instanceId].BossConfigId, skillId, skillName);
+            BossSkillUsed?.Invoke(_activeBossBattles[instanceId].BossConfigId, skillId, skillName);
         }
     }
 
@@ -167,7 +167,7 @@ public class BossMechanicsSystem : BaseSystem
             RewardsReceived = new List<string>()
         };
 
-        BossSpawned?.Emit(bossId, config.Name, config.Type);
+        BossSpawned?.Invoke(bossId, config.Name, config.Type);
     }
 
     public void DealDamageToBoss(string instanceId, string playerId, float damage)
@@ -223,7 +223,7 @@ public class BossMechanicsSystem : BaseSystem
         if (_comboCounters[playerId] > _playerStats.BestCombo)
             _playerStats.BestCombo = _comboCounters[playerId];
             
-        PlayerComboChanged?.Emit(playerId, _comboCounters[playerId]);
+        PlayerComboChanged?.Invoke(playerId, _comboCounters[playerId]);
     }
 
     private void CompleteBossBattle(string instanceId, string playerId)
@@ -289,7 +289,7 @@ public class BossMechanicsSystem : BaseSystem
                 _playerStats.BattleHistory[bossKey] = new List<BossBattleRecord>();
             _playerStats.BattleHistory[bossKey].Add(record);
             
-            BattleRecordUpdated?.Emit(playerId, record);
+            BattleRecordUpdated?.Invoke(playerId, record);
         }
         
         // 发放奖励
@@ -303,7 +303,7 @@ public class BossMechanicsSystem : BaseSystem
         _playerStats.TotalSurvivalTime += (float)(DateTime.Now - _playerBattleRecords[playerId].BattleStartTime).TotalSeconds;
         
         // 发出信号
-        BossDefeated?.Emit(battle.BossConfigId, battle.Config.Name, isFirstBlood, rewards);
+        BossDefeated?.Invoke(battle.BossConfigId, battle.Config.Name, isFirstBlood, rewards);
         
         // 清理
         _activeBossBattles.Remove(instanceId);

@@ -9,13 +9,13 @@ public class BossAbilitySystem : BaseSystem
 {
     public static BossAbilitySystem Instance { get; private set; }
 
-    // 信号 - 技能相关
-    public static signal BossSkillInitiated(string instanceId, string skillId, string skillName);
-    public static signal BossSkillExecuted(string instanceId, string skillId, string skillName);
-    public static signal BossSkillCompleted(string instanceId, string skillId);
-    public static signal BossHealed(string instanceId, float amount);
-    public static signal BossShielded(string instanceId, float amount);
-    public static signal MonstersSummoned(string instanceId, List<string> monsterIds);
+    // 信号 - 技能相关 (C# Action 委托)
+    public static Action<string, string, string> BossSkillInitiated;
+    public static Action<string, string, string> BossSkillExecuted;
+    public static Action<string, string> BossSkillCompleted;
+    public static Action<string, float> BossHealed;
+    public static Action<string, float> BossShielded;
+    public static Action<string, List<string>> MonstersSummoned;
 
     private Random _random = new Random();
 
@@ -107,7 +107,7 @@ public class BossAbilitySystem : BaseSystem
         battle.TimeSinceLastSkill = 0;
 
         // 发出技能开始信号
-        BossSkillInitiated?.Emit(battle.InstanceId, skill.Id, skill.Name);
+        BossSkillInitiated?.Invoke(battle.InstanceId, skill.Id, skill.Name);
 
         // 执行技能效果
         switch (skill.SkillType)
@@ -168,8 +168,8 @@ public class BossAbilitySystem : BaseSystem
         }
 
         // 发出技能执行完成信号
-        BossSkillExecuted?.Emit(battle.InstanceId, skill.Id, skill.Name);
-        BossSkillCompleted?.Emit(battle.InstanceId, skill.Id);
+        BossSkillExecuted?.Invoke(battle.InstanceId, skill.Id, skill.Name);
+        BossSkillCompleted?.Invoke(battle.InstanceId, skill.Id);
     }
 
     /// <summary>
@@ -220,7 +220,7 @@ public class BossAbilitySystem : BaseSystem
             summonedIds.Add(summonId);
         }
         
-        MonstersSummoned?.Emit(battle.InstanceId, summonedIds);
+        MonstersSummoned?.Invoke(battle.InstanceId, summonedIds);
     }
 
     /// <summary>
@@ -236,7 +236,7 @@ public class BossAbilitySystem : BaseSystem
         float actualHeal = battle.CurrentHealth - oldHealth;
         if (actualHeal > 0)
         {
-            BossHealed?.Emit(battle.InstanceId, actualHeal);
+            BossHealed?.Invoke(battle.InstanceId, actualHeal);
         }
     }
 
@@ -251,7 +251,7 @@ public class BossAbilitySystem : BaseSystem
         battle.ActiveEffects.RemoveAll(e => e.StartsWith("shield_"));
         battle.ActiveEffects.Add(shieldEffect);
         
-        BossShielded?.Emit(battle.InstanceId, skill.ShieldAmount);
+        BossShielded?.Invoke(battle.InstanceId, skill.ShieldAmount);
     }
 
     /// <summary>

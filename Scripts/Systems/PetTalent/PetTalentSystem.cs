@@ -10,8 +10,8 @@ public class PetTalentSystem : BaseSystem
     public Dictionary<int, PetTalentData> PetTalents { get; private set; }
     
     // Signal for talent changes
-    public static signal PetTalentUpdated;
-    public static signal TalentUnlocked;
+    public static Action<int> PetTalentUpdated;
+    public static Action<int, string, int> TalentUnlocked;
     
     public override void _Ready()
     {
@@ -38,7 +38,7 @@ public class PetTalentSystem : BaseSystem
             int pointsToAdd = newTotalPoints - data.TotalPointsEarned;
             data.TotalPointsEarned = newTotalPoints;
             data.AvailablePoints += pointsToAdd;
-            PetTalentUpdated?.Emit(petId);
+            PetTalentUpdated?.Invoke(petId);
         }
     }
     
@@ -85,8 +85,8 @@ public class PetTalentSystem : BaseSystem
         }
         data.AllocatedPoints[talent.Category] += talent.PointsPerLevel;
         
-        TalentUnlocked?.Emit(petId, talentId, data.UnlockedTalents[talentId]);
-        PetTalentUpdated?.Emit(petId);
+        TalentUnlocked?.Invoke(petId, talentId, data.UnlockedTalents[talentId]);
+        PetTalentUpdated?.Invoke(petId);
         
         return true;
     }
@@ -109,7 +109,7 @@ public class PetTalentSystem : BaseSystem
         data.UnlockedTalents.Clear();
         data.AllocatedPoints.Clear();
         
-        PetTalentUpdated?.Emit(petId);
+        PetTalentUpdated?.Invoke(petId);
         return true;
     }
     

@@ -10,11 +10,11 @@ public class BossPhaseSystem : BaseSystem
     public static BossPhaseSystem Instance { get; private set; }
 
     // 信号 - 阶段变化
-    public static signal BossPhaseChanged(string instanceId, int oldPhase, int newPhase);
-    public static signal BossEnraged(string instanceId);
-    public static signal BossEnrageProgressChanged(string instanceId, float progress);
-    public static signal PhaseTransitionStarted(string instanceId, int phase);
-    public static signal PhaseTransitionCompleted(string instanceId, int phase);
+    public static Action<string, int, int> BossPhaseChanged;
+    public static Action<string> BossEnraged;
+    public static Action<string, float> BossEnrageProgressChanged;
+    public static Action<string, int> PhaseTransitionStarted;
+    public static Action<string, int> PhaseTransitionCompleted;
 
     private Random _random = new Random();
 
@@ -70,7 +70,7 @@ public class BossPhaseSystem : BaseSystem
         else if (!battle.IsEnraged)
         {
             battle.EnrageProgress = targetProgress;
-            BossEnrageProgressChanged?.Emit(battle.InstanceId, battle.EnrageProgress);
+            BossEnrageProgressChanged?.Invoke(battle.InstanceId, battle.EnrageProgress);
         }
     }
 
@@ -85,7 +85,7 @@ public class BossPhaseSystem : BaseSystem
         battle.CurrentSpeedMultiplier *= 1.5f;
         battle.Phase = BossPhase.Enraged;
 
-        BossEnraged?.Emit(battle.InstanceId);
+        BossEnraged?.Invoke(battle.InstanceId);
     }
 
     /// <summary>
@@ -133,8 +133,8 @@ public class BossPhaseSystem : BaseSystem
         float phaseMultiplier = 1.0f + (newPhase - 1) * 0.25f;
         battle.CurrentDamageMultiplier *= phaseMultiplier;
         
-        PhaseTransitionStarted?.Emit(battle.InstanceId, newPhase);
-        BossPhaseChanged?.Emit(battle.InstanceId, oldPhase, newPhase);
+        PhaseTransitionStarted?.Invoke(battle.InstanceId, newPhase);
+        BossPhaseChanged?.Invoke(battle.InstanceId, oldPhase, newPhase);
 
         // 延迟完成阶段转换
         GetTree().CreateTimer(2.0f).Connect("timeout", this, nameof(OnPhaseTransitionComplete), new Godot.Collections.Array { battle.InstanceId, newPhase });
@@ -143,7 +143,7 @@ public class BossPhaseSystem : BaseSystem
     private void OnPhaseTransitionComplete(string instanceId, int phase)
     {
         // 通过事件系统通知完成
-        PhaseTransitionCompleted?.Emit(instanceId, phase);
+        PhaseTransitionCompleted?.Invoke(instanceId, phase);
     }
 
     /// <summary>
@@ -154,7 +154,7 @@ public class BossPhaseSystem : BaseSystem
         if (battle.Phase == BossPhase.Transition)
         {
             battle.Phase = battle.IsEnraged ? BossPhase.Enraged : BossPhase.Active;
-            PhaseTransitionCompleted?.Emit(battle.InstanceId, battle.CurrentPhase);
+            PhaseTransitionCompleted?.Invoke(battle.InstanceId, battle.CurrentPhase);
         }
     }
 

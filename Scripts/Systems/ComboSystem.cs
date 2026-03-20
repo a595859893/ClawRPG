@@ -141,23 +141,23 @@ public class ComboSystem : BaseSystem
     /// <summary>
     /// 连击执行时触发
     /// </summary>
-    public static signal ComboExecuted(string comboId, float damage, string effectName);
+    public static Action<string, float, string> ComboExecuted;
     /// <summary>
     /// 连击进度更新时触发
     /// </summary>
-    public static signal ComboProgressUpdated(string comboId, int currentStep, float timeRemaining);
+    public static Action<string, int, float> ComboProgressUpdated;
     /// <summary>
     /// 连击点数变化时触发
     /// </summary>
-    public static signal ComboPointsChanged(int newPoints);
+    public static Action<int> ComboPointsChanged;
     /// <summary>
     /// 连击等级变化时触发
     /// </summary>
-    public static signal ComboLevelChanged(int newLevel);
+    public static Action<int> ComboLevelChanged;
     /// <summary>
     /// 发现新连击时触发
     /// </summary>
-    public static signal NewComboDiscovered(ComboData combo);
+    public static Action<ComboData> NewComboDiscovered;
     
     public override void _Ready()
     {
@@ -412,7 +412,7 @@ public class ComboSystem : BaseSystem
                 progress.timeRemaining = _comboWindow;
                 progress.isActive = true;
                 
-                ComboProgressUpdated?.Call(progress.comboId, progress.currentStep, progress.timeRemaining);
+                ComboProgressUpdated?.Invoke(progress.comboId, progress.currentStep, progress.timeRemaining);
                 
                 // Check if combo is complete
                 if (progress.currentStep >= combo.skillSequence.Count)
@@ -427,7 +427,7 @@ public class ComboSystem : BaseSystem
                 progress.currentStep = 1;
                 progress.timeRemaining = _comboWindow;
                 progress.isActive = true;
-                ComboProgressUpdated?.Call(progress.comboId, progress.currentStep, progress.timeRemaining);
+                ComboProgressUpdated?.Invoke(progress.comboId, progress.currentStep, progress.timeRemaining);
             }
         }
     }
@@ -455,8 +455,8 @@ public class ComboSystem : BaseSystem
         progress.isActive = false;
         
         // Emit signals
-        ComboExecuted?.Call(comboId, comboDamage, combo.effectName);
-        ComboPointsChanged?.Call(_comboPoints);
+        ComboExecuted?.Invoke(comboId, comboDamage, combo.effectName);
+        ComboPointsChanged?.Invoke(_comboPoints);
         
         GD.Print($"[ComboSystem] Executed combo: {combo.comboName} for {comboDamage} damage!");
     }
@@ -469,7 +469,7 @@ public class ComboSystem : BaseSystem
         if (newLevel > _comboLevel)
         {
             _comboLevel = newLevel;
-            ComboLevelChanged?.Call(_comboLevel);
+            ComboLevelChanged?.Invoke(_comboLevel);
             GD.Print($"[ComboSystem] Combo Level up! Now level {_comboLevel}");
         }
     }
