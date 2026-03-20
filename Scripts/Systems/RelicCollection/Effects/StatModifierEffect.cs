@@ -98,6 +98,12 @@ public class StatModifierEffect : RelicEffect
             case "dodge":
                 player.RelicDodgeBonus -= Value;
                 break;
+            case "max_mana":
+                player.MaxMana -= IsPercentage ? player.MaxMana * Value : Value;
+                break;
+            case "mana_regen":
+                player.ManaRegen -= IsPercentage ? player.ManaRegen * Value : Value;
+                break;
         }
     }
 
