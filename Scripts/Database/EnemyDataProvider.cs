@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Project;
+using ClawRPG.Scripts.Data.Enemy;
 
 namespace ClawRPG.Scripts.Database
 {
