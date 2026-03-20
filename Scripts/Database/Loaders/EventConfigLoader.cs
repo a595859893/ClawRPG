@@ -194,15 +194,15 @@ namespace ClawRPG.Scripts.Database.Loaders
         }
 
         /// <summary>
-        /// 从配置数据转换为ChoiceEventData
+        /// 从配置数据转换为ChoiceEventRewards
         /// </summary>
         /// <param name="config">事件配置数据</param>
-        /// <returns>ChoiceEventData实例</returns>
-        public ChoiceEventData ConvertToChoiceEventData(ChoiceEventConfig config)
+        /// <returns>ChoiceEventRewards实例</returns>
+        public ChoiceEventRewards ConvertToChoiceEventData(ChoiceEventConfig config)
         {
             if (config == null) return null;
 
-            var eventData = new ChoiceEventData
+            var eventData = new ChoiceEventRewards
             {
                 EventId = config.EventId,
                 Title = config.Title,
@@ -278,12 +278,12 @@ namespace ClawRPG.Scripts.Database.Loaders
         }
 
         /// <summary>
-        /// 获取所有事件ChoiceEventData列表
+        /// 获取所有事件ChoiceEventRewards列表
         /// </summary>
-        /// <returns>ChoiceEventData列表</returns>
-        public List<ChoiceEventData> GetAllChoiceEventData()
+        /// <returns>ChoiceEventRewards列表</returns>
+        public List<ChoiceEventRewards> GetAllChoiceEventData()
         {
-            var eventDataList = new List<ChoiceEventData>();
+            var eventDataList = new List<ChoiceEventRewards>();
             if (_configFile?.Events == null) return eventDataList;
 
             foreach (var config in _configFile.Events)
@@ -309,11 +309,11 @@ namespace ClawRPG.Scripts.Database.Loaders
         }
 
         /// <summary>
-        /// 根据ID获取ChoiceEventData
+        /// 根据ID获取ChoiceEventRewards
         /// </summary>
         /// <param name="eventId">事件ID</param>
-        /// <returns>ChoiceEventData实例</returns>
-        public ChoiceEventData GetChoiceEventDataById(string eventId)
+        /// <returns>ChoiceEventRewards实例</returns>
+        public ChoiceEventRewards GetChoiceEventDataById(string eventId)
         {
             var config = GetEventConfigById(eventId);
             return config != null ? ConvertToChoiceEventData(config) : null;

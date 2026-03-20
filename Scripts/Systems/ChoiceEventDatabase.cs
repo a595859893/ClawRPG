@@ -16,7 +16,7 @@ namespace ClawRPG.Scripts.Systems
         private static ChoiceEventDatabase _instance;
         public static ChoiceEventDatabase Instance => _instance ??= new ChoiceEventDatabase();
 
-        private Dictionary<string, ChoiceEventData> _events = new Dictionary<string, ChoiceEventData>();
+        private Dictionary<string, ChoiceEventRewards> _events = new Dictionary<string, ChoiceEventRewards>();
 
         // 玩家选择记录（按玩家ID索引）
         private Dictionary<string, PlayerEventRecord> _playerRecords = new Dictionary<string, PlayerEventRecord>();
@@ -261,7 +261,7 @@ namespace ClawRPG.Scripts.Systems
             GD.Print($"[ChoiceEventDatabase] 成功从配置文件加载 {events.Count} 个事件");
         }
 
-        private void AddEvent(ChoiceEventData eventData)
+        private void AddEvent(ChoiceEventRewards eventData)
         {
             _events[eventData.EventId] = eventData;
         }
@@ -269,15 +269,15 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 获取所有事件
         /// </summary>
-        public Dictionary<string, ChoiceEventData> GetAllEvents()
+        public Dictionary<string, ChoiceEventRewards> GetAllEvents()
         {
-            return new Dictionary<string, ChoiceEventData>(_events);
+            return new Dictionary<string, ChoiceEventRewards>(_events);
         }
 
         /// <summary>
         /// 根据ID获取事件
         /// </summary>
-        public ChoiceEventData GetEvent(string eventId)
+        public ChoiceEventRewards GetEvent(string eventId)
         {
             if (_events.ContainsKey(eventId))
             {
@@ -289,9 +289,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 获取随机事件（基于玩家等级和区域）
         /// </summary>
-        public ChoiceEventData GetRandomEvent(int playerLevel, string region = "")
+        public ChoiceEventRewards GetRandomEvent(int playerLevel, string region = "")
         {
-            var validEvents = new List<ChoiceEventData>();
+            var validEvents = new List<ChoiceEventRewards>();
 
             foreach (var evt in _events.Values)
             {
@@ -313,9 +313,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 根据类别获取随机事件
         /// </summary>
-        public ChoiceEventData GetRandomEventByCategory(string category, int playerLevel)
+        public ChoiceEventRewards GetRandomEventByCategory(string category, int playerLevel)
         {
-            var validEvents = new List<ChoiceEventData>();
+            var validEvents = new List<ChoiceEventRewards>();
 
             foreach (var evt in _events.Values)
             {
@@ -333,7 +333,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 加权随机选择
         /// </summary>
-        private ChoiceEventData GetWeightedRandomEvent(List<ChoiceEventData> events)
+        private ChoiceEventRewards GetWeightedRandomEvent(List<ChoiceEventRewards> events)
         {
             if (events.Count == 0) return null;
             if (events.Count == 1) return events[0];

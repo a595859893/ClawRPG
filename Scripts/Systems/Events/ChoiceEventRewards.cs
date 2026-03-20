@@ -73,7 +73,7 @@ namespace ClawRPG.Scripts.Systems.Events
     /// <summary>
     /// 事件选择数据
     /// </summary>
-    public class ChoiceEventData
+    public class ChoiceEventRewards
     {
         public string EventId { get; set; }
         public string Title { get; set; }
@@ -83,7 +83,7 @@ namespace ClawRPG.Scripts.Systems.Events
         public string RequiredRegion { get; set; }
         public List<ChoiceOption> Options { get; set; }
         
-        public ChoiceEventData()
+        public ChoiceEventRewards()
         {
             Options = new List<ChoiceOption>();
             RequiredRegion = "";
