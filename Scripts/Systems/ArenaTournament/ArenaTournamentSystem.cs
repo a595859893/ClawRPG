@@ -20,13 +20,13 @@ namespace ClawRPG.Scripts.Systems
         private ArenaTournamentQueries _queriesSystem;
         
         // 信号
-        public signal tournament_created(Tournament tournament);
-        public signal player_registered(string tournament_id, string player_id);
-        public signal tournament_started(Tournament tournament);
-        public signal match_started(TournamentMatch match);
-        public signal match_completed(TournamentMatch match);
-        public signal stage_completed(Tournament tournament, TournamentStage stage);
-        public signal tournament_completed(Tournament tournament);
+        public Action<Tournament> tournament_created;
+        public Action<string, string> player_registered;
+        public Action<Tournament> tournament_started;
+        public Action<TournamentMatch> match_started;
+        public Action<TournamentMatch> match_completed;
+        public Action<Tournament, TournamentStage> stage_completed;
+        public Action<Tournament> tournament_completed;
 
         public override void _Ready()
         {

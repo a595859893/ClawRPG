@@ -14,9 +14,9 @@ namespace ClawRPG.Scripts.Systems {
         private PetRecycleDatabase _database;
         
         // 信号
-        public signal RecycleCompleted(PetRecycleRecord record);
-        public signal MaterialAdded(MaterialReward material);
-        public signal StatisticsUpdated();
+        public Action<PetRecycleRecord> RecycleCompleted;
+        public Action<MaterialReward> MaterialAdded;
+        public Action StatisticsUpdated;
         
         public override void _Ready()
         {

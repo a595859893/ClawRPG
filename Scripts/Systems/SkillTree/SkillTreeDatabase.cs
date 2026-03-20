@@ -26,7 +26,6 @@ public class SkillTreeDatabase : DatabaseBase
     {
         InitializeCategories();
         InitializeNodes();
-    }
         Categories["combat"] = new SkillTreeCategory
         {
             CategoryId = "combat",

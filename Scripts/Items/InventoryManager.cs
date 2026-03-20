@@ -40,10 +40,10 @@ namespace ClawRPG.Scripts.Items
         public static InventoryManager Instance { get; private set; }
 
         [Signal]
-        public signal_void InventoryUpdated;
+        public Action InventoryUpdated;
 
         [Signal]
-        public signal_void ItemUsed;
+        public Action ItemUsed;
 
         [Export]
         public int MaxSlots { get; set; } = 30;

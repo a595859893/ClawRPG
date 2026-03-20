@@ -20,12 +20,12 @@ namespace ClawRPG.Systems.SealedDungeon {
         private bool _isInDungeon;
         private Timer _dungeonTimer;
 
-        public signal EventHandler<SealedDungeonData> DungeonStarted;
-        public signal EventHandler<SealedDungeonData> DungeonCompleted;
-        public signal EventHandler<SealedDungeonData> DungeonFailed;
-        public signal EventHandler<(int floor, bool success)> FloorCompleted;
-        public signal EventHandler<DungeonZone> ZoneUnlocked;
-        public signal EventHandler<DungeonReward> RewardClaimed;
+        public Action<SealedDungeonData> DungeonStarted;
+        public Action<SealedDungeonData> DungeonCompleted;
+        public Action<SealedDungeonData> DungeonFailed;
+        public Action<(int floor, bool success)> FloorCompleted;
+        public Action<DungeonZone> ZoneUnlocked;
+        public Action<DungeonReward> RewardClaimed;
 
         public PlayerSealedDungeonData PlayerData => _playerData;
         public SealedDungeonData CurrentDungeon => _currentDungeon;

@@ -8,10 +8,10 @@ public class CharacterCreationSystem : BaseSystem
     private CharacterCreationDatabase _database;
     
     // Signals
-    public signal CharacterCreated(string name, string characterClass, Dictionary<string, int> attributes);
-    public signal AttributeChanged(string attribute, int value);
-    public signal ClassChanged(string characterClass);
-    public signal BackgroundChanged(string background);
+    public Action<string, string, Dictionary<string, int>> CharacterCreated;
+    public Action<string, int> AttributeChanged;
+    public Action<string> ClassChanged;
+    public Action<string> BackgroundChanged;
     
     public override void _Ready()
     {

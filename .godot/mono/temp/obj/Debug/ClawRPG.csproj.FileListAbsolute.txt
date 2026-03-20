@@ -4,10 +4,3 @@
 /project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.AssemblyInfo.cs
 /project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.csproj.CoreCompileInputs.cache
 /project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.sourcelink.json
-/project/ClawRPG/bin/ClawRPG.deps.json
-/project/ClawRPG/bin/ClawRPG.dll
-/project/ClawRPG/bin/ClawRPG.pdb
-/project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.dll
-/project/ClawRPG/.godot/mono/temp/obj/Debug/refint/ClawRPG.dll
-/project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.pdb
-/project/ClawRPG/.godot/mono/temp/obj/Debug/ref/ClawRPG.dll

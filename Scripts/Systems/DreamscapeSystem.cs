@@ -21,13 +21,13 @@ public class DreamscapeSystem : BaseSystem
     private Timer _timer;
     
     // Signals
-    public signal DreamscapeEntered(string dreamscapeId, int layer);
-    public signal DreamscapeLayerStarted(string dreamscapeId, int layer, DreamscapeRule rule);
-    public signal DreamscapeLayerCompleted(string dreamscapeId, int layer, int score, int gold, int exp);
-    public signal DreamscapeCompleted(string dreamscapeId, int totalScore, int totalGold, int totalExp);
-    public signal DreamscapeFailed(string dreamscapeId, int currentLayer);
-    public signal DreamscapeUnlocked(string dreamscapeId);
-    public signal DreamscapeMastered(string dreamscapeId);
+    public Action<string, int> DreamscapeEntered;
+    public Action<string, int, DreamscapeRule> DreamscapeLayerStarted;
+    public Action<string, int, int, int, int> DreamscapeLayerCompleted;
+    public Action<string, int, int, int> DreamscapeCompleted;
+    public Action<string, int> DreamscapeFailed;
+    public Action<string> DreamscapeUnlocked;
+    public Action<string> DreamscapeMastered;
     
     protected override void Initialize()
     {

@@ -36,22 +36,22 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         
         // 事件信号
         [Signal]
-        public signal_void EnchantmentStarted;
+        public Action EnchantmentStarted;
         
         [Signal]
-        public signal_void EnchantmentCompleted;
+        public Action EnchantmentCompleted;
         
         [Signal]
-        public signal_void EnchantmentSuccess;
+        public Action EnchantmentSuccess;
         
         [Signal]
-        public signal_void EnchantmentFailed;
+        public Action EnchantmentFailed;
         
         [Signal]
-        public signal_void EnchantmentUnlocked;
+        public Action EnchantmentUnlocked;
         
         [Signal]
-        public signal_void FocusPointsChanged;
+        public Action FocusPointsChanged;
         
         public override void _Ready()
         {

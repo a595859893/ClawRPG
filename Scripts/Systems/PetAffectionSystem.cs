@@ -24,8 +24,8 @@ namespace ClawRPG.Systems {
         private const float EPIC_PET_MULTIPLIER = 2.0f;
         private const float LEGENDARY_PET_MULTIPLIER = 3.0f;
         
-        public signal AffectionChanged(string petId, int newAffection, int level);
-        public signal AffectionLevelUp(string petId, int newLevel);
+        public Action<string, int, int> AffectionChanged;
+        public Action<string, int> AffectionLevelUp;
         
         public PetAffectionSystem() {
             Instance = this;

@@ -42,14 +42,14 @@ public class FishingSystem : BaseSystem
     private const float ReelTime = 2.0f;
     
     // 信号
-    public signal FishingStarted;
-    public signal FishBit(FishingData fish);
-    public signal FishCaught(FishingData fish, int quantity);
-    public signal FishMissed();
-    public signal FishingEnded();
-    public signal FishingStateChanged(FishingState newState);
-    public signal LevelUp(int newLevel);
-    public signal RodBroken();
+    public Action FishingStarted;
+    public Action<FishingData> FishBit;
+    public Action<FishingData, int> FishCaught;
+    public Action FishMissed;
+    public Action FishingEnded;
+    public Action<FishingState> FishingStateChanged;
+    public Action<int> LevelUp;
+    public Action RodBroken;
     
     public override void _Ready()
     {
