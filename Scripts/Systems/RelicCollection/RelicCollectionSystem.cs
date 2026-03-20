@@ -347,54 +347,6 @@ namespace ClawRPG.Scripts.Systems
     }
 }
 
-// ============================================
-// Relic Database - 遗物数据库 (保留用于兼容)
-// ============================================
-
-using System;
-using System.Collections.Generic;
-
-namespace ClawRPG.Systems.Relics
-{
-    /// <summary>
-    /// 遗物数据库 (已废弃，请使用 RelicConfigLoader)
-    /// 保留此类用于兼容旧代码
-    /// </summary>
-    [Obsolete("请使用 RelicConfigLoader 替代 RelicCollectionDatabase")]
-    public static class RelicCollectionDatabase
-    {
-        /// <summary>
-        /// 获取所有遗物
-        /// </summary>
-        public static Dictionary<string, Relic> Relics => RelicConfigLoader.Relics;
-
-        /// <summary>
-        /// 获取所有套装
-        /// </summary>
-        public static Dictionary<string, RelicSet> RelicSets => RelicConfigLoader.RelicSets;
-
-        /// <summary>
-        /// 获取生成配置
-        /// </summary>
-        public static RelicGenerationConfig GenerationConfig => RelicConfigLoader.GenerationConfig;
-
-        /// <summary>
-        /// 获取稀有度颜色
-        /// </summary>
-        public static string GetRarityColor(RelicRarity rarity)
-        {
-            return RelicConfigLoader.GetRarityColor(rarity);
-        }
-
-        /// <summary>
-        /// 获取随机遗物
-        /// </summary>
-        public static Relic GetRandomRelic()
-        {
-            return RelicConfigLoader.GetRandomRelic();
-        }
-    }
-}
 
 // ============================================
 // Relic Collection System - 遗物收集系统数据定义
