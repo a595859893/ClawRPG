@@ -1,0 +1,623 @@
+{
+  "version": "1.0",
+  "paths": [
+    {
+      "type": "Hero",
+      "name": "Hero's Path",
+      "description": "Walk the path of justice and protection. Your choices strengthen your resolve to help others.",
+      "pathBonuses": {
+        "damage_vs_evil": 0.15,
+        "healing_received": 0.1,
+        "defense": 0.05
+      },
+      "exclusiveChoices": ["village_raid_protect", "beggar_mercy"],
+      "unlockTier": 1
+    },
+    {
+      "type": "AntiHero",
+      "name": "Anti-Hero's Path",
+      "description": "A darker road. You do what needs to be done, regardless of moral costs.",
+      "pathBonuses": {
+        "critical_chance": 0.1,
+        "damage": 0.1,
+        "stealth": 0.1
+      },
+      "exclusiveChoices": ["village_raid_tribute", "beggar_ignore"],
+      "unlockTier": 1
+    },
+    {
+      "type": "Villain",
+      "name": "Villain's Path",
+      "description": "Embrace darkness. Power through fear and domination.",
+      "pathBonuses": {
+        "intimidation": 0.2,
+        "loot_bonus": 0.15,
+        "fear_duration": 0.1
+      },
+      "exclusiveChoices": ["village_raid_slaughter", "beggar_rob"],
+      "unlockTier": 3
+    },
+    {
+      "type": "Mercenary",
+      "name": "Mercenary's Path",
+      "description": "True neutral. Gold is your only loyalty.",
+      "pathBonuses": {
+        "trade_discount": 0.15,
+        "quest_reward": 0.1,
+        "negotiation": 0.1
+      },
+      "exclusiveChoices": ["village_raid_negotiate", "beggar_business"],
+      "unlockTier": 2
+    },
+    {
+      "type": "Legend",
+      "name": "Legend's Path",
+      "description": "Your deeds will be sung for generations. A path of great achievement.",
+      "pathBonuses": {
+        "reputation": 0.2,
+        "drop_rate": 0.1,
+        "exp_bonus": 0.1
+      },
+      "exclusiveChoices": ["legend_trial_sacrifice", "legend_trial_honor"],
+      "unlockTier": 5
+    },
+    {
+      "type": "Myth",
+      "name": "Mythic Path",
+      "description": "Transcend mortal limitations. Become legend itself.",
+      "pathBonuses": {
+        "all_stats": 0.05,
+        "mythical_drop": 0.1,
+        "special_ability": 1.0
+      },
+      "exclusiveChoices": ["myth_trial_gods", "myth_trial_knowledge"],
+      "unlockTier": 10
+    },
+    {
+      "type": "Chaos",
+      "name": "Chaos Path",
+      "description": "Embrace the unpredictable. Randomness is your ally.",
+      "pathBonuses": {
+        "random_effects": 0.2,
+        "critical_damage": 0.15,
+        "spell_variation": 0.1
+      },
+      "exclusiveChoices": ["chaos_trial_unpredictable", "chaos_trial_entropy"],
+      "unlockTier": 4
+    },
+    {
+      "type": "Order",
+      "name": "Order Path",
+      "description": "Structure and discipline guide your journey.",
+      "pathBonuses": {
+        "cooldown_reduction": 0.1,
+        "ability_consistency": 0.15,
+        "defense_bonus": 0.1
+      },
+      "exclusiveChoices": ["order_trial_discipline", "order_trial_structure"],
+      "unlockTier": 4
+    },
+    {
+      "type": "Shadow",
+      "name": "Shadow Path",
+      "description": "Walk in darkness. Strike from the unseen.",
+      "pathBonuses": {
+        "backstab_damage": 0.2,
+        "stealth_effectiveness": 0.15,
+        "evasion": 0.1
+      },
+      "exclusiveChoices": ["shadow_trial_silent", "shadow_trial_whisper"],
+      "unlockTier": 3
+    },
+    {
+      "type": "Light",
+      "name": "Light Path",
+      "description": "Radiance guides your way. Purge darkness wherever you go.",
+      "pathBonuses": {
+        "holy_damage": 0.15,
+        "undead_damage": 0.2,
+        "blessing_effectiveness": 0.15
+      },
+      "exclusiveChoices": ["light_trial_purify", "light_trial_bless"],
+      "unlockTier": 3
+    }
+  ],
+  "choices": [
+    {
+      "id": "village_raid_protect",
+      "title": "Defend the Village",
+      "description": "Bandits attack a small village. You can defend it.",
+      "choiceType": "Moral",
+      "pathInfluence": {
+        "Hero": 15.0,
+        "Legend": 5.0,
+        "Light": 5.0
+      },
+      "statBonuses": {
+        "strength": 2.0,
+        "charisma": 1.0
+      },
+      "consequenceDescription": "The villagers praise your heroism. Word of your deeds spreads.",
+      "isSecret": false,
+      "tierRequired": 1
+    },
+    {
+      "id": "village_raid_tribute",
+      "title": "Accept Tribute",
+      "description": "The village offers you gold to leave them to the bandits.",
+      "choiceType": "Moral",
+      "pathInfluence": {
+        "AntiHero": 10.0,
+        "Mercenary": 15.0,
+        "Villain": 5.0
+      },
+      "statBonuses": {
+        "charisma": 2.0,
+        "luck": 1.0
+      },
+      "consequenceDescription": "You take the gold and walk away. The bandits pillage the village.",
+      "isSecret": false,
+      "tierRequired": 1
+    },
+    {
+      "id": "village_raid_slaughter",
+      "title": "Join the Slaughter",
+      "description": "You can join the bandits in their raid for great plunder.",
+      "choiceType": "Moral",
+      "pathInfluence": {
+        "Villain": 20.0,
+        "Chaos": 5.0,
+        "Shadow": 5.0
+      },
+      "statBonuses": {
+        "strength": 3.0,
+        "dexterity": 1.0
+      },
+      "consequenceDescription": "The village burns. You gain wealth but earn a dark reputation.",
+      "isSecret": false,
+      "tierRequired": 3
+    },
+    {
+      "id": "village_raid_negotiate",
+      "title": "Negotiate Peace",
+      "description": "You attempt to broker a deal between bandits and villagers.",
+      "choiceType": "Moral",
+      "pathInfluence": {
+        "Mercenary": 15.0,
+        "Order": 5.0,
+        "Legend": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 2.0,
+        "charisma": 2.0
+      },
+      "consequenceDescription": "A tense peace is negotiated. Both sides respect your cunning.",
+      "isSecret": false,
+      "tierRequired": 2
+    },
+    {
+      "id": "beggar_mercy",
+      "title": "Give Generously",
+      "description": "A beggar asks for coin. You give freely.",
+      "choiceType": "Moral",
+      "pathInfluence": {
+        "Hero": 10.0,
+        "Light": 5.0
+      },
+      "statBonuses": {
+        "charisma": 1.0,
+        "luck": 2.0
+      },
+      "consequenceDescription": "The beggar reveals themselves as a disguised sage and grants you a blessing.",
+      "isSecret": true,
+      "tierRequired": 1
+    },
+    {
+      "id": "beggar_ignore",
+      "title": "Walk Past",
+      "description": "You ignore the beggar's plea.",
+      "choiceType": "Moral",
+      "pathInfluence": {
+        "AntiHero": 5.0,
+        "Mercenary": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 1.0
+      },
+      "consequenceDescription": "You continue on your path, focused on your goals.",
+      "isSecret": false,
+      "tierRequired": 1
+    },
+    {
+      "id": "beggar_rob",
+      "title": "Rob the Beggar",
+      "description": "The beggar looks wealthy despite their rags. You take what they have.",
+      "choiceType": "Moral",
+      "pathInfluence": {
+        "Villain": 15.0,
+        "Shadow": 5.0
+      },
+      "statBonuses": {
+        "dexterity": 2.0,
+        "luck": 1.0
+      },
+      "consequenceDescription": "You find a small fortune, but feel the weight of your actions.",
+      "isSecret": false,
+      "tierRequired": 2
+    },
+    {
+      "id": "beggar_business",
+      "title": "Offer Employment",
+      "description": "You offer the beggar work in exchange for pay.",
+      "choiceType": "Moral",
+      "pathInfluence": {
+        "Mercenary": 10.0,
+        "Order": 5.0,
+        "Legend": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 2.0,
+        "charisma": 1.0
+      },
+      "consequenceDescription": "The beggar becomes a loyal contact in the underworld.",
+      "isSecret": false,
+      "tierRequired": 2
+    },
+    {
+      "id": "duel_honor",
+      "title": "Honorable Duel",
+      "description": "A warrior challenges you. You accept with honor.",
+      "choiceType": "Combat",
+      "pathInfluence": {
+        "Hero": 10.0,
+        "Legend": 10.0,
+        "Order": 5.0
+      },
+      "statBonuses": {
+        "strength": 2.0,
+        "dexterity": 2.0
+      },
+      "consequenceDescription": "A glorious battle. Whether you win or lose, you gain respect.",
+      "isSecret": false,
+      "tierRequired": 2
+    },
+    {
+      "id": "duel_dirty",
+      "title": "Use Any Means",
+      "description": "Victory at any cost. You fight dirty.",
+      "choiceType": "Combat",
+      "pathInfluence": {
+        "Villain": 10.0,
+        "Chaos": 5.0,
+        "Shadow": 10.0
+      },
+      "statBonuses": {
+        "dexterity": 3.0,
+        "luck": 1.0
+      },
+      "consequenceDescription": "You win, but observers frown upon your tactics.",
+      "isSecret": false,
+      "tierRequired": 2
+    },
+    {
+      "id": "boss_spares",
+      "title": "Spare the Boss",
+      "description": "You defeat a powerful enemy but choose to spare their life.",
+      "choiceType": "Combat",
+      "pathInfluence": {
+        "Hero": 15.0,
+        "Light": 10.0,
+        "Legend": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 3.0,
+        "charisma": 2.0
+      },
+      "consequenceDescription": "The enemy becomes an ally. A powerful friend in need.",
+      "isSecret": false,
+      "tierRequired": 4
+    },
+    {
+      "id": "boss_mercy_no",
+      "title": "Show No Mercy",
+      "description": "You eliminate the defeated enemy completely.",
+      "choiceType": "Combat",
+      "pathInfluence": {
+        "Villain": 10.0,
+        "Shadow": 5.0,
+        "Chaos": 5.0
+      },
+      "statBonuses": {
+        "strength": 3.0,
+        "intelligence": 1.0
+      },
+      "consequenceDescription": "Fear follows your name. No one expects mercy from you.",
+      "isSecret": false,
+      "tierRequired": 3
+    },
+    {
+      "id": "diplomacy_peace",
+      "title": "Seek Peace",
+      "description": "Two factions are at war. You work to broker peace.",
+      "choiceType": "Social",
+      "pathInfluence": {
+        "Hero": 10.0,
+        "Legend": 10.0,
+        "Order": 5.0
+      },
+      "statBonuses": {
+        "charisma": 3.0,
+        "wisdom": 2.0
+      },
+      "consequenceDescription": "Your diplomatic success saves countless lives.",
+      "isSecret": false,
+      "tierRequired": 3
+    },
+    {
+      "id": "diplomacy_war",
+      "title": "Fuel the Conflict",
+      "description": "You supply weapons to both sides, profiting from war.",
+      "choiceType": "Social",
+      "pathInfluence": {
+        "Villain": 15.0,
+        "Mercenary": 15.0,
+        "Chaos": 5.0
+      },
+      "statBonuses": {
+        "luck": 3.0,
+        "charisma": 2.0
+      },
+      "consequenceDescription": "Blood money fills your coffers. Many suffer for your gain.",
+      "isSecret": false,
+      "tierRequired": 4
+    },
+    {
+      "id": "social_lead",
+      "title": "Lead by Example",
+      "description": "You inspire others through your actions.",
+      "choiceType": "Social",
+      "pathInfluence": {
+        "Legend": 15.0,
+        "Hero": 5.0,
+        "Light": 5.0
+      },
+      "statBonuses": {
+        "charisma": 3.0,
+        "wisdom": 2.0
+      },
+      "consequenceDescription": "Followers gather. You become a natural leader.",
+      "isSecret": false,
+      "tierRequired": 3
+    },
+    {
+      "id": "trade_honest",
+      "title": "Honest Deal",
+      "description": "A merchant offers a rigged deal. You refuse.",
+      "choiceType": "Economic",
+      "pathInfluence": {
+        "Hero": 10.0,
+        "Order": 10.0,
+        "Legend": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 2.0,
+        "charisma": 1.0
+      },
+      "consequenceDescription": "Your reputation as an honest trader spreads far and wide.",
+      "isSecret": false,
+      "tierRequired": 1
+    },
+    {
+      "id": "trade_swindle",
+      "title": "Swindle the Mark",
+      "description": "You take advantage of the naive buyer.",
+      "choiceType": "Economic",
+      "pathInfluence": {
+        "Villain": 10.0,
+        "Shadow": 10.0,
+        "Mercenary": 5.0
+      },
+      "statBonuses": {
+        "intelligence": 2.0,
+        "luck": 2.0
+      },
+      "consequenceDescription": "Quick gold, but your name becomes synonymous with deceit.",
+      "isSecret": false,
+      "tierRequired": 2
+    },
+    {
+      "id": "trade_invest",
+      "title": "Invest in Future",
+      "description": "You invest your gold in a risky venture.",
+      "choiceType": "Economic",
+      "pathInfluence": {
+        "Mercenary": 15.0,
+        "Chaos": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 2.0,
+        "luck": 3.0
+      },
+      "consequenceDescription": "Fortune favors the bold. The investment pays off handsomely.",
+      "isSecret": true,
+      "tierRequired": 2
+    },
+    {
+      "id": "explore_danger",
+      "title": "Braved the Danger",
+      "description": "You explore a dangerous ancient ruin.",
+      "choiceType": "Exploration",
+      "pathInfluence": {
+        "Legend": 10.0,
+        "Myth": 5.0,
+        "Chaos": 5.0
+      },
+      "statBonuses": {
+        "dexterity": 2.0,
+        "wisdom": 2.0
+      },
+      "consequenceDescription": "Ancient secrets revealed. Powerful artifacts claimed.",
+      "isSecret": false,
+      "tierRequired": 3
+    },
+    {
+      "id": "explore_careful",
+      "title": "Plan Thoroughly",
+      "description": "You carefully map and plan before exploring.",
+      "choiceType": "Exploration",
+      "pathInfluence": {
+        "Order": 15.0,
+        "Mercenary": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 3.0,
+        "intelligence": 1.0
+      },
+      "consequenceDescription": "Nothing missed. Every treasure secured with minimal risk.",
+      "isSecret": false,
+      "tierRequired": 2
+    },
+    {
+      "id": "explore_sacrifice",
+      "title": "Sacrifice for Knowledge",
+      "description": "You give up something precious to unlock ancient knowledge.",
+      "choiceType": "Exploration",
+      "pathInfluence": {
+        "Myth": 20.0,
+        "Legend": 5.0,
+        "Light": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 4.0,
+        "intelligence": 3.0
+      },
+      "consequenceDescription": "The ancient ones reveal truths beyond mortal comprehension.",
+      "isSecret": true,
+      "tierRequired": 5
+    },
+    {
+      "id": "mystery_truth",
+      "title": "Uncover the Truth",
+      "description": "A conspiracy lurks. You investigate despite the danger.",
+      "choiceType": "Mystery",
+      "pathInfluence": {
+        "Hero": 10.0,
+        "Shadow": 10.0,
+        "Light": 5.0
+      },
+      "statBonuses": {
+        "intelligence": 3.0,
+        "wisdom": 2.0
+      },
+      "consequenceDescription": "The truth is revealed. Evil foiled, but powerful enemies made.",
+      "isSecret": false,
+      "tierRequired": 3
+    },
+    {
+      "id": "mystery_secrets",
+      "title": "Keep the Secrets",
+      "description": "You discover dark secrets and choose to hide them.",
+      "choiceType": "Mystery",
+      "pathInfluence": {
+        "Shadow": 15.0,
+        "Villain": 5.0,
+        "Chaos": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 2.0,
+        "charisma": 2.0
+      },
+      "consequenceDescription": "You hold dangerous knowledge. Power, but at what cost?",
+      "isSecret": true,
+      "tierRequired": 4
+    },
+    {
+      "id": "mystery_sacrifice_innocent",
+      "title": "Sacrifice the Innocent",
+      "description": "To stop a greater evil, you must sacrifice one who is innocent.",
+      "choiceType": "Moral",
+      "pathInfluence": {
+        "AntiHero": 20.0,
+        "Villain": 10.0,
+        "Chaos": 5.0
+      },
+      "statBonuses": {
+        "strength": 3.0,
+        "intelligence": 3.0
+      },
+      "consequenceDescription": "The greater evil is stopped, but your soul grows darker.",
+      "isSecret": false,
+      "tierRequired": 8
+    },
+    {
+      "id": "legend_trial_sacrifice",
+      "title": "Trial by Sacrifice",
+      "description": "A legendary trial requires giving up something dear.",
+      "choiceType": "Mystery",
+      "pathInfluence": {
+        "Legend": 25.0,
+        "Hero": 10.0,
+        "Light": 5.0
+      },
+      "statBonuses": {
+        "all_stats": 5.0
+      },
+      "consequenceDescription": "Sacrifice begets power. You become legend.",
+      "isSecret": false,
+      "tierRequired": 10
+    },
+    {
+      "id": "legend_trial_honor",
+      "title": "Trial by Honor",
+      "description": "Face a legendary challenge with honor as your only shield.",
+      "choiceType": "Combat",
+      "pathInfluence": {
+        "Legend": 25.0,
+        "Hero": 15.0,
+        "Order": 5.0
+      },
+      "statBonuses": {
+        "all_stats": 4.0,
+        "charisma": 3.0
+      },
+      "consequenceDescription": "Your honor shines brighter than any blade. Legend awaits.",
+      "isSecret": false,
+      "tierRequired": 10
+    },
+    {
+      "id": "myth_trial_gods",
+      "title": "Challenge the Gods",
+      "description": "Defy the divine and claim godhood.",
+      "choiceType": "Combat",
+      "pathInfluence": {
+        "Myth": 30.0,
+        "Chaos": 15.0,
+        "Villain": 10.0
+      },
+      "statBonuses": {
+        "all_stats": 10.0
+      },
+      "consequenceDescription": "You ascend. Mortality behind you, eternity ahead.",
+      "isSecret": true,
+      "tierRequired": 15
+    },
+    {
+      "id": "myth_trial_knowledge",
+      "title": "Seek Cosmic Truth",
+      "description": "Abandon all to understand the universe.",
+      "choiceType": "Mystery",
+      "pathInfluence": {
+        "Myth": 30.0,
+        "Order": 10.0,
+        "Light": 5.0
+      },
+      "statBonuses": {
+        "wisdom": 15.0,
+        "intelligence": 15.0
+      },
+      "consequenceDescription": "The cosmos reveals its secrets. You become one with all.",
+      "isSecret": true,
+      "tierRequired": 15
+    }
+  ]
+}
