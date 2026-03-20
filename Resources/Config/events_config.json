@@ -1,0 +1,624 @@
+{
+  "version": "1.0",
+  "events": [
+    {
+      "eventId": "ambush",
+      "title": "遭遇伏击",
+      "description": "你在探索时遭遇了一伙盗贼的伏击！",
+      "category": "Combat",
+      "minPlayerLevel": 1,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "fight",
+          "text": "战斗到底",
+          "resultText": "你击败了盗贼，获得了战利品！",
+          "weight": 0.4,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 50, "chance": 1.0, "id": "" },
+            { "type": "Exp", "amount": 30, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "negotiate",
+          "text": "谈判和解",
+          "resultText": "你支付了一些金币换取安全通过",
+          "weight": 0.3,
+          "requiresGold": true,
+          "goldCost": 30,
+          "rewards": [
+            { "type": "Exp", "amount": 10, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "flee",
+          "text": "快速逃跑",
+          "resultText": "你成功逃跑了，但没有获得任何奖励",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "monster_den",
+      "title": "怪物巢穴",
+      "description": "你发现了一个怪物巢穴，里面似乎有宝贝...",
+      "category": "Combat",
+      "minPlayerLevel": 5,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "attack",
+          "text": "发起攻击",
+          "resultText": "你消灭了怪物，发现了宝藏！",
+          "weight": 0.5,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 100, "chance": 1.0, "id": "" },
+            { "type": "Exp", "amount": 50, "chance": 1.0, "id": "" },
+            { "type": "Item", "amount": 2, "chance": 0.5, "id": "material_001" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "stealth",
+          "text": "悄悄潜入",
+          "resultText": "你偷偷拿了一些财宝然后离开",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 60, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "ignore",
+          "text": "绕道而行",
+          "resultText": "你选择了安全离开",
+          "weight": 0.2,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "ancient_ruins",
+      "title": "古代遗迹",
+      "description": "你在探索中发现了一座神秘的古代遗迹",
+      "category": "Exploration",
+      "minPlayerLevel": 3,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "explore",
+          "text": "深入探索",
+          "resultText": "你发现了古老的宝藏！",
+          "weight": 0.4,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 150, "chance": 1.0, "id": "" },
+            { "type": "Exp", "amount": 80, "chance": 1.0, "id": "" },
+            { "type": "Item", "amount": 1, "chance": 0.3, "id": "ancient_coin" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "research",
+          "text": "研究碑文",
+          "resultText": "你从碑文学到了古老的知识",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Exp", "amount": 100, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "leave",
+          "text": "离开",
+          "resultText": "你决定不打扰这片宁静",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "hidden_chest",
+      "title": "隐藏宝箱",
+      "description": "你注意到墙壁上有一个隐蔽的开关...",
+      "category": "Exploration",
+      "minPlayerLevel": 1,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "open",
+          "text": "打开开关",
+          "resultText": "",
+          "weight": 0.6,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 80, "chance": 0.7, "id": "" },
+            { "type": "Item", "amount": 1, "chance": 0.3, "id": "gem_001" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "ignore",
+          "text": "不冒险",
+          "resultText": "",
+          "weight": 0.4,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "mysterious_merchant",
+      "title": "神秘商人",
+      "description": "一个神秘的商人出现在你面前，想要交易",
+      "category": "Mystery",
+      "minPlayerLevel": 1,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "buy",
+          "text": "购买物品",
+          "resultText": "",
+          "weight": 0.4,
+          "requiresGold": true,
+          "goldCost": 100,
+          "rewards": [
+            { "type": "Item", "amount": 3, "chance": 1.0, "id": "rare_potion" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "trade",
+          "text": "以物易物",
+          "resultText": "",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Item", "amount": 1, "chance": 0.5, "id": "mystic_trade" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "refuse",
+          "text": "拒绝交易",
+          "resultText": "你礼貌地离开了",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "strange_portal",
+      "title": "奇怪传送门",
+      "description": "地面上有一个散发诡异光芒的传送门",
+      "category": "Mystery",
+      "minPlayerLevel": 10,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "enter",
+          "text": "进入传送门",
+          "resultText": "你被传送到了未知的地方...",
+          "weight": 0.4,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 200, "chance": 0.6, "id": "" },
+            { "type": "Exp", "amount": 150, "chance": 0.8, "id": "" },
+            { "type": "Item", "amount": 1, "chance": 0.2, "id": "portal_shard" }
+          ],
+          "penalties": [
+            { "type": "Health", "amount": 20, "chance": 0.3, "id": "" }
+          ]
+        },
+        {
+          "optionId": "study",
+          "text": "研究传送门",
+          "resultText": "你学到了空间魔法的奥秘",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Exp", "amount": 50, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "avoid",
+          "text": "绕开它",
+          "resultText": "你安全地绕开了传送门",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "shrine",
+      "title": "神圣神殿",
+      "description": "你发现了一个古老的神殿，里面供奉着神灵",
+      "category": "Blessing",
+      "minPlayerLevel": 1,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "pray",
+          "text": "祈祷祈福",
+          "resultText": "",
+          "weight": 0.5,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Buff", "amount": 1, "chance": 0.7, "id": "blessing" },
+            { "type": "Exp", "amount": 20, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "sacrifice",
+          "text": "献祭物品",
+          "resultText": "",
+          "weight": 0.3,
+          "requiresGold": true,
+          "goldCost": 50,
+          "rewards": [
+            { "type": "Buff", "amount": 1, "chance": 0.9, "id": "blessing" },
+            { "type": "Exp", "amount": 40, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "ignore",
+          "text": "离开",
+          "resultText": "",
+          "weight": 0.2,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "healing_spring",
+      "title": "治愈之泉",
+      "description": "你发现了一处散发温和光芒的泉水",
+      "category": "Blessing",
+      "minPlayerLevel": 1,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "drink",
+          "text": "饮用泉水",
+          "resultText": "泉水恢复了你的体力！",
+          "weight": 0.6,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Buff", "amount": 1, "chance": 1.0, "id": "healing" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "collect",
+          "text": "收集泉水",
+          "resultText": "",
+          "weight": 0.4,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Item", "amount": 3, "chance": 1.0, "id": "spring_water" }
+          ],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "cursed_artifact",
+      "title": "受诅咒的神器",
+      "description": "你发现了一个散发不祥气息的古老神器",
+      "category": "Curse",
+      "minPlayerLevel": 5,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "take",
+          "text": "拿走神器",
+          "resultText": "你拿走了神器，但受到了诅咒...",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 300, "chance": 1.0, "id": "" },
+            { "type": "Item", "amount": 1, "chance": 1.0, "id": "cursed_artifact" }
+          ],
+          "penalties": [
+            { "type": "Debuff", "amount": 1, "chance": 1.0, "id": "curse" }
+          ]
+        },
+        {
+          "optionId": "destroy",
+          "text": "摧毁神器",
+          "resultText": "你摧毁了神器，获得了功德",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Exp", "amount": 60, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "leave",
+          "text": "不打扰",
+          "resultText": "你快速离开了这个危险的地方",
+          "weight": 0.4,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "dark_ritual",
+      "title": "黑暗仪式",
+      "description": "你意外闯入了正在进行中的黑暗仪式",
+      "category": "Curse",
+      "minPlayerLevel": 8,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "interrupt",
+          "text": "打断仪式",
+          "resultText": "你成功打断了仪式，获得了战利品",
+          "weight": 0.4,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 150, "chance": 1.0, "id": "" },
+            { "type": "Exp", "amount": 80, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "join",
+          "text": "加入仪式",
+          "resultText": "你获得了黑暗力量，但也受到了影响...",
+          "weight": 0.2,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Buff", "amount": 1, "chance": 1.0, "id": "dark_power" }
+          ],
+          "penalties": [
+            { "type": "Debuff", "amount": 1, "chance": 1.0, "id": "shadow_mark" }
+          ]
+        },
+        {
+          "optionId": "escape",
+          "text": "偷偷离开",
+          "resultText": "你成功逃走了",
+          "weight": 0.4,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "abandoned_camp",
+      "title": "废弃营地",
+      "description": "你发现了一个看起来已经废弃的冒险者营地",
+      "category": "Exploration",
+      "minPlayerLevel": 2,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "search",
+          "text": "搜索营地",
+          "resultText": "你找到了一些有用的物品！",
+          "weight": 0.5,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 40, "chance": 0.8, "id": "" },
+            { "type": "Item", "amount": 2, "chance": 0.6, "id": "potion_001" },
+            { "type": "Item", "amount": 1, "chance": 0.4, "id": "material_002" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "rest",
+          "text": "休息一下",
+          "resultText": "你休息了一会儿，恢复了一些体力",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Buff", "amount": 1, "chance": 1.0, "id": "rest" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "ignore",
+          "text": "继续前进",
+          "resultText": "",
+          "weight": 0.2,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "traveling_merchant",
+      "title": "旅行商人",
+      "description": "你遇到了一位旅行商人，他的货物很神秘...",
+      "category": "Mystery",
+      "minPlayerLevel": 1,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "browse",
+          "text": "浏览货物",
+          "resultText": "",
+          "weight": 0.5,
+          "requiresGold": true,
+          "goldCost": 80,
+          "rewards": [
+            { "type": "Item", "amount": 1, "chance": 1.0, "id": "mystery_box" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "ask",
+          "text": "询问情报",
+          "resultText": "商人告诉你一些有用的信息",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Exp", "amount": 25, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "leave",
+          "text": "离开",
+          "resultText": "",
+          "weight": 0.2,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "bandit_leader",
+      "title": "土匪头目",
+      "description": "你遇到了土匪头目，他威胁要抢劫你",
+      "category": "Combat",
+      "minPlayerLevel": 8,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "defeat",
+          "text": "击败他",
+          "resultText": "你战胜了土匪头目，获得了丰厚的奖励！",
+          "weight": 0.4,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Gold", "amount": 200, "chance": 1.0, "id": "" },
+            { "type": "Exp", "amount": 100, "chance": 1.0, "id": "" },
+            { "type": "Item", "amount": 1, "chance": 0.3, "id": "rare_equipment" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "bribe",
+          "text": "贿赂",
+          "resultText": "你给了贿赂金，土匪放你走了",
+          "weight": 0.3,
+          "requiresGold": true,
+          "goldCost": 150,
+          "rewards": [],
+          "penalties": []
+        },
+        {
+          "optionId": "trick",
+          "text": "欺骗",
+          "resultText": "你用计谋甩开了土匪",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Exp", "amount": 30, "chance": 1.0, "id": "" }
+          ],
+          "penalties": []
+        }
+      ]
+    },
+    {
+      "eventId": "dream_world",
+      "title": "梦境世界",
+      "description": "你突然被传送到了一个奇异的梦境世界",
+      "category": "Mystery",
+      "minPlayerLevel": 15,
+      "requiredRegion": "",
+      "options": [
+        {
+          "optionId": "explore_dream",
+          "text": "探索梦境",
+          "resultText": "你在梦中获得了神秘的启示！",
+          "weight": 0.5,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Exp", "amount": 200, "chance": 1.0, "id": "" },
+            { "type": "Buff", "amount": 1, "chance": 0.5, "id": "dream_blessing" }
+          ],
+          "penalties": []
+        },
+        {
+          "optionId": "wake",
+          "text": "努力醒来",
+          "resultText": "你醒来了，但感觉很疲惫",
+          "weight": 0.3,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [],
+          "penalties": [
+            { "type": "Health", "amount": 10, "chance": 1.0, "id": "" }
+          ]
+        },
+        {
+          "optionId": "accept",
+          "text": "接受梦境",
+          "resultText": "你在梦境中获得了强大的力量",
+          "weight": 0.2,
+          "requiresGold": false,
+          "goldCost": 0,
+          "rewards": [
+            { "type": "Buff", "amount": 1, "chance": 1.0, "id": "dream_power" }
+          ],
+          "penalties": []
+        }
+      ]
+    }
+  ]
+}
