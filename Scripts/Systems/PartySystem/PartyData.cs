@@ -80,6 +80,8 @@ public class PartyData
         public int TotalPartiesWon { get; set; }
         public int TotalPartyMembersInvited { get; set; }
         public List<PartyRecord> History { get; set; } = new List<PartyRecord>();
+        public List<int> Friends { get; set; } = new List<int>();
+        public List<int> Blacklist { get; set; } = new List<int>();
     }
 
     public class PartyRecord

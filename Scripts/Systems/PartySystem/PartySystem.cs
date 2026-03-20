@@ -29,6 +29,9 @@ public class PartySystem : BaseSystem
     // PartyOperations service for party creation/join/leave/invite logic
     private PartyOperations _partyOperations;
 
+    // SocialRelations service for friend/blacklist/social data logic
+    private SocialRelations _socialRelations;
+
     public Signal PartyCreated { get; } = new Signal();
     public Signal PartyDisbanded { get; } = new Signal();
     public Signal PlayerJoinedParty { get; } = new Signal();
@@ -40,6 +43,10 @@ public class PartySystem : BaseSystem
     public Signal LeaderChanged { get; } = new Signal();
     public Signal RoleChanged { get; } = new Signal();
     public Signal StateChanged { get; } = new Signal();
+    public Signal FriendAdded { get; } = new Signal();
+    public Signal FriendRemoved { get; } = new Signal();
+    public Signal PlayerBlocked { get; } = new Signal();
+    public Signal PlayerUnblocked { get; } = new Signal();
 
     public void Initialize()
     {
@@ -59,6 +66,15 @@ public class PartySystem : BaseSystem
             InviteDeclined,
             LeaderChanged,
             StateChanged
+        );
+
+        // Initialize SocialRelations with data references and signals
+        _socialRelations = new SocialRelations(
+            ref _playerData,
+            FriendAdded,
+            FriendRemoved,
+            PlayerBlocked,
+            PlayerUnblocked
         );
 
         GD.Print("[PartySystem] Initialized");
@@ -103,6 +119,70 @@ public class PartySystem : BaseSystem
     {
         return _partyOperations.DeclineInvite(playerId);
     }
+
+    // ==================== Social Relations ====================
+
+    public bool AddFriend(int playerId, int friendId)
+    {
+        return _socialRelations.AddFriend(playerId, friendId);
+    }
+
+    public bool RemoveFriend(int playerId, int friendId)
+    {
+        return _socialRelations.RemoveFriend(playerId, friendId);
+    }
+
+    public bool IsFriend(int playerId, int otherId)
+    {
+        return _socialRelations.IsFriend(playerId, otherId);
+    }
+
+    public List<int> GetFriends(int playerId)
+    {
+        return _socialRelations.GetFriends(playerId);
+    }
+
+    public bool BlockPlayer(int playerId, int blockedId)
+    {
+        return _socialRelations.BlockPlayer(playerId, blockedId);
+    }
+
+    public bool UnblockPlayer(int playerId, int unblockedId)
+    {
+        return _socialRelations.UnblockPlayer(playerId, unblockedId);
+    }
+
+    public bool IsBlocked(int playerId, int otherId)
+    {
+        return _socialRelations.IsBlocked(playerId, otherId);
+    }
+
+    public List<int> GetBlacklist(int playerId)
+    {
+        return _socialRelations.GetBlacklist(playerId);
+    }
+
+    public int GetRelationStatus(int playerId, int otherId)
+    {
+        return _socialRelations.GetRelationStatus(playerId, otherId);
+    }
+
+    public int GetFriendCount(int playerId)
+    {
+        return _socialRelations.GetFriendCount(playerId);
+    }
+
+    public int GetBlacklistCount(int playerId)
+    {
+        return _socialRelations.GetBlacklistCount(playerId);
+    }
+
+    public void ClearSocialData(int playerId)
+    {
+        _socialRelations.ClearSocialData(playerId);
+    }
+
+    // ==================== Member Status ====================
 
     public bool SetMemberReady(int playerId, bool ready)
     {
