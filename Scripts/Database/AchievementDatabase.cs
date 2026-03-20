@@ -19,8 +19,6 @@ namespace ClawRPG.Scripts.Database
         /// </summary>
         public static AchievementDatabase Instance { get; private set; }
 
-        public override object Instance => Instance;
-
         public AchievementDatabase()
         {
             Instance = this;
@@ -96,7 +94,17 @@ namespace ClawRPG.Scripts.Database
             return unlockedAchievements.Count;
         }
 
+        /// <summary>
+        /// 验证数据完整性
+        /// </summary>
+        public bool ValidateData()
+        {
+            return _achievements != null && _achievements.Count > 0;
+        }
+
         // IDatabase implementation
+        public object Instance => AchievementDatabase.Instance;
+
         public new T GetData<T>(string key) where T : class
         {
             if (_achievements.TryGetValue(key, out var value) && value is T typedValue)
