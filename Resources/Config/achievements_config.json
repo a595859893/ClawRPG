@@ -1,0 +1,445 @@
+{
+  "version": "1.0",
+  "achievements": [
+    {
+      "id": "kill_10",
+      "name": "初出茅庐",
+      "description": "击杀10个敌人",
+      "type": "Kill",
+      "difficulty": "Easy",
+      "requiredValue": 10,
+      "rewardGold": 50,
+      "rewardExp": 100
+    },
+    {
+      "id": "kill_100",
+      "name": "战士",
+      "description": "击杀100个敌人",
+      "type": "Kill",
+      "difficulty": "Normal",
+      "requiredValue": 100,
+      "rewardGold": 200,
+      "rewardExp": 500
+    },
+    {
+      "id": "kill_500",
+      "name": "战斗大师",
+      "description": "击杀500个敌人",
+      "type": "Kill",
+      "difficulty": "Hard",
+      "requiredValue": 500,
+      "rewardGold": 1000,
+      "rewardExp": 2000
+    },
+    {
+      "id": "kill_1000",
+      "name": "传奇杀手",
+      "description": "击杀1000个敌人",
+      "type": "Kill",
+      "difficulty": "Epic",
+      "requiredValue": 1000,
+      "rewardGold": 5000,
+      "rewardExp": 10000
+    },
+    {
+      "id": "level_5",
+      "name": "初学者",
+      "description": "达到5级",
+      "type": "LevelUp",
+      "difficulty": "Easy",
+      "requiredValue": 5,
+      "rewardGold": 100,
+      "rewardExp": 0
+    },
+    {
+      "id": "level_10",
+      "name": "进阶冒险者",
+      "description": "达到10级",
+      "type": "LevelUp",
+      "difficulty": "Normal",
+      "requiredValue": 10,
+      "rewardGold": 300,
+      "rewardExp": 0
+    },
+    {
+      "id": "level_20",
+      "name": "资深探险家",
+      "description": "达到20级",
+      "type": "LevelUp",
+      "difficulty": "Hard",
+      "requiredValue": 20,
+      "rewardGold": 1000,
+      "rewardExp": 0
+    },
+    {
+      "id": "level_50",
+      "name": "传奇英雄",
+      "description": "达到50级",
+      "type": "LevelUp",
+      "difficulty": "Legendary",
+      "requiredValue": 50,
+      "rewardGold": 10000,
+      "rewardExp": 0
+    },
+    {
+      "id": "gold_1000",
+      "name": "小有积蓄",
+      "description": "累计获得1000金币",
+      "type": "Gold",
+      "difficulty": "Easy",
+      "requiredValue": 1000,
+      "rewardGold": 0,
+      "rewardExp": 200
+    },
+    {
+      "id": "gold_10000",
+      "name": "富甲一方",
+      "description": "累计获得10000金币",
+      "type": "Gold",
+      "difficulty": "Normal",
+      "requiredValue": 10000,
+      "rewardGold": 0,
+      "rewardExp": 1000
+    },
+    {
+      "id": "gold_100000",
+      "name": "金币大亨",
+      "description": "累计获得100000金币",
+      "type": "Gold",
+      "difficulty": "Epic",
+      "requiredValue": 100000,
+      "rewardGold": 0,
+      "rewardExp": 5000
+    },
+    {
+      "id": "boss_1",
+      "name": "首胜",
+      "description": "击败第一个Boss",
+      "type": "Boss",
+      "difficulty": "Normal",
+      "requiredValue": 1,
+      "rewardGold": 500,
+      "rewardExp": 1000
+    },
+    {
+      "id": "boss_5",
+      "name": "Boss猎人",
+      "description": "击败5个Boss",
+      "type": "Boss",
+      "difficulty": "Hard",
+      "requiredValue": 5,
+      "rewardGold": 2000,
+      "rewardExp": 3000
+    },
+    {
+      "id": "boss_all",
+      "name": "Boss克星",
+      "description": "击败所有Boss",
+      "type": "Boss",
+      "difficulty": "Legendary",
+      "requiredValue": 9,
+      "rewardGold": 10000,
+      "rewardExp": 20000
+    },
+    {
+      "id": "craft_1",
+      "name": "新手匠人",
+      "description": "合成第一件装备",
+      "type": "Craft",
+      "difficulty": "Easy",
+      "requiredValue": 1,
+      "rewardGold": 100,
+      "rewardExp": 200
+    },
+    {
+      "id": "craft_10",
+      "name": "熟练工匠",
+      "description": "合成10件装备",
+      "type": "Craft",
+      "difficulty": "Normal",
+      "requiredValue": 10,
+      "rewardGold": 500,
+      "rewardExp": 1000
+    },
+    {
+      "id": "craft_50",
+      "name": "大师级铁匠",
+      "description": "合成50件装备",
+      "type": "Craft",
+      "difficulty": "Hard",
+      "requiredValue": 50,
+      "rewardGold": 3000,
+      "rewardExp": 5000
+    },
+    {
+      "id": "quest_1",
+      "name": "初试任务",
+      "description": "完成第一个任务",
+      "type": "Quest",
+      "difficulty": "Easy",
+      "requiredValue": 1,
+      "rewardGold": 100,
+      "rewardExp": 200
+    },
+    {
+      "id": "quest_10",
+      "name": "任务达人",
+      "description": "完成10个任务",
+      "type": "Quest",
+      "difficulty": "Normal",
+      "requiredValue": 10,
+      "rewardGold": 500,
+      "rewardExp": 1500
+    },
+    {
+      "id": "quest_all",
+      "name": "任务大师",
+      "description": "完成所有任务",
+      "type": "Quest",
+      "difficulty": "Epic",
+      "requiredValue": 15,
+      "rewardGold": 5000,
+      "rewardExp": 10000
+    },
+    {
+      "id": "combo_10",
+      "name": "连击初学者",
+      "description": "达成10连击",
+      "type": "Combo",
+      "difficulty": "Easy",
+      "requiredValue": 10,
+      "rewardGold": 100,
+      "rewardExp": 300
+    },
+    {
+      "id": "combo_50",
+      "name": "连击达人",
+      "description": "达成50连击",
+      "type": "Combo",
+      "difficulty": "Normal",
+      "requiredValue": 50,
+      "rewardGold": 500,
+      "rewardExp": 1000
+    },
+    {
+      "id": "combo_100",
+      "name": "连击王者",
+      "description": "达成100连击",
+      "type": "Combo",
+      "difficulty": "Hard",
+      "requiredValue": 100,
+      "rewardGold": 2000,
+      "rewardExp": 3000
+    },
+    {
+      "id": "survive_1min",
+      "name": "生存新手",
+      "description": "累计生存1分钟",
+      "type": "Survival",
+      "difficulty": "Easy",
+      "requiredValue": 60,
+      "rewardGold": 50,
+      "rewardExp": 100
+    },
+    {
+      "id": "survive_10min",
+      "name": "生存专家",
+      "description": "累计生存10分钟",
+      "type": "Survival",
+      "difficulty": "Normal",
+      "requiredValue": 600,
+      "rewardGold": 300,
+      "rewardExp": 500
+    },
+    {
+      "id": "survive_1hour",
+      "name": "生存大师",
+      "description": "累计生存1小时",
+      "type": "Survival",
+      "difficulty": "Hard",
+      "requiredValue": 3600,
+      "rewardGold": 2000,
+      "rewardExp": 3000
+    },
+    {
+      "id": "damage_1000",
+      "name": "初露锋芒",
+      "description": "单次造成1000伤害",
+      "type": "Damage",
+      "difficulty": "Easy",
+      "requiredValue": 1000,
+      "rewardGold": 200,
+      "rewardExp": 300
+    },
+    {
+      "id": "damage_10000",
+      "name": "伤害输出者",
+      "description": "单次造成10000伤害",
+      "type": "Damage",
+      "difficulty": "Normal",
+      "requiredValue": 10000,
+      "rewardGold": 1000,
+      "rewardExp": 2000
+    },
+    {
+      "id": "damage_100000",
+      "name": "毁灭者",
+      "description": "单次造成100000伤害",
+      "type": "Damage",
+      "difficulty": "Epic",
+      "requiredValue": 100000,
+      "rewardGold": 5000,
+      "rewardExp": 10000
+    },
+    {
+      "id": "skill_learn_5",
+      "name": "技能学徒",
+      "description": "学习5个技能",
+      "type": "Skill",
+      "difficulty": "Easy",
+      "requiredValue": 5,
+      "rewardGold": 200,
+      "rewardExp": 500
+    },
+    {
+      "id": "skill_learn_15",
+      "name": "技能大师",
+      "description": "学习15个技能",
+      "type": "Skill",
+      "difficulty": "Normal",
+      "requiredValue": 15,
+      "rewardGold": 1000,
+      "rewardExp": 2000
+    },
+    {
+      "id": "explore_3",
+      "name": "初探世界",
+      "description": "探索3个区域",
+      "type": "Explore",
+      "difficulty": "Easy",
+      "requiredValue": 3,
+      "rewardGold": 100,
+      "rewardExp": 200
+    },
+    {
+      "id": "explore_all",
+      "name": "世界探索者",
+      "description": "探索所有区域",
+      "type": "Explore",
+      "difficulty": "Hard",
+      "requiredValue": 7,
+      "rewardGold": 2000,
+      "rewardExp": 5000
+    },
+    {
+      "id": "enrage_kill_1",
+      "name": "狂暴杀手",
+      "description": "在Boss狂暴状态下击杀1个Boss",
+      "type": "EnrageKill",
+      "difficulty": "Normal",
+      "requiredValue": 1,
+      "rewardGold": 1000,
+      "rewardExp": 2000
+    },
+    {
+      "id": "enrage_kill_5",
+      "name": "狂暴猎手",
+      "description": "在Boss狂暴状态下击杀5个Boss",
+      "type": "EnrageKill",
+      "difficulty": "Hard",
+      "requiredValue": 5,
+      "rewardGold": 3000,
+      "rewardExp": 5000
+    },
+    {
+      "id": "enrage_kill_10",
+      "name": "狂暴终结者",
+      "description": "在Boss狂暴状态下击杀10个Boss",
+      "type": "EnrageKill",
+      "difficulty": "Epic",
+      "requiredValue": 10,
+      "rewardGold": 8000,
+      "rewardExp": 15000
+    },
+    {
+      "id": "perfect_block_10",
+      "name": "格挡新手",
+      "description": "完成10次完美格挡",
+      "type": "PerfectBlock",
+      "difficulty": "Easy",
+      "requiredValue": 10,
+      "rewardGold": 200,
+      "rewardExp": 500
+    },
+    {
+      "id": "perfect_block_50",
+      "name": "格挡大师",
+      "description": "完成50次完美格挡",
+      "type": "PerfectBlock",
+      "difficulty": "Normal",
+      "requiredValue": 50,
+      "rewardGold": 800,
+      "rewardExp": 1500
+    },
+    {
+      "id": "perfect_block_100",
+      "name": "铁壁防御者",
+      "description": "完成100次完美格挡",
+      "type": "PerfectBlock",
+      "difficulty": "Hard",
+      "requiredValue": 100,
+      "rewardGold": 2000,
+      "rewardExp": 3000
+    },
+    {
+      "id": "counter_5",
+      "name": "反击新手",
+      "description": "成功完成5次反击",
+      "type": "CounterAttack",
+      "difficulty": "Easy",
+      "requiredValue": 5,
+      "rewardGold": 300,
+      "rewardExp": 500
+    },
+    {
+      "id": "counter_25",
+      "name": "反击达人",
+      "description": "成功完成25次反击",
+      "type": "CounterAttack",
+      "difficulty": "Normal",
+      "requiredValue": 25,
+      "rewardGold": 1000,
+      "rewardExp": 2000
+    },
+    {
+      "id": "counter_50",
+      "name": "反击大师",
+      "description": "成功完成50次反击",
+      "type": "CounterAttack",
+      "difficulty": "Hard",
+      "requiredValue": 50,
+      "rewardGold": 2500,
+      "rewardExp": 5000
+    },
+    {
+      "id": "nohit_boss_1",
+      "name": "无伤初战",
+      "description": "无伤击败1个Boss",
+      "type": "NoHitBoss",
+      "difficulty": "Hard",
+      "requiredValue": 1,
+      "rewardGold": 2000,
+      "rewardExp": 3000
+    },
+    {
+      "id": "nohit_boss_3",
+      "name": "无伤猎手",
+      "description": "无伤击败3个Boss",
+      "type": "NoHitBoss",
+      "difficulty": "Epic",
+      "requiredValue": 3,
+      "rewardGold": 5000,
+      "rewardExp": 8000
+    }
+  ]
+}
