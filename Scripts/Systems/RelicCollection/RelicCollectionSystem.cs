@@ -35,8 +35,17 @@ namespace ClawRPG.Scripts.Systems
         // 初始化玩家数据
         protected override void Initialize()
         {
+            // 加载圣物配置
+            if (!RelicConfigLoader.IsLoaded)
+            {
+                if (!RelicConfigLoader.Load())
+                {
+                    GD.PrintErr("[RelicCollectionSystem] 警告: 圣物配置加载失败，将使用空配置");
+                }
+            }
+
             // 解锁所有普通遗物作为起始遗物
-            foreach (var relic in RelicCollectionDatabase.Relics.Values)
+            foreach (var relic in RelicConfigLoader.Relics.Values)
             {
                 if (relic.Rarity == RelicRarity.Common && !_playerCollection.Relics.ContainsKey(relic.Id))
                 {
@@ -55,7 +64,7 @@ namespace ClawRPG.Scripts.Systems
                 return true;
             }
 
-            if (RelicCollectionDatabase.Relics.ContainsKey(relicId))
+            if (RelicConfigLoader.Relics.ContainsKey(relicId))
             {
                 var relicData = new PlayerRelicData
                 {
@@ -114,7 +123,7 @@ namespace ClawRPG.Scripts.Systems
         public List<Relic> GenerateRoomRelics(int floorNumber)
         {
             _currentRoomRelics.Clear();
-            var config = RelicCollectionDatabase.GenerationConfig;
+            var config = RelicConfigLoader.GenerationConfig;
             var random = new Random();
             
             int relicCount = random.Next(config.MinRelicsPerFloor, config.MaxRelicsPerFloor + 1);
@@ -147,9 +156,9 @@ namespace ClawRPG.Scripts.Systems
             double epicBonus = Math.Min(floorNumber * 0.01, 0.10);
             
             RelicRarity rarity;
-            double adjustedMythic = RelicCollectionDatabase.GenerationConfig.MythicChance + mythBonus;
-            double adjustedLegendary = RelicCollectionDatabase.GenerationConfig.LegendaryChance + legBonus;
-            double adjustedEpic = RelicCollectionDatabase.GenerationConfig.EpicChance + epicBonus;
+            double adjustedMythic = RelicConfigLoader.GenerationConfig.MythicChance + mythBonus;
+            double adjustedLegendary = RelicConfigLoader.GenerationConfig.LegendaryChance + legBonus;
+            double adjustedEpic = RelicConfigLoader.GenerationConfig.EpicChance + epicBonus;
             
             if (roll < adjustedMythic)
                 rarity = RelicRarity.Mythic;
@@ -157,15 +166,15 @@ namespace ClawRPG.Scripts.Systems
                 rarity = RelicRarity.Legendary;
             else if (roll < adjustedMythic + adjustedLegendary + adjustedEpic)
                 rarity = RelicRarity.Epic;
-            else if (roll < adjustedMythic + adjustedLegendary + adjustedEpic + RelicCollectionDatabase.GenerationConfig.RareChance)
+            else if (roll < adjustedMythic + adjustedLegendary + adjustedEpic + RelicConfigLoader.GenerationConfig.RareChance)
                 rarity = RelicRarity.Rare;
-            else if (roll < adjustedMythic + adjustedLegendary + adjustedEpic + RelicCollectionDatabase.GenerationConfig.RareChance + RelicCollectionDatabase.GenerationConfig.UncommonChance)
+            else if (roll < adjustedMythic + adjustedLegendary + adjustedEpic + RelicConfigLoader.GenerationConfig.RareChance + RelicConfigLoader.GenerationConfig.UncommonChance)
                 rarity = RelicRarity.Uncommon;
             else
                 rarity = RelicRarity.Common;
 
             // 获取该稀有度的遗物
-            var relicsOfRarity = RelicCollectionDatabase.Relics.Values
+            var relicsOfRarity = RelicConfigLoader.Relics.Values
                 .Where(r => r.Rarity == rarity && !_playerCollection.Relics.ContainsKey(r.Id) || 
                            (_playerCollection.Relics.ContainsKey(r.Id) && !_playerCollection.Relics[r.Id].Unlocked))
                 .ToList();
@@ -173,7 +182,7 @@ namespace ClawRPG.Scripts.Systems
             if (relicsOfRarity.Count == 0)
             {
                 // 如果没有未解锁的，降级获取
-                relicsOfRarity = RelicCollectionDatabase.Relics.Values
+                relicsOfRarity = RelicConfigLoader.Relics.Values
                     .Where(r => r.Rarity <= rarity)
                     .ToList();
             }
@@ -191,7 +200,7 @@ namespace ClawRPG.Scripts.Systems
             
             foreach (var relicId in _playerCollection.EquippedRelics)
             {
-                if (RelicCollectionDatabase.Relics.TryGetValue(relicId, out var relic) && 
+                if (RelicConfigLoader.Relics.TryGetValue(relicId, out var relic) && 
                     !string.IsNullOrEmpty(relic.SetId))
                 {
                     if (!equippedSets.ContainsKey(relic.SetId))
@@ -202,7 +211,7 @@ namespace ClawRPG.Scripts.Systems
 
             foreach (var set in equippedSets)
             {
-                if (RelicCollectionDatabase.RelicSets.TryGetValue(set.Key, out var setConfig))
+                if (RelicConfigLoader.RelicSets.TryGetValue(set.Key, out var setConfig))
                 {
                     if (set.Value >= setConfig.RequiredCount && 
                         (!_playerCollection.SetCompletions.ContainsKey(set.Key) || 
@@ -222,7 +231,7 @@ namespace ClawRPG.Scripts.Systems
             
             foreach (var relicId in _playerCollection.EquippedRelics)
             {
-                if (!RelicCollectionDatabase.Relics.TryGetValue(relicId, out var relic))
+                if (!RelicConfigLoader.Relics.TryGetValue(relicId, out var relic))
                     continue;
 
                 var relicData = _playerCollection.Relics[relicId];
@@ -245,7 +254,7 @@ namespace ClawRPG.Scripts.Systems
             // 套装加成
             foreach (var set in _playerCollection.SetCompletions)
             {
-                if (RelicCollectionDatabase.RelicSets.TryGetValue(set.Key, out var setConfig))
+                if (RelicConfigLoader.RelicSets.TryGetValue(set.Key, out var setConfig))
                 {
                     if (!bonuses.ContainsKey(setConfig.SetEffect))
                         bonuses[setConfig.SetEffect] = 0;
@@ -289,22 +298,22 @@ namespace ClawRPG.Scripts.Systems
             foreach (RelicRarity rarity in Enum.GetValues(typeof(RelicRarity)))
             {
                 stats.UnlockedByRarity[rarity] = _playerCollection.Relics.Count(r => 
-                    r.Value.Unlocked && RelicCollectionDatabase.Relics.TryGetValue(r.Key, out var relic) && relic.Rarity == rarity);
+                    r.Value.Unlocked && RelicConfigLoader.Relics.TryGetValue(r.Key, out var relic) && relic.Rarity == rarity);
             }
 
             foreach (RelicType type in Enum.GetValues(typeof(RelicType)))
             {
                 stats.UnlockedByType[type] = _playerCollection.Relics.Count(r => 
-                    r.Value.Unlocked && RelicCollectionDatabase.Relics.TryGetValue(r.Key, out var relic) && relic.Type == type);
+                    r.Value.Unlocked && RelicConfigLoader.Relics.TryGetValue(r.Key, out var relic) && relic.Type == type);
             }
 
             return stats;
         }
 
         // 导出存档数据
-        public override Dictionary<string, object> ExportSaveData()
+        public override Dictionary ExportSaveData()
         {
-            return new Dictionary<string, object>
+            return new Dictionary
             {
                 ["Relics"] = _playerCollection.Relics,
                 ["EquippedRelics"] = _playerCollection.EquippedRelics,
@@ -314,26 +323,198 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 导入存档数据
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary data)
         {
             if (data == null) return;
 
-            if (data.TryGetValue("Relics", out var relics))
+            if (data.ContainsKey("Relics"))
             {
-                _playerCollection.Relics = relics as Dictionary<string, PlayerRelicData> ?? new Dictionary<string, PlayerRelicData>();
+                _playerCollection.Relics = data["Relics"] as Dictionary<string, PlayerRelicData> ?? new Dictionary<string, PlayerRelicData>();
             }
-            if (data.TryGetValue("EquippedRelics", out var equipped))
+            if (data.ContainsKey("EquippedRelics"))
             {
-                _playerCollection.EquippedRelics = equipped as List<string> ?? new List<string>();
+                _playerCollection.EquippedRelics = data["EquippedRelics"] as List<string> ?? new List<string>();
             }
-            if (data.TryGetValue("SetCompletions", out var sets))
+            if (data.ContainsKey("SetCompletions"))
             {
-                _playerCollection.SetCompletions = sets as Dictionary<string, int> ?? new Dictionary<string, int>();
+                _playerCollection.SetCompletions = data["SetCompletions"] as Dictionary<string, int> ?? new Dictionary<string, int>();
             }
-            if (data.TryGetValue("TotalRelicsUnlocked", out var total))
+            if (data.ContainsKey("TotalRelicsUnlocked"))
             {
-                _playerCollection.TotalRelicsUnlocked = Convert.ToInt32(total);
+                _playerCollection.TotalRelicsUnlocked = Convert.ToInt32(data["TotalRelicsUnlocked"]);
             }
         }
+    }
+}
+
+// ============================================
+// Relic Database - 遗物数据库 (保留用于兼容)
+// ============================================
+
+using System;
+using System.Collections.Generic;
+
+namespace ClawRPG.Systems.Relics
+{
+    /// <summary>
+    /// 遗物数据库 (已废弃，请使用 RelicConfigLoader)
+    /// 保留此类用于兼容旧代码
+    /// </summary>
+    [Obsolete("请使用 RelicConfigLoader 替代 RelicCollectionDatabase")]
+    public static class RelicCollectionDatabase
+    {
+        /// <summary>
+        /// 获取所有遗物
+        /// </summary>
+        public static Dictionary<string, Relic> Relics => RelicConfigLoader.Relics;
+
+        /// <summary>
+        /// 获取所有套装
+        /// </summary>
+        public static Dictionary<string, RelicSet> RelicSets => RelicConfigLoader.RelicSets;
+
+        /// <summary>
+        /// 获取生成配置
+        /// </summary>
+        public static RelicGenerationConfig GenerationConfig => RelicConfigLoader.GenerationConfig;
+
+        /// <summary>
+        /// 获取稀有度颜色
+        /// </summary>
+        public static string GetRarityColor(RelicRarity rarity)
+        {
+            return RelicConfigLoader.GetRarityColor(rarity);
+        }
+
+        /// <summary>
+        /// 获取随机遗物
+        /// </summary>
+        public static Relic GetRandomRelic()
+        {
+            return RelicConfigLoader.GetRandomRelic();
+        }
+    }
+}
+
+// ============================================
+// Relic Collection System - 遗物收集系统数据定义
+// ============================================
+
+namespace ClawRPG.Systems.Relics
+{
+    // 遗物稀有度
+    public enum RelicRarity
+    {
+        Common = 1,      // 普通
+        Uncommon = 2,    // 优秀
+        Rare = 3,        // 稀有
+        Epic = 4,        // 史诗
+        Legendary = 5,   // 传说
+        Mythic = 6       // 神器
+    }
+
+    // 遗物类型
+    public enum RelicType
+    {
+        Weapon,      // 武器
+        Armor,       // 护甲
+        Accessory,   // 饰品
+        Passive,     // 被遗物
+        Trigger,     // 触发遗物
+        Set          // 套装遗物
+    }
+
+    // 遗物效果类型
+    public enum RelicEffectType
+    {
+        DamageIncrease,      // 伤害增加
+        DamageReduction,    // 伤害减免
+        CriticalRate,       // 暴击率
+        CriticalDamage,     // 暴击伤害
+        AttackSpeed,        // 攻击速度
+        MoveSpeed,          // 移动速度
+        HealthMax,          // 最大生命
+        ManaMax,            // 最大法力
+        HealthRegen,        // 生命恢复
+        ManaRegen,          // 法力恢复
+        LifeSteal,          // 生命偷取
+        CooldownReduction,  // 冷却缩减
+        ElementalDamage,    // 元素伤害
+        ElementalResist,    // 元素抗性
+        GoldGain,           // 金币获取
+        ExperienceGain,     // 经验获取
+        DropRate,           // 掉落率
+        EnemyScale,         // 敌人规模
+        RoomReward          // 房间奖励
+    }
+
+    // 遗物数据
+    public class Relic
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public RelicType Type { get; set; }
+        public RelicRarity Rarity { get; set; }
+        public RelicEffectType PrimaryEffect { get; set; }
+        public double PrimaryEffectValue { get; set; }
+        public RelicEffectType? SecondaryEffect { get; set; }
+        public double? SecondaryEffectValue { get; set; }
+        public string SetId { get; set; }
+        public int Level { get; set; }
+    }
+
+    // 遗物套装
+    public class RelicSet
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int RequiredCount { get; set; }
+        public RelicEffectType SetEffect { get; set; }
+        public double SetEffectValue { get; set; }
+    }
+
+    // 玩家遗物数据
+    public class PlayerRelicData
+    {
+        public string RelicId { get; set; }
+        public bool Unlocked { get; set; }
+        public int CurrentLevel { get; set; }
+        public int MaxLevel { get; set; }
+        public bool Equipped { get; set; }
+    }
+
+    // 玩家遗物收集数据
+    public class PlayerRelicCollection
+    {
+        public Dictionary<string, PlayerRelicData> Relics { get; set; }
+        public List<string> EquippedRelics { get; set; }
+        public Dictionary<string, int> SetCompletions { get; set; }
+        public int TotalRelicsUnlocked { get; set; }
+    }
+
+    // 遗物统计
+    public class RelicStatistics
+    {
+        public int TotalRelicsUnlocked { get; set; }
+        public int TotalRelicsEquipped { get; set; }
+        public Dictionary<RelicRarity, int> UnlockedByRarity { get; set; }
+        public Dictionary<RelicType, int> UnlockedByType { get; set; }
+        public int SetsCompleted { get; set; }
+        public int TotalRelicLevels { get; set; }
+    }
+
+    // 遗物生成配置
+    public class RelicGenerationConfig
+    {
+        public int MinRelicsPerFloor { get; set; }
+        public int MaxRelicsPerFloor { get; set; }
+        public double CommonChance { get; set; }
+        public double UncommonChance { get; set; }
+        public double RareChance { get; set; }
+        public double EpicChance { get; set; }
+        public double LegendaryChance { get; set; }
+        public double MythicChance { get; set; }
     }
 }
