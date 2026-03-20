@@ -1,0 +1,1272 @@
+{
+  "version": "1.0",
+  "enemies": [
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "maxHealth": 30,
+      "speed": 80.0,
+      "damage": 8.0,
+      "description": "A small, mischievous creature",
+      "attackRange": 40.0,
+      "attackCooldown": 1.2,
+      "chaseRange": 150.0,
+      "detectionRange": 250.0,
+      "experienceReward": 10,
+      "goldReward": 5,
+      "dropTable": {
+        "goblin_ear": 0.3,
+        "monster_essence": 0.1
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.4,
+        "g": 0.6,
+        "b": 0.3
+      }
+    },
+    {
+      "id": "wolf",
+      "name": "Forest Wolf",
+      "maxHealth": 45,
+      "speed": 120.0,
+      "damage": 12.0,
+      "description": "A fierce predator from the forest",
+      "attackRange": 35.0,
+      "attackCooldown": 0.8,
+      "chaseRange": 200.0,
+      "detectionRange": 300.0,
+      "experienceReward": 15,
+      "goldReward": 8,
+      "dropTable": {
+        "monster_essence": 0.2,
+        "wolf_pelt": 0.4
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.5,
+        "g": 0.5,
+        "b": 0.5
+      }
+    },
+    {
+      "id": "slime",
+      "name": "Forest Slime",
+      "maxHealth": 25,
+      "speed": 40.0,
+      "damage": 5.0,
+      "description": "A gelatinous blob",
+      "attackRange": 30.0,
+      "attackCooldown": 2.0,
+      "chaseRange": 100.0,
+      "detectionRange": 150.0,
+      "experienceReward": 5,
+      "goldReward": 2,
+      "dropTable": {
+        "slime_gel": 0.5
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.5,
+        "ice": 0.5
+      },
+      "spriteModulate": {
+        "r": 0.3,
+        "g": 0.8,
+        "b": 0.3
+      }
+    },
+    {
+      "id": "spider",
+      "name": "Giant Spider",
+      "maxHealth": 40,
+      "speed": 100.0,
+      "damage": 10.0,
+      "description": "A poisonous arachnid",
+      "attackRange": 45.0,
+      "attackCooldown": 1.0,
+      "chaseRange": 180.0,
+      "detectionRange": 280.0,
+      "experienceReward": 12,
+      "goldReward": 6,
+      "dropTable": {
+        "spider_silk": 0.4,
+        "monster_essence": 0.15
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.3
+      },
+      "spriteModulate": {
+        "r": 0.2,
+        "g": 0.1,
+        "b": 0.2
+      }
+    },
+    {
+      "id": "forest_bear",
+      "name": "Forest Bear",
+      "maxHealth": 80,
+      "speed": 90.0,
+      "damage": 22.0,
+      "description": "A powerful bear of the forest",
+      "attackRange": 55.0,
+      "attackCooldown": 1.8,
+      "chaseRange": 180.0,
+      "detectionRange": 280.0,
+      "experienceReward": 28,
+      "goldReward": 18,
+      "dropTable": {
+        "bear_pelt": 0.5,
+        "monster_essence": 0.2
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.45,
+        "g": 0.3,
+        "b": 0.2
+      }
+    },
+    {
+      "id": "mystic_deer",
+      "name": "Mystic Deer",
+      "maxHealth": 35,
+      "speed": 130.0,
+      "damage": 8.0,
+      "description": "A magical deer with antlers glowing with nature power",
+      "attackRange": 30.0,
+      "attackCooldown": 0.9,
+      "chaseRange": 160.0,
+      "detectionRange": 260.0,
+      "experienceReward": 15,
+      "goldReward": 10,
+      "dropTable": {
+        "antler": 0.4,
+        "nature_essence": 0.25
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.85,
+        "g": 0.75,
+        "b": 0.6
+      }
+    },
+    {
+      "id": "poison_mushroom",
+      "name": "Poison Mushroom",
+      "maxHealth": 30,
+      "speed": 35.0,
+      "damage": 14.0,
+      "description": "A sentient fungus that releases toxic spores",
+      "attackRange": 45.0,
+      "attackCooldown": 1.5,
+      "chaseRange": 80.0,
+      "detectionRange": 150.0,
+      "experienceReward": 14,
+      "goldReward": 8,
+      "dropTable": {
+        "mushroom": 0.6,
+        "poison_essence": 0.2
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.4
+      },
+      "spriteModulate": {
+        "r": 0.6,
+        "g": 0.2,
+        "b": 0.7
+      }
+    },
+    {
+      "id": "bat",
+      "name": "Cave Bat",
+      "maxHealth": 20,
+      "speed": 150.0,
+      "damage": 6.0,
+      "description": "A nocturnal flying creature",
+      "attackRange": 25.0,
+      "attackCooldown": 0.6,
+      "chaseRange": 120.0,
+      "detectionRange": 200.0,
+      "experienceReward": 8,
+      "goldReward": 3,
+      "dropTable": {
+        "monster_essence": 0.1
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.3,
+        "g": 0.2,
+        "b": 0.3
+      }
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton Warrior",
+      "maxHealth": 55,
+      "speed": 70.0,
+      "damage": 15.0,
+      "description": "An undead warrior",
+      "attackRange": 50.0,
+      "attackCooldown": 1.5,
+      "chaseRange": 160.0,
+      "detectionRange": 260.0,
+      "experienceReward": 20,
+      "goldReward": 12,
+      "dropTable": {
+        "skeleton_bone": 0.5,
+        "ancient_coin": 0.2
+      },
+      "statusEffectVulnerability": {
+        "holy": 1.5,
+        "fire": 1.2
+      },
+      "spriteModulate": {
+        "r": 0.9,
+        "g": 0.9,
+        "b": 0.85
+      }
+    },
+    {
+      "id": "cave_spider",
+      "name": "Cave Spider",
+      "maxHealth": 50,
+      "speed": 90.0,
+      "damage": 14.0,
+      "description": "A blind spider from the depths",
+      "attackRange": 50.0,
+      "attackCooldown": 1.2,
+      "chaseRange": 150.0,
+      "detectionRange": 220.0,
+      "experienceReward": 18,
+      "goldReward": 10,
+      "dropTable": {
+        "spider_silk": 0.5,
+        "dark_crystal": 0.15
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.4
+      },
+      "spriteModulate": {
+        "r": 0.15,
+        "g": 0.08,
+        "b": 0.15
+      }
+    },
+    {
+      "id": "rock_golem",
+      "name": "Rock Golem",
+      "maxHealth": 100,
+      "speed": 40.0,
+      "damage": 20.0,
+      "description": "A stone construct animated with magic",
+      "attackRange": 60.0,
+      "attackCooldown": 2.0,
+      "chaseRange": 100.0,
+      "detectionRange": 180.0,
+      "experienceReward": 30,
+      "goldReward": 20,
+      "dropTable": {
+        "golem_core": 0.3,
+        "ancient_coin": 0.1
+      },
+      "statusEffectVulnerability": {
+        "ice": 1.3,
+        "lightning": 1.4
+      },
+      "spriteModulate": {
+        "r": 0.5,
+        "g": 0.45,
+        "b": 0.4
+      }
+    },
+    {
+      "id": "giant_centipede",
+      "name": "Giant Centipede",
+      "maxHealth": 45,
+      "speed": 110.0,
+      "damage": 12.0,
+      "description": "A massive multi-legged predator",
+      "attackRange": 40.0,
+      "attackCooldown": 0.7,
+      "chaseRange": 150.0,
+      "detectionRange": 240.0,
+      "experienceReward": 20,
+      "goldReward": 12,
+      "dropTable": {
+        "centipede_leg": 0.4,
+        "monster_essence": 0.15
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.3
+      },
+      "spriteModulate": {
+        "r": 0.5,
+        "g": 0.3,
+        "b": 0.2
+      }
+    },
+    {
+      "id": "cave_troll",
+      "name": "Cave Troll",
+      "maxHealth": 150,
+      "speed": 50.0,
+      "damage": 28.0,
+      "description": "A brutish troll from the deep caves",
+      "attackRange": 70.0,
+      "attackCooldown": 2.2,
+      "chaseRange": 120.0,
+      "detectionRange": 200.0,
+      "experienceReward": 50,
+      "goldReward": 35,
+      "dropTable": {
+        "troll_flesh": 0.4,
+        "golem_core": 0.2
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.35,
+        "g": 0.45,
+        "b": 0.35
+      }
+    },
+    {
+      "id": "fire_elemental",
+      "name": "Fire Elemental",
+      "maxHealth": 60,
+      "speed": 110.0,
+      "damage": 18.0,
+      "description": "A creature made of pure flame",
+      "attackRange": 40.0,
+      "attackCooldown": 0.9,
+      "chaseRange": 170.0,
+      "detectionRange": 270.0,
+      "experienceReward": 25,
+      "goldReward": 15,
+      "dropTable": {
+        "fire_essence": 0.4,
+        "phoenix_feather": 0.2
+      },
+      "statusEffectVulnerability": {
+        "ice": 2.0,
+        "water": 1.5
+      },
+      "spriteModulate": {
+        "r": 1.0,
+        "g": 0.4,
+        "b": 0.1
+      }
+    },
+    {
+      "id": "magma_golem",
+      "name": "Magma Golem",
+      "maxHealth": 120,
+      "speed": 35.0,
+      "damage": 25.0,
+      "description": "A golem forged from molten rock",
+      "attackRange": 70.0,
+      "attackCooldown": 2.5,
+      "chaseRange": 90.0,
+      "detectionRange": 160.0,
+      "experienceReward": 40,
+      "goldReward": 25,
+      "dropTable": {
+        "magma_core": 0.35,
+        "fire_essence": 0.25
+      },
+      "statusEffectVulnerability": {
+        "ice": 2.0,
+        "water": 1.8
+      },
+      "spriteModulate": {
+        "r": 0.7,
+        "g": 0.2,
+        "b": 0.1
+      }
+    },
+    {
+      "id": "fire_imp",
+      "name": "Fire Imp",
+      "maxHealth": 35,
+      "speed": 140.0,
+      "damage": 12.0,
+      "description": "A mischievous fire demon",
+      "attackRange": 35.0,
+      "attackCooldown": 0.7,
+      "chaseRange": 200.0,
+      "detectionRange": 320.0,
+      "experienceReward": 22,
+      "goldReward": 14,
+      "dropTable": {
+        "fire_essence": 0.5
+      },
+      "statusEffectVulnerability": {
+        "ice": 1.8
+      },
+      "spriteModulate": {
+        "r": 1.0,
+        "g": 0.3,
+        "b": 0.0
+      }
+    },
+    {
+      "id": "lava_eel",
+      "name": "Lava Eel",
+      "maxHealth": 55,
+      "speed": 125.0,
+      "damage": 16.0,
+      "description": "A serpentine creature that swims through molten rock",
+      "attackRange": 40.0,
+      "attackCooldown": 0.75,
+      "chaseRange": 180.0,
+      "detectionRange": 290.0,
+      "experienceReward": 26,
+      "goldReward": 16,
+      "dropTable": {
+        "lava_scale": 0.45,
+        "fire_essence": 0.3
+      },
+      "statusEffectVulnerability": {
+        "ice": 2.2,
+        "water": 1.6
+      },
+      "spriteModulate": {
+        "r": 1.0,
+        "g": 0.35,
+        "b": 0.05
+      }
+    },
+    {
+      "id": "fire_phoenix",
+      "name": "Fire Phoenix",
+      "maxHealth": 70,
+      "speed": 145.0,
+      "damage": 20.0,
+      "description": "A majestic bird reborn in flames",
+      "attackRange": 50.0,
+      "attackCooldown": 1.0,
+      "chaseRange": 220.0,
+      "detectionRange": 350.0,
+      "experienceReward": 45,
+      "goldReward": 30,
+      "dropTable": {
+        "phoenix_feather": 0.6,
+        "fire_essence": 0.4
+      },
+      "statusEffectVulnerability": {
+        "ice": 2.5
+      },
+      "spriteModulate": {
+        "r": 1.0,
+        "g": 0.6,
+        "b": 0.1
+      }
+    },
+    {
+      "id": "ice_elemental",
+      "name": "Ice Elemental",
+      "maxHealth": 55,
+      "speed": 100.0,
+      "damage": 16.0,
+      "description": "A creature formed from glacial ice",
+      "attackRange": 45.0,
+      "attackCooldown": 1.0,
+      "chaseRange": 160.0,
+      "detectionRange": 260.0,
+      "experienceReward": 24,
+      "goldReward": 14,
+      "dropTable": {
+        "ice_crystal": 0.4,
+        "frost_essence": 0.2
+      },
+      "statusEffectVulnerability": {
+        "fire": 2.0,
+        "lightning": 1.3
+      },
+      "spriteModulate": {
+        "r": 0.6,
+        "g": 0.8,
+        "b": 1.0
+      }
+    },
+    {
+      "id": "frost_wolf",
+      "name": "Frost Wolf",
+      "maxHealth": 50,
+      "speed": 130.0,
+      "damage": 14.0,
+      "description": "A wolf made of magical ice",
+      "attackRange": 40.0,
+      "attackCooldown": 0.85,
+      "chaseRange": 190.0,
+      "detectionRange": 290.0,
+      "experienceReward": 20,
+      "goldReward": 12,
+      "dropTable": {
+        "frost_essence": 0.3,
+        "wolf_pelt": 0.3
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.6
+      },
+      "spriteModulate": {
+        "r": 0.7,
+        "g": 0.85,
+        "b": 1.0
+      }
+    },
+    {
+      "id": "ice_skeleton",
+      "name": "Ice Skeleton",
+      "maxHealth": 60,
+      "speed": 65.0,
+      "damage": 16.0,
+      "description": "An undead frozen in ice",
+      "attackRange": 50.0,
+      "attackCooldown": 1.4,
+      "chaseRange": 140.0,
+      "detectionRange": 240.0,
+      "experienceReward": 22,
+      "goldReward": 13,
+      "dropTable": {
+        "ice_crystal": 0.35,
+        "skeleton_bone": 0.3
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.8
+      },
+      "spriteModulate": {
+        "r": 0.75,
+        "g": 0.9,
+        "b": 1.0
+      }
+    },
+    {
+      "id": "ice_yeti",
+      "name": "Ice Yeti",
+      "maxHealth": 95,
+      "speed": 85.0,
+      "damage": 24.0,
+      "description": "A towering ape of glacial ice",
+      "attackRange": 65.0,
+      "attackCooldown": 2.0,
+      "chaseRange": 160.0,
+      "detectionRange": 270.0,
+      "experienceReward": 38,
+      "goldReward": 24,
+      "dropTable": {
+        "yeti_fur": 0.5,
+        "ice_crystal": 0.35
+      },
+      "statusEffectVulnerability": {
+        "fire": 2.0,
+        "lightning": 1.4
+      },
+      "spriteModulate": {
+        "r": 0.9,
+        "g": 0.95,
+        "b": 1.0
+      }
+    },
+    {
+      "id": "frost_golem",
+      "name": "Frost Golem",
+      "maxHealth": 110,
+      "speed": 45.0,
+      "damage": 26.0,
+      "description": "A construct of eternal ice",
+      "attackRange": 65.0,
+      "attackCooldown": 2.3,
+      "chaseRange": 100.0,
+      "detectionRange": 180.0,
+      "experienceReward": 42,
+      "goldReward": 28,
+      "dropTable": {
+        "frost_core": 0.45,
+        "ice_crystal": 0.3
+      },
+      "statusEffectVulnerability": {
+        "fire": 2.2,
+        "lightning": 1.5
+      },
+      "spriteModulate": {
+        "r": 0.7,
+        "g": 0.9,
+        "b": 1.0
+      }
+    },
+    {
+      "id": "shadow_spirit",
+      "name": "Shadow Spirit",
+      "maxHealth": 30,
+      "speed": 160.0,
+      "damage": 10.0,
+      "description": "A wisp of pure darkness",
+      "attackRange": 30.0,
+      "attackCooldown": 0.5,
+      "chaseRange": 180.0,
+      "detectionRange": 300.0,
+      "experienceReward": 18,
+      "goldReward": 10,
+      "dropTable": {
+        "shadow_essence": 0.4,
+        "dark_crystal": 0.2
+      },
+      "statusEffectVulnerability": {
+        "holy": 1.8,
+        "fire": 1.3
+      },
+      "spriteModulate": {
+        "r": 0.2,
+        "g": 0.1,
+        "b": 0.3
+      }
+    },
+    {
+      "id": "dark_knight",
+      "name": "Dark Knight",
+      "maxHealth": 80,
+      "speed": 80.0,
+      "damage": 22.0,
+      "description": "A fallen warrior of darkness",
+      "attackRange": 55.0,
+      "attackCooldown": 1.3,
+      "chaseRange": 150.0,
+      "detectionRange": 250.0,
+      "experienceReward": 35,
+      "goldReward": 22,
+      "dropTable": {
+        "dark_crystal": 0.3,
+        "ancient_coin": 0.25
+      },
+      "statusEffectVulnerability": {
+        "holy": 1.5,
+        "fire": 1.2
+      },
+      "spriteModulate": {
+        "r": 0.25,
+        "g": 0.2,
+        "b": 0.3
+      }
+    },
+    {
+      "id": "wraith",
+      "name": "Wraith",
+      "maxHealth": 45,
+      "speed": 120.0,
+      "damage": 18.0,
+      "description": "A ghostly apparition",
+      "attackRange": 40.0,
+      "attackCooldown": 0.8,
+      "chaseRange": 170.0,
+      "detectionRange": 280.0,
+      "experienceReward": 28,
+      "goldReward": 16,
+      "dropTable": {
+        "shadow_essence": 0.35,
+        "ghost_essence": 0.25
+      },
+      "statusEffectVulnerability": {
+        "holy": 2.0,
+        "fire": 1.4
+      },
+      "spriteModulate": {
+        "r": 0.3,
+        "g": 0.4,
+        "b": 0.5
+      }
+    },
+    {
+      "id": "vampire",
+      "name": "Vampire Lord",
+      "maxHealth": 75,
+      "speed": 115.0,
+      "damage": 26.0,
+      "description": "An undead noble that feeds on the living",
+      "attackRange": 45.0,
+      "attackCooldown": 0.9,
+      "chaseRange": 200.0,
+      "detectionRange": 320.0,
+      "experienceReward": 40,
+      "goldReward": 28,
+      "dropTable": {
+        "vampire_fang": 0.5,
+        "blood_essence": 0.35
+      },
+      "statusEffectVulnerability": {
+        "holy": 2.0,
+        "fire": 1.5
+      },
+      "spriteModulate": {
+        "r": 0.4,
+        "g": 0.1,
+        "b": 0.15
+      }
+    },
+    {
+      "id": "banshee",
+      "name": "Banshee",
+      "maxHealth": 40,
+      "speed": 135.0,
+      "damage": 20.0,
+      "description": "A wailing spirit of death",
+      "attackRange": 35.0,
+      "attackCooldown": 0.6,
+      "chaseRange": 190.0,
+      "detectionRange": 310.0,
+      "experienceReward": 35,
+      "goldReward": 22,
+      "dropTable": {
+        "ghost_essence": 0.5,
+        "shadow_essence": 0.3
+      },
+      "statusEffectVulnerability": {
+        "holy": 2.2,
+        "fire": 1.6
+      },
+      "spriteModulate": {
+        "r": 0.25,
+        "g": 0.3,
+        "b": 0.5
+      }
+    },
+    {
+      "id": "dragon_scion",
+      "name": "Dragon Scion",
+      "maxHealth": 200,
+      "speed": 100.0,
+      "damage": 45.0,
+      "description": "A young dragon beginning its rise to power",
+      "attackRange": 80.0,
+      "attackCooldown": 2.5,
+      "chaseRange": 220.0,
+      "detectionRange": 400.0,
+      "experienceReward": 120,
+      "goldReward": 80,
+      "dropTable": {
+        "dragon_scale": 0.6,
+        "dragon_blood": 0.4
+      },
+      "statusEffectVulnerability": {
+        "ice": 1.5
+      },
+      "spriteModulate": {
+        "r": 0.8,
+        "g": 0.25,
+        "b": 0.15
+      }
+    },
+    {
+      "id": "drake",
+      "name": "Drake",
+      "maxHealth": 180,
+      "speed": 110.0,
+      "damage": 38.0,
+      "description": "A lesser dragon with powerful breath",
+      "attackRange": 75.0,
+      "attackCooldown": 2.2,
+      "chaseRange": 200.0,
+      "detectionRange": 380.0,
+      "experienceReward": 100,
+      "goldReward": 65,
+      "dropTable": {
+        "dragon_scale": 0.5,
+        "fire_essence": 0.35
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.3,
+        "g": 0.5,
+        "b": 0.3
+      }
+    },
+    {
+      "id": "young_dragon",
+      "name": "Young Dragon",
+      "maxHealth": 800,
+      "speed": 85.0,
+      "damage": 45.0,
+      "description": "A juvenile dragon still growing in power",
+      "attackRange": 90.0,
+      "attackCooldown": 2.5,
+      "chaseRange": 220.0,
+      "detectionRange": 400.0,
+      "experienceReward": 300,
+      "goldReward": 150,
+      "dropTable": {
+        "dragon_scale": 0.6,
+        "dragon_blood": 0.4
+      },
+      "statusEffectVulnerability": {
+        "ice": 1.3
+      },
+      "spriteModulate": {
+        "r": 0.7,
+        "g": 0.3,
+        "b": 0.2
+      }
+    },
+    {
+      "id": "dragon_whelp",
+      "name": "Dragon Whelp",
+      "maxHealth": 400,
+      "speed": 100.0,
+      "damage": 30.0,
+      "description": "A baby dragon with developing breath weapon",
+      "attackRange": 60.0,
+      "attackCooldown": 2.0,
+      "chaseRange": 180.0,
+      "detectionRange": 320.0,
+      "experienceReward": 180,
+      "goldReward": 80,
+      "dropTable": {
+        "dragon_scale": 0.4,
+        "fire_essence": 0.3
+      },
+      "statusEffectVulnerability": {
+        "ice": 1.2
+      },
+      "spriteModulate": {
+        "r": 0.8,
+        "g": 0.4,
+        "b": 0.25
+      }
+    },
+    {
+      "id": "dragon_knight",
+      "name": "Dragon Knight",
+      "maxHealth": 120,
+      "speed": 95.0,
+      "damage": 28.0,
+      "description": "A knight bonded with a dragon",
+      "attackRange": 65.0,
+      "attackCooldown": 1.2,
+      "chaseRange": 200.0,
+      "detectionRange": 350.0,
+      "experienceReward": 60,
+      "goldReward": 40,
+      "dropTable": {
+        "dragon_scale": 0.3,
+        "holy_crystal": 0.2
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.6,
+        "g": 0.5,
+        "b": 0.7
+      }
+    },
+    {
+      "id": "holy_sentinel",
+      "name": "Holy Sentinel",
+      "maxHealth": 90,
+      "speed": 75.0,
+      "damage": 20.0,
+      "description": "An ancient guardian of the sacred temple",
+      "attackRange": 55.0,
+      "attackCooldown": 1.4,
+      "chaseRange": 150.0,
+      "detectionRange": 260.0,
+      "experienceReward": 32,
+      "goldReward": 20,
+      "dropTable": {
+        "holy_crystal": 0.4,
+        "ancient_coin": 0.2
+      },
+      "statusEffectVulnerability": {
+        "shadow": 1.5,
+        "dark": 1.5
+      },
+      "spriteModulate": {
+        "r": 1.0,
+        "g": 0.9,
+        "b": 0.5
+      }
+    },
+    {
+      "id": "divine_angel",
+      "name": "Divine Angel",
+      "maxHealth": 60,
+      "speed": 140.0,
+      "damage": 16.0,
+      "description": "A celestial being of pure light",
+      "attackRange": 40.0,
+      "attackCooldown": 0.8,
+      "chaseRange": 200.0,
+      "detectionRange": 340.0,
+      "experienceReward": 50,
+      "goldReward": 35,
+      "dropTable": {
+        "holy_feather": 0.5,
+        "holy_crystal": 0.35
+      },
+      "statusEffectVulnerability": {
+        "shadow": 2.0,
+        "dark": 2.0
+      },
+      "spriteModulate": {
+        "r": 1.0,
+        "g": 0.95,
+        "b": 0.8
+      }
+    },
+    {
+      "id": "holy_guardian",
+      "name": "Holy Guardian",
+      "maxHealth": 200,
+      "speed": 70.0,
+      "damage": 35.0,
+      "description": "A sacred knight protecting the temple",
+      "attackRange": 60.0,
+      "attackCooldown": 1.6,
+      "chaseRange": 160.0,
+      "detectionRange": 280.0,
+      "experienceReward": 80,
+      "goldReward": 50,
+      "dropTable": {
+        "holy_crystal": 0.4,
+        "holy_feather": 0.3
+      },
+      "statusEffectVulnerability": {
+        "shadow": 1.5,
+        "dark": 1.5
+      },
+      "spriteModulate": {
+        "r": 0.95,
+        "g": 0.9,
+        "b": 0.7
+      }
+    },
+    {
+      "id": "fallen_angel",
+      "name": "Fallen Angel",
+      "maxHealth": 90,
+      "speed": 130.0,
+      "damage": 25.0,
+      "description": "A corrupted celestial being",
+      "attackRange": 50.0,
+      "attackCooldown": 0.9,
+      "chaseRange": 200.0,
+      "detectionRange": 350.0,
+      "experienceReward": 55,
+      "goldReward": 35,
+      "dropTable": {
+        "holy_feather": 0.35,
+        "shadow_essence": 0.25
+      },
+      "statusEffectVulnerability": {
+        "holy": 1.8,
+        "fire": 1.3
+      },
+      "spriteModulate": {
+        "r": 0.4,
+        "g": 0.4,
+        "b": 0.5
+      }
+    },
+    {
+      "id": "celestial_essence",
+      "name": "Celestial Essence",
+      "maxHealth": 40,
+      "speed": 145.0,
+      "damage": 15.0,
+      "description": "Pure celestial energy manifested",
+      "attackRange": 35.0,
+      "attackCooldown": 0.6,
+      "chaseRange": 170.0,
+      "detectionRange": 300.0,
+      "experienceReward": 30,
+      "goldReward": 20,
+      "dropTable": {
+        "holy_crystal": 0.5
+      },
+      "statusEffectVulnerability": {
+        "dark": 1.5
+      },
+      "spriteModulate": {
+        "r": 1.0,
+        "g": 0.95,
+        "b": 0.6
+      }
+    },
+    {
+      "id": "swamp_zombie",
+      "name": "Swamp Zombie",
+      "maxHealth": 65,
+      "speed": 45.0,
+      "damage": 16.0,
+      "description": "An undead risen from the murky waters",
+      "attackRange": 40.0,
+      "attackCooldown": 1.8,
+      "chaseRange": 100.0,
+      "detectionRange": 180.0,
+      "experienceReward": 18,
+      "goldReward": 10,
+      "dropTable": {
+        "rotten_flesh": 0.4,
+        "poison_essence": 0.15
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.4,
+        "holy": 1.6
+      },
+      "spriteModulate": {
+        "r": 0.3,
+        "g": 0.5,
+        "b": 0.3
+      }
+    },
+    {
+      "id": "crocodile",
+      "name": "Swamp Crocodile",
+      "maxHealth": 100,
+      "speed": 85.0,
+      "damage": 24.0,
+      "description": "A deadly predator lurking in the waters",
+      "attackRange": 55.0,
+      "attackCooldown": 1.5,
+      "chaseRange": 140.0,
+      "detectionRange": 240.0,
+      "experienceReward": 35,
+      "goldReward": 22,
+      "dropTable": {
+        "crocodile_scale": 0.5,
+        "monster_essence": 0.2
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.35,
+        "g": 0.45,
+        "b": 0.3
+      }
+    },
+    {
+      "id": "mosquito_swarm",
+      "name": "Mosquito Swarm",
+      "maxHealth": 30,
+      "speed": 160.0,
+      "damage": 8.0,
+      "description": "A deadly swarm of bloodsuckers",
+      "attackRange": 25.0,
+      "attackCooldown": 0.3,
+      "chaseRange": 200.0,
+      "detectionRange": 350.0,
+      "experienceReward": 15,
+      "goldReward": 8,
+      "dropTable": {
+        "mosquito_sting": 0.3
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.2
+      },
+      "spriteModulate": {
+        "r": 0.2,
+        "g": 0.15,
+        "b": 0.1
+      }
+    },
+    {
+      "id": "witch",
+      "name": "Swamp Witch",
+      "maxHealth": 120,
+      "speed": 90.0,
+      "damage": 22.0,
+      "description": "A mysterious sorceress of the swamp",
+      "attackRange": 120.0,
+      "attackCooldown": 1.8,
+      "chaseRange": 140.0,
+      "detectionRange": 300.0,
+      "experienceReward": 55,
+      "goldReward": 40,
+      "dropTable": {
+        "witch_hat": 0.5,
+        "poison_essence": 0.4
+      },
+      "statusEffectVulnerability": {
+        "fire": 1.4
+      },
+      "spriteModulate": {
+        "r": 0.4,
+        "g": 0.3,
+        "b": 0.5
+      }
+    },
+    {
+      "id": "void_creature",
+      "name": "Void Creature",
+      "maxHealth": 250,
+      "speed": 110.0,
+      "damage": 32.0,
+      "description": "An entity from the void between dimensions",
+      "attackRange": 55.0,
+      "attackCooldown": 1.1,
+      "chaseRange": 190.0,
+      "detectionRange": 340.0,
+      "experienceReward": 120,
+      "goldReward": 75,
+      "dropTable": {
+        "void_shard": 0.4,
+        "dark_crystal": 0.3
+      },
+      "statusEffectVulnerability": {
+        "holy": 1.7,
+        "fire": 1.3
+      },
+      "spriteModulate": {
+        "r": 0.15,
+        "g": 0.05,
+        "b": 0.2
+      }
+    },
+    {
+      "id": "abyss_demon",
+      "name": "Abyss Demon",
+      "maxHealth": 180,
+      "speed": 100.0,
+      "damage": 30.0,
+      "description": "A demon from the deepest abyss",
+      "attackRange": 50.0,
+      "attackCooldown": 1.0,
+      "chaseRange": 180.0,
+      "detectionRange": 320.0,
+      "experienceReward": 90,
+      "goldReward": 55,
+      "dropTable": {
+        "demon_heart": 0.3,
+        "shadow_essence": 0.25
+      },
+      "statusEffectVulnerability": {
+        "holy": 1.6,
+        "fire": 0.8
+      },
+      "spriteModulate": {
+        "r": 0.5,
+        "g": 0.1,
+        "b": 0.15
+      }
+    },
+    {
+      "id": "elder_dragon",
+      "name": "Elder Dragon",
+      "maxHealth": 2500,
+      "speed": 75.0,
+      "damage": 60.0,
+      "description": "An ancient dragon of immense power",
+      "attackRange": 100.0,
+      "attackCooldown": 3.0,
+      "chaseRange": 250.0,
+      "detectionRange": 450.0,
+      "experienceReward": 800,
+      "goldReward": 400,
+      "dropTable": {
+        "elder_dragon_scale": 1.0,
+        "elder_dragon_blood": 1.0
+      },
+      "statusEffectVulnerability": {
+        "ice": 1.2
+      },
+      "spriteModulate": {
+        "r": 0.5,
+        "g": 0.2,
+        "b": 0.5
+      }
+    },
+    {
+      "id": "goblin_chief",
+      "name": "Goblin Chief",
+      "maxHealth": 150,
+      "speed": 95.0,
+      "damage": 20.0,
+      "description": "The leader of the goblin band",
+      "attackRange": 45.0,
+      "attackCooldown": 1.0,
+      "chaseRange": 180.0,
+      "detectionRange": 300.0,
+      "experienceReward": 50,
+      "goldReward": 35,
+      "dropTable": {
+        "goblin_ear": 1.0,
+        "ancient_coin": 0.5
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.5,
+        "g": 0.7,
+        "b": 0.4
+      }
+    },
+    {
+      "id": "skeleton_lord",
+      "name": "Skeleton Lord",
+      "maxHealth": 200,
+      "speed": 75.0,
+      "damage": 28.0,
+      "description": "An undead commander of the bone army",
+      "attackRange": 55.0,
+      "attackCooldown": 1.4,
+      "chaseRange": 160.0,
+      "detectionRange": 280.0,
+      "experienceReward": 75,
+      "goldReward": 45,
+      "dropTable": {
+        "skeleton_bone": 1.0,
+        "skull": 0.5
+      },
+      "statusEffectVulnerability": {
+        "holy": 1.7,
+        "fire": 1.3
+      },
+      "spriteModulate": {
+        "r": 0.85,
+        "g": 0.85,
+        "b": 0.8
+      }
+    },
+    {
+      "id": "ancient_treant",
+      "name": "Ancient Treant",
+      "maxHealth": 2000,
+      "speed": 60.0,
+      "damage": 40.0,
+      "description": "The guardian of the forest",
+      "attackRange": 80.0,
+      "attackCooldown": 3.0,
+      "chaseRange": 200.0,
+      "detectionRange": 400.0,
+      "experienceReward": 500,
+      "goldReward": 200,
+      "dropTable": {
+        "treant_heart": 1.0,
+        "ancient_coin": 0.5
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.2,
+        "g": 0.5,
+        "b": 0.2
+      }
+    },
+    {
+      "id": "demon_lord",
+      "name": "Demon Lord",
+      "maxHealth": 10000,
+      "speed": 70.0,
+      "damage": 80.0,
+      "description": "The ruler of the demon realm",
+      "attackRange": 100.0,
+      "attackCooldown": 2.0,
+      "chaseRange": 250.0,
+      "detectionRange": 500.0,
+      "experienceReward": 5000,
+      "goldReward": 1000,
+      "dropTable": {
+        "demon_crown": 1.0,
+        "demon_heart": 1.0
+      },
+      "statusEffectVulnerability": {},
+      "spriteModulate": {
+        "r": 0.6,
+        "g": 0.1,
+        "b": 0.1
+      }
+    }
+  ]
+}
