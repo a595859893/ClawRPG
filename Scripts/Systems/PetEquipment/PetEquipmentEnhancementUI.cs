@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
+using Game.Systems.Pets;
 
 public class PetEquipmentEnhancementUI : Control
 {
