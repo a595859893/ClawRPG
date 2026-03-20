@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.PartySystem;
 
 namespace ClawRPG.Scripts.Systems
 {
@@ -25,6 +26,9 @@ public class PartySystem : BaseSystem
     
     private int _nextPartyId = 1;
 
+    // PartyOperations service for party creation/join/leave/invite logic
+    private PartyOperations _partyOperations;
+
     public Signal PartyCreated { get; } = new Signal();
     public Signal PartyDisbanded { get; } = new Signal();
     public Signal PlayerJoinedParty { get; } = new Signal();
@@ -39,307 +43,65 @@ public class PartySystem : BaseSystem
 
     public void Initialize()
     {
+        // Initialize PartyOperations with data references and signals
+        _partyOperations = new PartyOperations(
+            ref _parties,
+            ref _pendingInvites,
+            ref _playerData,
+            ref _nextPartyId,
+            PartyCreated,
+            PartyDisbanded,
+            PlayerJoinedParty,
+            PlayerLeftParty,
+            PlayerKicked,
+            InviteSent,
+            InviteAccepted,
+            InviteDeclined,
+            LeaderChanged,
+            StateChanged
+        );
+
         GD.Print("[PartySystem] Initialized");
     }
 
     public PartyData.Party CreateParty(int leaderId, string leaderName, PartyData.PartyType type, string partyName = "")
     {
-        var party = new PartyData.Party
-        {
-            PartyId = "party_" + _nextPartyId++,
-            PartyName = string.IsNullOrEmpty(partyName) ? $"{leaderName}的队伍" : partyName,
-            Type = type,
-            State = PartyData.PartyState.Forming,
-            LeaderId = leaderId,
-            MaxMembers = PartyDatabase.GetMaxMembers(type),
-            ExpShareBonus = PartyDatabase.GetExpShareBonus(type),
-            DropRateBonus = PartyDatabase.GetDropRateBonus(type),
-            CreatedAt = DateTime.Now
-        };
-
-        var leader = new PartyData.PartyMember
-        {
-            PlayerId = leaderId,
-            PlayerName = leaderName,
-            Level = 1,
-            ClassId = 0,
-            Role = PartyData.MemberRole.Leader,
-            IsReady = false,
-            IsOnline = true,
-            HealthPercent = 1.0f,
-            LastUpdate = DateTime.Now
-        };
-
-        party.Members.Add(leader);
-        _parties[party.PartyId] = party;
-
-        EnsurePlayerData(leaderId);
-        _playerData[leaderId].CurrentPartyId = party.PartyId;
-        _playerData[leaderId].TotalPartiesJoined++;
-
-        PartyCreated.Emit(party.PartyId);
-        GD.Print($"[PartySystem] Party created: {party.PartyId} by {leaderName}");
-
-        return party;
+        return _partyOperations.CreateParty(leaderId, leaderName, type, partyName);
     }
 
     public bool JoinParty(string partyId, int playerId, string playerName, int level, int classId)
     {
-        if (!_parties.ContainsKey(partyId))
-        {
-            GD.Print($"[PartySystem] Party not found: {partyId}");
-            return false;
-        }
-
-        var party = _parties[partyId];
-
-        if (party.Members.Count >= party.MaxMembers)
-        {
-            GD.Print($"[PartySystem] Party is full: {partyId}");
-            return false;
-        }
-
-        if (party.State != PartyData.PartyState.Forming && party.State != PartyData.PartyState.Ready)
-        {
-            GD.Print($"[PartySystem] Party not joinable: {party.State}");
-            return false;
-        }
-
-        var member = new PartyData.PartyMember
-        {
-            PlayerId = playerId,
-            PlayerName = playerName,
-            Level = level,
-            ClassId = classId,
-            Role = PartyData.MemberRole.Damage,
-            IsReady = false,
-            IsOnline = true,
-            HealthPercent = 1.0f,
-            LastUpdate = DateTime.Now
-        };
-
-        party.Members.Add(member);
-
-        // Update party bonuses based on member count
-        party.DamageBonus = PartyDatabase.GetDamageBonus(party.Type, party.Members.Count);
-        party.DefenseBonus = PartyDatabase.GetDefenseBonus(party.Type, party.Members.Count);
-
-        EnsurePlayerData(playerId);
-        _playerData[playerId].CurrentPartyId = partyId;
-        _playerData[playerId].TotalPartiesJoined++;
-
-        PlayerJoinedParty.Emit(partyId, playerId);
-        GD.Print($"[PartySystem] Player {playerName} joined party {partyId}");
-
-        return true;
+        return _partyOperations.JoinParty(partyId, playerId, playerName, level, classId);
     }
 
     public bool LeaveParty(int playerId)
     {
-        string partyId = GetPlayerPartyId(playerId);
-        if (string.IsNullOrEmpty(partyId) || !_parties.ContainsKey(partyId))
-            return false;
-
-        var party = _parties[partyId];
-        var member = party.Members.Find(m => m.PlayerId == playerId);
-        if (member == null)
-            return false;
-
-        party.Members.Remove(member);
-
-        // Record to history
-        EnsurePlayerData(playerId);
-        _playerData[playerId].History.Add(new PartyData.PartyRecord
-        {
-            PartyId = partyId,
-            PartyName = party.PartyName,
-            Type = party.Type,
-            JoinedAt = DateTime.Now.AddHours(-1),
-            LeftAt = DateTime.Now,
-            WasLeader = member.Role == PartyData.MemberRole.Leader,
-            WasVictory = party.State == PartyData.PartyState.InBattle
-        });
-
-        // If leader left, assign new leader or disband
-        if (member.Role == PartyData.MemberRole.Leader)
-        {
-            if (party.Members.Count > 0)
-            {
-                party.LeaderId = party.Members[0].PlayerId;
-                party.Members[0].Role = PartyData.MemberRole.Leader;
-                LeaderChanged.Emit(partyId, party.LeaderId);
-            }
-            else
-            {
-                DisbandParty(partyId);
-                return true;
-            }
-        }
-
-        // Update party bonuses
-        party.DamageBonus = PartyDatabase.GetDamageBonus(party.Type, party.Members.Count);
-        party.DefenseBonus = PartyDatabase.GetDefenseBonus(party.Type, party.Members.Count);
-
-        _playerData[playerId].CurrentPartyId = "";
-        PlayerLeftParty.Emit(partyId, playerId);
-        GD.Print($"[PartySystem] Player {playerId} left party {partyId}");
-
-        return true;
+        return _partyOperations.LeaveParty(playerId);
     }
 
     public bool KickPlayer(int kickerId, int targetId)
     {
-        string partyId = GetPlayerPartyId(kickerId);
-        if (string.IsNullOrEmpty(partyId) || !_parties.ContainsKey(partyId))
-            return false;
-
-        var party = _parties[partyId];
-        var kicker = party.Members.Find(m => m.PlayerId == kickerId);
-        
-        if (kicker == null || kicker.Role != PartyData.MemberRole.Leader)
-        {
-            GD.Print($"[PartySystem] Only leader can kick players");
-            return false;
-        }
-
-        var target = party.Members.Find(m => m.PlayerId == targetId);
-        if (target == null)
-            return false;
-
-        if (target.Role == PartyData.MemberRole.Leader)
-        {
-            GD.Print($"[PartySystem] Cannot kick leader");
-            return false;
-        }
-
-        party.Members.Remove(target);
-
-        // Record to history
-        EnsurePlayerData(targetId);
-        _playerData[targetId].History.Add(new PartyData.PartyRecord
-        {
-            PartyId = partyId,
-            PartyName = party.PartyName,
-            Type = party.Type,
-            JoinedAt = DateTime.Now.AddHours(-1),
-            LeftAt = DateTime.Now,
-            WasLeader = false,
-            WasVictory = party.State == PartyData.PartyState.InBattle
-        });
-
-        // Update party bonuses
-        party.DamageBonus = PartyDatabase.GetDamageBonus(party.Type, party.Members.Count);
-        party.DefenseBonus = PartyDatabase.GetDefenseBonus(party.Type, party.Members.Count);
-
-        _playerData[targetId].CurrentPartyId = "";
-        PlayerKicked.Emit(partyId, targetId);
-        GD.Print($"[PartySystem] Player {targetId} kicked from party {partyId}");
-
-        return true;
+        return _partyOperations.KickPlayer(kickerId, targetId);
     }
 
     public void DisbandParty(string partyId)
     {
-        if (!_parties.ContainsKey(partyId))
-            return;
-
-        var party = _parties[partyId];
-
-        // Record to all members' history
-        foreach (var member in party.Members)
-        {
-            EnsurePlayerData(member.PlayerId);
-            _playerData[member.PlayerId].History.Add(new PartyData.PartyRecord
-            {
-                PartyId = partyId,
-                PartyName = party.PartyName,
-                Type = party.Type,
-                JoinedAt = party.CreatedAt,
-                LeftAt = DateTime.Now,
-                WasLeader = member.Role == PartyData.MemberRole.Leader,
-                WasVictory = party.State == PartyData.PartyState.InBattle
-            });
-
-            if (member.Role == PartyData.MemberRole.Leader && member.PlayerId == party.LeaderId)
-            {
-                _playerData[member.PlayerId].TotalPartiesWon++;
-            }
-
-            _playerData[member.PlayerId].CurrentPartyId = "";
-        }
-
-        _parties.Remove(partyId);
-        PartyDisbanded.Emit(partyId);
-        GD.Print($"[PartySystem] Party disbanded: {partyId}");
+        _partyOperations.DisbandParty(partyId);
     }
 
     public bool SendInvite(int fromPlayerId, string fromPlayerName, int toPlayerId, PartyData.PartyType type)
     {
-        if (_pendingInvites.ContainsKey(toPlayerId))
-        {
-            GD.Print($"[PartySystem] Player {toPlayerId} already has pending invite");
-            return false;
-        }
-
-        var invite = new PartyData.PartyInvite
-        {
-            FromPlayerId = fromPlayerId,
-            FromPlayerName = fromPlayerName,
-            ToPlayerId = toPlayerId,
-            PartyType = type,
-            SentAt = DateTime.Now
-        };
-
-        _pendingInvites[toPlayerId] = invite;
-        EnsurePlayerData(fromPlayerId);
-        _playerData[fromPlayerId].TotalPartyMembersInvited++;
-
-        InviteSent.Emit(fromPlayerId, toPlayerId);
-        GD.Print($"[PartySystem] Invite sent from {fromPlayerName} to {toPlayerId}");
-
-        return true;
+        return _partyOperations.SendInvite(fromPlayerId, fromPlayerName, toPlayerId, type);
     }
 
     public bool AcceptInvite(int playerId)
     {
-        if (!_pendingInvites.ContainsKey(playerId))
-            return false;
-
-        var invite = _pendingInvites[playerId];
-        _pendingInvites.Remove(playerId);
-
-        string partyId = GetPlayerPartyId(invite.FromPlayerId);
-        if (string.IsNullOrEmpty(partyId))
-        {
-            // Create new party if inviter doesn't have one
-            var party = CreateParty(invite.FromPlayerId, invite.FromPlayerName, invite.PartyType);
-            partyId = party.PartyId;
-        }
-
-        // Get player info (would normally come from PlayerManager)
-        bool success = JoinParty(partyId, playerId, "Player_" + playerId, 1, 0);
-
-        if (success)
-        {
-            InviteAccepted.Emit(invite.FromPlayerId, playerId);
-            GD.Print($"[PartySystem] Player {playerId} accepted invite from {invite.FromPlayerId}");
-        }
-
-        return success;
+        return _partyOperations.AcceptInvite(playerId, CreateParty);
     }
 
     public bool DeclineInvite(int playerId)
     {
-        if (!_pendingInvites.ContainsKey(playerId))
-            return false;
-
-        var invite = _pendingInvites[playerId];
-        _pendingInvites.Remove(playerId);
-
-        InviteDeclined.Emit(invite.FromPlayerId, playerId);
-        GD.Print($"[PartySystem] Player {playerId} declined invite from {invite.FromPlayerId}");
-
-        return true;
+        return _partyOperations.DeclineInvite(playerId);
     }
 
     public bool SetMemberReady(int playerId, bool ready)
@@ -820,4 +582,5 @@ public class PartySystem : BaseSystem
 
         GD.Print($"[PartySystem] Loaded {_parties.Count} parties, {_pendingInvites.Count} invites");
     }
+}
 }
