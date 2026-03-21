@@ -123,7 +123,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         }
 
         // 处理训练（每帧调用）
-        public void _Process(double delta)
+        public override void _Process(double delta)
         {
             var now = DateTime.Now;
             var completedSessions = new List<PetTrainingData.TrainingSession>();
