@@ -149,7 +149,7 @@ public class MultiplayerChatUI : Control
             Button emoteBtn = new Button();
             emoteBtn.Text = emote.Id;
             emoteBtn.TooltipText = $"/me {emote.Id} - {emote.Name}";
-            emoteBtn.Connect("pressed", this, nameof(OnEmotePressed), new Godot.Collections.Array { emote.Id });
+            emoteBtn.Pressed += () => OnEmotePressed(emote.Id);
             _emoteGrid.AddChild(emoteBtn);
         }
         
@@ -175,7 +175,7 @@ public class MultiplayerChatUI : Control
         
         Button clearButton = new Button();
         clearButton.Text = "Clear Chat History";
-        clearButton.Connect("pressed", this, nameof(OnClearPressed));
+        clearButton.Pressed += OnClearPressed;
         _settingsTab.AddChild(clearButton);
         
         // Stats tab
@@ -203,19 +203,19 @@ public class MultiplayerChatUI : Control
     
     private void ConnectSignals()
     {
-        _sendButton.Connect("pressed", this, nameof(OnSendPressed));
-        _messageInput.Connect("text_entered", this, nameof(OnMessageEntered));
-        _channelSelector.Connect("item_selected", this, nameof(OnChannelSelected));
-        _emoteButton.Connect("pressed", this, nameof(OnEmoteButtonPressed));
+        _sendButton.Pressed += OnSendPressed;
+        _messageInput.TextSubmitted += OnMessageEntered;
+        _channelSelector.ItemSelected += OnChannelSelected;
+        _emoteButton.Pressed += OnEmoteButtonPressed;
         
         // Settings
-        _timestampToggle.Connect("toggled", this, nameof(OnTimestampToggled));
-        _emoteToggle.Connect("toggled", this, nameof(OnEmoteToggled));
-        _profanityToggle.Connect("toggled", this, nameof(OnProfanityToggled));
+        _timestampToggle.Toggled += OnTimestampToggled;
+        _emoteToggle.Toggled += OnEmoteToggled;
+        _profanityToggle.Toggled += OnProfanityToggled;
         
         // Chat system signals
-        _chatSystem.Connect(nameof(MultiplayerChatSystem.MessageReceived), this, nameof(OnMessageReceived));
-        _chatSystem.Connect(nameof(MultiplayerChatSystem.ClearRequested), this, nameof(OnClearRequested));
+        _chatSystem.MessageReceived += OnMessageReceived;
+        _chatSystem.ClearRequested += OnClearRequested;
     }
     
     private void OnSendPressed()

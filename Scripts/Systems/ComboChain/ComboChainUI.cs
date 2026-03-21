@@ -131,39 +131,39 @@ public class ComboChainUI : Control
         var lightButton = new Button();
         lightButton.Text = "Light Attack";
         lightButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        lightButton.Connect("pressed", this, nameof(_OnLightAttackPressed));
+        lightButton.Pressed += _OnLightAttackPressed;
         buttonContainer.AddChild(lightButton);
         
         // 测试重攻击按钮
         var heavyButton = new Button();
         heavyButton.Text = "Heavy Attack";
         heavyButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        heavyButton.Connect("pressed", this, nameof(_OnHeavyAttackPressed));
+        heavyButton.Pressed += _OnHeavyAttackPressed;
         buttonContainer.AddChild(heavyButton);
         
         // 测试技能按钮
         var skillButton = new Button();
         skillButton.Text = "Skill Attack";
         skillButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        skillButton.Connect("pressed", this, nameof(_OnSkillAttackPressed));
+        skillButton.Pressed += _OnSkillAttackPressed;
         buttonContainer.AddChild(skillButton);
         
         // 结束连击按钮
         var endButton = new Button();
         endButton.Text = "End Chain";
-        endButton.Connect("pressed", this, nameof(_OnEndChainPressed));
+        endButton.Pressed += _OnEndChainPressed;
         mainContainer.AddChild(endButton);
         
         // 重置统计按钮
         var resetButton = new Button();
         resetButton.Text = "Reset Statistics";
-        resetButton.Connect("pressed", this, nameof(_OnResetPressed));
+        resetButton.Pressed += _OnResetPressed;
         mainContainer.AddChild(resetButton);
         
         // 关闭按钮
         var closeButton = new Button();
         closeButton.Text = "Close (ESC)";
-        closeButton.Connect("pressed", this, nameof(_OnClosePressed));
+        closeButton.Pressed += _OnClosePressed;
         mainContainer.AddChild(closeButton);
         
         // 初始更新
@@ -175,10 +175,10 @@ public class ComboChainUI : Control
         var system = ComboChainSystem.Instance;
         if (system != null)
         {
-            system.Connect(nameof(ComboChainSystem.ChainStarted), this, nameof(_OnChainStarted));
-            system.Connect(nameof(ComboChainSystem.ChainEnded), this, nameof(_OnChainEnded));
-            system.Connect(nameof(ComboChainSystem.ChainBonusActivated), this, nameof(_OnChainBonusActivated));
-            system.Connect(nameof(ComboChainSystem.ComboLevelUp), this, nameof(_OnComboLevelUp));
+            system.ChainStarted += _OnChainStarted;
+            system.ChainEnded += _OnChainEnded;
+            system.ChainBonusActivated += _OnChainBonusActivated;
+            system.ComboLevelUp += _OnComboLevelUp;
         }
     }
     

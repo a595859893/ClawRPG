@@ -65,9 +65,9 @@ public class CharacterCreationUI : Control
         UpdateUI();
         
         // Connect signals
-        _system.Connect("AttributeChanged", this, "OnAttributeChanged");
-        _system.Connect("ClassChanged", this, "OnClassChanged");
-        _system.Connect("BackgroundChanged", this, "OnBackgroundChanged");
+        _system.AttributeChanged += OnAttributeChanged;
+        _system.ClassChanged += OnClassChanged;
+        _system.BackgroundChanged += OnBackgroundChanged;
     }
     
     private void SetupUI()
@@ -116,7 +116,7 @@ public class CharacterCreationUI : Control
             PlaceholderText = "Enter name...",
             SizeFlagsHorizontal = Control.SizeFlags.Expand
         };
-        _nameInput.Connect("text_changed", this, "OnNameChanged");
+        _nameInput.TextChanged += OnNameChanged;
         nameContainer.AddChild(_nameInput);
         
         // Class selection
@@ -133,7 +133,7 @@ public class CharacterCreationUI : Control
         {
             _classSelector.AddItem(c);
         }
-        _classSelector.Connect("item_selected", this, "OnClassSelected");
+        _classSelector.ItemSelected += OnClassSelected;
         mainContainer.AddChild(_classSelector);
         
         // Class info
@@ -191,7 +191,7 @@ public class CharacterCreationUI : Control
         {
             _backgroundSelector.AddItem(b);
         }
-        _backgroundSelector.Connect("item_selected", this, "OnBackgroundSelected");
+        _backgroundSelector.ItemSelected += OnBackgroundSelected;
         mainContainer.AddChild(_backgroundSelector);
         
         _backgroundNameLabel = new Label { Text = "", SizeFlagsVertical = Control.SizeFlags.ShrinkEnd };
@@ -220,7 +220,7 @@ public class CharacterCreationUI : Control
         {
             _hairStyleSelector.AddItem(h);
         }
-        _hairStyleSelector.Connect("item_selected", this, "OnHairStyleSelected");
+        _hairStyleSelector.ItemSelected += OnHairStyleSelected;
         hairContainer.AddChild(_hairStyleSelector);
         
         var skinContainer = new HBoxContainer();
@@ -233,7 +233,7 @@ public class CharacterCreationUI : Control
         {
             _skinColorSelector.AddItem(s);
         }
-        _skinColorSelector.Connect("item_selected", this, "OnSkinColorSelected");
+        _skinColorSelector.ItemSelected += OnSkinColorSelected;
         skinContainer.AddChild(_skinColorSelector);
         
         var eyeContainer = new HBoxContainer();
@@ -246,7 +246,7 @@ public class CharacterCreationUI : Control
         {
             _eyeColorSelector.AddItem(e);
         }
-        _eyeColorSelector.Connect("item_selected", this, "OnEyeColorSelected");
+        _eyeColorSelector.ItemSelected += OnEyeColorSelected;
         eyeContainer.AddChild(_eyeColorSelector);
         
         // Preview stats
@@ -266,14 +266,14 @@ public class CharacterCreationUI : Control
             Text = "✨ Create Character ✨",
             SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
         };
-        _createButton.Connect("pressed", this, "OnCreatePressed");
+        _createButton.Pressed += OnCreatePressed;
         buttonContainer.AddChild(_createButton);
         
         _resetButton = new Button
         {
             Text = "🔄 Reset"
         };
-        _resetButton.Connect("pressed", this, "OnResetPressed");
+        _resetButton.Pressed += OnResetPressed;
         buttonContainer.AddChild(_resetButton);
         
         // Store reference
@@ -288,11 +288,11 @@ public class CharacterCreationUI : Control
         container.AddChild(valueLabel);
         
         minusBtn = new Button { Text = "-" };
-        minusBtn.Connect("pressed", this, "OnMinusPressed", new Godot.Collections.Array { attrName });
+        minusBtn.Pressed += () => OnMinusPressed(attrName);
         container.AddChild(minusBtn);
         
         plusBtn = new Button { Text = "+" };
-        plusBtn.Connect("pressed", this, "OnPlusPressed", new Godot.Collections.Array { attrName });
+        plusBtn.Pressed += () => OnPlusPressed(attrName);
         container.AddChild(plusBtn);
         
         return container;
@@ -537,6 +537,10 @@ public class CharacterCreationUI : Control
         if (ev.IsActionPressed("ui_cancel"))
         {
             Toggle();
+        }
+    }
+}
+ggle();
         }
     }
 }

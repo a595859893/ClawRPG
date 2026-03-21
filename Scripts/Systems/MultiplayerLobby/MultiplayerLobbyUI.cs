@@ -140,7 +140,7 @@ namespace ClawRPG.Systems
             
             // 私人房间选项
             _privateCheckBox = new CheckBox { Text = "Private Room" };
-            _privateCheckBox.Connect("toggled", this, nameof(OnPrivateToggled));
+            _privateCheckBox.Toggled += OnPrivateToggled;
             _createRoomPanel.AddChild(_privateCheckBox);
             
             // 密码
@@ -156,7 +156,7 @@ namespace ClawRPG.Systems
             
             // 创建按钮
             _createButton = new Button { Text = "Create Room" };
-            _createButton.Connect("pressed", this, nameof(OnCreateRoomPressed));
+            _createButton.Pressed += OnCreateRoomPressed;
             _createRoomPanel.AddChild(_createButton);
             
             // ===== 加入房间标签页 =====
@@ -176,7 +176,7 @@ namespace ClawRPG.Systems
             
             // 刷新按钮
             _refreshButton = new Button { Text = "Refresh" };
-            _refreshButton.Connect("pressed", this, nameof(OnRefreshPressed));
+            _refreshButton.Pressed += OnRefreshPressed;
             _joinRoomPanel.AddChild(_refreshButton);
             
             _joinRoomPanel.AddChild(new Control { RectMinSize = new Vector2(0, 10) }); // Spacer
@@ -194,7 +194,7 @@ namespace ClawRPG.Systems
             
             // 加入按钮
             _joinButton = new Button { Text = "Join Room" };
-            _joinButton.Connect("pressed", this, nameof(OnJoinRoomPressed));
+            _joinButton.Pressed += OnJoinRoomPressed;
             _joinRoomPanel.AddChild(_joinButton);
             
             // ===== 当前房间标签页 =====
@@ -229,16 +229,16 @@ namespace ClawRPG.Systems
             _currentRoomPanel.AddChild(buttonRow);
             
             _readyButton = new Button { Text = "Ready" };
-            _readyButton.Connect("pressed", this, nameof(OnReadyPressed));
+            _readyButton.Pressed += OnReadyPressed;
             buttonRow.AddChild(_readyButton);
             
             _startButton = new Button { Text = "Start Game" };
-            _startButton.Connect("pressed", this, nameof(OnStartPressed));
+            _startButton.Pressed += OnStartPressed;
             _startButton.Visible = false;
             buttonRow.AddChild(_startButton);
             
             _leaveButton = new Button { Text = "Leave Room" };
-            _leaveButton.Connect("pressed", this, nameof(OnLeavePressed));
+            _leaveButton.Pressed += OnLeavePressed;
             buttonRow.AddChild(_leaveButton);
             
             // ===== 统计标签页 =====
