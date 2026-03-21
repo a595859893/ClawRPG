@@ -116,21 +116,21 @@ public class DynamicMarketTaxUI : Control
         _simulateButton = new Button();
         _simulateButton.Text = "模拟交易";
         _simulateButton.CustomMinimumSize = new Vector2(120, 30);
-        _simulateButton.Connect("pressed", this, nameof(_OnSimulateButtonPressed));
+        _simulateButton.Pressed += _OnSimulateButtonPressed;
         _mainContainer.AddChild(_simulateButton);
         
         // 重置按钮
         _resetButton = new Button();
         _resetButton.Text = "重置统计";
         _resetButton.CustomMinimumSize = new Vector2(120, 30);
-        _resetButton.Connect("pressed", this, nameof(_OnResetButtonPressed));
+        _resetButton.Pressed += _OnResetButtonPressed;
         _mainContainer.AddChild(_resetButton);
         
         // 关闭按钮
         _closeButton = new Button();
         _closeButton.Text = "关闭 (ESC)";
         _closeButton.CustomMinimumSize = new Vector2(120, 30);
-        _closeButton.Connect("pressed", this, nameof(_OnCloseButtonPressed));
+        _closeButton.Pressed += _OnCloseButtonPressed;
         _mainContainer.AddChild(_closeButton);
     }
     

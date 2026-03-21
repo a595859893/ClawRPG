@@ -32,10 +32,10 @@ public partial class TradeUI : Control {
         ConnectSignals();
         Visible = false; 
 
-        TradeSystem.Instance.Connect(TradeSystem.SignalName.TradeStarted, Callable.From(OnTradeStarted));
-        TradeSystem.Instance.Connect(TradeSystem.SignalName.OfferUpdated, Callable.From(OnOfferUpdated));
-        TradeSystem.Instance.Connect(TradeSystem.SignalName.TradeCompleted, Callable.From(OnTradeCompleted));
-        TradeSystem.Instance.Connect(TradeSystem.SignalName.TradeCancelled, Callable.From(OnTradeCancelled));
+        TradeSystem.Instance.TradeStarted += OnTradeStarted;
+        TradeSystem.Instance.OfferUpdated += OnOfferUpdated;
+        TradeSystem.Instance.TradeCompleted += OnTradeCompleted;
+        TradeSystem.Instance.TradeCancelled += OnTradeCancelled;
     }
 
     private void SetupUI() {

@@ -162,19 +162,16 @@ namespace UI
             // 连接商店信号
             if (ShopSystem.Instance != null)
             {
-                ShopSystem.Instance.Connect(ShopSystem.SignalName.PurchaseCompleted, 
-                    Callable.From<string, string, int, int>(OnPurchaseCompleted));
-                ShopSystem.Instance.Connect(ShopSystem.SignalName.ItemSold,
-                    Callable.From<string, int, int>(OnItemSold));
-                ShopSystem.Instance.Connect(ShopSystem.SignalName.ShopRefreshed,
-                    Callable.From<string>(OnShopRefreshed));
+                ShopSystem.Instance.PurchaseCompleted += OnPurchaseCompleted;
+                ShopSystem.Instance.ItemSold += OnItemSold;
+                ShopSystem.Instance.ShopRefreshed += OnShopRefreshed;
             }
 
             // 连接玩家金币变化信号
             var inventory = InventoryManager.Instance;
             if (inventory != null)
             {
-                inventory.Connect(InventoryManager.SignalName.GoldChanged, Callable.From(UpdateGoldDisplay));
+                inventory.GoldChanged += UpdateGoldDisplay;
             }
         }
 

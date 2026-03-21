@@ -59,7 +59,7 @@ public class MarketTrendUI : Control
         Button closeBtn = new Button();
         closeBtn.Text = "✕";
         closeBtn.RectMinSize = new Vector2(30, 30);
-        closeBtn.Connect("pressed", this, nameof(OnClosePressed));
+        closeBtn.Pressed += OnClosePressed;
         header.AddChild(closeBtn);
         
         HSeparator sep = new HSeparator();
@@ -155,7 +155,7 @@ public class MarketTrendUI : Control
         {
             _categorySelector.AddItem(category);
         }
-        _categorySelector.Connect("item_selected", this, nameof(OnCategorySelected));
+        _categorySelector.ItemSelected += OnCategorySelected;
         selectorRow.AddChild(_categorySelector);
         
         // Trend info
