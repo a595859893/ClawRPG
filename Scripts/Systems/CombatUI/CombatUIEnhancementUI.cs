@@ -46,7 +46,7 @@ namespace ClawRPG.Systems
             _CreateUI();
             
             // Connect input
-            Connect("visibility_changed", this, nameof(_OnVisibilityChanged));
+            VisibilityChanged += _OnVisibilityChanged;
             
             GD.Print("[CombatUIEnhancementUI] Initialized - Press Ctrl+Shift+U to toggle");
         }
