@@ -55,12 +55,12 @@ public class PetLifeCycleUI : Control
         
         var closeButton = new Button();
         closeButton.Text = "  关闭 (ESC)  ";
-        closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        closeButton.Pressed += OnClosePressed;
         buttonBox.AddChild(closeButton);
         
         var refreshButton = new Button();
         refreshButton.Text = "  刷新  ";
-        refreshButton.Connect("pressed", this, nameof(OnRefreshPressed));
+        refreshButton.Pressed += OnRefreshPressed;
         buttonBox.AddChild(refreshButton);
     }
     
@@ -138,7 +138,7 @@ public class PetLifeCycleUI : Control
         // 添加测试宠物按钮
         var testButton = new Button();
         testButton.Text = "  添加测试宠物  ";
-        testButton.Connect("pressed", this, nameof(OnAddTestPetPressed));
+        testButton.Pressed += OnAddTestPetPressed;
         _petsTab.AddChild(testButton);
     }
     

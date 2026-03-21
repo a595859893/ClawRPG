@@ -92,7 +92,7 @@ public class MountTrainingUI : Control
         mountSelector = new OptionButton();
         mountSelector.SetAnchor(0, 0, 0, 0);
         mountSelector.SetOffset(130, 55, 350, 95);
-        mountSelector.Connect("item_selected", this, "_on_mount_selected");
+        mountSelector.ItemSelected += _on_mount_selected;
         mainContainer.AddChild(mountSelector);
         
         // Level display
@@ -167,7 +167,7 @@ public class MountTrainingUI : Control
         trainButton.Text = "Start Training";
         trainButton.SetAnchor(0, 0, 0, 0);
         trainButton.SetOffset(550, 545, 650, 585);
-        trainButton.Connect("pressed", this, "_on_train_pressed");
+        trainButton.Pressed += _on_train_pressed;
         mainContainer.AddChild(trainButton);
         
         // Close button
@@ -175,7 +175,7 @@ public class MountTrainingUI : Control
         closeBtn.Text = "Close";
         closeBtn.SetAnchor(0, 0, 0, 0);
         closeBtn.SetOffset(20, 545, 120, 585);
-        closeBtn.Connect("pressed", this, "_on_close_pressed");
+        closeBtn.Pressed += _on_close_pressed;
         mainContainer.AddChild(closeBtn);
         
         Visible = false;
@@ -190,7 +190,7 @@ public class MountTrainingUI : Control
         ItemList list = new ItemList();
         list.SetAnchor(0, 0, 1, 1);
         list.SetOffset(10, 10, -10, -10);
-        list.Connect("item_selected", this, "_on_project_selected");
+        list.ItemSelected += _on_project_selected;
         scroll.AddChild(list);
         
         switch (category)

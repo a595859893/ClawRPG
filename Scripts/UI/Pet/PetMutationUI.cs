@@ -60,7 +60,7 @@ public class PetMutationUI : Control
         titleBar.AddChild(new Control { HBoxExpand = true });
         
         _closeButton = new Button { Text = "✕ 关闭" };
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
         titleBar.AddChild(_closeButton);
         
         // 主内容区
@@ -78,8 +78,8 @@ public class PetMutationUI : Control
         var selectorLabel = new Label { Text = "选择宠物:", RectMinSize = new Vector2(80, 0) };
         selectorContainer.AddChild(selectorLabel);
         
-        _petSelector = new OptionButton()
-        _petSelector.Connect("item_selected", this, nameof(OnPetSelected));
+        _petSelector = new OptionButton();
+        _petSelector.ItemSelected += OnPetSelected;
         selectorContainer.AddChild(_petSelector);
         
         // 变异树
@@ -91,11 +91,11 @@ public class PetMutationUI : Control
         leftPanel.AddChild(buttonContainer);
         
         var mutateButton = new Button { Text = "🔄 尝试变异 (100金币)" };
-        mutateButton.Connect("pressed", this, nameof(OnMutatePressed));
+        mutateButton.Pressed += OnMutatePressed;
         buttonContainer.AddChild(mutateButton);
         
         _rerollButton = new Button { Text = "🎲 重新随机 (200金币)", Disabled = true };
-        _rerollButton.Connect("pressed", this, nameof(OnRerollPressed));
+        _rerollButton.Pressed += OnRerollPressed;
         buttonContainer.AddChild(_rerollButton);
         
         // 右侧 - 详情面板和统计

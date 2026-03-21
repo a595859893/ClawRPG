@@ -28,9 +28,9 @@ namespace ClawRPG.UI
             RefreshAll();
             
             // 连接信号
-            MountExpeditionSystem.OnExpeditionStarted.Connect(OnExpeditionStarted);
-            MountExpeditionSystem.OnExpeditionCompleted.Connect(OnExpeditionCompleted);
-            MountExpeditionSystem.OnExpeditionFailed.Connect(OnExpeditionFailed);
+            MountExpeditionSystem.OnExpeditionStarted += OnExpeditionStarted;
+            MountExpeditionSystem.OnExpeditionCompleted += OnExpeditionCompleted;
+            MountExpeditionSystem.OnExpeditionFailed += OnExpeditionFailed;
         }
         
         private void SetupUI()

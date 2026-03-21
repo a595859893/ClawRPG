@@ -251,8 +251,8 @@ public class MountRaceUI : Control
 		vbox.AddChild(cancelButton);
 
 		// Connect signals
-		MountRaceSystem.Instance.Connect(SignalName.RacePositionUpdate, Callable.From(OnRaceUpdate));
-		MountRaceSystem.Instance.Connect(SignalName.RaceFinished, Callable.From(OnRaceFinished));
+		MountRaceSystem.Instance.RacePositionUpdate += () => OnRaceUpdate();
+		MountRaceSystem.Instance.RaceFinished += () => OnRaceFinished();
 	}
 
 	private void OnRaceUpdate()
@@ -337,8 +337,8 @@ public class MountRaceUI : Control
 		}
 
 		// Disconnect signals
-		MountRaceSystem.Instance.Disconnect(SignalName.RacePositionUpdate, Callable.From(OnRaceUpdate));
-		MountRaceSystem.Instance.Disconnect(SignalName.RaceFinished, Callable.From(OnRaceFinished));
+		MountRaceSystem.Instance.RacePositionUpdate -= () => OnRaceUpdate();
+		MountRaceSystem.Instance.RaceFinished -= () => OnRaceFinished();
 	}
 
 	private void OnExitRacePressed()

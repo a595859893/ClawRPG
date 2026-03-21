@@ -54,14 +54,14 @@ public class BossMechanicsSystem : BaseSystem
     private void ConnectSubsystemSignals()
     {
         // 连接PhaseSystem信号
-        BossPhaseSystem.Instance.Connect("boss_phase_changed", this, nameof(_OnPhaseChanged));
-        BossPhaseSystem.Instance.Connect("boss_enraged", this, nameof(_OnBossEnraged));
+        BossPhaseSystem.Instance.BossPhaseChanged += _OnPhaseChanged;
+        BossPhaseSystem.Instance.BossEnraged += _OnBossEnraged;
         
         // 连接AbilitySystem信号
-        BossAbilitySystem.Instance.Connect("boss_skill_executed", this, nameof(_OnSkillExecuted));
+        BossAbilitySystem.Instance.BossSkillExecuted += _OnSkillExecuted;
         
         // 连接PatternSystem信号
-        BossPatternSystem.Instance.Connect("boss_pattern_changed", this, nameof(_OnPatternChanged));
+        BossPatternSystem.Instance.BossPatternChanged += _OnPatternChanged;
     }
 
     private void _OnPhaseChanged(string instanceId, int oldPhase, int newPhase)

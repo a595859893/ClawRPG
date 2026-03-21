@@ -236,10 +236,10 @@ public class PetEquipmentUI : Control
     {
         if (PetEquipmentSystem.Instance != null)
         {
-            PetEquipmentSystem.Instance.Connect(nameof(PetEquipmentSystem.EquipmentPurchased), this, nameof(OnEquipmentChanged));
-            PetEquipmentSystem.Instance.Connect(nameof(PetEquipmentSystem.EquipmentEquipped), this, nameof(OnEquipmentChanged));
-            PetEquipmentSystem.Instance.Connect(nameof(PetEquipmentSystem.EquipmentUnequipped), this, nameof(OnEquipmentChanged));
-            PetEquipmentSystem.Instance.Connect(nameof(PetEquipmentSystem.DataLoaded), this, nameof(RefreshUI));
+            PetEquipmentSystem.Instance.EquipmentPurchased += OnEquipmentChanged;
+            PetEquipmentSystem.Instance.EquipmentEquipped += OnEquipmentChanged;
+            PetEquipmentSystem.Instance.EquipmentUnequipped += OnEquipmentChanged;
+            PetEquipmentSystem.Instance.DataLoaded += RefreshUI;
         }
     }
     

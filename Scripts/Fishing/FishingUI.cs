@@ -340,11 +340,11 @@ namespace ClawRPG.Scripts.Fishing
         {
             if (FishingSystem.Instance != null)
             {
-                FishingSystem.Instance.Connect(FishingSystem.FishingStartedSignal, Callable.From<string>(OnFishingStarted));
-                FishingSystem.Instance.Connect(FishingSystem.FishBitingSignal, Callable.From<string>(OnFishBiting));
-                FishingSystem.Instance.Connect(FishingSystem.FishCaughtSignal, Callable.From<string, int, int>(OnFishCaught));
-                FishingSystem.Instance.Connect(FishingSystem.FishEscapedSignal, Callable.From(OnFishEscaped));
-                FishingSystem.Instance.Connect(FishingSystem.LevelUpSignal, Callable.From<int>(OnLevelUp));
+                FishingSystem.Instance.FishingStarted += location => OnFishingStarted(location);
+                FishingSystem.Instance.FishBiting += fishName => OnFishBiting(fishName);
+                FishingSystem.Instance.FishCaught += (fishName, value, weight) => OnFishCaught(fishName, value, weight);
+                FishingSystem.Instance.FishEscaped += OnFishEscaped;
+                FishingSystem.Instance.LevelUp += newLevel => OnLevelUp(newLevel);
             }
         }
         

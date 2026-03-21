@@ -54,9 +54,9 @@ public class PetSynthesisUI : Control
         SetupUI();
         
         // Connect signals
-        PetSynthesisSystem.Instance.Connect(PetSynthesisSystem.SignalSynthesisStarted, this, "_on_synthesis_started");
-        PetSynthesisSystem.Instance.Connect(PetSynthesisSystem.SignalSynthesisCompleted, this, "_on_synthesis_completed");
-        PetSynthesisSystem.Instance.Connect(PetSynthesisSystem.SignalSynthesisFailed, this, "_on_synthesis_failed");
+        PetSynthesisSystem.Instance.SignalSynthesisStarted += _on_synthesis_started;
+        PetSynthesisSystem.Instance.SignalSynthesisCompleted += _on_synthesis_completed;
+        PetSynthesisSystem.Instance.SignalSynthesisFailed += _on_synthesis_failed;
     }
     
     private void SetupUI()
@@ -79,7 +79,7 @@ public class PetSynthesisUI : Control
         closeButton.Text = "X";
         closeButton.RectPosition = new Vector2(550, 10);
         closeButton.RectSize = new Vector2(30, 30);
-        closeButton.Connect("pressed", this, "_on_close_pressed");
+        closeButton.Pressed += _on_close_pressed;
         _mainPanel.AddChild(closeButton);
         
         // Tab container
@@ -114,7 +114,7 @@ public class PetSynthesisUI : Control
         
         _pet1Selector = new OptionButton();
         _pet1Selector.RectSize = new Vector2(300, 30);
-        _pet1Selector.Connect("item_selected", this, "_on_pet1_selected");
+        _pet1Selector.ItemSelected += _on_pet1_selected;
         container.AddChild(_pet1Selector);
         
         // Pet 2 selector
@@ -124,7 +124,7 @@ public class PetSynthesisUI : Control
         
         _pet2Selector = new OptionButton();
         _pet2Selector.RectSize = new Vector2(300, 30);
-        _pet2Selector.Connect("item_selected", this, "_on_pet2_selected");
+        _pet2Selector.ItemSelected += _on_pet2_selected;
         container.AddChild(_pet2Selector);
         
         // Recipe info
@@ -144,7 +144,7 @@ public class PetSynthesisUI : Control
         _synthesizeButton = new Button();
         _synthesizeButton.Text = "🔮 Synthesize";
         _synthesizeButton.RectSize = new Vector2(200, 40);
-        _synthesizeButton.Connect("pressed", this, "_on_synthesize_pressed");
+        _synthesizeButton.Pressed += _on_synthesize_pressed;
         container.AddChild(_synthesizeButton);
         
         // Result label
@@ -176,7 +176,7 @@ public class PetSynthesisUI : Control
         refreshButton.Text = "🔄 Refresh";
         refreshButton.RectPosition = new Vector2(420, 380);
         refreshButton.RectSize = new Vector2(120, 30);
-        refreshButton.Connect("pressed", this, "_on_refresh_history_pressed");
+        refreshButton.Pressed += _on_refresh_history_pressed;
         _historyTab.AddChild(refreshButton);
     }
     

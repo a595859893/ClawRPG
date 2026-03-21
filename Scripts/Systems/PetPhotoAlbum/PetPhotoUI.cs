@@ -43,13 +43,13 @@ public class PetPhotoUI : Control
         Button takePhotoBtn = new Button();
         takePhotoBtn.Text = "Take Photo 📷";
         takePhotoBtn.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        takePhotoBtn.Connect("pressed", this, nameof(_on_take_photo_pressed));
+        takePhotoBtn.Pressed += _on_take_photo_pressed;
         actionContainer.AddChild(takePhotoBtn);
 
         Button unlockBtn = new Button();
         unlockBtn.Text = "Unlock Location 🌍";
         unlockBtn.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        unlockBtn.Connect("pressed", this, nameof(_on_unlock_location_pressed));
+        unlockBtn.Pressed += _on_unlock_location_pressed;
         actionContainer.AddChild(unlockBtn);
 
         // Tab container
@@ -150,7 +150,7 @@ public class PetPhotoUI : Control
         // Create album button
         Button createAlbumBtn = new Button();
         createAlbumBtn.Text = "Create New Album +";
-        createAlbumBtn.Connect("pressed", this, nameof(_on_create_album_pressed));
+        createAlbumBtn.Pressed += _on_create_album_pressed;
         albumsContainer.AddChild(createAlbumBtn);
 
         // Statistics tab
@@ -174,7 +174,7 @@ public class PetPhotoUI : Control
         Button closeButton = new Button();
         closeButton.Text = "Close (ESC)";
         closeButton.Align = Button.AlignEnum.Center;
-        closeButton.Connect("pressed", this, nameof(_on_close_pressed));
+        closeButton.Pressed += _on_close_pressed;
         mainContainer.AddChild(closeButton);
 
         // Initial stats update
@@ -260,13 +260,13 @@ public class PetPhotoUI : Control
             Button favBtn = new Button();
             favBtn.Text = photo.IsFavorite ? "Unfavorite" : "❤️ Favorite";
             favBtn.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-            favBtn.Connect("pressed", this, nameof(_on_favorite_pressed), new Godot.Collections.Array { photo.PhotoId });
+            favBtn.Pressed += () => _on_favorite_pressed(photo.PhotoId);
             actions.AddChild(favBtn);
 
             Button deleteBtn = new Button();
             deleteBtn.Text = "🗑️ Delete";
             deleteBtn.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-            deleteBtn.Connect("pressed", this, nameof(_on_delete_pressed), new Godot.Collections.Array { photo.PhotoId });
+            deleteBtn.Pressed += () => _on_delete_pressed(photo.PhotoId);
             actions.AddChild(deleteBtn);
 
             photoCard.AddChild(actions);

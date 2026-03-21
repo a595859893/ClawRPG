@@ -27,10 +27,10 @@ namespace ClawRPG.Scripts.UI {
             
             // 连接信号
             if (MountManager.Instance != null) {
-                MountManager.Instance.Connect("OnMountAdded", this, nameof(OnMountAdded));
-                MountManager.Instance.Connect("OnMountRemoved", this, nameof(OnMountRemoved));
-                MountManager.Instance.Connect("OnMountActivated", this, nameof(OnMountActivated));
-                MountManager.Instance.Connect("OnMountDeactivated", this, nameof(OnMountDeactivated));
+                MountManager.Instance.OnMountAdded += OnMountAdded;
+                MountManager.Instance.OnMountRemoved += OnMountRemoved;
+                MountManager.Instance.OnMountActivated += OnMountActivated;
+                MountManager.Instance.OnMountDeactivated += OnMountDeactivated;
             }
         }
 
