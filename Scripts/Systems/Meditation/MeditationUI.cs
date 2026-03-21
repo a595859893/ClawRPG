@@ -1,298 +1,320 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Framework;
 
 namespace ClawRPG.Systems.Meditation
 {
     /// <summary>
-    /// Meditation UI - Interface for meditation system
+    /// Meditation UI - Coordinator for the Meditation System
+    /// Orchestrates MeditationCoreSystem, MeditationBuffSystem, and MeditationCooldownSystem
+    /// Provides unified meditation entry point and aggregates signals from all subsystems
     /// </summary>
-    public class MeditationUI : Control
+    public partial class MeditationUI : BaseSystem
     {
-        // UI Components
-        private PanelContainer _mainPanel;
-        private VBoxContainer _contentBox;
-        private Label _titleLabel;
-        private ProgressBar _focusProgress;
-        private Label _focusLabel;
-        private GridContainer _meditationGrid;
-        private Label _statusLabel;
-        private Button _closeButton;
-        
-        // Meditation buttons
-        private Dictionary<MeditationType, Button> _meditationButtons = new Dictionary<MeditationType, Button>();
-        
-        // Current session timer
-        private float _sessionTimer = 0f;
-        private MeditationSession _currentSession;
-        private bool _isMeditating = false;
-        
+        public static MeditationUI Instance { get; private set; }
+
+        // Subsystem references
+        private MeditationCoreSystem _coreSystem;
+        private MeditationBuffSystem _buffSystem;
+        private MeditationCooldownSystem _cooldownSystem;
+
+        // Aggregated signals - combines all subsystem signals
+        public Signals Signals;
+
+        /// <summary>
+        /// Aggregated signals from all meditation subsystems
+        /// </summary>
+        public class Signals : Godot.Object
+        {
+            public delegate void MeditationStartedHandler(string playerId, MeditationType type);
+            public delegate void MeditationCompletedHandler(string playerId, MeditationType type, List<string> benefits);
+            public delegate void BuffAppliedHandler(string playerId, MeditationType type, string statAffected, float value);
+            public delegate void BuffExpiredHandler(string playerId, MeditationType type);
+            public delegate void FocusGainedHandler(string playerId, int focusAmount);
+            public delegate void AbilityUnlockedHandler(string playerId, string abilityId);
+
+            public event MeditationStartedHandler MeditationStarted;
+            public event MeditationCompletedHandler MeditationCompleted;
+            public event BuffAppliedHandler BuffApplied;
+            public event BuffExpiredHandler BuffExpired;
+            public event FocusGainedHandler FocusGained;
+            public event AbilityUnlockedHandler AbilityUnlocked;
+
+            public void EmitMeditationStarted(string playerId, MeditationType type)
+            {
+                MeditationStarted?.Invoke(playerId, type);
+            }
+
+            public void EmitMeditationCompleted(string playerId, MeditationType type, List<string> benefits)
+            {
+                MeditationCompleted?.Invoke(playerId, type, benefits);
+            }
+
+            public void EmitBuffApplied(string playerId, MeditationType type, string statAffected, float value)
+            {
+                BuffApplied?.Invoke(playerId, type, statAffected, value);
+            }
+
+            public void EmitBuffExpired(string playerId, MeditationType type)
+            {
+                BuffExpired?.Invoke(playerId, type);
+            }
+
+            public void EmitFocusGained(string playerId, int focusAmount)
+            {
+                FocusGained?.Invoke(playerId, focusAmount);
+            }
+
+            public void EmitAbilityUnlocked(string playerId, string abilityId)
+            {
+                AbilityUnlocked?.Invoke(playerId, abilityId);
+            }
+        }
+
         public override void _Ready()
         {
-            SetupUI();
-            ConnectSignals();
-            RefreshUI();
+            base._Ready();
+            Instance = this;
+            Signals = new Signals();
+
+            // Get references to sibling systems
+            InitializeSubsystemReferences();
+
+            // Connect to subsystem signals
+            ConnectSubsystemSignals();
+
+            GD.Print($"[MeditationUI] MeditationUI coordinator initialized");
         }
-        
-        private void SetupUI()
+
+        private void InitializeSubsystemReferences()
         {
-            // Main panel
-            _mainPanel = new PanelContainer();
-            _mainPanel.Name = "MeditationPanel";
-            _mainPanel.AnchorLeft = 0.5f;
-            _mainPanel.AnchorTop = 0.5f;
-            _mainPanel.AnchorRight = 0.5f;
-            _mainPanel.AnchorBottom = 0.5f;
-            _mainPanel.OffsetLeft = -300;
-            _mainPanel.OffsetTop = -250;
-            _mainPanel.OffsetRight = 300;
-            _mainPanel.OffsetBottom = 250;
-            _mainPanel.RectMinSize = new Vector2(600, 500);
-            AddChild(_mainPanel);
-            
-            // Style
-            var style = new StyleBoxFlat();
-            style.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.95f);
-            style.BorderColor = new Color(0.3f, 0.3f, 0.5f);
-            style.SetBorderWidthAll(2);
-            style.SetCornerRadiusAll(8);
-            _mainPanel.AddStyleboxOverride("panel", style);
-            
-            // Content box
-            _contentBox = new VBoxContainer();
-            _contentBox.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
-            _contentBox.MarginLeft = 15;
-            _contentBox.MarginTop = 15;
-            _contentBox.MarginRight = -15;
-            _contentBox.MarginBottom = -15;
-            _mainPanel.AddChild(_contentBox);
-            
-            // Title
-            _titleLabel = new Label();
-            _titleLabel.Text = "🧘 Meditation";
-            _titleLabel.Align = Label.AlignEnum.Center;
-            _titleLabel.AnchorRight = 1f;
-            _titleLabel.RectMinSize = new Vector2(0, 40);
-            _contentBox.AddChild(_titleLabel);
-            
-            // Focus progress
-            var focusContainer = new HBoxContainer();
-            focusContainer.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
-            focusContainer.MarginBottom = 5;
-            _contentBox.AddChild(focusContainer);
-            
-            var focusLabelTitle = new Label();
-            focusLabelTitle.Text = "Focus: ";
-            focusLabelTitle.RectMinSize = new Vector2(80, 0);
-            focusContainer.AddChild(focusLabelTitle);
-            
-            _focusProgress = new ProgressBar();
-            _focusProgress.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-            _focusProgress.MinValue = 0;
-            _focusProgress.MaxValue = 100;
-            _focusProgress.ShowPercentage = false;
-            _focusProgress.RectMinSize = new Vector2(200, 20);
-            focusContainer.AddChild(_focusProgress);
-            
-            _focusLabel = new Label();
-            _focusLabel.Text = "0/100";
-            _focusLabel.RectMinSize = new Vector2(80, 0);
-            focusContainer.AddChild(_focusLabel);
-            
-            // Meditation type grid
-            _meditationGrid = new GridContainer();
-            _meditationGrid.Columns = 2;
-            _meditationGrid.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-            _contentBox.AddChild(_meditationGrid);
-            
-            // Create meditation buttons
-            CreateMeditationButtons();
-            
-            // Status label
-            _statusLabel = new Label();
-            _statusLabel.Align = Label.AlignEnum.Center;
-            _statusLabel.Text = "Select a meditation type to begin";
-            _statusLabel.RectMinSize = new Vector2(0, 60);
-            _contentBox.AddChild(_statusLabel);
-            
-            // Close button
-            _closeButton = new Button();
-            _closeButton.Text = "Close";
-            _closeButton.RectMinSize = new Vector2(120, 40);
-            _contentBox.AddChild(_closeButton);
-        }
-        
-        private void CreateMeditationButtons()
-        {
-            foreach (MeditationType type in Enum.GetValues(typeof(MeditationType)))
+            // Try to get references via node paths
+            // In the actual game, these would be autoloaded or accessible via proper paths
+            _coreSystem = GetNodeOrNull<MeditationCoreSystem>("/root/MeditationCoreSystem");
+            _buffSystem = GetNodeOrNull<MeditationBuffSystem>("/root/MeditationBuffSystem");
+            _cooldownSystem = GetNodeOrNull<MeditationCooldownSystem>("/root/MeditationCooldownSystem");
+
+            // Fallback: Try Common autoload path
+            if (_coreSystem == null)
+                _coreSystem = GetNodeOrNull<MeditationCoreSystem>("/root/MeditationCoreSystem");
+            if (_buffSystem == null)
+                _buffSystem = GetNodeOrNull<MeditationBuffSystem>("/root/MeditationBuffSystem");
+            if (_cooldownSystem == null)
+                _cooldownSystem = GetNodeOrNull<MeditationCooldownSystem>("/root/MeditationCooldownSystem");
+
+            if (_coreSystem == null || _buffSystem == null || _cooldownSystem == null)
             {
-                var button = new Button();
-                button.Name = type.ToString() + "Button";
-                button.RectMinSize = new Vector2(250, 60);
-                
-                var config = MeditationDatabase.Instance.GetTypeConfig(type);
-                if (config != null)
-                {
-                    button.Text = $"{config.DisplayName}\n{config.Description}";
-                    button.HintTooltip = $"Duration: {config.MinDuration}-{config.MaxDuration}s\nCooldown: {config.Cooldown}s";
-                }
-                
-                button.Pressed += () => _OnMeditationButtonPressed(type);
-                _meditationButtons[type] = button;
-                _meditationGrid.AddChild(button);
+                GD.PushWarning("[MeditationUI] Some subsystem references could not be resolved. " +
+                    $"Core: {_coreSystem != null}, Buff: {_buffSystem != null}, Cooldown: {_cooldownSystem != null}");
             }
         }
-        
-        private void ConnectSignals()
+
+        private void ConnectSubsystemSignals()
         {
-            _closeButton.Pressed += _OnClosePressed;
-            
-            if (MeditationSystem.Instance?.signals != null)
+            // Connect to Core System signals
+            if (_coreSystem?.Signals != null)
             {
-                MeditationSystem.Instance.signals.MeditationStarted += _OnMeditationStarted;
-                MeditationSystem.Instance.signals.MeditationCompleted += _OnMeditationCompleted;
-                MeditationSystem.Instance.signals.BuffApplied += _OnBuffApplied;
-                MeditationSystem.Instance.signals.FocusGained += _OnFocusGained;
-                MeditationSystem.Instance.signals.AbilityUnlocked += _OnAbilityUnlocked;
+                _coreSystem.Signals.MeditationStarted += (playerId, type) =>
+                    Signals.EmitMeditationStarted(playerId, type);
+                _coreSystem.Signals.MeditationCompleted += (playerId, type, benefits) =>
+                    Signals.EmitMeditationCompleted(playerId, type, benefits);
+                _coreSystem.Signals.FocusGained += (playerId, amount) =>
+                    Signals.EmitFocusGained(playerId, amount);
+                _coreSystem.Signals.AbilityUnlocked += (playerId, abilityId) =>
+                    Signals.EmitAbilityUnlocked(playerId, abilityId);
+            }
+
+            // Connect to Buff System signals
+            if (_buffSystem?.Signals != null)
+            {
+                _buffSystem.Signals.BuffApplied += (playerId, type, stat, value) =>
+                    Signals.EmitBuffApplied(playerId, type, stat, value);
+                _buffSystem.Signals.BuffExpired += (playerId, type) =>
+                    Signals.EmitBuffExpired(playerId, type);
             }
         }
-        
-        private void RefreshUI()
+
+        /// <summary>
+        /// Start a meditation session (coordinator entry point)
+        /// </summary>
+        public bool StartMeditation(string playerId, MeditationType type, int duration)
         {
-            // Get player ID (would normally come from game state)
-            string playerId = "player1"; // Placeholder
-            
-            var progress = MeditationSystem.Instance.GetProgress(playerId);
-            if (progress != null)
+            if (_coreSystem != null)
             {
-                _focusProgress.Value = progress.CurrentFocus;
-                _focusProgress.MaxValue = progress.MaxFocus;
-                _focusLabel.Text = $"{progress.CurrentFocus}/{progress.MaxFocus}";
+                return _coreSystem.StartMeditation(playerId, type, duration);
             }
-            
-            // Update button states
-            foreach (var kvp in _meditationButtons)
+            GD.PushWarning("[MeditationUI] Cannot start meditation: CoreSystem not available");
+            return false;
+        }
+
+        /// <summary>
+        /// Complete a meditation session
+        /// </summary>
+        public void CompleteMeditation(string playerId)
+        {
+            if (_coreSystem != null)
             {
-                var type = kvp.Key;
-                var button = kvp.Value;
-                
-                bool unlocked = MeditationSystem.Instance.GetUnlockedTypes(playerId).Contains(type);
-                bool onCooldown = MeditationSystem.Instance.IsOnCooldown(playerId, type);
-                bool canMeditate = MeditationSystem.Instance.CanMeditate(playerId, type, 60); // Default 60s
-                
-                button.Disabled = !unlocked || onCooldown || !canMeditate || _isMeditating;
-                
-                if (!unlocked)
-                {
-                    var config = MeditationDatabase.Instance.GetTypeConfig(type);
-                    if (config != null && MeditationDatabase.Instance.FocusToUnlock.ContainsKey(type.ToString()))
-                    {
-                        int required = MeditationDatabase.Instance.FocusToUnlock[type.ToString()];
-                        button.Text = $"🔒 {config.DisplayName}\nRequires {required} Focus";
-                    }
-                }
-                else if (onCooldown)
-                {
-                    int remaining = MeditationSystem.Instance.GetCooldownRemaining(playerId, type);
-                    button.Text = $"⏳ {type} ({remaining}s)";
-                }
+                _coreSystem.CompleteMeditation(playerId);
             }
         }
-        
-        private void _OnMeditationButtonPressed(MeditationType type)
+
+        /// <summary>
+        /// Cancel a meditation session
+        /// </summary>
+        public void CancelMeditation(string playerId)
         {
-            string playerId = "player1"; // Placeholder
-            
-            int duration = 60; // Default duration
-            
-            if (MeditationSystem.Instance.CanMeditate(playerId, type, duration))
+            if (_coreSystem != null)
             {
-                MeditationSystem.Instance.StartMeditation(playerId, type, duration);
-                _statusLabel.Text = $"Meditating: {type}...";
-                _isMeditating = true;
-            }
-            else
-            {
-                _statusLabel.Text = "Cannot start meditation. Check cooldown or unlock status.";
+                _coreSystem.CancelMeditation(playerId);
             }
         }
-        
-        private void _OnClosePressed()
+
+        /// <summary>
+        /// Check if player can meditate
+        /// </summary>
+        public bool CanMeditate(string playerId, MeditationType type, int duration)
         {
-            if (_isMeditating)
+            if (_coreSystem != null)
             {
-                string playerId = "player1";
-                MeditationSystem.Instance.CancelMeditation(playerId);
+                return _coreSystem.CanMeditate(playerId, type, duration);
             }
-            QueueFree();
+            return false;
         }
-        
-        private void _OnMeditationStarted(string playerId, MeditationType type)
+
+        /// <summary>
+        /// Check if meditation type is on cooldown
+        /// </summary>
+        public bool IsOnCooldown(string playerId, MeditationType type)
         {
-            _statusLabel.Text = $"Started: {type}";
-            RefreshUI();
-        }
-        
-        private void _OnMeditationCompleted(string playerId, MeditationType type, List<string> benefits)
-        {
-            _isMeditating = false;
-            string benefitText = benefits.Count > 0 ? string.Join(", ", benefits) : "None";
-            _statusLabel.Text = $"Completed {type}!\nBenefits: {benefitText}";
-            RefreshUI();
-        }
-        
-        private void _OnBuffApplied(string playerId, MeditationType type, string stat, float value)
-        {
-            GD.Print($"[MeditationUI] Buff applied: {stat} + {value}");
-        }
-        
-        private void _OnFocusGained(string playerId, int focusAmount)
-        {
-            RefreshUI();
-        }
-        
-        private void _OnAbilityUnlocked(string playerId, string abilityId)
-        {
-            _statusLabel.Text = $"New meditation unlocked: {abilityId}!";
-            RefreshUI();
-        }
-        
-        public override void _Process(float delta)
-        {
-            if (_isMeditating && _currentSession != null)
+            if (_cooldownSystem != null)
             {
-                _sessionTimer += delta;
-                
-                var session = MeditationSystem.Instance.GetCurrentSession("player1");
-                if (session != null)
-                {
-                    int elapsed = (int)_sessionTimer;
-                    int remaining = session.Duration - elapsed;
-                    
-                    if (remaining <= 0)
-                    {
-                        // Session complete
-                        MeditationSystem.Instance.CompleteMeditation("player1");
-                        _sessionTimer = 0;
-                    }
-                    else
-                    {
-                        _statusLabel.Text = $"Meditating... {remaining}s remaining";
-                    }
-                }
+                return _cooldownSystem.IsOnCooldown(playerId, type);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get remaining cooldown time
+        /// </summary>
+        public int GetCooldownRemaining(string playerId, MeditationType type)
+        {
+            if (_cooldownSystem != null)
+            {
+                return _cooldownSystem.GetCooldownRemaining(playerId, type);
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Get current meditation session
+        /// </summary>
+        public MeditationSession GetCurrentSession(string playerId)
+        {
+            if (_coreSystem != null)
+            {
+                return _coreSystem.GetCurrentSession(playerId);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get meditation progress
+        /// </summary>
+        public MeditationProgress GetProgress(string playerId)
+        {
+            if (_coreSystem != null)
+            {
+                return _coreSystem.GetProgress(playerId);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get active buffs
+        /// </summary>
+        public List<MeditationBuff> GetActiveBuffs(string playerId)
+        {
+            if (_buffSystem != null)
+            {
+                return _buffSystem.GetActiveBuffs(playerId);
+            }
+            return new List<MeditationBuff>();
+        }
+
+        /// <summary>
+        /// Get unlocked meditation types
+        /// </summary>
+        public List<MeditationType> GetUnlockedTypes(string playerId)
+        {
+            if (_coreSystem != null)
+            {
+                return _coreSystem.GetUnlockedTypes(playerId);
+            }
+            return new List<MeditationType>();
+        }
+
+        /// <summary>
+        /// Get meditation bonus for stat
+        /// </summary>
+        public float GetStatBonus(string playerId, string stat)
+        {
+            if (_buffSystem != null)
+            {
+                return _buffSystem.GetStatBonus(playerId, stat);
+            }
+            return 0f;
+        }
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary<string, Variant>();
+
+            // Delegate to each subsystem
+            if (_coreSystem != null)
+            {
+                data["core"] = _coreSystem.ExportSaveData();
+            }
+            if (_buffSystem != null)
+            {
+                data["buff"] = _buffSystem.ExportSaveData();
+            }
+            if (_cooldownSystem != null)
+            {
+                data["cooldown"] = _cooldownSystem.ExportSaveData();
+            }
+
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            // Delegate to each subsystem
+            if (data.TryGetValue("core", out var coreData) && _coreSystem != null)
+            {
+                _coreSystem.ImportSaveData((Dictionary)coreData);
+            }
+            if (data.TryGetValue("buff", out var buffData) && _buffSystem != null)
+            {
+                _buffSystem.ImportSaveData((Dictionary)buffData);
+            }
+            if (data.TryGetValue("cooldown", out var cooldownData) && _cooldownSystem != null)
+            {
+                _cooldownSystem.ImportSaveData((Dictionary)cooldownData);
             }
         }
-        
-        public override void _ExitTree()
+
+        public override void Reset()
         {
-            if (MeditationSystem.Instance?.signals != null)
-            {
-                MeditationSystem.Instance.signals.MeditationStarted -= _OnMeditationStarted;
-                MeditationSystem.Instance.signals.MeditationCompleted -= _OnMeditationCompleted;
-                MeditationSystem.Instance.signals.BuffApplied -= _OnBuffApplied;
-                MeditationSystem.Instance.signals.FocusGained -= _OnFocusGained;
-                MeditationSystem.Instance.signals.AbilityUnlocked -= _OnAbilityUnlocked;
-            }
+            base.Reset();
+            Instance = null;
+        }
+
+        public override string GetId()
+        {
+            return "MeditationUI";
         }
     }
 }
