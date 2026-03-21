@@ -83,15 +83,15 @@ namespace ClawRPG.Systems.MultiplayerVote
         /// </summary>
         private void ConnectSubsystemSignals()
         {
-            // PartyManagementSystem signals - use _partySystem (not PartySystem.Instance)
-            // These are Godot signals, use .Connect() method
+            // PartyManagementSystem signals - use C# event pattern with Godot 4 Signal
             if (_partySystem != null)
             {
-                _partySystem.Connect("PartyCreated", new Callable(this, nameof(OnPartyCreated)));
-                _partySystem.Connect("PartyJoined", new Callable(this, nameof(OnPartyJoined)));
-                _partySystem.Connect("PartyLeft", new Callable(this, nameof(OnPartyLeft)));
-                _partySystem.Connect("PartyMemberKicked", new Callable(this, nameof(OnPartyMemberKicked)));
-                _partySystem.Connect("PartyLeaderChanged", new Callable(this, nameof(OnPartyLeaderChanged)));
+                // Godot 4 Signal can be subscribed via += directly
+                _partySystem.PartyCreated += OnPartyCreated;
+                _partySystem.PlayerJoinedParty += OnPartyJoined;
+                _partySystem.PlayerLeftParty += OnPartyLeft;
+                _partySystem.PlayerKicked += OnPartyMemberKicked;
+                _partySystem.LeaderChanged += OnPartyLeaderChanged;
             }
             
             // VoteProcessingSystem signals - these have C# event patterns
