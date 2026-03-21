@@ -24,9 +24,9 @@ namespace ClawRPG.Systems.Meditation
         private Dictionary<string, Dictionary<MeditationType, DateTime>> _cooldowns = new Dictionary<string, Dictionary<MeditationType, DateTime>>();
         
         // Signals
-        public signals signals;
+        public Signals Signals;
         
-        public class signals : Godot.Object
+        public class Signals : Godot.Object
         {
             public delegate void MeditationStartedHandler(string playerId, MeditationType type);
             public delegate void MeditationCompletedHandler(string playerId, MeditationType type, List<string> benefits);
@@ -116,7 +116,7 @@ namespace ClawRPG.Systems.Meditation
             SetCooldown(playerId, type, config.Cooldown);
             
             // Emit signal
-            signals.EmitMeditationStarted(playerId, type);
+            Signals.EmitMeditationStarted(playerId, type);
             
             GD.Print($"[Meditation] Player {playerId} started {type} meditation for {duration} seconds");
             return true;
@@ -164,7 +164,7 @@ namespace ClawRPG.Systems.Meditation
             CheckUnlocks(playerId);
             
             // Emit signal
-            signals.EmitMeditationCompleted(playerId, session.Type, session.AchievedBenefits);
+            Signals.EmitMeditationCompleted(playerId, session.Type, session.AchievedBenefits);
             
             GD.Print($"[Meditation] Player {playerId} completed {session.Type} meditation, gained {focusGain} focus");
             
@@ -322,7 +322,7 @@ namespace ClawRPG.Systems.Meditation
             
             foreach (var expired in expiredBuffs)
             {
-                signals.EmitBuffExpired(expired.Item1, expired.Item2.Type);
+                Signals.EmitBuffExpired(expired.Item1, expired.Item2.Type);
             }
         }
         
@@ -333,7 +333,7 @@ namespace ClawRPG.Systems.Meditation
         {
             var progress = GetOrCreateProgress(playerId);
             progress.CurrentFocus = Mathf.Min(progress.CurrentFocus + amount, progress.MaxFocus);
-            signals.EmitFocusGained(playerId, amount);
+            Signals.EmitFocusGained(playerId, amount);
         }
         
         /// <summary>
@@ -354,7 +354,7 @@ namespace ClawRPG.Systems.Meditation
                 ApplyTemporaryBuff(playerId, type, benefit.StatAffected, value, benefit.Duration);
             }
             
-            signals.EmitBuffApplied(playerId, type, benefit.StatAffected, value);
+            Signals.EmitBuffApplied(playerId, type, benefit.StatAffected, value);
         }
         
         /// <summary>
@@ -433,7 +433,7 @@ namespace ClawRPG.Systems.Meditation
                 if (progress.CurrentFocus >= requiredFocus && !progress.UnlockedAbilities.Contains(abilityId))
                 {
                     progress.UnlockedAbilities.Add(abilityId);
-                    signals.EmitAbilityUnlocked(playerId, abilityId);
+                    Signals.EmitAbilityUnlocked(playerId, abilityId);
                     GD.Print($"[Meditation] Player {playerId} unlocked {abilityId} meditation!");
                 }
             }
