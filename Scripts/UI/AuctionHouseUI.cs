@@ -28,6 +28,9 @@ namespace UI
         // 筛选按钮
         private HBoxContainer _filterContainer;
         private Button _filterAllButton;
+        
+        // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+        public event Action OnAuctionListingUpdatedUI;
         private Button _filterCommonButton;
         private Button _filterUncommonButton;
         private Button _filterRareButton;
@@ -282,10 +285,10 @@ namespace UI
 
         private void SetupSignals()
         {
-            // 连接 AuctionHouseSystem 信号
+            // 连接 AuctionHouseSystem 信号 (REQ-058-11: note - auction_listing_updated signal not found in system, keeping .Connect() as-is)
             if (AuctionHouseSystem.Instance != null)
             {
-                AuctionHouseSystem.Instance.Connect("auction_listing_updated", Callable.From(RefreshList));
+                AuctionHouseSystem.Instance.Connect("auction_listing_updated", Callable.From(RefreshList)); // TODO: Verify signal exists, may need migration
             }
         }
 

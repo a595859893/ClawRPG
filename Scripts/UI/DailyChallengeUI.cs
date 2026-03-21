@@ -20,7 +20,10 @@ namespace ClawRPG.Scripts.UI {
         private Label _timerLabel;
         private Button _closeButton;
         
-        private bool _isVisible = false; 
+        private bool _isVisible = false;
+        
+        // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+        public event Action OnCloseButtonPressedEvent; 
         
         public override void _Ready() {
             // Get nodes
@@ -30,9 +33,10 @@ namespace ClawRPG.Scripts.UI {
             _timerLabel = GetNode<Label>(timerLabelPath);
             _closeButton = GetNode<Button>(closeButtonPath);
             
-            // Connect signals
+            // Connect signals (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
             if (_closeButton != null) {
-                _closeButton.Connect("pressed", this, nameof(OnCloseButtonPressed));
+                _closeButton.Pressed += OnCloseButtonPressed; // NEW
+                _closeButton.Connect("pressed", this, nameof(OnCloseButtonPressed)); // TODO: Remove after migration
             }
             
             // Initial state
@@ -157,6 +161,8 @@ namespace ClawRPG.Scripts.UI {
         }
         
         private void OnCloseButtonPressed() {
+            // REQ-058-11: Invoke new event
+            OnCloseButtonPressedEvent?.Invoke();
             Toggle();
         }
         

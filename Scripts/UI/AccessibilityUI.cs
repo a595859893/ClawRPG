@@ -23,6 +23,9 @@ namespace ClawRPG.UI {
         private OptionButton _uiScaleOption;
         private OptionButton _textSizeOption;
         private CheckButton _subtitlesCheck;
+        
+        // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+        public event Action OnAccessibilitySettingsChangedUI;
         private CheckButton _soundVizCheck;
         private CheckButton _simplifiedCheck;
         private CheckButton _autoPotionCheck;
@@ -40,10 +43,11 @@ namespace ClawRPG.UI {
             SetupUI();
             Hide();
             
-            // 连接到AccessibilityManager信号
+            // 连接到AccessibilityManager信号 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
             if (AccessibilityManager.Instance != null)
             {
-                AccessibilityManager.Instance.Connect(nameof(AccessibilityManager.AccessibilitySettingsChanged), Callable.From(OnSettingsChanged));
+                AccessibilityManager.Instance.AccessibilitySettingsChanged += OnSettingsChanged; // NEW
+                AccessibilityManager.Instance.Connect(nameof(AccessibilityManager.AccessibilitySettingsChanged), Callable.From(OnSettingsChanged)); // TODO: Remove after migration
             }
         }
 
@@ -386,6 +390,8 @@ namespace ClawRPG.UI {
 
         private void OnSettingsChanged()
         {
+            // REQ-058-11: Invoke new event
+            OnAccessibilitySettingsChangedUI?.Invoke();
             // 更新UI显示
             _colorBlindOption.Selected = (int)AccessibilityManager.Instance.ColorBlind;
             _highContrastCheck.ButtonPressed = AccessibilityManager.Instance.HighContrast;
