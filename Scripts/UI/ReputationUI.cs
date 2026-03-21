@@ -24,6 +24,10 @@ namespace ClawRPG.Scripts.UI {
         
         private string _selectedFactionId;
         
+        // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+        public event Action<string> OnReputationChangedUI;
+        public event Action<string, ReputationTier> OnTierChangedUI;
+        
         public override void _Ready() {
             SetupUI();
             Visible = false; 
@@ -106,12 +110,15 @@ namespace ClawRPG.Scripts.UI {
             // 刷新列表
             RefreshFactionList();
             
-            // 连接信号
+            // 连接信号 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
+            // TODO: Remove old .Connect() after migration verified
             if (ReputationSystem.Instance.ReputationChanged != null) {
-                ReputationSystem.Instance.ReputationChanged.Connect(OnReputationChanged);
+                ReputationSystem.Instance.ReputationChanged += OnReputationChanged; // NEW
+                ReputationSystem.Instance.ReputationChanged.Connect(OnReputationChanged); // TODO: Remove after migration
             }
             if (ReputationSystem.Instance.TierChanged != null) {
-                ReputationSystem.Instance.TierChanged.Connect(OnTierChanged);
+                ReputationSystem.Instance.TierChanged += OnTierChanged; // NEW
+                ReputationSystem.Instance.TierChanged.Connect(OnTierChanged); // TODO: Remove after migration
             }
         }
         
@@ -266,6 +273,8 @@ namespace ClawRPG.Scripts.UI {
         }
         
         private void OnReputationChanged(string factionId) {
+            // REQ-058-11: Invoke new event
+            OnReputationChangedUI?.Invoke(factionId);
             if (factionId == _selectedFactionId) {
                 UpdateFactionInfo();
             }
@@ -273,6 +282,8 @@ namespace ClawRPG.Scripts.UI {
         }
         
         private void OnTierChanged(string factionId, ReputationTier newTier) {
+            // REQ-058-11: Invoke new event
+            OnTierChangedUI?.Invoke(factionId, newTier);
             if (factionId == _selectedFactionId) {
                 UpdateFactionInfo();
             }

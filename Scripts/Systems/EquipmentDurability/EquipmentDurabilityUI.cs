@@ -14,11 +14,15 @@ public class EquipmentDurabilityUI : Control
     private Label _totalCostLabel;
     private Button _repairAllButton;
 
-    private bool _isVisible = false; 
+    private bool _isVisible = false;
+
+    // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+    public event Action<string, int, int> OnDurabilityChangedUI;
+    public event Action<string, int> OnEquipmentRepairedUI;
 
     public override void _Ready()
     {
-        Visible = false; 
+        Visible = false;
         _mainPanel = new PanelContainer();
         _mainPanel.SetAnchorsPreset(Control.LayoutPreset.Center);
         _mainPanel.CustomMinimumSize = new Vector2(500, 400);
@@ -90,11 +94,13 @@ public class EquipmentDurabilityUI : Control
         helpLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.6f));
         _content.AddChild(helpLabel);
 
-        // 连接到信号
+        // 连接到信号 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
         if (EquipmentDurabilitySystem.Instance != null)
         {
-            EquipmentDurabilitySystem.Instance.Connect("DurabilityChanged", this, nameof(OnDurabilityChanged));
-            EquipmentDurabilitySystem.Instance.Connect("EquipmentRepaired", this, nameof(OnEquipmentRepaired));
+            EquipmentDurabilitySystem.Instance.DurabilityChanged += OnDurabilityChanged; // NEW
+            EquipmentDurabilitySystem.Instance.Connect("DurabilityChanged", this, nameof(OnDurabilityChanged)); // TODO: Remove after migration
+            EquipmentDurabilitySystem.Instance.EquipmentRepaired += OnEquipmentRepaired; // NEW
+            EquipmentDurabilitySystem.Instance.Connect("EquipmentRepaired", this, nameof(OnEquipmentRepaired)); // TODO: Remove after migration
         }
 
         UpdateUI();
@@ -104,7 +110,7 @@ public class EquipmentDurabilityUI : Control
     {
         _isVisible = !_isVisible;
         Visible = _isVisible;
-        
+
         if (_isVisible)
         {
             UpdateUI();
@@ -121,7 +127,7 @@ public class EquipmentDurabilityUI : Control
         var tween = CreateTween();
         _mainPanel.Modulate = new Color(1, 1, 1, 0);
         _mainPanel.Scale = new Vector2(0.9f, 0.9f);
-        
+
         tween.SetParallel(true);
         tween.TweenProperty(_mainPanel, "modulate:a", 1.0f, 0.2f);
         tween.TweenProperty(_mainPanel, "scale", new Vector2(1.0f, 1.0f), 0.2f).SetTrans(Tween.TransitionType.Back).SetEasing(Tween.EasingFunction.EaseOut);
@@ -202,7 +208,7 @@ public class EquipmentDurabilityUI : Control
         progressBar.CustomMinimumSize = new Vector2(200, 20);
         progressBar.Value = durability.DurabilityPercent * 100;
         progressBar.MaxValue = 100;
-        
+
         var progressStyle = new StyleBoxFlat();
         progressStyle.BgColor = new Color(0.2f, 0.2f, 0.25f);
         progressStyle.SetCornerRadiusAll(4);
@@ -212,7 +218,7 @@ public class EquipmentDurabilityUI : Control
         fillStyle.BgColor = stateColor;
         fillStyle.SetCornerRadiusAll(4);
         progressBar.AddThemeStyleboxOverride("fill", fillStyle);
-        
+
         container.AddChild(progressBar);
 
         // 耐久度数值
@@ -227,10 +233,10 @@ public class EquipmentDurabilityUI : Control
         var repairButton = new Button();
         repairButton.Text = "修理";
         repairButton.Disabled = durability.CurrentDurability >= durability.MaxDurability;
-        
+
         int cost = EquipmentDurabilitySystem.Instance.GetRepairCost(itemId);
         repairButton.Disabled = repairButton.Disabled || (Player.Instance != null && Player.Instance.Gold < cost);
-        
+
         repairButton.Pressed += () => OnRepairButtonPressed(itemId);
         container.AddChild(repairButton);
 
@@ -281,11 +287,15 @@ public class EquipmentDurabilityUI : Control
 
     private void OnDurabilityChanged(string itemId, int current, int max)
     {
+        // REQ-058-11: Invoke new event
+        OnDurabilityChangedUI?.Invoke(itemId, current, max);
         UpdateUI();
     }
-
+    
     private void OnEquipmentRepaired(string itemId, int cost)
     {
+        // REQ-058-11: Invoke new event
+        OnEquipmentRepairedUI?.Invoke(itemId, cost);
         UpdateUI();
     }
 

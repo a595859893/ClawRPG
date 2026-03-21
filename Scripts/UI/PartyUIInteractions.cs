@@ -124,6 +124,8 @@ public partial class PartyUI
     /// </summary>
     private void OnPlayerSelected(string listName)
     {
+        // REQ-058-11: Invoke new event
+        OnPlayerSelectedEvent?.Invoke(listName);
         var list = FindChild(listName, true, false) as ItemList;
         if (list != null && list.GetItemCount() > 0)
         {
@@ -155,6 +157,8 @@ public partial class PartyUI
     /// </summary>
     private void OnInviteCancelled(string popupName)
     {
+        // REQ-058-11: Invoke new event
+        OnInviteCancelledEvent?.Invoke(popupName);
         var popup = FindChild(popupName, true, false) as WindowDialog;
         if (popup != null)
         {

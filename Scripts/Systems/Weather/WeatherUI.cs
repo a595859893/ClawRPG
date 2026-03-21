@@ -22,6 +22,10 @@ public class WeatherUI : Control
         new Color(1.0f, 0.4f, 0.4f)   // Severe - Red
     };
     
+    // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+    public event Action<WeatherType, WeatherType> OnWeatherChangedUI;
+    public event Action<WeatherIntensity> OnIntensityChangedUI;
+    
     public override void _Ready()
     {
         CreateUI();
@@ -133,8 +137,11 @@ public class WeatherUI : Control
         
         if (WeatherSystem.Instance != null)
         {
-            WeatherSystem.Instance.Connect(nameof(WeatherSystem.WeatherChanged), this, nameof(OnWeatherChanged));
-            WeatherSystem.Instance.Connect(nameof(WeatherSystem.WeatherIntensityChanged), this, nameof(OnIntensityChanged));
+            // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
+            WeatherSystem.Instance.WeatherChanged += OnWeatherChanged; // NEW
+            WeatherSystem.Instance.Connect(nameof(WeatherSystem.WeatherChanged), this, nameof(OnWeatherChanged)); // TODO: Remove after migration
+            WeatherSystem.Instance.WeatherIntensityChanged += OnIntensityChanged; // NEW
+            WeatherSystem.Instance.Connect(nameof(WeatherSystem.WeatherIntensityChanged), this, nameof(OnIntensityChanged)); // TODO: Remove after migration
         }
     }
     
@@ -209,11 +216,15 @@ public class WeatherUI : Control
     
     private void OnWeatherChanged(WeatherType old_type, WeatherType new_type)
     {
+        // REQ-058-11: Invoke new event
+        OnWeatherChangedUI?.Invoke(old_type, new_type);
         RefreshDisplay();
     }
     
     private void OnIntensityChanged(WeatherIntensity intensity)
     {
+        // REQ-058-11: Invoke new event
+        OnIntensityChangedUI?.Invoke(intensity);
         RefreshDisplay();
     }
     

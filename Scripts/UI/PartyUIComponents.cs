@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public partial class PartyUI
 {
+    // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+    public event Action<string> OnPlayerSelectedEvent;
+    public event Action<string> OnInviteCancelledEvent;
+    
     /// <summary>
     /// 创建成员面板
     /// </summary>
@@ -189,18 +193,20 @@ public partial class PartyUI
         buttonBox.Alignment = HBoxContainer.AlignmentMode.Center;
         vbox.AddChild(buttonBox);
         
-        // 邀请按钮
+        // 邀请按钮 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
         var inviteBtn = new Button();
         inviteBtn.Text = "邀请";
         inviteBtn.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        inviteBtn.Connect("pressed", this, nameof(OnPlayerSelected), new[] { playerList.Name });
+        inviteBtn.Pressed += () => OnPlayerSelected(playerList.Name); // NEW
+        inviteBtn.Connect("pressed", this, nameof(OnPlayerSelected), new[] { playerList.Name }); // TODO: Remove after migration
         buttonBox.AddChild(inviteBtn);
         
-        // 取消按钮
+        // 取消按钮 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
         var cancelBtn = new Button();
         cancelBtn.Text = "取消";
         cancelBtn.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        cancelBtn.Connect("pressed", this, nameof(OnInviteCancelled), new[] { popup.Name });
+        cancelBtn.Pressed += () => OnInviteCancelled(popup.Name); // NEW
+        cancelBtn.Connect("pressed", this, nameof(OnInviteCancelled), new[] { popup.Name }); // TODO: Remove after migration
         buttonBox.AddChild(cancelBtn);
         
         popup.PopupCentered();

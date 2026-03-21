@@ -16,18 +16,22 @@ namespace ClawRPG.UI {
         private Button _resetButton;
         private Button _closeButton;
         private Label _instructionsLabel;
-        
+
         // 按键绑定项
         private Dictionary<string, KeybindingItem> _items = new Dictionary<string, KeybindingItem>();
-        
+
         // 当前正在绑定的项
         private KeybindingItem _bindingItem = null;
         private Label _bindingPrompt;
-        
+
+        // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+        public event Action<string, Key, Key> OnKeybindingChangedUI;
+        public event Action OnKeybindingsResetUI;
+
         // 分类
         private OptionButton _categoryOption;
         private string _currentCategory = "all";
-        
+
         private Dictionary<string, List<string>> _categories = new Dictionary<string, List<string>>
         {
             { "all", new List<string>() },
@@ -41,7 +45,7 @@ namespace ClawRPG.UI {
 
         public override void _Ready()
         {
-            Visible = false; 
+            Visible = false;
             SetupUI();
             ConnectSignals();
             PopulateKeybindings();
@@ -174,10 +178,13 @@ namespace ClawRPG.UI {
 
         private void ConnectSignals()
         {
+            // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
             if (KeybindingSystem.Instance != null)
             {
-                KeybindingSystem.Instance.Connect(nameof(KeybindingSystem.KeybindingChanged), this, nameof(OnKeybindingChanged));
-                KeybindingSystem.Instance.Connect(nameof(KeybindingSystem.KeybindingsReset), this, nameof(OnKeybindingsReset));
+                KeybindingSystem.Instance.KeybindingChanged += OnKeybindingChanged; // NEW
+                KeybindingSystem.Instance.Connect(nameof(KeybindingSystem.KeybindingChanged), this, nameof(OnKeybindingChanged)); // TODO: Remove after migration
+                KeybindingSystem.Instance.KeybindingsReset += OnKeybindingsReset; // NEW
+                KeybindingSystem.Instance.Connect(nameof(KeybindingSystem.KeybindingsReset), this, nameof(OnKeybindingsReset)); // TODO: Remove after migration
             }
         }
 
@@ -210,13 +217,13 @@ namespace ClawRPG.UI {
         private void StartBinding(string actionName)
         {
             if (_bindingItem != null) return;
-            
+
             if (_items.TryGetValue(actionName, out var item))
             {
                 _bindingItem = item;
                 _bindingItem.SetBinding(true);
                 _bindingPrompt.Visible = true;
-                
+
                 // 设置输入捕获
                 GetTree().SetInputAsHandled();
             }
@@ -229,7 +236,7 @@ namespace ClawRPG.UI {
             if (@event is InputEventKey keyEvent && keyEvent.Pressed)
             {
                 var newKey = keyEvent.Keycode;
-                
+
                 // 忽略Escape键
                 if (newKey == Key.Escape)
                 {
@@ -242,10 +249,10 @@ namespace ClawRPG.UI {
                 {
                     _bindingItem.SetBinding(false);
                     _bindingItem.UpdateKey(newKey);
-                    _bindingPrompt.Visible = false; 
+                    _bindingPrompt.Visible = false;
                     _bindingItem = null;
                 }
-                
+
                 GetTree().SetInputAsHandled();
             }
         }
@@ -256,7 +263,7 @@ namespace ClawRPG.UI {
             {
                 _bindingItem.SetBinding(false);
                 _bindingItem = null;
-                _bindingPrompt.Visible = false; 
+                _bindingPrompt.Visible = false;
             }
         }
 
@@ -291,14 +298,18 @@ namespace ClawRPG.UI {
 
         private void OnKeybindingChanged(string actionName, Key oldKey, Key newKey)
         {
+            // REQ-058-11: Invoke new event
+            OnKeybindingChangedUI?.Invoke(actionName, oldKey, newKey);
             if (_items.TryGetValue(actionName, out var item))
             {
                 item.UpdateKey(newKey);
             }
         }
-
+        
         private void OnKeybindingsReset()
         {
+            // REQ-058-11: Invoke new event
+            OnKeybindingsResetUI?.Invoke();
             PopulateKeybindings();
         }
 
@@ -310,7 +321,7 @@ namespace ClawRPG.UI {
 
         public void HideKeybindingUI()
         {
-            Visible = false; 
+            Visible = false;
             CancelBinding();
         }
 
@@ -329,12 +340,12 @@ namespace ClawRPG.UI {
     public class KeybindingItem : HBoxContainer
     {
         public string ActionName { get; }
-        
+
         private Label _nameLabel;
         private Label _keyLabel;
         private Button _bindButton;
         private Button _resetButton;
-        
+
         public event Action OnBindRequested;
         public event Action OnResetRequested;
 
@@ -424,7 +435,7 @@ namespace ClawRPG.UI {
             else
             {
                 _bindButton.Text = "修改";
-                _bindButton.Disabled = false; 
+                _bindButton.Disabled = false;
             }
         }
     }
