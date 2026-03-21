@@ -13,6 +13,7 @@ public class ChronicleUI : Control
     private VBoxContainer chroniclesList;
     private VBoxContainer loreList;
     private VBoxContainer flagsList;
+    private Button closeButton;
     
     private Color defaultColor = new Color(1, 1, 1, 1);
     private Color completedColor = new Color(0.3f, 0.8f, 0.3f, 1);
@@ -24,7 +25,7 @@ public class ChronicleUI : Control
         SetupUI();
         
         // Connect input
-        Connect("visibility_changed", this, "_on_visibility_changed");
+        VisibilityChanged += OnVisibilityChanged;
     }
     
     private void SetupUI()
@@ -61,10 +62,10 @@ public class ChronicleUI : Control
         
         headerContainer.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
         
-        var closeButton = new Button();
+        closeButton = new Button();
         closeButton.Text = "✕";
         closeButton.TooltipText = "Close (Esc)";
-        closeButton.Connect("pressed", this, "_on_close_pressed");
+        closeButton.Pressed += OnClosePressed;
         headerContainer.AddChild(closeButton);
         
         // Chapter info
@@ -305,12 +306,12 @@ public class ChronicleUI : Control
         }
     }
     
-    private void _on_close_pressed()
+    private void OnClosePressed()
     {
         Visible = false;
     }
     
-    private void _on_visibility_changed()
+    private void OnVisibilityChanged()
     {
         if (Visible)
         {
