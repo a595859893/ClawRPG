@@ -30,9 +30,9 @@ namespace ClawRPG.Scripts.UI
             // Connect signals
             if (CounterAttackSystem.Instance != null)
             {
-                CounterAttackSystem.Instance.Connect(CounterAttackSystem.SignalName.CounterAttack窗口, new Callable(this, nameof(_OnCounterWindowChanged)));
-                CounterAttackSystem.Instance.Connect(CounterAttackSystem.SignalName.CounterAttackReady, new Callable(this, nameof(_OnCounterReady)));
-                CounterAttackSystem.Instance.Connect(CounterAttackSystem.SignalName.CounterAttackPerformed, new Callable(this, nameof(_OnCounterPerformed)));
+                CounterAttackSystem.Instance.CounterAttack窗口 += _OnCounterWindowChanged;
+                CounterAttackSystem.Instance.CounterAttackReady += _OnCounterReady;
+                CounterAttackSystem.Instance.CounterAttackPerformed += _OnCounterPerformed;
             }
         }
         
@@ -297,9 +297,9 @@ namespace ClawRPG.Scripts.UI
             {
                 if (CounterAttackSystem.Instance != null)
                 {
-                    CounterAttackSystem.Instance.Disconnect(CounterAttackSystem.SignalName.CounterAttack窗口, new Callable(this, nameof(_OnCounterWindowChanged)));
-                    CounterAttackSystem.Instance.Disconnect(CounterAttackSystem.SignalName.CounterAttackReady, new Callable(this, nameof(_OnCounterReady)));
-                    CounterAttackSystem.Instance.Disconnect(CounterAttackSystem.SignalName.CounterAttackPerformed, new Callable(this, nameof(_OnCounterPerformed)));
+                    CounterAttackSystem.Instance.CounterAttack窗口 -= _OnCounterWindowChanged;
+                    CounterAttackSystem.Instance.CounterAttackReady -= _OnCounterReady;
+                    CounterAttackSystem.Instance.CounterAttackPerformed -= _OnCounterPerformed;
                 }
             }
             base.Dispose(disposing);

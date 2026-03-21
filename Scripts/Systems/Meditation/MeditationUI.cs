@@ -137,7 +137,7 @@ namespace ClawRPG.Systems.Meditation
                     button.HintTooltip = $"Duration: {config.MinDuration}-{config.MaxDuration}s\nCooldown: {config.Cooldown}s";
                 }
                 
-                button.Connect("pressed", this, nameof(_OnMeditationButtonPressed), new Godot.Collections.Array { type });
+                button.Pressed += () => _OnMeditationButtonPressed(type);
                 _meditationButtons[type] = button;
                 _meditationGrid.AddChild(button);
             }
@@ -145,7 +145,7 @@ namespace ClawRPG.Systems.Meditation
         
         private void ConnectSignals()
         {
-            _closeButton.Connect("pressed", this, nameof(_OnClosePressed));
+            _closeButton.Pressed += _OnClosePressed;
             
             if (MeditationSystem.Instance?.signals != null)
             {

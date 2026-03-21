@@ -77,19 +77,19 @@ public class GuildRankUI : Control
 		leaderboardTab = new Button();
 		leaderboardTab.Text = "Leaderboard";
 		leaderboardTab.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		leaderboardTab.Connect("pressed", this, nameof(OnTabPressed), new Variant(0));
+		leaderboardTab.Pressed += () => OnTabPressed(0);
 		tabContainer.AddChild(leaderboardTab);
 		
 		myRankTab = new Button();
 		myRankTab.Text = "My Rank";
 		myRankTab.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		myRankTab.Connect("pressed", this, nameof(OnTabPressed), new Variant(1));
+		myRankTab.Pressed += () => OnTabPressed(1);
 		tabContainer.AddChild(myRankTab);
 		
 		seasonTab = new Button();
 		seasonTab.Text = "Season";
 		seasonTab.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		seasonTab.Connect("pressed", this, nameof(OnTabPressed), new Variant(2));
+		seasonTab.Pressed += () => OnTabPressed(2);
 		tabContainer.AddChild(seasonTab);
 		
 		// Content container
@@ -109,7 +109,7 @@ public class GuildRankUI : Control
 		var closeButton = new Button();
 		closeButton.Text = "Close (ESC)";
 		closeButton.Align = Button.TextAlign.Center;
-		closeButton.Connect("pressed", this, nameof(OnClosePressed));
+		closeButton.Pressed += OnClosePressed;
 		mainContainer.AddChild(closeButton);
 	}
 	
@@ -269,7 +269,7 @@ public class GuildRankUI : Control
 		// Start new season button
 		var newSeasonButton = new Button();
 		newSeasonButton.Text = "Start New Season";
-		newSeasonButton.Connect("pressed", this, nameof(OnNewSeasonPressed));
+		newSeasonButton.Pressed += OnNewSeasonPressed;
 		seasonContainer.AddChild(newSeasonButton);
 	}
 	

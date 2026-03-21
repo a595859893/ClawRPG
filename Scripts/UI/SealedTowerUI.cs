@@ -139,11 +139,11 @@ public class SealedTowerUI : Control
         // Connect signals
         if (SealedTowerManager.Instance != null)
         {
-            SealedTowerManager.Instance.Connect(nameof(SealedTowerManager.RunStarted), this, nameof(OnRunStarted));
-            SealedTowerManager.Instance.Connect(nameof(SealedTowerManager.RunEnded), this, nameof(OnRunEnded));
-            SealedTowerManager.Instance.Connect(nameof(SealedTowerManager.FloorChanged), this, nameof(OnFloorChanged));
-            SealedTowerManager.Instance.Connect(nameof(SealedTowerManager.BoonAcquired), this, nameof(OnBoonAcquired));
-            SealedTowerManager.Instance.Connect(nameof(SealedTowerManager.CurseAcquired), this, nameof(OnCurseAcquired));
+            SealedTowerManager.Instance.RunStarted += OnRunStarted;
+            SealedTowerManager.Instance.RunEnded += OnRunEnded;
+            SealedTowerManager.Instance.FloorChanged += OnFloorChanged;
+            SealedTowerManager.Instance.BoonAcquired += OnBoonAcquired;
+            SealedTowerManager.Instance.CurseAcquired += OnCurseAcquired;
         }
         
         UpdateDisplay();

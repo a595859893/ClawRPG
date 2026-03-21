@@ -83,7 +83,7 @@ namespace ClawRPG.Systems.Meditation
             timer.Name = "MeditationBuffTimer";
             timer.WaitTime = 1.0f;
             timer.Autostart = true;
-            timer.Connect("timeout", this, nameof(_OnBuffCheckTimer));
+            timer.Timeout += _OnBuffCheckTimer;
             AddChild(timer);
         }
         

@@ -78,7 +78,7 @@ public class EnemyScalingUI : Control
         var closeButton = new Button();
         closeButton.Text = "Close (ESC)";
         closeButton.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        closeButton.Pressed += OnClosePressed;
         mainContainer.AddChild(closeButton);
     }
 
@@ -117,7 +117,7 @@ public class EnemyScalingUI : Control
         // 更新按钮
         var updateButton = new Button();
         updateButton.Text = "Update Progress";
-        updateButton.Connect("pressed", this, nameof(OnUpdateProgressPressed));
+        updateButton.Pressed += OnUpdateProgressPressed;
         _overviewTab.AddChild(updateButton);
 
         // 刷新显示
@@ -144,7 +144,7 @@ public class EnemyScalingUI : Control
         {
             _enemyTypeOption.AddItem(type);
         }
-        _enemyTypeOption.Connect("item_selected", this, nameof(OnEnemyTypeSelected));
+        _enemyTypeOption.ItemSelected += OnEnemyTypeSelected;
         hbox1.AddChild(_enemyTypeOption);
 
         // 难度选择
@@ -162,7 +162,7 @@ public class EnemyScalingUI : Control
             _difficultyOption.AddItem(diff);
         }
         _difficultyOption.Selected = 1; // Default to Normal
-        _difficultyOption.Connect("item_selected", this, nameof(OnDifficultySelected));
+        _difficultyOption.ItemSelected += OnDifficultySelected;
         hbox2.AddChild(_difficultyOption);
 
         // 缩放等级输入
@@ -183,7 +183,7 @@ public class EnemyScalingUI : Control
         // 计算按钮
         var calcButton = new Button();
         calcButton.Text = "Calculate Scaled Stats";
-        calcButton.Connect("pressed", this, nameof(OnCalculatePressed));
+        calcButton.Pressed += OnCalculatePressed;
         vbox.AddChild(calcButton);
 
         // 结果显示
@@ -213,7 +213,7 @@ public class EnemyScalingUI : Control
         // 重置按钮
         _resetButton = new Button();
         _resetButton.Text = "Reset Progress";
-        _resetButton.Connect("pressed", this, nameof(OnResetPressed));
+        _resetButton.Pressed += OnResetPressed;
         vbox.AddChild(_resetButton);
 
         RefreshStatistics();

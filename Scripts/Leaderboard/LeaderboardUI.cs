@@ -62,7 +62,7 @@ namespace ClawRPG.Scripts.Leaderboard {
             _closeButton = new Button();
             _closeButton.Text = "X";
             _closeButton.RectMinSize = new Vector2(30, 30);
-            _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+            _closeButton.Pressed += OnClosePressed;
             titleBar.AddChild(_closeButton);
 
             // 控制栏
@@ -77,7 +77,7 @@ namespace ClawRPG.Scripts.Leaderboard {
 
             _leaderboardTypeSelector = new OptionButton();
             PopulateTypeSelector();
-            _leaderboardTypeSelector.Connect("item_selected", this, nameof(OnTypeSelected));
+            _leaderboardTypeSelector.ItemSelected += OnTypeSelected;
             controlBar.AddChild(_leaderboardTypeSelector);
 
             // 时间周期选择
@@ -90,14 +90,14 @@ namespace ClawRPG.Scripts.Leaderboard {
             _periodSelector.AddItem("Monthly", (int)LeaderboardPeriod.Monthly);
             _periodSelector.AddItem("Weekly", (int)LeaderboardPeriod.Weekly);
             _periodSelector.AddItem("Daily", (int)LeaderboardPeriod.Daily);
-            _periodSelector.Connect("item_selected", this, nameof(OnPeriodSelected));
+            _periodSelector.ItemSelected += OnPeriodSelected;
             controlBar.AddChild(_periodSelector);
 
             controlBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.Expand });
 
             _refreshButton = new Button();
             _refreshButton.Text = "Refresh";
-            _refreshButton.Connect("pressed", this, nameof(OnRefreshPressed));
+            _refreshButton.Pressed += OnRefreshPressed;
             controlBar.AddChild(_refreshButton);
 
             // 统计信息

@@ -92,8 +92,8 @@ namespace ClawRPG.Scripts.Combat
             // Connect to combat log system
             if (CombatLogSystem.Instance != null)
             {
-                CombatLogSystem.Instance.Connect(CombatLogSystem.SignalNewEntry, Callable.From<CombatLogEntry>(OnNewLogEntry));
-                CombatLogSystem.Instance.Connect(CombatLogSystem.SignalComboMilestone, Callable.From<int>(OnComboMilestone));
+                CombatLogSystem.Instance.SignalNewEntry += OnNewLogEntry;
+                CombatLogSystem.Instance.SignalComboMilestone += OnComboMilestone;
             }
             
             GD.Print("[CombatLogUI] Combat Log UI initialized");
