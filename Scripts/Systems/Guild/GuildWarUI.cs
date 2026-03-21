@@ -94,9 +94,9 @@ public class GuildWarUI : Control
     {
         if (warManager != null)
         {
-            warManager.Connect(nameof(GuildWarManager.WarStartedSignal), this, nameof(OnWarStarted));
-            warManager.Connect(nameof(GuildWarManager.WarEndedSignal), this, nameof(OnWarEnded));
-            warManager.Connect(nameof(GuildWarManager.PointsUpdatedSignal), this, nameof(OnPointsUpdated));
+            warManager.WarStarted += OnWarStarted;
+            warManager.WarEnded += OnWarEnded;
+            warManager.PointsUpdated += OnPointsUpdated;
         }
     }
     

@@ -63,7 +63,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             difficultyBtn.AddItem("普通", (int)ContractDifficulty.Medium + 1);
             difficultyBtn.AddItem("困难", (int)ContractDifficulty.Hard + 1);
             difficultyBtn.AddItem("传说", (int)ContractDifficulty.Legendary + 1);
-            difficultyBtn.Connect("item_selected", this, nameof(_on_difficulty_selected));
+            difficultyBtn.ItemSelected += index => _on_difficulty_selected(index);
             filterContainer.AddChild(difficultyBtn);
             
             var typeBtn = new OptionButton();
@@ -74,13 +74,13 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             typeBtn.AddItem("护送", (int)ContractType.Escort + 1);
             typeBtn.AddItem("收集", (int)ContractType.Collection + 1);
             typeBtn.AddItem("防御", (int)ContractType.Defense + 1);
-            typeBtn.Connect("item_selected", this, nameof(_on_type_selected));
+            typeBtn.ItemSelected += index => _on_type_selected(index);
             filterContainer.AddChild(typeBtn);
             
             // Refresh button
             var refreshBtn = new Button();
             refreshBtn.Text = "刷新合同";
-            refreshBtn.Connect("pressed", this, nameof(_on_refresh_pressed));
+            refreshBtn.Pressed += _on_refresh_pressed;
             leftPanel.AddChild(refreshBtn);
             
             // Tab container
@@ -304,19 +304,19 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             {
                 var acceptBtn = new Button();
                 acceptBtn.Text = "接受";
-                acceptBtn.Connect("pressed", this, nameof(_on_accept_pressed), new Array { contract.contractId });
+                acceptBtn.Pressed += () => _on_accept_pressed(contract.contractId);
                 buttonContainer.AddChild(acceptBtn);
             }
             else if (contract.status == ContractStatus.Active)
             {
                 var detailsBtn = new Button();
                 detailsBtn.Text = "详情";
-                detailsBtn.Connect("pressed", this, nameof(_on_details_pressed), new Array { contract.contractId });
+                detailsBtn.Pressed += () => _on_details_pressed(contract.contractId);
                 buttonContainer.AddChild(detailsBtn);
                 
                 var abandonBtn = new Button();
                 abandonBtn.Text = "放弃";
-                abandonBtn.Connect("pressed", this, nameof(_on_abandon_pressed), new Array { contract.contractId });
+                abandonBtn.Pressed += () => _on_abandon_pressed(contract.contractId);
                 buttonContainer.AddChild(abandonBtn);
             }
             

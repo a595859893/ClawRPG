@@ -84,7 +84,7 @@ public class GuildHeritageUI : Control
         var closeButton = new Button();
         closeButton.Text = "Close (ESC)";
         closeButton.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        closeButton.Pressed += OnClosePressed;
         mainContainer.AddChild(closeButton);
     }
     
@@ -103,7 +103,7 @@ public class GuildHeritageUI : Control
         _transferTypeOption.AddItem("🎁 Gift - Regular transfer", 0);
         _transferTypeOption.AddItem("🏛️ Inheritance - Senior to Junior", 1);
         _transferTypeOption.AddItem("📚 Teaching - Share experience", 2);
-        _transferTypeOption.Connect("item_selected", this, nameof(OnTransferTypeChanged));
+        _transferTypeOption.ItemSelected += OnTransferTypeChanged;
         tab.AddChild(_transferTypeOption);
         
         // Info Label
@@ -164,7 +164,7 @@ public class GuildHeritageUI : Control
         _sendButton = new Button();
         _sendButton.Text = "Send Transfer";
         _sendButton.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        _sendButton.Connect("pressed", this, nameof(OnSendPressed));
+        _sendButton.Pressed += OnSendPressed;
         tab.AddChild(_sendButton);
     }
     
@@ -191,12 +191,12 @@ public class GuildHeritageUI : Control
         
         _acceptButton = new Button();
         _acceptButton.Text = "Accept";
-        _acceptButton.Connect("pressed", this, nameof(OnAcceptPressed));
+        _acceptButton.Pressed += OnAcceptPressed;
         buttonContainer.AddChild(_acceptButton);
         
         _rejectButton = new Button();
         _rejectButton.Text = "Reject";
-        _rejectButton.Connect("pressed", this, nameof(OnRejectPressed));
+        _rejectButton.Pressed += OnRejectPressed;
         buttonContainer.AddChild(_rejectButton);
     }
     

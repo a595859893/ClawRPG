@@ -52,14 +52,14 @@ public class TattooUI : Control
         _tattooList = new ItemList();
         _tattooList.RectPosition = new Vector2(20, 60);
         _tattooList.RectSize = new Vector2(300, 250);
-        _tattooList.Connect("item_selected", this, "_on_tattoo_selected");
+        _tattooList.ItemSelected += _on_tattoo_selected;
         AddChild(_tattooList);
         
         // Slot list
         _slotList = new ItemList();
         _slotList.RectPosition = new Vector2(340, 60);
         _slotList.RectSize = new Vector2(150, 250);
-        _slotList.Connect("item_selected", this, "_on_slot_selected");
+        _slotList.ItemSelected += _on_slot_selected;
         AddChild(_slotList);
         
         // Info label
@@ -74,7 +74,7 @@ public class TattooUI : Control
         _applyButton.Text = "Apply Tattoo";
         _applyButton.RectPosition = new Vector2(20, 330);
         _applyButton.RectSize = new Vector2(150, 40);
-        _applyButton.Connect("pressed", this, "_on_apply_pressed");
+        _applyButton.Pressed += _on_apply_pressed;
         AddChild(_applyButton);
         
         // Remove button
@@ -82,7 +82,7 @@ public class TattooUI : Control
         _removeButton.Text = "Remove";
         _removeButton.RectPosition = new Vector2(180, 330);
         _removeButton.RectSize = new Vector2(150, 40);
-        _removeButton.Connect("pressed", this, "_on_remove_pressed");
+        _removeButton.Pressed += _on_remove_pressed;
         AddChild(_removeButton);
         
         // Bonus label
@@ -97,7 +97,7 @@ public class TattooUI : Control
         _closeButton.Text = "Close";
         _closeButton.RectPosition = new Vector2(650, 330);
         _closeButton.RectSize = new Vector2(100, 40);
-        _closeButton.Connect("pressed", this, "_on_close_pressed");
+        _closeButton.Pressed += _on_close_pressed;
         AddChild(_closeButton);
     }
     

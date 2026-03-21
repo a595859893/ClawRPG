@@ -106,7 +106,7 @@ public class GuildFestivalUI : Control
         buttonBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.Expand });
 
         _closeButton = new Button { Text = "关闭 (ESC)", RectMinSize = new Vector2(120, 40) };
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
         buttonBar.AddChild(_closeButton);
     }
 
@@ -120,7 +120,7 @@ public class GuildFestivalUI : Control
 
         // 刷新按钮
         var refreshButton = new Button { Text = "刷新列表", RectMinSize = new Vector2(120, 35) };
-        refreshButton.Connect("pressed", this, nameof(RefreshFestivals));
+        refreshButton.Pressed += RefreshFestivals;
         tab.AddChild(refreshButton);
     }
 
@@ -331,7 +331,7 @@ public class GuildFestivalUI : Control
         if (festival.State == GuildFestivalSystem.FestivalState.Inactive)
         {
             var startButton = new Button { Text = "开始准备", RectMinSize = new Vector2(110, 30) };
-            startButton.Connect("pressed", this, nameof(OnStartPressed), new Godot.Collections.Array { festival.Id });
+            startButton.Pressed += () => OnStartPressed(festival.Id);
             buttonContainer.AddChild(startButton);
         }
         else if (festival.State == GuildFestivalSystem.FestivalState.Active)

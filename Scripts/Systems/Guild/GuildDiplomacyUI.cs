@@ -98,21 +98,21 @@ public class GuildDiplomacyUI : Control
         var addButton = new Button();
         addButton.Text = "  📜 Propose Treaty";
         addButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        addButton.Connect("pressed", this, nameof(_OnProposeTreaty));
+        addButton.Pressed += _OnProposeTreaty;
         actionPanel.AddChild(addButton);
         
         // 终止按钮
         var breakButton = new Button();
         breakButton.Text = "  ❌ Break Treaty";
         breakButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        breakButton.Connect("pressed", this, nameof(_OnBreakTreaty));
+        breakButton.Pressed += _OnBreakTreaty;
         actionPanel.AddChild(breakButton);
         
         // 关闭按钮
         var closeButton = new Button();
         closeButton.Text = "  ✖ Close (ESC)";
         closeButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        closeButton.Connect("pressed", this, nameof(_OnClose));
+        closeButton.Pressed += _OnClose;
         actionPanel.AddChild(closeButton);
         
         // 按ESC关闭
@@ -123,7 +123,7 @@ public class GuildDiplomacyUI : Control
     {
         if (diplomacySystem != null)
         {
-            diplomacySystem.Connect(nameof(GuildDiplomacySystem.RelationChanged), this, nameof(_OnRelationChanged));
+            diplomacySystem.RelationChanged += _OnRelationChanged;
         }
     }
     
@@ -219,7 +219,7 @@ public class GuildDiplomacyUI : Control
         
         var button = new Button();
         button.Text = "  Send Proposal";
-        button.Connect("pressed", this, nameof(_OnSendProposal), new Godot.Collections.Array { guildName });
+        button.Pressed += () => _OnSendProposal(guildName);
         container.AddChild(button);
         
         return container;

@@ -30,9 +30,9 @@ public class GuildLevelUI : Control
         Visible = false;
         
         // Connect signals
-        GuildLevelSystem.Instance.Connect(GuildLevelSystem.SignalGuildLevelUp, this, "_on_guild_level_up");
-        GuildLevelSystem.Instance.Connect(GuildLevelSystem.SignalGuildExperienceGained, this, "_on_experience_gained");
-        GuildLevelSystem.Instance.Connect(GuildLevelSystem.SignalPerkUnlocked, this, "_on_perk_unlocked");
+        GuildLevelSystem.Instance.GuildLevelUp += _on_guild_level_up;
+        GuildLevelSystem.Instance.GuildExperienceGained += _on_experience_gained;
+        GuildLevelSystem.Instance.PerkUnlocked += _on_perk_unlocked;
         
         // Input handling
         SetProcessInput(true);
@@ -68,7 +68,7 @@ public class GuildLevelUI : Control
         closeBtn.Text = "✕";
         closeBtn.RectMinSize = new Vector2(40, 40);
         closeBtn.RectPosition = new Vector2(550, 15);
-        closeBtn.Connect("pressed", this, "ToggleUI");
+        closeBtn.Pressed += ToggleUI;
         _mainContainer.AddChild(closeBtn);
         
         // Level display
@@ -215,7 +215,7 @@ public class GuildLevelUI : Control
         refreshBtn.Text = "🔄 Refresh";
         refreshBtn.RectMinSize = new Vector2(100, 30);
         refreshBtn.RectPosition = new Vector2(480, 460);
-        refreshBtn.Connect("pressed", this, "RefreshData");
+        refreshBtn.Pressed += RefreshData;
         _mainContainer.AddChild(refreshBtn);
     }
     

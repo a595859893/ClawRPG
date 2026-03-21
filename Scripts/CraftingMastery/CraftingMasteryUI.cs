@@ -68,7 +68,7 @@ namespace ClawRPG.UI
             var closeButton = new Button();
             closeButton.Text = "关闭 (ESC)";
             closeButton.Align = Button.AlignEnum.Center;
-            closeButton.Connect("pressed", this, nameof(OnClosePressed));
+            closeButton.Pressed += OnClosePressed;
             _mainContainer.AddChild(closeButton);
         }
         
@@ -110,7 +110,7 @@ namespace ClawRPG.UI
                 int totalCrafts = mastery?.TotalCrafts ?? 0;
                 
                 btn.Text = $"{config.Icon} {config.DisplayName}\n等级: {level} | 制作次数: {totalCrafts}";
-                btn.Connect("pressed", this, nameof(OnCategorySelected), new Godot.Collections.Array { cat });
+                btn.Pressed += () => OnCategorySelected(cat);
                 
                 _categoryGrid.AddChild(btn);
             }
@@ -146,7 +146,7 @@ namespace ClawRPG.UI
             var craftButton = new Button();
             craftButton.Text = "开始制作";
             craftButton.Align = Button.AlignEnum.Center;
-            craftButton.Connect("pressed", this, nameof(OnCraftPressed));
+            craftButton.Pressed += OnCraftPressed;
             tab.AddChild(craftButton);
             
             RefreshRecipeList();
@@ -176,7 +176,7 @@ namespace ClawRPG.UI
                 
                 btn.Text = $"[{difficulty}] {recipe.Name} - {status}";
                 btn.Disabled = !isUnlocked;
-                btn.Connect("pressed", this, nameof(OnRecipeSelected), new Godot.Collections.Array { recipe.Id });
+                btn.Pressed += () => OnRecipeSelected(recipe.Id);
                 
                 _recipeList.AddChild(btn);
             }

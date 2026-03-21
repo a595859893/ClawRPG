@@ -175,14 +175,10 @@ public partial class CookingUI : Control
     {
         if (CookingSystem.Instance != null)
         {
-            CookingSystem.Instance.Connect(CookingSystem.SignalName.CookingProgress, 
-                Callable.From<float>(OnCookingProgress));
-            CookingSystem.Instance.Connect(CookingSystem.SignalName.CookingCompleted, 
-                Callable.From<string, bool>(OnCookingCompleted));
-            CookingSystem.Instance.Connect(CookingSystem.SignalName.LevelUp, 
-                Callable.From<int, int>(OnLevelUp));
-            CookingSystem.Instance.Connect(CookingSystem.SignalName.RecipeLearned, 
-                Callable.From<string, string>(OnRecipeLearned));
+            CookingSystem.Instance.CookingProgress += OnCookingProgress;
+            CookingSystem.Instance.CookingCompleted += OnCookingCompleted;
+            CookingSystem.Instance.LevelUp += OnLevelUp;
+            CookingSystem.Instance.RecipeLearned += OnRecipeLearned;
         }
     }
 

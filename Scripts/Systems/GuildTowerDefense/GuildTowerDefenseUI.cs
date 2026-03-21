@@ -100,7 +100,7 @@ public class GuildTowerDefenseUI : Control
             AnchorRight = 0.98f,
             AnchorBottom = 0.06f
         };
-        closeBtn.Connect("pressed", this, nameof(OnClosePressed));
+        closeBtn.Pressed += OnClosePressed;
         mainBg.AddChild(closeBtn);
         
         // Info bar at bottom
@@ -197,7 +197,7 @@ public class GuildTowerDefenseUI : Control
             AnchorTop = 0.22f,
             AnchorRight = 0.95f
         };
-        _buildButton.Connect("pressed", this, nameof(OnBuildPressed));
+        _buildButton.Pressed += OnBuildPressed;
         defensePanel.AddChild(_buildButton);
         
         // Upgrade button
@@ -208,7 +208,7 @@ public class GuildTowerDefenseUI : Control
             AnchorTop = 0.30f,
             AnchorRight = 0.95f
         };
-        _upgradeButton.Connect("pressed", this, nameof(OnUpgradePressed));
+        _upgradeButton.Pressed += OnUpgradePressed;
         defensePanel.AddChild(_upgradeButton);
         
         // Start wave button
@@ -219,7 +219,7 @@ public class GuildTowerDefenseUI : Control
             AnchorTop = 0.40f,
             AnchorRight = 0.35f
         };
-        _startWaveButton.Connect("pressed", this, nameof(OnStartWavePressed));
+        _startWaveButton.Pressed += OnStartWavePressed;
         defensePanel.AddChild(_startWaveButton);
         
         // Enemies defeated
