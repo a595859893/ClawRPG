@@ -7,6 +7,25 @@ namespace ClawRPG.Scripts.Systems
 
 public class PartyUI : Control
 {
+    // Godot 4 C# event Actions (migrated from Godot 3 .Connect())
+    public Action OnClosePressed;
+    public Action OnRefreshPressed;
+    public Action OnCreatePartyPressed;
+    public Action OnInvitePressed;
+    public Action OnLeavePressed;
+    public Action OnDisbandPressed;
+    public Action OnConfirmCreatePressed;
+    public Action OnCancelCreatePressed;
+    public Action OnSendInvitePressed;
+    public Action OnCancelInvitePressed;
+    public Action<string> OnJoinPartyPressed;
+
+    // PartySystem signals
+    public Action<string> OnPartyCreated;
+    public Action<string> OnPartyDisbanded;
+    public Action<string, int> OnPlayerJoinedParty;
+    public Action<string, int> OnPlayerLeftParty;
+
     private PanelContainer _mainPanel;
     private VBoxContainer _mainVBox;
     private TabContainer _tabContainer;
@@ -100,7 +119,7 @@ public class PartyUI : Control
         _closeButton = new Button();
         _closeButton.Text = "×";
         _closeButton.CustomMinimumSize = new Vector2(30, 30);
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
         _mainVBox.AddChild(_closeButton);
 
         // Tab Container
@@ -127,12 +146,12 @@ public class PartyUI : Control
 
         _refreshButton = new Button();
         _refreshButton.Text = "刷新";
-        _refreshButton.Connect("pressed", this, nameof(OnRefreshPressed));
+        _refreshButton.Pressed += OnRefreshPressed;
         header.AddChild(_refreshButton);
 
         _createPartyButton = new Button();
         _createPartyButton.Text = "创建队伍";
-        _createPartyButton.Connect("pressed", this, nameof(OnCreatePartyPressed));
+        _createPartyButton.Pressed += OnCreatePartyPressed;
         header.AddChild(_createPartyButton);
 
         _partyListScroll = new ScrollContainer();
@@ -191,17 +210,17 @@ public class PartyUI : Control
 
         _inviteButton = new Button();
         _inviteButton.Text = "邀请玩家";
-        _inviteButton.Connect("pressed", this, nameof(OnInvitePressed));
+        _inviteButton.Pressed += OnInvitePressed;
         buttonPanel.AddChild(_inviteButton);
 
         _leaveButton = new Button();
         _leaveButton.Text = "离开队伍";
-        _leaveButton.Connect("pressed", this, nameof(OnLeavePressed));
+        _leaveButton.Pressed += OnLeavePressed;
         buttonPanel.AddChild(_leaveButton);
 
         _disbandButton = new Button();
         _disbandButton.Text = "解散队伍";
-        _disbandButton.Connect("pressed", this, nameof(OnDisbandPressed));
+        _disbandButton.Pressed += OnDisbandPressed;
         _disbandButton.Modulate = _dangerColor;
         buttonPanel.AddChild(_disbandButton);
     }
@@ -284,12 +303,12 @@ public class PartyUI : Control
 
         _confirmCreateButton = new Button();
         _confirmCreateButton.Text = "创建";
-        _confirmCreateButton.Connect("pressed", this, nameof(OnConfirmCreatePressed));
+        _confirmCreateButton.Pressed += OnConfirmCreatePressed;
         buttonPanel.AddChild(_confirmCreateButton);
 
         _cancelCreateButton = new Button();
         _cancelCreateButton.Text = "取消";
-        _cancelCreateButton.Connect("pressed", this, nameof(OnCancelCreatePressed));
+        _cancelCreateButton.Pressed += OnCancelCreatePressed;
         buttonPanel.AddChild(_cancelCreateButton);
     }
 
@@ -319,21 +338,39 @@ public class PartyUI : Control
 
         _sendInviteButton = new Button();
         _sendInviteButton.Text = "发送邀请";
-        _sendInviteButton.Connect("pressed", this, nameof(OnSendInvitePressed));
+        _sendInviteButton.Pressed += OnSendInvitePressed;
         buttonPanel.AddChild(_sendInviteButton);
 
         _cancelInviteButton = new Button();
         _cancelInviteButton.Text = "取消";
-        _cancelInviteButton.Connect("pressed", this, nameof(OnCancelInvitePressed));
+        _cancelInviteButton.Pressed += OnCancelInvitePressed;
         buttonPanel.AddChild(_cancelInviteButton);
     }
 
     private void ConnectSignals()
     {
-        PartySystem.Instance.PartyCreated.Connect(OnPartyCreated);
-        PartySystem.Instance.PartyDisbanded.Connect(OnPartyDisbanded);
-        PartySystem.Instance.PlayerJoinedParty.Connect(OnPlayerJoinedParty);
-        PartySystem.Instance.PlayerLeftParty.Connect(OnPlayerLeftParty);
+        // Button signal -> Action wiring
+        OnClosePressed += HandleClosePressed;
+        OnRefreshPressed += HandleRefreshPressed;
+        OnCreatePartyPressed += HandleCreatePartyPressed;
+        OnInvitePressed += HandleInvitePressed;
+        OnLeavePressed += HandleLeavePressed;
+        OnDisbandPressed += HandleDisbandPressed;
+        OnConfirmCreatePressed += HandleConfirmCreatePressed;
+        OnCancelCreatePressed += HandleCancelCreatePressed;
+        OnSendInvitePressed += HandleSendInvitePressed;
+        OnCancelInvitePressed += HandleCancelInvitePressed;
+
+        // PartySystem signal -> Action wiring
+        OnPartyCreated += HandlePartyCreated;
+        OnPartyDisbanded += HandlePartyDisbanded;
+        OnPlayerJoinedParty += HandlePlayerJoinedParty;
+        OnPlayerLeftParty += HandlePlayerLeftParty;
+
+        PartySystem.Instance.PartyCreated += OnPartyCreated;
+        PartySystem.Instance.PartyDisbanded += OnPartyDisbanded;
+        PartySystem.Instance.PlayerJoinedParty += OnPlayerJoinedParty;
+        PartySystem.Instance.PlayerLeftParty += OnPlayerLeftParty;
     }
 
     public override void _Process(float delta)
@@ -401,7 +438,7 @@ public class PartyUI : Control
 
         var joinButton = new Button();
         joinButton.Text = "加入";
-        joinButton.Connect("pressed", this, nameof(OnJoinPartyPressed), new Godot.Collections.Array { party.PartyId });
+        joinButton.Pressed += () => OnJoinPartyPressed(party.PartyId);
         hbox.AddChild(joinButton);
 
         return panel;
@@ -537,39 +574,39 @@ public class PartyUI : Control
         }
     }
 
-    private void OnClosePressed()
+    private void HandleClosePressed()
     {
         Visible = false;
     }
 
-    private void OnRefreshPressed()
+    private void HandleRefreshPressed()
     {
         RefreshPartyList();
     }
 
-    private void OnCreatePartyPressed()
+    private void HandleCreatePartyPressed()
     {
         _createDialog.PopupCentered();
     }
 
-    private void OnJoinPartyPressed(string partyId)
+    private void HandleJoinPartyPressed(string partyId)
     {
         int playerId = 1; // Placeholder
         PartySystem.Instance.JoinParty(partyId, playerId, "Player_" + playerId, 1, 0);
     }
 
-    private void OnInvitePressed()
+    private void HandleInvitePressed()
     {
         _inviteDialog.PopupCentered();
     }
 
-    private void OnLeavePressed()
+    private void HandleLeavePressed()
     {
         int playerId = 1; // Placeholder
         PartySystem.Instance.LeaveParty(playerId);
     }
 
-    private void OnDisbandPressed()
+    private void HandleDisbandPressed()
     {
         int playerId = 1;
         var party = PartySystem.Instance.GetPlayerParty(playerId);
@@ -579,7 +616,7 @@ public class PartyUI : Control
         }
     }
 
-    private void OnConfirmCreatePressed()
+    private void HandleConfirmCreatePressed()
     {
         int playerId = 1; // Placeholder
         var type = (PartyData.PartyType)_partyTypeOption.Selected;
@@ -589,12 +626,12 @@ public class PartyUI : Control
         _createDialog.Hide();
     }
 
-    private void OnCancelCreatePressed()
+    private void HandleCancelCreatePressed()
     {
         _createDialog.Hide();
     }
 
-    private void OnSendInvitePressed()
+    private void HandleSendInvitePressed()
     {
         int playerId = 1; // Placeholder
         if (int.TryParse(_playerIdInput.Text, out int targetId))
@@ -608,30 +645,30 @@ public class PartyUI : Control
         _inviteDialog.Hide();
     }
 
-    private void OnCancelInvitePressed()
+    private void HandleCancelInvitePressed()
     {
         _inviteDialog.Hide();
     }
 
-    private void OnPartyCreated(string partyId)
+    private void HandlePartyCreated(string partyId)
     {
         RefreshPartyList();
         RefreshMyParty();
     }
 
-    private void OnPartyDisbanded(string partyId)
+    private void HandlePartyDisbanded(string partyId)
     {
         RefreshPartyList();
         RefreshMyParty();
     }
 
-    private void OnPlayerJoinedParty(string partyId, int playerId)
+    private void HandlePlayerJoinedParty(string partyId, int playerId)
     {
         RefreshPartyList();
         RefreshMyParty();
     }
 
-    private void OnPlayerLeftParty(string partyId, int playerId)
+    private void HandlePlayerLeftParty(string partyId, int playerId)
     {
         RefreshPartyList();
         RefreshMyParty();
