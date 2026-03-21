@@ -124,7 +124,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 更新挑战状态
         /// </summary>
-        public void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (!IsChallengeActive) return;
             
@@ -132,7 +132,7 @@ namespace ClawRPG.Scripts.Systems
             if (config == null) return;
             
             // 更新时间
-            _currentChallenge.ElapsedTime += delta;
+            _currentChallenge.ElapsedTime += (float)delta;
             OnTimeUpdated?.Invoke(_currentChallenge.ElapsedTime);
             
             // 检查时间限制
