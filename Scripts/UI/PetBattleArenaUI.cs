@@ -116,13 +116,13 @@ public class PetBattleArenaUI : Control
         _battleButton = new Button();
         _battleButton.Text = "⚔️ Battle";
         _battleButton.CustomMinimumSize = new Vector2(130, 40);
-        _battleButton.Connect("pressed", this, nameof(OnBattlePressed));
+        _battleButton.Pressed += OnBattlePressed;
         buttonSection.AddChild(_battleButton);
         
         _autoBattleButton = new Button();
         _autoBattleButton.Text = "⚡ Auto";
         _autoBattleButton.CustomMinimumSize = new Vector2(130, 40);
-        _autoBattleButton.Connect("pressed", this, nameof(OnAutoBattlePressed));
+        _autoBattleButton.Pressed += OnAutoBattlePressed;
         buttonSection.AddChild(_autoBattleButton);
         
         // Stats panel
@@ -267,14 +267,14 @@ public class PetBattleArenaUI : Control
         _claimRewardButton = new Button();
         _claimRewardButton.Text = "🎁 Claim Reward";
         _claimRewardButton.Visible = false;
-        _claimRewardButton.Connect("pressed", this, nameof(OnClaimRewardPressed));
+        _claimRewardButton.Pressed += OnClaimRewardPressed;
         rightPanel.AddChild(_claimRewardButton);
         
         // Close button
         _closeButton = new Button();
         _closeButton.Text = "✖ Close";
         _closeButton.CustomMinimumSize = new Vector2(100, 40);
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
         rightPanel.AddChild(_closeButton);
         
         RefreshArenaList();
@@ -285,10 +285,10 @@ public class PetBattleArenaUI : Control
     {
         if (_system != null)
         {
-            _system.Connect(nameof(PetBattleArenaSystem.BattleStarted), this, nameof(OnBattleStarted));
-            _system.Connect(nameof(PetBattleArenaSystem.BattleRoundComplete), this, nameof(OnBattleRoundComplete));
-            _system.Connect(nameof(PetBattleArenaSystem.BattleCompleted), this, nameof(OnBattleCompleted));
-            _system.Connect(nameof(PetBattleArenaSystem.RankUpdated), this, nameof(OnRankUpdated));
+            _system.BattleStarted += OnBattleStarted;
+            _system.BattleRoundComplete += OnBattleRoundComplete;
+            _system.BattleCompleted += OnBattleCompleted;
+            _system.RankUpdated += OnRankUpdated;
         }
     }
     
@@ -318,7 +318,7 @@ public class PetBattleArenaUI : Control
             }
             
             int arenaIdx = (int)arena["index"];
-            arenaButton.Connect("pressed", this, nameof(OnArenaSelected), new Godot.Collections.Array { arenaIdx });
+            arenaButton.Pressed += () => OnArenaSelected(arenaIdx);
             
             _arenaList.AddChild(arenaButton);
         }

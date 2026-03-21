@@ -28,16 +28,16 @@ namespace ClawRPG.Scripts.UI {
             
             // 连接到坐骑管理器信号
             if (MountManager.Instance != null) {
-                MountManager.Instance.Connect(nameof(MountManager.OnMountActivated), this, nameof(_OnMountActivated));
-                MountManager.Instance.Connect(nameof(MountManager.OnMountDeactivated), this, nameof(_OnMountDeactivated));
+                MountManager.Instance.OnMountActivated += _OnMountActivated;
+                MountManager.Instance.OnMountDeactivated += _OnMountDeactivated;
             }
             
             // 连接到战斗系统信号
             if (MountCombatSystem.Instance != null) {
-                MountCombatSystem.Instance.Connect(nameof(MountCombatSystem.OnMountSkillUsed), this, nameof(_OnSkillUsed));
-                MountCombatSystem.Instance.Connect(nameof(MountCombatSystem.OnMountSkillReady), this, nameof(_OnSkillReady));
-                MountCombatSystem.Instance.Connect(nameof(MountCombatSystem.OnMountCombatStart), this, nameof(_OnCombatStart));
-                MountCombatSystem.Instance.Connect(nameof(MountCombatSystem.OnMountCombatEnd), this, nameof(_OnCombatEnd));
+                MountCombatSystem.Instance.OnMountSkillUsed += _OnSkillUsed;
+                MountCombatSystem.Instance.OnMountSkillReady += _OnSkillReady;
+                MountCombatSystem.Instance.OnMountCombatStart += _OnCombatStart;
+                MountCombatSystem.Instance.OnMountCombatEnd += _OnCombatEnd;
             }
             
             GD.Print("[MountCombatUI] Initialized");
@@ -177,7 +177,7 @@ namespace ClawRPG.Scripts.UI {
                 _skillIcons.Add(iconBg);
                 
                 // 绑定点击事件
-                iconBg.Connect("gui_input", this, nameof(_OnSkillButtonPressed), new Array { i });
+                iconBg.GuiInput += (InputEvent @event) => _OnSkillButtonPressed(@event, i);
             }
         }
 

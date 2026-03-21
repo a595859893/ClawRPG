@@ -94,7 +94,7 @@ public class BossMechanicsUI : Control
 
         _bossList = new ItemList();
         _bossList.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
-        _bossList.Connect("item_selected", this, nameof(OnBossListItemSelected));
+        _bossList.ItemSelected += OnBossListItemSelected;
         vbox.AddChild(_bossList);
 
         // Boss信息
@@ -105,7 +105,7 @@ public class BossMechanicsUI : Control
         // 开始战斗按钮
         _startBattleButton = new Button();
         _startBattleButton.Text = "[Enter] 开始挑战";
-        _startBattleButton.Connect("pressed", this, nameof(OnStartBattlePressed));
+        _startBattleButton.Pressed += OnStartBattlePressed;
         vbox.AddChild(_startBattleButton);
     }
 
@@ -195,12 +195,12 @@ public class BossMechanicsUI : Control
     {
         if (_bossSystem != null)
         {
-            _bossSystem.Connect("BossSpawned", this, nameof(OnBossSpawned));
-            _bossSystem.Connect("BossDefeated", this, nameof(OnBossDefeated));
-            _bossSystem.Connect("BossPhaseChanged", this, nameof(OnBossPhaseChanged));
-            _bossSystem.Connect("BossEnraged", this, nameof(OnBossEnraged));
-            _bossSystem.Connect("BossSkillUsed", this, nameof(OnBossSkillUsed));
-            _bossSystem.Connect("PlayerComboChanged", this, nameof(OnPlayerComboChanged));
+            BossMechanicsSystem.BossSpawned += OnBossSpawned;
+            BossMechanicsSystem.BossDefeated += OnBossDefeated;
+            BossMechanicsSystem.BossPhaseChanged += OnBossPhaseChanged;
+            BossMechanicsSystem.BossEnraged += OnBossEnraged;
+            BossMechanicsSystem.BossSkillUsed += OnBossSkillUsed;
+            BossMechanicsSystem.PlayerComboChanged += OnPlayerComboChanged;
         }
     }
 

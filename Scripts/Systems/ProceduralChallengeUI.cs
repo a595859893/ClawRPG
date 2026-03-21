@@ -29,10 +29,10 @@ public class ProceduralChallengeUI : Control
         // Connect to challenge system signals
         if (ProceduralChallengeSystem.Instance != null)
         {
-            ProceduralChallengeSystem.Instance.Connect(ProceduralChallengeSystem.ChallengeStarted, this, nameof(OnChallengeStarted));
-            ProceduralChallengeSystem.Instance.Connect(ProceduralChallengeSystem.ChallengeUpdated, this, nameof(OnChallengeUpdated));
-            ProceduralChallengeSystem.Instance.Connect(ProceduralChallengeSystem.ChallengeCompleted, this, nameof(OnChallengeCompleted));
-            ProceduralChallengeSystem.Instance.Connect(ProceduralChallengeSystem.ChallengeFailed, this, nameof(OnChallengeFailed));
+            ProceduralChallengeSystem.Instance.ChallengeStarted += OnChallengeStarted;
+            ProceduralChallengeSystem.Instance.ChallengeUpdated += OnChallengeUpdated;
+            ProceduralChallengeSystem.Instance.ChallengeCompleted += OnChallengeCompleted;
+            ProceduralChallengeSystem.Instance.ChallengeFailed += OnChallengeFailed;
         }
     }
 
@@ -77,13 +77,13 @@ public class ProceduralChallengeUI : Control
         _refreshButton = new Button();
         _refreshButton.Text = "🔄 Refresh Challenges";
         _refreshButton.SetOffset(100, 450, 500, 500);
-        _refreshButton.Connect("pressed", this, nameof(OnRefreshPressed));
+        _refreshButton.Pressed += OnRefreshPressed;
         _mainContainer.AddChild(_refreshButton);
 
         // Close button
         Button closeButton = new Button();
         closeButton.Text = "✕ Close";
-        closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        closeButton.Pressed += OnClosePressed;
         _mainContainer.AddChild(closeButton);
     }
 
@@ -209,7 +209,7 @@ public class ProceduralChallengeUI : Control
         {
             case ProceduralChallengeData.ChallengeStatus.Available:
                 actionButton.Text = "Start";
-                actionButton.Connect("pressed", this, nameof(OnStartPressed), new Godot.Collections.Array { challenge.InstanceId });
+                actionButton.Pressed += () => OnStartPressed(challenge.InstanceId);
                 break;
             case ProceduralChallengeData.ChallengeStatus.InProgress:
                 actionButton.Text = "In Progress";

@@ -42,11 +42,11 @@ public class ElementalTrialUI : Control
         CreateUI();
         ConnectSignals();
         
-        ElementalTrialSystem.Instance.TrialStarted.Connect(OnTrialStarted);
-        ElementalTrialSystem.Instance.TrialCompleted.Connect(OnTrialCompleted);
-        ElementalTrialSystem.Instance.TrialFailed.Connect(OnTrialFailed);
-        ElementalTrialSystem.Instance.WaveCompleted.Connect(OnWaveCompleted);
-        ElementalTrialSystem.Instance.TrialUnlocked.Connect(OnTrialUnlocked);
+        ElementalTrialSystem.Instance.TrialStarted += OnTrialStarted;
+        ElementalTrialSystem.Instance.TrialCompleted += OnTrialCompleted;
+        ElementalTrialSystem.Instance.TrialFailed += OnTrialFailed;
+        ElementalTrialSystem.Instance.WaveCompleted += OnWaveCompleted;
+        ElementalTrialSystem.Instance.TrialUnlocked += OnTrialUnlocked;
     }
 
     private void CreateUI()
@@ -126,7 +126,7 @@ public class ElementalTrialUI : Control
                 trialButton.Modulate = GetDifficultyColor(trial.Difficulty);
             }
             
-            trialButton.Connect("pressed", this, nameof(OnTrialButtonPressed), new Godot.Collections.Array { trial.TrialId });
+            trialButton.Pressed += () => OnTrialButtonPressed(trial.TrialId);
             listContainer.AddChild(trialButton);
         }
     }
@@ -159,7 +159,7 @@ public class ElementalTrialUI : Control
         _startTrialButton = new Button();
         _startTrialButton.Text = "开始试炼";
         _startTrialButton.CustomMinimumSize = new Vector2(200, 50);
-        _startTrialButton.Connect("pressed", this, nameof(OnStartTrialPressed));
+        _startTrialButton.Pressed += OnStartTrialPressed;
         _infoContainer.AddChild(_startTrialButton);
     }
 
@@ -198,13 +198,13 @@ public class ElementalTrialUI : Control
         
         _retreatButton = new Button();
         _retreatButton.Text = "撤退 (放弃当前试炼)";
-        _retreatButton.Connect("pressed", this, nameof(OnRetreatPressed));
+        _retreatButton.Pressed += OnRetreatPressed;
         activeContainer.AddChild(_retreatButton);
     }
 
     private void ConnectSignals()
     {
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
     }
 
     private void OnTrialButtonPressed(string trialId)
