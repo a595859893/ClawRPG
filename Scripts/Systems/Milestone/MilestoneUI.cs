@@ -112,7 +112,7 @@ public class MilestoneUI : Control
         var closeButton = new Button();
         closeButton.Text = "Close (ESC)";
         closeButton.Align = Button.AlignEnum.Center;
-        closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        closeButton.Pressed += OnClosePressed;
         mainVBox.AddChild(closeButton);
     }
     
@@ -163,7 +163,7 @@ public class MilestoneUI : Control
         
         _milestoneList = new ItemList();
         _milestoneList.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-        _milestoneList.Connect("item_selected", this, nameof(OnMilestoneSelected));
+        _milestoneList.ItemSelected += OnMilestoneSelected;
         listContainer.AddChild(_milestoneList);
         
         // Detail panel
@@ -220,8 +220,8 @@ public class MilestoneUI : Control
     
     private void ConnectSignals()
     {
-        _categoryFilter.Connect("item_selected", this, nameof(OnCategorySelected));
-        _showUnlockedOnly.Connect("toggled", this, nameof(OnFilterToggled));
+        _categoryFilter.ItemSelected += OnCategorySelected;
+        _showUnlockedOnly.Toggled += OnFilterToggled;
     }
     
     private void RefreshMilestones()

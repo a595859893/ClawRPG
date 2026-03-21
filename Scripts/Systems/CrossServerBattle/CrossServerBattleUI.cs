@@ -91,7 +91,7 @@ public class CrossServerBattleUI : Control
         var closeButton = new Button();
         closeButton.Text = "  Close (ESC)  ";
         closeButton.Align = Button.AlignMode.Center;
-        closeButton.Connect("pressed", this, nameof(OnCloseButtonPressed));
+        closeButton.Pressed += OnCloseButtonPressed;
         mainContainer.AddChild(closeButton);
     }
 
@@ -185,7 +185,7 @@ public class CrossServerBattleUI : Control
         // Start Match Button
         _startMatchButton = new Button();
         _startMatchButton.Text = "  Find Match  ";
-        _startMatchButton.Connect("pressed", this, nameof(OnStartMatchPressed));
+        _startMatchButton.Pressed += OnStartMatchPressed;
         _overviewTab.AddChild(_startMatchButton);
     }
 
@@ -203,7 +203,7 @@ public class CrossServerBattleUI : Control
         _rankingTypeOption = new OptionButton();
         _rankingTypeOption.AddItem("Player Rankings");
         _rankingTypeOption.AddItem("Server Rankings");
-        _rankingTypeOption.Connect("item_selected", this, nameof(OnRankingTypeSelected));
+        _rankingTypeOption.ItemSelected += OnRankingTypeSelected;
         _rankingsTab.AddChild(_rankingTypeOption);
 
         AddSeparator(_rankingsTab);
@@ -267,7 +267,7 @@ public class CrossServerBattleUI : Control
         // Refresh Button
         _refreshMatchesButton = new Button();
         _refreshMatchesButton.Text = "  Refresh  ";
-        _refreshMatchesButton.Connect("pressed", this, nameof(OnRefreshMatchesPressed));
+        _refreshMatchesButton.Pressed += OnRefreshMatchesPressed;
         _matchesTab.AddChild(_refreshMatchesButton);
 
         AddSeparator(_matchesTab);

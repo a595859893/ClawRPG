@@ -88,14 +88,8 @@ namespace ClawRPG.Scripts.Systems {
 
         private void ConnectSignals() {
             if (RandomWorldEventSystem.Instance != null) {
-                RandomWorldEventSystem.Instance.Connect(
-                    RandomWorldEventSystem.SignalName.EventTriggered,
-                    Callable.From<WorldEventConfig>(OnEventTriggered)
-                );
-                RandomWorldEventSystem.Instance.Connect(
-                    RandomWorldEventSystem.SignalName.EventExpired,
-                    Callable.From<string>(OnEventExpired)
-                );
+                RandomWorldEventSystem.Instance.EventTriggered += OnEventTriggered;
+                RandomWorldEventSystem.Instance.EventExpired += OnEventExpired;
             }
         }
 

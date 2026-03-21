@@ -313,10 +313,10 @@ public partial class DreamRealmUI : Control
     {
         if (_dreamSystem != null)
         {
-            _dreamSystem.Connect(DreamRealmSystem.SignalName.DreamEntered, Callable.From(OnDreamEntered));
-            _dreamSystem.Connect(DreamRealmSystem.SignalName.DreamExited, Callable.From(OnDreamExited));
-            _dreamSystem.Connect(DreamRealmSystem.SignalName.LevelUp, Callable.From<int>(OnLevelUp));
-            _dreamSystem.Connect(DreamRealmSystem.SignalName.TreasureFound, Callable.From<DreamRealmSystem.DreamTreasure>(OnTreasureFound));
+            _dreamSystem.DreamEntered += OnDreamEntered;
+            _dreamSystem.DreamExited += OnDreamExited;
+            _dreamSystem.LevelUp += OnLevelUp;
+            _dreamSystem.TreasureFound += OnTreasureFound;
         }
     }
 

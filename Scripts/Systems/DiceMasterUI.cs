@@ -28,7 +28,7 @@ public class DiceMasterUI : Control
         // Connect signals
         if (DiceMasterSystem.Instance != null)
         {
-            DiceMasterSystem.Instance.Connect(nameof(DiceMasterSystem.DiceRolled), this, nameof(OnDiceRolled));
+            DiceMasterSystem.Instance.DiceRolled += OnDiceRolled;
         }
         
         // Hide initially
@@ -70,7 +70,7 @@ public class DiceMasterUI : Control
         Button addDiamondBtn = new Button();
         addDiamondBtn.Text = "+";
         addDiamondBtn.RectMinSize = new Vector2(30, 30);
-        addDiamondBtn.Connect("pressed", this, nameof(OnAddDiamondPressed));
+        addDiamondBtn.Pressed += OnAddDiamondPressed;
         diamondsBox.AddChild(addDiamondBtn);
         
         // Result display
@@ -124,7 +124,7 @@ public class DiceMasterUI : Control
         // Close button
         closeButton = new Button();
         closeButton.Text = "Close (Esc)";
-        closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        closeButton.Pressed += OnClosePressed;
         mainVBox.AddChild(closeButton);
     }
     
@@ -136,7 +136,7 @@ public class DiceMasterUI : Control
         
         // Store dice type in metadata
         btn.SetMeta("dice_type", (int)diceType);
-        btn.Connect("pressed", this, nameof(OnDiceButtonPressed));
+        btn.Pressed += OnDiceButtonPressed;
         
         diceButtons.AddChild(btn);
     }

@@ -59,7 +59,7 @@ public class WorldEventUI : Control
         closeBtn.Text = "✕";
         closeBtn.RectPosition = new Vector2(750, 15);
         closeBtn.RectMinSize = new Vector2(30, 30);
-        closeBtn.Connect("pressed", this, nameof(OnClosePressed));
+        closeBtn.Pressed += OnClosePressed;
         background.AddChild(closeBtn);
 
         // Tab container
@@ -131,10 +131,10 @@ public class WorldEventUI : Control
     {
         if (WorldEventSystem.Instance != null)
         {
-            WorldEventSystem.Instance.Connect(nameof(WorldEventSystem.EventAnnounced), this, nameof(OnEventAnnounced));
-            WorldEventSystem.Instance.Connect(nameof(WorldEventSystem.EventStarted), this, nameof(OnEventStarted));
-            WorldEventSystem.Instance.Connect(nameof(WorldEventSystem.EventCompleted), this, nameof(OnEventCompleted));
-            WorldEventSystem.Instance.Connect(nameof(WorldEventSystem.PlayerParticipated), this, nameof(OnPlayerParticipated));
+            WorldEventSystem.Instance.EventAnnounced += OnEventAnnounced;
+            WorldEventSystem.Instance.EventStarted += OnEventStarted;
+            WorldEventSystem.Instance.EventCompleted += OnEventCompleted;
+            WorldEventSystem.Instance.PlayerParticipated += OnPlayerParticipated;
         }
     }
 
@@ -412,7 +412,7 @@ public class WorldEventUI : Control
 
             if (!_event.playerParticipated)
             {
-                joinBtn.Connect("pressed", this, nameof(OnJoinPressed));
+                joinBtn.Pressed += OnJoinPressed;
             }
 
             bg.AddChild(joinBtn);

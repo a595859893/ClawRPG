@@ -69,7 +69,7 @@ public class FateWeavingUI : Control {
             AnchorRight = 1f,
             MarginLeft = -40
         };
-        closeButton.Connect("pressed", this, nameof(Hide));
+        closeButton.Pressed += Hide;
         titleBar.AddChild(closeButton);
         
         // Level Info
@@ -228,7 +228,7 @@ public class FateWeavingUI : Control {
             Text = "Cancel",
             CustomMinimumSize = new Vector2(100, 40)
         };
-        cancelButton.Connect("pressed", this, nameof(CloseChoiceModal));
+        cancelButton.Pressed += CloseChoiceModal;
         buttonHBox.AddChild(cancelButton);
         
         buttonHBox.AddChild(new Control { CustomMinimumWidth = 20 });
@@ -238,7 +238,7 @@ public class FateWeavingUI : Control {
             CustomMinimumSize = new Vector2(150, 40),
             CustomColors = new Button.ButtonTextures { FontColor = new Color(1f, 0.85f, 0.3f) }
         };
-        _confirmButton.Connect("pressed", this, nameof(ConfirmChoice));
+        _confirmButton.Pressed += ConfirmChoice;
         buttonHBox.AddChild(_confirmButton);
     }
     
@@ -341,7 +341,7 @@ public class FateWeavingUI : Control {
             Text = "Select",
             CustomMinimumSize = new Vector2(80, 30)
         };
-        selectButton.Connect("pressed", this, nameof(OnSelectChoice), new Godot.Collections.Array { choice });
+        selectButton.Pressed += () => OnSelectChoice(choice);
         hbox.AddChild(selectButton);
         
         if (choice.IsSecret) {

@@ -103,7 +103,7 @@ public class MythicPlusDungeonUI : Control
             Margin = new Margin(-120, -40, -20, -10),
             RectMinSize = new Vector2(100, 30)
         };
-        closeButton.Connect("pressed", this, nameof(OnCloseButtonPressed));
+        closeButton.Pressed += OnCloseButtonPressed;
         mainPanel.AddChild(closeButton);
     }
     
@@ -157,7 +157,7 @@ public class MythicPlusDungeonUI : Control
             RectMinSize = new Vector2(300, 50)
         };
         _startButton.AddThemeFontSizeOverride("font_size", 22);
-        _startButton.Connect("pressed", this, nameof(OnStartButtonPressed));
+        _startButton.Pressed += OnStartButtonPressed;
         content.AddChild(_startButton);
         
         // Separator
@@ -201,7 +201,7 @@ public class MythicPlusDungeonUI : Control
             RectMinSize = new Vector2(150, 40),
             Disabled = true
         };
-        _completeButton.Connect("pressed", this, nameof(OnCompleteButtonPressed));
+        _completeButton.Pressed += OnCompleteButtonPressed;
         buttonContainer.AddChild(_completeButton);
         
         _failButton = new Button
@@ -210,7 +210,7 @@ public class MythicPlusDungeonUI : Control
             RectMinSize = new Vector2(150, 40),
             Disabled = true
         };
-        _failButton.Connect("pressed", this, nameof(OnFailButtonPressed));
+        _failButton.Pressed += OnFailButtonPressed;
         buttonContainer.AddChild(_failButton);
     }
     

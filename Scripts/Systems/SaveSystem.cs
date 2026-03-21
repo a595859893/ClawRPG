@@ -109,23 +109,23 @@ namespace ClawRPG.Scripts.Systems {
             // 转发 SlotManager 信号
             if (_slotManager != null)
             {
-                _slotManager.Connect("OnSaveComplete", Callable.From((int slot, bool success) => 
-                    EmitSignal(SignalName.OnSaveComplete, slot, success)));
-                _slotManager.Connect("OnLoadComplete", Callable.From((int slot, bool success) => 
-                    EmitSignal(SignalName.OnLoadComplete, slot, success)));
-                _slotManager.Connect("OnAutoSave", Callable.From((int slot) => 
-                    EmitSignal(SignalName.OnAutoSave, slot)));
+                _slotManager.OnSaveComplete += (slot, success) =>
+                    EmitSignal(SignalName.OnSaveComplete, slot, success);
+                _slotManager.OnLoadComplete += (slot, success) =>
+                    EmitSignal(SignalName.OnLoadComplete, slot, success);
+                _slotManager.OnAutoSave += (slot) =>
+                    EmitSignal(SignalName.OnAutoSave, slot);
             }
             
             // 转发 CloudSystem 信号
             if (_cloudSystem != null)
             {
-                _cloudSystem.Connect("OnCloudSyncStart", Callable.From(() => 
-                    EmitSignal(SignalName.OnCloudSyncStart)));
-                _cloudSystem.Connect("OnCloudSyncComplete", Callable.From((bool success) => 
-                    EmitSignal(SignalName.OnCloudSyncComplete, success)));
-                _cloudSystem.Connect("OnCloudSyncError", Callable.From((string error) => 
-                    EmitSignal(SignalName.OnCloudSyncError, error)));
+                _cloudSystem.OnCloudSyncStart += () =>
+                    EmitSignal(SignalName.OnCloudSyncStart);
+                _cloudSystem.OnCloudSyncComplete += (success) =>
+                    EmitSignal(SignalName.OnCloudSyncComplete, success);
+                _cloudSystem.OnCloudSyncError += (error) =>
+                    EmitSignal(SignalName.OnCloudSyncError, error);
             }
         }
         
