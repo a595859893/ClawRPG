@@ -106,7 +106,7 @@ public class CombatSkillCooldownSystem : BaseSystem
 	/// <summary>
 	/// 更新冷却时间
 	/// </summary>
-	public void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		var readySkills = new List<string>();
 		
