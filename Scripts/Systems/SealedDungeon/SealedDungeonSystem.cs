@@ -26,6 +26,9 @@ namespace ClawRPG.Systems.SealedDungeon {
         public Action<(int floor, bool success)> FloorCompleted;
         public Action<DungeonZone> ZoneUnlocked;
         public Action<DungeonReward> RewardClaimed;
+        
+        // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+        public event Action OnTimerTickUI;
 
         public PlayerSealedDungeonData PlayerData => _playerData;
         public SealedDungeonData CurrentDungeon => _currentDungeon;
@@ -41,7 +44,9 @@ namespace ClawRPG.Systems.SealedDungeon {
         public void Initialize() {
             _dungeonTimer = new Timer();
             AddChild(_dungeonTimer);
-            _dungeonTimer.Connect("timeout", this, nameof(OnTimerTick));
+            // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
+            _dungeonTimer.Timeout += OnTimerTick; // NEW
+            _dungeonTimer.Connect("timeout", this, nameof(OnTimerTick)); // TODO: Remove after migration
             
             GD.Print("[SealedDungeonSystem] Initialized - Sealed Dungeon System ready");
         }
@@ -255,6 +260,8 @@ namespace ClawRPG.Systems.SealedDungeon {
         }
 
         private void OnTimerTick() {
+            // REQ-058-11: Invoke new event
+            OnTimerTickUI?.Invoke();
             _elapsedTime++;
             
             var floorConfig = SealedDungeonDatabase.Instance.GetFloorConfig(_currentDungeon.CurrentFloor);

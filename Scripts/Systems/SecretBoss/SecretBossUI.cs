@@ -26,6 +26,9 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
         // 统计容器
         private VBoxContainer _statisticsContent;
         
+        // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+        public event Action<int> OnRarityFilterSelectedUI;
+        
         // 按键提示
         private Label _hintLabel;
         
@@ -74,7 +77,9 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             _rarityFilter.AddItem("稀有 (Rare)", 3);
             _rarityFilter.AddItem("史诗 (Epic)", 4);
             _rarityFilter.AddItem("传说 (Legendary)", 5);
-            _rarityFilter.Connect("item_selected", this, nameof(_OnRarityFilterSelected));
+            // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
+            _rarityFilter.ItemSelected += _OnRarityFilterSelected; // NEW
+            _rarityFilter.Connect("item_selected", this, nameof(_OnRarityFilterSelected)); // TODO: Remove after migration
             AddChild(_rarityFilter);
             
             // 提示
@@ -395,6 +400,8 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
         /// 稀有度过滤选择
         /// </summary>
         private void _OnRarityFilterSelected(int index) {
+            // REQ-058-11: Invoke new event
+            OnRarityFilterSelectedUI?.Invoke(index);
             RefreshBossList();
         }
         

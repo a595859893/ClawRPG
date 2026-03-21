@@ -18,6 +18,9 @@ public partial class RandomQuestSystem : BaseSystem
     public event Action<RandomQuestData.ActiveQuest> OnQuestFailed;
     public event Action<RandomQuestData.ActiveQuest> OnQuestProgress;
     
+    // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+    public event Action OnTimerTickUI;
+    
     public RandomQuestData Data => _data;
     public List<RandomQuestData.ActiveQuest> ActiveQuests => _data?.ActiveQuests;
     public int TotalQuestsGenerated => _data?.TotalQuestsGenerated ?? 0;
@@ -75,7 +78,9 @@ public partial class RandomQuestSystem : BaseSystem
         if (timerParent != null)
         {
             timerParent.AddChild(_questTimer);
-            _questTimer.Connect("timeout", this, nameof(OnTimerTick));
+            // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
+            _questTimer.Timeout += OnTimerTick; // NEW
+            _questTimer.Connect("timeout", this, nameof(OnTimerTick)); // TODO: Remove after migration
         }
     }
     
@@ -86,6 +91,8 @@ public partial class RandomQuestSystem : BaseSystem
     
     private void OnTimerTick()
     {
+        // REQ-058-11: Invoke new event
+        OnTimerTickUI?.Invoke();
         if (_data == null || _data.ActiveQuests == null) return;
         
         List<RandomQuestData.ActiveQuest> toRemove = new List<RandomQuestData.ActiveQuest>();
