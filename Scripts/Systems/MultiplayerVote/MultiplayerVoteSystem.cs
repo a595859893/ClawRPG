@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Systems.MultiplayerVote
 {
@@ -82,14 +83,17 @@ namespace ClawRPG.Systems.MultiplayerVote
         /// </summary>
         private void ConnectSubsystemSignals()
         {
-            // PartyManagementSystem signals
-            _partySystem.PartyCreated += OnPartyCreated;
-            _partySystem.PartyJoined += OnPartyJoined;
-            _partySystem.PartyLeft += OnPartyLeft;
-            _partySystem.PartyMemberKicked += OnPartyMemberKicked;
-            _partySystem.PartyLeaderChanged += OnPartyLeaderChanged;
+            // PartySystem signals - use correct signal names (PlayerJoinedParty etc.)
+            // These are Godot signals, use .Connect() method
+            if (PartySystem.Instance != null)
+            {
+                PartySystem.Instance.Connect("PlayerJoinedParty", new Callable(this, nameof(OnPartyJoined)));
+                PartySystem.Instance.Connect("PlayerLeftParty", new Callable(this, nameof(OnPartyLeft)));
+                PartySystem.Instance.Connect("PlayerKicked", new Callable(this, nameof(OnPartyMemberKicked)));
+                PartySystem.Instance.Connect("LeaderChanged", new Callable(this, nameof(OnPartyLeaderChanged)));
+            }
             
-            // VoteProcessingSystem signals
+            // VoteProcessingSystem signals - these have C# event patterns
             _voteSystem.VoteStarted += OnVoteStarted;
             _voteSystem.VoteEnded += OnVoteEnded;
             _voteSystem.VoteUpdated += OnVoteUpdated;
