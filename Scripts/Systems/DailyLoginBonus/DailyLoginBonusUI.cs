@@ -18,6 +18,9 @@ public class DailyLoginBonusUI : Control
     private TabContainer _tabContainer;
     private Control _dailyTab;
     private Control _historyTab;
+    
+    // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+    public event Action OnClaimPressedEvent;
     private Control _statsTab;
     
     public override void _Ready()
@@ -113,7 +116,9 @@ public class DailyLoginBonusUI : Control
         };
         _claimButton.Set("custom_colors/font_color", new Color(1, 1, 1));
         _claimButton.Set("custom_colors/font_hover_color", new Color(1, 1, 0));
-        _claimButton.Connect("pressed", this, nameof(OnClaimPressed));
+        // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
+        _claimButton.Pressed += OnClaimPressed; // NEW
+        _claimButton.Connect("pressed", this, nameof(OnClaimPressed)); // TODO: Remove after migration
         mainVBox.AddChild(_claimButton);
     }
     
@@ -366,6 +371,8 @@ public class DailyLoginBonusUI : Control
     
     private void OnClaimPressed()
     {
+        // REQ-058-11: Invoke new event
+        OnClaimPressedEvent?.Invoke();
         if (_system == null) return;
         
         var result = _system.ClaimDailyBonus();

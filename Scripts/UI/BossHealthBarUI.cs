@@ -387,9 +387,15 @@ namespace ClawRPG.Scripts.UI {
             if (cameraEffect != null)
             {
                 cameraEffect.SetVignette(0.5f);
-                // Create a timer to fade out vignette
+                // Create a timer to fade out vignette (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
                 var timer = GetTree().CreateTimer(2.0f);
-                timer.Connect("timeout", () => {
+                timer.Timeout += () => { // NEW
+                    if (cameraEffect != null)
+                    {
+                        cameraEffect.SetVignette(0f);
+                    }
+                };
+                timer.Connect("timeout", () => { // TODO: Remove after migration
                     if (cameraEffect != null)
                     {
                         cameraEffect.SetVignette(0f);
