@@ -118,7 +118,7 @@ namespace ClawRPG.Scripts.Combat
         /// <summary>
         /// Process called every frame
         /// </summary>
-        public void _Process(double delta)
+        public override void _Process(double delta)
         {
             if (_currentCombat.IsInCombat)
             {
