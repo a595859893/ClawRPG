@@ -31,7 +31,7 @@ namespace ClawRPG.Scripts.Systems
         [Signal] public delegate void OnCloudSyncStartEventHandler();
         [Signal] public delegate void OnCloudSyncCompleteEventHandler(bool success);
         [Signal] public delegate void OnCloudSyncErrorEventHandler(string error);
-        [Signal] public delegate void OnConflictDetectedEventHandler(int slot, Dictionary<string, object> localData, Dictionary<string, object> cloudData);
+        [Signal] public delegate void OnConflictDetectedEventHandler(int slot, SaveDataManager.SaveData localData, SaveDataManager.SaveData cloudData);
         
         protected override void Initialize()
         {
@@ -301,12 +301,43 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public void CheckForConflicts(int slot, SaveDataManager.SaveData localData, Action<SaveDataManager.SaveData> resolveCallback)
         {
-            // TODO: 实现实际的冲突检测逻辑
-            // 1. 比较本地和云端的存档时间戳
-            // 2. 如果时间差超过阈值，触发冲突处理
+            if (!_isCloudSyncEnabled)
+            {
+                resolveCallback?.Invoke(localData);
+                return;
+            }
             
-            // 暂时直接使用本地数据
-            resolveCallback?.Invoke(localData);
+            // 从云端下载对应槽位数据
+            string cloudJson = _storageProvider.DownloadSlot(slot);
+            
+            // 云端无此槽，直接使用本地数据
+            if (string.IsNullOrEmpty(cloudJson))
+            {
+                GD.Print("[CloudSaveSystem] No cloud data for slot " + slot + ", using local");
+                resolveCallback?.Invoke(localData);
+                return;
+            }
+            
+            // 反序列化云端数据
+            SaveDataManager.SaveData cloudData = JsonSerializer.Deserialize<SaveDataManager.SaveData>(cloudJson);
+            
+            // 比较时间戳
+            double timeDiffSeconds = Math.Abs((localData.SaveTime - cloudData.SaveTime).TotalSeconds);
+            
+            if (timeDiffSeconds > 60)
+            {
+                // 冲突：时间差超过阈值，通知上层处理
+                GD.Print("[CloudSaveSystem] Conflict detected for slot " + slot + ": time diff = " + timeDiffSeconds + "s");
+                EmitSignal(SignalName.OnConflictDetected, slot, localData, cloudData);
+                // 由 resolveCallback 处理解决策略（上层可能会调用 SaveDataManager 处理）
+                resolveCallback?.Invoke(localData);
+            }
+            else
+            {
+                // 无冲突，使用较新的数据
+                GD.Print("[CloudSaveSystem] No conflict for slot " + slot + ", using local");
+                resolveCallback?.Invoke(localData);
+            }
         }
 
         /// <summary>
