@@ -70,7 +70,7 @@ namespace ClawRPG.Scripts.UI {
         
         private void ConnectSignals()
         {
-            // Combat events via EventBus (Main doesn't have direct signals)
+            // Combat events via EventBus
             if (EventBusManager.Instance != null)
             {
                 EventBusManager.Instance.Subscribe<EnemyDamagedEventData>(
@@ -81,49 +81,15 @@ namespace ClawRPG.Scripts.UI {
                     EventBusManager.Events.EnemyDied,
                     (data) => { if (data.Killer is Player) OnEnemyDied(); }
                 );
+                EventBusManager.Instance.Subscribe<PlayerHealthChangedEventData>(
+                    EventBusManager.Events.PlayerHealthChanged,
+                    (data) => { if (data.Delta < 0) OnPlayerDamaged(-data.Delta); }
+                );
             }
             
             // Connect to combo system via static Actions
             ComboSystem.ComboProgressUpdated += OnComboProgressUpdated;
             ComboSystem.ComboLevelChanged += OnComboLevelChanged;
-            
-            // Connect to player combat signals if available
-            var player = GetTree().GetFirstNodeInGroup("Player");
-            if (player != null)
-            {
-                // Player doesn't emit dodge/block/crit signals - these are tracked via combat events
-                // PlayerHealthChanged via EventBus for damage tracking
-                if (EventBusManager.Instance != null)
-                {
-                    EventBusManager.Instance.Subscribe<PlayerHealthChangedEventData>(
-                        EventBusManager.Events.PlayerHealthChanged,
-                        (data) => { if (data.Delta < 0) OnPlayerDamaged(-data.Delta); }
-                    );
-                }
-            }
-        }
-        
-        private void ConnectCombatSignals()
-        {
-            // Try to connect to Player's damage methods
-            var player = GetTree().GetFirstNodeInGroup("Player");
-            if (player != null)
-            {
-                // Player damage received
-                player.TookDamage += (damage) => OnPlayerDamaged(damage);
-            }
-            
-            // Connect to enemy group
-            GetTree().NodeAdded += OnNodeAdded;
-        }
-        
-        private void OnNodeAdded(Node node)
-        {
-            if (node is Enemy enemy)
-            {
-                enemy.DamageReceived += (damage, isCrit) => OnEnemyDamaged(damage, isCrit);
-                enemy.Died += OnEnemyDied;
-            }
         }
         
         public void StartCombat()

@@ -89,8 +89,7 @@ namespace ClawRPG.Scripts.UI {
             // Rating panel (initially hidden)
             SetupRatingPanel();
             
-            // Connect signals
-            ConnectCombatSignals();
+            // Note: Combat signal connections are handled via EventBus in ConnectSignals()
         }
         
         private void SetupRatingPanel()
