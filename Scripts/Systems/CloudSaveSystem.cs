@@ -357,9 +357,10 @@ namespace ClawRPG.Scripts.Systems
                 // 模拟API调用
                 await ToSignal(GetTree().CreateTimer(0.3), "timeout");
                 
-                // TODO: 返回实际的云端槽位列表
-                var slotList = new List<SaveDataManager.SaveSlotInfo>();
+                // 获取云端槽位列表
+                var slotList = _storageProvider.ListSlots();
                 
+                GD.Print("[CloudSaveSystem] Got cloud slot list: " + slotList.Count + " slots");
                 callback?.Invoke(slotList);
             }
             catch (Exception e)
@@ -388,7 +389,13 @@ namespace ClawRPG.Scripts.Systems
                 // 模拟API调用
                 await ToSignal(GetTree().CreateTimer(0.3), "timeout");
                 
-                // TODO: 实现实际的云端删除逻辑
+                // 调用云存储 Provider 删除
+                bool deleteSuccess = _storageProvider.DeleteSlot(slot);
+                
+                if (!deleteSuccess)
+                {
+                    throw new Exception("DeleteSlot returned false for slot " + slot);
+                }
                 
                 GD.Print("[CloudSaveSystem] Deleted slot " + slot + " from cloud");
                 
@@ -419,9 +426,10 @@ namespace ClawRPG.Scripts.Systems
                 // 模拟API调用
                 await ToSignal(GetTree().CreateTimer(0.2), "timeout");
                 
-                // TODO: 返回实际的存储使用量（字节）
-                long usage = 0;
+                // 获取云存储使用量
+                long usage = _storageProvider.GetStorageUsageBytes();
                 
+                GD.Print("[CloudSaveSystem] Cloud storage usage: " + usage + " bytes");
                 callback?.Invoke(usage);
             }
             catch (Exception e)
