@@ -131,8 +131,7 @@ public class EnemyLifecycleManager : ManagerBase
         // 添加到活跃列表
         ActiveEnemies.Add(enemy);
         
-        // 连接死亡信号 (REQ-058-11: NOTE - enemy_died signal not found in Enemy class, keeping .Connect() as-is for compatibility)
-        enemy.Connect("enemy_died", this, nameof(_OnEnemyDeathHandler), new Godot.Collections.Array { enemy }); // TODO: Verify signal exists, may need EventBus migration
+
         
         GD.Print($"[EnemyLifecycleManager] Enemy spawned at {spawnPos}");
         
@@ -270,31 +269,7 @@ public class EnemyLifecycleManager : ManagerBase
         return enemies;
     }
     
-    /// <summary>
-    /// 敌人死亡处理
-    /// </summary>
-    private void _OnEnemyDeathHandler(Enemy enemy)
-    {
-        if (ActiveEnemies.Contains(enemy))
-        {
-            ActiveEnemies.Remove(enemy);
-        }
-        
-        KillCount++;
-        
-        GD.Print($"[EnemyLifecycleManager] Enemy died! Kill count: {KillCount}");
-        
-        // 触发本地事件
-        OnEnemyDied?.Invoke(enemy);
-        OnKillCountChanged?.Invoke(KillCount);
-        
-        // 通过事件总线发布全局事件
-        if (EventBusManager.Instance != null)
-        {
-            EventBusManager.Instance.Emit(EventBusManager.Events.EnemyDied, enemy);
-        }
-    }
-    
+
     /// <summary>
     /// 更新敌人 AI
     /// </summary>

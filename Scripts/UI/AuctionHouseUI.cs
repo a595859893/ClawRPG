@@ -285,11 +285,7 @@ namespace UI
 
         private void SetupSignals()
         {
-            // 连接 AuctionHouseSystem 信号 (REQ-058-11: note - auction_listing_updated signal not found in system, keeping .Connect() as-is)
-            if (AuctionHouseSystem.Instance != null)
-            {
-                AuctionHouseSystem.Instance.Connect("auction_listing_updated", Callable.From(RefreshList)); // TODO: Verify signal exists, may need migration
-            }
+
         }
 
         public void Open()
