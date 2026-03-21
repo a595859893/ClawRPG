@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using GameSystems;
 using ClawRPG.Framework;
 
@@ -109,8 +110,16 @@ namespace ClawRPG.Scripts.Systems
                 // 模拟云同步延迟（实际实现中会调用云API）
                 await ToSignal(GetTree().CreateTimer(0.5), "timeout");
                 
-                // TODO: 实现实际的云端上传逻辑
-                // 根据 _cloudProvider 选择不同的云服务
+                // 序列化存档数据为 JSON
+                string jsonData = JsonSerializer.Serialize(localData);
+                
+                // 调用云存储 Provider 上传
+                bool uploadSuccess = _storageProvider.UploadSlot(slot, jsonData);
+                
+                if (!uploadSuccess)
+                {
+                    throw new Exception("UploadSlot returned false for slot " + slot);
+                }
                 
                 GD.Print("[CloudSaveSystem] Slot " + slot + " synced to cloud");
                 _lastSyncTime = DateTime.Now;
