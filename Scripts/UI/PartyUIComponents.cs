@@ -225,5 +225,3 @@ public partial class PartyUI
         return players;
     }
 }
-}
-}
