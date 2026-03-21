@@ -78,8 +78,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             _rarityFilter.AddItem("史诗 (Epic)", 4);
             _rarityFilter.AddItem("传说 (Legendary)", 5);
             // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
-            _rarityFilter.ItemSelected += _OnRarityFilterSelected; // NEW
-            _rarityFilter.Connect("item_selected", this, nameof(_OnRarityFilterSelected)); // TODO: Remove after migration
+            _rarityFilter.ItemSelected += _OnRarityFilterSelected;
             AddChild(_rarityFilter);
             
             // 提示

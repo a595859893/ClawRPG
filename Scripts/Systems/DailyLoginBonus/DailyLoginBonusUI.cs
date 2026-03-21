@@ -117,8 +117,7 @@ public class DailyLoginBonusUI : Control
         _claimButton.Set("custom_colors/font_color", new Color(1, 1, 1));
         _claimButton.Set("custom_colors/font_hover_color", new Color(1, 1, 0));
         // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
-        _claimButton.Pressed += OnClaimPressed; // NEW
-        _claimButton.Connect("pressed", this, nameof(OnClaimPressed)); // TODO: Remove after migration
+        _claimButton.Pressed += OnClaimPressed;
         mainVBox.AddChild(_claimButton);
     }
     

@@ -197,16 +197,14 @@ public partial class PartyUI
         var inviteBtn = new Button();
         inviteBtn.Text = "邀请";
         inviteBtn.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        inviteBtn.Pressed += () => OnPlayerSelected(playerList.Name); // NEW
-        inviteBtn.Connect("pressed", this, nameof(OnPlayerSelected), new[] { playerList.Name }); // TODO: Remove after migration
+        inviteBtn.Pressed += () => OnPlayerSelected(playerList.Name);
         buttonBox.AddChild(inviteBtn);
         
         // 取消按钮 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
         var cancelBtn = new Button();
         cancelBtn.Text = "取消";
         cancelBtn.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        cancelBtn.Pressed += () => OnInviteCancelled(popup.Name); // NEW
-        cancelBtn.Connect("pressed", this, nameof(OnInviteCancelled), new[] { popup.Name }); // TODO: Remove after migration
+        cancelBtn.Pressed += () => OnInviteCancelled(popup.Name);
         buttonBox.AddChild(cancelBtn);
         
         popup.PopupCentered();
@@ -226,4 +224,6 @@ public partial class PartyUI
         
         return players;
     }
+}
+}
 }

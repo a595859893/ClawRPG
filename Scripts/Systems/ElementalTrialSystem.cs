@@ -54,8 +54,7 @@ public class ElementalTrialSystem : BaseSystem
         _trialTimer = new Timer();
         _trialTimer.WaitTime = 1.0f;
         // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
-        _trialTimer.Timeout += OnTrialTimerTick; // NEW
-        _trialTimer.Connect("timeout", this, nameof(OnTrialTimerTick)); // TODO: Remove after migration
+        _trialTimer.Timeout += OnTrialTimerTick;
     }
 
     private void OnTrialTimerTick()

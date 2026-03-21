@@ -137,8 +137,7 @@ public class BossPhaseSystem : BaseSystem
         BossPhaseChanged?.Invoke(battle.InstanceId, oldPhase, newPhase);
 
         // 延迟完成阶段转换 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
-        GetTree().CreateTimer(2.0f).Timeout += () => OnPhaseTransitionComplete(battle.InstanceId, newPhase); // NEW
-        GetTree().CreateTimer(2.0f).Connect("timeout", this, nameof(OnPhaseTransitionComplete), new Godot.Collections.Array { battle.InstanceId, newPhase }); // TODO: Remove after migration
+        GetTree().CreateTimer(2.0f).Timeout += () => OnPhaseTransitionComplete(battle.InstanceId, newPhase);
     }
 
     private void OnPhaseTransitionComplete(string instanceId, int phase)

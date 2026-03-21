@@ -181,10 +181,8 @@ namespace ClawRPG.UI {
             // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
             if (KeybindingSystem.Instance != null)
             {
-                KeybindingSystem.Instance.KeybindingChanged += OnKeybindingChanged; // NEW
-                KeybindingSystem.Instance.Connect(nameof(KeybindingSystem.KeybindingChanged), this, nameof(OnKeybindingChanged)); // TODO: Remove after migration
-                KeybindingSystem.Instance.KeybindingsReset += OnKeybindingsReset; // NEW
-                KeybindingSystem.Instance.Connect(nameof(KeybindingSystem.KeybindingsReset), this, nameof(OnKeybindingsReset)); // TODO: Remove after migration
+                KeybindingSystem.Instance.KeybindingChanged += OnKeybindingChanged;
+                KeybindingSystem.Instance.KeybindingsReset += OnKeybindingsReset;
             }
         }
 

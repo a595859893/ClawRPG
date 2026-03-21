@@ -138,10 +138,8 @@ public class WeatherUI : Control
         if (WeatherSystem.Instance != null)
         {
             // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
-            WeatherSystem.Instance.WeatherChanged += OnWeatherChanged; // NEW
-            WeatherSystem.Instance.Connect(nameof(WeatherSystem.WeatherChanged), this, nameof(OnWeatherChanged)); // TODO: Remove after migration
-            WeatherSystem.Instance.WeatherIntensityChanged += OnIntensityChanged; // NEW
-            WeatherSystem.Instance.Connect(nameof(WeatherSystem.WeatherIntensityChanged), this, nameof(OnIntensityChanged)); // TODO: Remove after migration
+            WeatherSystem.Instance.WeatherChanged += OnWeatherChanged;
+            WeatherSystem.Instance.WeatherIntensityChanged += OnIntensityChanged;
         }
     }
     

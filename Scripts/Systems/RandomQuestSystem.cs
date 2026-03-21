@@ -79,8 +79,7 @@ public partial class RandomQuestSystem : BaseSystem
         {
             timerParent.AddChild(_questTimer);
             // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
-            _questTimer.Timeout += OnTimerTick; // NEW
-            _questTimer.Connect("timeout", this, nameof(OnTimerTick)); // TODO: Remove after migration
+            _questTimer.Timeout += OnTimerTick;
         }
     }
     

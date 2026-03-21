@@ -52,8 +52,7 @@ namespace ClawRPG.Systems
             _comboTimer.WaitTime = _data.ComboTimeout;
             _comboTimer.OneShot = true;
             // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
-            _comboTimer.Timeout += _OnComboTimeout; // NEW
-            _comboTimer.Connect("timeout", this, nameof(_OnComboTimeout)); // TODO: Remove after migration
+            _comboTimer.Timeout += _OnComboTimeout;
             AddChild(_comboTimer);
             
             // Try to get screen effect system for integration

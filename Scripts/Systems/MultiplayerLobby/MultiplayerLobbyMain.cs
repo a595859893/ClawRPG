@@ -44,8 +44,7 @@ namespace ClawRPG.Systems
             AddChild(_database);
             
             // 等待数据库初始化完成 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
-            _database.Ready += OnDatabaseReady; // NEW
-            _database.Connect("ready", this, nameof(OnDatabaseReady)); // TODO: Remove after migration
+            _database.Ready += OnDatabaseReady;
         }
         
         private void OnDatabaseReady()

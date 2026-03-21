@@ -166,8 +166,7 @@ public class CollectibleUI : Control
 		_closeButton.Pressed += OnClosePressed;
 
 		// Connect system signals (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
-		CollectibleSystem.Instance.CollectibleDiscovered += OnCollectibleDiscovered; // NEW
-		CollectibleSystem.Instance.CollectibleDiscovered.Connect(OnCollectibleDiscovered); // TODO: Remove after migration
+		CollectibleSystem.Instance.CollectibleDiscovered += OnCollectibleDiscovered;
 	}
 
 	private void RefreshCollectibles()

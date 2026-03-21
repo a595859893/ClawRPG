@@ -35,8 +35,7 @@ namespace ClawRPG.Scripts.UI {
             
             // Connect signals (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
             if (_closeButton != null) {
-                _closeButton.Pressed += OnCloseButtonPressed; // NEW
-                _closeButton.Connect("pressed", this, nameof(OnCloseButtonPressed)); // TODO: Remove after migration
+                _closeButton.Pressed += OnCloseButtonPressed;
             }
             
             // Initial state

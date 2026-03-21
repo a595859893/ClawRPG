@@ -97,10 +97,8 @@ public class EquipmentDurabilityUI : Control
         // 连接到信号 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
         if (EquipmentDurabilitySystem.Instance != null)
         {
-            EquipmentDurabilitySystem.Instance.DurabilityChanged += OnDurabilityChanged; // NEW
-            EquipmentDurabilitySystem.Instance.Connect("DurabilityChanged", this, nameof(OnDurabilityChanged)); // TODO: Remove after migration
-            EquipmentDurabilitySystem.Instance.EquipmentRepaired += OnEquipmentRepaired; // NEW
-            EquipmentDurabilitySystem.Instance.Connect("EquipmentRepaired", this, nameof(OnEquipmentRepaired)); // TODO: Remove after migration
+            EquipmentDurabilitySystem.Instance.DurabilityChanged += OnDurabilityChanged;
+            EquipmentDurabilitySystem.Instance.EquipmentRepaired += OnEquipmentRepaired;
         }
 
         UpdateUI();

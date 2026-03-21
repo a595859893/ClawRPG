@@ -111,14 +111,11 @@ namespace ClawRPG.Scripts.UI {
             RefreshFactionList();
             
             // 连接信号 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
-            // TODO: Remove old .Connect() after migration verified
             if (ReputationSystem.Instance.ReputationChanged != null) {
-                ReputationSystem.Instance.ReputationChanged += OnReputationChanged; // NEW
-                ReputationSystem.Instance.ReputationChanged.Connect(OnReputationChanged); // TODO: Remove after migration
+                ReputationSystem.Instance.ReputationChanged += OnReputationChanged;
             }
             if (ReputationSystem.Instance.TierChanged != null) {
-                ReputationSystem.Instance.TierChanged += OnTierChanged; // NEW
-                ReputationSystem.Instance.TierChanged.Connect(OnTierChanged); // TODO: Remove after migration
+                ReputationSystem.Instance.TierChanged += OnTierChanged;
             }
         }
         

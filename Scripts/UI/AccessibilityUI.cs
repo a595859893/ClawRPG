@@ -46,8 +46,7 @@ namespace ClawRPG.UI {
             // 连接到AccessibilityManager信号 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
             if (AccessibilityManager.Instance != null)
             {
-                AccessibilityManager.Instance.AccessibilitySettingsChanged += OnSettingsChanged; // NEW
-                AccessibilityManager.Instance.Connect(nameof(AccessibilityManager.AccessibilitySettingsChanged), Callable.From(OnSettingsChanged)); // TODO: Remove after migration
+                AccessibilityManager.Instance.AccessibilitySettingsChanged += OnSettingsChanged;
             }
         }
 

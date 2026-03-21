@@ -45,8 +45,7 @@ namespace ClawRPG.Systems.SealedDungeon {
             _dungeonTimer = new Timer();
             AddChild(_dungeonTimer);
             // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
-            _dungeonTimer.Timeout += OnTimerTick; // NEW
-            _dungeonTimer.Connect("timeout", this, nameof(OnTimerTick)); // TODO: Remove after migration
+            _dungeonTimer.Timeout += OnTimerTick;
             
             GD.Print("[SealedDungeonSystem] Initialized - Sealed Dungeon System ready");
         }
