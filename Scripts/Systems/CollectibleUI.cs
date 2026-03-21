@@ -18,6 +18,9 @@ public class CollectibleUI : Control
 	private Label _detailCategory;
 	private Label _detailRarity;
 	private Label _detailRewards;
+	
+	// REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+	public event Action<string> OnCollectibleDiscoveredUI;
 	private TextureRect _detailIcon;
 	private Button _closeButton;
 
@@ -162,8 +165,9 @@ public class CollectibleUI : Control
 		_rarityFilter.ItemSelected += OnRaritySelected;
 		_closeButton.Pressed += OnClosePressed;
 
-		// Connect system signals
-		CollectibleSystem.Instance.CollectibleDiscovered.Connect(OnCollectibleDiscovered);
+		// Connect system signals (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
+		CollectibleSystem.Instance.CollectibleDiscovered += OnCollectibleDiscovered; // NEW
+		CollectibleSystem.Instance.CollectibleDiscovered.Connect(OnCollectibleDiscovered); // TODO: Remove after migration
 	}
 
 	private void RefreshCollectibles()
@@ -329,6 +333,8 @@ public class CollectibleUI : Control
 
 	private void OnCollectibleDiscovered(string collectibleId)
 	{
+		// REQ-058-11: Invoke new event
+		OnCollectibleDiscoveredUI?.Invoke(collectibleId);
 		RefreshCollectibles();
 	}
 

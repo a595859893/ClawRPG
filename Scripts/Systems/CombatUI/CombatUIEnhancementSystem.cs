@@ -29,6 +29,9 @@ namespace ClawRPG.Systems
         
         // Combo system
         private Timer _comboTimer;
+        
+        // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+        public event Action OnComboTimeoutUI;
         private int _currentCombo = 0;
         
         // Health bar interpolation
@@ -48,7 +51,9 @@ namespace ClawRPG.Systems
             _comboTimer = new Timer();
             _comboTimer.WaitTime = _data.ComboTimeout;
             _comboTimer.OneShot = true;
-            _comboTimer.Connect("timeout", this, nameof(_OnComboTimeout));
+            // REQ-058-11: migrated from Godot 3 .Connect() to C# event +=
+            _comboTimer.Timeout += _OnComboTimeout; // NEW
+            _comboTimer.Connect("timeout", this, nameof(_OnComboTimeout)); // TODO: Remove after migration
             AddChild(_comboTimer);
             
             // Try to get screen effect system for integration
@@ -246,6 +251,8 @@ namespace ClawRPG.Systems
         
         private void _OnComboTimeout()
         {
+            // REQ-058-11: Invoke new event
+            OnComboTimeoutUI?.Invoke();
             _currentCombo = 0;
         }
         

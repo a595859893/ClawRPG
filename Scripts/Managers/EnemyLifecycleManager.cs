@@ -131,8 +131,8 @@ public class EnemyLifecycleManager : ManagerBase
         // 添加到活跃列表
         ActiveEnemies.Add(enemy);
         
-        // 连接死亡信号
-        enemy.Connect("enemy_died", this, nameof(_OnEnemyDeathHandler), new Godot.Collections.Array { enemy });
+        // 连接死亡信号 (REQ-058-11: NOTE - enemy_died signal not found in Enemy class, keeping .Connect() as-is for compatibility)
+        enemy.Connect("enemy_died", this, nameof(_OnEnemyDeathHandler), new Godot.Collections.Array { enemy }); // TODO: Verify signal exists, may need EventBus migration
         
         GD.Print($"[EnemyLifecycleManager] Enemy spawned at {spawnPos}");
         

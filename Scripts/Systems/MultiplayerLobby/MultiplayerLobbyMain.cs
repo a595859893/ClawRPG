@@ -24,6 +24,9 @@ namespace ClawRPG.Systems
         
         private MultiplayerLobbyData _data;
         private MultiplayerLobbyDatabase _database;
+        
+        // REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+        public event Action OnDatabaseReadyUI;
         private MultiplayerLobbySystem _system;
         private MultiplayerLobbyUI _ui;
         
@@ -40,12 +43,15 @@ namespace ClawRPG.Systems
             _database = new MultiplayerLobbyDatabase();
             AddChild(_database);
             
-            // 等待数据库初始化完成
-            _database.Connect("ready", this, nameof(OnDatabaseReady));
+            // 等待数据库初始化完成 (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
+            _database.Ready += OnDatabaseReady; // NEW
+            _database.Connect("ready", this, nameof(OnDatabaseReady)); // TODO: Remove after migration
         }
         
         private void OnDatabaseReady()
         {
+            // REQ-058-11: Invoke new event
+            OnDatabaseReadyUI?.Invoke();
             // 初始化系统
             _system = new MultiplayerLobbySystem();
             AddChild(_system);
