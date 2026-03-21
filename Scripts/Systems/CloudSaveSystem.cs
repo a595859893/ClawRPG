@@ -210,7 +210,18 @@ namespace ClawRPG.Scripts.Systems
                     if (localSaves[i] != null)
                     {
                         await ToSignal(GetTree().CreateTimer(0.1), "timeout");
-                        // TODO: 上传每个槽位
+                        
+                        // 序列化存档数据为 JSON
+                        string jsonData = JsonSerializer.Serialize(localSaves[i]);
+                        
+                        // 调用云存储 Provider 上传
+                        bool uploadSuccess = _storageProvider.UploadSlot(i, jsonData);
+                        
+                        if (!uploadSuccess)
+                        {
+                            throw new Exception("UploadSlot returned false for slot " + i);
+                        }
+                        
                         GD.Print("[CloudSaveSystem] Synced slot " + i + " to cloud");
                     }
                 }
