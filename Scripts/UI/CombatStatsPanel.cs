@@ -1,6 +1,8 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Events;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
@@ -68,31 +70,36 @@ namespace ClawRPG.Scripts.UI {
         
         private void ConnectSignals()
         {
-            // Connect to combat events via Main
-            var main = GetNode("/root/Main");
-            if (main != null)
+            // Combat events via EventBus (Main doesn't have direct signals)
+            if (EventBusManager.Instance != null)
             {
-                main.EnemyDamaged += (damage, isCrit) => OnEnemyDamaged(damage, isCrit);
-                main.PlayerDamaged += (damage) => OnPlayerDamaged(damage);
-                main.EnemyKilled += OnEnemyKilled;
-                main.PlayerDodged += OnPlayerDodged;
-                main.PlayerBlocked += OnPlayerBlocked;
-                main.PlayerCrit += OnPlayerCrit;
+                EventBusManager.Instance.Subscribe<EnemyDamagedEventData>(
+                    EventBusManager.Events.EnemyDamaged,
+                    (data) => { if (data.Attacker is Player) OnEnemyDamaged(data.Damage, false); }
+                );
+                EventBusManager.Instance.Subscribe<EnemyDiedEventData>(
+                    EventBusManager.Events.EnemyDied,
+                    (data) => { if (data.Killer is Player) OnEnemyDied(); }
+                );
             }
             
-            // Connect to combo system
-            var comboSystem = GetTree().GetFirstNodeInGroup("ComboSystem");
-            if (comboSystem != null)
-            {
-                comboSystem.OnComboMilestone += (combo, gold, exp) => OnComboMilestone(combo, gold, exp);
-            }
+            // Connect to combo system via static Actions
+            ComboSystem.ComboProgressUpdated += OnComboProgressUpdated;
+            ComboSystem.ComboLevelChanged += OnComboLevelChanged;
             
-            // Connect to player
+            // Connect to player combat signals if available
             var player = GetTree().GetFirstNodeInGroup("Player");
             if (player != null)
             {
-                player.DodgeSuccess += OnPlayerDodged;
-                player.BlockSuccess += OnPlayerBlocked;
+                // Player doesn't emit dodge/block/crit signals - these are tracked via combat events
+                // PlayerHealthChanged via EventBus for damage tracking
+                if (EventBusManager.Instance != null)
+                {
+                    EventBusManager.Instance.Subscribe<PlayerHealthChangedEventData>(
+                        EventBusManager.Events.PlayerHealthChanged,
+                        (data) => { if (data.Delta < 0) OnPlayerDamaged(-data.Delta); }
+                    );
+                }
             }
         }
         
@@ -209,11 +216,21 @@ namespace ClawRPG.Scripts.UI {
             UpdateDisplay();
         }
         
-        private void OnComboMilestone(int comboLevel, int goldReward, int expReward)
+        private void OnComboProgressUpdated(string skillId, int combo, float delta)
         {
-            if (comboLevel > _maxCombo)
+            if (combo > _maxCombo)
             {
-                _maxCombo = comboLevel;
+                _maxCombo = combo;
+                PulseLabel(_comboLabel);
+                UpdateDisplay();
+            }
+        }
+        
+        private void OnComboLevelChanged(int newLevel)
+        {
+            if (newLevel > _maxCombo)
+            {
+                _maxCombo = newLevel;
                 PulseLabel(_comboLabel);
                 UpdateDisplay();
             }
