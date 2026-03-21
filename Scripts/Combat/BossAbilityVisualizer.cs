@@ -3,6 +3,26 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Scripts.Combat {
+
+    /// <summary>
+    /// Node2D-based renderer for drawing ability effects.
+    /// Owned by BossAbilityVisualizer (composition pattern).
+    /// </summary>
+    public partial class EffectRenderer : Node2D
+    {
+        private BossAbilityVisualizer _parent;
+
+        public void SetParent(BossAbilityVisualizer parent)
+        {
+            _parent = parent;
+        }
+
+        public override void _Draw()
+        {
+            if (_parent == null) return;
+            _parent.DrawEffects();
+        }
+    }
     /// <summary>
     /// Boss ability visual effect types
     /// </summary>
@@ -59,7 +79,7 @@ namespace ClawRPG.Scripts.Combat {
     /// <summary>
     /// Manages visual effects for boss abilities
     /// </summary>
-    public partial class BossAbilityVisualizer : Node2D
+    public partial class BossAbilityVisualizer : BaseSystem
     {
         private static BossAbilityVisualizer _instance;
         public static BossAbilityVisualizer Instance => _instance;
@@ -74,20 +94,32 @@ namespace ClawRPG.Scripts.Combat {
         // Particles
         private Random _random = new Random();
         
-        public override void _Ready()
+        // Effect renderer (composition: Node2D child for drawing)
+        private EffectRenderer _renderer;
+        
+        protected override void Initialize()
         {
+            base.Initialize();
             _instance = this;
             _visualDatabase = new Dictionary<string, BossAbilityVisual>();
             _activeEffects = new List<AbilityEffectInstance>();
             _particlePositions = new Dictionary<string, List<Vector2>>();
             
             InitializeVisualDatabase();
+            
+            // Create EffectRenderer child for drawing
+            _renderer = new EffectRenderer();
+            _renderer.SetParent(this);
+            AddChild(_renderer);
         }
         
         public override void _Process(float delta)
         {
             UpdateEffects(delta);
-            QueueRedraw();
+            if (_renderer != null)
+            {
+                _renderer.QueueRedraw();
+            }
         }
         
         private void InitializeVisualDatabase()
@@ -402,6 +434,14 @@ namespace ClawRPG.Scripts.Combat {
         
         public override void _Draw()
         {
+            // Drawing is handled by EffectRenderer child
+        }
+        
+        /// <summary>
+        /// Called by EffectRenderer to draw all active effects.
+        /// </summary>
+        public void DrawEffects()
+        {
             foreach (var effect in _activeEffects)
             {
                 DrawAbilityEffect(effect);
@@ -660,6 +700,18 @@ namespace ClawRPG.Scripts.Combat {
         {
             _activeEffects.Clear();
             _particlePositions.Clear();
+        }
+        
+        public override Dictionary ExportSaveData()
+        {
+            // Visualizer is stateless for saves — no persistent state to export
+            return new Dictionary();
+        }
+        
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            // No persistent state to restore
         }
         
         private enum EffectPhase
