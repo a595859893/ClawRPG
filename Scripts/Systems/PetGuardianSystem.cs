@@ -128,7 +128,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 每帧更新
         /// </summary>
-        public void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (!_playerData.IsGuardianModeActive || _player == null)
                 return;
@@ -140,17 +140,17 @@ namespace ClawRPG.Scripts.Systems
                 var config = _configs.GetValueOrDefault(petId, PetGuardianData.GetDefaultConfig());
                 
                 // 更新状态计时
-                info.TimeInState += delta;
+                info.TimeInState += (float)delta;
                 
                 // 决策检查
                 if (Time.GetTicksMsec() / 1000f - info.LastDecisionTime > config.DecisionInterval)
                 {
-                    MakeDecision(petId, info, config, delta);
+                    MakeDecision(petId, info, config, (float)delta);
                     info.LastDecisionTime = Time.GetTicksMsec() / 1000f;
                 }
                 
                 // 执行状态行为
-                ExecuteStateBehavior(petId, info, config, delta);
+                ExecuteStateBehavior(petId, info, config, (float)delta);
             }
         }
         
