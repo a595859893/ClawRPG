@@ -76,7 +76,7 @@ namespace ClawRPG.Systems.Meditation
         public override void _Ready()
         {
             Instance = this;
-            signals = new signals();
+            Signals = new Signals();
             
             // Initialize timer for buff expiration checking
             var timer = new Timer();
