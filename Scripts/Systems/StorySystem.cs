@@ -326,7 +326,7 @@ namespace ClawRPG.Scripts.Systems {
             // Connect to player signals
             var player = GetNode<Player>("/root/Main/Player");
             if (player != null) {
-                player.Connect("LevelUp", this, nameof(OnPlayerLevelUp));
+                player.LevelUp += OnPlayerLevelUp;
             }
         }
         

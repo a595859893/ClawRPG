@@ -191,9 +191,9 @@ namespace ClawRPG.Scripts.UI
         {
             if (_interactionSystem != null)
             {
-                _interactionSystem.Connect(SignalName.InteractionStarted, Callable.From(OnInteractionStarted));
-                _interactionSystem.Connect(SignalName.InteractionCompleted, Callable.From(OnInteractionCompleted));
-                _interactionSystem.Connect(SignalName.InteractionFailed, Callable.From(OnInteractionFailed));
+                _interactionSystem.InteractionStarted += OnInteractionStarted;
+                _interactionSystem.InteractionCompleted += OnInteractionCompleted;
+                _interactionSystem.InteractionFailed += OnInteractionFailed;
             }
         }
 

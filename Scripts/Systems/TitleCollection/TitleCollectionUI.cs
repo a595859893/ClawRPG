@@ -66,7 +66,7 @@ public class TitleCollectionUI : Control
         _closeButton = new Button();
         _closeButton.Text = "✕";
         _closeButton.RectMinSize = new Vector2(40, 40);
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
         titleBar.AddChild(_closeButton);
         
         // Tab Container
@@ -130,7 +130,7 @@ public class TitleCollectionUI : Control
         displaySection.AddChild(displayDesc);
         
         _displayTitleSelector = new OptionButton();
-        _displayTitleSelector.Connect("item_selected", this, nameof(OnDisplayTitleSelected));
+        _displayTitleSelector.ItemSelected += OnDisplayTitleSelected;
         displaySection.AddChild(_displayTitleSelector);
         
         _currentTitleLabel = new Label();
@@ -155,7 +155,7 @@ public class TitleCollectionUI : Control
         filterBar.AddChild(categoryLabel);
         
         _categoryFilter = new OptionButton();
-        _categoryFilter.Connect("item_selected", this, nameof(OnCategorySelected));
+        _categoryFilter.ItemSelected += OnCategorySelected;
         filterBar.AddChild(_categoryFilter);
         
         var rarityLabel = new Label();
@@ -163,7 +163,7 @@ public class TitleCollectionUI : Control
         filterBar.AddChild(rarityLabel);
         
         _rarityFilter = new OptionButton();
-        _rarityFilter.Connect("item_selected", this, nameof(OnRaritySelected));
+        _rarityFilter.ItemSelected += OnRaritySelected;
         filterBar.AddChild(_rarityFilter);
         
         // 标题列表

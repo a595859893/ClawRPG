@@ -27,7 +27,7 @@ public class ProceduralStorySystem : BaseSystem
         var timer = new Timer();
         timer.WaitTime = 60; // Check every minute
         timer.Autostart = true;
-        timer.Connect("timeout", this, "_OnAutoGenerateTimer");
+        timer.Timeout += _OnAutoGenerateTimer;
         AddChild(timer);
     }
     

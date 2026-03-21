@@ -25,9 +25,9 @@ namespace ClawRPG.Scripts.UI {
             
             // Connect to story manager signals
             if (StoryManager.Instance != null) {
-                StoryManager.Instance.Connect("ChapterUnlocked", this, nameof(OnChapterUnlocked));
-                StoryManager.Instance.Connect("ChapterCompleted", this, nameof(OnChapterCompleted));
-                StoryManager.Instance.Connect("ObjectiveProgressUpdated", this, nameof(OnObjectiveProgressUpdated));
+                StoryManager.Instance.ChapterUnlocked += OnChapterUnlocked;
+                StoryManager.Instance.ChapterCompleted += OnChapterCompleted;
+                StoryManager.Instance.ObjectiveProgressUpdated += OnObjectiveProgressUpdated;
             }
         }
         
@@ -76,7 +76,7 @@ namespace ClawRPG.Scripts.UI {
                 AnchorRight = 0.98f,
                 AnchorBottom = 0.08f
             };
-            closeButton.Connect("pressed", this, nameof(OnClosePressed));
+            closeButton.Pressed += OnClosePressed;
             panel.AddChild(closeButton);
             
             // Current chapter display

@@ -56,12 +56,12 @@ public class DreamscapeUI : Control
         
         _exitButton = new Button();
         _exitButton.Text = "Exit Dreamscape";
-        _exitButton.Connect("pressed", this, nameof(_OnExitPressed));
+        _exitButton.Pressed += _OnExitPressed;
         buttonRow.AddChild(_exitButton);
         
         _closeButton = new Button();
         _closeButton.Text = "X";
-        _closeButton.Connect("pressed", this, nameof(_OnClosePressed));
+        _closeButton.Pressed += _OnClosePressed;
         buttonRow.AddChild(_closeButton);
         
         // Current layer info (shown when in dreamscape)
@@ -127,7 +127,7 @@ public class DreamscapeUI : Control
         // Enter button
         _enterButton = new Button();
         _enterButton.Text = "Enter Dreamscape";
-        _enterButton.Connect("pressed", this, nameof(_OnEnterPressed));
+        _enterButton.Pressed += _OnEnterPressed;
         _enterButton.Disabled = true;
         _mainContainer.AddChild(_enterButton);
         
@@ -183,7 +183,7 @@ public class DreamscapeUI : Control
         
         var selectButton = new Button();
         selectButton.Text = "Select";
-        selectButton.Connect("pressed", this, nameof(_OnDreamscapeSelected), new Godot.Collections.Array { ds.Id });
+        selectButton.Pressed += () => _OnDreamscapeSelected(ds.Id);
         vbox.AddChild(selectButton);
         
         return panel;

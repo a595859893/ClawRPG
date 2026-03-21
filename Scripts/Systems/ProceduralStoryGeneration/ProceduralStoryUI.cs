@@ -67,7 +67,7 @@ public class ProceduralStoryUI : Control
         // Add story button
         var addButton = new Button();
         addButton.Text = "Start New Story";
-        addButton.Connect("pressed", this, "_OnStartStoryPressed");
+        addButton.Pressed += _OnStartStoryPressed;
         _activeStoriesContainer.AddChild(addButton);
         
         var separator = new HSeparator();
@@ -94,13 +94,13 @@ public class ProceduralStoryUI : Control
         // Refresh button
         var refreshButton = new Button();
         refreshButton.Text = "Refresh";
-        refreshButton.Connect("pressed", this, "_OnRefreshPressed");
+        refreshButton.Pressed += _OnRefreshPressed;
         mainVBox.AddChild(refreshButton);
         
         // Close button
         var closeButton = new Button();
         closeButton.Text = "Close (ESC)";
-        closeButton.Connect("pressed", this, "_OnClosePressed");
+        closeButton.Pressed += _OnClosePressed;
         mainVBox.AddChild(closeButton);
         
         // Initial refresh
@@ -189,19 +189,19 @@ public class ProceduralStoryUI : Control
         // Continue button
         var continueButton = new Button();
         continueButton.Text = "Continue";
-        continueButton.Connect("pressed", this, "_OnContinueStoryPressed", new Array { story.StoryId });
+        continueButton.Pressed += () => _OnContinueStoryPressed(story.StoryId);
         buttonVBox.AddChild(continueButton);
         
         // Pause button
         var pauseButton = new Button();
         pauseButton.Text = story.State == ProceduralStoryData.StoryState.Paused ? "Resume" : "Pause";
-        pauseButton.Connect("pressed", this, "_OnPauseStoryPressed", new Array { story.StoryId });
+        pauseButton.Pressed += () => _OnPauseStoryPressed(story.StoryId);
         buttonVBox.AddChild(pauseButton);
         
         // Fail button
         var failButton = new Button();
         failButton.Text = "Give Up";
-        failButton.Connect("pressed", this, "_OnFailStoryPressed", new Array { story.StoryId });
+        failButton.Pressed += () => _OnFailStoryPressed(story.StoryId);
         buttonVBox.AddChild(failButton);
         
         return panel;
@@ -244,7 +244,7 @@ public class ProceduralStoryUI : Control
         // Reset button
         var resetButton = new Button();
         resetButton.Text = "Reset Statistics";
-        resetButton.Connect("pressed", this, "_OnResetStatsPressed");
+        resetButton.Pressed += _OnResetStatsPressed;
         _statsContainer.AddChild(resetButton);
     }
     

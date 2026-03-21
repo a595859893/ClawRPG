@@ -173,12 +173,9 @@ public partial class TitleCollectionUI : Control
     {
         if (TitleCollectionSystem.Instance != null)
         {
-            TitleCollectionSystem.Instance.Connect(TitleCollectionSystem.SignalName.TitleUnlocked, 
-                new Callable(this, MethodName.OnTitleUnlocked));
-            TitleCollectionSystem.Instance.Connect(TitleCollectionSystem.SignalName.TitleEquipped, 
-                new Callable(this, MethodName.OnTitleEquipped));
-            TitleCollectionSystem.Instance.Connect(TitleCollectionSystem.SignalName.TitleUnequipped, 
-                new Callable(this, MethodName.OnTitleUnequipped));
+            TitleCollectionSystem.Instance.TitleUnlocked += OnTitleUnlocked;
+            TitleCollectionSystem.Instance.TitleEquipped += OnTitleEquipped;
+            TitleCollectionSystem.Instance.TitleUnequipped += OnTitleUnequipped;
         }
     }
     

@@ -36,20 +36,20 @@ public class TitleUI : Control
         
         // Connect signals
         if (_equipButton != null)
-            _equipButton.Connect("pressed", this, nameof(OnEquipButtonPressed));
+            _equipButton.Pressed += OnEquipButtonPressed;
         if (_unequipButton != null)
-            _unequipButton.Connect("pressed", this, nameof(OnUnequipButtonPressed));
+            _unequipButton.Pressed += OnUnequipButtonPressed;
         if (_closeButton != null)
-            _closeButton.Connect("pressed", this, nameof(OnCloseButtonPressed));
+            _closeButton.Pressed += OnCloseButtonPressed;
         if (_categoryFilter != null)
-            _categoryFilter.Connect("item_selected", this, nameof(OnCategorySelected));
+            _categoryFilter.ItemSelected += OnCategorySelected;
         if (_showUnlockedOnly != null)
-            _showUnlockedOnly.Connect("toggled", this, nameof(OnUnlockedOnlyToggled));
+            _showUnlockedOnly.Toggled += OnUnlockedOnlyToggled;
         if (_titleList != null)
-            _titleList.Connect("item_selected", this, nameof(OnTitleSelected));
+            _titleList.ItemSelected += OnTitleSelected;
 
         // Input handling
-        Connect("visibility_changed", this, nameof(OnVisibilityChanged));
+        VisibilityChanged += OnVisibilityChanged;
     }
 
     private void SetupUI()

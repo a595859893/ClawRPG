@@ -36,7 +36,7 @@ public class DreamscapeSystem : BaseSystem
         _timer = new Timer();
         AddChild(_timer);
         _timer.WaitTime = 1.0f;
-        _timer.Connect("timeout", this, nameof(_OnTimerTick));
+        _timer.Timeout += _OnTimerTick;
     }
 
     public override void _Ready()
