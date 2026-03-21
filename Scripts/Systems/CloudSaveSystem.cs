@@ -261,15 +261,30 @@ namespace ClawRPG.Scripts.Systems
                 // 模拟云同步延迟
                 await ToSignal(GetTree().CreateTimer(0.5), "timeout");
                 
-                // TODO: 实现实际的云端批量下载逻辑
-                // 返回 null 表示云端没有数据
+                // 获取云端所有槽位列表
+                var cloudSlotList = _storageProvider.ListSlots();
+                
+                // 下载每个槽位的数据
+                var downloadedSaves = new List<SaveDataManager.SaveData>();
+                foreach (var slotInfo in cloudSlotList)
+                {
+                    int slot = slotInfo.Slot;
+                    string jsonData = _storageProvider.DownloadSlot(slot);
+                    
+                    if (!string.IsNullOrEmpty(jsonData))
+                    {
+                        SaveDataManager.SaveData saveData = JsonSerializer.Deserialize<SaveDataManager.SaveData>(jsonData);
+                        downloadedSaves.Add(saveData);
+                        GD.Print("[CloudSaveSystem] Downloaded slot " + slot + " from cloud");
+                    }
+                }
                 
                 _lastSyncTime = DateTime.Now;
-                GD.Print("[CloudSaveSystem] All slots downloaded from cloud");
+                GD.Print("[CloudSaveSystem] All slots downloaded from cloud: " + downloadedSaves.Count + " slots");
                 
                 _isSyncing = false;
                 EmitSignal(SignalName.OnCloudSyncComplete, true);
-                callback?.Invoke(null);
+                callback?.Invoke(downloadedSaves.Count > 0 ? downloadedSaves.ToArray() : null);
             }
             catch (Exception e)
             {
