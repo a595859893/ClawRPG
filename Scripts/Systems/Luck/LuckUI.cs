@@ -76,13 +76,13 @@ public class LuckUI : Control
         var rollBtn = new Button();
         rollBtn.Text = "🎲 投掷 (难度50)";
         rollBtn.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        rollBtn.Connect("pressed", this, nameof(OnRollPressed));
+        rollBtn.Pressed += OnRollPressed;
         buttonContainer.AddChild(rollBtn);
         
         var simpleRollBtn = new Button();
         simpleRollBtn.Text = "🎯 简单投掷 (50%)";
         simpleRollBtn.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        simpleRollBtn.Connect("pressed", this, nameof(OnSimpleRollPressed));
+        simpleRollBtn.Pressed += OnSimpleRollPressed;
         buttonContainer.AddChild(simpleRollBtn);
         
         // 标签页容器
@@ -126,7 +126,7 @@ public class LuckUI : Control
         var closeBtn = new Button();
         closeBtn.Text = "关闭 (ESC)";
         closeBtn.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        closeBtn.Connect("pressed", this, nameof(OnClosePressed));
+        closeBtn.Pressed += OnClosePressed;
         bottomContainer.AddChild(closeBtn);
         
         // 快捷键

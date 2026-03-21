@@ -71,7 +71,7 @@ public class ArtifactFusionUI : Control
             Text = "X",
             SizeFlagsHorizontal = SizeFlags.ShrinkEnd
         };
-        closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        closeButton.Pressed += OnClosePressed;
         titleBar.AddChild(closeButton);
         
         // TabContainer
@@ -160,7 +160,7 @@ public class ArtifactFusionUI : Control
             Text = "Reset Statistics",
             MarginTop = 30
         };
-        resetButton.Connect("pressed", this, nameof(OnResetPressed));
+        resetButton.Pressed += OnResetPressed;
         statsVBox.AddChild(resetButton);
         
         statsContainer = statsVBox;
@@ -229,7 +229,7 @@ public class ArtifactFusionUI : Control
             MarginTop = 5
         };
         var recipeCopy = recipe;
-        fuseButton.Connect("pressed", this, nameof(OnFuseButtonPressed), new Godot.Collections.Array { recipeCopy.Id });
+        fuseButton.Pressed += () => OnFuseButtonPressed(recipeCopy.Id);
         vbox.AddChild(fuseButton);
         
         return panel;

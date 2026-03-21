@@ -100,7 +100,7 @@ namespace ClawRPG.Scripts.UI {
                 Text = "Full Reset",
                 CustomMinimumSize = new Vector2(150, 40)
             };
-            _fullResetButton.Connect("pressed", this, nameof(_OnFullResetPressed));
+            _fullResetButton.Pressed += _OnFullResetPressed;
             _buttonContainer.AddChild(_fullResetButton);
 
             // Spacing
@@ -114,7 +114,7 @@ namespace ClawRPG.Scripts.UI {
                 Text = "Close",
                 CustomMinimumSize = new Vector2(150, 40)
             };
-            _closeButton.Connect("pressed", this, nameof(_OnClosePressed));
+            _closeButton.Pressed += _OnClosePressed;
             _buttonContainer.AddChild(_closeButton);
 
             // Load presets
@@ -144,7 +144,7 @@ namespace ClawRPG.Scripts.UI {
                 CustomMinimumSize = new Vector2(0, 45),
                 SizeFlagsVertical = Control.SizeFlags.ExpandFill
             };
-            button.Connect("pressed", this, nameof(_OnPresetPressed), new Godot.Collections.Array { preset.Id });
+            button.Pressed += () => _OnPresetPressed(preset.Id);
             return button;
         }
 

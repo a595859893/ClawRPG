@@ -79,13 +79,13 @@ public class EquipmentDurabilityUI : Control
         _repairAllButton = new Button();
         _repairAllButton.Text = "修理全部 (100 金币)";
         _repairAllButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        _repairAllButton.Connect("pressed", this, nameof(OnRepairAllPressed));
+        _repairAllButton.Pressed += OnRepairAllPressed;
         buttonContainer.AddChild(_repairAllButton);
         
         _closeButton = new Button();
         _closeButton.Text = "关闭 (ESC)";
         _closeButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
         buttonContainer.AddChild(_closeButton);
         
         // Setup input
@@ -209,7 +209,7 @@ public class EquipmentDurabilityUI : Control
         // Repair button
         var repairButton = new Button();
         repairButton.Text = "修理";
-        repairButton.Connect("pressed", this, nameof(OnRepairPressed), new Godot.Collections.Array { equipmentId });
+        repairButton.Pressed += () => OnRepairPressed(equipmentId);
         hbox.AddChild(repairButton);
         
         return panel;

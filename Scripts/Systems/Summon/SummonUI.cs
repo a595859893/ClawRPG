@@ -52,12 +52,12 @@ public class SummonUI : Control
 		
 		var closeButton = new Button();
 		closeButton.Text = "关闭 (ESC)";
-		closeButton.Connect("pressed", this, nameof(OnClosePressed));
+		closeButton.Pressed += OnClosePressed;
 		buttonContainer.AddChild(closeButton);
 		
 		var unlockAllButton = new Button();
 		unlockAllButton.Text = "解锁全部召唤兽";
-		unlockAllButton.Connect("pressed", this, nameof(OnUnlockAllPressed));
+		unlockAllButton.Pressed += OnUnlockAllPressed;
 		buttonContainer.AddChild(unlockAllButton);
 	}
 	
@@ -200,7 +200,7 @@ public class SummonUI : Control
 		// Select button
 		var selectButton = new Button();
 		selectButton.Text = isUnlocked ? "选择" : "查看";
-		selectButton.Connect("pressed", this, nameof(OnSummonSelected), new Godot.Collections.Array { summon.SummonId });
+		selectButton.Pressed += () => OnSummonSelected(summon.SummonId);
 		vbox.AddChild(selectButton);
 		
 		return panel;

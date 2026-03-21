@@ -42,7 +42,7 @@ public class StreakUI : Control
         _closeButton.Text = "✕ Close";
         _closeButton.AlignMode = Button.TextAlign.Center;
         _closeButton.CustomMinimumSize = new Vector2(100, 30);
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
         mainVBox.AddChild(_closeButton);
         
         // Separator
@@ -163,14 +163,14 @@ public class StreakUI : Control
         Button claimButton = new Button();
         claimButton.Text = record.ClaimedToday ? "✅ Claimed" : "🎁 Claim";
         claimButton.Disabled = record.ClaimedToday || record.CurrentStreak == 0;
-        claimButton.Connect("pressed", this, nameof(OnClaimPressed), new Godot.Collections.Array { type });
+        claimButton.Pressed += () => OnClaimPressed(type);
         buttonBox.AddChild(claimButton);
         
         // Streak freeze button
         Button freezeButton = new Button();
         freezeButton.Text = "❄️ Freeze";
         freezeButton.Disabled = !_streakSystem.CanUseStreakFreeze();
-        freezeButton.Connect("pressed", this, nameof(OnFreezePressed), new Godot.Collections.Array { type });
+        freezeButton.Pressed += () => OnFreezePressed(type);
         buttonBox.AddChild(freezeButton);
         
         // Status indicator

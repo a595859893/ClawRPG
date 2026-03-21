@@ -27,9 +27,9 @@ public class BuffUI : Control
 		// 连接到BuffSystem信号
 		if (BuffSystem.Instance != null)
 		{
-			BuffSystem.Instance.Connect(nameof(BuffSystem.BuffListChanged), this, nameof(OnBuffListChanged));
-			BuffSystem.Instance.Connect(nameof(BuffSystem.BuffApplied), this, nameof(OnBuffApplied));
-			BuffSystem.Instance.Connect(nameof(BuffSystem.BuffRemoved), this, nameof(OnBuffRemoved));
+			BuffSystem.Instance.BuffListChanged += OnBuffListChanged;
+			BuffSystem.Instance.BuffApplied += OnBuffApplied;
+			BuffSystem.Instance.BuffRemoved += OnBuffRemoved;
 		}
 	}
 	

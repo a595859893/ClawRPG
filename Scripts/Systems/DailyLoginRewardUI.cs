@@ -33,12 +33,12 @@ namespace 悬疑RPG
             Visible = false; 
             
             // 连接信号
-            DailyLoginRewardSystem.Instance.Connect(DailyLoginRewardSystem.SignalName.LoginDaysUpdated, Callable.From(OnLoginDaysUpdated));
-            DailyLoginRewardSystem.Instance.Connect(DailyLoginRewardSystem.SignalName.RewardClaimed, Callable.From(OnRewardClaimed));
-            DailyLoginRewardSystem.Instance.Connect(DailyLoginRewardSystem.SignalName.NewDayAvailable, Callable.From(OnNewDayAvailable));
+            DailyLoginRewardSystem.Instance.LoginDaysUpdated += OnLoginDaysUpdated;
+            DailyLoginRewardSystem.Instance.RewardClaimed += OnRewardClaimed;
+            DailyLoginRewardSystem.Instance.NewDayAvailable += OnNewDayAvailable;
 
             // 按键处理
-            GetTree().Root.Connect("size_changed", Callable.From(OnWindowResized));
+            GetTree().Root.SizeChanged += OnWindowResized;
         }
 
         /// <summary>

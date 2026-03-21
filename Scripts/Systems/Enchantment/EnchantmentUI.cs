@@ -220,9 +220,9 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             // 连接到附魔系统信号
             if (EnchantmentSystem.Instance != null)
             {
-                EnchantmentSystem.Instance.Connect(SignalName.EnchantmentCompleted, new Callable(this, MethodName.OnEnchantmentCompleted));
-                EnchantmentSystem.Instance.Connect(SignalName.EnchantmentSuccess, new Callable(this, MethodName.OnEnchantmentSuccess));
-                EnchantmentSystem.Instance.Connect(SignalName.FocusPointsChanged, new Callable(this, MethodName.RefreshFocusPoints));
+                EnchantmentSystem.Instance.EnchantmentCompleted += OnEnchantmentCompleted;
+                EnchantmentSystem.Instance.EnchantmentSuccess += OnEnchantmentSuccess;
+                EnchantmentSystem.Instance.FocusPointsChanged += RefreshFocusPoints;
             }
         }
         

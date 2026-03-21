@@ -25,8 +25,8 @@ public class DailyQuestUI : Control
 		// Connect signals
 		if (DailyQuestSystem.Instance != null)
 		{
-			DailyQuestSystem.Instance.QuestUpdated.Connect(OnQuestUpdated);
-			DailyQuestSystem.Instance.QuestCompleted.Connect(OnQuestCompleted);
+			DailyQuestSystem.Instance.QuestUpdated += OnQuestUpdated;
+			DailyQuestSystem.Instance.QuestCompleted += OnQuestCompleted;
 		}
 	}
 

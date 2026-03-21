@@ -122,8 +122,8 @@ public class DailyRitualUI : Control
     {
         if (DailyRitualSystem.Instance != null)
         {
-            DailyRitualSystem.Instance.Connect(nameof(DailyRitualSystem.RitualCompleted), this, nameof(OnRitualCompleted));
-            DailyRitualSystem.Instance.Connect(nameof(DailyRitualSystem.RitualUnlocked), this, nameof(OnRitualUnlocked));
+            DailyRitualSystem.Instance.RitualCompleted += OnRitualCompleted;
+            DailyRitualSystem.Instance.RitualUnlocked += OnRitualUnlocked;
         }
     }
 
