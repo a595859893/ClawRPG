@@ -83,16 +83,16 @@ namespace ClawRPG.Systems.MultiplayerVote
         private void ConnectSubsystemSignals()
         {
             // PartyManagementSystem signals
-            _partySystem.Connect(SignalName.PartyCreated, new Callable(this, nameof(OnPartyCreated)));
-            _partySystem.Connect(SignalName.PartyJoined, new Callable(this, nameof(OnPartyJoined)));
-            _partySystem.Connect(SignalName.PartyLeft, new Callable(this, nameof(OnPartyLeft)));
-            _partySystem.Connect(SignalName.PartyMemberKicked, new Callable(this, nameof(OnPartyMemberKicked)));
-            _partySystem.Connect(SignalName.PartyLeaderChanged, new Callable(this, nameof(OnPartyLeaderChanged)));
+            _partySystem.PartyCreated += OnPartyCreated;
+            _partySystem.PartyJoined += OnPartyJoined;
+            _partySystem.PartyLeft += OnPartyLeft;
+            _partySystem.PartyMemberKicked += OnPartyMemberKicked;
+            _partySystem.PartyLeaderChanged += OnPartyLeaderChanged;
             
             // VoteProcessingSystem signals
-            _voteSystem.Connect(SignalName.VoteStarted, new Callable(this, nameof(OnVoteStarted)));
-            _voteSystem.Connect(SignalName.VoteEnded, new Callable(this, nameof(OnVoteEnded)));
-            _voteSystem.Connect(SignalName.VoteUpdated, new Callable(this, nameof(OnVoteUpdated)));
+            _voteSystem.VoteStarted += OnVoteStarted;
+            _voteSystem.VoteEnded += OnVoteEnded;
+            _voteSystem.VoteUpdated += OnVoteUpdated;
         }
         
         // 信号转发处理

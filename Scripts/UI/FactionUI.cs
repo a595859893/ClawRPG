@@ -39,7 +39,7 @@ public class FactionUI : Control
         // Connect signals
         if (factionSystem != null)
         {
-            factionSystem.Connect(nameof(FactionSystem.ReputationChanged), this, nameof(OnReputationChanged));
+            factionSystem.ReputationChanged += OnReputationChanged;
         }
         
         // Load factions
@@ -142,7 +142,7 @@ public class FactionUI : Control
         closeButton.Text = "Close";
         closeButton.RectPosition = new Vector2(650, 20);
         closeButton.RectSize = new Vector2(100, 30);
-        closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        closeButton.Pressed += OnClosePressed;
         AddChild(closeButton);
         
         // Update reputation summary
@@ -187,7 +187,7 @@ public class FactionUI : Control
         button.TooltipText = tooltip;
         
         // Connect
-        button.Connect("pressed", this, nameof(OnFactionSelected), new Array { faction });
+        button.Pressed += () => OnFactionSelected(faction);
         
         return button;
     }

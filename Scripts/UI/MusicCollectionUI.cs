@@ -118,9 +118,9 @@ namespace ClawRPG.Scripts.UI {
         
         private void ConnectSignals() {
             if (_collectionSystem != null) {
-                _collectionSystem.Connect(nameof(MusicCollectionSystem.TrackUnlocked), this, nameof(OnTrackUnlocked));
-                _collectionSystem.Connect(nameof(MusicCollectionSystem.FavoriteAdded), this, nameof(OnFavoriteChanged));
-                _collectionSystem.Connect(nameof(MusicCollectionSystem.FavoriteRemoved), this, nameof(OnFavoriteChanged));
+                _collectionSystem.TrackUnlocked += OnTrackUnlocked;
+                _collectionSystem.FavoriteAdded += OnFavoriteChanged;
+                _collectionSystem.FavoriteRemoved += OnFavoriteChanged;
             }
         }
         

@@ -113,7 +113,7 @@ public class PetExpeditionUI : Control
             Text = "关闭",
             RectMinSize = new Vector2(100, 40)
         };
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
         _mainPanel.AddChild(_closeButton);
         
         // 打开动画
@@ -264,7 +264,7 @@ public class PetExpeditionUI : Control
             Text = "开始远征",
             RectMinSize = new Vector2(120, 40)
         };
-        startBtn.Connect("pressed", this, nameof(OnStartExpedition), new Godot.Collections.Array { zone.Id });
+        startBtn.Pressed += () => OnStartExpedition(zone.Id);
         
         // 检查是否可以开始
         var petManager = GetNode<PetManager>("/root/Main/PetManager");
@@ -373,7 +373,7 @@ public class PetExpeditionUI : Control
                 Text = "取消",
                 RectMinSize = new Vector2(80, 40)
             };
-            cancelBtn.Connect("pressed", this, nameof(OnCancelExpedition), new Godot.Collections.Array { expedition.ExpeditionId });
+            cancelBtn.Pressed += () => OnCancelExpedition(expedition.ExpeditionId);
             hbox.AddChild(cancelBtn);
         }
     }

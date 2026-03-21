@@ -161,9 +161,9 @@ public class RandomBoonUI : Control
     {
         if (RandomBoonSystem.Instance == null) return;
         
-        RandomBoonSystem.Instance.BoonOffered.Connect(OnBoonOffered);
-        RandomBoonSystem.Instance.BoonActivated.Connect(OnBoonActivated);
-        RandomBoonSystem.Instance.BoonRemoved.Connect(OnBoonRemoved);
+        RandomBoonSystem.Instance.BoonOffered += OnBoonOffered;
+        RandomBoonSystem.Instance.BoonActivated += OnBoonActivated;
+        RandomBoonSystem.Instance.BoonRemoved += OnBoonRemoved;
     }
     
     private void OnBoonOffered(List<BoonData> boons)

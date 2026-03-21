@@ -72,27 +72,27 @@ namespace ClawRPG.Scripts.UI {
             var main = GetNode("/root/Main");
             if (main != null)
             {
-                main.Connect("enemy_damaged", new Callable(this, nameof(OnEnemyDamaged)));
-                main.Connect("player_damaged", new Callable(this, nameof(OnPlayerDamaged)));
-                main.Connect("enemy_killed", new Callable(this, nameof(OnEnemyKilled)));
-                main.Connect("player_dodged", new Callable(this, nameof(OnPlayerDodged)));
-                main.Connect("player_blocked", new Callable(this, nameof(OnPlayerBlocked)));
-                main.Connect("player_crit", new Callable(this, nameof(OnPlayerCrit)));
+                main.EnemyDamaged += (damage, isCrit) => OnEnemyDamaged(damage, isCrit);
+                main.PlayerDamaged += (damage) => OnPlayerDamaged(damage);
+                main.EnemyKilled += OnEnemyKilled;
+                main.PlayerDodged += OnPlayerDodged;
+                main.PlayerBlocked += OnPlayerBlocked;
+                main.PlayerCrit += OnPlayerCrit;
             }
             
             // Connect to combo system
             var comboSystem = GetTree().GetFirstNodeInGroup("ComboSystem");
             if (comboSystem != null)
             {
-                comboSystem.Connect("OnComboMilestone", new Callable(this, nameof(OnComboMilestone)));
+                comboSystem.OnComboMilestone += (combo, gold, exp) => OnComboMilestone(combo, gold, exp);
             }
             
             // Connect to player
             var player = GetTree().GetFirstNodeInGroup("Player");
             if (player != null)
             {
-                player.Connect("dodge_success", new Callable(this, nameof(OnPlayerDodged)));
-                player.Connect("block_success", new Callable(this, nameof(OnPlayerBlocked)));
+                player.DodgeSuccess += OnPlayerDodged;
+                player.BlockSuccess += OnPlayerBlocked;
             }
         }
         
@@ -103,19 +103,19 @@ namespace ClawRPG.Scripts.UI {
             if (player != null)
             {
                 // Player damage received
-                player.Connect("took_damage", new Callable(this, nameof(OnPlayerDamaged)));
+                player.TookDamage += (damage) => OnPlayerDamaged(damage);
             }
             
             // Connect to enemy group
-            GetTree().Connect("node_added", new Callable(this, nameof(OnNodeAdded)));
+            GetTree().NodeAdded += OnNodeAdded;
         }
         
         private void OnNodeAdded(Node node)
         {
             if (node is Enemy enemy)
             {
-                enemy.Connect("damage_received", new Callable(this, nameof(OnEnemyDamaged)));
-                enemy.Connect("died", new Callable(this, nameof(OnEnemyDied)));
+                enemy.DamageReceived += (damage, isCrit) => OnEnemyDamaged(damage, isCrit);
+                enemy.Died += OnEnemyDied;
             }
         }
         

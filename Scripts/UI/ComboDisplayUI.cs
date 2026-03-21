@@ -133,9 +133,9 @@ namespace ClawRPG.Scripts.UI {
             var comboSystem = GetTree().GetFirstNodeInGroup("ComboSystem");
             if (comboSystem != null)
             {
-                comboSystem.Connect("OnComboChanged", new Callable(this, nameof(OnComboChanged)));
-                comboSystem.Connect("OnComboMilestone", new Callable(this, nameof(OnComboMilestone)));
-                comboSystem.Connect("OnComboBroken", new Callable(this, nameof(OnComboBroken)));
+                comboSystem.OnComboChanged += OnComboChanged;
+                comboSystem.OnComboMilestone += OnComboMilestone;
+                comboSystem.OnComboBroken += OnComboBroken;
             }
         }
         

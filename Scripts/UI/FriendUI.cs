@@ -191,9 +191,9 @@ public class FriendUI : Control
     {
         if (_friendSystem != null)
         {
-            _friendSystem.Connect(nameof(FriendSystem.FriendListUpdated), this, nameof(OnFriendListUpdated));
-            _friendSystem.Connect(nameof(FriendSystem.FriendRequestReceived), this, nameof(OnFriendRequestReceived));
-            _friendSystem.Connect(nameof(FriendSystem.ChatMessageReceived), this, nameof(OnChatMessageReceived));
+            _friendSystem.FriendListUpdated += OnFriendListUpdated;
+            _friendSystem.FriendRequestReceived += OnFriendRequestReceived;
+            _friendSystem.ChatMessageReceived += OnChatMessageReceived;
         }
     }
 
