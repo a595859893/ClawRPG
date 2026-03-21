@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using GameSystems;
+using ClawRPG.Framework;
 
 namespace ClawRPG.Scripts.Systems
 {
@@ -18,6 +19,9 @@ namespace ClawRPG.Scripts.Systems
         private bool _isSyncing = false;
         private DateTime _lastSyncTime;
         private string _cloudProvider = "local"; // local, steam, google, etc.
+        
+        // 云存储 Provider
+        private ICloudStorageProvider _storageProvider;
         
         // 云端存储的最大槽位数
         private const int MaxCloudSlots = 10;
@@ -42,6 +46,15 @@ namespace ClawRPG.Scripts.Systems
         {
             _cloudProvider = provider;
             _isCloudSyncEnabled = true;
+            
+            // 根据 provider 参数创建并挂载对应的 provider 实现
+            if (provider == "local")
+            {
+                _storageProvider = new LocalCloudStorageProvider();
+                AddChild(_storageProvider);
+            }
+            // TODO: 支持其他 provider (steam, google, etc.)
+            
             GD.Print("[CloudSaveSystem] Cloud sync enabled with provider: " + provider);
         }
 
@@ -51,6 +64,14 @@ namespace ClawRPG.Scripts.Systems
         public void DisableCloudSync()
         {
             _isCloudSyncEnabled = false;
+            
+            // 清理 storageProvider
+            if (_storageProvider != null)
+            {
+                _storageProvider.QueueFree();
+                _storageProvider = null;
+            }
+            
             GD.Print("[CloudSaveSystem] Cloud sync disabled");
         }
 
