@@ -156,15 +156,28 @@ namespace ClawRPG.Scripts.Systems
                 // 模拟云同步延迟（实际实现中会调用云API）
                 await ToSignal(GetTree().CreateTimer(0.5), "timeout");
                 
-                // TODO: 实现实际的云端下载逻辑
+                // 调用云存储 Provider 下载
+                string jsonData = _storageProvider.DownloadSlot(slot);
+                
                 // 返回 null 表示云端没有该槽位的数据
+                if (string.IsNullOrEmpty(jsonData))
+                {
+                    GD.Print("[CloudSaveSystem] No cloud data found for slot " + slot);
+                    _isSyncing = false;
+                    EmitSignal(SignalName.OnCloudSyncComplete, true);
+                    callback?.Invoke(null);
+                    return;
+                }
+                
+                // 反序列化 JSON 为 SaveData
+                SaveDataManager.SaveData saveData = JsonSerializer.Deserialize<SaveDataManager.SaveData>(jsonData);
                 
                 GD.Print("[CloudSaveSystem] Slot " + slot + " downloaded from cloud");
                 _lastSyncTime = DateTime.Now;
                 
                 _isSyncing = false;
                 EmitSignal(SignalName.OnCloudSyncComplete, true);
-                callback?.Invoke(null);
+                callback?.Invoke(saveData);
             }
             catch (Exception e)
             {
