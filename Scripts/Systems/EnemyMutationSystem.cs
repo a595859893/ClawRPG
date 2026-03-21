@@ -118,7 +118,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 处理变异敌人的更新
         /// </summary>
-        public void _Process(float delta)
+        public override void _Process(double delta)
         {
             foreach (var instance in _activeMutations.Values)
             {
@@ -131,7 +131,7 @@ namespace ClawRPG.Scripts.Systems
                 // 护盾周期性生成
                 if (instance.Mutation.ShieldPerSecond > 0)
                 {
-                    instance.TimeSinceLastShield += delta;
+                    instance.TimeSinceLastShield += (float)delta;
                     if (instance.TimeSinceLastShield >= 3f)  // 每3秒生成护盾
                     {
                         instance.ActiveShield = Mathf.Min(
