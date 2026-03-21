@@ -110,21 +110,21 @@ public class RandomNameUI : Control
         _generateButton = new Button();
         _generateButton.Text = "Generate Name";
         _generateButton.RectMinSize = new Vector2(0, 40);
-        _generateButton.Connect("pressed", this, "_OnGeneratePressed");
+        _generateButton.Pressed += _OnGeneratePressed;
         mainVBox.AddChild(_generateButton);
         
         // Fantasy name button
         _fantasyButton = new Button();
         _fantasyButton.Text = "Generate Fantasy Name";
         _fantasyButton.RectMinSize = new Vector2(0, 35);
-        _fantasyButton.Connect("pressed", this, "_OnFantasyPressed");
+        _fantasyButton.Pressed += _OnFantasyPressed;
         mainVBox.AddChild(_fantasyButton);
         
         // Generate multiple button
         _generateMultipleButton = new Button();
         _generateMultipleButton.Text = "Generate 5 Names";
         _generateMultipleButton.RectMinSize = new Vector2(0, 35);
-        _generateMultipleButton.Connect("pressed", this, "_OnGenerateMultiplePressed");
+        _generateMultipleButton.Pressed += _OnGenerateMultiplePressed;
         mainVBox.AddChild(_generateMultipleButton);
         
         // Stats

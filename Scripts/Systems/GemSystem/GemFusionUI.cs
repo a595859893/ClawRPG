@@ -156,8 +156,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         
         private void _ConnectSignals() {
             if (_fusionSystem != null) {
-                _fusionSystem.Connect(nameof(GemFusionSystem.FusionCompleted), 
-                    this, nameof(_OnFusionCompleted));
+                _fusionSystem.FusionCompleted += _OnFusionCompleted;
             }
         }
         
@@ -275,7 +274,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             
             // 延迟恢复颜色
             var timer = GetTree().CreateTimer(2.0f);
-            timer.Connect("timeout", this, nameof(_ResetResultColor));
+            timer.Timeout += _ResetResultColor;
         }
         
         private void _ResetResultColor() {
@@ -320,6 +319,11 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
                 if (keyEvent.Keycode == Key.G) {
                     Hide();
                 }
+            }
+        }
+    }
+}
+         }
             }
         }
     }

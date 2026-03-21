@@ -84,7 +84,7 @@ public class ElementalReactionUI : Control
         var closeBtn = new Button();
         closeBtn.Text = "✕";
         closeBtn.TooltipText = "Close (ESC)";
-        closeBtn.Connect("pressed", this, nameof(OnClosePressed));
+        closeBtn.Pressed += OnClosePressed;
         titleBar.AddChild(closeBtn);
 
         // 内容区域
@@ -317,7 +317,7 @@ public class ElementalReactionUI : Control
         // 重置按钮
         var resetBtn = new Button();
         resetBtn.Text = "🔄 Reset Statistics";
-        resetBtn.Connect("pressed", this, nameof(OnResetPressed));
+        resetBtn.Pressed += OnResetPressed;
         _statsContent.AddChild(resetBtn);
     }
 

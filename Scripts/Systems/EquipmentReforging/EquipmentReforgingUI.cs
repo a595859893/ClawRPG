@@ -236,8 +236,7 @@ namespace Game.Scripts.UI
 
             if (EquipmentReforgingSystem.Instance != null)
             {
-                EquipmentReforgingSystem.Instance.Connect(nameof(EquipmentReforgingSystem.ReforgeCompleted), 
-                    Callable.From<string, bool, Dictionary<string, float>>(OnReforgeCompleted));
+                EquipmentReforgingSystem.Instance.ReforgeCompleted += OnReforgeCompleted;
             }
         }
 

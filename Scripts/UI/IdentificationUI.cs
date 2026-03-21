@@ -64,7 +64,7 @@ public class IdentificationUI : Control
         _methodOption.AddItem("高级鉴定 (500金, 3-4属性)", 2);
         _methodOption.AddItem("高级鉴定 (2000金, 4-5属性)", 3);
         
-        _methodOption.Connect("item_selected", this, nameof(OnMethodChanged));
+        _methodOption.ItemSelected += OnMethodChanged;
         _bg.AddChild(_methodOption);
         
         // Cost Label
@@ -79,7 +79,7 @@ public class IdentificationUI : Control
         _identifyButton.Text = "🔮 开始鉴定";
         _identifyButton.Position = new Vector2(30, 220);
         _identifyButton.CustomMinimumSize = new Vector2(200, 50);
-        _identifyButton.Connect("pressed", this, nameof(OnIdentifyPressed));
+        _identifyButton.Pressed += OnIdentifyPressed;
         _bg.AddChild(_identifyButton);
         
         // Result Label
@@ -96,7 +96,7 @@ public class IdentificationUI : Control
         _closeButton.Text = "关闭";
         _closeButton.Position = new Vector2(350, 390);
         _closeButton.CustomMinimumSize = new Vector2(120, 40);
-        _closeButton.Connect("pressed", this, nameof(OnClosePressed));
+        _closeButton.Pressed += OnClosePressed;
         _bg.AddChild(_closeButton);
         
         UpdateStats();
@@ -257,3 +257,4 @@ public class IdentificationUI : Control
         }
     }
 }
+

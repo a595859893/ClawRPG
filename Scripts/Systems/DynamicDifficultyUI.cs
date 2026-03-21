@@ -196,12 +196,9 @@ public class DynamicDifficultyUI : Control
         // 订阅系统信号
         if (DynamicDifficultySystem.Instance != null)
         {
-            DynamicDifficultySystem.Instance.Connect(nameof(DynamicDifficultySystem.DifficultyChanged), 
-                OnDifficultyChanged);
-            DynamicDifficultySystem.Instance.Connect(nameof(DynamicDifficultySystem.SkillProfileUpdated), 
-                OnSkillProfileUpdated);
-            DynamicDifficultySystem.Instance.Connect(nameof(DynamicDifficultySystem.RecommendationChanged), 
-                OnRecommendationChanged);
+            DynamicDifficultySystem.Instance.DifficultyChanged += OnDifficultyChanged;
+            DynamicDifficultySystem.Instance.SkillProfileUpdated += OnSkillProfileUpdated;
+            DynamicDifficultySystem.Instance.RecommendationChanged += OnRecommendationChanged;
         }
     }
 

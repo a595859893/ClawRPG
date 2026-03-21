@@ -127,10 +127,10 @@ public class RelicUI : Control
     {
         if (RelicSystem.Instance != null)
         {
-            RelicSystem.Instance.Connect(nameof(RelicSystem.RelicPurchased), Callable.From<string>(OnRelicPurchased));
-            RelicSystem.Instance.Connect(nameof(RelicSystem.RelicEquipped), Callable.From<string>(OnRelicEquipped));
-            RelicSystem.Instance.Connect(nameof(RelicSystem.RelicUnequipped), Callable.From<string>(OnRelicUnequipped));
-            RelicSystem.Instance.Connect(nameof(RelicSystem.RelicSlotUnlocked), Callable.From<int>(OnRelicSlotUnlocked));
+            RelicSystem.Instance.RelicPurchased += OnRelicPurchased;
+            RelicSystem.Instance.RelicEquipped += OnRelicEquipped;
+            RelicSystem.Instance.RelicUnequipped += OnRelicUnequipped;
+            RelicSystem.Instance.RelicSlotUnlocked += OnRelicSlotUnlocked;
         }
     }
     

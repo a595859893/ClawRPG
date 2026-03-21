@@ -75,10 +75,10 @@ namespace ClawRPG.Systems.Alchemy
             // 连接信号
             if (_recipeStore != null)
             {
-                _recipeStore.Connect(SignalName.CraftSuccess, Callable.From((int rId, int itemId, int qty) => 
-                    EmitSignal(SignalName.CraftSuccess, rId, itemId, qty)));
-                _recipeStore.Connect(SignalName.CraftFailed, Callable.From((int rId, string reason) => 
-                    EmitSignal(SignalName.CraftFailed, rId, reason)));
+                _recipeStore.CraftSuccess += (rId, itemId, qty) =>
+                    EmitSignal(SignalName.CraftSuccess, rId, itemId, qty);
+                _recipeStore.CraftFailed += (rId, reason) =>
+                    EmitSignal(SignalName.CraftFailed, rId, reason);
             }
         }
         
