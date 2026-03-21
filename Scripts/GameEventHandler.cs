@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts
     /// <summary>
     /// GameEventHandler - 处理游戏全局事件订阅
     /// </summary>
-    public class GameEventHandler : Node
+    public partial class GameEventHandler : BaseSystem
     {
         private Main _main;
         

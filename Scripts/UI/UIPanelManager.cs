@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI
     /// UIPanelManager - 面板生命周期管理器
     /// 统一管理所有UI面板的显示/隐藏状态，处理面板互斥逻辑
     /// </summary>
-    public partial class UIPanelManager : Node
+    public partial class UIPanelManager : BaseSystem
     {
         private Main _main;
         

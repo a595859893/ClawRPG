@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Characters
     /// <summary>
     /// 玩家状态机 - 管理玩家所有行为状态
     /// </summary>
-    public partial class PlayerStateMachine : Node
+    public partial class PlayerStateMachine : BaseSystem
     {
         // 状态枚举
         public enum PlayerState 
