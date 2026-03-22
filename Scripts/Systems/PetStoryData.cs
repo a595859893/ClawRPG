@@ -52,6 +52,7 @@ namespace ClawRPG.Scripts.Systems {
 
     /// <summary>
     /// 宠物故事数据库
+    /// 无需持久化: 仅存储静态故事配置数据,运行时状态由 PetStorySystem 统一管理
     /// </summary>
     public class PetStoryDatabase {
         public static PetStoryDatabase Instance { get; private set; }
