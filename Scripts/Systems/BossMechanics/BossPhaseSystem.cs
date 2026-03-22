@@ -18,9 +18,22 @@ public class BossPhaseSystem : BaseSystem
 
     private Random _random = new Random();
 
+    // ========== 系统内部状态 (用于 SaveData) ==========
+    // 当前关联的 BossBattleInstance 引用
+    private BossBattleInstance _currentBattle;
+
     public override void _Ready()
     {
         Instance = this;
+    }
+
+    /// <summary>
+    /// 获取或设置当前关联的 BossBattleInstance
+    /// </summary>
+    public BossBattleInstance CurrentBattle
+    {
+        get => _currentBattle;
+        set => _currentBattle = value;
     }
 
     /// <summary>
@@ -28,6 +41,7 @@ public class BossPhaseSystem : BaseSystem
     /// </summary>
     public void InitializePhase(BossBattleInstance battle)
     {
+        _currentBattle = battle;
         battle.CurrentPhase = 1;
         battle.Phase = BossPhase.Active;
         battle.IsEnraged = false;
@@ -199,12 +213,57 @@ public class BossPhaseSystem : BaseSystem
     }
 
     /// <summary>
-    /// 导出阶段系统数据
+    /// 导出阶段系统数据 (Override基类无参方法)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+
+        // 从当前关联的battle导出数据
+        if (_currentBattle != null)
+        {
+            data["currentPhase"] = _currentBattle.CurrentPhase;
+            data["isEnraged"] = _currentBattle.IsEnraged;
+            data["enrageProgress"] = _currentBattle.EnrageProgress;
+            data["timeInCombat"] = _currentBattle.TimeInCombat;
+            data["phase"] = (int)_currentBattle.Phase;
+            data["currentDamageMultiplier"] = _currentBattle.CurrentDamageMultiplier;
+            data["currentSpeedMultiplier"] = _currentBattle.CurrentSpeedMultiplier;
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    /// 导入阶段系统数据 (Override基类无参方法)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        // 导入到当前关联的battle
+        if (_currentBattle != null)
+        {
+            _currentBattle.CurrentPhase = data.GetValueOrDefault("currentPhase", 1);
+            _currentBattle.IsEnraged = data.GetValueOrDefault("isEnraged", false);
+            _currentBattle.EnrageProgress = data.GetValueOrDefault("enrageProgress", 0f);
+            _currentBattle.TimeInCombat = data.GetValueOrDefault("timeInCombat", 0f);
+
+            // 恢复阶段状态
+            _currentBattle.Phase = (BossPhase)data.GetValueOrDefault("phase", (int)BossPhase.Active);
+            _currentBattle.CurrentDamageMultiplier = data.GetValueOrDefault("currentDamageMultiplier", 1.0f);
+            _currentBattle.CurrentSpeedMultiplier = data.GetValueOrDefault("currentSpeedMultiplier", 1.0f);
+        }
+    }
+
+    /*
+    /// <summary>
+    /// 导出阶段系统数据 (旧方法，保留以兼容)
     /// </summary>
     public Dictionary ExportSaveData(BossBattleInstance battle)
     {
         var data = new Dictionary();
-        
+
         if (battle != null)
         {
             data["currentPhase"] = battle.CurrentPhase;
@@ -212,23 +271,24 @@ public class BossPhaseSystem : BaseSystem
             data["enrageProgress"] = battle.EnrageProgress;
             data["timeInCombat"] = battle.TimeInCombat;
         }
-        
+
         return data;
     }
 
     /// <summary>
-    /// 导入阶段系统数据
+    /// 导入阶段系统数据 (旧方法，保留以兼容)
     /// </summary>
     public void ImportSaveData(BossBattleInstance battle, Dictionary data)
     {
         if (battle == null || data == null) return;
-        
+
         battle.CurrentPhase = data.GetValueOrDefault("currentPhase", 1);
         battle.IsEnraged = data.GetValueOrDefault("isEnraged", false);
         battle.EnrageProgress = data.GetValueOrDefault("enrageProgress", 0f);
         battle.TimeInCombat = data.GetValueOrDefault("timeInCombat", 0f);
-        
+
         // 恢复阶段状态
         battle.Phase = battle.IsEnraged ? BossPhase.Enraged : BossPhase.Active;
     }
+    */
 }

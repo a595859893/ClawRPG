@@ -19,9 +19,26 @@ public class BossAbilitySystem : BaseSystem
 
     private Random _random = new Random();
 
+    // ========== 系统内部状态 (用于 SaveData) ==========
+    // 当前关联的 BossBattleInstance 引用
+    private BossBattleInstance _currentBattle;
+    // 激活技能列表 (技能ID)
+    private List<string> _activatedSkills = new List<string>();
+    // 召唤的小怪ID列表
+    private List<string> _summonedMonsters = new List<string>();
+
     public override void _Ready()
     {
         Instance = this;
+    }
+
+    /// <summary>
+    /// 获取或设置当前关联的 BossBattleInstance
+    /// </summary>
+    public BossBattleInstance CurrentBattle
+    {
+        get => _currentBattle;
+        set => _currentBattle = value;
     }
 
     /// <summary>
@@ -29,9 +46,12 @@ public class BossAbilitySystem : BaseSystem
     /// </summary>
     public void InitializeAbilities(BossBattleInstance battle)
     {
+        _currentBattle = battle;
         battle.SkillCooldowns.Clear();
         battle.ActiveEffects.Clear();
-        
+        _activatedSkills.Clear();
+        _summonedMonsters.Clear();
+
         // 初始化技能冷却
         if (battle.Config.Skills != null)
         {
@@ -105,6 +125,12 @@ public class BossAbilitySystem : BaseSystem
         // 设置冷却
         battle.SkillCooldowns[skill.Id] = skill.Cooldown;
         battle.TimeSinceLastSkill = 0;
+
+        // 跟踪激活的技能
+        if (!_activatedSkills.Contains(skill.Id))
+        {
+            _activatedSkills.Add(skill.Id);
+        }
 
         // 发出技能开始信号
         BossSkillInitiated?.Invoke(battle.InstanceId, skill.Id, skill.Name);
@@ -212,14 +238,19 @@ public class BossAbilitySystem : BaseSystem
         if (string.IsNullOrEmpty(skill.SummonMonsterId)) return;
 
         List<string> summonedIds = new List<string>();
-        
+
         for (int i = 0; i < skill.SummonCount; i++)
         {
             string summonId = $"{skill.SummonMonsterId}_{battle.InstanceId}_{i}";
             battle.SummonedMonsters.Add(summonId);
+            // 同步到系统内部状态
+            if (!_summonedMonsters.Contains(summonId))
+            {
+                _summonedMonsters.Add(summonId);
+            }
             summonedIds.Add(summonId);
         }
-        
+
         MonstersSummoned?.Invoke(battle.InstanceId, summonedIds);
     }
 
@@ -396,12 +427,91 @@ public class BossAbilitySystem : BaseSystem
     }
 
     /// <summary>
-    /// 导出技能系统数据
+    /// 导出技能系统数据 (Override基类无参方法)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+
+        // 导出激活的技能列表
+        var activatedArray = new Godot.Collections.Array();
+        foreach (var skillId in _activatedSkills)
+        {
+            activatedArray.Add(skillId);
+        }
+        data["activatedSkills"] = activatedArray;
+
+        // 导出召唤的小怪
+        var summonArray = new Godot.Collections.Array();
+        foreach (var monsterId in _summonedMonsters)
+        {
+            summonArray.Add(monsterId);
+        }
+        data["summonedMonsters"] = summonArray;
+
+        // 导出技能冷却 (从当前关联的battle)
+        if (_currentBattle != null)
+        {
+            var cooldownArray = new Godot.Collections.Array();
+            foreach (var kvp in _currentBattle.SkillCooldowns)
+            {
+                cooldownArray.Add(new Godot.Collections.Array { kvp.Key, kvp.Value });
+            }
+            data["skillCooldowns"] = cooldownArray;
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    /// 导入技能系统数据 (Override基类无参方法)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        // 导入激活的技能列表
+        if (data.Contains("activatedSkills"))
+        {
+            _activatedSkills.Clear();
+            var activatedArray = (Godot.Collections.Array)data["activatedSkills"];
+            foreach (string skillId in activatedArray)
+            {
+                _activatedSkills.Add(skillId);
+            }
+        }
+
+        // 导入召唤的小怪
+        if (data.Contains("summonedMonsters"))
+        {
+            _summonedMonsters.Clear();
+            var summonArray = (Godot.Collections.Array)data["summonedMonsters"];
+            foreach (string monsterId in summonArray)
+            {
+                _summonedMonsters.Add(monsterId);
+            }
+        }
+
+        // 导入技能冷却 (到当前关联的battle)
+        if (_currentBattle != null && data.Contains("skillCooldowns"))
+        {
+            _currentBattle.SkillCooldowns.Clear();
+            var cooldownArray = (Godot.Collections.Array)data["skillCooldowns"];
+            foreach (Godot.Collections.Array entry in cooldownArray)
+            {
+                _currentBattle.SkillCooldowns[(string)entry[0]] = (float)entry[1];
+            }
+        }
+    }
+
+    /*
+    /// <summary>
+    /// 导出技能系统数据 (旧方法，保留以兼容)
     /// </summary>
     public Dictionary ExportSaveData(BossBattleInstance battle)
     {
         var data = new Dictionary();
-        
+
         if (battle != null)
         {
             // 导出技能冷却
@@ -411,7 +521,7 @@ public class BossAbilitySystem : BaseSystem
                 cooldownArray.Add(new Godot.Collections.Array { kvp.Key, kvp.Value });
             }
             data["skillCooldowns"] = cooldownArray;
-            
+
             // 导出召唤的小怪
             var summonArray = new Godot.Collections.Array();
             foreach (var monsterId in battle.SummonedMonsters)
@@ -420,17 +530,17 @@ public class BossAbilitySystem : BaseSystem
             }
             data["summonedMonsters"] = summonArray;
         }
-        
+
         return data;
     }
 
     /// <summary>
-    /// 导入技能系统数据
+    /// 导入技能系统数据 (旧方法，保留以兼容)
     /// </summary>
     public void ImportSaveData(BossBattleInstance battle, Dictionary data)
     {
         if (battle == null || data == null) return;
-        
+
         // 导入技能冷却
         if (data.Contains("skillCooldowns"))
         {
@@ -441,7 +551,7 @@ public class BossAbilitySystem : BaseSystem
                 battle.SkillCooldowns[(string)entry[0]] = (float)entry[1];
             }
         }
-        
+
         // 导入召唤的小怪
         if (data.Contains("summonedMonsters"))
         {
@@ -453,4 +563,5 @@ public class BossAbilitySystem : BaseSystem
             }
         }
     }
+    */
 }

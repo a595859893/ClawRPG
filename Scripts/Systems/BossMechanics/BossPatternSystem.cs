@@ -16,9 +16,22 @@ public class BossPatternSystem : BaseSystem
 
     private Random _random = new Random();
 
+    // ========== 系统内部状态 (用于 SaveData) ==========
+    // 当前关联的 BossBattleInstance 引用
+    private BossBattleInstance _currentBattle;
+
     public override void _Ready()
     {
         Instance = this;
+    }
+
+    /// <summary>
+    /// 获取或设置当前关联的 BossBattleInstance
+    /// </summary>
+    public BossBattleInstance CurrentBattle
+    {
+        get => _currentBattle;
+        set => _currentBattle = value;
     }
 
     /// <summary>
@@ -26,6 +39,7 @@ public class BossPatternSystem : BaseSystem
     /// </summary>
     public void InitializePattern(BossBattleInstance battle)
     {
+        _currentBattle = battle;
         battle.CurrentPattern = battle.Config.DefaultPattern;
         battle.TimeSinceLastAttack = 0;
     }
@@ -462,31 +476,67 @@ public class BossPatternSystem : BaseSystem
     }
 
     /// <summary>
-    /// 导出模式系统数据
+    /// 导出模式系统数据 (Override基类无参方法)
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+
+        // 从当前关联的battle导出数据
+        if (_currentBattle != null)
+        {
+            data["currentPattern"] = (int)_currentBattle.CurrentPattern;
+            data["timeSinceLastAttack"] = _currentBattle.TimeSinceLastAttack;
+            data["timeSinceLastSkill"] = _currentBattle.TimeSinceLastSkill;
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    /// 导入模式系统数据 (Override基类无参方法)
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        // 导入到当前关联的battle
+        if (_currentBattle != null)
+        {
+            _currentBattle.CurrentPattern = (AttackPattern)data.GetValueOrDefault("currentPattern", (int)AttackPattern.Balanced);
+            _currentBattle.TimeSinceLastAttack = data.GetValueOrDefault("timeSinceLastAttack", 0f);
+            _currentBattle.TimeSinceLastSkill = data.GetValueOrDefault("timeSinceLastSkill", 0f);
+        }
+    }
+
+    /*
+    /// <summary>
+    /// 导出模式系统数据 (旧方法，保留以兼容)
     /// </summary>
     public Dictionary ExportSaveData(BossBattleInstance battle)
     {
         var data = new Dictionary();
-        
+
         if (battle != null)
         {
             data["currentPattern"] = (int)battle.CurrentPattern;
             data["timeSinceLastAttack"] = battle.TimeSinceLastAttack;
             data["timeSinceLastSkill"] = battle.TimeSinceLastSkill;
         }
-        
+
         return data;
     }
 
     /// <summary>
-    /// 导入模式系统数据
+    /// 导入模式系统数据 (旧方法，保留以兼容)
     /// </summary>
     public void ImportSaveData(BossBattleInstance battle, Dictionary data)
     {
         if (battle == null || data == null) return;
-        
+
         battle.CurrentPattern = (AttackPattern)data.GetValueOrDefault("currentPattern", (int)AttackPattern.Balanced);
         battle.TimeSinceLastAttack = data.GetValueOrDefault("timeSinceLastAttack", 0f);
         battle.TimeSinceLastSkill = data.GetValueOrDefault("timeSinceLastSkill", 0f);
     }
+    */
 }
