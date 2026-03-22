@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CardCollectionData : BaseSystem
+public class CardCollectionData
 {
     // Card collection entries: card_id -> count
     public Dictionary<string, int> OwnedCards = new Dictionary<string, int>();
@@ -29,7 +29,7 @@ public class CardCollectionData : BaseSystem
     // Deck building integration: cards available for deck building
     public List<string> DeckBuildableCards = new List<string>();
     
-    public override void _Ready()
+    public CardCollectionData()
     {
         // Initialize default categories as unlocked
         string[] defaultCategories = { "Attack", "Skill", "Power", "Defense" };
@@ -45,7 +45,7 @@ public class CardCollectionData : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public Dictionary ExportSaveData()
     {
         var data = new Dictionary();
         
@@ -90,7 +90,7 @@ public class CardCollectionData : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         

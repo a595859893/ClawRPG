@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CharacterCreationData : BaseSystem
+public class CharacterCreationData
 {
     // Character Info
     public string CharacterName { get; set; } = "Hero";
@@ -114,7 +114,7 @@ public class CharacterCreationData : BaseSystem
         return Strength + Agility + Intelligence + Vitality + Luck;
     }
 
-    public override Dictionary ExportSaveData()
+    public Dictionary ExportSaveData()
     {
         var data = new Dictionary();
         
@@ -146,7 +146,7 @@ public class CharacterCreationData : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         

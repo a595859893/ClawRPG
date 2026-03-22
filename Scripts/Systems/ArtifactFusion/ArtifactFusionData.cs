@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ArtifactFusionData : BaseSystem
+public class ArtifactFusionData
 {
     // 融合记录
     public List<FusionRecord> FusionHistory { get; set; } = new List<FusionRecord>();
@@ -69,7 +69,7 @@ public class ArtifactFusionData : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public Dictionary ExportSaveData()
     {
         return new Dictionary
         {
@@ -87,7 +87,7 @@ public class ArtifactFusionData : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
         
@@ -173,77 +173,4 @@ public enum FusionType
     Ring,
     Amulet,
     Mixed
-}
-
-/// <summary>
-/// 导出保存数据
-/// </summary>
-public override Dictionary ExportSaveData()
-{
-    var data = new Dictionary();
-    
-    // 融合历史
-    var historyList = new Array();
-    foreach (var record in FusionHistory)
-    {
-        historyList.Add(record.Save());
-    }
-    data["fusion_history"] = historyList;
-    
-    // 已解锁的配方
-    data["unlocked_recipes"] = new Array(UnlockedRecipes);
-    
-    // 统计数据
-    data["total_fusions"] = TotalFusions;
-    data["successful_fusions"] = SuccessfulFusions;
-    data["legendary_fusions"] = LegendaryFusions;
-    data["total_gold_spent"] = TotalGoldSpent;
-    
-    // 融合槽位
-    data["selected_artifact1"] = SelectedArtifact1;
-    data["selected_artifact2"] = SelectedArtifact2;
-    
-    return data;
-}
-
-/// <summary>
-/// 导入保存数据
-/// </summary>
-public override void ImportSaveData(Dictionary data)
-{
-    if (data == null) return;
-    
-    // 融合历史
-    if (data.Contains("fusion_history"))
-    {
-        var historyArray = (Array)data["fusion_history"];
-        FusionHistory = new List<FusionRecord>();
-        foreach (Dictionary recordDict in historyArray)
-        {
-            var record = new FusionRecord();
-            record.Load(recordDict);
-            FusionHistory.Add(record);
-        }
-    }
-    
-    // 已解锁的配方
-    if (data.Contains("unlocked_recipes"))
-    {
-        var recipesArray = (Array)data["unlocked_recipes"];
-        UnlockedRecipes = new List<string>();
-        foreach (string recipe in recipesArray)
-        {
-            UnlockedRecipes.Add(recipe);
-        }
-    }
-    
-    // 统计数据
-    TotalFusions = (int)data.GetValueOrDefault("total_fusions", 0);
-    SuccessfulFusions = (int)data.GetValueOrDefault("successful_fusions", 0);
-    LegendaryFusions = (int)data.GetValueOrDefault("legendary_fusions", 0);
-    TotalGoldSpent = (int)data.GetValueOrDefault("total_gold_spent", 0);
-    
-    // 融合槽位
-    SelectedArtifact1 = (string)data.GetValueOrDefault("selected_artifact1", "");
-    SelectedArtifact2 = (string)data.GetValueOrDefault("selected_artifact2", "");
 }
