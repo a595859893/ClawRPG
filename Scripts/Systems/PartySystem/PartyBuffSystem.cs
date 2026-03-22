@@ -13,8 +13,11 @@ namespace ClawRPG.Scripts.Systems
         private static PartyBuffSystem _instance;
         public static PartyBuffSystem Instance => _instance;
         
-        // 队伍Buff存储
+        // 队伍Buff存储 (stat bonuses)
         private Dictionary<string, List<PartyBuff>> _partyBuffs = new Dictionary<string, List<PartyBuff>>();
+        
+        // 资源型Buff存储 (LuckBoost, ExpBoost, etc.) - 兼容 PartyLootSystem
+        private Dictionary<PartyData.PartyBuffType, float> _resourceBuffs = new Dictionary<PartyData.PartyBuffType, float>();
         
         // 协同效果存储
         private Dictionary<string, SynergyEffect> _synergyEffects = new Dictionary<string, SynergyEffect>();
@@ -110,6 +113,37 @@ namespace ClawRPG.Scripts.Systems
             if (_partyBuffs.ContainsKey(partyId))
             {
                 _partyBuffs[partyId].Clear();
+            }
+        }
+        
+        #endregion
+        
+        #region Resource Buffs (Compatibility)
+        
+        /// <summary>
+        /// 获取资源型Buff值 (LuckBoost, ExpBoost, GoldBoost, DropRateBoost)
+        /// </summary>
+        public float GetBuffValue(PartyData.PartyBuffType type)
+        {
+            return _resourceBuffs.ContainsKey(type) ? _resourceBuffs[type] : 0f;
+        }
+        
+        /// <summary>
+        /// 添加资源型Buff (兼容 PartyLootSystem)
+        /// </summary>
+        public void AddResourceBuff(PartyData.PartyBuffType type, float value, float duration, int providerId)
+        {
+            _resourceBuffs[type] = value;
+        }
+        
+        /// <summary>
+        /// 移除资源型Buff
+        /// </summary>
+        public void RemoveResourceBuff(PartyData.PartyBuffType type)
+        {
+            if (_resourceBuffs.ContainsKey(type))
+            {
+                _resourceBuffs.Remove(type);
             }
         }
         
@@ -239,6 +273,14 @@ namespace ClawRPG.Scripts.Systems
             
             data["nextBuffId"] = _nextBuffId;
             
+            // Export resource buffs
+            var resourceBuffs = new Dictionary();
+            foreach (var kvp in _resourceBuffs)
+            {
+                resourceBuffs[(int)kvp.Key] = kvp.Value;
+            }
+            data["resourceBuffs"] = JsonSerializer.Serialize(resourceBuffs);
+            
             return data;
         }
         
@@ -248,6 +290,7 @@ namespace ClawRPG.Scripts.Systems
             
             _partyBuffs.Clear();
             _synergyEffects.Clear();
+            _resourceBuffs.Clear();
             
             // Import party buffs
             if (data.Contains("partyBuffs"))
@@ -282,6 +325,19 @@ namespace ClawRPG.Scripts.Systems
             if (data.Contains("nextBuffId"))
             {
                 _nextBuffId = Convert.ToInt32(data["nextBuffId"]);
+            }
+            
+            // Import resource buffs
+            if (data.Contains("resourceBuffs"))
+            {
+                var resourceData = JsonSerializer.Deserialize<Dictionary<int, float>>(data["resourceBuffs"].ToString());
+                if (resourceData != null)
+                {
+                    foreach (var kvp in resourceData)
+                    {
+                        _resourceBuffs[(PartyData.PartyBuffType)kvp.Key] = kvp.Value;
+                    }
+                }
             }
         }
         
