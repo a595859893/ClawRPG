@@ -17,7 +17,6 @@ public class StyleMasteryUI : Control
     private Label styleInfoLabel;
     
     private StyleMasterySystem system;
-    private StyleMasterySystem data;
     private StyleMasteryDatabase database;
     
     private string selectedStyle = "";
@@ -25,7 +24,6 @@ public class StyleMasteryUI : Control
     public override void _Ready()
     {
         system = GetNode<StyleMasterySystem>("/root/StyleMasterySystem");
-        data = GetNode<StyleMasterySystem>("/root/StyleMasteryData");
         database = GetNode<StyleMasteryDatabase>("/root/StyleMasteryDatabase");
         
         SetupUI();
@@ -161,7 +159,7 @@ public class StyleMasteryUI : Control
         foreach (var kvp in styles)
         {
             var style = kvp.Value;
-            var record = data.GetStyle(style.StyleId);
+            var record = system.GetStyle(style.StyleId);
             
             var stylePanel = new PanelContainer();
             stylePanel.CustomMinimumSize = new Vector2(0, 80);
