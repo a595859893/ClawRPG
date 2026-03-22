@@ -337,7 +337,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             if (candidates.Count == 0)
                 return null;
             
-            return candidates[UnityEngine.Random.Range(0, candidates.Count)];
+            return candidates[(int)GD.Randi() % candidates.Count];
         }
     }
     
