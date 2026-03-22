@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AuctionHouseData : Node
+public class AuctionHouseData
 {
     public Dictionary<int, AuctionItem> ActiveListings = new Dictionary<int, AuctionItem>();
     public Dictionary<int, List<int>> PurchaseHistory = new Dictionary<int, List<int>>();
@@ -11,11 +11,6 @@ public class AuctionHouseData : Node
     public long LastUpdate { get; set; }
     
     public int NextListingId { get; set; } = 1;
-    
-    public override void _Ready()
-    {
-        LastUpdate = OS.GetSystemTimeMsecs();
-    }
     
     // ==================== 持久化接口 ====================
     public Dictionary<string, object> ExportSaveData()

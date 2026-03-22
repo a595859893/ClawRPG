@@ -13,7 +13,6 @@ public class AuctionHouseSystem : BaseSystem
     public override void _Ready()
     {
         _data = new AuctionHouseData();
-        AddChild(_data);
         
         AddToGroup("save");
         AddToGroup("auction_house");
