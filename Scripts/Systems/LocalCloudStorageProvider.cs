@@ -9,7 +9,7 @@ namespace ClawRPG.Framework
     /// 本地文件云存储提供器
     /// 使用本地文件系统模拟云存储，将存档以 JSON 格式存储到 user://cloud_saves/ 目录
     /// </summary>
-    public class LocalCloudStorageProvider : Node, ICloudStorageProvider
+    public class LocalCloudStorageProvider : BaseSystem, ICloudStorageProvider
     {
         /// <summary>
         /// 云存储根目录（相对于 user://）
