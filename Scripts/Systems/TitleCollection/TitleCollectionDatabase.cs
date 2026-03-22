@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TitleCollectionDatabase : GodotObject
+public class TitleCollectionDatabase : Object
 {
     // 标题稀有度颜色
     public static readonly Godot.Color CommonColor = new Godot.Color(0.7f, 0.7f, 0.7f);

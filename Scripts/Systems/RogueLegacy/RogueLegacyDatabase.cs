@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class RogueLegacyDatabase : GodotObject
+public class RogueLegacyDatabase : Object
 {
     // 继承百分比配置
     private Dictionary<string, int> _baseInheritanceConfig = new Dictionary<string, int>

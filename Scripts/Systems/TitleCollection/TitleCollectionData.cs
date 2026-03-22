@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TitleCollectionData : GodotObject
+public class TitleCollectionData : Object
 {
     private Godot.Collections.Dictionary _data = new Godot.Collections.Dictionary();
     

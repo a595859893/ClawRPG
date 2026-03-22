@@ -376,7 +376,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Simple signal wrapper for Godot signals
     /// </summary>
-    public class SignalWrapper : GodotObject
+    public class SignalWrapper : Object
     {
         public new void Emit(params object[] args) { }
     }

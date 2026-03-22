@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class RogueLegacyData : GodotObject
+public class RogueLegacyData : Object
 {
     // 继承资源追踪
     private int _goldInheritancePercent = 25;
