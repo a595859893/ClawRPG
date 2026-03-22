@@ -97,7 +97,7 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("combat", typeof(BountyManager));
             RegisterSystemInGroup("combat", typeof(MailManager));
             RegisterSystemInGroup("combat", typeof(DailyLoginRewardSystem));
-            RegisterSystemInGroup("combat", typeof(MeditationSystem));
+            RegisterSystemInGroup("combat", typeof(MeditationUI));
             RegisterSystemInGroup("combat", typeof(MeditationDatabase));
             RegisterSystemInGroup("combat", typeof(EnchantmentSystem));
             RegisterSystemInGroup("combat", typeof(BossMechanicsSystem));

@@ -376,7 +376,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         /// </summary>
         public void SyncFocusBonus()
         {
-            if (MeditationSystem.Instance != null)
+            if (MeditationUI.Instance != null)
             {
                 // 假设冥想系统有专注力加成
                 _focusBonus = 0f; // 简化实现

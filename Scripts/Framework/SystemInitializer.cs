@@ -79,7 +79,7 @@ public class SystemInitializer : BaseSystem
         AddSystem<PlayerProfileSystem>(parent, "PlayerProfileSystem");
         
         // 冥想系统
-        AddSystem<MeditationSystem>(parent, "MeditationSystem");
+        AddSystem<MeditationUI>(parent, "MeditationUI");
     }
     
     private void InitializeEquipmentSystems(Node parent)
