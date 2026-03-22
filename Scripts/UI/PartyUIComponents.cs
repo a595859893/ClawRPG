@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 public partial class PartyUI
 {
@@ -11,7 +12,7 @@ public partial class PartyUI
     /// <summary>
     /// 创建成员面板
     /// </summary>
-    private Control CreateMemberPanel(PartySystem.PartyMember member)
+    private Control CreateMemberPanel(PartyData.PartyMember member)
     {
         var panel = new PanelContainer
         {
@@ -72,16 +73,16 @@ public partial class PartyUI
     /// <summary>
     /// 获取角色图标
     /// </summary>
-    private string GetRoleIcon(PartySystem.PartyRole role)
+    private string GetRoleIcon(PartyData.PartyRole role)
     {
         switch (role)
         {
-            case PartySystem.PartyRole.Leader: return "👑";
-            case PartySystem.PartyRole.Tank: return "🛡";
-            case PartySystem.PartyRole.Healer: return "💚";
-            case PartySystem.PartyRole.DamageDealer: return "⚔";
-            case PartySystem.PartyRole.Support: return "✨";
-            case PartySystem.PartyRole.Scout: return "👁";
+            case PartyData.PartyRole.Leader: return "👑";
+            case PartyData.PartyRole.Tank: return "🛡";
+            case PartyData.PartyRole.Healer: return "💚";
+            case PartyData.PartyRole.DamageDealer: return "⚔";
+            case PartyData.PartyRole.Support: return "✨";
+            case PartyData.PartyRole.Scout: return "👁";
             default: return "•";
         }
     }
@@ -89,16 +90,16 @@ public partial class PartyUI
     /// <summary>
     /// 获取角色名称
     /// </summary>
-    private string GetRoleName(PartySystem.PartyRole role)
+    private string GetRoleName(PartyData.PartyRole role)
     {
         switch (role)
         {
-            case PartySystem.PartyRole.Leader: return "队长";
-            case PartySystem.PartyRole.Tank: return "坦克";
-            case PartySystem.PartyRole.Healer: return "治疗";
-            case PartySystem.PartyRole.DamageDealer: return "输出";
-            case PartySystem.PartyRole.Support: return "辅助";
-            case PartySystem.PartyRole.Scout: return "侦察";
+            case PartyData.PartyRole.Leader: return "队长";
+            case PartyData.PartyRole.Tank: return "坦克";
+            case PartyData.PartyRole.Healer: return "治疗";
+            case PartyData.PartyRole.DamageDealer: return "输出";
+            case PartyData.PartyRole.Support: return "辅助";
+            case PartyData.PartyRole.Scout: return "侦察";
             default: return "成员";
         }
     }
@@ -106,18 +107,18 @@ public partial class PartyUI
     /// <summary>
     /// 获取Buff名称
     /// </summary>
-    private string GetBuffName(PartySystem.PartyBuffType type)
+    private string GetBuffName(PartyData.PartyBuffType type)
     {
         switch (type)
         {
-            case PartySystem.PartyBuffType.ExperienceBoost: return "经验";
-            case PartySystem.PartyBuffType.GoldBoost: return "金币";
-            case PartySystem.PartyBuffType.DamageBoost: return "伤害";
-            case PartySystem.PartyBuffType.DefenseBoost: return "防御";
-            case PartySystem.PartyBuffType.HealthRegen: return "生命";
-            case PartySystem.PartyBuffType.ManaRegen: return "法力";
-            case PartySystem.PartyBuffType.LuckBoost: return "幸运";
-            case PartySystem.PartyBuffType.DropRateBoost: return "掉落";
+            case PartyData.PartyBuffType.ExperienceBoost: return "经验";
+            case PartyData.PartyBuffType.GoldBoost: return "金币";
+            case PartyData.PartyBuffType.DamageBoost: return "伤害";
+            case PartyData.PartyBuffType.DefenseBoost: return "防御";
+            case PartyData.PartyBuffType.HealthRegen: return "生命";
+            case PartyData.PartyBuffType.ManaRegen: return "法力";
+            case PartyData.PartyBuffType.LuckBoost: return "幸运";
+            case PartyData.PartyBuffType.DropRateBoost: return "掉落";
             default: return "未知";
         }
     }

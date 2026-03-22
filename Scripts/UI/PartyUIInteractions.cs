@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 public partial class PartyUI
 {
@@ -224,12 +225,12 @@ public partial class PartyUI
         RefreshUI();
     }
 
-    private void OnBuffAdded(PartySystem.PartyBuff buff)
+    private void OnBuffAdded(PartyData.PartyBuff buff)
     {
         UpdateBuffDisplay();
     }
 
-    private void OnBuffRemoved(PartySystem.PartyBuffType buffType)
+    private void OnBuffRemoved(PartyData.PartyBuffType buffType)
     {
         UpdateBuffDisplay();
     }

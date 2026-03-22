@@ -33,6 +33,49 @@ public class PartyData
         Support
     }
 
+    // 队伍角色 (separate from MemberRole for UI purposes)
+    public enum PartyRole
+    {
+        Leader,
+        Tank,
+        Healer,
+        DamageDealer,
+        Support,
+        Scout
+    }
+
+    // 经验分配模式
+    public enum ExpDistributionMode
+    {
+        Equal,
+        BasedOnLevel,
+        BasedOnContribution
+    }
+
+    // 队伍Buff类型
+    public enum PartyBuffType
+    {
+        None,
+        LuckBoost,
+        ExperienceBoost,
+        GoldBoost,
+        DropRateBoost,
+        DamageBoost,
+        DefenseBoost,
+        HealthRegen,
+        ManaRegen
+    }
+
+    // 队伍Buff
+    public class PartyBuff
+    {
+        public PartyBuffType Type { get; set; }
+        public float Value { get; set; }
+        public float Duration { get; set; }
+        public float RemainingTime { get; set; }
+        public int ProviderId { get; set; }
+    }
+
     public class PartyMember
     {
         public int PlayerId { get; set; }

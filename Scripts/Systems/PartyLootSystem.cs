@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 /// <summary>
 /// 队伍战利品系统 - 管理经验分配和掉落规则
