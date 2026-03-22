@@ -6,7 +6,7 @@ using Framework;
 public class ConstellationDatabase : BaseSystem
 {
     // All constellation configurations
-    private Dictionary<string, ConstellationData.Constellation> _constellations = new Dictionary<string, ConstellationData.Constellation>();
+    private Dictionary<string, ConstellationSystem.Constellation> _constellations = new Dictionary<string, ConstellationSystem.Constellation>();
     
     // 已解锁的星座（用于持久化）
     private HashSet<string> _unlockedConstellations = new HashSet<string>();
@@ -19,13 +19,13 @@ public class ConstellationDatabase : BaseSystem
     private void InitializeConstellations()
     {
         // Fire Constellations (Aries, Leo, Sagittarius)
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "aries",
             Name = "Aries",
             Description = "The Ram - Grants fiery passion and combat prowess",
-            Type = ConstellationData.ConstellationType.Fire,
-            Rarity = ConstellationData.ConstellationRarity.Common,
+            Type = ConstellationSystem.ConstellationType.Fire,
+            Rarity = ConstellationSystem.ConstellationRarity.Common,
             Stars = 3,
             AttackBonus = 0.10f,
             DefenseBonus = 0.05f,
@@ -39,13 +39,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 1
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "leo",
             Name = "Leo",
             Description = "The Lion - The king of beasts grants royal strength",
-            Type = ConstellationData.ConstellationType.Fire,
-            Rarity = ConstellationData.ConstellationRarity.Rare,
+            Type = ConstellationSystem.ConstellationType.Fire,
+            Rarity = ConstellationSystem.ConstellationRarity.Rare,
             Stars = 5,
             AttackBonus = 0.20f,
             DefenseBonus = 0.10f,
@@ -59,13 +59,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 15
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "sagittarius",
             Name = "Sagittarius",
             Description = "The Archer - Seeks truth and grants accuracy",
-            Type = ConstellationData.ConstellationType.Fire,
-            Rarity = ConstellationData.ConstellationRarity.Epic,
+            Type = ConstellationSystem.ConstellationType.Fire,
+            Rarity = ConstellationSystem.ConstellationRarity.Epic,
             Stars = 7,
             AttackBonus = 0.25f,
             DefenseBonus = 0.12f,
@@ -80,13 +80,13 @@ public class ConstellationDatabase : BaseSystem
         });
         
         // Water Constellations (Cancer, Scorpio, Pisces)
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "cancer",
             Name = "Cancer",
             Description = "The Crab - Grants defensive resilience",
-            Type = ConstellationData.ConstellationType.Water,
-            Rarity = ConstellationData.ConstellationRarity.Common,
+            Type = ConstellationSystem.ConstellationType.Water,
+            Rarity = ConstellationSystem.ConstellationRarity.Common,
             Stars = 3,
             AttackBonus = 0.05f,
             DefenseBonus = 0.12f,
@@ -100,13 +100,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 1
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "scorpio",
             Name = "Scorpio",
             Description = "The Scorpion - Grants deadly precision",
-            Type = ConstellationData.ConstellationType.Water,
-            Rarity = ConstellationData.ConstellationRarity.Rare,
+            Type = ConstellationSystem.ConstellationType.Water,
+            Rarity = ConstellationSystem.ConstellationRarity.Rare,
             Stars = 5,
             AttackBonus = 0.18f,
             DefenseBonus = 0.08f,
@@ -120,13 +120,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 15
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "pisces",
             Name = "Pisces",
             Description = "The Fish - Grants mystical wisdom",
-            Type = ConstellationData.ConstellationType.Water,
-            Rarity = ConstellationData.ConstellationRarity.Epic,
+            Type = ConstellationSystem.ConstellationType.Water,
+            Rarity = ConstellationSystem.ConstellationRarity.Epic,
             Stars = 7,
             AttackBonus = 0.12f,
             DefenseBonus = 0.20f,
@@ -141,13 +141,13 @@ public class ConstellationDatabase : BaseSystem
         });
         
         // Earth Constellations (Taurus, Virgo, Capricorn)
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "taurus",
             Name = "Taurus",
             Description = "The Bull - Grants unyielding strength",
-            Type = ConstellationData.ConstellationType.Earth,
-            Rarity = ConstellationData.ConstellationRarity.Common,
+            Type = ConstellationSystem.ConstellationType.Earth,
+            Rarity = ConstellationSystem.ConstellationRarity.Common,
             Stars = 3,
             AttackBonus = 0.08f,
             DefenseBonus = 0.15f,
@@ -161,13 +161,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 1
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "virgo",
             Name = "Virgo",
             Description = "The Maiden - Grants analytical precision",
-            Type = ConstellationData.ConstellationType.Earth,
-            Rarity = ConstellationData.ConstellationRarity.Rare,
+            Type = ConstellationSystem.ConstellationType.Earth,
+            Rarity = ConstellationSystem.ConstellationRarity.Rare,
             Stars = 5,
             AttackBonus = 0.12f,
             DefenseBonus = 0.18f,
@@ -181,13 +181,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 15
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "capricorn",
             Name = "Capricorn",
             Description = "The Goat - Grants ambitious determination",
-            Type = ConstellationData.ConstellationType.Earth,
-            Rarity = ConstellationData.ConstellationRarity.Epic,
+            Type = ConstellationSystem.ConstellationType.Earth,
+            Rarity = ConstellationSystem.ConstellationRarity.Epic,
             Stars = 7,
             AttackBonus = 0.15f,
             DefenseBonus = 0.25f,
@@ -202,13 +202,13 @@ public class ConstellationDatabase : BaseSystem
         });
         
         // Air Constellations (Gemini, Libra, Aquarius)
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "gemini",
             Name = "Gemini",
             Description = "The Twins - Grants versatile agility",
-            Type = ConstellationData.ConstellationType.Air,
-            Rarity = ConstellationData.ConstellationRarity.Common,
+            Type = ConstellationSystem.ConstellationType.Air,
+            Rarity = ConstellationSystem.ConstellationRarity.Common,
             Stars = 3,
             AttackBonus = 0.07f,
             DefenseBonus = 0.05f,
@@ -222,13 +222,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 1
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "libra",
             Name = "Libra",
             Description = "The Scales - Grants balance and harmony",
-            Type = ConstellationData.ConstellationType.Air,
-            Rarity = ConstellationData.ConstellationRarity.Rare,
+            Type = ConstellationSystem.ConstellationType.Air,
+            Rarity = ConstellationSystem.ConstellationRarity.Rare,
             Stars = 5,
             AttackBonus = 0.10f,
             DefenseBonus = 0.15f,
@@ -242,13 +242,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 15
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "aquarius",
             Name = "Aquarius",
             Description = "The Water Bearer - Grants innovative wisdom",
-            Type = ConstellationData.ConstellationType.Air,
-            Rarity = ConstellationData.ConstellationRarity.Epic,
+            Type = ConstellationSystem.ConstellationType.Air,
+            Rarity = ConstellationSystem.ConstellationRarity.Epic,
             Stars = 7,
             AttackBonus = 0.18f,
             DefenseBonus = 0.12f,
@@ -263,13 +263,13 @@ public class ConstellationDatabase : BaseSystem
         });
         
         // Light Constellations (Orion, Phoenix, Sirius)
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "orion",
             Name = "Orion",
             Description = "The Hunter - Grants legendary combat mastery",
-            Type = ConstellationData.ConstellationType.Light,
-            Rarity = ConstellationData.ConstellationRarity.Legendary,
+            Type = ConstellationSystem.ConstellationType.Light,
+            Rarity = ConstellationSystem.ConstellationRarity.Legendary,
             Stars = 9,
             AttackBonus = 0.35f,
             DefenseBonus = 0.20f,
@@ -283,13 +283,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 45
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "phoenix",
             Name = "Phoenix",
             Description = "The Immortal Bird - Grants rebirth and resilience",
-            Type = ConstellationData.ConstellationType.Light,
-            Rarity = ConstellationData.ConstellationRarity.Legendary,
+            Type = ConstellationSystem.ConstellationType.Light,
+            Rarity = ConstellationSystem.ConstellationRarity.Legendary,
             Stars = 9,
             AttackBonus = 0.20f,
             DefenseBonus = 0.25f,
@@ -303,13 +303,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 45
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "sirius",
             Name = "Sirius",
             Description = "The Bright Star - Grants celestial power",
-            Type = ConstellationData.ConstellationType.Light,
-            Rarity = ConstellationData.ConstellationRarity.Legendary,
+            Type = ConstellationSystem.ConstellationType.Light,
+            Rarity = ConstellationSystem.ConstellationRarity.Legendary,
             Stars = 9,
             AttackBonus = 0.25f,
             DefenseBonus = 0.18f,
@@ -324,13 +324,13 @@ public class ConstellationDatabase : BaseSystem
         });
         
         // Dark Constellations (Shadow, Void, Eclipse)
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "shadow",
             Name = "Shadow",
             Description = "The Dark Realm - Grants stealth and cunning",
-            Type = ConstellationData.ConstellationType.Dark,
-            Rarity = ConstellationData.ConstellationRarity.Legendary,
+            Type = ConstellationSystem.ConstellationType.Dark,
+            Rarity = ConstellationSystem.ConstellationRarity.Legendary,
             Stars = 9,
             AttackBonus = 0.30f,
             DefenseBonus = 0.10f,
@@ -344,13 +344,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 45
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "void",
             Name = "Void",
             Description = "The Empty Abyss - Grants mysterious power",
-            Type = ConstellationData.ConstellationType.Dark,
-            Rarity = ConstellationData.ConstellationRarity.Legendary,
+            Type = ConstellationSystem.ConstellationType.Dark,
+            Rarity = ConstellationSystem.ConstellationRarity.Legendary,
             Stars = 9,
             AttackBonus = 0.25f,
             DefenseBonus = 0.25f,
@@ -364,13 +364,13 @@ public class ConstellationDatabase : BaseSystem
             RequiredLevel = 45
         });
         
-        AddConstellation(new ConstellationData.Constellation
+        AddConstellation(new ConstellationSystem.Constellation
         {
             Id = "eclipse",
             Name = "Eclipse",
             Description = "The Celestial Event - Grants ultimate power",
-            Type = ConstellationData.ConstellationType.Dark,
-            Rarity = ConstellationData.ConstellationRarity.Legendary,
+            Type = ConstellationSystem.ConstellationType.Dark,
+            Rarity = ConstellationSystem.ConstellationRarity.Legendary,
             Stars = 9,
             AttackBonus = 0.28f,
             DefenseBonus = 0.28f,
@@ -385,26 +385,26 @@ public class ConstellationDatabase : BaseSystem
         });
     }
     
-    private void AddConstellation(ConstellationData.Constellation constellation)
+    private void AddConstellation(ConstellationSystem.Constellation constellation)
     {
         _constellations[constellation.Id] = constellation;
     }
     
-    public ConstellationData.Constellation GetConstellation(string id)
+    public ConstellationSystem.Constellation GetConstellation(string id)
     {
         if (_constellations.ContainsKey(id))
             return _constellations[id];
         return null;
     }
     
-    public Dictionary<string, ConstellationData.Constellation> GetAllConstellations()
+    public Dictionary<string, ConstellationSystem.Constellation> GetAllConstellations()
     {
-        return new Dictionary<string, ConstellationData.Constellation>(_constellations);
+        return new Dictionary<string, ConstellationSystem.Constellation>(_constellations);
     }
     
-    public Dictionary<string, ConstellationData.Constellation> GetConstellationsByType(ConstellationData.ConstellationType type)
+    public Dictionary<string, ConstellationSystem.Constellation> GetConstellationsByType(ConstellationSystem.ConstellationType type)
     {
-        Dictionary<string, ConstellationData.Constellation> result = new Dictionary<string, ConstellationData.Constellation>();
+        Dictionary<string, ConstellationSystem.Constellation> result = new Dictionary<string, ConstellationSystem.Constellation>();
         foreach (var kvp in _constellations)
         {
             if (kvp.Value.Type == type)
@@ -413,9 +413,9 @@ public class ConstellationDatabase : BaseSystem
         return result;
     }
     
-    public Dictionary<string, ConstellationData.Constellation> GetConstellationsByRarity(ConstellationData.ConstellationRarity rarity)
+    public Dictionary<string, ConstellationSystem.Constellation> GetConstellationsByRarity(ConstellationSystem.ConstellationRarity rarity)
     {
-        Dictionary<string, ConstellationData.Constellation> result = new Dictionary<string, ConstellationData.Constellation>();
+        Dictionary<string, ConstellationSystem.Constellation> result = new Dictionary<string, ConstellationSystem.Constellation>();
         foreach (var kvp in _constellations)
         {
             if (kvp.Value.Rarity == rarity)
@@ -424,9 +424,9 @@ public class ConstellationDatabase : BaseSystem
         return result;
     }
     
-    public List<ConstellationData.Constellation> GetAvailableConstellations(int playerLevel)
+    public List<ConstellationSystem.Constellation> GetAvailableConstellations(int playerLevel)
     {
-        List<ConstellationData.Constellation> result = new List<ConstellationData.Constellation>();
+        List<ConstellationSystem.Constellation> result = new List<ConstellationSystem.Constellation>();
         foreach (var kvp in _constellations)
         {
             if (kvp.Value.RequiredLevel <= playerLevel)

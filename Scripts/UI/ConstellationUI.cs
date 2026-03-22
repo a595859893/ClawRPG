@@ -123,7 +123,7 @@ public class ConstellationUI : Control
         }
     }
     
-    private Control CreateConstellationCard(ConstellationData.Constellation constellation)
+    private Control CreateConstellationCard(ConstellationSystem.Constellation constellation)
     {
         var cardContainer = new HBoxContainer();
         cardContainer.SetHExpand(ExpandMode.IgnoreSize);
@@ -239,7 +239,7 @@ public class ConstellationUI : Control
         }
     }
     
-    private Control CreateActiveConstellationCard(ConstellationData.Constellation constellation, ConstellationData.ConstellationProgress progress)
+    private Control CreateActiveConstellationCard(ConstellationSystem.Constellation constellation, ConstellationSystem.ConstellationProgress progress)
     {
         var cardContainer = new VBoxContainer();
         cardContainer.SetHExpand(ExpandMode.IgnoreSize);
@@ -341,43 +341,43 @@ public class ConstellationUI : Control
         PopulateStatistics();
     }
     
-    private string GetConstellationSymbol(ConstellationData.ConstellationType type)
+    private string GetConstellationSymbol(ConstellationSystem.ConstellationType type)
     {
         switch (type)
         {
-            case ConstellationData.ConstellationType.Fire: return "🔥";
-            case ConstellationData.ConstellationType.Water: return "💧";
-            case ConstellationData.ConstellationType.Earth: return "🌍";
-            case ConstellationData.ConstellationType.Air: return "💨";
-            case ConstellationData.ConstellationType.Light: return "✨";
-            case ConstellationData.ConstellationType.Dark: return "🌑";
+            case ConstellationSystem.ConstellationType.Fire: return "🔥";
+            case ConstellationSystem.ConstellationType.Water: return "💧";
+            case ConstellationSystem.ConstellationType.Earth: return "🌍";
+            case ConstellationSystem.ConstellationType.Air: return "💨";
+            case ConstellationSystem.ConstellationType.Light: return "✨";
+            case ConstellationSystem.ConstellationType.Dark: return "🌑";
             default: return "⭐";
         }
     }
     
-    private Color GetElementColor(ConstellationData.ConstellationType type)
+    private Color GetElementColor(ConstellationSystem.ConstellationType type)
     {
         switch (type)
         {
-            case ConstellationData.ConstellationType.Fire: return _fireColor;
-            case ConstellationData.ConstellationType.Water: return _waterColor;
-            case ConstellationData.ConstellationType.Earth: return _earthColor;
-            case ConstellationData.ConstellationType.Air: return _airColor;
-            case ConstellationData.ConstellationType.Light: return _lightColor;
-            case ConstellationData.ConstellationType.Dark: return _darkColor;
+            case ConstellationSystem.ConstellationType.Fire: return _fireColor;
+            case ConstellationSystem.ConstellationType.Water: return _waterColor;
+            case ConstellationSystem.ConstellationType.Earth: return _earthColor;
+            case ConstellationSystem.ConstellationType.Air: return _airColor;
+            case ConstellationSystem.ConstellationType.Light: return _lightColor;
+            case ConstellationSystem.ConstellationType.Dark: return _darkColor;
             default: return Colors.White;
         }
     }
     
-    private Color GetRarityColor(ConstellationData.ConstellationRarity rarity)
+    private Color GetRarityColor(ConstellationSystem.ConstellationRarity rarity)
     {
         switch (rarity)
         {
-            case ConstellationData.ConstellationRarity.Common: return _commonColor;
-            case ConstellationData.ConstellationRarity.Uncommon: return _uncommonColor;
-            case ConstellationData.ConstellationRarity.Rare: return _rareColor;
-            case ConstellationData.ConstellationRarity.Epic: return _epicColor;
-            case ConstellationData.ConstellationRarity.Legendary: return _legendaryColor;
+            case ConstellationSystem.ConstellationRarity.Common: return _commonColor;
+            case ConstellationSystem.ConstellationRarity.Uncommon: return _uncommonColor;
+            case ConstellationSystem.ConstellationRarity.Rare: return _rareColor;
+            case ConstellationSystem.ConstellationRarity.Epic: return _epicColor;
+            case ConstellationSystem.ConstellationRarity.Legendary: return _legendaryColor;
             default: return Colors.Gray;
         }
     }

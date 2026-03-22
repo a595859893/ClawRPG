@@ -17,7 +17,7 @@ public class StyleMasteryUI : Control
     private Label styleInfoLabel;
     
     private StyleMasterySystem system;
-    private StyleMasteryData data;
+    private StyleMasterySystem data;
     private StyleMasteryDatabase database;
     
     private string selectedStyle = "";
@@ -25,7 +25,7 @@ public class StyleMasteryUI : Control
     public override void _Ready()
     {
         system = GetNode<StyleMasterySystem>("/root/StyleMasterySystem");
-        data = GetNode<StyleMasteryData>("/root/StyleMasteryData");
+        data = GetNode<StyleMasterySystem>("/root/StyleMasteryData");
         database = GetNode<StyleMasteryDatabase>("/root/StyleMasteryDatabase");
         
         SetupUI();
