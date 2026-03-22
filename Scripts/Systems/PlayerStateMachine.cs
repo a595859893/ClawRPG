@@ -451,5 +451,36 @@ namespace ClawRPG.Scripts.Characters
         public bool IsHurt => _currentState == PlayerState.Hurt;
         public bool IsDead => _currentState == PlayerState.Dead;
         public bool CanAct => _currentState == PlayerState.Idle || _currentState == PlayerState.Walk;
+
+        // ========== 持久化支持 ==========
+
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary
+            {
+                ["currentState"] = (int)_currentState,
+                ["stateDuration"] = _stateDuration
+            };
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            if (data.TryGetValue("currentState", out var stateVal))
+            {
+                var state = (PlayerState)(int)(System.Int64)stateVal;
+                _currentState = state;
+                _stateTimer = 0f;
+
+                // 恢复状态配置到 Player 属性
+                ApplyStateConfig(state);
+            }
+
+            if (data.TryGetValue("stateDuration", out var durVal))
+            {
+                _stateDuration = Convert.ToSingle(durVal);
+            }
+        }
     }
 }
