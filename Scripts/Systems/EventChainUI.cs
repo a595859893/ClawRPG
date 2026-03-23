@@ -203,7 +203,7 @@ namespace ClawRPG.Scripts.Systems {
             }
 
             foreach (var chain in activeChains) {
-                var chainData = EventChainDatabase.Instance.GetChain(chain.chainId);
+                var chainData = EventChainSystem.Instance.GetChain(chain.chainId);
                 if (chainData == null) continue;
 
                 var chainPanel = CreateChainCard(chainData, chain.progress);
