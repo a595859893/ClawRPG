@@ -55,7 +55,7 @@ public class StyleMasterySystem : BaseSystem
     public void LoadData()
     {
         // Initialize default styles
-        var db = GetNode<StyleMasteryDatabase>("/root/StyleMasteryDatabase");
+        var db = GetNode<StyleMasterySystem>("/root/StyleMasterySystem");
         if (db != null)
         {
             foreach (var style in db.Styles.Values)
@@ -89,7 +89,7 @@ public class StyleMasterySystem : BaseSystem
     {
         if (!MasteredStyles.ContainsKey(styleId))
         {
-            var db = GetNode<StyleMasteryDatabase>("/root/StyleMasteryDatabase");
+            var db = GetNode<StyleMasterySystem>("/root/StyleMasterySystem");
             if (db != null && db.Styles.ContainsKey(styleId))
             {
                 MasteredStyles[styleId] = new StyleMasteryRecord(styleId, db.Styles[styleId].StyleName);

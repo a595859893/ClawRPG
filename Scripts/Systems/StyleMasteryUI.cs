@@ -24,7 +24,7 @@ public class StyleMasteryUI : Control
     public override void _Ready()
     {
         system = GetNode<StyleMasterySystem>("/root/StyleMasterySystem");
-        database = GetNode<StyleMasteryDatabase>("/root/StyleMasteryDatabase");
+        database = GetNode<StyleMasterySystem>("/root/StyleMasterySystem");
         
         SetupUI();
         RefreshUI();
@@ -325,4 +325,5 @@ public class StyleMasteryUI : Control
             Hide();
         }
     }
+}
 }
