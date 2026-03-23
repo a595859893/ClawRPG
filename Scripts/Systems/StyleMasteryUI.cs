@@ -17,7 +17,7 @@ public class StyleMasteryUI : Control
     private Label styleInfoLabel;
     
     private StyleMasterySystem system;
-    private StyleMasteryDatabase database;
+    private StyleMasterySystem database;
     
     private string selectedStyle = "";
     
