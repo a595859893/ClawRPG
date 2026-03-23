@@ -3,19 +3,14 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// Combo Skill System - 连击技能系统核心
+/// Combo Skill Database - 连击技能配置数据库
 /// </summary>
 public class ComboSkillSystem : BaseSystem
 {
-    // 信号定义 (C# 事件)
-    public event Action<string> OnComboExecuted;
-    public event Action<string> OnComboCompleted;
-    public event Action<string, int> OnComboStepTriggered;
-    public event Action<string> OnComboCancelled;
-    public event Action<string, float> OnCooldownUpdated;
-    public event Action<string> OnComboUnlocked;
+    // 单例
+    private static ComboSkillSystem instance;
 
-    // 枚举定义
+    // 枚举定义 (与 ComboSkillSystem 共享)
     public enum ComboType
     {
         Sequential,
@@ -52,7 +47,7 @@ public class ComboSkillSystem : BaseSystem
         GrantInvulnerability
     }
 
-    // 内部类定义
+    // 内部类定义 (与 ComboSkillSystem 共享)
     public class ComboSkillEffect
     {
         public EffectType effectType;
@@ -85,43 +80,14 @@ public class ComboSkillSystem : BaseSystem
         public int rarity = 0;
     }
 
-    public class PlayerComboSkill
-    {
-        public string comboId = "";
-        public bool isEquipped = false;
-        public float currentCooldown = 0f;
-        public int useCount = 0;
-    }
-
-    public class ComboExecutionState
-    {
-        public string comboId = "";
-        public int currentStep = 0;
-        public bool isExecuting = false;
-        public double startTime = 0;
-        public int effectsApplied = 0;
-    }
-
-    // 单例
-    private static ComboSkillSystem instance;
-
-    // 玩家数据
-    private List<string> unlockedCombos = new List<string>();
-    private List<PlayerComboSkill> equippedCombos = new List<PlayerComboSkill>();
-    private List<ComboExecutionState> executionQueue = new List<ComboExecutionState>();
-
-    // 统计
-    private int totalCombosExecuted = 0;
-    private int totalCombosCompleted = 0;
-
-    // 数据库引用
-    private ComboSkillDatabase database;
+    // 数据库
+    private Dictionary<string, ComboSkill> combos = new Dictionary<string, ComboSkill>();
 
     protected override void Initialize()
     {
         base.Initialize();
         instance = this;
-        database = GetNodeOrNull<ComboSkillDatabase>("/root/ComboSkillDatabase");
+        InitCombos();
     }
 
     public static ComboSkillSystem GetInstance()
@@ -129,404 +95,353 @@ public class ComboSkillSystem : BaseSystem
         return instance;
     }
 
-    // ============ 解锁管理 ============
-
-    public bool UnlockCombo(string comboId)
+    public ComboSkill GetCombo(string comboId)
     {
-        if (unlockedCombos.Contains(comboId))
-            return false;
-
-        var combo = database?.GetCombo(comboId);
-        if (combo == null)
-            return false;
-
-        unlockedCombos.Add(comboId);
-        OnComboUnlocked?.Invoke(comboId);
-        return true;
+        return combos.ContainsKey(comboId) ? combos[comboId] : null;
     }
 
-    public bool IsUnlocked(string comboId)
+    public List<ComboSkill> GetAllCombos()
     {
-        return unlockedCombos.Contains(comboId);
+        return new List<ComboSkill>(combos.Values);
     }
 
-    public List<string> GetUnlockedCombos()
+    public List<ComboSkill> GetCombosByType(ComboType comboType)
     {
-        return new List<string>(unlockedCombos);
-    }
-
-    // ============ 装备管理 ============
-
-    public bool EquipCombo(string comboId)
-    {
-        if (!unlockedCombos.Contains(comboId))
-            return false;
-
-        // 检查是否已装备
-        foreach (var equipped in equippedCombos)
+        var result = new List<ComboSkill>();
+        foreach (var combo in combos.Values)
         {
-            if (equipped.comboId == comboId)
-                return true;
+            if (combo.comboType == comboType)
+                result.Add(combo);
         }
+        return result;
+    }
 
-        // 限制装备数量
-        if (equippedCombos.Count >= 5)
-            return false;
-
-        var combo = database?.GetCombo(comboId);
-        if (combo == null)
-            return false;
-
-        var playerCombo = new PlayerComboSkill
+    public List<ComboSkill> GetCombosByRarity(int rarity)
+    {
+        var result = new List<ComboSkill>();
+        foreach (var combo in combos.Values)
         {
-            comboId = comboId,
-            isEquipped = true,
-            currentCooldown = 0f,
-            useCount = 0
+            if (combo.rarity == rarity)
+                result.Add(combo);
+        }
+        return result;
+    }
+
+    public List<ComboSkill> GetAvailableCombos(int playerLevel)
+    {
+        var result = new List<ComboSkill>();
+        foreach (var combo in combos.Values)
+        {
+            if (combo.levelRequired <= playerLevel)
+                result.Add(combo);
+        }
+        return result;
+    }
+
+    public Color GetRarityColor(int rarity)
+    {
+        switch (rarity)
+        {
+            case 0: return Colors.White;
+            case 1: return Colors.Green;
+            case 2: return new Color(0.3f, 0.5f, 1.0f);
+            case 3: return new Color(0.6f, 0.2f, 0.8f);
+            case 4: return new Color(1.0f, 0.6f, 0.0f);
+        }
+        return Colors.White;
+    }
+
+    public string GetRarityName(int rarity)
+    {
+        switch (rarity)
+        {
+            case 0: return "普通";
+            case 1: return "优秀";
+            case 2: return "稀有";
+            case 3: return "史诗";
+            case 4: return "传说";
+        }
+        return "未知";
+    }
+
+    private void InitCombos()
+    {
+        InitSequentialCombos();
+        InitChainCombos();
+        InitParallelCombos();
+        InitConditionalCombos();
+    }
+
+    private void InitSequentialCombos()
+    {
+        // 闪电连击 - 顺序触发
+        var combo1 = new ComboSkill
+        {
+            id = "combo_lightning",
+            name = "闪电连击",
+            description = "召唤三道闪电依次打击敌人",
+            comboType = ComboType.Sequential,
+            cooldown = 8.0f,
+            manaCost = 30.0f,
+            levelRequired = 5,
+            rarity = 1,
+            steps = new List<ComboStep>
+            {
+                CreateStep("lightning_bolt", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 50.0f, "闪电打击 50 伤害") }),
+                CreateStep("lightning_bolt", 0.5f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 50.0f, "闪电打击 50 伤害") }),
+                CreateStep("lightning_bolt", 1.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 75.0f, "终结闪电 75 伤害") })
+            },
+            totalTime = 2.0f
         };
+        combos[combo1.id] = combo1;
 
-        equippedCombos.Add(playerCombo);
-        return true;
-    }
-
-    public bool UnequipCombo(string comboId)
-    {
-        for (int i = 0; i < equippedCombos.Count; i++)
+        // 治疗链 - 顺序治疗
+        var combo2 = new ComboSkill
         {
-            if (equippedCombos[i].comboId == comboId)
+            id = "combo_healing_chain",
+            name = "治疗链",
+            description = "依次治疗目标三次",
+            comboType = ComboType.Sequential,
+            cooldown = 12.0f,
+            manaCost = 40.0f,
+            levelRequired = 8,
+            rarity = 1,
+            steps = new List<ComboStep>
             {
-                equippedCombos[i].isEquipped = false;
-                equippedCombos.RemoveAt(i);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public bool IsEquipped(string comboId)
-    {
-        foreach (var equipped in equippedCombos)
-        {
-            if (equipped.comboId == comboId)
-                return equipped.isEquipped;
-        }
-        return false;
-    }
-
-    public List<PlayerComboSkill> GetEquippedCombos()
-    {
-        return new List<PlayerComboSkill>(equippedCombos);
-    }
-
-    // ============ 执行系统 ============
-
-    public bool ExecuteCombo(string comboId)
-    {
-        if (!unlockedCombos.Contains(comboId))
-            return false;
-
-        // 检查冷却
-        var playerCombo = GetPlayerCombo(comboId);
-        if (playerCombo != null && playerCombo.currentCooldown > 0)
-            return false;
-
-        // 检查是否正在执行
-        foreach (var state in executionQueue)
-        {
-            if (state.comboId == comboId)
-                return false;
-        }
-
-        var combo = database?.GetCombo(comboId);
-        if (combo == null)
-            return false;
-
-        // 创建执行状态
-        var state = new ComboExecutionState
-        {
-            comboId = comboId,
-            currentStep = 0,
-            isExecuting = true,
-            startTime = Time.GetUnixTimeFromSystem(),
-            effectsApplied = 0
+                CreateStep("heal", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Heal, 30.0f, "治疗 30 HP") }),
+                CreateStep("heal", 0.8f, new List<ComboSkillEffect> { CreateEffect(EffectType.Heal, 30.0f, "治疗 30 HP") }),
+                CreateStep("heal", 1.6f, new List<ComboSkillEffect> { CreateEffect(EffectType.Heal, 50.0f, "强力治疗 50 HP") })
+            },
+            totalTime = 2.5f
         };
+        combos[combo2.id] = combo2;
 
-        executionQueue.Add(state);
-
-        // 设置冷却
-        if (playerCombo != null)
+        // 火焰风暴
+        var combo3 = new ComboSkill
         {
-            playerCombo.currentCooldown = (float)combo.cooldown;
-            playerCombo.useCount++;
-        }
-
-        totalCombosExecuted++;
-        OnComboExecuted?.Invoke(comboId);
-
-        // 开始执行第一步
-        ExecuteStep(state);
-
-        return true;
-    }
-
-    private async void ExecuteStep(ComboExecutionState state)
-    {
-        if (!state.isExecuting)
-            return;
-
-        var combo = database?.GetCombo(state.comboId);
-        if (combo == null || state.currentStep >= combo.steps.Count)
-        {
-            CompleteCombo(state);
-            return;
-        }
-
-        var step = combo.steps[state.currentStep];
-
-        // 延迟执行
-        if (step.delay > 0)
-        {
-            await ToSignal(GetTree().CreateTimer(step.delay), "timeout");
-        }
-
-        // 检查触发条件
-        if (!CheckCondition(step))
-        {
-            // 条件不满足，跳过此步骤
-            state.currentStep++;
-            ExecuteStep(state);
-            return;
-        }
-
-        // 执行效果
-        ApplyEffects(step.effects);
-        state.effectsApplied += step.effects.Count;
-        OnComboStepTriggered?.Invoke(state.comboId, state.currentStep);
-
-        state.currentStep++;
-
-        // 继续下一步或完成
-        if (state.currentStep < combo.steps.Count)
-        {
-            ExecuteStep(state);
-        }
-        else
-        {
-            CompleteCombo(state);
-        }
-    }
-
-    private bool CheckCondition(ComboStep step)
-    {
-        switch (step.condition)
-        {
-            case TriggerCondition.Manual:
-                return true;
-            case TriggerCondition.OnHit:
-                return true;
-            case TriggerCondition.OnCritical:
-                return false;
-            case TriggerCondition.OnKill:
-                return false;
-            case TriggerCondition.OnHealthBelow:
-                return false;
-            case TriggerCondition.OnManaBelow:
-                return false;
-            default:
-                return true;
-        }
-    }
-
-    private void ApplyEffects(List<ComboSkillEffect> effects)
-    {
-        foreach (var effect in effects)
-        {
-            switch (effect.effectType)
+            id = "combo_fire_storm",
+            name = "火焰风暴",
+            description = "召唤火焰陨石轰炸区域",
+            comboType = ComboType.Sequential,
+            cooldown = 20.0f,
+            manaCost = 80.0f,
+            levelRequired = 20,
+            rarity = 3,
+            steps = new List<ComboStep>
             {
-                case EffectType.Damage:
-                    ApplyDamage(effect.value);
-                    break;
-                case EffectType.Heal:
-                    ApplyHeal(effect.value);
-                    break;
-                case EffectType.Shield:
-                    ApplyShield(effect.value, effect.duration);
-                    break;
-                case EffectType.Buff:
-                    ApplyBuff(effect.value, effect.duration);
-                    break;
-                case EffectType.Debuff:
-                    ApplyDebuff(effect.value, effect.duration);
-                    break;
-            }
-        }
+                CreateStep("fire_meteor", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "陨石 100 伤害") }),
+                CreateStep("fire_meteor", 0.6f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "陨石 100 伤害") }),
+                CreateStep("fire_meteor", 1.2f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "陨石 100 伤害") }),
+                CreateStep("fire_explosion", 2.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 150.0f, "爆炸 150 伤害") })
+            },
+            totalTime = 3.0f
+        };
+        combos[combo3.id] = combo3;
     }
 
-    private void ApplyDamage(float value)
+    private void InitChainCombos()
     {
-        GD.Print($"Combo Skill: Dealing {value} damage");
-    }
-
-    private void ApplyHeal(float value)
-    {
-        GD.Print($"Combo Skill: Healing {value} HP");
-    }
-
-    private void ApplyShield(float value, float duration)
-    {
-        GD.Print($"Combo Skill: Shield {value} for {duration} seconds");
-    }
-
-    private void ApplyBuff(float value, float duration)
-    {
-        GD.Print($"Combo Skill: Buff +{value} for {duration} seconds");
-    }
-
-    private void ApplyDebuff(float value, float duration)
-    {
-        GD.Print($"Combo Skill: Debuff {value} for {duration} seconds");
-    }
-
-    private void CompleteCombo(ComboExecutionState state)
-    {
-        state.isExecuting = false;
-        executionQueue.Remove(state);
-        totalCombosCompleted++;
-        OnComboCompleted?.Invoke(state.comboId);
-    }
-
-    public bool CancelCombo(string comboId)
-    {
-        for (int i = 0; i < executionQueue.Count; i++)
+        // 暗影打击 - 链式触发
+        var combo1 = new ComboSkill
         {
-            if (executionQueue[i].comboId == comboId)
+            id = "combo_shadow_strike",
+            name = "暗影打击",
+            description = "穿梭于阴影中连续攻击",
+            comboType = ComboType.Chain,
+            cooldown = 10.0f,
+            manaCost = 35.0f,
+            levelRequired = 12,
+            rarity = 2,
+            steps = new List<ComboStep>
             {
-                executionQueue[i].isExecuting = false;
-                executionQueue.RemoveAt(i);
-                OnComboCancelled?.Invoke(comboId);
-                return true;
-            }
-        }
-        return false;
-    }
+                CreateStep("shadow_strike", 0.0f, TriggerCondition.Manual, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 40.0f, "暗影斩 40 伤害") }),
+                CreateStep("shadow_strike", 0.3f, TriggerCondition.OnHit, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 50.0f, "穿刺 50 伤害") }),
+                CreateStep("shadow_strike", 0.3f, TriggerCondition.OnHit, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 70.0f, "终结 70 伤害") })
+            },
+            totalTime = 2.0f
+        };
+        combos[combo1.id] = combo1;
 
-    // ============ 冷却管理 ============
-
-    public override void _Process(float delta)
-    {
-        base._Process(delta);
-        
-        foreach (var equipped in equippedCombos)
+        // 冰火两重天
+        var combo2 = new ComboSkill
         {
-            if (equipped.currentCooldown > 0)
+            id = "combo_fire_ice",
+            name = "冰火两重天",
+            description = "冰霜后接火焰，造成额外伤害",
+            comboType = ComboType.Chain,
+            cooldown = 15.0f,
+            manaCost = 50.0f,
+            levelRequired = 15,
+            rarity = 2,
+            steps = new List<ComboStep>
             {
-                equipped.currentCooldown -= delta;
-                if (equipped.currentCooldown < 0)
-                    equipped.currentCooldown = 0;
-                OnCooldownUpdated?.Invoke(equipped.comboId, equipped.currentCooldown);
-            }
-        }
+                CreateStep("ice_burst", 0.0f, TriggerCondition.Manual, 0.0f, new List<ComboSkillEffect> { 
+                    CreateEffect(EffectType.Damage, 60.0f, "冰霜 60 伤害"),
+                    CreateEffect(EffectType.Debuff, 30.0f, "减速 30%", 3.0f)
+                }),
+                CreateStep("fire_burst", 0.5f, TriggerCondition.OnHit, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 80.0f, "火焰 80 伤害") })
+            },
+            totalTime = 1.5f
+        };
+        combos[combo2.id] = combo2;
     }
 
-    public float GetCooldown(string comboId)
+    private void InitParallelCombos()
     {
-        var playerCombo = GetPlayerCombo(comboId);
-        if (playerCombo == null)
-            return 0f;
-        return playerCombo.currentCooldown;
-    }
-
-    public bool IsOnCooldown(string comboId)
-    {
-        return GetCooldown(comboId) > 0;
-    }
-
-    private PlayerComboSkill GetPlayerCombo(string comboId)
-    {
-        foreach (var pc in equippedCombos)
+        // 全屏护盾 - 并行效果
+        var combo1 = new ComboSkill
         {
-            if (pc.comboId == comboId)
-                return pc;
-        }
-        return null;
+            id = "combo_shield_wall",
+            name = "护盾壁垒",
+            description = "同时施加多重护盾",
+            comboType = ComboType.Parallel,
+            cooldown = 25.0f,
+            manaCost = 60.0f,
+            levelRequired = 10,
+            rarity = 2,
+            steps = new List<ComboStep>
+            {
+                CreateStep("shield", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Shield, 100.0f, "护盾 100") }),
+                CreateStep("buff", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Buff, 20.0f, "防御强化 20%", 10.0f) }),
+                CreateStep("cleanse", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.ClearDebuffs, 1.0f, "清除减益") })
+            },
+            totalTime = 0.5f
+        };
+        combos[combo1.id] = combo1;
+
+        // 元素爆发
+        var combo2 = new ComboSkill
+        {
+            id = "combo_elemental_burst",
+            name = "元素爆发",
+            description = "同时触发所有元素之力",
+            comboType = ComboType.Parallel,
+            cooldown = 30.0f,
+            manaCost = 100.0f,
+            levelRequired = 25,
+            rarity = 4,
+            steps = new List<ComboStep>
+            {
+                CreateStep("fire", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 120.0f, "火 120 伤害") }),
+                CreateStep("ice", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "冰 100 伤害") }),
+                CreateStep("lightning", 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 80.0f, "雷 80 伤害") })
+            },
+            totalTime = 0.2f
+        };
+        combos[combo2.id] = combo2;
     }
 
-    // ============ 统计信息 ============
-
-    public Dictionary GetStatistics()
+    private void InitConditionalCombos()
     {
-        return new Dictionary
+        // 绝地反击 - 条件触发
+        var combo1 = new ComboSkill
         {
-            { "total_executed", totalCombosExecuted },
-            { "total_completed", totalCombosCompleted },
-            { "unlocked_count", unlockedCombos.Count },
-            { "equipped_count", equippedCombos.Count }
+            id = "combo_desperation",
+            name = "绝地反击",
+            description = "生命低于30%时触发强力反击",
+            comboType = ComboType.Conditional,
+            cooldown = 45.0f,
+            manaCost = 0.0f,
+            levelRequired = 8,
+            rarity = 2,
+            steps = new List<ComboStep>
+            {
+                CreateStep("desperation_strike", 0.0f, TriggerCondition.OnHealthBelow, 30.0f, new List<ComboSkillEffect> { 
+                    CreateEffect(EffectType.Damage, 150.0f, "反击 150 伤害"),
+                    CreateEffect(EffectType.Heal, 50.0f, "吸血 50 HP")
+                })
+            },
+            totalTime = 0.5f
+        };
+        combos[combo1.id] = combo1;
+
+        // 暴击盛宴
+        var combo2 = new ComboSkill
+        {
+            id = "combo_critical_feast",
+            name = "暴击盛宴",
+            description = "暴击时触发连击",
+            comboType = ComboType.Conditional,
+            cooldown = 20.0f,
+            manaCost = 25.0f,
+            levelRequired = 15,
+            rarity = 3,
+            steps = new List<ComboStep>
+            {
+                CreateStep("critical_strike", 0.0f, TriggerCondition.OnCritical, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 100.0f, "暴击 100 伤害") }),
+                CreateStep("follow_up", 0.2f, TriggerCondition.OnHit, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 80.0f, "追击 80 伤害") })
+            },
+            totalTime = 1.0f
+        };
+        combos[combo2.id] = combo2;
+
+        // 凤凰涅槃
+        var combo3 = new ComboSkill
+        {
+            id = "combo_phoenix",
+            name = "凤凰涅槃",
+            description = "死亡时复活并造成巨额伤害",
+            comboType = ComboType.Conditional,
+            cooldown = 120.0f,
+            manaCost = 0.0f,
+            levelRequired = 30,
+            rarity = 4,
+            steps = new List<ComboStep>
+            {
+                CreateStep("resurrection", 0.0f, TriggerCondition.OnHealthBelow, 0.0f, new List<ComboSkillEffect> { 
+                    CreateEffect(EffectType.Heal, 100.0f, "复活并恢复 100 HP"),
+                    CreateEffect(EffectType.GrantInvulnerability, 1.0f, "无敌 3秒", 3.0f)
+                }),
+                CreateStep("rebirth_damage", 0.5f, TriggerCondition.Manual, 0.0f, new List<ComboSkillEffect> { CreateEffect(EffectType.Damage, 200.0f, "涅槃之火 200 伤害") })
+            },
+            totalTime = 2.0f
+        };
+        combos[combo3.id] = combo3;
+    }
+
+    // 辅助函数
+    private ComboStep CreateStep(string skillId, float delay, List<ComboSkillEffect> effects)
+    {
+        return CreateStep(skillId, delay, TriggerCondition.Manual, 0f, effects);
+    }
+
+    private ComboStep CreateStep(string skillId, float delay, TriggerCondition condition, float condValue, List<ComboSkillEffect> effects)
+    {
+        return new ComboStep
+        {
+            skillId = skillId,
+            delay = delay,
+            condition = condition,
+            conditionValue = condValue,
+            effects = effects
         };
     }
 
-    // ============ 存档支持 ============
-
-    public override Dictionary ExportSaveData()
+    private ComboSkillEffect CreateEffect(EffectType effectType, float value, string desc, float duration = 0f)
     {
-        var data = new Dictionary
+        return new ComboSkillEffect
         {
-            { "unlocked_combos", new List<string>(unlockedCombos) },
-            { "equipped", new List<Dictionary>() },
-            { "statistics", new Dictionary
-                {
-                    { "total_executed", totalCombosExecuted },
-                    { "total_completed", totalCombosCompleted }
-                }
-            }
+            effectType = effectType,
+            value = value,
+            description = desc,
+            duration = duration
         };
-
-        var equippedList = new List<Dictionary>();
-        foreach (var equipped in equippedCombos)
-        {
-            equippedList.Add(new Dictionary
-            {
-                { "combo_id", equipped.comboId },
-                { "cooldown", equipped.currentCooldown },
-                { "use_count", equipped.useCount }
-            });
-        }
-        data["equipped"] = equippedList;
-
+    }
+    
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData() {
+        var data = new Dictionary();
+        // ComboSkillSystem 是静态配置数据库，无运行时持久化状态
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
-    {
-        base.ImportSaveData(data);
-
-        if (data.Contains("unlocked_combos"))
-        {
-            unlockedCombos = new List<string>((List<string>)data["unlocked_combos"]);
-        }
-
-        equippedCombos.Clear();
-        if (data.Contains("equipped"))
-        {
-            var equippedList = (List<object>)data["equipped"];
-            foreach (var eqData in equippedList)
-            {
-                var dict = (Dictionary)eqData;
-                var pc = new PlayerComboSkill
-                {
-                    comboId = (string)dict["combo_id"],
-                    isEquipped = true,
-                    currentCooldown = dict.Contains("cooldown") ? (float)dict["cooldown"] : 0f,
-                    useCount = dict.Contains("use_count") ? (int)dict["use_count"] : 0
-                };
-                equippedCombos.Add(pc);
-            }
-        }
-
-        if (data.Contains("statistics"))
-        {
-            var stats = (Dictionary)data["statistics"];
-            totalCombosExecuted = stats.Contains("total_executed") ? (int)stats["total_executed"] : 0;
-            totalCombosCompleted = stats.Contains("total_completed") ? (int)stats["total_completed"] : 0;
-        }
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data) {
+        if (data == null) return;
+        // ComboSkillSystem 是静态配置数据库，无运行时持久化状态
     }
 }
