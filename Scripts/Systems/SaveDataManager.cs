@@ -246,6 +246,9 @@ namespace ClawRPG.Scripts.Systems
             /// <summary>Quick Mode Reward system data dictionary.</summary>
             public Dictionary<string, object> QuickModeRewardData { get; set; } = new();
 
+            /// <summary>Style Mastery system data dictionary.</summary>
+            public Dictionary<string, object> StyleMasteryData { get; set; } = new();
+
             /// <summary>Guild Quest system data dictionary.</summary>
             public Dictionary<string, object> GuildQuestData { get; set; } = new();
             

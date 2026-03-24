@@ -25,6 +25,7 @@ namespace ClawRPG.Scripts.Systems
         private WeatherSystem _weatherSystem;
         private EquipmentVisuals _equipmentVisuals;
         private ComboSystem _comboSystem;
+        private StyleMasterySystem _styleMasterySystem;
         private KeybindingSystem _keybindingSystem;
         private PetStorySystem _petStorySystem;
         private EmoteSystem _emoteSystem;
@@ -133,6 +134,12 @@ namespace ClawRPG.Scripts.Systems
                 data.ComboData = _comboSystem.Serialize();
             }
 
+            // 保存风格精通系统数据
+            if (_styleMasterySystem != null)
+            {
+                data.StyleMasteryData = _styleMasterySystem.ExportSaveData();
+            }
+            
             // 保存按键绑定数据
             if (_keybindingSystem != null)
             {
@@ -198,6 +205,7 @@ namespace ClawRPG.Scripts.Systems
             _weatherSystem = saveSystem.GetNodeOrNull<WeatherSystem>("WeatherSystem");
             _equipmentVisuals = saveSystem.GetNodeOrNull<UI.EquipmentVisuals>("EquipmentVisuals");
             _comboSystem = saveSystem.GetNodeOrNull<ComboSystem>("ComboSystem");
+            _styleMasterySystem = saveSystem.GetNodeOrNull<StyleMasterySystem>("StyleMasterySystem");
             _keybindingSystem = saveSystem.GetNodeOrNull<KeybindingSystem>("KeybindingSystem");
             _petStorySystem = saveSystem.GetNodeOrNull<PetStorySystem>("PetStorySystem");
             _emoteSystem = saveSystem.GetNodeOrNull<EmoteSystem>("EmoteSystem");
@@ -212,7 +220,7 @@ namespace ClawRPG.Scripts.Systems
         public Dictionary<string, object> SerializePetHabitatData(PlayerHabitatData data)
         {
             var dict = new Dictionary<string, object>();
-            
+
             dict["current_habitat_id"] = data.CurrentHabitatId;
             dict["total_comfort"] = data.TotalComfort;
             dict["total_attraction"] = data.TotalAttraction;
@@ -220,7 +228,7 @@ namespace ClawRPG.Scripts.Systems
             dict["gold_spent_on_decorations"] = data.GoldSpentOnDecorations;
             dict["habitat_visits"] = data.HabitatVisits;
             dict["pets_attracted"] = data.PetsAttracted;
-            
+
             // 序列化已放置的装饰
             var placedList = new List<Dictionary<string, object>>();
             foreach (var dec in data.PlacedDecorations)
@@ -233,10 +241,10 @@ namespace ClawRPG.Scripts.Systems
                 });
             }
             dict["placed_decorations"] = placedList;
-            
+
             // 序列化装饰数量
             dict["decoration_counts"] = data.DecorationCounts;
-            
+
             return dict;
         }
 
@@ -246,7 +254,7 @@ namespace ClawRPG.Scripts.Systems
         public PlayerHabitatData DeserializePetHabitatData(Dictionary<string, object> dict)
         {
             var data = new PlayerHabitatData();
-            
+
             data.CurrentHabitatId = dict.ContainsKey("current_habitat_id") ? (string)dict["current_habitat_id"] : "meadow";
             data.TotalComfort = dict.ContainsKey("total_comfort") ? Convert.ToInt32(dict["total_comfort"]) : 0;
             data.TotalAttraction = dict.ContainsKey("total_attraction") ? Convert.ToInt32(dict["total_attraction"]) : 0;
@@ -254,7 +262,7 @@ namespace ClawRPG.Scripts.Systems
             data.GoldSpentOnDecorations = dict.ContainsKey("gold_spent_on_decorations") ? Convert.ToInt32(dict["gold_spent_on_decorations"]) : 0;
             data.HabitatVisits = dict.ContainsKey("habitat_visits") ? Convert.ToInt32(dict["habitat_visits"]) : 0;
             data.PetsAttracted = dict.ContainsKey("pets_attracted") ? Convert.ToInt32(dict["pets_attracted"]) : 0;
-            
+
             // 反序列化已放置的装饰
             if (dict.ContainsKey("placed_decorations") && dict["placed_decorations"] != null)
             {
@@ -270,7 +278,7 @@ namespace ClawRPG.Scripts.Systems
                     data.PlacedDecorations.Add(dec);
                 }
             }
-            
+
             // 反序列化装饰数量
             if (dict.ContainsKey("decoration_counts") && dict["decoration_counts"] != null)
             {
@@ -280,7 +288,7 @@ namespace ClawRPG.Scripts.Systems
                     data.DecorationCounts[item.Name] = item.Value.GetInt32();
                 }
             }
-            
+
             return data;
         }
 

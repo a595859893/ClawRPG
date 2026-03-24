@@ -17,14 +17,12 @@ public class StyleMasteryUI : Control
     private Label styleInfoLabel;
     
     private StyleMasterySystem system;
-    private StyleMasterySystem database;
     
     private string selectedStyle = "";
     
     public override void _Ready()
     {
         system = GetNode<StyleMasterySystem>("/root/StyleMasterySystem");
-        database = GetNode<StyleMasterySystem>("/root/StyleMasterySystem");
         
         SetupUI();
         RefreshUI();
@@ -118,7 +116,7 @@ public class StyleMasteryUI : Control
         foreach (var styleId in topStyles)
         {
             var btn = new Button();
-            var config = database.GetStyle(styleId);
+            var config = system.GetStyleConfig(styleId);
             if (config != null)
             {
                 btn.Text = config.Icon + " " + config.StyleName;
@@ -154,7 +152,7 @@ public class StyleMasteryUI : Control
             child.QueueFree();
         }
         
-        var styles = database.GetAllStyles();
+        var styles = system.GetAllStyles();
         
         foreach (var kvp in styles)
         {
@@ -241,7 +239,7 @@ public class StyleMasteryUI : Control
         string activeStyle = system.GetActiveStyle();
         if (!string.IsNullOrEmpty(activeStyle))
         {
-            var config = database.GetStyle(activeStyle);
+            var config = system.GetStyleConfig(activeStyle);
             if (config != null)
             {
                 activeStyleLabel.Text = $"Active Style: {config.Icon} {config.StyleName}";
