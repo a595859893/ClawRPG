@@ -1,6 +1,8 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.UI;
 
 /// <summary>
 /// MainDebug - 调试管理模块
@@ -8,6 +10,23 @@ using System.Collections.Generic;
 /// </summary>
 public partial class MainDebug : Node
 {
+    /// <summary>
+    /// 控制台命令定义
+    /// </summary>
+    public class ConsoleCommand
+    {
+        public string Name { get; }
+        public string Description { get; }
+        public Action<string[]> Action { get; }
+
+        public ConsoleCommand(string name, string description, Action<string[]> action)
+        {
+            Name = name;
+            Description = description;
+            Action = action;
+        }
+    }
+
     // 调试模式开关
     public static bool DebugMode { get; private set; } = false;
     
@@ -37,6 +56,28 @@ public partial class MainDebug : Node
         DebugMode = true;
         _currentLogLevel = LogLevel.Debug;
 #endif
+        RegisterConsoleCommands();
+    }
+
+    private void RegisterConsoleCommands()
+    {
+        // /help - 显示所有可用命令
+        CommandRegistry.Instance.Register("help", new ConsoleCommand(
+            "help",
+            "显示所有可用命令",
+            (args) =>
+            {
+                if (DebugConsoleUI.Instance == null) return;
+                DebugConsoleUI.Instance.PrintLine("");
+                DebugConsoleUI.Instance.PrintLine("=== 可用命令 ===", new Color(0.4f, 0.8f, 1.0f));
+                foreach (var kvp in CommandRegistry.Instance.All())
+                {
+                    string line = $"  /{kvp.Key,-12} - {kvp.Value.Description}";
+                    DebugConsoleUI.Instance.PrintLine(line, new Color(0.85f, 0.85f, 0.9f));
+                }
+                DebugConsoleUI.Instance.PrintLine("");
+            }
+        ));
     }
     
     /// <summary>
