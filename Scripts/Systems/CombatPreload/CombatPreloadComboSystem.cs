@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Combat;
 using ClawRPG.Scripts.Managers;
+using ClawRPG.Scripts.Systems.ProceduralDungeon;
 
 namespace ClawRPG.Scripts.Systems.CombatPreload
 {
@@ -33,6 +34,10 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
         private Control _previewPanel;
         private Control _previewUI;
         
+        // 管理器引用 (REQ-117-05: EventBus集成 - 战斗开始流程触发预览)
+        private ProceduralDungeonSystem _dungeonSystem;
+        private EnemyLifecycleManager _enemyLifecycleManager;
+        
         // Signals
         public static Action<CombatPreloadState> OnPreloadStateChanged;
         public static Action<List<CombatPreloadComboEntry>> OnCombosUpdated;
@@ -51,6 +56,10 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
             _comboSystem = GetNodeOrNull<ComboSystem>("/root/Game/ComboSystem");
             _skillComboSystem = GetNodeOrNull<SkillComboSystem>("/root/Game/SkillComboSystem");
             
+            // 获取管理器引用 (REQ-117-05)
+            _dungeonSystem = GetNodeOrNull<ProceduralDungeonSystem>("/root/Game/ProceduralDungeonSystem");
+            _enemyLifecycleManager = GetNodeOrNull<EnemyLifecycleManager>("/root/Game/EnemyLifecycleManager");
+            
             // 如果没有找到，尝试从EventBusManager订阅
             var eventBus = EventBusManager.Instance;
             if (eventBus != null)
@@ -58,6 +67,9 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
                 eventBus.Subscribe("combat_preload_requested", OnCombatPreloadRequested);
                 eventBus.Subscribe("combat_started", OnCombatStarted);
             }
+            
+            // 订阅 OnCombatEntered 以在玩家确认后触发战斗开始 (REQ-117-05)
+            OnCombatEntered += _OnPlayerConfirmedCombat;
             
             GD.Print("[CombatPreloadComboSystem] Initialized");
         }
@@ -237,6 +249,76 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
             if (_state == CombatPreloadState.Showing)
             {
                 _state = CombatPreloadState.Hidden;
+            }
+        }
+        
+        /// <summary>
+        /// REQ-117-05: 玩家确认战斗后触发 - 实际生成敌人并开始战斗
+        /// </summary>
+        private void _OnPlayerConfirmedCombat()
+        {
+            GD.Print("[CombatPreloadComboSystem] Player confirmed combat - spawning enemies");
+            
+            // 从地下城系统获取当前房间信息
+            if (_dungeonSystem?.CurrentDungeon?.CurrentRoom != null)
+            {
+                var room = _dungeonSystem.CurrentDungeon.CurrentRoom;
+                
+                // 生成房间内的敌人
+                if (room.Enemies != null && room.Enemies.Count > 0)
+                {
+                    foreach (var enemyType in room.Enemies)
+                    {
+                        _SpawnEnemyForRoom(enemyType);
+                    }
+                }
+                else
+                {
+                    // 如果房间没有预设敌人，随机生成
+                    _SpawnDefaultEnemiesForRoom(room.Type);
+                }
+                
+                GD.Print($"[CombatPreloadComboSystem] Spawned enemies for room: {room.Type}");
+            }
+            else
+            {
+                // Fallback: 如果没有地下城系统，随机生成敌人
+                _SpawnDefaultEnemiesForRoom(RoomType.Combat);
+            }
+            
+            // 重置预览状态
+            _state = CombatPreloadState.Hidden;
+        }
+        
+        /// <summary>
+        /// 为房间生成指定类型的敌人
+        /// </summary>
+        private void _SpawnEnemyForRoom(string enemyType)
+        {
+            if (_enemyLifecycleManager != null)
+            {
+                _enemyLifecycleManager.SpawnEnemy(null, enemyType);
+            }
+        }
+        
+        /// <summary>
+        /// 根据房间类型生成默认敌人
+        /// </summary>
+        private void _SpawnDefaultEnemiesForRoom(RoomType roomType)
+        {
+            if (_enemyLifecycleManager == null) return;
+            
+            int enemyCount = roomType switch
+            {
+                RoomType.Combat => 3,
+                RoomType.Elite => 1,
+                RoomType.Boss => 1,
+                _ => 0
+            };
+            
+            for (int i = 0; i < enemyCount; i++)
+            {
+                _enemyLifecycleManager.SpawnEnemy(null, "default");
             }
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using Godot;
 using Godot.Collections;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Managers;
 
 namespace ClawRPG.Scripts.Systems.ProceduralDungeon
 {
@@ -146,9 +147,24 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
             
             RoomEntered?.Emit();
             
+            // REQ-117-05: 战斗开始流程触发预览 - 进入战斗房间时请求Combo预览
+            if (_IsCombatRoom(room.Type))
+            {
+                EventBusManager.Instance?.Emit("combat_preload_requested");
+                GD.Print($"[ProceduralDungeonSystem] Combat room entered - combat preload requested");
+            }
+            
             GD.Print($"Entered room: {room.Type} ({room.RoomId})");
             
             return true;
+        }
+        
+        /// <summary>
+        /// 判断房间类型是否为战斗房间
+        /// </summary>
+        private bool _IsCombatRoom(RoomType type)
+        {
+            return type == RoomType.Combat || type == RoomType.Elite || type == RoomType.Boss;
         }
         
         /// <summary>
