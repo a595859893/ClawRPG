@@ -75,10 +75,6 @@ namespace ClawRPG.UI
         /// </summary>
         public void LoadRegions()
         {
-            // Note: TreasureHuntManager is still GDScript - this will need to be updated
-            // when TreasureHuntManager is converted to C#
-            // For now, this is a placeholder implementation
-
             if (_regionList == null)
             {
                 return;
@@ -86,8 +82,14 @@ namespace ClawRPG.UI
 
             _regionList.Clear();
 
-            // TODO: When TreasureHuntManager is converted to C#, implement region loading
-            // var regions = TreasureHuntManager.Instance.GetRegions();
+            var regions = TreasureHuntManager.Instance.GetRegions();
+            foreach (var region in regions)
+            {
+                _regionList.AddItem($"{region.name} (Lv.{region.requiredLevel})");
+                _regionList.SetItemMetadata(_regionList.ItemCount - 1, region);
+            }
+
+            UpdateTreasurePreview();
         }
 
         /// <summary>
@@ -106,8 +108,11 @@ namespace ClawRPG.UI
                 return;
             }
 
-            // Assuming itemData contains region info
-            // This will need to be updated when TreasureHuntManager is converted
+            _selectedRegion = itemData as TreasureHuntManager.HuntRegion;
+            if (_selectedRegion == null)
+            {
+                return;
+            }
 
             // Update info panel
             if (_infoPanel != null)
@@ -117,8 +122,11 @@ namespace ClawRPG.UI
                 var levelLabel = _infoPanel.GetNodeOrNull<Label>("LevelLabel");
                 var energyCostLabel = _infoPanel.GetNodeOrNull<Label>("EnergyCostLabel");
 
-                // Update labels with region data
-                // These will be populated when region selection is fully implemented
+                if (nameLabel != null) nameLabel.Text = _selectedRegion.name;
+                if (descLabel != null) descLabel.Text = _selectedRegion.description;
+                if (levelLabel != null) levelLabel.Text = $"Required Level: {_selectedRegion.requiredLevel}";
+                if (energyCostLabel != null) energyCostLabel.Text = $"Energy Cost: {_selectedRegion.energyCost}";
+                if (_successRateLabel != null) _successRateLabel.Text = $"Success Rate: {_selectedRegion.successRate:P0}";
             }
 
             UpdateTreasurePreview();
@@ -134,6 +142,12 @@ namespace ClawRPG.UI
                 return;
             }
 
+            var region = _selectedRegion as TreasureHuntManager.HuntRegion;
+            if (region == null || region.treasures == null)
+            {
+                return;
+            }
+
             var treasureContainer = GetNodeOrNull<ItemList>("VBoxContainer/HBoxContainer/InfoPanel/TreasureContainer");
             if (treasureContainer == null)
             {
@@ -142,11 +156,10 @@ namespace ClawRPG.UI
 
             treasureContainer.Clear();
 
-            // TODO: When TreasureHuntManager is converted, populate treasures
-            // foreach (var treasure in selectedRegion.Treasures)
-            // {
-            //     treasureContainer.AddItem($"{treasure.Name} - {treasure.GoldReward} Gold");
-            // }
+            foreach (var treasure in region.treasures)
+            {
+                treasureContainer.AddItem($"{treasure.name} - {treasure.goldReward} Gold");
+            }
         }
 
         /// <summary>
