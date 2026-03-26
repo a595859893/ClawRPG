@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Systems.Commands;
 using ClawRPG.Scripts.UI;
 
 /// <summary>
@@ -78,6 +79,9 @@ public partial class MainDebug : Node
                 DebugConsoleUI.Instance.PrintLine("");
             }
         ));
+
+        // 注册所有 REQ-096-02 命令
+        ConsoleCommandRegistrar.RegisterAll();
     }
     
     /// <summary>
@@ -190,7 +194,7 @@ public partial class MainDebug : Node
         
         GD.Print("=== Performance Info ===");
         GD.Print($"FPS: {Engine.GetFramesPerSecond()}");
-        GD.Print($"Draw Calls: {RenderingServer.Server.GetRenderInfo(RenderingServer.RenderInfoObject.Active));
+        GD.Print($"Objects: {Performance.GetMonitor(Performance.Monitor.ObjectCount)}");
     }
     
     /// <summary>
