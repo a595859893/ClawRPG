@@ -13,8 +13,8 @@ public partial class DebugConsoleUI : Control
 {
     public static DebugConsoleUI Instance { get; private set; }
 
-    // 命令历史
-    private List<string> _commandHistory = new List<string>();
+    // 历史记录管理器
+    private ConsoleHistory _historyManager = new ConsoleHistory();
     private int _historyIndex = -1;
 
     // UI 组件
@@ -129,6 +129,10 @@ public partial class DebugConsoleUI : Control
 
     public override void _Input(InputEvent @event)
     {
+        // 非 DEBUG 模式不响应控制台
+        if (!MainDebug.DebugMode)
+            return;
+
         if (@event is InputEventKey keyEvent && keyEvent.Pressed)
         {
             // ~ 键打开/关闭控制台
@@ -146,13 +150,15 @@ public partial class DebugConsoleUI : Control
         {
             Hide();
             _commandInput.Text = "";
+            _historyManager.Save();
         }
         else
         {
             Show();
             _commandInput.GrabFocus();
             _commandInput.Text = "";
-            _historyIndex = -1;
+            _historyManager.ResetNavigation();
+            _historyManager.Load();
         }
     }
 
@@ -162,9 +168,9 @@ public partial class DebugConsoleUI : Control
         if (string.IsNullOrEmpty(cmd))
             return;
 
-        // 添加到历史
-        _commandHistory.Add(cmd);
-        _historyIndex = -1;
+        // 添加到历史并持久化
+        _historyManager.Add(cmd);
+        _historyManager.Save();
 
         // 显示命令
         PrintCommandLine(cmd);
@@ -191,32 +197,49 @@ public partial class DebugConsoleUI : Control
                 NavigateHistory(1);
                 GetTree().SetInputAsHandled();
             }
+            // Tab：补全
+            else if (keyEvent.Keycode == Key.Tab)
+            {
+                HandleTabCompletion();
+                GetTree().SetInputAsHandled();
+            }
+        }
+    }
+
+    private void HandleTabCompletion()
+    {
+        string current = _commandInput.Text;
+        if (!current.StartsWith("/"))
+            return;
+
+        string prefix = current.Substring(1);
+        var completions = _historyManager.GetCompletions(prefix);
+
+        if (completions.Length == 0)
+            return;
+
+        if (completions.Length == 1)
+        {
+            _commandInput.Text = "/" + completions[0] + " ";
+            _commandInput.CaretColumn = _commandInput.Text.Length;
+        }
+        else
+        {
+            // 多于一个匹配：显示所有匹配项
+            PrintSystemLine("可能的命令: " + string.Join(", ", completions.Select(c => "/" + c)));
         }
     }
 
     private void NavigateHistory(int direction)
     {
-        if (_commandHistory.Count == 0)
-            return;
-
-        _historyIndex += direction;
-
-        if (_historyIndex >= _commandHistory.Count)
-        {
-            _historyIndex = _commandHistory.Count - 1;
-        }
-        else if (_historyIndex < -1)
-        {
-            _historyIndex = -1;
-        }
-
-        if (_historyIndex == -1)
+        string cmd = _historyManager.Navigate(direction);
+        if (cmd == null)
         {
             _commandInput.Text = "";
         }
         else
         {
-            _commandInput.Text = _commandHistory[_commandHistory.Count - 1 - _historyIndex];
+            _commandInput.Text = cmd;
             _commandInput.CaretColumn = _commandInput.Text.Length;
         }
     }
@@ -239,6 +262,12 @@ public partial class DebugConsoleUI : Control
         var cmd = CommandRegistry.Instance.Get(cmdName);
         if (cmd != null)
         {
+            if (cmd.RequiresCheatCode && !MainDebug.DebugMode)
+            {
+                PrintErrorLine("此命令在非调试模式下不可用");
+                return;
+            }
+
             try
             {
                 cmd.Action.Invoke(args);

@@ -19,12 +19,14 @@ public partial class MainDebug : Node
         public string Name { get; }
         public string Description { get; }
         public Action<string[]> Action { get; }
+        public bool RequiresCheatCode { get; }
 
-        public ConsoleCommand(string name, string description, Action<string[]> action)
+        public ConsoleCommand(string name, string description, Action<string[]> action, bool requiresCheatCode = true)
         {
             Name = name;
             Description = description;
             Action = action;
+            RequiresCheatCode = requiresCheatCode;
         }
     }
 
