@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Pets.AI;
+using ClawRPG.Scripts.Events;
 
 namespace ClawRPG.Systems.Pets.AI
 {
@@ -58,6 +59,11 @@ namespace ClawRPG.Systems.Pets.AI
         private Node2D _currentTarget;
         private List<Node2D> _nearbyEnemies = new List<Node2D>();
         
+        // ===== 事件驱动状态 =====
+        
+        private bool _isInCombat = false;  // 事件驱动标记，非轮询
+        private bool _pendingSkillCheck = false;  // 事件触发技能检查
+        
         // ===== 子系统引用 =====
         
         private PetDecisionSystem _decisionSystem;
@@ -97,6 +103,9 @@ namespace ClawRPG.Systems.Pets.AI
             _decisionSystem = PetDecisionSystem.Instance;
             _behaviorTree = PetBehaviorTree.Instance;
             _skillSystem = PetSkillSystem.Instance;
+            
+            // 订阅事件总线（REQ-112-05: 事件驱动集成）
+            SubscribeToEventBus();
             
             GD.Print($"[PetTacticalAI] Initialized for pet: {pet?.PetName ?? "null"}");
         }
@@ -167,6 +176,93 @@ namespace ClawRPG.Systems.Pets.AI
             _currentTarget = target;
         }
 
+        // ===== 事件驱动集成 (REQ-112-05) =====
+        
+        /// <summary>
+        /// 订阅 EventBusManager 事件，替代部分 _Process 轮询
+        /// </summary>
+        private void SubscribeToEventBus()
+        {
+            var eventBus = EventBusManager.Instance;
+            if (eventBus == null)
+            {
+                GD.Warn("[PetTacticalAI] EventBusManager not available, event-driven integration disabled");
+                return;
+            }
+            
+            eventBus.Subscribe(EventBusManager.Events.CombatStarted, OnCombatStarted);
+            eventBus.Subscribe(EventBusManager.Events.CombatEnded, OnCombatEnded);
+            eventBus.Subscribe<EnemySpawnedEventData>(EventBusManager.Events.EnemySpawned, OnEnemySpawned);
+            eventBus.Subscribe<EnemyDiedEventData>(EventBusManager.Events.EnemyDied, OnEnemyDied);
+            
+            GD.Print("[PetTacticalAI] Subscribed to EventBusManager events (CombatStarted, CombatEnded, EnemySpawned, EnemyDied)");
+        }
+        
+        /// <summary>
+        /// 战斗开始事件处理
+        /// </summary>
+        private void OnCombatStarted()
+        {
+            _isInCombat = true;
+            _tacticalState.LastDecisionReason = "Combat started via event";
+            GD.Print("[PetTacticalAI] Combat started (event-driven)");
+        }
+        
+        /// <summary>
+        /// 战斗结束事件处理
+        /// </summary>
+        private void OnCombatEnded()
+        {
+            _isInCombat = false;
+            _nearbyEnemies.Clear();
+            _tacticalState.LastDecisionReason = "Combat ended via event";
+            _tacticalState.CurrentMode = PetTacticalMode.Follow;
+            GD.Print("[PetTacticalAI] Combat ended (event-driven)");
+        }
+        
+        /// <summary>
+        /// 敌人生成事件处理
+        /// </summary>
+        private void OnEnemySpawned(EnemySpawnedEventData data)
+        {
+            if (data?.Enemy != null)
+            {
+                _isInCombat = true;
+                
+                // 如果敌人不在列表中，添加
+                if (!_nearbyEnemies.Contains(data.Enemy))
+                {
+                    _nearbyEnemies.Add(data.Enemy);
+                    _pendingSkillCheck = true;  // 触发立即技能检查
+                    GD.Print($"[PetTacticalAI] Enemy spawned and added to tracking: {data.EnemyType}, total enemies: {_nearbyEnemies.Count}");
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 敌人死亡事件处理
+        /// </summary>
+        private void OnEnemyDied(EnemyDiedEventData data)
+        {
+            if (data?.Enemy != null)
+            {
+                _nearbyEnemies.Remove(data.Enemy);
+                _pendingSkillCheck = true;
+                
+                if (_nearbyEnemies.Count == 0)
+                {
+                    // 触发战斗结束检查（延迟，由 CombatEnded 事件最终确认）
+                    _tacticalState.LastDecisionReason = $"Enemy {data.EnemyType} killed, {_nearbyEnemies.Count} enemies remaining";
+                }
+                else
+                {
+                    _tacticalState.LastDecisionReason = $"Enemy {data.EnemyType} killed, {_nearbyEnemies.Count} enemies remaining";
+                }
+                
+                GD.Print($"[PetTacticalAI] Enemy removed from tracking: {data.EnemyType}, remaining: {_nearbyEnemies.Count}");
+            }
+        }
+        
         // ===== 内部更新 =====
 
         private void UpdateTimers(float delta)
@@ -259,10 +355,11 @@ namespace ClawRPG.Systems.Pets.AI
             if (_skillSystem == null || _activePet == null)
                 return;
             
-            // 按间隔检查，不是每帧检查
-            if (_tacticalState.SkillCheckTimer < _skillCheckInterval)
+            // 按间隔检查，除非有事件触发的待检查标记
+            if (!_pendingSkillCheck && _tacticalState.SkillCheckTimer < _skillCheckInterval)
                 return;
             _tacticalState.SkillCheckTimer = 0f;
+            _pendingSkillCheck = false;
             
             if (_activePet.Id == null)
                 return;

@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Managers;
+using ClawRPG.Scripts.Events;
 
 /// <summary>
 /// 敌人生命周期管理器 - 负责敌人的生成、AI 更新、死亡和状态管理
@@ -138,10 +139,11 @@ public class EnemyLifecycleManager : ManagerBase
         // 触发本地事件
         OnEnemySpawned?.Invoke(enemy);
         
-        // 通过事件总线发布全局事件
+        // 通过事件总线发布全局事件 (REQ-112-05: 使用 EventData 封装)
         if (EventBusManager.Instance != null)
         {
-            EventBusManager.Instance.Emit(EventBusManager.Events.EnemySpawned, enemy);
+            var spawnData = new EnemySpawnedEventData(enemy, new Vector3(spawnPos.X, spawnPos.Y, 0), ActiveEnemies.Count);
+            EventBusManager.Instance.Emit(EventBusManager.Events.EnemySpawned, spawnData);
         }
         
         return enemy;
@@ -175,6 +177,11 @@ public class EnemyLifecycleManager : ManagerBase
         {
             ActiveEnemies.Remove(enemy);
         }
+        
+        // Emit EnemyDied to EventBusManager (REQ-112-05: 事件驱动集成)
+        var pos = enemy.GlobalPosition;
+        var diedData = new EnemyDiedEventData(enemy, ActiveEnemies.Count + 1, new Vector3(pos.X, pos.Y, 0));
+        EventBusManager.Instance?.Emit(EventBusManager.Events.EnemyDied, diedData);
         
         if (IsInstanceValid(enemy))
         {

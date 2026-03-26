@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Combat;
+using ClawRPG.Scripts.Managers;
 
 namespace ClawRPG.Scripts.Combat
 {
@@ -86,6 +87,8 @@ namespace ClawRPG.Scripts.Combat
                 };
                 _sessionStats.TotalCombats++;
                 OnCombatStarted?.Invoke();
+                // Bridge to EventBusManager (REQ-112-05: 事件驱动集成)
+                EventBusManager.Instance?.Emit(EventBusManager.Events.CombatStarted);
             }
             _combatTimer = COMBAT_TIMEOUT;
         }
@@ -112,6 +115,8 @@ namespace ClawRPG.Scripts.Combat
                     _sessionStats.BestCombo = _currentCombat.MaxCombo;
                 
                 OnCombatEnded?.Invoke();
+                // Bridge to EventBusManager (REQ-112-05: 事件驱动集成)
+                EventBusManager.Instance?.Emit(EventBusManager.Events.CombatEnded);
             }
         }
 
