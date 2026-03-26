@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.Pets.AI;
 
 namespace ClawRPG.Scripts.UI
 {
@@ -20,6 +21,17 @@ namespace ClawRPG.Scripts.UI
         private Label _statsLabel;
         private Label _learningLabel;
         
+        // Tactical tab controls
+        private Label _tacticalModeLabel;
+        private Label _petHealthLabel;
+        private ProgressBar _petHealthBar;
+        private Label _playerHealthLabel;
+        private ProgressBar _playerHealthBar;
+        private Label _decisionLogLabel;
+        private Button _btnFollow;
+        private Button _btnProtect;
+        private Button _btnAttack;
+        
         private string _selectedPetId = "";
 
         public override void _Ready()
@@ -35,6 +47,7 @@ namespace ClawRPG.Scripts.UI
             SetupUI();
             ConnectSignals();
             RefreshPetList();
+            RefreshTacticalUI();
         }
 
         private void SetupUI()
@@ -78,7 +91,7 @@ namespace ClawRPG.Scripts.UI
             var selectorLabel = new Label { Text = "选择宠物: " };
             selectorHBox.AddChild(selectorLabel);
 
-            _petSelector = new ComboBox()
+            _petSelector = new ComboBox();
             _petSelector.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _petSelector.ItemSelected += OnPetSelected;
             selectorHBox.AddChild(_petSelector);
@@ -117,7 +130,7 @@ namespace ClawRPG.Scripts.UI
             overviewTab.AddChild(_roleLabel);
 
             // Role buttons
-            var roleHBox = new HBoxContainer()
+            var roleHBox = new HBoxContainer();
             overviewTab.AddChild(roleHBox);
 
             string[] roles = { "Attacker", "Support", "Tank", "Scout" };
@@ -151,6 +164,112 @@ namespace ClawRPG.Scripts.UI
             };
             _learningLabel.Position = new Vector2(10, 10);
             learningTab.AddChild(_learningLabel);
+
+            // Tactical tab
+            SetupTacticalTab();
+        }
+
+        /// <summary>
+        /// Setup the Tactical tab - REQ-112-03 & REQ-112-04
+        /// </summary>
+        private void SetupTacticalTab()
+        {
+            var tacticalTab = new VBoxContainer { Name = "Tactical" };
+            _tabContainer.AddChild(tacticalTab);
+
+            // Mode display
+            _tacticalModeLabel = new Label
+            {
+                Text = "战术模式: Follow",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            _tacticalModeLabel.AddThemeFontSizeOverride("font_size", 20);
+            tacticalTab.AddChild(_tacticalModeLabel);
+
+            // Mode buttons
+            var modeHBox = new HBoxContainer();
+            tacticalTab.AddChild(modeHBox);
+
+            _btnFollow = new Button { Text = "跟随" };
+            _btnFollow.Pressed += () => OnTacticalModePressed(PetTacticalAI.PetTacticalMode.Follow);
+            modeHBox.AddChild(_btnFollow);
+
+            _btnProtect = new Button { Text = "保护" };
+            _btnProtect.Pressed += () => OnTacticalModePressed(PetTacticalAI.PetTacticalMode.Protect);
+            modeHBox.AddChild(_btnProtect);
+
+            _btnAttack = new Button { Text = "进攻" };
+            _btnAttack.Pressed += () => OnTacticalModePressed(PetTacticalAI.PetTacticalMode.Attack);
+            modeHBox.AddChild(_btnAttack);
+
+            // Health status section
+            var healthTitle = new Label { Text = "--- 生命状态 ---" };
+            healthTitle.AddThemeFontSizeOverride("font_size", 14);
+            tacticalTab.AddChild(healthTitle);
+
+            // Pet health
+            var petHealthHBox = new HBoxContainer();
+            tacticalTab.AddChild(petHealthHBox);
+
+            _petHealthLabel = new Label { Text = "宠物: 100%" };
+            _petHealthLabel.SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+            petHealthHBox.AddChild(_petHealthLabel);
+
+            _petHealthBar = new ProgressBar
+            {
+                MinValue = 0,
+                MaxValue = 100,
+                Value = 100,
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+            };
+            _petHealthBar.CustomMinimumSize = new Vector2(0, 20);
+            petHealthHBox.AddChild(_petHealthBar);
+
+            // Player health
+            var playerHealthHBox = new HBoxContainer();
+            tacticalTab.AddChild(playerHealthHBox);
+
+            _playerHealthLabel = new Label { Text = "玩家: 100%" };
+            _playerHealthLabel.SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+            playerHealthHBox.AddChild(_playerHealthLabel);
+
+            _playerHealthBar = new ProgressBar
+            {
+                MinValue = 0,
+                MaxValue = 100,
+                Value = 100,
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+            };
+            _playerHealthBar.CustomMinimumSize = new Vector2(0, 20);
+            playerHealthHBox.AddChild(_playerHealthBar);
+
+            // Decision log section
+            var logTitle = new Label { Text = "--- 决策日志 (Readable Failure) ---" };
+            logTitle.AddThemeFontSizeOverride("font_size", 14);
+            tacticalTab.AddChild(logTitle);
+
+            var logScroll = new ScrollContainer
+            {
+                SizeFlagsVertical = Control.SizeFlags.ExpandFill
+            };
+            tacticalTab.AddChild(logScroll);
+
+            _decisionLogLabel = new Label
+            {
+                Text = "等待决策...",
+                VerticalAlignment = VerticalAlignment.Top,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart
+            };
+            _decisionLogLabel.CustomMinimumSize = new Vector2(0, 100);
+            logScroll.AddChild(_decisionLogLabel);
+
+            // Connect PetTacticalAI signals if available
+            var tacticalAI = PetTacticalAI.Instance;
+            if (tacticalAI != null)
+            {
+                tacticalAI.OnTacticalModeChanged += OnPetTacticalModeChanged;
+                tacticalAI.OnTacticalDecision += OnTacticalDecision;
+            }
         }
 
         private void ConnectSignals()
@@ -200,6 +319,104 @@ namespace ClawRPG.Scripts.UI
             {
                 _companionSystem.SetPetRole(_selectedPetId, role);
             }
+        }
+
+        /// <summary>
+        /// Handle tactical mode button press - REQ-112-03
+        /// </summary>
+        private void OnTacticalModePressed(PetTacticalAI.PetTacticalMode mode)
+        {
+            var tacticalAI = PetTacticalAI.Instance;
+            if (tacticalAI != null)
+            {
+                tacticalAI.SetTacticalMode(mode);
+                AppendDecisionLog($"[玩家] 切换至 {GetModeName(mode)}");
+            }
+            else
+            {
+                GD.PushWarning("[PetCombatCompanionUI] PetTacticalAI.Instance is null");
+            }
+        }
+
+        /// <summary>
+        /// Handle tactical mode changes from PetTacticalAI
+        /// </summary>
+        private void OnPetTacticalModeChanged(PetTacticalAI.PetTacticalMode oldMode, PetTacticalAI.PetTacticalMode newMode)
+        {
+            _tacticalModeLabel.Text = $"战术模式: {GetModeName(newMode)}";
+            UpdateModeButtonHighlight(newMode);
+        }
+
+        /// <summary>
+        /// Handle tactical decision events - REQ-112-04 Readable Failure
+        /// </summary>
+        private void OnTacticalDecision(string reason)
+        {
+            AppendDecisionLog(reason);
+        }
+
+        /// <summary>
+        /// Append a line to the decision log
+        /// </summary>
+        private void AppendDecisionLog(string line)
+        {
+            if (_decisionLogLabel == null) return;
+            
+            string existing = _decisionLogLabel.Text;
+            if (existing == "等待决策..." || existing == "")
+            {
+                _decisionLogLabel.Text = line;
+            }
+            else
+            {
+                // Keep last 5 lines
+                string[] lines = existing.Split('\n');
+                if (lines.Length >= 5)
+                {
+                    var trimmed = new List<string>(lines);
+                    while (trimmed.Count >= 5) trimmed.RemoveAt(0);
+                    _decisionLogLabel.Text = string.Join("\n", trimmed) + "\n" + line;
+                }
+                else
+                {
+                    _decisionLogLabel.Text = existing + "\n" + line;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update tactical UI state
+        /// </summary>
+        private void RefreshTacticalUI()
+        {
+            var tacticalAI = PetTacticalAI.Instance;
+            if (tacticalAI != null)
+            {
+                var mode = tacticalAI.GetCurrentMode();
+                _tacticalModeLabel.Text = $"战术模式: {GetModeName(mode)}";
+                UpdateModeButtonHighlight(mode);
+            }
+        }
+
+        /// <summary>
+        /// Highlight the active mode button
+        /// </summary>
+        private void UpdateModeButtonHighlight(PetTacticalAI.PetTacticalMode activeMode)
+        {
+            _btnFollow.ButtonDisabled = activeMode != PetTacticalAI.PetTacticalMode.Follow;
+            _btnProtect.ButtonDisabled = activeMode != PetTacticalAI.PetTacticalMode.Protect;
+            _btnAttack.ButtonDisabled = activeMode != PetTacticalAI.PetTacticalMode.Attack;
+        }
+
+        private string GetModeName(PetTacticalAI.PetTacticalMode mode)
+        {
+            return mode switch
+            {
+                PetTacticalAI.PetTacticalMode.Follow => "跟随",
+                PetTacticalAI.PetTacticalMode.Protect => "保护",
+                PetTacticalAI.PetTacticalMode.Attack => "进攻",
+                _ => "未知"
+            };
         }
 
         private void OnComboChainChanged(string petId, int chain)
@@ -305,6 +522,33 @@ namespace ClawRPG.Scripts.UI
             _learningLabel.Text = text;
         }
 
+        public override void _Process(double delta)
+        {
+            // Update health bars from PetTacticalAI state
+            RefreshHealthDisplay();
+        }
+
+        /// <summary>
+        /// Refresh health display from PetTacticalAI
+        /// </summary>
+        private void RefreshHealthDisplay()
+        {
+            var tacticalAI = PetTacticalAI.Instance;
+            if (tacticalAI == null) return;
+
+            // Pet health
+            float petHP = tacticalAI.GetPetHealthPercent();
+            int petPercent = (int)(petHP * 100);
+            _petHealthLabel.Text = $"宠物: {petPercent}%";
+            _petHealthBar.Value = petPercent;
+
+            // Player health
+            float playerHP = tacticalAI.GetPlayerHealthPercent();
+            int playerPercent = (int)(playerHP * 100);
+            _playerHealthLabel.Text = $"玩家: {playerPercent}%";
+            _playerHealthBar.Value = playerPercent;
+        }
+
         public override void _Notification(int what)
         {
             if (what == NotificationExitTree)
@@ -316,6 +560,13 @@ namespace ClawRPG.Scripts.UI
                     _companionSystem.SyncLevelChanged -= OnSyncLevelChanged;
                     _companionSystem.ComboExecuted -= OnComboExecuted;
                     _companionSystem.LearningUpdated -= OnLearningUpdated;
+                }
+
+                var tacticalAI = PetTacticalAI.Instance;
+                if (tacticalAI != null)
+                {
+                    tacticalAI.OnTacticalModeChanged -= OnPetTacticalModeChanged;
+                    tacticalAI.OnTacticalDecision -= OnTacticalDecision;
                 }
             }
         }
