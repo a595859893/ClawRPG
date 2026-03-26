@@ -99,6 +99,10 @@ namespace ClawRPG.Scripts.Systems
             var enemyLifecycleManager = new EnemyLifecycleManager { Name = "EnemyLifecycleManager" };
             _main.AddChild(enemyLifecycleManager);
 
+            // 战斗前Combo预览系统
+            var combatPreloadComboSystem = new CombatPreloadComboSystem { Name = "CombatPreloadComboSystem" };
+            _main.AddChild(combatPreloadComboSystem);
+
             GD.Print("Additional managers initialized");
         }
 
