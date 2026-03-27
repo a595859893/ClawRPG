@@ -19,7 +19,9 @@ namespace ClawRPG.Scripts.Systems.Pets
         
         // 宠物战斗属性
         private Pet _activePet;
+        private Node2D _petNode;  // 宠物场景节点（用于位置/移动）
         private CharacterBody2D _player;
+        private Node2D _currentTarget;  // 当前攻击目标
         
         // AI配置
         private float _followDistance = 80f;
@@ -69,6 +71,14 @@ namespace ClawRPG.Scripts.Systems.Pets
                 _decisionSystem.DeterminePersonalityFromPetType(pet.Type);
             }
         }
+
+        /// <summary>
+        /// 设置宠物场景节点（用于位置/移动）
+        /// </summary>
+        public void SetPetNode(Node2D petNode)
+        {
+            _petNode = petNode;
+        }
         
         /// <summary>
         /// 设置玩家引用
@@ -83,7 +93,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// </summary>
         public override void _Process(double delta)
         {
-            if (_activePet == null || _player == null)
+            if (_activePet == null || _player == null || _petNode == null)
                 return;
             
             float deltaF = (float)delta;
@@ -104,7 +114,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         private void UpdateStateMachine(float delta)
         {
             Vector2 playerPos = _player.GlobalPosition;
-            Vector2 petPos = _activePet.GlobalPosition;
+            Vector2 petPos = _petNode.GlobalPosition;
             float distToPlayer = petPos.DistanceTo(playerPos);
             
             // 检测附近敌人
@@ -143,7 +153,8 @@ namespace ClawRPG.Scripts.Systems.Pets
             switch (_currentState)
             {
                 case PetAIState.Idle:
-                    // 待命状态
+                    // 待命状态 - 保持跟随距离
+                    FollowPlayer(delta);
                     break;
                     
                 case PetAIState.Following:
@@ -151,11 +162,11 @@ namespace ClawRPG.Scripts.Systems.Pets
                     break;
                     
                 case PetAIState.Engaging:
+                    EngageEnemy(delta);
+                    break;
+                    
                 case PetAIState.Attacking:
-                    if (_activePet != null)
-                    {
-                        // 寻找目标并攻击
-                    }
+                    AttackEnemy(delta);
                     break;
                     
                 case PetAIState.Retreating:
@@ -167,17 +178,106 @@ namespace ClawRPG.Scripts.Systems.Pets
                     break;
             }
         }
+
+        /// <summary>
+        /// 接近敌人
+        /// </summary>
+        private void EngageEnemy(float delta)
+        {
+            var enemies = DetectNearbyEnemies();
+            if (enemies.Count == 0) return;
+            
+            // 选择最近的敌人
+            Node2D target = GetClosestEnemy(enemies);
+            if (target == null) return;
+            
+            _currentTarget = target;
+            
+            Vector2 enemyPos = target.GlobalPosition;
+            float dist = _petNode.GlobalPosition.DistanceTo(enemyPos);
+            
+            // 接近到攻击范围
+            if (dist > _attackRange)
+            {
+                MoveTowards(enemyPos, delta, _followSpeed);
+            }
+            else
+            {
+                // 进入攻击范围，切换到攻击状态
+                ChangeState(PetAIState.Attacking);
+            }
+        }
+
+        /// <summary>
+        /// 攻击敌人
+        /// </summary>
+        private void AttackEnemy(float delta)
+        {
+            var enemies = DetectNearbyEnemies();
+            
+            // 目标死亡或丢失，切换到跟随
+            if (_currentTarget == null || !IsInstanceValid(_currentTarget) || !enemies.Contains(_currentTarget))
+            {
+                _currentTarget = enemies.Count > 0 ? GetClosestEnemy(enemies) : null;
+                if (_currentTarget == null)
+                {
+                    ChangeState(PetAIState.Following);
+                    return;
+                }
+            }
+            
+            Vector2 enemyPos = _currentTarget.GlobalPosition;
+            float dist = _petNode.GlobalPosition.DistanceTo(enemyPos);
+            
+            // 超出攻击范围，切换到接近
+            if (dist > _attackRange * 1.5f)
+            {
+                ChangeState(PetAIState.Engaging);
+                return;
+            }
+            
+            // 攻击冷却检查
+            double currentTime = Time.GetTicksMsec() / 1000.0;
+            if (currentTime - _lastAttackTime < _attackCooldown)
+                return;
+            
+            // 执行攻击
+            PerformAttack();
+        }
+
+        /// <summary>
+        /// 执行一次攻击
+        /// </summary>
+        private void PerformAttack()
+        {
+            if (_currentTarget == null || !IsInstanceValid(_currentTarget))
+                return;
+            
+            // 计算伤害（基于宠物属性）
+            int baseDamage = _activePet != null ? _activePet.GetTotalAttackBonus() : 5;
+            int damage = Mathf.Max(1, baseDamage);
+            
+            // 对敌人造成伤害
+            if (_currentTarget is Enemy enemy)
+            {
+                enemy.TakeDamage(damage);
+                _lastAttackTime = Time.GetTicksMsec() / 1000.0;
+                
+                GD.Print($"[PetCombatAI] {_activePet?.PetName ?? "Pet"} attacks {_currentTarget.Name} for {damage}");
+                EmitSignal(SignalName.PetAttacked, _currentTarget, damage);
+            }
+        }
         
         /// <summary>
         /// 跟随玩家
         /// </summary>
         private void FollowPlayer(float delta)
         {
-            if (_player == null || _activePet == null)
+            if (_player == null || _petNode == null)
                 return;
             
             Vector2 targetPos = _player.GlobalPosition;
-            float dist = _activePet.GlobalPosition.DistanceTo(targetPos);
+            float dist = _petNode.GlobalPosition.DistanceTo(targetPos);
             
             // 保持跟随距离
             if (dist > _followDistance)
@@ -191,7 +291,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// </summary>
         private void Retreat(float delta)
         {
-            if (_player == null || _activePet == null)
+            if (_player == null || _petNode == null)
                 return;
             
             // 向玩家移动
@@ -217,23 +317,69 @@ namespace ClawRPG.Scripts.Systems.Pets
         }
         
         /// <summary>
-        /// 移动到目标
+        /// 移动到目标（使用宠物节点）
         /// </summary>
         private void MoveTowards(Vector2 targetPos, float delta, float speed)
         {
-            // 简化实现
-            Vector2 direction = (targetPos - _activePet.GlobalPosition).Normalized();
-            _activePet.GlobalPosition += direction * speed * delta;
+            if (_petNode == null) return;
+            
+            Vector2 direction = (targetPos - _petNode.GlobalPosition).Normalized();
+            _petNode.GlobalPosition += direction * speed * delta;
         }
         
         /// <summary>
-        /// 检测附近敌人
+        /// 检测附近敌人（使用 Godot 敌人组）
         /// </summary>
         private List<Node2D> DetectNearbyEnemies()
         {
-            // 简化实现，返回空列表
-            // 实际需要使用 Area2D 检测
-            return new List<Node2D>();
+            var enemies = GetTree().GetNodesInGroup("enemy");
+            var result = new List<Node2D>();
+            
+            foreach (var node in enemies)
+            {
+                if (node is Node2D enemy)
+                {
+                    // 过滤死亡或无效节点
+                    if (!IsInstanceValid(enemy)) continue;
+                    
+                    // 检查距离（使用攻击范围的 2 倍作为检测范围）
+                    if (_petNode != null)
+                    {
+                        float dist = _petNode.GlobalPosition.DistanceTo(enemy.GlobalPosition);
+                        if (dist < _attackRange * 2.5f)
+                        {
+                            result.Add(enemy);
+                        }
+                    }
+                }
+            }
+            
+            return result;
+        }
+
+        /// <summary>
+        /// 获取最近的敌人
+        /// </summary>
+        private Node2D GetClosestEnemy(List<Node2D> enemies)
+        {
+            if (_petNode == null || enemies.Count == 0) return null;
+            
+            Node2D closest = null;
+            float minDist = float.MaxValue;
+            
+            foreach (var enemy in enemies)
+            {
+                if (!IsInstanceValid(enemy)) continue;
+                
+                float dist = _petNode.GlobalPosition.DistanceTo(enemy.GlobalPosition);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    closest = enemy;
+                }
+            }
+            
+            return closest;
         }
         
         /// <summary>
