@@ -75,6 +75,30 @@ public partial class SkillComboSystem : BaseSystem
         {
             _activeSkillQueue.RemoveAt(0);
         }
+
+        // REQ-136: 通知宠物系统玩家使用了技能（协同攻击触发）
+        NotifyPetOfPlayerAttack(skillId);
+    }
+
+    /// <summary>
+    /// REQ-136: 玩家使用技能时通知宠物系统，宠物根据SyncLevel决定是否发动协同攻击
+    /// </summary>
+    private void NotifyPetOfPlayerAttack(string skillId)
+    {
+        if (PetCombatCompanionSystem.Instance == null)
+            return;
+
+        string petId = PetCombatCompanionSystem.Instance.GetActivePetId();
+        if (string.IsNullOrEmpty(petId))
+            return;
+
+        // 获取玩家位置
+        Vector2 playerPos = Vector2.Zero;
+        var player = GetTree().GetFirstNodeInGroup("player");
+        if (player != null)
+            playerPos = player.GlobalPosition;
+
+        PetCombatCompanionSystem.Instance.RecordPlayerAttack(petId, skillId, playerPos);
     }
     
     private void CheckComboActivation(string skillId, float currentTime)

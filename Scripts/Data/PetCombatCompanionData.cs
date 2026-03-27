@@ -16,6 +16,17 @@ namespace ClawRPG.Scripts.Data
         public int TotalCombos { get; set; }
         public float TotalComboDamage { get; set; }
         public int HighestComboChain { get; set; }
+
+        // Active companion tracking (REQ-136)
+        public string ActivePetId { get; set; } = "";
+        public string CurrentRole { get; set; } = "Attacker";
+        public float SyncLevel { get; set; } = 0.5f;
+        public int ComboCount { get; set; }
+        public int MaxComboCount { get; set; }
+        public int TotalAttacksAssisted { get; set; }
+        public int TotalDamageDealt { get; set; }
+        public int TotalEnemiesDefeated { get; set; }
+        public List<string> LearnedSkills { get; set; } = new List<string>();
     }
 
     public class PetCompanionState

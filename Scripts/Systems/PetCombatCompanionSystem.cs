@@ -22,6 +22,10 @@ namespace ClawRPG.Scripts.Systems
         public Signal<string, ComboType, float> ComboExecuted { get; }
         public Signal<string, string> LearningUpdated { get; }
         public Signal<string, Vector2> PositionRecommendation { get; }
+        /// <summary>
+        /// 宠物协同攻击触发（REQ-136）：玩家combo触发后，宠物根据syncLevel概率发动协战
+        /// </summary>
+        public Signal<string, string, float> SynergyAttackTriggered { get; } // petId, attackType, syncLevel
 
         public override void _Ready()
         {
@@ -170,6 +174,15 @@ namespace ClawRPG.Scripts.Systems
 
             // Update sync level based on timing
             UpdateSyncLevel(petId, timeSinceLastAction);
+
+            // REQ-136: 协同攻击概率触发
+            // attackChance = 0.3f + syncLevel * 0.5f
+            float attackChance = 0.3f + state.SyncLevel * 0.5f;
+            if (Random.Shared.NextFloat() < attackChance && state.ComboChain >= 1)
+            {
+                ExecuteCombo(petId, state.ComboChain);
+                SynergyAttackTriggered?.Emit(petId, attackType, state.SyncLevel);
+            }
         }
 
         private void ExecuteCombo(string petId, int chainLength)
@@ -342,6 +355,24 @@ namespace ClawRPG.Scripts.Systems
                 return state.SyncLevel;
             }
             return 0.5f;
+        }
+
+        /// <summary>
+        /// 获取当前激活的宠物ID（REQ-136）
+        /// </summary>
+        public string GetActivePetId()
+        {
+            if (!string.IsNullOrEmpty(_companionData.ActivePetId) &&
+                _companionData.PetStates.ContainsKey(_companionData.ActivePetId))
+            {
+                return _companionData.ActivePetId;
+            }
+            // Fallback: return first registered pet
+            foreach (var petId in _companionData.PetStates.Keys)
+            {
+                return petId;
+            }
+            return "";
         }
 
         #endregion
