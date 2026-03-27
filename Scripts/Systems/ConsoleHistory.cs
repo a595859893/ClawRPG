@@ -19,6 +19,10 @@ public class ConsoleHistory
     private int _navigationIndex = -1;
     private string _configPath => "user://clawrpg_console.cfg".ToGodotPath();
 
+    // REQ-125: Search state — persists filtered navigation
+    private List<string> _searchResults = new List<string>();
+    private int _searchNavigationIndex = -1;
+
     /// <summary>
     /// 加载历史记录（从本地 ConfigFile）
     /// </summary>
@@ -61,7 +65,7 @@ public class ConsoleHistory
     }
 
     /// <summary>
-    /// 添加命令到历史（不重复最近的命令）
+    /// 添加命令到历史（完整去重 — 扫描全部历史，REQ-125 Gap #2）
     /// </summary>
     public void Add(string command)
     {
@@ -70,9 +74,9 @@ public class ConsoleHistory
 
         string trimmed = command.Trim();
 
-        // 不重复最近一条
-        if (_history.Count > 0 && _history[^1] == trimmed)
-            return;
+        // 扫描全部历史去重，不只是最近一条
+        if (_history.Contains(trimmed))
+            _history.Remove(trimmed);
 
         _history.Add(trimmed);
 
@@ -81,6 +85,7 @@ public class ConsoleHistory
             _history.RemoveAt(0);
 
         _navigationIndex = -1;
+        ClearSearch();
     }
 
     /// <summary>
@@ -90,24 +95,30 @@ public class ConsoleHistory
 
     /// <summary>
     /// 导航历史：direction=-1 往旧，direction=+1 往新
+    /// 当有活跃搜索时，只在搜索结果中导航
     /// 返回 null 表示越界（回到当前输入）
     /// </summary>
     public string Navigate(int direction)
     {
+        // Use search results if a search is active
+        if (_searchResults.Count > 0)
+            return NavigateSearch(direction);
+
         if (_history.Count == 0)
             return null;
 
         int newIndex = _navigationIndex + direction;
 
-        if (newIndex < -1)
+        // REQ-125 Gap #3: at oldest end (index = count-1) and pressing Down → return null (current input)
+        if (newIndex >= _history.Count)
         {
             _navigationIndex = -1;
             return null;
         }
-        if (newIndex >= _history.Count)
+        if (newIndex < -1)
         {
-            _navigationIndex = _history.Count - 1;
-            return _history[^1];
+            _navigationIndex = -1;
+            return null;
         }
 
         _navigationIndex = newIndex;
@@ -118,13 +129,72 @@ public class ConsoleHistory
         return _history[_history.Count - 1 - _navigationIndex];
     }
 
+    private string NavigateSearch(int direction)
+    {
+        int newIndex = _searchNavigationIndex + direction;
+
+        // At oldest end and pressing Down → return null (current input)
+        if (newIndex >= _searchResults.Count)
+        {
+            _searchNavigationIndex = -1;
+            return null;
+        }
+        if (newIndex < -1)
+        {
+            _searchNavigationIndex = -1;
+            return null;
+        }
+
+        _searchNavigationIndex = newIndex;
+
+        if (_searchNavigationIndex == -1)
+            return null;
+
+        return _searchResults[_searchResults.Count - 1 - _searchNavigationIndex];
+    }
+
     /// <summary>
     /// 重置导航位置
     /// </summary>
     public void ResetNavigation()
     {
         _navigationIndex = -1;
+        _searchNavigationIndex = -1;
     }
+
+    /// <summary>
+    /// REQ-125 Gap #1: 部分匹配搜索历史（大小写不敏感）
+    /// 输入 "att" 能找到 "attack"、"defend" 等所有含 "att" 的历史
+    /// </summary>
+    public IReadOnlyList<string> Search(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            ClearSearch();
+            return _history.AsReadOnly();
+        }
+
+        string lower = query.ToLower();
+        _searchResults = _history
+            .Where(cmd => cmd.ToLower().Contains(lower))
+            .ToList();
+        _searchNavigationIndex = -1;
+        return _searchResults.AsReadOnly();
+    }
+
+    /// <summary>
+    /// 清除搜索状态，回到完整历史
+    /// </summary>
+    public void ClearSearch()
+    {
+        _searchResults.Clear();
+        _searchNavigationIndex = -1;
+    }
+
+    /// <summary>
+    /// 是否有活跃搜索
+    /// </summary>
+    public bool IsSearchActive => _searchResults.Count > 0;
 
     /// <summary>
     /// Tab 补全：返回匹配的命令名或 null
