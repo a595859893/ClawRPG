@@ -340,6 +340,18 @@ namespace ClawRPG.Systems
                 _data.CurrentDeck.Add(cardId);
             }
         }
+
+        /// <summary>
+        /// 直接添加卡牌到手牌（用于沉积卡等外部系统注入）
+        /// </summary>
+        public void AddCardToHand(string cardId)
+        {
+            if (!_hand.Contains(cardId))
+            {
+                _hand.Add(cardId);
+                _data.TotalCardsDrawn++;
+            }
+        }
         
         /// <summary>
         /// 从套牌移除卡牌
