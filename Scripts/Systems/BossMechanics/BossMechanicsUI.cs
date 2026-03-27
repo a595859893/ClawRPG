@@ -18,7 +18,7 @@ public class BossMechanicsUI : Control
     
     // 战斗标签页
     private Control _battleTab;
-    private ProgressBar _bossHealthBar;
+    private ConfidenceFloorHealthBar _bossHealthBar;
     private Label _bossNameLabel;
     private Label _phaseLabel;
     private Label _enrageLabel;
@@ -126,11 +126,8 @@ public class BossMechanicsUI : Control
         _bossNameLabel.Align = Label.AlignEnum.Center;
         vbox.AddChild(_bossNameLabel);
 
-        _bossHealthBar = new ProgressBar();
-        _bossHealthBar.MinValue = 0;
-        _bossHealthBar.MaxValue = 100;
-        _bossHealthBar.Value = 100;
-        _bossHealthBar.ShowPercentage = false;
+        _bossHealthBar = new ConfidenceFloorHealthBar();
+        _bossHealthBar.SetThresholds(0.3f, 0.15f); // 30% warning, 15% danger
         vbox.AddChild(_bossHealthBar);
 
         // 阶段和狂暴状态
@@ -302,8 +299,7 @@ public class BossMechanicsUI : Control
 
     private void UpdateBattleUI(BossBattleInstance battle)
     {
-        _bossHealthBar.MaxValue = battle.Config.MaxHealth;
-        _bossHealthBar.Value = battle.CurrentHealth;
+        _bossHealthBar.SetHealth(battle.CurrentHealth, battle.Config.MaxHealth);
         
         _phaseLabel.Text = $"阶段: {battle.CurrentPhase}/{battle.Config.PhaseCount}";
         
