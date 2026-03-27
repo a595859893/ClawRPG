@@ -255,6 +255,7 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("pet", typeof(ClawRPG.Scripts.Systems.Pets.VFX.PetAttackVFX));
             RegisterSystemInGroup("pet", typeof(ClawRPG.Scripts.Systems.Pets.VFX.PetSynergyTracker));
             RegisterSystemInGroup("pet", typeof(PetReplayTraceSystem));
+            RegisterSystemInGroup("pet", typeof(ClawRPG.Scripts.Systems.Pets.AI.AdversarialObserverSystem));
 
             // 活动与挑战系统
             RegisterSystemInGroup("event", typeof(SeasonalEventSystem));

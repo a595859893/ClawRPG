@@ -229,6 +229,9 @@ public partial class SkillComboSystem : BaseSystem
         // Record combo usage for fatigue system (REQ-120)
         _lastCompletedComboId = combo.ComboId;
         ComboFatigueSystem.Instance.RecordComboUsage(combo.ComboId);
+
+        // Record player action for adversarial observer (REQ-138)
+        ClawRPG.Systems.Pets.AI.AdversarialObserverSystem.Instance?.RecordPlayerAction("attack", "enemy_combo", Vector2.Zero, 1.0f, combo.Bonus.DamageMultiplier, 0f);
         
         // Apply combo bonus
         ApplyComboBonus(combo.Bonus);
