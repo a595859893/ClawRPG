@@ -275,7 +275,14 @@ public class PetBehaviorLogger : Node
 
         imprint.LastRecordedAt = DateTime.Now;
         imprint.TotalTriggers++;
-        bool leveledUp = imprint.AddXp(GetXpForBehavior(behavior));
+        float xpGained = GetXpForBehavior(behavior);
+        bool leveledUp = imprint.AddXp(xpGained);
+
+        // Notify level tracker for decay management and UI updates
+        if (MimicryLevelTracker.Instance != null)
+        {
+            MimicryLevelTracker.Instance.OnImprintXpGained(imprint, xpGained);
+        }
 
         if (leveledUp)
         {
