@@ -48,6 +48,7 @@ public class TreasureHuntManager : BaseSystem
     
     // Regions
     private List<HuntRegion> regions = new List<HuntRegion>();
+    private Dictionary<string, HuntRegion> regionsById = new Dictionary<string, HuntRegion>();
     
     // UI
     private Control ui;
@@ -164,6 +165,12 @@ public class TreasureHuntManager : BaseSystem
         regions.Add(ocean);
         regions.Add(volcano);
         regions.Add(ice);
+        
+        // Build O(1) lookup dictionary
+        foreach (var r in regions)
+        {
+            regionsById[r.id] = r;
+        }
     }
     
     public void ToggleUI()
@@ -186,7 +193,8 @@ public class TreasureHuntManager : BaseSystem
         if (ui == null)
         {
             ui = (Control)GD.Load<PackedScene>("res://UI/TreasureHuntUI.tscn").Instance();
-            GetTree().CurrentScene.AddChild(ui);
+            // Use CallDeferred to safely add to scene tree at a safe lifecycle point
+            GetTree().CurrentScene.CallDeferred("add_child", ui);
             ui.Visible = isUIVisible;
         }
     }
@@ -207,18 +215,8 @@ public class TreasureHuntManager : BaseSystem
         
         PlayerHuntData data = playerHuntData[playerId];
         
-        // Find region
-        HuntRegion region = null;
-        foreach (var r in regions)
-        {
-            if (r.id == regionId)
-            {
-                region = r;
-                break;
-            }
-        }
-        
-        if (region == null)
+        // Find region — O(1) dictionary lookup
+        if (!regionsById.TryGetValue(regionId, out HuntRegion region))
         {
             return false;
         }
@@ -238,9 +236,8 @@ public class TreasureHuntManager : BaseSystem
         // Deduct energy
         data.currentEnergy -= region.energyCost;
         
-        // Determine success
-        Random rand = new Random();
-        bool success = rand.NextDouble() < region.successRate;
+        // Determine success — use thread-safe shared Random instance
+        bool success = Random.Shared.NextDouble() < region.successRate;
         
         data.totalHunts++;
         
@@ -266,7 +263,7 @@ public class TreasureHuntManager : BaseSystem
                 Player.Instance.AddGold(treasure.goldReward);
                 Player.Instance.AddExp(treasure.expReward);
                 
-                if (!string.IsNullOrEmpty(treasure.itemId) && rand.NextDouble() < treasure.dropChance)
+                if (!string.IsNullOrEmpty(treasure.itemId) && Random.Shared.NextDouble() < treasure.dropChance)
                 {
                     // Add item to inventory
                     if (InventoryManager.Instance != null)
@@ -291,8 +288,7 @@ public class TreasureHuntManager : BaseSystem
     
     private Treasure SelectTreasure(List<Treasure> treasures)
     {
-        Random rand = new Random();
-        float roll = (float)rand.NextDouble();
+        float roll = (float)Random.Shared.NextDouble();
         float cumulative = 0;
         
         foreach (var treasure in treasures)

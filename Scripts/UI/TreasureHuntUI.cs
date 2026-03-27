@@ -172,11 +172,15 @@ namespace ClawRPG.UI
                 return;
             }
 
-            // Note: TreasureHuntManager is still GDScript
-            // var success = TreasureHuntManager.Instance.StartHunt(playerId, selectedRegion.Id);
+            var region = _selectedRegion as TreasureHuntManager.HuntRegion;
+            if (region == null)
+            {
+                return;
+            }
 
-            // For now, show placeholder result
-            ShowResult(true);
+            int playerId = Player.Instance != null ? Player.Instance.playerId : 0;
+            bool success = TreasureHuntManager.Instance.StartHunt(playerId, region.id);
+            ShowResult(success);
         }
 
         /// <summary>
