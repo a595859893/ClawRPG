@@ -428,6 +428,34 @@ namespace ClawRPG.Scripts.Systems.Pets
             // 设置宠物精灵可见性
         }
         
+        /// <summary>
+        /// 获取宠物当前锁定的攻击目标
+        /// </summary>
+        public Node2D GetCurrentTarget() => _currentTarget;
+        
+        /// <summary>
+        /// 获取宠物周围所有可攻击的敌人
+        /// </summary>
+        public List<Node2D> GetNearbyEnemies()
+        {
+            return DetectNearbyEnemies();
+        }
+        
+        /// <summary>
+        /// 对目标敌人造成宠物战斗伤害（由 PetCombatCompanionSystem 调用 combo 伤害）
+        /// </summary>
+        public void ApplyComboDamageToTarget(Node2D target, float damage)
+        {
+            if (target == null || !IsInstanceValid(target))
+                return;
+            
+            if (target is Enemy enemy)
+            {
+                enemy.TakeDamage((int)damage);
+                GD.Print($"[PetCombatAI] Combo damage applied: {target.Name} took {damage} damage");
+            }
+        }
+        
         #region Properties
         
         public bool IsEnabled { get; set; } = true;

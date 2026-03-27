@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.Pets;
 
 namespace ClawRPG.Scripts.Systems
 {
@@ -202,7 +203,62 @@ namespace ClawRPG.Scripts.Systems
 
             _companionData.TotalComboDamage += damage;
             
+            // Apply actual damage to enemy target(s)
+            ApplyComboDamage(petId, damage, chainLength);
+            
             ComboExecuted?.Emit(petId, comboType, damage);
+        }
+        
+        /// <summary>
+        /// 将 combo 伤害实际施加到敌人（REQ-134 核心修复）
+        /// </summary>
+        private void ApplyComboDamage(string petId, float damage, int chainLength)
+        {
+            // 获取 PetCombatAI 实例
+            var petAI = PetCombatAI.Instance;
+            if (petAI == null)
+            {
+                GD.PrintErr("[PetCombatCompanionSystem] PetCombatAI.Instance is null, cannot apply combo damage");
+                return;
+            }
+            
+            // 获取当前目标
+            var currentTarget = petAI.GetCurrentTarget();
+            
+            if (chainLength <= 1 || currentTarget == null)
+            {
+                // 单目标攻击
+                if (currentTarget != null)
+                {
+                    petAI.ApplyComboDamageToTarget(currentTarget, damage);
+                }
+                return;
+            }
+            
+            // 多目标：分裂伤害
+            var enemies = petAI.GetNearbyEnemies();
+            if (enemies.Count == 0)
+            {
+                if (currentTarget != null)
+                {
+                    petAI.ApplyComboDamageToTarget(currentTarget, damage);
+                }
+                return;
+            }
+            
+            int targetCount = Mathf.Min(chainLength, enemies.Count);
+            float damagePerTarget = damage / targetCount;
+            
+            for (int i = 0; i < targetCount; i++)
+            {
+                var enemy = enemies[i];
+                if (IsInstanceValid(enemy))
+                {
+                    petAI.ApplyComboDamageToTarget(enemy, damagePerTarget);
+                }
+            }
+            
+            GD.Print($"[PetCombatCompanionSystem] Multi-target combo: {targetCount} enemies, {damagePerTarget:F1} damage each");
         }
 
         private ComboType DetermineComboType(int chainLength, string role)
