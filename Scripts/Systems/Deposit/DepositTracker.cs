@@ -92,7 +92,7 @@ public class DepositTracker : Node
             int depositEvents = _damageTaken / 15;
             for (int i = 0; i < depositEvents; i++)
             {
-                DepositData.Instance?.RecordDeposit(DepositData.DepositType.Sediment, XP_PER_DAMAGE_TAKEN);
+                DepositData.Instance?.RecordDeposit(DepositData.DepositType.Sediment, XP_PER_DAMAGE_TAKEN * damageAmount);
             }
             _damageTaken %= 15;
         }
