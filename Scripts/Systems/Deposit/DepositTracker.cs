@@ -119,7 +119,7 @@ public class DepositTracker : Node
         if (_fireDamageDealt > 0)
             DepositData.Instance?.RecordDeposit(DepositData.DepositType.Ember, XP_PER_FIRE_DAMAGE * _fireDamageDealt / 10f);
         if (_damageTaken > 0)
-            DepositData.Instance?.RecordDeposit(DepositData.DepositType.Sediment, XP_PER_DAMAGE_TAKEN * XP_PER_DAMAGE_TAKEN / 15f);
+            DepositData.Instance?.RecordDeposit(DepositData.DepositType.Sediment, _damageTaken * XP_PER_DAMAGE_TAKEN / 15f);
         if (_comboUses > 0)
             DepositData.Instance?.RecordDeposit(DepositData.DepositType.Echo, XP_PER_COMBO_USE * _comboUses);
         if (_lowHpActions > 0)
