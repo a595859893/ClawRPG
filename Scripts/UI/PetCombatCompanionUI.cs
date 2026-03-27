@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Pets.AI;
 
 namespace ClawRPG.Scripts.UI
@@ -35,7 +36,13 @@ namespace ClawRPG.Scripts.UI
         // Synergy tracker controls
         private Label _synergyCounterLabel;
         private PanelContainer _synergyBurstPanel;
-        
+
+        // Decision Review tab controls - REQ-137
+        private ScrollContainer _decisionScroll;
+        private VBoxContainer _decisionList;
+        private Label _decisionEmptyLabel;
+        private Button _btnRefreshDecision;
+
         private string _selectedPetId = "";
 
         public override void _Ready()
@@ -171,6 +178,7 @@ namespace ClawRPG.Scripts.UI
 
             // Tactical tab
             SetupTacticalTab();
+            SetupDecisionTab();
         }
 
         /// <summary>
@@ -311,7 +319,244 @@ namespace ClawRPG.Scripts.UI
             }
         }
 
-        private void ConnectSignals()
+        /// <summary>
+        /// Setup the Decision Review tab - REQ-137
+        /// Shows a timeline of pet AI decisions from the last battle
+        /// </summary>
+        private void SetupDecisionTab()
+        {
+            var decisionTab = new VBoxContainer { Name = "Decision" };
+            _tabContainer.AddChild(decisionTab);
+
+            // Header with title and refresh button
+            var headerHBox = new HBoxContainer();
+            decisionTab.AddChild(headerHBox);
+
+            var decisionTitle = new Label
+            {
+                Text = "宠物决策回顾",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            decisionTitle.AddThemeFontSizeOverride("font_size", 20);
+            headerHBox.AddChild(decisionTitle);
+
+            _btnRefreshDecision = new Button { Text = "🔄 刷新" };
+            _btnRefreshDecision.Pressed += OnRefreshDecisionPressed;
+            headerHBox.AddChild(_btnRefreshDecision);
+
+            // Stats summary
+            var statsHBox = new HBoxContainer();
+            decisionTab.AddChild(statsHBox);
+
+            var replaySystem = PetReplayTraceSystem.Instance;
+            if (replaySystem != null)
+            {
+                var (total, success, failure, rate) = replaySystem.GetStatistics();
+                var statsText = $"总决策: {total}  |  成功: {success}  |  失败: {failure}  |  成功率: {rate:P0}";
+                var statsLabel = new Label { Text = statsText };
+                statsLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+                statsHBox.AddChild(statsLabel);
+            }
+
+            // Decision list (scrollable)
+            _decisionScroll = new ScrollContainer
+            {
+                SizeFlagsVertical = Control.SizeFlags.ExpandFill
+            };
+            decisionTab.AddChild(_decisionScroll);
+
+            _decisionList = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+            _decisionScroll.AddChild(_decisionList);
+
+            _decisionEmptyLabel = new Label
+            {
+                Text = "暂无决策记录\n请先进行一场战斗",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            _decisionEmptyLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+            _decisionList.AddChild(_decisionEmptyLabel);
+
+            // Subscribe to PetReplayTraceSystem signals
+            if (replaySystem != null)
+            {
+                replaySystem.OnReplayFinished += OnReplayFinished;
+                replaySystem.OnDecisionRecorded += OnDecisionRecorded;
+            }
+        }
+
+        private void OnRefreshDecisionPressed()
+        {
+            RefreshDecisionTab();
+        }
+
+        private void OnReplayFinished()
+        {
+            // Refresh the decision list when replay finishes (battle ends)
+            RefreshDecisionTab();
+        }
+
+        private void OnDecisionRecorded(PetDecisionRecord record)
+        {
+            // Optionally update in real-time, but for now just refresh on battle end
+        }
+
+        private void RefreshDecisionTab()
+        {
+            // Clear existing entries
+            foreach (var child in _decisionList.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            var replaySystem = PetReplayTraceSystem.Instance;
+            if (replaySystem == null)
+            {
+                _decisionList.AddChild(new Label { Text = "PetReplayTraceSystem 不可用" });
+                return;
+            }
+
+            var records = replaySystem.GetCurrentBattleRecords();
+            if (records.Count == 0)
+            {
+                var emptyLabel = new Label
+                {
+                    Text = "暂无决策记录\n请先进行一场战斗",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                emptyLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+                _decisionList.AddChild(emptyLabel);
+                return;
+            }
+
+            // Add each decision as a card
+            foreach (var record in records)
+            {
+                AddDecisionCard(record);
+            }
+        }
+
+        private void AddDecisionCard(PetDecisionRecord record)
+        {
+            var card = new PanelContainer();
+            var cardStyle = new StyleBoxFlat
+            {
+                BgColor = GetDecisionColor(record.Outcome).WithAlpha(0.15f)
+            };
+            cardStyle.SetBorderWidthAll(1);
+            cardStyle.BorderColor = GetDecisionColor(record.Outcome).WithAlpha(0.4f);
+            cardStyle.SetCornerRadiusAll(4);
+            card.AddThemeStyleboxOverride("panel", cardStyle);
+            _decisionList.AddChild(card);
+
+            var cardVBox = new VBoxContainer();
+            card.AddChild(cardVBox);
+
+            // Header: tick + type + outcome icon
+            var headerHBox = new HBoxContainer();
+            cardVBox.AddChild(headerHBox);
+
+            var tickLabel = new Label
+            {
+                Text = $"[Tick {record.TickId}]",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            tickLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.8f, 1f));
+            tickLabel.AddThemeFontSizeOverride("font_size", 14);
+            headerHBox.AddChild(tickLabel);
+
+            var typeLabel = new Label
+            {
+                Text = GetDecisionTypeLabel(record.Type),
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            typeLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
+            typeLabel.AddThemeFontSizeOverride("font_size", 13);
+            headerHBox.AddChild(typeLabel);
+
+            var outcomeLabel = new Label
+            {
+                Text = GetOutcomeIcon(record.Outcome),
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+            outcomeLabel.AddThemeColorOverride("font_color", GetDecisionColor(record.Outcome));
+            headerHBox.AddChild(outcomeLabel);
+
+            // State transition info
+            if (record.Type == PetDecisionRecord.DecisionType.StateTransition)
+            {
+                var stateLabel = new Label
+                {
+                    Text = $"{record.StateBefore} → {record.StateAfter}",
+                    HorizontalAlignment = HorizontalAlignment.Left
+                };
+                stateLabel.AddThemeFontSizeOverride("font_size", 13);
+                stateLabel.AddThemeColorOverride("font_color", new Color(0.75f, 0.75f, 0.75f));
+                cardVBox.AddChild(stateLabel);
+            }
+
+            // Target info
+            if (!string.IsNullOrEmpty(record.TargetName) && record.TargetName != "null")
+            {
+                var targetLabel = new Label
+                {
+                    Text = $"目标: {record.TargetName} ({record.TargetDistance:F0}px)",
+                    HorizontalAlignment = HorizontalAlignment.Left
+                };
+                targetLabel.AddThemeFontSizeOverride("font_size", 13);
+                cardVBox.AddChild(targetLabel);
+            }
+
+            // Reason
+            if (!string.IsNullOrEmpty(record.Reason))
+            {
+                var reasonLabel = new Label
+                {
+                    Text = record.Reason,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    AutowrapMode = TextServer.AutowrapMode.WordSmart
+                };
+                reasonLabel.AddThemeFontSizeOverride("font_size", 12);
+                reasonLabel.AddThemeColorOverride("font_color", new Color(0.65f, 0.65f, 0.65f));
+                cardVBox.AddChild(reasonLabel);
+            }
+        }
+
+        private static string GetDecisionTypeLabel(PetDecisionRecord.DecisionType type)
+        {
+            return type switch
+            {
+                PetDecisionRecord.DecisionType.StateTransition => "🔄 状态切换",
+                PetDecisionRecord.DecisionType.TargetSelection => "🎯 目标选择",
+                PetDecisionRecord.DecisionType.BehaviorExecution => "⚡ 行为执行",
+                _ => "❓ 未知"
+            };
+        }
+
+        private static string GetOutcomeIcon(PetDecisionRecord.DecisionOutcome outcome)
+        {
+            return outcome switch
+            {
+                PetDecisionRecord.DecisionOutcome.Success => "✅",
+                PetDecisionRecord.DecisionOutcome.Failure => "❌",
+                PetDecisionRecord.DecisionOutcome.Cancelled => "⭕",
+                _ => "⚪"
+            };
+        }
+
+        private static Color GetDecisionColor(PetDecisionRecord.DecisionOutcome outcome)
+        {
+            return outcome switch
+            {
+                PetDecisionRecord.DecisionOutcome.Success => new Color(0.3f, 0.9f, 0.3f),
+                PetDecisionRecord.DecisionOutcome.Failure => new Color(0.9f, 0.3f, 0.2f),
+                PetDecisionRecord.DecisionOutcome.Cancelled => new Color(0.9f, 0.7f, 0.2f),
+                _ => new Color(0.6f, 0.6f, 0.6f)
+            };
+        }
+
+        private void ConnectSignals
         {
             if (_companionSystem != null)
             {

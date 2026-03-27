@@ -57,6 +57,15 @@ namespace ClawRPG.Scripts.Systems.Pets
             GD.Print("[PetReplayTraceSystem] Initialized with ring buffer capacity: ", _maxRecords);
         }
 
+        public override void _Process(double delta)
+        {
+            // 驱动回放状态机
+            if (_isReplaying)
+            {
+                UpdateReplay((float)delta);
+            }
+        }
+
         private void OnCombatStarted()
         {
             StartBattle();
