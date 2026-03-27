@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ClawRPG.Systems;
 using SkillComboSystem = global::SkillComboSystem;
 using ComboFatigueSystem = global::ComboFatigueSystem;
+using WeaponResonanceSystem = global::ClawRPG.Scripts.Systems.WeaponResonance.WeaponResonanceSystem;
 
 namespace ClawRPG.Scripts.Skills {
     /// <summary>
@@ -255,11 +256,26 @@ namespace ClawRPG.Scripts.Skills {
                     float fatigueMultiplier = ComboFatigueSystem.Instance?.GetDamageMultiplier(lastComboId) ?? 1.0f;
                     damage *= fatigueMultiplier;
                 }
-                
-                // Critical hit
-                if (GD.Randf() < player.CritChance)
+
+                // Apply weapon resonance bonus (REQ-113)
+                float resonanceDamageBonus = 0f;
+                if (WeaponResonanceSystem.Instance != null && WeaponResonanceSystem.Instance.IsResonanceActive())
                 {
-                    damage *= player.CritDamage;
+                    resonanceDamageBonus = WeaponResonanceSystem.Instance.GetDamageBonus();
+                    damage *= (1f + resonanceDamageBonus);
+                }
+                
+                // Critical hit (应用共鸣暴击加成)
+                float critChance = player.CritChance;
+                float critDamage = player.CritDamage;
+                if (WeaponResonanceSystem.Instance != null && WeaponResonanceSystem.Instance.IsResonanceActive())
+                {
+                    critChance += WeaponResonanceSystem.Instance.GetCritBonus();
+                    critDamage += WeaponResonanceSystem.Instance.GetCritDamageBonus();
+                }
+                if (GD.Randf() < critChance)
+                {
+                    damage *= critDamage;
                     ShowDamageNumber(target, damage, true);
                 }
             }

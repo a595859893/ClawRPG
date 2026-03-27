@@ -55,6 +55,9 @@ public class SystemInitializer : BaseSystem
         // 武器专精系统
         AddSystem<WeaponMasterySystem>(parent, "WeaponMasterySystem");
         
+        // 武器共鸣系统 (REQ-113)
+        AddSystem<ClawRPG.Scripts.Systems.WeaponResonance.WeaponResonanceSystem>(parent, "WeaponResonanceSystem");
+        
         // 反击系统
         var counterAttackSystem = AddSystem<CounterAttackSystem>(parent, "CounterAttackSystem");
         
