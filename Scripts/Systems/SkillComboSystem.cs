@@ -154,7 +154,10 @@ public partial class SkillComboSystem : BaseSystem
                 StartTime = currentTime,
                 TriggeredSkills = new List<string>(),
                 CurrentStreak = 0,
-                IsComplete = false
+                IsComplete = false,
+                CurrentStep = 0,
+                TimeRemaining = combo.TimeWindow,
+                IsActive = true
             };
             ComboStarted.Emit(comboId);
         }
@@ -162,6 +165,9 @@ public partial class SkillComboSystem : BaseSystem
         var activeCombo = _activeCombos[comboId];
         activeCombo.TriggeredSkills.Add(_activeSkillQueue[_activeSkillQueue.Count - 1]);
         activeCombo.CurrentStreak++;
+        activeCombo.CurrentStep = activeCombo.TriggeredSkills.Count;
+        activeCombo.TimeRemaining = combo.TimeWindow;
+        activeCombo.IsActive = true;
         
         // Check if combo is complete
         if (activeCombo.CurrentStreak >= combo.Bonus.RequiredComboCount)
@@ -193,6 +199,7 @@ public partial class SkillComboSystem : BaseSystem
         if (activeCombo.IsComplete) return;
         
         activeCombo.IsComplete = true;
+        activeCombo.TimesExecuted++;
         _playerData.TotalCombosTriggered++;
         
         // Record combo usage for fatigue system (REQ-120)
@@ -203,7 +210,8 @@ public partial class SkillComboSystem : BaseSystem
         ApplyComboBonus(combo.Bonus);
         
         ComboCompleted.Emit(combo.ComboId, activeCombo.CurrentStreak);
-        
+        OnComboCompletedInternal(combo.ComboId, activeCombo.CurrentStreak);
+
         // Reset after duration
         activeCombo.CurrentStreak = 0;
         activeCombo.TriggeredSkills.Clear();
@@ -379,6 +387,103 @@ public partial class SkillComboSystem : BaseSystem
             {
                 _playerData.DiscoveredCombos.Add(combo);
             }
+        }
+    }
+
+    // ============================================================
+    // 兼容旧 ComboSystem 的静态 Action 事件（供 ComboUI / CombatStatsPanel）
+    // ============================================================
+    public static Action<string, int, float> ComboProgressUpdated;
+    public static Action<int> ComboPointsChanged;
+    public static Action<int> ComboLevelChanged;
+
+    private int _comboPoints;
+    private int _comboLevel = 1;
+
+    private const int POINTS_FOR_LEVEL_UP = 100;
+
+    // ============================================================
+    // 兼容旧 ComboSystem API（REQ-135）
+    // ============================================================
+
+    /// <summary>返回所有技能连击（Dictionary 格式）</summary>
+    public Dictionary<string, SkillCombo> GetAllCombos()
+    {
+        return SkillComboDatabase.Instance.Combos;
+    }
+
+    /// <summary>返回已解锁（已发现且等级足够）的技能连击</summary>
+    public List<SkillCombo> GetUnlockedCombos()
+    {
+        var result = new List<SkillCombo>();
+        foreach (var combo in SkillComboDatabase.Instance.GetAllCombos())
+        {
+            if (combo.RequiredComboLevel <= _comboLevel &&
+                (_playerData.DiscoveredCombos.Contains(combo.ComboId) ||
+                 combo.RequiredComboLevel == 1))
+            {
+                result.Add(combo);
+            }
+        }
+        return result;
+    }
+
+    /// <summary>按旧 ComboData.ComboType 过滤</summary>
+    public List<SkillCombo> GetCombosByType(ComboData.ComboType type)
+    {
+        var result = new List<SkillCombo>();
+        foreach (var combo in SkillComboDatabase.Instance.GetCombosByOldType(type))
+        {
+            if (combo.RequiredComboLevel <= _comboLevel)
+            {
+                result.Add(combo);
+            }
+        }
+        return result;
+    }
+
+    /// <summary>返回玩家当前连击进度</summary>
+    public Dictionary<string, ActiveCombo> GetPlayerProgress()
+    {
+        return _activeCombos;
+    }
+
+    public int GetComboPoints() => _comboPoints;
+    public int GetComboLevel() => _comboLevel;
+
+    /// <summary>
+    /// 内部：连击完成时调用，增加点数并检查升级
+    /// </summary>
+    private void OnComboCompletedInternal(string comboId, int streak)
+    {
+        var combo = SkillComboDatabase.Instance.GetCombo(comboId);
+        if (combo == null) return;
+
+        int oldPoints = _comboPoints;
+        int oldLevel = _comboLevel;
+
+        _comboPoints += combo.ComboPointReward;
+        _playerData.ComboPoints = _comboPoints;
+
+        // 检查升级
+        int newLevel = 1 + (_comboPoints / POINTS_FOR_LEVEL_UP);
+        if (newLevel > _comboLevel)
+        {
+            _comboLevel = newLevel;
+            _playerData.ComboLevel = _comboLevel;
+            ComboLevelChanged?.Invoke(_comboLevel);
+        }
+
+        if (_comboPoints != oldPoints)
+        {
+            ComboPointsChanged?.Invoke(_comboPoints);
+        }
+
+        // 触发进度更新
+        var active = _activeCombos.ContainsKey(comboId) ? _activeCombos[comboId] : null;
+        if (active != null)
+        {
+            ComboProgressUpdated?.Invoke(comboId, active.CurrentStep, active.TimeRemaining);
         }
     }
 }

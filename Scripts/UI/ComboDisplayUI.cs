@@ -130,13 +130,9 @@ namespace ClawRPG.Scripts.UI {
         
         private void ConnectSignals()
         {
-            var comboSystem = GetTree().GetFirstNodeInGroup("ComboSystem");
-            if (comboSystem != null)
-            {
-                comboSystem.OnComboChanged += OnComboChanged;
-                comboSystem.OnComboMilestone += OnComboMilestone;
-                comboSystem.OnComboBroken += OnComboBroken;
-            }
+            // ComboSystem 被合并到 SkillComboSystem；原有 OnComboChanged/OnComboMilestone/OnComboBroken
+            // 事件不存在（ComboSystem 从未实现它们），此 UI 暂时禁用连击显示
+            // TODO: 后续可接入 SkillComboSystem.ComboCompleted 信号实现连击显示
         }
         
         private void OnComboChanged(int newCombo, int maxCombo)

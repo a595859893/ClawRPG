@@ -129,9 +129,10 @@ namespace ClawRPG.Scripts.Systems
             }
 
             // 保存连击系统数据
-            if (_comboSystem != null)
+            var skillComboSystem = SkillComboSystem.Instance;
+            if (skillComboSystem != null)
             {
-                data.ComboData = _comboSystem.Serialize();
+                data.ComboData = skillComboSystem.ExportSaveData();
             }
 
             // 保存风格精通系统数据

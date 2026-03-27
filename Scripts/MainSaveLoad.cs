@@ -107,10 +107,10 @@ public partial class MainSaveLoad : Node
     /// </summary>
     private void LoadComboData(SaveData data)
     {
-        var comboSystem = GetNodeOrNull<ComboSystem>("ComboSystem");
-        if (comboSystem != null && data.ComboData != null)
+        var skillComboSystem = SkillComboSystem.Instance;
+        if (skillComboSystem != null && data.ComboData != null)
         {
-            comboSystem.Deserialize(data.ComboData);
+            skillComboSystem.ImportSaveData(new Dictionary(data.ComboData));
             GD.Print("Combo data loaded successfully!");
         }
     }

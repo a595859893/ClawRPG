@@ -116,7 +116,6 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("combat", typeof(WeeklyChallengeSystem));
             RegisterSystemInGroup("combat", typeof(CompanionInteractionSystem));
             RegisterSystemInGroup("combat", typeof(CameraEffectSystem));
-            RegisterSystemInGroup("combat", typeof(ComboSystem));
             RegisterSystemInGroup("combat", typeof(ComboChainData));
             RegisterSystemInGroup("combat", typeof(ComboChainDatabase));
             RegisterSystemInGroup("combat", typeof(ComboChainSystem));

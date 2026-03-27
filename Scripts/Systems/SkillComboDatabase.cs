@@ -226,6 +226,228 @@ public class SkillComboDatabase
             TimeWindow = 8f,
             Bonus = Bonuses["combo_ultimate"]
         };
+
+        // === 旧 ComboSystem hardcoded combos 迁移 ===
+        // Offensive
+        Combos["combo_double_strike"] = new SkillCombo
+        {
+            ComboId = "combo_double_strike",
+            Name = "Double Strike",
+            Description = "Strike twice in quick succession",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "basic_attack", "basic_attack" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 1.8f, CooldownReduction = 0f, Duration = 0, RequiredComboCount = 2 },
+            OldComboType = ComboData.ComboType.Offensive,
+            Rarity = ComboData.Rarity.Common,
+            EffectName = "Double Slash",
+            RequiredComboLevel = 1,
+            CooldownReduction = 0f,
+            ComboPointReward = 5
+        };
+
+        Combos["combo_triple_slice"] = new SkillCombo
+        {
+            ComboId = "combo_triple_slice",
+            Name = "Triple Slice",
+            Description = "Three rapid cuts dealing massive damage",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "basic_attack", "basic_attack", "basic_attack" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 2.5f, CooldownReduction = 0f, Duration = 0, RequiredComboCount = 3 },
+            OldComboType = ComboData.ComboType.Offensive,
+            Rarity = ComboData.Rarity.Uncommon,
+            EffectName = "Triple Slash",
+            RequiredComboLevel = 2,
+            CooldownReduction = 0f,
+            ComboPointReward = 10
+        };
+
+        Combos["combo_whirlwind"] = new SkillCombo
+        {
+            ComboId = "combo_whirlwind",
+            Name = "Whirlwind",
+            Description = "Spin attack hitting all nearby enemies",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "basic_attack", "dodge", "basic_attack" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 2.2f, CooldownReduction = 0f, Duration = 0, RequiredComboCount = 3 },
+            OldComboType = ComboData.ComboType.Offensive,
+            Rarity = ComboData.Rarity.Rare,
+            EffectName = "Wind Blade",
+            RequiredComboLevel = 3,
+            CooldownReduction = 0f,
+            ComboPointReward = 15
+        };
+
+        Combos["combo_fury"] = new SkillCombo
+        {
+            ComboId = "combo_fury",
+            Name = "Fury Rush",
+            Description = "Berserker combo dealing overwhelming damage",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "power_strike", "basic_attack", "power_strike" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 3.0f, CooldownReduction = 0.3f, Duration = 0, RequiredComboCount = 3 },
+            OldComboType = ComboData.ComboType.Offensive,
+            Rarity = ComboData.Rarity.Epic,
+            EffectName = "Fury Explosion",
+            RequiredComboLevel = 5,
+            CooldownReduction = 0.3f,
+            ComboPointReward = 25
+        };
+
+        // Defensive
+        Combos["combo_block_counter"] = new SkillCombo
+        {
+            ComboId = "combo_block_counter",
+            Name = "Block Counter",
+            Description = "Block and counterattack",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "block", "basic_attack" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 1.5f, CooldownReduction = 0f, Duration = 0, RequiredComboCount = 2 },
+            OldComboType = ComboData.ComboType.Defensive,
+            Rarity = ComboData.Rarity.Common,
+            EffectName = "Counter Strike",
+            RequiredComboLevel = 1,
+            CooldownReduction = 0f,
+            ComboPointReward = 8
+        };
+
+        Combos["combo_shield_bash"] = new SkillCombo
+        {
+            ComboId = "combo_shield_bash",
+            Name = "Shield Bash",
+            Description = "Stun enemies with shield bash combo",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "block", "dodge", "basic_attack" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 1.8f, CooldownReduction = 0f, Duration = 0, RequiredComboCount = 3 },
+            OldComboType = ComboData.ComboType.Defensive,
+            Rarity = ComboData.Rarity.Uncommon,
+            EffectName = "Shield Impact",
+            RequiredComboLevel = 2,
+            CooldownReduction = 0f,
+            ComboPointReward = 12
+        };
+
+        Combos["combo_iron_will"] = new SkillCombo
+        {
+            ComboId = "combo_iron_will",
+            Name = "Iron Will",
+            Description = "Defensive stance that reflects damage",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "block", "block", "block" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 1.0f, CooldownReduction = 0.4f, Duration = 0, RequiredComboCount = 3 },
+            OldComboType = ComboData.ComboType.Defensive,
+            Rarity = ComboData.Rarity.Rare,
+            EffectName = "Iron Reflection",
+            RequiredComboLevel = 4,
+            CooldownReduction = 0.4f,
+            ComboPointReward = 20
+        };
+
+        // Support
+        Combos["combo_healing_wave"] = new SkillCombo
+        {
+            ComboId = "combo_healing_wave",
+            Name = "Healing Wave",
+            Description = "Chain healing skills for massive recovery",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "heal", "heal" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 1.0f, CooldownReduction = 0f, Duration = 0, RequiredComboCount = 2 },
+            OldComboType = ComboData.ComboType.Support,
+            Rarity = ComboData.Rarity.Rare,
+            EffectName = "Wave of Life",
+            RequiredComboLevel = 3,
+            CooldownReduction = 0f,
+            ComboPointReward = 15
+        };
+
+        Combos["combo_blessing"] = new SkillCombo
+        {
+            ComboId = "combo_blessing",
+            Name = "Divine Blessing",
+            Description = "Apply multiple buffs at once",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "buff_attack", "buff_defense", "buff_speed" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 1.0f, CooldownReduction = 0.35f, Duration = 0, RequiredComboCount = 3 },
+            OldComboType = ComboData.ComboType.Support,
+            Rarity = ComboData.Rarity.Epic,
+            EffectName = "Divine Aura",
+            RequiredComboLevel = 5,
+            CooldownReduction = 0.35f,
+            ComboPointReward = 30
+        };
+
+        // Special
+        Combos["combo_ultimate"] = new SkillCombo
+        {
+            ComboId = "combo_ultimate",
+            Name = "Ultimate Combo",
+            Description = "The ultimate skill combination",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "power_strike", "dodge", "basic_attack", "power_strike", "heal" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 4.0f, CooldownReduction = 0.5f, Duration = 0, RequiredComboCount = 5 },
+            OldComboType = ComboData.ComboType.Special,
+            Rarity = ComboData.Rarity.Legendary,
+            EffectName = "Divine Wrath",
+            RequiredComboLevel = 10,
+            CooldownReduction = 0.5f,
+            ComboPointReward = 100
+        };
+
+        Combos["combo_elemental_fusion"] = new SkillCombo
+        {
+            ComboId = "combo_elemental_fusion",
+            Name = "Elemental Fusion",
+            Description = "Combine elements for explosive damage",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "fire_skill", "ice_skill", "lightning_skill" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 3.5f, CooldownReduction = 0f, Duration = 0, RequiredComboCount = 3 },
+            OldComboType = ComboData.ComboType.Special,
+            Rarity = ComboData.Rarity.Legendary,
+            EffectName = "Elemental Nova",
+            RequiredComboLevel = 8,
+            CooldownReduction = 0f,
+            ComboPointReward = 50
+        };
+
+        // Utility
+        Combos["combo_swift_escape"] = new SkillCombo
+        {
+            ComboId = "combo_swift_escape",
+            Name = "Swift Escape",
+            Description = "Quick dodge sequence for escape",
+            Type = ComboType.Sequential,
+            Trigger = ComboTrigger.TimeWindow,
+            SkillIds = new List<string> { "dodge", "dodge", "speed_buff" },
+            TimeWindow = 3f,
+            Bonus = new ComboBonus { DamageMultiplier = 1.0f, CooldownReduction = 0.25f, Duration = 0, RequiredComboCount = 3 },
+            OldComboType = ComboData.ComboType.Utility,
+            Rarity = ComboData.Rarity.Uncommon,
+            EffectName = "Shadow Step",
+            RequiredComboLevel = 2,
+            CooldownReduction = 0.25f,
+            ComboPointReward = 10
+        };
     }
     
     public SkillCombo GetCombo(string comboId)
@@ -244,6 +466,20 @@ public class SkillComboDatabase
         foreach (var combo in Combos.Values)
         {
             if (combo.Type == type)
+                result.Add(combo);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 按旧 ComboData.ComboType 过滤（兼容 ComboUI）
+    /// </summary>
+    public List<SkillCombo> GetCombosByOldType(ComboData.ComboType type)
+    {
+        List<SkillCombo> result = new List<SkillCombo>();
+        foreach (var combo in Combos.Values)
+        {
+            if (combo.OldComboType == type)
                 result.Add(combo);
         }
         return result;

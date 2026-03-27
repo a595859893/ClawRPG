@@ -87,9 +87,9 @@ namespace ClawRPG.Scripts.UI {
                 );
             }
             
-            // Connect to combo system via static Actions
-            ComboSystem.ComboProgressUpdated += OnComboProgressUpdated;
-            ComboSystem.ComboLevelChanged += OnComboLevelChanged;
+            // Connect to combo system via static Actions (SkillComboSystem is now the single source)
+            SkillComboSystem.ComboProgressUpdated += OnComboProgressUpdated;
+            SkillComboSystem.ComboLevelChanged += OnComboLevelChanged;
         }
         
         public void StartCombat()

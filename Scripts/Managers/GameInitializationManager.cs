@@ -172,12 +172,12 @@ namespace ClawRPG.Scripts.Managers
             {
                 StatisticsManager.Instance.LoadStatistics(statsData);
             }
-            
-            // Load combo system data
-            var comboSystem = GetNodeOrNull<Systems.ComboSystem>("/root/Main/ComboSystem");
-            if (comboSystem != null && data.ComboData != null)
+
+            // Load combo system data (SkillComboSystem is the single source)
+            var skillComboSystem = SkillComboSystem.Instance;
+            if (skillComboSystem != null && data.ComboData != null)
             {
-                comboSystem.Deserialize(data.ComboData);
+                skillComboSystem.ImportSaveData(new Dictionary(data.ComboData));
             }
             
             // Load keybinding data

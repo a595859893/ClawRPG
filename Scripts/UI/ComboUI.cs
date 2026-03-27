@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class ComboUI : Control
 {
-    private ComboSystem _comboSystem;
+    private SkillComboSystem _comboSystem;
     
     // UI Elements
     private Label _titleLabel;
@@ -24,10 +24,10 @@ public class ComboUI : Control
     
     public override void _Ready()
     {
-        _comboSystem = GetNode<ComboSystem>("/root/Game/ComboSystem");
+        _comboSystem = SkillComboSystem.Instance;
         if (_comboSystem == null)
         {
-            GD.PrintErr("[ComboUI] ComboSystem not found!");
+            GD.PrintErr("[ComboUI] SkillComboSystem not found!");
             return;
         }
         
@@ -137,9 +137,9 @@ public class ComboUI : Control
     {
         if (_comboSystem != null)
         {
-            ComboSystem.ComboPointsChanged += OnComboPointsChanged;
-            ComboSystem.ComboLevelChanged += OnComboLevelChanged;
-            ComboSystem.ComboProgressUpdated += OnComboProgressUpdated;
+            SkillComboSystem.ComboPointsChanged += OnComboPointsChanged;
+            SkillComboSystem.ComboLevelChanged += OnComboLevelChanged;
+            SkillComboSystem.ComboProgressUpdated += OnComboProgressUpdated;
         }
     }
     
@@ -154,22 +154,22 @@ public class ComboUI : Control
         
         if (_comboSystem == null) return;
         
-        var combos = _currentFilter == (ComboData.ComboType)99 
+        var combos = _currentFilter == (ComboData.ComboType)99
             ? _comboSystem.GetUnlockedCombos()
             : _comboSystem.GetCombosByType(_currentFilter);
-        
+
         foreach (var combo in combos)
         {
             var card = _CreateComboCard(combo);
             _comboGrid.AddChild(card);
-            _comboCards[combo.comboId] = card;
+            _comboCards[combo.ComboId] = card;
         }
         
         // Update stats display
         _UpdateStats();
     }
     
-    private Control _CreateComboCard(ComboData combo)
+    private Control _CreateComboCard(SkillCombo combo)
     {
         var card = new PanelContainer();
         card.CustomMinimumSize = new Vector2(250, 150);
@@ -180,41 +180,41 @@ public class ComboUI : Control
         
         // Name and rarity
         var nameLabel = new Label();
-        nameLabel.Text = combo.comboName;
+        nameLabel.Text = combo.Name;
         nameLabel.AddThemeFontSizeOverride("font_size", 16);
         
         // Color by rarity
-        Color rarityColor = _GetRarityColor(combo.comboRarity);
+        Color rarityColor = _GetRarityColor(combo.Rarity);
         nameLabel.AddThemeColorOverride("font_color", rarityColor);
         vbox.AddChild(nameLabel);
         
         // Description
         var descLabel = new Label();
-        descLabel.Text = combo.description;
+        descLabel.Text = combo.Description ?? "";
         descLabel.AddThemeFontSizeOverride("font_size", 12);
         descLabel.AutowrapMode = TextServer.AutowrapMode.Word;
         vbox.AddChild(descLabel);
         
         // Skill sequence
         var seqLabel = new Label();
-        seqLabel.Text = "Sequence: " + string.Join(" → ", combo.skillSequence);
+        seqLabel.Text = "Sequence: " + string.Join(" → ", combo.SkillIds ?? new System.Collections.Generic.List<string>());
         seqLabel.AddThemeFontSizeOverride("font_size", 11);
         seqLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
         vbox.AddChild(seqLabel);
         
         // Stats
         var statsLabel = new Label();
-        statsLabel.Text = $"DMG: {combo.damageMultiplier}x | Points: +{combo.comboPointReward}";
+        statsLabel.Text = $"DMG: {combo.Bonus?.DamageMultiplier ?? 1f}x | Points: +{combo.ComboPointReward}";
         statsLabel.AddThemeFontSizeOverride("font_size", 11);
         statsLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.6f));
         vbox.AddChild(statsLabel);
         
         // Execution count
         var progress = _comboSystem.GetPlayerProgress();
-        if (progress.TryGetValue(combo.comboId, out var prog) && prog.timesExecuted > 0)
+        if (progress.TryGetValue(combo.ComboId, out var prog) && prog.TimesExecuted > 0)
         {
             var execLabel = new Label();
-            execLabel.Text = $"Executed: {prog.timesExecuted}x";
+            execLabel.Text = $"Executed: {prog.TimesExecuted}x";
             execLabel.AddThemeFontSizeOverride("font_size", 10);
             execLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.9f, 0.6f));
             vbox.AddChild(execLabel);
@@ -222,9 +222,9 @@ public class ComboUI : Control
         
         // Type badge
         var typeLabel = new Label();
-        typeLabel.Text = combo.comboType.ToString();
+        typeLabel.Text = combo.OldComboType.ToString();
         typeLabel.AddThemeFontSizeOverride("font_size", 10);
-        typeLabel.AddThemeColorOverride("font_color", _GetTypeColor(combo.comboType));
+        typeLabel.AddThemeColorOverride("font_color", _GetTypeColor(combo.OldComboType));
         vbox.AddChild(typeLabel);
         
         return card;
@@ -288,8 +288,8 @@ public class ComboUI : Control
         if (progress.TryGetValue(comboId, out var prog))
         {
             var combo = _comboSystem.GetAllCombos()[comboId];
-            int totalSteps = combo.skillSequence.Count;
-            _progressLabel.Text = $"▶ {combo.comboName}: Step {currentStep}/{totalSteps} ({timeRemaining:F1}s)";
+            int totalSteps = combo.SkillIds?.Count ?? 0;
+            _progressLabel.Text = $"▶ {combo.Name}: Step {currentStep}/{totalSteps} ({timeRemaining:F1}s)";
         }
     }
     
@@ -326,9 +326,9 @@ public class ComboUI : Control
         {
             if (_comboSystem != null)
             {
-                ComboSystem.ComboPointsChanged -= OnComboPointsChanged;
-                ComboSystem.ComboLevelChanged -= OnComboLevelChanged;
-                ComboSystem.ComboProgressUpdated -= OnComboProgressUpdated;
+                SkillComboSystem.ComboPointsChanged -= OnComboPointsChanged;
+                SkillComboSystem.ComboLevelChanged -= OnComboLevelChanged;
+                SkillComboSystem.ComboProgressUpdated -= OnComboProgressUpdated;
             }
         }
     }
