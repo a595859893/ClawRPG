@@ -43,6 +43,15 @@ namespace ClawRPG.Scripts.UI
         private Label _decisionEmptyLabel;
         private Button _btnRefreshDecision;
 
+        // Observer tab controls - REQ-138
+        private Label _observerGoalLabel;
+        private Label _observerTrajectoryLabel;
+        private Label _observerWorldLabel;
+        private Label _observerConfidenceLabel;
+        private VBoxContainer _observerInfoBox;
+        private Button _btnToggleObserver;
+        private GuardianPetNarrativeModule _narrativeModule;
+
         private string _selectedPetId = "";
 
         public override void _Ready()
@@ -179,6 +188,7 @@ namespace ClawRPG.Scripts.UI
             // Tactical tab
             SetupTacticalTab();
             SetupDecisionTab();
+            SetupObserverTab();
         }
 
         /// <summary>
@@ -554,6 +564,179 @@ namespace ClawRPG.Scripts.UI
                 PetDecisionRecord.DecisionOutcome.Cancelled => new Color(0.9f, 0.7f, 0.2f),
                 _ => new Color(0.6f, 0.6f, 0.6f)
             };
+        }
+
+        /// <summary>
+        /// Setup the Observer tab - REQ-138
+        /// Shows AdversarialObserver's view of the player's strategy
+        /// </summary>
+        private void SetupObserverTab()
+        {
+            var observerTab = new VBoxContainer { Name = "Observer" };
+            _tabContainer.AddChild(observerTab);
+
+            // Header
+            var headerHBox = new HBoxContainer();
+            observerTab.AddChild(headerHBox);
+
+            var observerTitle = new Label
+            {
+                Text = "🧐 战略观察者",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            observerTitle.AddThemeFontSizeOverride("font_size", 20);
+            headerHBox.AddChild(observerTitle);
+
+            headerHBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
+
+            _btnToggleObserver = new Button { Text = "🛑 关闭" };
+            _btnToggleObserver.Pressed += OnToggleObserverPressed;
+            headerHBox.AddChild(_btnToggleObserver);
+
+            // Observer enable status
+            var observerSystem = AdversarialObserverSystem.Instance;
+            bool isEnabled = observerSystem == null || !observerSystem.GetObserverState().IsDisabled;
+
+            // Confidence indicator
+            var confidenceHBox = new HBoxContainer();
+            observerTab.AddChild(confidenceHBox);
+
+            var confidenceTitle = new Label { Text = "置信度: " };
+            confidenceHBox.AddChild(confidenceTitle);
+
+            _observerConfidenceLabel = new Label
+            {
+                Text = isEnabled ? "观测中" : "已关闭",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            _observerConfidenceLabel.AddThemeFontSizeOverride("font_size", 16);
+            confidenceHBox.AddChild(_observerConfidenceLabel);
+
+            // Separator
+            var sep1 = new HSeparator();
+            observerTab.AddChild(sep1);
+
+            // World Assessment section
+            var worldTitle = new Label
+            {
+                Text = "【我的视野】",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            worldTitle.AddThemeColorOverride("font_color", new Color(0.7f, 0.85f, 1f));
+            observerTab.AddChild(worldTitle);
+
+            _observerWorldLabel = new Label
+            {
+                Text = "正在观测...",
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                SizeFlagsVertical = Control.SizeFlags.ShinkBegin
+            };
+            _observerWorldLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.7f));
+            observerTab.AddChild(_observerWorldLabel);
+
+            // Separator
+            var sep2 = new HSeparator();
+            observerTab.AddChild(sep2);
+
+            // Player Goal Inference section
+            var goalTitle = new Label
+            {
+                Text = "【你的目标（我猜的）】",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            goalTitle.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.7f));
+            observerTab.AddChild(goalTitle);
+
+            _observerGoalLabel = new Label
+            {
+                Text = "还未看清你的意图...",
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                SizeFlagsVertical = Control.SizeFlags.ShinkBegin
+            };
+            _observerGoalLabel.AddThemeColorOverride("font_color", new Color(0.85f, 0.8f, 0.7f));
+            observerTab.AddChild(_observerGoalLabel);
+
+            // Separator
+            var sep3 = new HSeparator();
+            observerTab.AddChild(sep3);
+
+            // Trajectory Prediction section
+            var trajTitle = new Label
+            {
+                Text = "【我的预测】",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            trajTitle.AddThemeColorOverride("font_color", new Color(0.7f, 1f, 0.85f));
+            observerTab.AddChild(trajTitle);
+
+            _observerTrajectoryLabel = new Label
+            {
+                Text = "还没有足够的数据...",
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                SizeFlagsVertical = Control.SizeFlags.ShinkBegin
+            };
+            _observerTrajectoryLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.9f, 0.8f));
+            observerTab.AddChild(_observerTrajectoryLabel);
+
+            // Initialize narrative module
+            _narrativeModule = new GuardianPetNarrativeModule();
+
+            // Subscribe to Observer signals
+            if (observerSystem != null)
+            {
+                observerSystem.OnConfidenceChanged += OnObserverConfidenceChanged;
+            }
+
+            // Initial refresh
+            RefreshObserverTab();
+        }
+
+        private void OnToggleObserverPressed()
+        {
+            var observerSystem = AdversarialObserverSystem.Instance;
+            if (observerSystem == null) return;
+
+            var state = observerSystem.GetObserverState();
+            bool newDisabled = !state.IsDisabled;
+            observerSystem.SetEnabled(!newDisabled);
+
+            _btnToggleObserver.Text = newDisabled ? "▶️ 开启" : "🛑 关闭";
+            _observerConfidenceLabel.Text = newDisabled ? "已关闭" : "观测中";
+        }
+
+        private void OnObserverConfidenceChanged(float confidence)
+        {
+            RefreshObserverTab();
+        }
+
+        private void RefreshObserverTab()
+        {
+            var observerSystem = AdversarialObserverSystem.Instance;
+            if (observerSystem == null || _observerWorldLabel == null) return;
+
+            var assessment = observerSystem.GetCurrentAssessment();
+            var goalInference = observerSystem.GetCurrentGoalInference();
+            var state = observerSystem.GetObserverState();
+
+            // Update world label
+            if (_observerWorldLabel != null && _narrativeModule != null)
+            {
+                _observerWorldLabel.Text = _narrativeModule.DescribeWorldAssessment(assessment);
+            }
+
+            // Update goal label
+            if (_observerGoalLabel != null && _narrativeModule != null)
+            {
+                _observerGoalLabel.Text = _narrativeModule.DescribeGoalInference(goalInference);
+            }
+
+            // Update confidence
+            if (_observerConfidenceLabel != null)
+            {
+                float conf = state.PersistentState.Confidence;
+                string confStr = conf > 0.75f ? "◆◆◆ 高" : (conf > 0.5f ? "◆◆ 中" : (conf > 0.25f ? "◆ 低" : "◇ 迷茫"));
+                _observerConfidenceLabel.Text = $"{confStr} ({conf:P0})";
+            }
         }
 
         private void ConnectSignals

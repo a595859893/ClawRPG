@@ -71,7 +71,64 @@ namespace ClawRPG.Systems.Pets.AI
             // 加载持久化数据
             LoadPersistentState();
 
+            // 初始化 ObserverBubbleUI
+            InitializeBubbleUI();
+
             GD.Print("[AdversarialObserverSystem] Initialized - Strategic Critic ready");
+        }
+
+        private void InitializeBubbleUI()
+        {
+            // 尝试在 CanvasLayer 下创建 ObserverBubbleUI
+            var tree = GetTree();
+            if (tree == null) return;
+
+            // 查找 CanvasLayer
+            Node canvasLayer = null;
+            var root = tree.GetRoot();
+            if (root != null)
+            {
+                canvasLayer = root.FindChild("CanvasLayer", true, false);
+            }
+
+            if (canvasLayer == null)
+            {
+                // 如果没有 CanvasLayer，尝试在 Main 下
+                var main = tree.CurrentScene;
+                if (main != null)
+                {
+                    canvasLayer = main.FindChild("CanvasLayer", true, false);
+                }
+            }
+
+            if (canvasLayer == null)
+            {
+                GD.Print("[AdversarialObserverSystem] CanvasLayer not found, ObserverBubbleUI will not be shown");
+                return;
+            }
+
+            // 创建 ObserverBubbleUI
+            var bubbleUI = new ObserverBubbleUI { Name = "ObserverBubbleUI" };
+            bubbleUI.SetObserverPetName(GetPetNameFromPetSystem());
+            canvasLayer.AddChild(bubbleUI);
+
+            GD.Print("[AdversarialObserverSystem] ObserverBubbleUI instantiated");
+        }
+
+        private string GetPetNameFromPetSystem()
+        {
+            // 尝试从 PetCombatCompanionSystem 获取宠物名
+            var companion = PetCombatCompanionSystem.Instance;
+            if (companion != null)
+            {
+                var activePet = companion.GetActivePetId();
+                if (!string.IsNullOrEmpty(activePet))
+                {
+                    // 尝试从宠物数据库获取名字
+                    // 这里返回默认名字，实际可以从 PetStoryDatabase 获取
+                }
+            }
+            return "小家伙";
         }
 
         public override void _Process(double delta)
@@ -142,6 +199,14 @@ namespace ClawRPG.Systems.Pets.AI
         public WorldAssessment GetCurrentAssessment()
         {
             return _observerState.CurrentAssessment;
+        }
+
+        /// <summary>
+        /// 获取 Observer 状态（用于 UI 显示）
+        /// </summary>
+        public AdversarialObserverState GetObserverState()
+        {
+            return _observerState;
         }
 
         /// <summary>
