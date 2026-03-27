@@ -100,6 +100,9 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
         {
             _availableCombos.Clear();
             
+            // 获取 ComboFatigueSystem 实例（REQ-128）
+            var fatigueSystem = ComboFatigueSystem.Instance;
+            
             // 从ComboSystem获取已解锁的Combos
             if (_comboSystem != null)
             {
@@ -108,6 +111,9 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
                 
                 foreach (var combo in unlockedCombos)
                 {
+                    // REQ-128: 查询每个 Combo 的疲劳状态
+                    var (adaptation, multiplier, status) = fatigueSystem.GetFatigueInfo(combo.comboId);
+                    
                     var entry = new CombatPreloadComboEntry
                     {
                         ComboId = combo.comboId,
@@ -121,7 +127,12 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
                         Rarity = _ConvertRarity(combo.comboRarity),
                         RequiredComboLevel = combo.requiredComboLevel,
                         IsUnlocked = true,
-                        CurrentProgress = 0
+                        CurrentProgress = 0,
+                        // REQ-128: 疲劳字段
+                        FatigueLevel = adaptation,
+                        EffectiveDamageMultiplier = combo.damageMultiplier * multiplier,
+                        FatigueStatus = status,
+                        FatigueColor = _GetFatigueColor(adaptation)
                     };
                     _availableCombos.Add(entry);
                 }
@@ -167,6 +178,16 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
                 ComboData.Rarity.Legendary => CombatPreloadComboRarity.Legendary,
                 _ => CombatPreloadComboRarity.Common
             };
+        }
+        
+        // REQ-128: 根据疲劳等级返回对应颜色
+        private Color _GetFatigueColor(float adaptation)
+        {
+            if (adaptation <= 0f) return new Color(0.3f, 1f, 0.3f);       // Fresh → 绿色
+            if (adaptation < 0.2f) return new Color(0.7f, 1f, 0.4f);    // Slightly Familiar → 浅绿
+            if (adaptation < 0.35f) return new Color(1f, 0.9f, 0.2f); // Adapted → 黄色
+            if (adaptation < 0.45f) return new Color(1f, 0.6f, 0.2f);  // Highly Adapted → 橙色
+            return new Color(1f, 0.3f, 0.3f);                           // Fully Adapted → 红色
         }
 
         /// <summary>

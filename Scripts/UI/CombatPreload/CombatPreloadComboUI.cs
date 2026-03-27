@@ -252,10 +252,27 @@ public partial class CombatPreloadComboUI : Control
         headerBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
         
         var damageLabel = new Label();
-        damageLabel.Text = $"伤害: x{combo.DamageMultiplier:F1}";
-        damageLabel.AddThemeFontSizeOverride("font_size", 14);
-        damageLabel.AddThemeColorOverride("font_color", new Color(1f, 0.4f, 0.4f));
+        // REQ-128: 显示有效伤害倍率（已应用疲劳惩罚），与基础倍率不同时标注
+        if (Mathf.Abs(combo.EffectiveDamageMultiplier - combo.DamageMultiplier) > 0.01f)
+        {
+            damageLabel.Text = $"伤害: x{combo.EffectiveDamageMultiplier:F1} (原x{combo.DamageMultiplier:F1})";
+            damageLabel.AddThemeFontSizeOverride("font_size", 14);
+            damageLabel.AddThemeColorOverride("font_color", new Color(1f, 0.6f, 0.2f)); // 橙色表示有惩罚
+        }
+        else
+        {
+            damageLabel.Text = $"伤害: x{combo.DamageMultiplier:F1}";
+            damageLabel.AddThemeFontSizeOverride("font_size", 14);
+            damageLabel.AddThemeColorOverride("font_color", new Color(1f, 0.4f, 0.4f));
+        }
         headerBox.AddChild(damageLabel);
+        
+        // REQ-128: 疲劳状态标签
+        var fatigueLabel = new Label();
+        fatigueLabel.Text = $"[疲劳: {combo.FatigueStatus}]";
+        fatigueLabel.AddThemeFontSizeOverride("font_size", 13);
+        fatigueLabel.AddThemeColorOverride("font_color", combo.FatigueColor);
+        headerBox.AddChild(fatigueLabel);
         
         // 技能序列
         var sequenceBox = new HBoxContainer();

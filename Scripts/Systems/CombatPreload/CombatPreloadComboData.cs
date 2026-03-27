@@ -21,6 +21,12 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
         public int RequiredComboLevel;
         public bool IsUnlocked;
         public int CurrentProgress; // 0 = not started, n = completed n steps
+        
+        // REQ-128: 疲劳状态（来自 ComboFatigueSystem）
+        public string FatigueStatus = "Fresh";       // Fresh / Slightly Familiar / Adapted / Highly Adapted / Fully Adapted
+        public float FatigueLevel = 0f;              // 0.0–1.0，1.0 = 完全疲劳
+        public float EffectiveDamageMultiplier;      // base DamageMultiplier × fatigue multiplier
+        public Color FatigueColor = new Color(0.3f, 1f, 0.3f); // UI 颜色
     }
 
     public enum CombatPreloadComboType
