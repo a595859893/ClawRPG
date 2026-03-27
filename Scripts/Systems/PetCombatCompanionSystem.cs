@@ -358,6 +358,19 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
+        /// 获取当前激活宠物的同步等级
+        /// </summary>
+        public float GetCurrentSyncLevel()
+        {
+            string activeId = GetActivePetId();
+            if (!string.IsNullOrEmpty(activeId))
+            {
+                return GetSyncLevel(activeId);
+            }
+            return 0.5f;
+        }
+
+        /// <summary>
         /// 获取当前激活的宠物ID（REQ-136）
         /// </summary>
         public string GetActivePetId()

@@ -23,6 +23,10 @@ namespace ClawRPG.Scripts.Systems.Pets
         private CharacterBody2D _player;
         private Node2D _currentTarget;  // 当前攻击目标
         
+        // 宠物运行时HP（独立于Pet资源数据）
+        private int _runtimeCurrentHp = 100;
+        private int _runtimeMaxHp = 100;
+        
         // AI配置
         private float _followDistance = 80f;
         private float _attackRange = 100f;
@@ -444,6 +448,57 @@ namespace ClawRPG.Scripts.Systems.Pets
         public List<Node2D> GetNearbyEnemies()
         {
             return DetectNearbyEnemies();
+        }
+
+        /// <summary>
+        /// 获取宠物当前HP百分比
+        /// </summary>
+        public float GetPetHpPercent()
+        {
+            if (_runtimeMaxHp <= 0) return 1f;
+            return Mathf.Clamp((float)_runtimeCurrentHp / _runtimeMaxHp, 0f, 1f);
+        }
+
+        /// <summary>
+        /// 获取宠物最大HP
+        /// </summary>
+        public float GetPetMaxHp()
+        {
+            return _runtimeMaxHp;
+        }
+
+        /// <summary>
+        /// 治疗宠物
+        /// </summary>
+        public void HealPet(int amount)
+        {
+            _runtimeCurrentHp = Mathf.Min(_runtimeCurrentHp + amount, _runtimeMaxHp);
+            GD.Print($"[PetCombatAI] Pet healed for {amount}, now at {_runtimeCurrentHp}/{_runtimeMaxHp}");
+        }
+
+        /// <summary>
+        /// 初始化宠物运行时HP
+        /// </summary>
+        public void InitRuntimeHp(int maxHp)
+        {
+            _runtimeMaxHp = maxHp;
+            _runtimeCurrentHp = maxHp;
+        }
+
+        /// <summary>
+        /// 宠物受到伤害
+        /// </summary>
+        public void DamagePet(int amount)
+        {
+            _runtimeCurrentHp = Mathf.Max(_runtimeCurrentHp - amount, 0);
+        }
+
+        /// <summary>
+        /// 发射宠物攻击信号（供 PetAttackVFX 使用）
+        /// </summary>
+        public void EmitPetAttackedSignal(Node2D target, int damage)
+        {
+            EmitSignal(SignalName.PetAttacked, target, damage);
         }
         
         /// <summary>
