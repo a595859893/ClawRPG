@@ -432,7 +432,12 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// 获取宠物当前锁定的攻击目标
         /// </summary>
         public Node2D GetCurrentTarget() => _currentTarget;
-        
+
+        /// <summary>
+        /// 获取宠物场景节点（用于屏幕坐标转换）
+        /// </summary>
+        public Node2D GetPetNode() => _petNode;
+
         /// <summary>
         /// 获取宠物周围所有可攻击的敌人
         /// </summary>
