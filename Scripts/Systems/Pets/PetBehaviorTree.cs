@@ -66,6 +66,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// </summary>
         public void ExecuteBehavior(PetDecisionSystem.PetAIState state, Node2D target, float delta)
         {
+            PetDecisionSystem.NextDecisionTick(); // REQ-137: 行为执行决策节点
             switch (state)
             {
                 case PetDecisionSystem.PetAIState.Following:

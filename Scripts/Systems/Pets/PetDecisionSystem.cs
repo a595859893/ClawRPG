@@ -39,7 +39,21 @@ namespace ClawRPG.Scripts.Systems.Pets
         
         // 计时器
         private float _stateTimer = 0f;
-        
+
+        // 决策 Tick ID 计数器（REQ-137: 跨系统决策追溯）
+        private static int _decisionTickId = 0;
+        public static int DecisionTickId => _decisionTickId;
+
+        /// <summary>
+        /// 推进决策 Tick ID（每次决策入口调用，跨系统共享）
+        /// </summary>
+        public static int NextDecisionTick() => ++_decisionTickId;
+
+        /// <summary>
+        /// 重置 Tick ID（每场战斗开始时调用）
+        /// </summary>
+        public static void ResetDecisionTick() => _decisionTickId = 0;
+
         // 信号
         public Action<PetAIState, PetAIState> OnStateChanged;
         
@@ -98,6 +112,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// </summary>
         public void UpdateDecision(Node2D target, float delta)
         {
+            NextDecisionTick(); // REQ-137: 每个决策周期分配唯一 Tick ID
             _stateTimer += delta;
             
             if (target == null)

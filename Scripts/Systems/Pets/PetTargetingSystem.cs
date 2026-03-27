@@ -56,6 +56,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// </summary>
         public Node2D SelectSmartTarget()
         {
+            PetDecisionSystem.NextDecisionTick(); // REQ-137: 目标选择决策节点
             if (_detectionArea == null) return null;
             
             var bodies = _detectionArea.GetOverlappingAreas();
