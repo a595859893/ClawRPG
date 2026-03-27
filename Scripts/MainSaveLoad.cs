@@ -62,6 +62,7 @@ public partial class MainSaveLoad : Node
                 LoadComboData(data);
                 LoadKeybindingData(data);
                 LoadPetStoryData(data);
+                LoadStyleMasteryData(data);
             }
         }
     }
@@ -137,6 +138,19 @@ public partial class MainSaveLoad : Node
         {
             petStorySystem.Deserialize(data.PetStoryData);
             GD.Print("Pet story data loaded successfully!");
+        }
+    }
+    
+    /// <summary>
+    /// 加载风格精通数据
+    /// </summary>
+    private void LoadStyleMasteryData(SaveData data)
+    {
+        var styleMasterySystem = GetNodeOrNull<StyleMasterySystem>("StyleMasterySystem");
+        if (styleMasterySystem != null && data.StyleMasteryData != null)
+        {
+            styleMasterySystem.ImportSaveData(new Dictionary(data.StyleMasteryData));
+            GD.Print("Style mastery data loaded successfully!");
         }
     }
     
