@@ -62,6 +62,14 @@ namespace ClawRPG.Scripts.Characters {
             // Find player
             _target = GetTree().GetFirstNodeInGroup("player") as Player;
             
+            // REQ-129: Auto-attach EnemyPatternTracker if not already present
+            if (GetNodeOrNull<EnemyPatternTracker>("EnemyPatternTracker") == null)
+            {
+                var tracker = new EnemyPatternTracker();
+                tracker.Name = "EnemyPatternTracker";
+                AddChild(tracker);
+            }
+            
             ChangeState(new EnemyStateIdle(this));
             
             GD.Print("Enemy spawned: " + EnemyName + " HP: " + CurrentHealth);
@@ -135,7 +143,16 @@ namespace ClawRPG.Scripts.Characters {
         {
             if (IsDead) return;
             
-            CurrentHealth -= damage;
+            // REQ-129: Apply counter defense if enemy has recognized our combo
+            int actualDamage = damage;
+            var tracker = GetNodeOrNull<EnemyPatternTracker>("EnemyPatternTracker");
+            if (tracker != null && tracker.IsInCounterMode)
+            {
+                actualDamage = (int)tracker.ApplyCounterDefense(damage);
+                // Visual feedback is handled by SetCounterModeActive (orange pulse)
+            }
+            
+            CurrentHealth -= actualDamage;
             
             // Track statistics
             StatisticsManager.Instance.RecordDamageDealt(damage);
@@ -336,12 +353,69 @@ namespace ClawRPG.Scripts.Characters {
             }
         }
         
+        private void ShowCounterText()
+        {
+            // Show "识破!" text when counter defense reduces damage
+            if (DamageNumberSystem.Instance != null)
+            {
+                DamageNumberSystem.Instance.ShowDamageOnEntity2D(this, 0, DamageNumberSystem.DamageType.Perfect);
+            }
+        }
+        
         private void FlashDamage()
         {
             var tween = CreateTween();
             _sprite.Modulate = new Color(1f, 0f, 0f);
             tween.TweenProperty(_sprite, "modulate", Color.White, 0.1f);
         }
+        
+        // === Counter Mode (REQ-129: Enemy Observer AI) ===
+        
+        private bool _isInCounterMode = false;
+        private Color _originalSpriteModulate;
+        private Tween _counterModeTween;
+        
+        /// <summary>
+        /// Called by EnemyPatternTracker when this enemy's counter mode activates/deactivates.
+        /// </summary>
+        public void SetCounterModeActive(bool active)
+        {
+            if (active == _isInCounterMode) return;
+            _isInCounterMode = active;
+            
+            if (active)
+            {
+                // Orange glow to indicate "pattern recognized"
+                _counterModeTween = CreateTween();
+                _counterModeTween.TweenProperty(_sprite, "modulate", new Color(1f, 0.6f, 0.1f), 0.2f);
+                _counterModeTween.SetLoops(-1);
+                _counterModeTween.TweenProperty(_sprite, "modulate", new Color(1f, 0.9f, 0.3f), 0.4f);
+            }
+            else
+            {
+                if (_counterModeTween != null)
+                {
+                    _counterModeTween.Kill();
+                    _counterModeTween = null;
+                }
+                _sprite.Modulate = Color.White;
+            }
+        }
+        
+        /// <summary>
+        /// Called by EnemyPatternTracker when this enemy recognizes a player combo pattern.
+        /// </summary>
+        public void NotifyPatternRecognized(string comboId, float threatLevel)
+        {
+            // Emit a signal that UI can listen to
+            EmitSignal(nameof(PatternRecognized), comboId, threatLevel);
+            GD.Print($"{EnemyName} recognized combo pattern: {comboId} (threat: {threatLevel:F2})");
+        }
+        
+        [Signal]
+        public delegate void PatternRecognizedEventHandler(string comboId, float threatLevel);
+        
+        // === End Counter Mode ===
         
         public void Heal(int amount)
         {
