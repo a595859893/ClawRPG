@@ -15,6 +15,7 @@ public class BossPhaseSystem : BaseSystem
     public static Action<string, float> BossEnrageProgressChanged;
     public static Action<string, int> PhaseTransitionStarted;
     public static Action<string, int> PhaseTransitionCompleted;
+    public static Action<string> BossRageTriggered; // REQ-127: HP-based rage
 
     private Random _random = new Random();
 
@@ -45,6 +46,7 @@ public class BossPhaseSystem : BaseSystem
         battle.CurrentPhase = 1;
         battle.Phase = BossPhase.Active;
         battle.IsEnraged = false;
+        battle.IsRageTriggered = false;
         battle.EnrageProgress = 0f;
         battle.CurrentDamageMultiplier = 1.0f;
         battle.CurrentSpeedMultiplier = 1.0f;
@@ -61,6 +63,9 @@ public class BossPhaseSystem : BaseSystem
 
         // 更新狂暴进度
         UpdateEnrageProgress(battle, delta);
+
+        // 检查HP-based狂暴触发 (REQ-127)
+        CheckRageTrigger(battle);
 
         // 检查阶段转换
         CheckPhaseTransition(battle);
@@ -100,6 +105,27 @@ public class BossPhaseSystem : BaseSystem
         battle.Phase = BossPhase.Enraged;
 
         BossEnraged?.Invoke(battle.InstanceId);
+    }
+
+    /// <summary>
+    /// 检查HP-based狂暴触发 (REQ-127: HP < RageThreshold 触发狂暴)
+    /// </summary>
+    private void CheckRageTrigger(BossBattleInstance battle)
+    {
+        if (battle.IsRageTriggered || !battle.IsAlive) return;
+
+        float rageThreshold = battle.Config.RageThreshold > 0 ? battle.Config.RageThreshold : 0.05f;
+        float healthPercent = battle.CurrentHealth / battle.Config.MaxHealth;
+
+        if (healthPercent <= rageThreshold)
+        {
+            battle.IsRageTriggered = true;
+            // 狂暴状态下攻击速度 +50%
+            battle.CurrentSpeedMultiplier *= 1.5f;
+
+            BossRageTriggered?.Invoke(battle.InstanceId);
+            BossEnraged?.Invoke(battle.InstanceId);
+        }
     }
 
     /// <summary>

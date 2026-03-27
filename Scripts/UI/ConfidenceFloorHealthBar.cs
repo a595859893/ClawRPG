@@ -13,6 +13,7 @@ public class ConfidenceFloorHealthBar : Control
     private Color _healthyColor = new Color(0.2f, 0.8f, 0.2f);   // 绿色
     private Color _warningColor = new Color(1f, 0.6f, 0f);        // 橙色
     private Color _dangerColor = new Color(1f, 0.2f, 0.2f);       // 红色
+    private Color _rageColor = new Color(0.6f, 0f, 0f);          // 深红色 (REQ-127)
 
     // 阈值配置
     [Export]
@@ -20,6 +21,9 @@ public class ConfidenceFloorHealthBar : Control
 
     [Export]
     private float _dangerThreshold = 0.15f;
+
+    [Export]
+    private float _rageThreshold = 0.05f; // REQ-127: HP < 5% triggers rage
 
     // 内部状态
     private float _currentHealth = 100f;
@@ -35,6 +39,7 @@ public class ConfidenceFloorHealthBar : Control
     // 子组件
     private TextureProgress _healthBar;
     private AnimationPlayer _pulsePlayer;
+    private Label _rageLabel; // REQ-127: RAGE indicator
 
     // 脉动参数
     [Export]
@@ -47,9 +52,21 @@ public class ConfidenceFloorHealthBar : Control
     public override void _Ready()
     {
         SetupHealthBar();
+        SetupRageLabel();
         SetupPulseAnimation();
         _currentColor = _healthyColor;
         Modulate = _currentColor;
+    }
+
+    private void SetupRageLabel()
+    {
+        _rageLabel = new Label();
+        _rageLabel.Text = "⚠ RAGE ⚠";
+        _rageLabel.Align = Label.AlignEnum.Center;
+        _rageLabel.Modulate = new Color(1f, 0.3f, 0.3f);
+        _rageLabel.Modulate.a = 0f; // 隐藏直到触发
+        _rageLabel.SetAnchorsPreset(Control.LayoutPreset.Center);
+        AddChild(_rageLabel);
     }
 
     private void SetupHealthBar()
@@ -115,7 +132,13 @@ public class ConfidenceFloorHealthBar : Control
 
         // 确定目标颜色
         Color newTarget;
-        if (percent <= _dangerThreshold)
+        bool isRage = percent <= _rageThreshold;
+
+        if (isRage)
+        {
+            newTarget = _rageColor;
+        }
+        else if (percent <= _dangerThreshold)
         {
             newTarget = _dangerColor;
         }
@@ -129,6 +152,7 @@ public class ConfidenceFloorHealthBar : Control
         }
 
         UpdateColor(newTarget, percent);
+        UpdateRageLabel(isRage);
     }
 
     private void UpdateColor(Color target, float percent)
@@ -179,6 +203,32 @@ public class ConfidenceFloorHealthBar : Control
         _healthBar.AddThemeStyleboxOverride("fill", fillStyle);
     }
 
+    private void UpdateRageLabel(bool isRage)
+    {
+        if (_rageLabel == null) return;
+
+        // 渐显/渐隐 RAGE 标签
+        float targetAlpha = isRage ? 1f : 0f;
+        if (_rageLabel.Modulate.a != targetAlpha)
+        {
+            var tween = CreateTween();
+            tween.TweenProperty(_rageLabel, "modulate:a", targetAlpha, 0.3f);
+        }
+
+        // RAGE 状态下加快脉动
+        if (isRage)
+        {
+            if (!_isPulsing)
+                StartPulsing();
+            _pulsePlayer.PlaybackSpeed = 3f; // 更快的脉动
+        }
+        else
+        {
+            if (_pulsePlayer.PlaybackSpeed != 1f)
+                _pulsePlayer.PlaybackSpeed = 1f;
+        }
+    }
+
     private void OnColorUpdate()
     {
         // 颜色更新完成回调
@@ -218,9 +268,10 @@ public class ConfidenceFloorHealthBar : Control
         Modulate = Colors.White; // 恢复正常
     }
 
-    public void SetThresholds(float warning, float danger)
+    public void SetThresholds(float warning, float danger, float rage = 0.05f)
     {
         _warningThreshold = Mathf.Clamp(warning, 0f, 1f);
         _dangerThreshold = Mathf.Clamp(danger, 0f, _warningThreshold);
+        _rageThreshold = Mathf.Clamp(rage, 0f, _dangerThreshold);
     }
 }

@@ -106,6 +106,7 @@ public class BossConfig
     public int PhaseCount { get; set; }
     public float EnrageThreshold { get; set; }
     public float EnrageTimer { get; set; }
+    public float RageThreshold { get; set; } = 0.05f; // HP < 5% triggers rage
     public AttackPattern DefaultPattern { get; set; }
     public List<BossSkillConfig> Skills { get; set; } = new List<BossSkillConfig>();
     public List<DropTableEntry> DropTable { get; set; } = new List<DropTableEntry>();
@@ -197,6 +198,7 @@ public class BossBattleInstance
     public float TimeSinceLastSkill { get; set; }
     public AttackPattern CurrentPattern { get; set; }
     public bool IsEnraged { get; set; }
+    public bool IsRageTriggered { get; set; } // HP < 5% rage (REQ-127)
     public float EnrageProgress { get; set; }
     public float CurrentDamageMultiplier { get; set; }
     public float CurrentSpeedMultiplier { get; set; }

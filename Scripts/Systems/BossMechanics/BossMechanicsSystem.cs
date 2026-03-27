@@ -47,6 +47,9 @@ public class BossMechanicsSystem : BaseSystem
         
         // 连接子系统信号
         ConnectSubsystemSignals();
+
+        // 连接Rage触发信号 (REQ-127)
+        BossPhaseSystem.Instance.BossRageTriggered += _OnBossRageTriggered;
         
         LoadPlayerStats();
     }
@@ -76,6 +79,15 @@ public class BossMechanicsSystem : BaseSystem
     private void _OnBossEnraged(string instanceId)
     {
         // 转发狂暴信号
+        if (_activeBossBattles.ContainsKey(instanceId))
+        {
+            BossEnraged?.Invoke(_activeBossBattles[instanceId].BossConfigId);
+        }
+    }
+
+    private void _OnBossRageTriggered(string instanceId)
+    {
+        // 转发HP-based狂暴信号 (REQ-127)
         if (_activeBossBattles.ContainsKey(instanceId))
         {
             BossEnraged?.Invoke(_activeBossBattles[instanceId].BossConfigId);

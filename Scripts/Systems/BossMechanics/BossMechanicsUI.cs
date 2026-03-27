@@ -305,8 +305,17 @@ public class BossMechanicsUI : Control
         
         if (battle.IsEnraged)
         {
-            _enrageLabel.Text = "⚠️ 狂暴: 已激活!";
-            _enrageLabel.Modulate = new Color(1, 0, 0);
+            if (battle.IsRageTriggered)
+            {
+                // HP < 5% rage (REQ-127)
+                _enrageLabel.Text = "☠️ 狂暴: HP临界!";
+                _enrageLabel.Modulate = new Color(0.8f, 0f, 0f);
+            }
+            else
+            {
+                _enrageLabel.Text = "⚠️ 狂暴: 已激活!";
+                _enrageLabel.Modulate = new Color(1, 0, 0);
+            }
         }
         
         // 更新技能列表
@@ -352,8 +361,26 @@ public class BossMechanicsUI : Control
 
     private void OnBossEnraged(string bossId)
     {
-        _enrageLabel.Text = "⚠️ 狂暴: 已激活!";
-        _enrageLabel.Modulate = new Color(1, 0, 0);
+        // 检查是HP-based rage还是time-based enrage
+        var battles = _bossSystem.GetAllActiveBattles();
+        foreach (var battle in battles)
+        {
+            if (battle.BossConfigId == bossId)
+            {
+                if (battle.IsRageTriggered)
+                {
+                    // HP < 5% rage (REQ-127)
+                    _enrageLabel.Text = "☠️ 狂暴: HP临界!";
+                    _enrageLabel.Modulate = new Color(0.8f, 0f, 0f);
+                }
+                else
+                {
+                    _enrageLabel.Text = "⚠️ 狂暴: 已激活!";
+                    _enrageLabel.Modulate = new Color(1, 0, 0);
+                }
+                break;
+            }
+        }
     }
 
     private void OnBossSkillUsed(string bossId, string skillId, string skillName)
