@@ -138,12 +138,25 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         public DateTime LastRecordedAt { get; set; }
         public int TotalTriggers { get; set; }
 
+        // REQ-144: 行为保真度 — 宠物模仿的精确程度 (0.0-1.0)
+        // 初始值 0.3-0.6 随机，每次重复行为 +0.05，上限 1.0
+        public float Fidelity { get; set; }
+
+        // REQ-143: 衰减计时器 — 距离上次触发的时间（秒）
+        // 超过 DECAY_GRACE_SECONDS 后开始衰减
+        public float DecayTimer { get; set; }
+
+        /// <summary>
+        /// 获取下次升级所需 XP（对数曲线）
+        /// </summary>
         public float GetXpForNextLevel()
         {
-            // 对数曲线：等级越高所需XP越多
             return 10f * Mathf.Pow(2f, ImprintLevel);
         }
 
+        /// <summary>
+        /// 添加 XP，达到阈值时升级
+        /// </summary>
         public bool AddXp(float amount)
         {
             Xp += amount;
@@ -154,6 +167,52 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                 return true; // 升级了
             }
             return false;
+        }
+
+        /// <summary>
+        /// REQ-144: 增加保真度（每次重复相同行为时调用）
+        /// </summary>
+        public void ImproveFidelity()
+        {
+            Fidelity = Mathf.Clamp(Fidelity + 0.05f, 0f, 1f);
+        }
+
+        /// <summary>
+        /// REQ-143: 衰减检查 — 当 DecayTimer 超过阈值时降低等级
+        /// 返回是否发生了衰减
+        /// </summary>
+        public bool CheckDecay(float graceSeconds, float decayIntervalSeconds)
+        {
+            if (DecayTimer >= graceSeconds)
+            {
+                // 每 decayIntervalSeconds 秒衰减一次
+                float decayTicks = (DecayTimer - graceSeconds) / decayIntervalSeconds;
+                if (decayTicks >= 1f)
+                {
+                    ImprintLevel = Mathf.Max(1, ImprintLevel - 1);
+                    DecayTimer = graceSeconds; // 重置到宽限期边界
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// REQ-143: 重置衰减计时器（当印记被刷新时调用）
+        /// </summary>
+        public void ResetDecayTimer()
+        {
+            DecayTimer = 0f;
+        }
+
+        /// <summary>
+        /// 获取保真度等级描述
+        /// </summary>
+        public string GetFidelityLabel()
+        {
+            if (Fidelity >= 0.7f) return "高保真";
+            if (Fidelity >= 0.4f) return "中保真";
+            return "低保真";
         }
     }
 
@@ -217,10 +276,13 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         }
 
         /// <summary>
-        /// 添加新印记
+        /// 添加新印记（REQ-144: 随机初始保真度 0.3-0.6）
         /// </summary>
         public void AddImprint(BehaviorImprint imprint)
         {
+            // 初始化保真度为 0.3-0.6 随机
+            if (imprint.Fidelity <= 0f)
+                imprint.Fidelity = 0.3f + (float)GD.RandDouble() * 0.3f;
             _imprints.Add(imprint);
             UpdateHighestLevel(imprint.BehaviorType, imprint.ImprintLevel);
         }
@@ -283,7 +345,9 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     { "level", imprint.ImprintLevel },
                     { "xp", imprint.Xp },
                     { "lastRecorded", imprint.LastRecordedAt.ToString("o") },
-                    { "totalTriggers", imprint.TotalTriggers }
+                    { "totalTriggers", imprint.TotalTriggers },
+                    { "fidelity", imprint.Fidelity },
+                    { "decayTimer", imprint.DecayTimer }
                 });
             }
             data["imprints"] = imprintList;
@@ -307,7 +371,10 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     ImprintLevel = (int)imprintData["level"],
                     Xp = (float)(double)imprintData["xp"],
                     LastRecordedAt = DateTime.Parse((string)imprintData["lastRecorded"]),
-                    TotalTriggers = (int)imprintData["totalTriggers"]
+                    TotalTriggers = (int)imprintData["totalTriggers"],
+                    // REQ-144/REQ-143: 新字段，向后兼容
+                    Fidelity = imprintData.Contains("fidelity") ? (float)(double)imprintData["fidelity"] : 0.5f,
+                    DecayTimer = imprintData.Contains("decayTimer") ? (float)(double)imprintData["decayTimer"] : 0f
                 };
                 _imprints.Add(imprint);
                 UpdateHighestLevel(imprint.BehaviorType, imprint.ImprintLevel);

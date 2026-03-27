@@ -265,6 +265,7 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("pet", typeof(ClawRPG.Scripts.Systems.PetMimicry.PetBehaviorLogger));
             RegisterSystemInGroup("pet", typeof(ClawRPG.Scripts.Systems.PetMimicry.MimicryDatabase));
             RegisterSystemInGroup("pet", typeof(ClawRPG.Scripts.Systems.PetMimicry.MimicryLevelTracker));
+            RegisterSystemInGroup("pet", typeof(ClawRPG.Scripts.Systems.PetMimicry.PetMimicrySkillSystem)); // REQ-146
 
             // 活动与挑战系统
             RegisterSystemInGroup("event", typeof(SeasonalEventSystem));

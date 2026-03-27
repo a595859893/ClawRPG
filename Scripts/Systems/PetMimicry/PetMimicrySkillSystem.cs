@@ -41,6 +41,17 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         private const int   MAX_SKILL_TARGETS = 3;          // AOE最大目标数
         private float _thinkAccumulator = 0f;
 
+        // REQ-146: 互斥组管理 — 记录当前激活的互斥组，防止同组技能重复触发
+        private HashSet<string> _activeMutexGroups = new HashSet<string>();
+
+        // REQ-146: 最后一次主人受伤时间（用于 OnOwnerDamaged 触发检测）
+        private float _lastOwnerDamageTime = float.MinValue;
+        private const float OWNER_DAMAGE_COOLDOWN = 3f; // 主人受伤后3秒内的触发窗口
+
+        // REQ-146: 主人攻击冷却（用于 OnOwnerAttacking 触发）
+        private float _ownerAttackCooldown = 0f;
+        private const float OWNER_ATTACK_COOLDOWN = 1f; // 主人攻击后1秒窗口
+
         // ── Signals ─────────────────────────────────────────────────────────
         [Signal]
         public delegate void MimicrySkillUsedEventHandler(PlayerBehaviorType skillType, MimicrySkillType mimSkill, Vector2 worldPosition);
@@ -96,6 +107,19 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
 
             // 环境变化时重新评估技能
             bus.Subscribe<string>(EventBusManager.Events.SceneChanged, OnSceneChanged);
+
+            // REQ-146: 主人受伤时触发反击类技能
+            bus.Subscribe<float>(EventBusManager.Events.PlayerHealthChanged, OnOwnerDamaged);
+
+            // REQ-146: 主人攻击时触发协同技能（通过宠物协战信号间接检测）
+            if (PetCombatCompanionSystem.Instance != null)
+                PetCombatCompanionSystem.Instance.SynergyAttackTriggered += OnPetSynergyAttack;
+        }
+
+        private void OnPetSynergyAttack(string petId, string attackType, float syncLevel)
+        {
+            // 宠物协战信号说明主人刚刚发起了攻击
+            _ownerAttackCooldown = OWNER_ATTACK_COOLDOWN;
         }
 
         public override void _Process(double delta)
@@ -107,6 +131,10 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
 
             // 更新激活效果持续时间
             UpdateActiveEffects(dt);
+
+            // REQ-146: 更新攻击冷却
+            if (_ownerAttackCooldown > 0f)
+                _ownerAttackCooldown -= dt;
 
             // 技能思考逻辑
             _thinkAccumulator += dt;
@@ -212,8 +240,12 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
 
         // ── Core AI Logic ──────────────────────────────────────────────────
 
+        // ══════════════════════════════════════════════════════════════
+        // REQ-146: Skill Activator — 触发评估 + 优先级选择 + 互斥组
+        // ══════════════════════════════════════════════════════════════
+
         /// <summary>
-        /// 技能决策循环：检测环境 → 选技能 → 执行
+        /// 技能决策循环：评估所有技能触发条件 → 选最佳 → 执行
         /// </summary>
         private void ThinkAndAct()
         {
@@ -228,22 +260,139 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                 RefreshSkillInstances();
             }
 
-            // 选择最佳技能
-            var skill = GetBestSkillForCurrentEnvironment();
-            if (skill == null || !skill.IsReady) return;
+            // REQ-146: 评估所有技能的触发条件
+            var candidates = EvaluateTriggerConditions(currentEnv);
+            if (candidates.Count == 0) return;
 
-            // 检查是否应该使用这个技能
-            if (!ShouldUseSkill(skill, currentEnv)) return;
+            // REQ-146: 按优先级选择最佳技能（尊重互斥组）
+            var best = SelectBestSkill(candidates);
+            if (best == null || !best.IsReady) return;
 
             // 执行技能
-            if (ExecuteSkill(skill))
+            if (ExecuteSkill(best))
             {
-                EmitSignal(SignalName.MimicrySkillUsed, skill.Definition.SourceBehavior, skill.Definition.SkillType, Vector2.Zero);
+                // 标记互斥组为活跃
+                if (!string.IsNullOrEmpty(best.Definition.TriggerConfig.MutexGroup))
+                    _activeMutexGroups.Add(best.Definition.TriggerConfig.MutexGroup);
+
+                EmitSignal(SignalName.MimicrySkillUsed, best.Definition.SourceBehavior, best.Definition.SkillType, Vector2.Zero);
             }
         }
 
         /// <summary>
-        /// 判断是否应该使用该技能
+        /// REQ-146: 评估所有技能的触发条件，返回满足条件的技能列表
+        /// </summary>
+        private List<MimicrySkillInstance> EvaluateTriggerConditions(RoomEnvironmentType currentEnv)
+        {
+            var candidates = new List<MimicrySkillInstance>();
+            var petHp = GetPetHpPercent();
+            var ownerHp = GetOwnerHpPercent();
+            var nearbyEnemy = GetCurrentTarget();
+            float timeSinceOwnerDamage = Time.GetTicksMsec() / 1000f - _lastOwnerDamageTime;
+
+            foreach (var kvp in _skillInstances)
+            {
+                var inst = kvp.Value;
+                var def = inst.Definition;
+                var trigger = def.TriggerConfig;
+
+                // 冷却检查
+                if (!inst.IsReady) continue;
+
+                // 互斥组检查（同组技能正在执行则跳过）
+                if (!string.IsNullOrEmpty(trigger.MutexGroup) && _activeMutexGroups.Contains(trigger.MutexGroup))
+                    continue;
+
+                // 被动/持续性技能已经在激活列表则跳过
+                if (_activeSkillEffects.ContainsKey(def.SkillType) &&
+                    (def.SkillType == MimicrySkillType.DodgeMaster ||
+                     def.SkillType == MimicrySkillType.LootInstinct ||
+                     def.SkillType == MimicrySkillType.PuzzleInsight ||
+                     def.SkillType == MimicrySkillType.SpecialMorph))
+                    continue;
+
+                bool triggered = false;
+                switch (trigger.Trigger)
+                {
+                    case MimicryTriggerType.HpBelowThreshold:
+                        // 宠物HP低于阈值
+                        triggered = petHp < trigger.Threshold;
+                        break;
+
+                    case MimicryTriggerType.OnOwnerDamaged:
+                        // 主人最近受伤（3秒窗口）
+                        triggered = timeSinceOwnerDamage < OWNER_DAMAGE_COOLDOWN;
+                        break;
+
+                    case MimicryTriggerType.OnEnemyNearby:
+                        // 敌人在技能范围内
+                        triggered = nearbyEnemy != null && IsEnemyInRange(nearbyEnemy, trigger.Range);
+                        break;
+
+                    case MimicryTriggerType.OnOwnerAttacking:
+                        // 需要检测主人是否在攻击（通过 PetSynergyAttackTriggered 信号被动触发检查）
+                        triggered = _ownerAttackCooldown > 0f && nearbyEnemy != null;
+                        break;
+
+                    case MimicryTriggerType.OnEnvironmentMatch:
+                        // 当前环境匹配技能的环境类型
+                        triggered = (currentEnv & trigger.EnvironmentType) == trigger.EnvironmentType;
+                        break;
+
+                    case MimicryTriggerType.CooldownBased:
+                        // 冷却结束自动触发（默认行为）
+                        triggered = true;
+                        break;
+
+                    case MimicryTriggerType.ManualToggle:
+                        // 手动激活（暂不自动触发）
+                        triggered = false;
+                        break;
+
+                    case MimicryTriggerType.None:
+                    default:
+                        triggered = false;
+                        break;
+                }
+
+                if (triggered)
+                    candidates.Add(inst);
+            }
+
+            return candidates;
+        }
+
+        /// <summary>
+        /// REQ-146: 从候选技能中选择最佳技能（最高优先级，互斥组去重）
+        /// </summary>
+        private MimicrySkillInstance SelectBestSkill(List<MimicrySkillInstance> candidates)
+        {
+            if (candidates.Count == 0) return null;
+            if (candidates.Count == 1) return candidates[0];
+
+            // 按优先级降序排序
+            candidates.Sort((a, b) =>
+                b.Definition.TriggerConfig.Priority.CompareTo(a.Definition.TriggerConfig.Priority));
+
+            return candidates[0];
+        }
+
+        /// <summary>
+        /// 检查敌人是否在指定范围内
+        /// </summary>
+        private bool IsEnemyInRange(Node2D enemy, float range)
+        {
+            if (enemy == null) return false;
+            var petPos = GetPetPosition();
+            return petPos.DistanceTo(enemy.GlobalPosition) <= range;
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // Legacy trigger evaluation (kept for compatibility)
+        // ══════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// 判断是否应该使用该技能（REX-146前向兼容）
         /// </summary>
         private bool ShouldUseSkill(MimicrySkillInstance skill, RoomEnvironmentType env)
         {
@@ -255,7 +404,6 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                 case MimicrySkillType.DodgeMaster:
                 case MimicrySkillType.LootInstinct:
                 case MimicrySkillType.PuzzleInsight:
-                    // 这些是持续可见的技能，已经在激活列表就不重复触发
                     if (_activeSkillEffects.ContainsKey(def.SkillType)) return false;
                     break;
             }
@@ -472,6 +620,28 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             return 1f; // 默认满血
         }
 
+        /// <summary>
+        /// REQ-146: 获取主人当前HP百分比
+        /// </summary>
+        private float GetOwnerHpPercent()
+        {
+            try
+            {
+                var players = GetTree().GetNodesInGroup("player");
+                foreach (Node node in players)
+                {
+                    if (node is Character ch)
+                    {
+                        float maxHp = ch.MaxHealth;
+                        if (maxHp > 0f)
+                            return ch.Health / maxHp;
+                    }
+                }
+            }
+            catch { }
+            return 1f;
+        }
+
         // ── Skill Effects ───────────────────────────────────────────────────
 
         /// <summary>
@@ -648,6 +818,22 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             // 战斗结束：清除所有激活效果
             _activeSkillEffects.Clear();
             _skillInstances.Clear();
+            _activeMutexGroups.Clear();
+            _ownerAttackCooldown = 0f;
+        }
+
+        private void OnOwnerDamaged(float damageAmount)
+        {
+            _lastOwnerDamageTime = Time.GetTicksMsec() / 1000f;
+            GD.Print($"[PetMimicrySkillSystem] Owner damaged by {damageAmount:F0}, setting trigger window");
+        }
+
+        /// <summary>
+        /// REQ-146: 当主人发起攻击时调用（由 PetSynergyAttackTriggered 或类似信号触发）
+        /// </summary>
+        public void OnOwnerAttack()
+        {
+            _ownerAttackCooldown = OWNER_ATTACK_COOLDOWN;
         }
 
         private void OnSceneChanged(string scenePath)
@@ -658,6 +844,10 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             {
                 _lastEnvironment = newEnv;
                 RefreshSkillInstances();
+
+                // REQ-143: 尝试刷新匹配的印记
+                if (MimicryLevelTracker.Instance != null && newEnv != RoomEnvironmentType.None)
+                    MimicryLevelTracker.Instance.RefreshImprint(newEnv);
             }
         }
 

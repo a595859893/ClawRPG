@@ -71,46 +71,34 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         // ── Decay Logic ───────────────────────────────────────────────────
 
         /// <summary>
-        /// 定期检查所有印记的衰减
+        /// 定期检查所有印记的衰减（REQ-143: 使用 BehaviorImprint.DecayTimer 实时跟踪）
         /// </summary>
         private void CheckImprintDecay()
         {
             if (_mimicryData == null) return;
 
             var allImprints = _mimicryData.GetAllImprints();
-            DateTime now = DateTime.Now;
+            float graceSeconds = DECAY_GRACE_DAYS * 86400f; // 7天转秒
+            float decayIntervalSeconds = DAYS_PER_LEVEL_DECAY * 86400f; // 14天/级
 
             foreach (var imprint in allImprints)
             {
                 if (imprint.ImprintLevel == 0) continue; // 未解锁的不衰减
 
-                double daysSinceLastRecord = (now - imprint.LastRecordedAt).TotalDays;
+                // REQ-143: 实时跟踪衰减计时器
+                imprint.DecayTimer += DECAY_CHECK_INTERVAL;
 
-                // 超过 grace period，开始衰减
-                if (daysSinceLastRecord > DECAY_GRACE_DAYS)
+                bool decayed = imprint.CheckDecay(graceSeconds, decayIntervalSeconds);
+                if (decayed)
                 {
-                    // 1. XP 线性衰减
-                    imprint.Xp = Mathf.Max(0f, imprint.Xp - XP_DECAY_AMOUNT);
+                    int oldLevel = imprint.ImprintLevel + 1; // CheckDecay already decremented
+                    GD.Print($"[MimicryLevelTracker] Decay: {imprint.BehaviorType} in {imprint.EnvironmentType} " +
+                             $"dropped from Lv{oldLevel} → Lv{imprint.ImprintLevel} (idle {imprint.DecayTimer / 86400f:F1}d)");
 
-                    // 2. 等级衰减（每 DAYS_PER_LEVEL_DECAY 天降一级）
-                    int targetLevel = Mathf.Max(0,
-                        imprint.ImprintLevel - (int)((daysSinceLastRecord - DECAY_GRACE_DAYS) / DAYS_PER_LEVEL_DECAY));
+                    EmitSignal(SignalName.ImprintLevelChanged,
+                        imprint.BehaviorType, imprint.EnvironmentType, oldLevel, imprint.ImprintLevel);
 
-                    if (targetLevel < imprint.ImprintLevel)
-                    {
-                        int oldLevel = imprint.ImprintLevel;
-                        imprint.ImprintLevel = targetLevel;
-                        imprint.Xp = 0f; // 降级后XP清零
-
-                        GD.Print($"[MimicryLevelTracker] Decay: {imprint.BehaviorType} in {imprint.EnvironmentType} " +
-                                 $"dropped from Lv{oldLevel} → Lv{targetLevel} (idle {daysSinceLastRecord:F1}d)");
-
-                        EmitSignal(SignalName.ImprintLevelChanged,
-                            imprint.BehaviorType, imprint.EnvironmentType, oldLevel, targetLevel);
-
-                        // 通知技能系统刷新
-                        NotifySkillSystemRefresh();
-                    }
+                    NotifySkillSystemRefresh();
                 }
             }
         }
@@ -124,6 +112,36 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             {
                 PetMimicrySkillSystem.Instance.RefreshSkillInstances();
             }
+        }
+
+        /// <summary>
+        /// REQ-143: 刷新印记 — 宠物回到匹配的房间时调用，重置衰减计时器并提升等级
+        /// </summary>
+        public void RefreshImprint(RoomEnvironmentType envType)
+        {
+            if (_mimicryData == null) return;
+
+            var imprints = _mimicryData.GetImprintsForEnvironment(envType);
+            foreach (var imprint in imprints)
+            {
+                int oldLevel = imprint.ImprintLevel;
+
+                // 重置衰减计时器
+                imprint.ResetDecayTimer();
+
+                // 等级+1（上限5）
+                if (imprint.ImprintLevel < 5)
+                {
+                    imprint.ImprintLevel++;
+                    imprint.Xp = 0f;
+                    GD.Print($"[MimicryLevelTracker] Imprint refreshed: {imprint.BehaviorType} in {envType} Lv{oldLevel}→Lv{imprint.ImprintLevel}");
+
+                    EmitSignal(SignalName.ImprintLevelChanged,
+                        imprint.BehaviorType, envType, oldLevel, imprint.ImprintLevel);
+                }
+            }
+
+            NotifySkillSystemRefresh();
         }
 
         // ── Level Up Handler ─────────────────────────────────────────────

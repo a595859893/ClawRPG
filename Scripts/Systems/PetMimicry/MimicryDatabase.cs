@@ -5,6 +5,63 @@ using Godot;
 namespace ClawRPG.Scripts.Systems.PetMimicry
 {
     /// <summary>
+    /// 模仿技能触发类型 — 定义技能在什么条件下激活
+    /// </summary>
+    public enum MimicryTriggerType
+    {
+        /// <summary>无触发条件（手动或默认）</summary>
+        None,
+        /// <summary>宠物HP低于阈值时触发</summary>
+        HpBelowThreshold,
+        /// <summary>主人受伤时触发（反击类）</summary>
+        OnOwnerDamaged,
+        /// <summary>敌人在范围内时触发</summary>
+        OnEnemyNearby,
+        /// <summary>主人攻击时触发（协同类）</summary>
+        OnOwnerAttacking,
+        /// <summary>冷却结束自动触发</summary>
+        CooldownBased,
+        /// <summary>玩家手动激活</summary>
+        ManualToggle,
+        /// <summary>进入特定环境类型时触发</summary>
+        OnEnvironmentMatch
+    }
+
+    /// <summary>
+    /// 技能触发配置 — 定义单个技能的触发条件、优先级和互斥组
+    /// </summary>
+    public struct MimicryTriggerConfig
+    {
+        /// <summary>触发类型</summary>
+        public MimicryTriggerType Trigger { get; set; }
+
+        /// <summary>HP阈值（HpBelowThreshold时使用，0.0-1.0）</summary>
+        public float Threshold { get; set; }
+
+        /// <summary>敌人距离阈值（OnEnemyNearby时使用，像素）</summary>
+        public float Range { get; set; }
+
+        /// <summary>激活优先级（越高越优先，0-100）</summary>
+        public int Priority { get; set; }
+
+        /// <summary>互斥组名（同组技能不能同时激活）</summary>
+        public string MutexGroup { get; set; }
+
+        /// <summary>该技能对应的环境类型（OnEnvironmentMatch时使用）</summary>
+        public RoomEnvironmentType EnvironmentType { get; set; }
+
+        public static MimicryTriggerConfig Default => new MimicryTriggerConfig
+        {
+            Trigger = MimicryTriggerType.CooldownBased,
+            Threshold = 0f,
+            Range = 200f,
+            Priority = 50,
+            MutexGroup = null,
+            EnvironmentType = RoomEnvironmentType.None
+        };
+    }
+
+    /// <summary>
     /// 模仿技能类型 — 宠物根据印记习得的技能效果
     /// </summary>
     public enum MimicrySkillType
@@ -66,6 +123,10 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         public float CooldownReductionPerLevel { get; set; }
         public int MaxCharges { get; set; }         // 0 = 无限制（普通技能）
         public float ChargeRestoreTime { get; set; } // 每次充能时间
+
+        // ── REQ-146: Skill Activator 触发配置 ──────────────────────────────
+        /// <summary>技能触发条件配置</summary>
+        public MimicryTriggerConfig TriggerConfig { get; set; }
 
         /// <summary>
         /// 根据印记等级计算实际伤害
@@ -180,6 +241,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             var definitions = new List<MimicrySkillDefinition>
             {
                 // ── 元素系 ──────────────────────────────────────────────────
+                // ── 元素系 ──────────────────────────────────────────────────
                 new MimicrySkillDefinition
                 {
                     SkillType = MimicrySkillType.FireBreath,
@@ -192,7 +254,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0f,
                     CooldownSeconds = 8f,
                     CooldownReductionPerLevel = 0.5f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnemyNearby,
+                        Threshold = 0f,
+                        Range = 250f,
+                        Priority = 60,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -206,7 +276,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0.3f,
                     CooldownSeconds = 8f,
                     CooldownReductionPerLevel = 0.5f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnemyNearby,
+                        Threshold = 0f,
+                        Range = 250f,
+                        Priority = 60,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -220,7 +298,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0f,
                     CooldownSeconds = 10f,
                     CooldownReductionPerLevel = 0.6f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnemyNearby,
+                        Threshold = 0f,
+                        Range = 180f,
+                        Priority = 70,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -234,7 +320,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0f,
                     CooldownSeconds = 9f,
                     CooldownReductionPerLevel = 0.5f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnemyNearby,
+                        Threshold = 0f,
+                        Range = 200f,
+                        Priority = 65,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -248,7 +342,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0f,
                     CooldownSeconds = 12f,
                     CooldownReductionPerLevel = 0.7f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnemyNearby,
+                        Threshold = 0f,
+                        Range = 220f,
+                        Priority = 65,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -262,7 +364,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0.2f,
                     CooldownSeconds = 9f,
                     CooldownReductionPerLevel = 0.5f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnemyNearby,
+                        Threshold = 0f,
+                        Range = 200f,
+                        Priority = 60,
+                        MutexGroup = null
+                    }
                 },
 
                 // ── 战术系 ──────────────────────────────────────────────────
@@ -278,7 +388,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0f,
                     CooldownSeconds = 6f,
                     CooldownReductionPerLevel = 0.4f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnemyNearby,
+                        Threshold = 0f,
+                        Range = 150f,
+                        Priority = 75,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -292,7 +410,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0.5f,
                     CooldownSeconds = 14f,
                     CooldownReductionPerLevel = 0.8f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnOwnerAttacking,
+                        Threshold = 0f,
+                        Range = 0f,
+                        Priority = 55,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -306,7 +432,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0.5f,
                     CooldownSeconds = 12f,
                     CooldownReductionPerLevel = 0.6f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnOwnerDamaged,
+                        Threshold = 0f,
+                        Range = 0f,
+                        Priority = 70,
+                        MutexGroup = "defense"
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -320,7 +454,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0f,
                     CooldownSeconds = 20f,
                     CooldownReductionPerLevel = 1.2f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.HpBelowThreshold,
+                        Threshold = 0.3f,
+                        Range = 0f,
+                        Priority = 90,
+                        MutexGroup = "offense"
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -334,7 +476,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0.3f,
                     CooldownSeconds = 15f,
                     CooldownReductionPerLevel = 0.8f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnOwnerAttacking,
+                        Threshold = 0f,
+                        Range = 0f,
+                        Priority = 65,
+                        MutexGroup = "defense"
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -348,7 +498,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0f,
                     CooldownSeconds = 10f,
                     CooldownReductionPerLevel = 0.6f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnemyNearby,
+                        Threshold = 0f,
+                        Range = 300f,
+                        Priority = 80,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -362,7 +520,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0.5f,
                     CooldownSeconds = 18f,
                     CooldownReductionPerLevel = 1f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.CooldownBased,
+                        Threshold = 0f,
+                        Range = 0f,
+                        Priority = 50,
+                        MutexGroup = null
+                    }
                 },
 
                 // ── 感知系 ──────────────────────────────────────────────────
@@ -378,7 +544,16 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0.2f,
                     CooldownSeconds = 20f,
                     CooldownReductionPerLevel = 1f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnvironmentMatch,
+                        Threshold = 0f,
+                        Range = 0f,
+                        Priority = 55,
+                        MutexGroup = null,
+                        EnvironmentType = RoomEnvironmentType.TrapDense
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -392,7 +567,16 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 2f,
                     CooldownSeconds = 30f,
                     CooldownReductionPerLevel = 2f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnEnvironmentMatch,
+                        Threshold = 0f,
+                        Range = 0f,
+                        Priority = 55,
+                        MutexGroup = null,
+                        EnvironmentType = RoomEnvironmentType.Puzzle
+                    }
                 },
 
                 // ── 增益系 ──────────────────────────────────────────────────
@@ -409,7 +593,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     CooldownSeconds = 45f,
                     CooldownReductionPerLevel = 3f,
                     MaxCharges = 1,
-                    ChargeRestoreTime = 0f
+                    ChargeRestoreTime = 0f,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.CooldownBased,
+                        Threshold = 0f,
+                        Range = 0f,
+                        Priority = 40,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -423,7 +615,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0f,
                     CooldownSeconds = 15f,
                     CooldownReductionPerLevel = 0.8f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.HpBelowThreshold,
+                        Threshold = 0.5f,
+                        Range = 0f,
+                        Priority = 75,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -437,7 +637,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     DurationPerLevel = 0f,
                     CooldownSeconds = 12f,
                     CooldownReductionPerLevel = 0.6f,
-                    MaxCharges = 0
+                    MaxCharges = 0,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.OnOwnerAttacking,
+                        Threshold = 0f,
+                        Range = 0f,
+                        Priority = 70,
+                        MutexGroup = null
+                    }
                 },
                 new MimicrySkillDefinition
                 {
@@ -452,7 +660,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     CooldownSeconds = 60f,
                     CooldownReductionPerLevel = 4f,
                     MaxCharges = 1,
-                    ChargeRestoreTime = 0f
+                    ChargeRestoreTime = 0f,
+                    TriggerConfig = new MimicryTriggerConfig
+                    {
+                        Trigger = MimicryTriggerType.ManualToggle,
+                        Threshold = 0f,
+                        Range = 0f,
+                        Priority = 30,
+                        MutexGroup = null
+                    }
                 }
             };
 
