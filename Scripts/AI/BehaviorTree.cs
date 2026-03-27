@@ -43,6 +43,7 @@ namespace ClawRPG.Scripts.AI {
         public float HealthPercent => (float)Boss.CurrentHealth / Boss.MaxHealth;
         public int CurrentPhase => Boss.GetCurrentPhase();
         public bool IsEnraged => Boss.IsEnraged();
+        public bool IsRageTriggered => Boss.IsRageTriggered(); // REQ-127: HP < 5% rage
         public float TimeSinceLastAbility { get; set; }
     }
     

@@ -29,6 +29,12 @@ namespace ClawRPG.Scripts.Systems {
         private void BuildBehaviorTree() {
             // Root selector: Priority-based decision making
             _root = new BTSelector(
+                // Priority 0: RAGE MODE - HP < 5% triggers aggressive rampage (REQ-127)
+                new BTSequence(
+                    new BTCondition(ctx => ctx.IsRageTriggered),
+                    CreateRageEvaluation()
+                ),
+
                 // Priority 1: Emergency healing when low health
                 new BTSequence(
                     new BTCondition(ctx => ctx.HealthPercent < 0.3f),
@@ -131,6 +137,53 @@ namespace ClawRPG.Scripts.Systems {
             });
         }
         
+        /// <summary>
+        /// Create Rage mode evaluation - aggressive rapid attacks (REQ-127)
+        /// </summary>
+        private BTNode CreateRageEvaluation() {
+            return new BTScoreSelector()
+                .AddScoringNode(new BTScoringAction(ctx => {
+                    // In rage mode, prioritize devastating abilities
+                    var rageAbilities = new[] { "fire_breath", "dark_bolt", "lightning_chain", "ground_slam" };
+
+                    foreach (var ability in rageAbilities) {
+                        if (!IsAbilityReady(ability)) continue;
+
+                        float score = 300f; // High base priority
+
+                        var abilityData = _boss.GetAbilityDatabase().GetValueOrDefault(ability);
+                        if (abilityData != null) {
+                            score += abilityData.DamageMultiplier * 80f;
+                            // Prefer AoE in rage
+                            if (abilityData.IsAoE) score += 100f;
+                            // Prefer high damage
+                            if (abilityData.DamageMultiplier >= 2.0f) score += 80f;
+                        }
+
+                        // Closer = better for melee
+                        if (ctx.DistanceToTarget < 200f) score += 50f;
+
+                        if (score > ctx.Score) {
+                            ctx.Score = score;
+                            ctx.SelectedAbility = ability;
+                        }
+                    }
+                }))
+                .AddScoringNode(new BTScoringAction(ctx => {
+                    // Fallback: rapid basic attacks
+                    var basicAbilities = new[] { "magic_missile", "ice_lance" };
+                    foreach (var ability in basicAbilities) {
+                        if (!IsAbilityReady(ability)) continue;
+
+                        float score = 200f;
+                        if (score > ctx.Score) {
+                            ctx.Score = score;
+                            ctx.SelectedAbility = ability;
+                        }
+                    }
+                }));
+        }
+
         /// <summary>
         /// Create AoE ability evaluation
         /// </summary>

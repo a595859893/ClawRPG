@@ -186,6 +186,79 @@ namespace ClawRPG.Scripts.Characters {
         /// Check if boss is enraged
         /// </summary>
         public bool IsEnraged() => _data.IsEnraged;
+
+        /// <summary>
+        /// Check if boss has triggered HP-based rage (REQ-127)
+        /// </summary>
+        public bool IsRageTriggered() => _data.IsRageTriggered;
+
+        /// <summary>
+        /// Check HP-based rage trigger (REQ-127: HP < 5%)
+        /// </summary>
+        public void CheckRageTrigger()
+        {
+            if (_data.IsRageTriggered) return;
+
+            float healthPercent = _boss.CurrentHealth / _boss.MaxHealth;
+            float rageThreshold = 0.05f; // 5%
+
+            if (healthPercent <= rageThreshold)
+            {
+                _data.IsRageTriggered = true;
+                TriggerRageEffects();
+                GD.Print($"{_data.BossTitle} entered RAGE MODE at {healthPercent * 100:F1}% HP!");
+            }
+        }
+
+        /// <summary>
+        /// Trigger rage mode effects (speed +50%)
+        /// </summary>
+        private void TriggerRageEffects()
+        {
+            _boss.MoveSpeed *= 1.5f;
+            _boss.AttackCooldown *= 0.67f; // ~50% faster attacks
+            ShowRageEffect();
+        }
+
+        /// <summary>
+        /// Show rage visual effect
+        /// </summary>
+        private void ShowRageEffect()
+        {
+            // Apply rage shader effect
+            if (_data.RageMaterial != null && _boss.GetSprite() != null)
+            {
+                _boss.GetSprite().Material = _data.RageMaterial;
+                AnimateRageShader();
+            }
+
+            // Red pulsing modulate
+            var tween = _boss.CreateTween();
+            _boss.GetSprite().Modulate = new Color(1f, 0.2f, 0f);
+            tween.SetLoops();
+            tween.TweenProperty(_boss.GetSprite(), "modulate", new Color(1f, 0f, 0f), 0.3f);
+            tween.TweenProperty(_boss.GetSprite(), "modulate", new Color(1f, 0.2f, 0f), 0.3f);
+        }
+
+        /// <summary>
+        /// Animate rage shader
+        /// </summary>
+        private void AnimateRageShader()
+        {
+            if (_data.RageMaterial == null) return;
+
+            var tween = _boss.CreateTween();
+            tween.SetLoops();
+
+            tween.TweenCallback(Callable.From(() => {
+                _data.RageMaterial.SetShaderParameter("rage_amount", 0.7f);
+            }));
+            tween.TweenInterval(0.3f);
+            tween.TweenCallback(Callable.From(() => {
+                _data.RageMaterial.SetShaderParameter("rage_amount", 1.0f);
+            }));
+            tween.TweenInterval(0.3f);
+        }
         
         /// <summary>
         /// Get enrage time remaining

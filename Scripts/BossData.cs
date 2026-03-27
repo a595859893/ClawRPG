@@ -32,6 +32,7 @@ namespace ClawRPG.Scripts.Characters {
         public float EnrageTimer { get; set; }
         public bool IsEnraged { get; set; }
         public bool PhaseTransitioning { get; set; }
+        public bool IsRageTriggered { get; set; } // HP < 5% rage (REQ-127)
         
         // Rage shader
         public ShaderMaterial RageMaterial { get; set; }
@@ -211,6 +212,7 @@ namespace ClawRPG.Scripts.Characters {
             {
                 { "currentPhase", CurrentPhase },
                 { "isEnraged", IsEnraged },
+                { "isRageTriggered", IsRageTriggered },
                 { "enrageTimer", EnrageTimer },
                 { "abilityTimer", AbilityTimer }
             };
@@ -227,6 +229,8 @@ namespace ClawRPG.Scripts.Characters {
                 CurrentPhase = (int)data["currentPhase"];
             if (data.Contains("isEnraged"))
                 IsEnraged = (bool)data["isEnraged"];
+            if (data.Contains("isRageTriggered"))
+                IsRageTriggered = (bool)data["isRageTriggered"];
             if (data.Contains("enrageTimer"))
                 EnrageTimer = (float)data["enrageTimer"];
             if (data.Contains("abilityTimer"))
