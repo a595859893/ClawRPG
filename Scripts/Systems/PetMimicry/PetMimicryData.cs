@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Godot;
 
 namespace ClawRPG.Scripts.Systems.PetMimicry
 {
@@ -152,6 +154,176 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                 return true; // 升级了
             }
             return false;
+        }
+    }
+
+    /// <summary>
+    /// 宠物行为模仿数据 — 全局单例，存储所有行为印记
+    /// 跨游戏持久化：存档时保存，进游戏时加载
+    /// </summary>
+    public class PetMimicryData : Node
+    {
+        public static PetMimicryData Instance { get; private set; }
+
+        /// <summary>
+        /// 所有行为印记列表 (environment × behavior)
+        /// </summary>
+        private List<BehaviorImprint> _imprints = new List<BehaviorImprint>();
+
+        /// <summary>
+        /// 每种行为类型的最高等级（用于宠物个性卡）
+        /// </summary>
+        private Dictionary<PlayerBehaviorType, int> _highestBehaviorLevel = new Dictionary<PlayerBehaviorType, int>();
+
+        public override void _Ready()
+        {
+            Instance = this;
+            GD.Print("[PetMimicryData] Initialized");
+        }
+
+        // ── Imprint Access ─────────────────────────────────────────────────
+
+        /// <summary>
+        /// 获取指定环境+行为类型的印记
+        /// </summary>
+        public BehaviorImprint GetImprint(RoomEnvironmentType envType, PlayerBehaviorType behavior)
+        {
+            return _imprints.Find(i =>
+                i.EnvironmentType == envType && i.BehaviorType == behavior);
+        }
+
+        /// <summary>
+        /// 获取指定行为类型在所有环境中的最高等级
+        /// </summary>
+        public int GetHighestLevel(PlayerBehaviorType behavior)
+        {
+            return _highestBehaviorLevel.TryGetValue(behavior, out var level) ? level : 0;
+        }
+
+        /// <summary>
+        /// 获取某环境类型下的所有印记
+        /// </summary>
+        public List<BehaviorImprint> GetImprintsForEnvironment(RoomEnvironmentType envType)
+        {
+            return _imprints.FindAll(i => i.EnvironmentType == envType);
+        }
+
+        /// <summary>
+        /// 获取所有印记
+        /// </summary>
+        public List<BehaviorImprint> GetAllImprints()
+        {
+            return new List<BehaviorImprint>(_imprints);
+        }
+
+        /// <summary>
+        /// 添加新印记
+        /// </summary>
+        public void AddImprint(BehaviorImprint imprint)
+        {
+            _imprints.Add(imprint);
+            UpdateHighestLevel(imprint.BehaviorType, imprint.ImprintLevel);
+        }
+
+        private void UpdateHighestLevel(PlayerBehaviorType behavior, int level)
+        {
+            if (!_highestBehaviorLevel.ContainsKey(behavior) ||
+                _highestBehaviorLevel[behavior] < level)
+            {
+                _highestBehaviorLevel[behavior] = level;
+            }
+        }
+
+        /// <summary>
+        /// 获取宠物的个性类型（最高等级的行为类型）
+        /// </summary>
+        public PlayerBehaviorType? GetDominantBehavior()
+        {
+            PlayerBehaviorType? dominant = null;
+            int maxLevel = 0;
+            foreach (var kvp in _highestBehaviorLevel)
+            {
+                if (kvp.Value > maxLevel)
+                {
+                    maxLevel = kvp.Value;
+                    dominant = kvp.Key;
+                }
+            }
+            return dominant;
+        }
+
+        /// <summary>
+        /// 获取所有行为类型的等级排名
+        /// </summary>
+        public List<(PlayerBehaviorType Behavior, int Level)> GetBehaviorRanking()
+        {
+            var result = new List<(PlayerBehaviorType, int)>();
+            foreach (PlayerBehaviorType behavior in Enum.GetValues(typeof(PlayerBehaviorType)))
+            {
+                int level = GetHighestLevel(behavior);
+                if (level > 0)
+                    result.Add((behavior, level));
+            }
+            result.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+            return result;
+        }
+
+        // ── Persistence ─────────────────────────────────────────────────────
+
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            var imprintList = new List<Dictionary>();
+            foreach (var imprint in _imprints)
+            {
+                imprintList.Add(new Dictionary
+                {
+                    { "envType", (int)imprint.EnvironmentType },
+                    { "behaviorType", (int)imprint.BehaviorType },
+                    { "level", imprint.ImprintLevel },
+                    { "xp", imprint.Xp },
+                    { "lastRecorded", imprint.LastRecordedAt.ToString("o") },
+                    { "totalTriggers", imprint.TotalTriggers }
+                });
+            }
+            data["imprints"] = imprintList;
+            return data;
+        }
+
+        public override void ImportSaveData(Dictionary data)
+        {
+            _imprints.Clear();
+            _highestBehaviorLevel.Clear();
+
+            if (data == null || !data.Contains("imprints")) return;
+
+            var imprintList = (Godot.Collections.Array)data["imprints"];
+            foreach (Dictionary imprintData in imprintList)
+            {
+                var imprint = new BehaviorImprint
+                {
+                    EnvironmentType = (RoomEnvironmentType)(int)imprintData["envType"],
+                    BehaviorType = (PlayerBehaviorType)(int)imprintData["behaviorType"],
+                    ImprintLevel = (int)imprintData["level"],
+                    Xp = (float)(double)imprintData["xp"],
+                    LastRecordedAt = DateTime.Parse((string)imprintData["lastRecorded"]),
+                    TotalTriggers = (int)imprintData["totalTriggers"]
+                };
+                _imprints.Add(imprint);
+                UpdateHighestLevel(imprint.BehaviorType, imprint.ImprintLevel);
+            }
+
+            GD.Print($"[PetMimicryData] Loaded {_imprints.Count} behavior imprints from save");
+        }
+
+        /// <summary>
+        /// 重置所有印记（用于测试或新游戏）
+        /// </summary>
+        public void ResetAll()
+        {
+            _imprints.Clear();
+            _highestBehaviorLevel.Clear();
+            GD.Print("[PetMimicryData] All imprints reset");
         }
     }
 }
