@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 /// <summary>
 /// Boss阶段管理系统 - 负责Boss阶段管理、愤怒机制、阶段转换
@@ -114,14 +115,20 @@ public class BossPhaseSystem : BaseSystem
     {
         if (battle.IsRageTriggered || !battle.IsAlive) return;
 
-        float rageThreshold = battle.Config.RageThreshold > 0 ? battle.Config.RageThreshold : 0.05f;
+        // REQ-127-04: Use config values (BalanceManager > BossBalance)
+        var balanceConfig = BalanceManager.Instance?.GetConfig();
+        float rageThreshold = balanceConfig?.Boss?.RageThreshold ?? (battle.Config.RageThreshold > 0 ? battle.Config.RageThreshold : 0.05f);
+        float rageSpeedBonus = balanceConfig?.Boss?.RageSpeedBonus ?? 1.5f;
+        float rageDamageBonus = balanceConfig?.Boss?.RageDamageBonus ?? 1.0f;
+        
         float healthPercent = battle.CurrentHealth / battle.Config.MaxHealth;
 
         if (healthPercent <= rageThreshold)
         {
             battle.IsRageTriggered = true;
-            // 狂暴状态下攻击速度 +50%
-            battle.CurrentSpeedMultiplier *= 1.5f;
+            // 狂暴状态下攻击速度 +50% (configurable)
+            battle.CurrentSpeedMultiplier *= rageSpeedBonus;
+            battle.CurrentDamageMultiplier *= rageDamageBonus;
 
             BossRageTriggered?.Invoke(battle.InstanceId);
             BossEnraged?.Invoke(battle.InstanceId);

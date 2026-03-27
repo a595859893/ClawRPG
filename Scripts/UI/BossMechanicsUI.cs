@@ -19,6 +19,7 @@ public class BossMechanicsUI : Control
     private Label _phaseLabel;
     private Label _timerLabel;
     private Label _enrageLabel;
+    private Label _rageLabel;
     private Label _minionLabel;
     private VBoxContainer _skillContainer;
     private VBoxContainer _timerContainer;
@@ -119,6 +120,14 @@ public class BossMechanicsUI : Control
         _enrageLabel.Text = "⚠️ Enrage: Not triggered";
         _enrageLabel.Modulate = new Color(1, 0.3, 0.3);
         _activeBattleTab.AddChild(_enrageLabel);
+        
+        // REQ-127: RAGE mode indicator
+        _rageLabel = new Label();
+        _rageLabel.Text = "☠️ RAGE MODE";
+        _rageLabel.Modulate = new Color(1, 0, 0);
+        _rageLabel.AddThemeFontSizeOverride("font_size", 28);
+        _rageLabel.Hide();
+        _activeBattleTab.AddChild(_rageLabel);
         
         _minionLabel = new Label();
         _minionLabel.Text = "Minions: 0";
@@ -309,6 +318,14 @@ public class BossMechanicsUI : Control
                 
                 _enrageLabel.Text = state.IsEnraged ? "⚠️⚠️ ENRAGED! ⚠️⚠️" : $"Enrage in: {Mathf.Max(0, bossData.EnrageTime - state.BattleTime):F0}s";
                 _enrageLabel.Modulate = state.IsEnraged ? new Color(1, 0, 0) : new Color(1, 0.7, 0.3);
+                
+                // REQ-127: Show RAGE mode indicator
+                bool isRageTriggered = state.IsRageTriggered;
+                _rageLabel.Visible = isRageTriggered;
+                if (isRageTriggered)
+                {
+                    GD.Print($"[BossMechanicsUI] BOSS {bossData.BossName} entered RAGE MODE!");
+                }
                 
                 _minionLabel.Text = $"Minions: {state.ActiveMinionCount}";
                 

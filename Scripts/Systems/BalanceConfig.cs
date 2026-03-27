@@ -113,6 +113,11 @@ namespace ClawRPG.Scripts.Systems {
         public float Phase3HealthThreshold = 0.25f;
         public float MinionSpawnMultiplier = 1.0f;
         public float AbilityCooldownMultiplier = 1.0f;
+        
+        // REQ-127: Boss Rage Mode config
+        public float RageThreshold = 0.05f;       // HP < 5% triggers rage
+        public float RageSpeedBonus = 1.5f;        // +50% attack speed in rage
+        public float RageDamageBonus = 1.0f;       // Additional damage multiplier in rage
     }
 
     [Serializable]
