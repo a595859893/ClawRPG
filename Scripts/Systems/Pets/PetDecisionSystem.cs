@@ -112,7 +112,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// </summary>
         public void UpdateDecision(Node2D target, float delta)
         {
-            NextDecisionTick(); // REQ-137: 每个决策周期分配唯一 Tick ID
+            int tickId = NextDecisionTick(); // REQ-137: 每个决策周期分配唯一 Tick ID
             _stateTimer += delta;
             
             if (target == null)
@@ -134,7 +134,20 @@ namespace ClawRPG.Scripts.Systems.Pets
             }
             
             PetAIState newState = DecideState(target, distToEnemy, playerLowHealth);
+            PetAIState stateBefore = CurrentState; // REQ-137: 记录切换前的状态
             SetState(newState);
+
+            // REQ-137: 记录状态切换决策
+            if (PetReplayTraceSystem.Instance != null)
+            {
+                float timestamp = (float)Time.GetTicksMsec() / 1000f;
+                var record = PetDecisionRecord.CreateStateTransition(
+                    tickId, timestamp,
+                    stateBefore, newState,
+                    target != null ? $"目标距离:{distToEnemy:F0}px 性格:{_personality}" : "无目标→跟随"
+                );
+                PetReplayTraceSystem.Instance.RecordDecision(record);
+            }
         }
 
         private PetAIState DecideState(Node2D target, float distToEnemy, bool playerLowHealth)

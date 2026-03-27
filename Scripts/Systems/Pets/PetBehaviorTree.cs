@@ -66,7 +66,17 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// </summary>
         public void ExecuteBehavior(PetDecisionSystem.PetAIState state, Node2D target, float delta)
         {
-            PetDecisionSystem.NextDecisionTick(); // REQ-137: 行为执行决策节点
+            int tickId = PetDecisionSystem.NextDecisionTick(); // REQ-137: 行为执行决策节点
+
+            // REQ-137: 记录行为执行决策
+            if (PetReplayTraceSystem.Instance != null)
+            {
+                float timestamp = (float)Time.GetTicksMsec() / 1000f;
+                string reason = target != null ? $"目标:{target.Name}" : "无目标";
+                var record = PetDecisionRecord.CreateBehaviorExecution(tickId, timestamp, state, reason);
+                PetReplayTraceSystem.Instance.RecordDecision(record);
+            }
+
             switch (state)
             {
                 case PetDecisionSystem.PetAIState.Following:

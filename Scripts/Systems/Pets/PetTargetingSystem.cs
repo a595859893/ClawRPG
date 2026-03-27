@@ -56,9 +56,9 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// </summary>
         public Node2D SelectSmartTarget()
         {
-            PetDecisionSystem.NextDecisionTick(); // REQ-137: 目标选择决策节点
+            int tickId = PetDecisionSystem.NextDecisionTick(); // REQ-137: 目标选择决策节点
             if (_detectionArea == null) return null;
-            
+
             var bodies = _detectionArea.GetOverlappingAreas();
             if (bodies.Count == 0) return null;
             
@@ -78,6 +78,16 @@ namespace ClawRPG.Scripts.Systems.Pets
                 }
             }
             
+            // REQ-137: 记录目标选择决策
+            if (PetReplayTraceSystem.Instance != null && bestTarget != null)
+            {
+                float timestamp = (float)Time.GetTicksMsec() / 1000f;
+                float dist = GlobalPosition.DistanceTo(bestTarget.GlobalPosition);
+                string reason = $"评分:{bestScore:F0} 性格:{_personality}";
+                var record = PetDecisionRecord.CreateTargetSelection(tickId, timestamp, bestTarget, dist, reason);
+                PetReplayTraceSystem.Instance.RecordDecision(record);
+            }
+
             return bestTarget;
         }
 
