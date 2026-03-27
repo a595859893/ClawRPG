@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Systems;
+using SkillComboSystem = global::SkillComboSystem;
+using ComboFatigueSystem = global::ComboFatigueSystem;
 
 namespace ClawRPG.Scripts.Skills {
     /// <summary>
@@ -245,6 +247,14 @@ namespace ClawRPG.Scripts.Skills {
             if (source is Player player)
             {
                 damage *= multiplier;
+                
+                // Apply combo fatigue penalty if combo was recently used (REQ-120)
+                string lastComboId = SkillComboSystem.Instance?.LastCompletedComboId ?? "";
+                if (!string.IsNullOrEmpty(lastComboId))
+                {
+                    float fatigueMultiplier = ComboFatigueSystem.Instance?.GetDamageMultiplier(lastComboId) ?? 1.0f;
+                    damage *= fatigueMultiplier;
+                }
                 
                 // Critical hit
                 if (GD.Randf() < player.CritChance)

@@ -26,6 +26,10 @@ public partial class SkillComboSystem : BaseSystem
     // Player data
     private PlayerComboData _playerData;
     
+    // Last completed combo ID for fatigue system integration (REQ-120)
+    private string _lastCompletedComboId = "";
+    public string LastCompletedComboId => _lastCompletedComboId;
+    
     // Signals
     public Signal<string> ComboStarted { get; } = new Signal<string>();
     public Signal<string, int> ComboCompleted { get; } = new Signal<string, int>();
@@ -190,6 +194,10 @@ public partial class SkillComboSystem : BaseSystem
         
         activeCombo.IsComplete = true;
         _playerData.TotalCombosTriggered++;
+        
+        // Record combo usage for fatigue system (REQ-120)
+        _lastCompletedComboId = combo.ComboId;
+        ComboFatigueSystem.Instance.RecordComboUsage(combo.ComboId);
         
         // Apply combo bonus
         ApplyComboBonus(combo.Bonus);
