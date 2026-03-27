@@ -31,6 +31,10 @@ namespace ClawRPG.Scripts.UI
         private Button _btnFollow;
         private Button _btnProtect;
         private Button _btnAttack;
+
+        // Synergy tracker controls
+        private Label _synergyCounterLabel;
+        private PanelContainer _synergyBurstPanel;
         
         private string _selectedPetId = "";
 
@@ -262,6 +266,41 @@ namespace ClawRPG.Scripts.UI
             };
             _decisionLogLabel.CustomMinimumSize = new Vector2(0, 100);
             logScroll.AddChild(_decisionLogLabel);
+
+            // Synergy tracker section - REQ-132
+            var synergyTitle = new Label { Text = "--- 宠物协同 (REQ-132) ---" };
+            synergyTitle.AddThemeFontSizeOverride("font_size", 14);
+            tacticalTab.AddChild(synergyTitle);
+
+            _synergyCounterLabel = new Label
+            {
+                Text = "协同攻击: 0/5",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            _synergyCounterLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.3f));
+            tacticalTab.AddChild(_synergyCounterLabel);
+
+            // Synergy burst panel (hidden by default)
+            _synergyBurstPanel = new PanelContainer {
+                Visible = false,
+                ZIndex = 3000
+            };
+            var burstStyle = new StyleBoxFlat {
+                BgColor = new Color(1f, 0.85f, 0.1f, 0.9f),
+                BorderColor = new Color(1f, 0.7f, 0.1f)
+            };
+            burstStyle.SetBorderWidthAll(3);
+            burstStyle.SetCornerRadiusAll(8);
+            _synergyBurstPanel.AddThemeStyleboxOverride("panel", burstStyle);
+            tacticalTab.AddChild(_synergyBurstPanel);
+
+            var burstLabel = new Label {
+                Text = "⚡ 宠物协同！+10% 伤害！",
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            burstLabel.AddThemeFontSizeOverride("font_size", 18);
+            burstLabel.AddThemeColorOverride("font_color", new Color(0.2f, 0.15f, 0f));
+            _synergyBurstPanel.AddChild(burstLabel);
 
             // Connect PetTacticalAI signals if available
             var tacticalAI = PetTacticalAI.Instance;
@@ -547,6 +586,50 @@ namespace ClawRPG.Scripts.UI
             int playerPercent = (int)(playerHP * 100);
             _playerHealthLabel.Text = $"玩家: {playerPercent}%";
             _playerHealthBar.Value = playerPercent;
+        }
+
+        /// <summary>
+        /// 更新协同攻击计数器 UI（由 PetSynergyTracker 调用）
+        /// </summary>
+        public void UpdateSynergyCounter(int count, int threshold, bool active, float remaining) {
+            if (_synergyCounterLabel == null) return;
+
+            if (active) {
+                _synergyCounterLabel.Text = $"⚡ 协同激活！剩余 {remaining:F0}s (+10%)";
+                _synergyCounterLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.1f));
+            } else {
+                _synergyCounterLabel.Text = $"协同攻击: {count}/{threshold}";
+                if (count >= threshold - 1) {
+                    _synergyCounterLabel.AddThemeColorOverride("font_color", new Color(1f, 0.5f, 0.2f));
+                } else {
+                    _synergyCounterLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.3f));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 显示协同增益爆发特效（由 PetSynergyTracker 调用）
+        /// </summary>
+        public void ShowSynergyBurst() {
+            if (_synergyBurstPanel == null) return;
+
+            _synergyBurstPanel.Visible = true;
+
+            // 2秒后自动隐藏
+            var timer = new Timer { OneShot = true, WaitTime = 2f };
+            timer.Timeout += () => {
+                if (_synergyBurstPanel != null) {
+                    _synergyBurstPanel.Visible = false;
+                }
+                timer.QueueFree();
+            };
+            AddChild(timer);
+            timer.Start();
+
+            // 淡出动画
+            var tween = CreateTween();
+            tween.TweenInterval(1.5f);
+            tween.TweenProperty(_synergyBurstPanel, "modulate:a", 0f, 0.5f);
         }
 
         public override void _Notification(int what)
