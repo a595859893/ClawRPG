@@ -27,6 +27,7 @@ public partial class GameSettings : BaseSystem
     [Export] private int _qualityLevel = 2; // 0=Low, 1=Medium, 2=High
     [Export] private bool _showFps = false; 
     [Export] private bool _showDamageNumbers = true;
+    [Export] private bool _showComboTrails = true; // REQ-130: combo echo trail
 
     // Game settings
     [Export] private int _difficulty = 1; // 0=Easy, 1=Normal, 2=Hard
@@ -180,6 +181,20 @@ public partial class GameSettings : BaseSystem
     {
         get => _showDamageNumbers;
         set => _showDamageNumbers = value;
+    }
+
+    /// <summary>
+    /// Show combo echo trails (REQ-130).
+    /// </summary>
+    public bool ShowComboTrails
+    {
+        get => _showComboTrails;
+        set
+        {
+            _showComboTrails = value;
+            if (ComboEchoTrailSystem.Instance != null)
+                ComboEchoTrailSystem.Instance.SetShowComboTrails(value);
+        }
     }
 
     private void ApplyDisplaySettings()
