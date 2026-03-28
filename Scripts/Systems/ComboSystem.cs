@@ -1,7 +1,31 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Framework;
+
+// ========== JSON 配置数据结构 ==========
+public class ComboConfigEntry
+{
+    [JsonPropertyName("comboId")] public string ComboId { get; set; }
+    [JsonPropertyName("comboName")] public string ComboName { get; set; }
+    [JsonPropertyName("description")] public string Description { get; set; }
+    [JsonPropertyName("skillSequence")] public List<string> SkillSequence { get; set; }
+    [JsonPropertyName("damageMultiplier")] public float DamageMultiplier { get; set; }
+    [JsonPropertyName("cooldownReduction")] public float CooldownReduction { get; set; }
+    [JsonPropertyName("comboPointReward")] public int ComboPointReward { get; set; }
+    [JsonPropertyName("effectName")] public string EffectName { get; set; }
+    [JsonPropertyName("requiredComboLevel")] public int RequiredComboLevel { get; set; }
+    [JsonPropertyName("comboType")] public string ComboType { get; set; }
+    [JsonPropertyName("comboRarity")] public string ComboRarity { get; set; }
+}
+
+public class ComboConfigFile
+{
+    [JsonPropertyName("version")] public string Version { get; set; }
+    [JsonPropertyName("combos")] public List<ComboConfigEntry> Combos { get; set; }
+}
 
 /// <summary>
 /// 连击数据资源 - 定义一个连击的完整配置
@@ -119,6 +143,9 @@ public class ComboSystem : BaseSystem
     // Combo database
     private Dictionary<string, ComboData> _combos = new Dictionary<string, ComboData>();
     
+    // Combo discovery — tracks which combos have been discovered by the player
+    private HashSet<string> _discoveredComboIds = new HashSet<string>();
+    
     // Player combo progress
     private Dictionary<string, ComboProgress> _playerCombos = new Dictionary<string, ComboProgress>();
     /// <summary>
@@ -172,6 +199,98 @@ public class ComboSystem : BaseSystem
     }
     
     private void _InitializeComboDatabase()
+    {
+        // Try loading from JSON config first (data-driven)
+        if (_LoadCombosFromJson())
+        {
+            GD.Print($"[ComboSystem] Loaded {_combos.Count} combos from JSON config");
+        }
+        else
+        {
+            GD.Print("[ComboSystem] JSON config not found or invalid, falling back to hardcoded combos");
+            _LoadHardcodedCombos();
+        }
+        
+        // Initialize progress for each combo
+        foreach (var comboId in _combos.Keys)
+        {
+            _playerCombos[comboId] = new ComboProgress { comboId = comboId };
+        }
+        
+        GD.Print($"[ComboSystem] Initialized {_combos.Count} combos");
+    }
+    
+    private bool _LoadCombosFromJson()
+    {
+        string configPath = "res://Resources/Config/combos_config.json";
+        if (!FileAccess.FileExists(configPath))
+            return false;
+        
+        try
+        {
+            using var file = FileAccess.Open(configPath, FileAccess.ModeFlags.Read);
+            if (file == null) return false;
+            
+            string json = file.GetAsText();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var configFile = JsonSerializer.Deserialize<ComboConfigFile>(json, options);
+            
+            if (configFile?.Combos == null) return false;
+            
+            foreach (var entry in configFile.Combos)
+            {
+                var combo = new ComboData
+                {
+                    comboId = entry.ComboId,
+                    comboName = entry.ComboName,
+                    description = entry.Description,
+                    skillSequence = entry.SkillSequence ?? new List<string>(),
+                    damageMultiplier = entry.DamageMultiplier,
+                    cooldownReduction = entry.CooldownReduction,
+                    comboPointReward = entry.ComboPointReward,
+                    effectName = entry.EffectName,
+                    requiredComboLevel = entry.RequiredComboLevel,
+                    comboType = _ParseComboType(entry.ComboType),
+                    comboRarity = _ParseRarity(entry.ComboRarity)
+                };
+                _combos[combo.comboId] = combo;
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr($"[ComboSystem] Failed to load combos from JSON: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private ComboData.ComboType _ParseComboType(string type)
+    {
+        return type?.ToLowerInvariant() switch
+        {
+            "offensive" => ComboData.ComboType.Offensive,
+            "defensive" => ComboData.ComboType.Defensive,
+            "support" => ComboData.ComboType.Support,
+            "utility" => ComboData.ComboType.Utility,
+            "special" => ComboData.ComboType.Special,
+            _ => ComboData.ComboType.Offensive
+        };
+    }
+    
+    private ComboData.Rarity _ParseRarity(string rarity)
+    {
+        return rarity?.ToLowerInvariant() switch
+        {
+            "common" => ComboData.Rarity.Common,
+            "uncommon" => ComboData.Rarity.Uncommon,
+            "rare" => ComboData.Rarity.Rare,
+            "epic" => ComboData.Rarity.Epic,
+            "legendary" => ComboData.Rarity.Legendary,
+            _ => ComboData.Rarity.Common
+        };
+    }
+    
+    private void _LoadHardcodedCombos()
     {
         // Offensive Combos
         _RegisterCombo(new ComboData
@@ -350,14 +469,6 @@ public class ComboSystem : BaseSystem
             comboRarity = ComboData.Rarity.Uncommon,
             requiredComboLevel = 2
         });
-        
-        // Initialize progress for each combo
-        foreach (var comboId in _combos.Keys)
-        {
-            _playerCombos[comboId] = new ComboProgress { comboId = comboId };
-        }
-        
-        GD.Print($"[ComboSystem] Initialized {_combos.Count} combos");
     }
     
     private void _RegisterCombo(ComboData combo)
@@ -458,6 +569,9 @@ public class ComboSystem : BaseSystem
         ComboExecuted?.Invoke(comboId, comboDamage, combo.effectName);
         ComboPointsChanged?.Invoke(_comboPoints);
         
+        // Check for combo discovery
+        _MaybeDiscoverCombo(comboId);
+        
         GD.Print($"[ComboSystem] Executed combo: {combo.comboName} for {comboDamage} damage!");
     }
     
@@ -473,6 +587,34 @@ public class ComboSystem : BaseSystem
             GD.Print($"[ComboSystem] Combo Level up! Now level {_comboLevel}");
         }
     }
+    
+    private void _MaybeDiscoverCombo(string comboId)
+    {
+        if (!_discoveredComboIds.Contains(comboId))
+        {
+            _discoveredComboIds.Add(comboId);
+            if (_combos.TryGetValue(comboId, out var combo))
+            {
+                NewComboDiscovered?.Invoke(combo);
+                GD.Print($"[ComboSystem] New combo discovered: {combo.comboName} ({combo.comboRarity})!");
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 获取已发现的连击ID列表
+    /// </summary>
+    public List<string> GetDiscoveredComboIds() => new List<string>(_discoveredComboIds);
+    
+    /// <summary>
+    /// 检查某个连击是否已发现
+    /// </summary>
+    public bool IsComboDiscovered(string comboId) => _discoveredComboIds.Contains(comboId);
+    
+    /// <summary>
+    /// 获取未发现的连击数量（用于显示"还有X个未知连击"）
+    /// </summary>
+    public int GetUndiscoveredCount() => _combos.Count - _discoveredComboIds.Count;
     
     // Getters
     
@@ -552,6 +694,12 @@ public class ComboSystem : BaseSystem
         }
         data["progress"] = progressData;
         
+        // Save discovered combo IDs
+        var discoveredList = new List<object>();
+        foreach (var id in _discoveredComboIds)
+            discoveredList.Add(id);
+        data["discoveredCombos"] = discoveredList;
+        
         return data;
     }
     
@@ -578,6 +726,14 @@ public class ComboSystem : BaseSystem
                     progress.timesExecuted = (int)entry.Value;
                 }
             }
+        }
+        
+        if (data.ContainsKey("discoveredCombos"))
+        {
+            _discoveredComboIds.Clear();
+            var discoveredList = (List<object>)data["discoveredCombos"];
+            foreach (var item in discoveredList)
+                _discoveredComboIds.Add((string)item);
         }
     }
     
