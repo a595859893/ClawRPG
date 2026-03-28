@@ -549,16 +549,43 @@ public class ComboSystem : BaseSystem
         
         var progress = _playerCombos[comboId];
         
-        // Calculate combo damage
-        float baseDamage = 100f; // Would get from player stats
-        float comboDamage = baseDamage * combo.damageMultiplier;
+        // Calculate combo damage — use player's weapon damage instead of hardcoded 100f (REQ-151 Fix #1)
+        float baseDamage = 100f;
+        try
+        {
+            var weapon = Player.Instance?.Equipment?.GetCurrentWeapon();
+            if (weapon != null) baseDamage = weapon.Damage;
+        }
+        catch (Exception)
+        {
+            // Fallback if player/equipment not available at call time
+        }
+        
+        // Apply rarity multiplier (REQ-151 Fix #3: rarity now affects damage)
+        float rarityMultiplier = _GetRarityDamageMultiplier(combo.comboRarity);
+        float comboDamage = baseDamage * combo.damageMultiplier * rarityMultiplier;
         
         // Award combo points
         _comboPoints += combo.comboPointReward;
         _CheckLevelUp();
         
-        // Apply cooldown reduction
-        // Would apply to skill cooldowns
+        // Apply cooldown reduction via SkillComboSystem (REQ-151 Fix #2: cooldownReduction actually applied)
+        float effectiveCdReduction = combo.cooldownReduction * rarityMultiplier;
+        try
+        {
+            var bonus = new ClawRPG.Scripts.Systems.ComboBonus
+            {
+                Name = combo.comboName,
+                CooldownReduction = effectiveCdReduction,
+                DamageMultiplier = 1f,
+                Duration = 5f
+            };
+            ClawRPG.Scripts.Systems.SkillComboSystem.Instance?.ApplyComboBonus(bonus);
+        }
+        catch (Exception)
+        {
+            // SkillComboSystem may not be available
+        }
         
         // Track execution
         progress.timesExecuted++;
@@ -572,7 +599,23 @@ public class ComboSystem : BaseSystem
         // Check for combo discovery
         _MaybeDiscoverCombo(comboId);
         
-        GD.Print($"[ComboSystem] Executed combo: {combo.comboName} for {comboDamage} damage!");
+        GD.Print($"[ComboSystem] Executed combo: {combo.comboName} (rarity={combo.comboRarity}) for {comboDamage} damage!");
+    }
+    
+    /// <summary>
+    /// Returns a damage multiplier based on combo rarity (REQ-151 Fix #3)
+    /// </summary>
+    private float _GetRarityDamageMultiplier(ComboData.Rarity rarity)
+    {
+        return rarity switch
+        {
+            ComboData.Rarity.Common => 1.0f,
+            ComboData.Rarity.Uncommon => 1.1f,
+            ComboData.Rarity.Rare => 1.25f,
+            ComboData.Rarity.Epic => 1.5f,
+            ComboData.Rarity.Legendary => 2.0f,
+            _ => 1.0f
+        };
     }
     
     private void _CheckLevelUp()

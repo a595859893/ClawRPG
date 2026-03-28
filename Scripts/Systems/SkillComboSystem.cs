@@ -247,7 +247,10 @@ public partial class SkillComboSystem : BaseSystem
         activeCombo.TriggeredSkills.Clear();
     }
     
-    private void ApplyComboBonus(ComboBonus bonus)
+    /// <summary>
+    /// Applies a combo bonus including cooldown reduction. Called when ComboSystem executes a combo (REQ-151 Fix #2)
+    /// </summary>
+    public void ApplyComboBonus(ComboBonus bonus)
     {
         float currentTime = Time.GetTicksMsec() / 1000f;
         

@@ -468,8 +468,9 @@ namespace ClawRPG.Scripts.Skills {
             // Check mana (would need player reference)
             // Apply skill effects...
             
-            // Start cooldown
-            _cooldowns[skillId] = skill.Cooldown;
+            // Start cooldown — apply combo cooldown reduction from SkillComboSystem (REQ-151 Fix #2)
+            float cdReduction = ClawRPG.Scripts.Systems.SkillComboSystem.Instance?.GetCooldownReduction() ?? 0f;
+            _cooldowns[skillId] = skill.Cooldown * (1f - cdReduction);
             
             // Trigger tutorial for first skill use
             if (!_hasTriggeredFirstSkillUse)
