@@ -45,6 +45,8 @@ public class EventBusManager : ManagerBase
         public const string CombatEnded = "CombatEnded";
         public const string DamageDealt = "DamageDealt";
         public const string DamageTaken = "DamageTaken";
+        public const string BattlefieldVariantStarted = "BattlefieldVariantStarted";
+        public const string BattlefieldVariantEnded = "BattlefieldVariantEnded";
         
         // 游戏状态事件
         public const string GamePaused = "GamePaused";
