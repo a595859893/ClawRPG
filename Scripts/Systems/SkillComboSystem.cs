@@ -78,6 +78,9 @@ public partial class SkillComboSystem : BaseSystem
 
         // REQ-136: 通知宠物系统玩家使用了技能（协同攻击触发）
         NotifyPetOfPlayerAttack(skillId);
+
+        // REQ-114-02: 通知回放录制器记录技能使用
+        ClawRPG.Scripts.Systems.ComboReplay.ComboReplayRecorder.Instance?.RecordSkillUse(skillId);
     }
 
     /// <summary>
@@ -511,6 +514,18 @@ public partial class SkillComboSystem : BaseSystem
         if (active != null)
         {
             ComboProgressUpdated?.Invoke(comboId, active.CurrentStep, active.TimeRemaining);
+        }
+
+        // REQ-114-02: 通知回放录制器记录Combo完成
+        if (combo != null)
+        {
+            ClawRPG.Scripts.Systems.ComboReplay.ComboReplayRecorder.Instance?.RecordComboCompletion(
+                combo.ComboId,
+                combo.ComboName,
+                combo.SkillSequence,
+                0,  // 实际伤害在 SkillModules.ApplyDamage 中计算，此处不累加
+                false
+            );
         }
     }
 }
