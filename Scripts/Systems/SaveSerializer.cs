@@ -134,13 +134,19 @@ namespace ClawRPG.Scripts.Systems
             {
                 data.ComboData = skillComboSystem.ExportSaveData();
             }
-
+    
+            // 保存 Combo 遗忘系统数据 (REQ-154)
+            if (Framework.ComboForgetData.Instance != null)
+            {
+                data.ComboForgetData = Framework.ComboForgetData.Instance.ExportSaveData();
+            }
+    
             // 保存风格精通系统数据
             if (_styleMasterySystem != null)
             {
                 data.StyleMasteryData = _styleMasterySystem.ExportSaveData();
             }
-            
+
             // 保存按键绑定数据
             if (_keybindingSystem != null)
             {
@@ -191,7 +197,7 @@ namespace ClawRPG.Scripts.Systems
         }
 
         /// <summary>
-        /// 设置系统引用（在 SaveSystem 中调用）
+        /// 设置系统引用(在 SaveSystem 中调用)
         /// </summary>
         public void SetSystemReferences(SaveSystem saveSystem)
         {

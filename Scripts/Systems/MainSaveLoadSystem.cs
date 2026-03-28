@@ -6,6 +6,7 @@ using ClawRPG.Scripts.Combat;
 using ClawRPG.Scripts.Crafting;
 using ClawRPG.Scripts.Systems.PetMimicry;
 using ClawRPG.Scripts.Systems.EventCardPool;
+using Framework;
 using CombatSkillCooldownSystem = global::CombatSkillCooldownSystem;
 using SummonSystem = global::ClawRPG.Scripts.SummonSystem;
 
@@ -35,6 +36,9 @@ namespace ClawRPG.Scripts.Systems
 
         // Pet Performance system reference - REQ-148
         private PetPerformanceData _petPerformanceData;
+        
+        // Combo Forget system reference - REQ-154
+        private ComboForgetData _comboForgetData;
 
         public void Initialize(Main main)
         {
@@ -61,6 +65,9 @@ namespace ClawRPG.Scripts.Systems
 
             // Pet Performance system - REQ-148
             _petPerformanceData = PetPerformanceData.Instance;
+            
+            // Combo Forget system - REQ-154
+            _comboForgetData = ComboForgetData.Instance;
         }
 
         /// <summary>
@@ -139,6 +146,12 @@ namespace ClawRPG.Scripts.Systems
                 allData["petPerformance"] = _petPerformanceData.ExportSaveData();
             }
 
+            // Combo Forget persistence - REQ-154
+            if (_comboForgetData != null)
+            {
+                allData["comboForget"] = _comboForgetData.ExportSaveData();
+            }
+
             return allData;
         }
 
@@ -207,6 +220,12 @@ namespace ClawRPG.Scripts.Systems
             if (data.Contains("petPerformance"))
             {
                 _petPerformanceData?.ImportSaveData(data["petPerformance"] as Dictionary);
+            }
+
+            // Combo Forget persistence - REQ-154
+            if (data.Contains("comboForget"))
+            {
+                _comboForgetData?.ImportSaveData(data["comboForget"] as Dictionary);
             }
         }
 

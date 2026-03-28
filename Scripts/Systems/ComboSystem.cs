@@ -185,11 +185,43 @@ public class ComboSystem : BaseSystem
     /// 发现新连击时触发
     /// </summary>
     public static Action<ComboData> NewComboDiscovered;
+    /// <summary>
+    /// 当可用 combo 列表因遗忘/唤醒而变化时触发
+    /// </summary>
+    public static Action ComboAvailabilityChanged;
     
     public override void _Ready()
     {
         Instance = this;
         _InitializeComboDatabase();
+        
+        // 订阅遗忘状态变化（当 combo 从休眠唤醒时通知 UI 刷新）
+        if (ComboForgetData.Instance != null)
+        {
+            ComboForgetData.ComboForgetStateChanged += OnForgetStateChanged;
+            ComboForgetData.ComboRediscovered += OnComboRediscovered;
+        }
+    }
+    
+    private void OnForgetStateChanged(string comboId, bool isNowDormant)
+    {
+        // 休眠状态变化时通知 UI 刷新 combo 列表
+        ComboAvailabilityChanged?.Invoke();
+    }
+    
+    private void OnComboRediscovered(string comboId)
+    {
+        // combo 重新发现时通知 UI（信号由 ComboRediscoveredNotification 处理）
+        ComboAvailabilityChanged?.Invoke();
+    }
+    
+    public override void _ExitTree()
+    {
+        if (ComboForgetData.Instance != null)
+        {
+            ComboForgetData.ComboForgetStateChanged -= OnForgetStateChanged;
+            ComboForgetData.ComboRediscovered -= OnComboRediscovered;
+        }
     }
     
     public override void _Process(float delta)
@@ -599,6 +631,9 @@ public class ComboSystem : BaseSystem
         // Check for combo discovery
         _MaybeDiscoverCombo(comboId);
         
+        // 记录使用（唤醒休眠 combo 或重置遗忘计时器）
+        ComboForgetSystem.Instance?.RecordComboUsage(comboId);
+        
         GD.Print($"[ComboSystem] Executed combo: {combo.comboName} (rarity={combo.comboRarity}) for {comboDamage} damage!");
     }
     
@@ -642,15 +677,29 @@ public class ComboSystem : BaseSystem
                 GD.Print($"[ComboSystem] New combo discovered: {combo.comboName} ({combo.comboRarity})!");
             }
         }
+        // 注册到遗忘系统（即使已发现也会更新 wasEverDiscovered）
+        ComboForgetSystem.Instance?.RegisterCombo(comboId);
     }
     
     /// <summary>
-    /// 获取已发现的连击ID列表
+    /// 获取已发现的连击ID列表（排除休眠 combo，用于 UI 展示）
     /// </summary>
-    public List<string> GetDiscoveredComboIds() => new List<string>(_discoveredComboIds);
+    public List<string> GetDiscoveredComboIds()
+    {
+        var result = new List<string>();
+        foreach (var id in _discoveredComboIds)
+        {
+            // 排除休眠的 combo（它们仍然可以被执行，但不显示在列表中）
+            if (ComboForgetSystem.Instance == null || !ComboForgetSystem.Instance.IsDormant(id))
+            {
+                result.Add(id);
+            }
+        }
+        return result;
+    }
     
     /// <summary>
-    /// 检查某个连击是否已发现
+    /// 检查某个连击是否已发现（无论是否休眠）
     /// </summary>
     public bool IsComboDiscovered(string comboId) => _discoveredComboIds.Contains(comboId);
     
@@ -687,7 +736,7 @@ public class ComboSystem : BaseSystem
     public float GetComboWindow() => _comboWindow;
     
     /// <summary>
-    /// 获取已解锁的连击列表
+    /// 获取已解锁的连击列表（排除休眠 combo）
     /// </summary>
     public List<ComboData> GetUnlockedCombos()
     {
@@ -696,6 +745,9 @@ public class ComboSystem : BaseSystem
         {
             if (_comboLevel >= combo.requiredComboLevel)
             {
+                // 排除休眠的 combo
+                if (ComboForgetSystem.Instance != null && ComboForgetSystem.Instance.IsDormant(combo.comboId))
+                    continue;
                 unlocked.Add(combo);
             }
         }
@@ -713,6 +765,9 @@ public class ComboSystem : BaseSystem
         {
             if (combo.comboType == type && _comboLevel >= combo.requiredComboLevel)
             {
+                // 排除休眠的 combo
+                if (ComboForgetSystem.Instance != null && ComboForgetSystem.Instance.IsDormant(combo.comboId))
+                    continue;
                 filtered.Add(combo);
             }
         }

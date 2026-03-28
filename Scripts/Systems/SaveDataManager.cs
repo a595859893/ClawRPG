@@ -181,6 +181,9 @@ namespace ClawRPG.Scripts.Systems
             /// <summary>Combo system serialized data.</summary>
             public Dictionary<string, Variant> ComboData { get; set; }
             
+            /// <summary>Combo forget system serialized data (REQ-154).</summary>
+            public Dictionary<string, object> ComboForgetData { get; set; }
+            
             // Title system data
             /// <summary>Current title ID.</summary>
             public string CurrentTitleId { get; set; } = "";

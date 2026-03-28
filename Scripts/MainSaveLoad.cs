@@ -60,6 +60,7 @@ public partial class MainSaveLoad : Node
             {
                 LoadStatistics(data);
                 LoadComboData(data);
+                LoadComboForgetData(data);
                 LoadKeybindingData(data);
                 LoadPetStoryData(data);
                 LoadStyleMasteryData(data);
@@ -112,6 +113,18 @@ public partial class MainSaveLoad : Node
         {
             skillComboSystem.ImportSaveData(new Dictionary(data.ComboData));
             GD.Print("Combo data loaded successfully!");
+        }
+    }
+    
+    /// <summary>
+    /// 加载 Combo 遗忘数据 (REQ-154)
+    /// </summary>
+    private void LoadComboForgetData(SaveData data)
+    {
+        if (Framework.ComboForgetData.Instance != null && data.ComboForgetData != null)
+        {
+            Framework.ComboForgetData.Instance.ImportSaveData(new Dictionary(data.ComboForgetData));
+            GD.Print("Combo forget data loaded successfully!");
         }
     }
     
