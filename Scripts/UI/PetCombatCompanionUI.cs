@@ -60,6 +60,14 @@ namespace ClawRPG.Scripts.UI
         private Label _personalityDescLabel;
         private VBoxContainer _imprintListContainer;
 
+        // Performance tab controls - REQ-148
+        private VBoxContainer _performanceTab;
+        private Label _performanceSummaryLabel;
+        private Label _performanceTimeLabel;
+        private Label _performanceHpLabel;
+        private Label _performanceWinRateLabel;
+        private Label _performanceSampleLabel;
+
         private string _selectedPetId = "";
 
         public override void _Ready()
@@ -198,6 +206,7 @@ namespace ClawRPG.Scripts.UI
             SetupDecisionTab();
             SetupPersonalityTab();
             SetupObserverTab();
+            SetupPerformanceTab();
         }
 
         /// <summary>
@@ -966,6 +975,7 @@ namespace ClawRPG.Scripts.UI
             RefreshStatsTab();
             RefreshLearningTab();
             RefreshPersonalityTab();
+            RefreshPerformanceTab();
         }
 
         private void RefreshStatsTab()
@@ -1276,6 +1286,136 @@ namespace ClawRPG.Scripts.UI
                     _synergyCounterLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.3f));
                 }
             }
+        }
+
+        // ── Performance Tab (REQ-148) ────────────────────────────────────────
+        private void SetupPerformanceTab()
+        {
+            _performanceTab = new VBoxContainer { Name = "Performance" };
+            _tabContainer.AddChild(_performanceTab);
+
+            // Header
+            var headerHBox = new HBoxContainer();
+            _performanceTab.AddChild(headerHBox);
+
+            var perfTitle = new Label
+            {
+                Text = "🐾 我的价值",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            perfTitle.AddThemeFontSizeOverride("font_size", 20);
+            headerHBox.AddChild(perfTitle);
+
+            headerHBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
+
+            var sep1 = new HSeparator();
+            _performanceTab.AddChild(sep1);
+
+            // Summary section
+            _performanceSummaryLabel = new Label
+            {
+                Text = "数据收集中...",
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                SizeFlagsVertical = Control.SizeFlags.ExpandFill
+            };
+            _performanceSummaryLabel.AddThemeFontSizeOverride("font_size", 14);
+            _performanceTab.AddChild(_performanceSummaryLabel);
+
+            var sep2 = new HSeparator();
+            _performanceTab.AddChild(sep2);
+
+            // Time comparison
+            _performanceTimeLabel = new Label
+            {
+                Text = "⏱ 平均时间: -",
+                AutowrapMode = TextServer.AutowrapMode.WordSmart
+            };
+            _performanceTimeLabel.AddThemeFontSizeOverride("font_size", 14);
+            _performanceTab.AddChild(_performanceTimeLabel);
+
+            // HP comparison
+            _performanceHpLabel = new Label
+            {
+                Text = "❤️ 平均HP损耗: -",
+                AutowrapMode = TextServer.AutowrapMode.WordSmart
+            };
+            _performanceHpLabel.AddThemeFontSizeOverride("font_size", 14);
+            _performanceTab.AddChild(_performanceHpLabel);
+
+            // Win rate
+            _performanceWinRateLabel = new Label
+            {
+                Text = "🏆 胜率对比: -",
+                AutowrapMode = TextServer.AutowrapMode.WordSmart
+            };
+            _performanceWinRateLabel.AddThemeFontSizeOverride("font_size", 14);
+            _performanceTab.AddChild(_performanceWinRateLabel);
+
+            var sep3 = new HSeparator();
+            _performanceTab.AddChild(sep3);
+
+            // Sample count
+            _performanceSampleLabel = new Label
+            {
+                Text = "样本数: 0 (需要5个样本才能显示对比)",
+                AutowrapMode = TextServer.AutowrapMode.WordSmart
+            };
+            _performanceSampleLabel.AddThemeFontSizeOverride("font_size", 12);
+            _performanceSampleLabel.Modulate = new Color(0.6f, 0.6f, 0.6f);
+            _performanceTab.AddChild(_performanceSampleLabel);
+        }
+
+        private void RefreshPerformanceTab()
+        {
+            if (_performanceTab == null || PetPerformanceData.Instance == null)
+                return;
+
+            var perfData = PetPerformanceData.Instance;
+            var comparison = perfData.GetComparison();
+
+            int petCount = perfData.GetPetAssistedCount();
+            int soloCount = perfData.GetSoloCount();
+
+            if (!comparison.HasEnoughData)
+            {
+                _performanceSummaryLabel.Text = "数据收集中...\n\n使用宠物参与战斗，我会记录通关数据。\n收集足够的样本后，我会展示宠物对我战斗表现的帮助。";
+                _performanceSummaryLabel.Modulate = new Color(0.7f, 0.7f, 0.7f);
+                _performanceTimeLabel.Text = "⏱ 平均时间: 待收集";
+                _performanceHpLabel.Text = "❤️ 平均HP损耗: 待收集";
+                _performanceWinRateLabel.Text = "🏆 胜率对比: 待收集";
+                _performanceSampleLabel.Text = $"样本数: {petCount}宠物 / {soloCount}独战 (需要各5个样本)";
+                return;
+            }
+
+            // 有足够数据，显示对比
+            _performanceSummaryLabel.Modulate = new Color(1f, 0.9f, 0.5f);
+
+            string timeStr = comparison.TimeSavedPerRoom >= 0
+                ? $"宠物帮我平均节省 {comparison.TimeSavedPerRoom:F1}秒/房间"
+                : $"宠物参战时平均多花 {-comparison.TimeSavedPerRoom:F1}秒/房间";
+
+            string hpStr = comparison.HpSavedPerRoom >= 0
+                ? $"宠物帮我平均节省 {comparison.HpSavedPerRoom}HP/房间"
+                : $"宠物参战时多损耗 {-comparison.HpSavedPerRoom}HP/房间";
+
+            string winStr = $"宠物模式胜率 {comparison.WinRatePetAssisted:P0} vs 独战胜率 {comparison.WinRateSolo:P0}";
+
+            _performanceSummaryLabel.Text = "=== 宠物价值报告 ===\n\n" +
+                $"📊 基于 {petCount}次宠物参战 vs {soloCount}次独战数据";
+
+            _performanceTimeLabel.Text = $"⏱ {timeStr}";
+            _performanceTimeLabel.Modulate = comparison.TimeSavedPerRoom >= 0
+                ? new Color(0.5f, 1f, 0.5f)
+                : new Color(1f, 0.5f, 0.5f);
+
+            _performanceHpLabel.Text = $"❤️ {hpStr}";
+            _performanceHpLabel.Modulate = comparison.HpSavedPerRoom >= 0
+                ? new Color(0.5f, 1f, 0.5f)
+                : new Color(1f, 0.5f, 0.5f);
+
+            _performanceWinRateLabel.Text = $"🏆 {winStr}";
+            _performanceSampleLabel.Text = $"样本数: {petCount}宠物 / {soloCount}独战 ✓";
+            _performanceSampleLabel.Modulate = new Color(0.5f, 1f, 0.5f);
         }
 
         /// <summary>

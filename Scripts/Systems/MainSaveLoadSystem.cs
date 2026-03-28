@@ -33,6 +33,9 @@ namespace ClawRPG.Scripts.Systems
         // Event Card Pool system reference - REQ-118
         private EventCardPoolData _eventCardPoolData;
 
+        // Pet Performance system reference - REQ-148
+        private PetPerformanceData _petPerformanceData;
+
         public void Initialize(Main main)
         {
             _main = main;
@@ -55,6 +58,9 @@ namespace ClawRPG.Scripts.Systems
 
             // Event Card Pool system - REQ-118
             _eventCardPoolData = EventCardPoolData.Instance;
+
+            // Pet Performance system - REQ-148
+            _petPerformanceData = PetPerformanceData.Instance;
         }
 
         /// <summary>
@@ -127,6 +133,12 @@ namespace ClawRPG.Scripts.Systems
                 allData["eventCardPool"] = _eventCardPoolData.ExportSaveData();
             }
 
+            // Pet Performance persistence - REQ-148
+            if (_petPerformanceData != null)
+            {
+                allData["petPerformance"] = _petPerformanceData.ExportSaveData();
+            }
+
             return allData;
         }
 
@@ -189,6 +201,12 @@ namespace ClawRPG.Scripts.Systems
             if (data.Contains("eventCardPool"))
             {
                 _eventCardPoolData?.ImportSaveData(data["eventCardPool"] as Dictionary);
+            }
+
+            // Pet Performance persistence - REQ-148
+            if (data.Contains("petPerformance"))
+            {
+                _petPerformanceData?.ImportSaveData(data["petPerformance"] as Dictionary);
             }
         }
 

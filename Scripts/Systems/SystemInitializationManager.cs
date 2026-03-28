@@ -138,6 +138,7 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("combat", typeof(DepositRunIntegration));
             RegisterSystemInGroup("combat", typeof(CombatRhythmData)); // REQ-131: 战斗节拍感知音乐
             RegisterSystemInGroup("combat", typeof(CombatRhythmUI));     // REQ-131-04: 节奏等级图标 UI
+            RegisterSystemInGroup("combat", typeof(PetPerformanceData)); // REQ-148: Pet vs Solo 战绩对比
             RegisterSystemInGroup("combat", typeof(StyleMasterySystem));
             RegisterSystemInGroup("combat", typeof(SkillTreeSystem));
             RegisterSystemInGroup("combat", typeof(SkillTreeResetSystem));
