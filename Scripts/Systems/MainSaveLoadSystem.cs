@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ClawRPG.Scripts.Managers;
 using ClawRPG.Scripts.Combat;
 using ClawRPG.Scripts.Crafting;
+using ClawRPG.Scripts.Systems.PetMimicry;
 using CombatSkillCooldownSystem = global::CombatSkillCooldownSystem;
 using SummonSystem = global::ClawRPG.Scripts.SummonSystem;
 
@@ -25,6 +26,9 @@ namespace ClawRPG.Scripts.Systems
         private CraftingSystem _craftingSystem;
         private SummonSystem _summonSystem;
 
+        // Pet Mimicry system reference - REQ-142-07
+        private PetMimicryData _petMimicryData;
+
         public void Initialize(Main main)
         {
             _main = main;
@@ -41,6 +45,9 @@ namespace ClawRPG.Scripts.Systems
             _combatStatusSystem = _main.GetNodeOrNull<CombatStatusSystem>("CombatStatusSystem");
             _craftingSystem = _main.GetNodeOrNull<CraftingSystem>("CraftingSystem");
             _summonSystem = _main.GetNodeOrNull<SummonSystem>("SummonSystem");
+
+            // Pet Mimicry system - REQ-142-07
+            _petMimicryData = PetMimicryData.Instance;
         }
 
         /// <summary>
@@ -101,6 +108,12 @@ namespace ClawRPG.Scripts.Systems
                 allData["summon"] = _summonSystem.ExportSaveData();
             }
 
+            // Pet Mimicry persistence - REQ-142-07
+            if (_petMimicryData != null)
+            {
+                allData["petMimicry"] = _petMimicryData.ExportSaveData();
+            }
+
             return allData;
         }
 
@@ -151,6 +164,12 @@ namespace ClawRPG.Scripts.Systems
             if (data.Contains("summon"))
             {
                 _summonSystem?.ImportSaveData(data["summon"] as Dictionary);
+            }
+
+            // Pet Mimicry persistence - REQ-142-07
+            if (data.Contains("petMimicry"))
+            {
+                _petMimicryData?.ImportSaveData(data["petMimicry"] as Dictionary);
             }
         }
 

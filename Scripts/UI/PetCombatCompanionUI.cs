@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Pets.AI;
+using ClawRPG.Scripts.Systems.PetMimicry;
 
 namespace ClawRPG.Scripts.UI
 {
@@ -51,6 +52,13 @@ namespace ClawRPG.Scripts.UI
         private VBoxContainer _observerInfoBox;
         private Button _btnToggleObserver;
         private GuardianPetNarrativeModule _narrativeModule;
+
+        // Personality tab controls - REQ-142-06
+        private VBoxContainer _personalityTab;
+        private Label _personalityCardLabel;
+        private Label _personalityTypeLabel;
+        private Label _personalityDescLabel;
+        private VBoxContainer _imprintListContainer;
 
         private string _selectedPetId = "";
 
@@ -188,6 +196,7 @@ namespace ClawRPG.Scripts.UI
             // Tactical tab
             SetupTacticalTab();
             SetupDecisionTab();
+            SetupPersonalityTab();
             SetupObserverTab();
         }
 
@@ -956,6 +965,7 @@ namespace ClawRPG.Scripts.UI
 
             RefreshStatsTab();
             RefreshLearningTab();
+            RefreshPersonalityTab();
         }
 
         private void RefreshStatsTab()
@@ -987,6 +997,239 @@ namespace ClawRPG.Scripts.UI
             }
 
             _learningLabel.Text = text;
+        }
+
+        // ── Personality Tab (REQ-142-06) ───────────────────────────────────
+        private void SetupPersonalityTab()
+        {
+            _personalityTab = new ScrollContainer { Name = "Personality" };
+            _tabContainer.AddChild(_personalityTab);
+
+            var container = new VBoxContainer();
+            container.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+            _personalityTab.AddChild(container);
+
+            // Personality Card Header
+            _personalityCardLabel = new Label
+            {
+                Text = "个性卡",
+                VerticalAlignment = VerticalAlignment.Top
+            };
+            _personalityCardLabel.AddThemeFontSizeOverride("font_size", 18);
+            _personalityCardLabel.Position = new Vector2(10, 10);
+            container.AddChild(_personalityCardLabel);
+
+            _personalityTypeLabel = new Label
+            {
+                Text = "尚未形成个性",
+                VerticalAlignment = VerticalAlignment.Top
+            };
+            _personalityTypeLabel.AddThemeFontSizeOverride("font_size", 24);
+            _personalityTypeLabel.Modulate = new Color(1f, 0.85f, 0.4f);
+            _personalityTypeLabel.Position = new Vector2(10, 40);
+            container.AddChild(_personalityTypeLabel);
+
+            _personalityDescLabel = new Label
+            {
+                Text = "宠物正在观察你的行为...",
+                VerticalAlignment = VerticalAlignment.Top,
+                AutowrapMode = TextServer.AutowrapMode.Word
+            };
+            _personalityDescLabel.Modulate = new Color(0.7f, 0.7f, 0.7f);
+            _personalityDescLabel.Position = new Vector2(10, 72);
+            _personalityDescLabel.Size = new Vector2(380, 60);
+            container.AddChild(_personalityDescLabel);
+
+            var separator = new HSeparator();
+            separator.Position = new Vector2(10, 135);
+            container.AddChild(separator);
+
+            var imprintHeader = new Label
+            {
+                Text = "行为印记",
+                VerticalAlignment = VerticalAlignment.Top
+            };
+            imprintHeader.AddThemeFontSizeOverride("font_size", 14);
+            imprintHeader.Modulate = new Color(0.8f, 0.8f, 0.8f);
+            imprintHeader.Position = new Vector2(10, 145);
+            container.AddChild(imprintHeader);
+
+            _imprintListContainer = new VBoxContainer();
+            _imprintListContainer.Position = new Vector2(10, 175);
+            container.AddChild(_imprintListContainer);
+        }
+
+        private void RefreshPersonalityTab()
+        {
+            if (_personalityTab == null) return;
+
+            var mimicryData = PetMimicryData.Instance;
+            if (mimicryData == null) return;
+
+            // Determine personality card type
+            var dominant = mimicryData.GetDominantBehavior();
+            string typeName;
+            string description;
+
+            if (dominant.HasValue)
+            {
+                typeName = GetPersonalityTypeName(dominant.Value);
+                description = GetPersonalityDescription(dominant.Value);
+            }
+            else
+            {
+                typeName = "尚未形成个性";
+                description = "宠物正在观察你的行为...";
+            }
+
+            _personalityTypeLabel.Text = typeName;
+            _personalityDescLabel.Text = description;
+
+            // Rebuild imprint list
+            foreach (var child in _imprintListContainer.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            var ranking = mimicryData.GetBehaviorRanking();
+            if (ranking.Count == 0)
+            {
+                var emptyLabel = new Label
+                {
+                    Text = "暂无印记记录",
+                    Modulate = new Color(0.5f, 0.5f, 0.5f)
+                };
+                _imprintListContainer.AddChild(emptyLabel);
+                return;
+            }
+
+            foreach (var (behavior, level) in ranking)
+            {
+                var row = CreateImprintRow(behavior, level);
+                _imprintListContainer.AddChild(row);
+            }
+        }
+
+        private string GetPersonalityTypeName(PlayerBehaviorType behavior)
+        {
+            return behavior switch
+            {
+                PlayerBehaviorType.UseFireSkill => "🔥 火焰使者",
+                PlayerBehaviorType.UseIceSkill => "❄️ 冰霜使者",
+                PlayerBehaviorType.UseElectricSkill => "⚡ 雷电使者",
+                PlayerBehaviorType.UseShadowSkill => "🌙 暗影使者",
+                PlayerBehaviorType.UseHolySkill => "✨ 神圣使者",
+                PlayerBehaviorType.UseNatureSkill => "🌿 自然使者",
+                PlayerBehaviorType.FrequentDodge => "💨 闪避大师",
+                PlayerBehaviorType.AggressiveAttack => "⚔️ 战斗狂人",
+                PlayerBehaviorType.DefensiveStance => "🛡️ 守护者",
+                PlayerBehaviorType.LowHPAggression => "💀 背水一战",
+                PlayerBehaviorType.QuickRetreat => "🏃 撤退专家",
+                PlayerBehaviorType.FocusElite => "🎯 精英猎手",
+                PlayerBehaviorType.AvoidCombat => "🔍 规避战士",
+                PlayerBehaviorType.TriggerTrap => "⚙️ 陷阱触发者",
+                PlayerBehaviorType.SolvePuzzle => "🧩 解谜专家",
+                PlayerBehaviorType.CollectLoot => "💰 收藏家",
+                PlayerBehaviorType.UseHealing => "💚 治愈师",
+                PlayerBehaviorType.PetSynergy => "🐾 协战伙伴",
+                PlayerBehaviorType.SpecialInteraction => "🌟 特殊互动者",
+                _ => "❓ 未知性格"
+            };
+        }
+
+        private string GetPersonalityDescription(PlayerBehaviorType behavior)
+        {
+            return behavior switch
+            {
+                PlayerBehaviorType.UseFireSkill => "你的火系法术给宠物留下了灼烧的印象",
+                PlayerBehaviorType.UseIceSkill => "你的冰系控制让宠物学会了冰霜护体",
+                PlayerBehaviorType.UseElectricSkill => "你的闪电战术被宠物记在心里",
+                PlayerBehaviorType.UseShadowSkill => "你的暗系能力让宠物学会了潜行",
+                PlayerBehaviorType.UseHolySkill => "你的神圣力量启发了宠物",
+                PlayerBehaviorType.UseNatureSkill => "你对自然的亲近感染了宠物",
+                PlayerBehaviorType.FrequentDodge => "你灵活的走位是宠物的教材",
+                PlayerBehaviorType.AggressiveAttack => "你的激进打法激励了宠物",
+                PlayerBehaviorType.DefensiveStance => "宠物从你身上学到了防守",
+                PlayerBehaviorType.LowHPAggression => "你在低血量时的勇敢震撼了宠物",
+                PlayerBehaviorType.QuickRetreat => "你的战术撤退被宠物效仿",
+                PlayerBehaviorType.FocusElite => "你优先击杀精英的策略被宠物观察",
+                PlayerBehaviorType.AvoidCombat => "你规避战斗的方式影响了宠物",
+                PlayerBehaviorType.TriggerTrap => "你触发陷阱的行为被宠物记住",
+                PlayerBehaviorType.SolvePuzzle => "你解谜的能力启发了宠物",
+                PlayerBehaviorType.CollectLoot => "你收集战利品的习惯传染给了宠物",
+                PlayerBehaviorType.UseHealing => "你的治疗本能被宠物继承",
+                PlayerBehaviorType.PetSynergy => "你经常与宠物协同作战，宠物更加信任你",
+                PlayerBehaviorType.SpecialInteraction => "你的特殊互动方式被宠物铭记",
+                _ => "宠物正在形成独特个性"
+            };
+        }
+
+        private Control CreateImprintRow(PlayerBehaviorType behavior, int level)
+        {
+            var hbox = new HBoxContainer();
+            hbox.CustomMinimumSize = new Vector2(380, 28);
+
+            var nameLabel = new Label
+            {
+                Text = GetBehaviorDisplayName(behavior),
+                VerticalAlignment = VerticalAlignment.Center,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            nameLabel.AddThemeFontSizeOverride("font_size", 12);
+            hbox.AddChild(nameLabel);
+
+            // Level stars
+            var starsLabel = new Label
+            {
+                Text = new string('★', level) + new string('☆', 5 - level),
+                VerticalAlignment = VerticalAlignment.Center,
+                Modulate = GetLevelColor(level)
+            };
+            starsLabel.AddThemeFontSizeOverride("font_size", 12);
+            hbox.AddChild(starsLabel);
+
+            return hbox;
+        }
+
+        private string GetBehaviorDisplayName(PlayerBehaviorType behavior)
+        {
+            return behavior switch
+            {
+                PlayerBehaviorType.UseFireSkill => "🔥 火系",
+                PlayerBehaviorType.UseIceSkill => "❄️ 冰系",
+                PlayerBehaviorType.UseElectricSkill => "⚡ 电系",
+                PlayerBehaviorType.UseShadowSkill => "🌙 暗系",
+                PlayerBehaviorType.UseHolySkill => "✨ 神圣",
+                PlayerBehaviorType.UseNatureSkill => "🌿 自然",
+                PlayerBehaviorType.FrequentDodge => "💨 闪避",
+                PlayerBehaviorType.AggressiveAttack => "⚔️ 激进攻击",
+                PlayerBehaviorType.DefensiveStance => "🛡️ 防守姿态",
+                PlayerBehaviorType.LowHPAggression => "💀 背水一战",
+                PlayerBehaviorType.QuickRetreat => "🏃 快速撤退",
+                PlayerBehaviorType.FocusElite => "🎯 精英猎手",
+                PlayerBehaviorType.AvoidCombat => "🔍 规避战斗",
+                PlayerBehaviorType.TriggerTrap => "⚙️ 触发陷阱",
+                PlayerBehaviorType.SolvePuzzle => "🧩 解谜",
+                PlayerBehaviorType.CollectLoot => "💰 收集战利品",
+                PlayerBehaviorType.UseHealing => "💚 治疗",
+                PlayerBehaviorType.PetSynergy => "🐾 协战",
+                PlayerBehaviorType.SpecialInteraction => "🌟 特殊互动",
+                _ => behavior.ToString()
+            };
+        }
+
+        private Color GetLevelColor(int level)
+        {
+            return level switch
+            {
+                0 => new Color(0.4f, 0.4f, 0.4f),
+                1 => new Color(0.6f, 0.9f, 0.6f),
+                2 => new Color(0.9f, 0.9f, 0.4f),
+                3 => new Color(1f, 0.7f, 0.3f),
+                4 => new Color(1f, 0.5f, 0.2f),
+                5 => new Color(1f, 0.3f, 0.3f),
+                _ => Colors.White
+            };
         }
 
         public override void _Process(double delta)
