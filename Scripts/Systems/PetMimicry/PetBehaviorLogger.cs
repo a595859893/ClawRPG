@@ -155,10 +155,21 @@ public class PetBehaviorLogger : Node
         if (data == null || data.Player == null) return;
 
         float hpPercent = data.HealthPercentage;
+
+        // REQ-149: 同步HP状态到PetMimicryData（用于性格触发器）
+        _mimicryData?.SetCurrentHpPercent(hpPercent);
+
         if (hpPercent <= LOW_HP_THRESHOLD && !_isLowHpState)
         {
             _isLowHpState = true;
             _lowHpActionTimer = 0f;
+        }
+
+        // REQ-149: 从低HP恢复 → 事件驱动勇敢性格加成
+        // （玩家在低HP状态存活后变得勇敢）
+        if (hpPercent > LOW_HP_THRESHOLD && _isLowHpState && _lowHpActionTimer > 5f)
+        {
+            _mimicryData?.TriggerEventDrivenBonus(PlayerBehaviorType.LowHPAggression, 1.0f);
         }
     }
 
@@ -184,12 +195,18 @@ public class PetBehaviorLogger : Node
         if (enemyType.Contains("elite") || enemyType.Contains("boss"))
         {
             RecordImprint(PlayerBehaviorType.FocusElite);
+
+            // REQ-149: 击杀精英/Boss → 事件驱动进攻性格加成
+            _mimicryData?.TriggerEventDrivenBonus(PlayerBehaviorType.AggressiveAttack, 1.5f);
         }
     }
 
     private void OnSynergyTriggeredDirect(string petId, string attackType, float syncLevel)
     {
         RecordImprint(PlayerBehaviorType.PetSynergy);
+
+        // REQ-149: 协同攻击触发 → 事件驱动加成（宠物协战行为强化）
+        _mimicryData?.TriggerEventDrivenBonus(PlayerBehaviorType.PetSynergy, syncLevel * 0.5f);
     }
 
     private void OnSceneChanged(string scenePath)
@@ -221,6 +238,9 @@ public class PetBehaviorLogger : Node
             _dodgeCountThisRoom = 0;
             _cooldownCache.Clear();
             _cooldownAccumulator = 0f;
+
+            // REQ-149: 同步环境到PetMimicryData（用于环境专精触发器）
+            _mimicryData?.SetCurrentEnvironment(_currentEnvironment);
 
             GD.Print($"[PetBehaviorLogger] Room environment: {RoomEnvironmentClassifier.GetDisplayName(_currentEnvironment)}");
         }
@@ -369,6 +389,9 @@ public class PetBehaviorLogger : Node
     {
         UpdateCurrentEnvironment();
         RecordImprint(PlayerBehaviorType.UseHealing);
+
+        // REQ-149: 使用治疗 → 事件驱动防守性格加成
+        _mimicryData?.TriggerEventDrivenBonus(PlayerBehaviorType.DefensiveStance, 0.8f);
     }
 
     /// <summary>

@@ -216,9 +216,87 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         }
     }
 
+    // ══════════════════════════════════════════════════════════════════════════
+    // REQ-149: 性格机制层 — 条件触发系统
+    // ══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// 性格触发器类型 — 决定宠物性格的条件来源
+    /// </summary>
+    public enum PersonalityTriggerType
+    {
+        /// <summary>历史最多行为（原有统计逻辑）</summary>
+        MostFrequent,
+
+        /// <summary>HP状态相关触发</summary>
+        HPRelated,
+
+        /// <summary>当前环境专精触发</summary>
+        EnvironmentSpecialist,
+
+        /// <summary>近期事件驱动触发</summary>
+        EventDriven,
+
+        /// <summary>近因偏好（近期行为权重更高）</summary>
+        RecentBias,
+
+        /// <summary>某行为长期未触发被抑制</summary>
+        Suppressed
+    }
+
+    /// <summary>
+    /// 性格触发器 — 带条件权重计算的行为触发器
+    /// </summary>
+    public struct PersonalityTrigger
+    {
+        /// <summary>触发器类型</summary>
+        public PersonalityTriggerType Type;
+
+        /// <summary>该触发器关联的行为类型</summary>
+        public PlayerBehaviorType Behavior;
+
+        /// <summary>权重贡献（可配置）</summary>
+        public float Weight;
+
+        /// <summary>触发条件是否满足</summary>
+        public bool IsActive;
+
+        /// <summary>触发原因的简短描述（用于UI）</summary>
+        public string Reason;
+
+        public PersonalityTrigger(PersonalityTriggerType type, PlayerBehaviorType behavior, float weight, bool isActive, string reason = "")
+        {
+            Type = type;
+            Behavior = behavior;
+            Weight = weight;
+            IsActive = isActive;
+            Reason = reason;
+        }
+    }
+
+    /// <summary>
+    /// 性格分析结果 — GetDominantBehaviorEx() 返回的扩展结果
+    /// </summary>
+    public class PersonalityAnalysisResult
+    {
+        public PlayerBehaviorType? DominantBehavior;
+        public float DominantScore;
+        public float HistoricalScore;
+        public float TriggerScore;
+        public List<PersonalityTrigger> ActiveTriggers = new List<PersonalityTrigger>();
+        public string Description = "";
+
+        /// <summary>各行为类型的加权得分</summary>
+        public Dictionary<PlayerBehaviorType, float> AllScores = new Dictionary<PlayerBehaviorType, float>();
+    }
+
     /// <summary>
     /// 宠物行为模仿数据 — 全局单例，存储所有行为印记
     /// 跨游戏持久化：存档时保存，进游戏时加载
+    ///
+    /// REQ-149: 增加条件触发性格机制层
+    /// - 不再只返回"历史最多行为"作为性格
+    /// - 结合HP状态、环境专精、事件驱动等条件触发器加权计算
     /// </summary>
     public class PetMimicryData : Node
     {
@@ -234,13 +312,84 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         /// </summary>
         private Dictionary<PlayerBehaviorType, int> _highestBehaviorLevel = new Dictionary<PlayerBehaviorType, int>();
 
+        // ══════════════════════════════════════════════════════════════════════
+        // REQ-149: 条件触发状态
+        // ══════════════════════════════════════════════════════════════════════
+
+        /// <summary>当前玩家HP百分比 (0.0-1.0)，由外部系统更新</summary>
+        private float _currentHpPercent = 1.0f;
+
+        /// <summary>当前房间环境类型，由外部系统更新</summary>
+        private RoomEnvironmentType _currentEnvironment = RoomEnvironmentType.None;
+
+        /// <summary>近期事件触发的临时性格加成（会随时间衰减）</summary>
+        private Dictionary<PlayerBehaviorType, float> _eventDrivenBonus = new Dictionary<PlayerBehaviorType, float>();
+
+        /// <summary>各触发器的默认权重配置</summary>
+        private const float HP_TRIGGER_WEIGHT = 2.0f;      // HP触发权重
+        private const float ENV_TRIGGER_WEIGHT = 1.5f;     // 环境专精权重
+        private const float EVENT_TRIGGER_WEIGHT = 1.8f;   // 事件驱动权重
+        private const float RECENT_TRIGGER_WEIGHT = 1.3f;  // 近因偏好权重
+        private const float SUPPRESSED_TRIGGER_WEIGHT = -0.5f; // 抑制惩罚
+
+        /// <summary>HP低阈值（低于此值触发谨慎性格）</summary>
+        private const float HP_LOW_THRESHOLD = 0.3f;
+
+        /// <summary>HP极低阈值（触发背水一战性格）</summary>
+        private const float HP_CRITICAL_THRESHOLD = 0.15f;
+
+        /// <summary>HP相关触发的有效窗口（秒）</summary>
+        private const float HP_TRIGGER_WINDOW_SECONDS = 10f;
+
+        /// <summary>事件驱动加成衰减时间（秒）</summary>
+        private const float EVENT_BONUS_DECAY_SECONDS = 30f;
+
+        /// <summary>某行为超过此秒数未触发开始计算抑制（秒）</summary>
+        private const float SUPPRESSION_THRESHOLD_SECONDS = 120f;
+
+        /// <summary>最近记录的印记时间（用于近因偏好）</summary>
+        private DateTime _mostRecentRecordTime = DateTime.MinValue;
+
+        // ══════════════════════════════════════════════════════════════════════
+        // 公开 API — 外部系统调用
+        // ══════════════════════════════════════════════════════════════════════
+
         public override void _Ready()
         {
             Instance = this;
             GD.Print("[PetMimicryData] Initialized");
         }
 
-        // ── Imprint Access ─────────────────────────────────────────────────
+        /// <summary>
+        /// 设置当前玩家HP百分比（由 PetBehaviorLogger 或其他系统调用）
+        /// </summary>
+        public void SetCurrentHpPercent(float hpPercent)
+        {
+            _currentHpPercent = Mathf.Clamp(hpPercent, 0f, 1f);
+        }
+
+        /// <summary>
+        /// 设置当前房间环境类型（由 PetBehaviorLogger 调用）
+        /// </summary>
+        public void SetCurrentEnvironment(RoomEnvironmentType envType)
+        {
+            _currentEnvironment = envType;
+        }
+
+        /// <summary>
+        /// 触发事件驱动的性格加成（由 PetBehaviorLogger 在特定事件时调用）
+        /// 例如：救了玩家 → 勇敢性格临时提升
+        /// </summary>
+        public void TriggerEventDrivenBonus(PlayerBehaviorType behavior, float bonusAmount = 1.0f)
+        {
+            if (!_eventDrivenBonus.ContainsKey(behavior))
+                _eventDrivenBonus[behavior] = 0f;
+            _eventDrivenBonus[behavior] += bonusAmount;
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
+        // Imprint Access
+        // ══════════════════════════════════════════════════════════════════════
 
         /// <summary>
         /// 获取指定环境+行为类型的印记
@@ -285,6 +434,9 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                 imprint.Fidelity = 0.3f + (float)GD.RandDouble() * 0.3f;
             _imprints.Add(imprint);
             UpdateHighestLevel(imprint.BehaviorType, imprint.ImprintLevel);
+
+            if (imprint.LastRecordedAt > _mostRecentRecordTime)
+                _mostRecentRecordTime = imprint.LastRecordedAt;
         }
 
         private void UpdateHighestLevel(PlayerBehaviorType behavior, int level)
@@ -296,23 +448,292 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             }
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        // REQ-149: 条件触发性格分析
+        // ══════════════════════════════════════════════════════════════════════
+
         /// <summary>
-        /// 获取宠物的个性类型（最高等级的行为类型）
+        /// 获取宠物的个性类型（原有兼容方法，纯统计）
         /// </summary>
         public PlayerBehaviorType? GetDominantBehavior()
         {
-            PlayerBehaviorType? dominant = null;
-            int maxLevel = 0;
-            foreach (var kvp in _highestBehaviorLevel)
+            return GetDominantBehaviorEx().DominantBehavior;
+        }
+
+        /// <summary>
+        /// REQ-149: 获取宠物的扩展性格分析结果
+        /// 结合条件触发器（HP状态、环境专精、事件驱动等）加权计算
+        /// </summary>
+        public PersonalityAnalysisResult GetDominantBehaviorEx()
+        {
+            var result = new PersonalityAnalysisResult();
+
+            // 1. 计算每种行为的历史得分
+            var scores = new Dictionary<PlayerBehaviorType, float>();
+            foreach (PlayerBehaviorType behavior in Enum.GetValues(typeof(PlayerBehaviorType)))
             {
-                if (kvp.Value > maxLevel)
+                int level = GetHighestLevel(behavior);
+                float historicalScore = level * 1.0f; // 基础：每级 1.0 分
+                scores[behavior] = historicalScore;
+            }
+
+            // 2. HP 相关触发器
+            EvaluateHpTriggers(scores, result.ActiveTriggers);
+
+            // 3. 环境专精触发器
+            EvaluateEnvironmentTriggers(scores, result.ActiveTriggers);
+
+            // 4. 事件驱动触发器
+            EvaluateEventDrivenTriggers(scores, result.ActiveTriggers);
+
+            // 5. 近因偏好
+            EvaluateRecentBias(scores, result.ActiveTriggers);
+
+            // 6. 抑制触发器
+            EvaluateSuppressedTriggers(scores, result.ActiveTriggers);
+
+            // 7. 找到最高分
+            float maxScore = 0f;
+            PlayerBehaviorType? dominant = null;
+            foreach (var kvp in scores)
+            {
+                if (kvp.Value > maxScore)
                 {
-                    maxLevel = kvp.Value;
+                    maxScore = kvp.Value;
                     dominant = kvp.Key;
                 }
             }
-            return dominant;
+
+            result.DominantBehavior = dominant;
+            result.DominantScore = maxScore;
+            result.AllScores = scores;
+            result.Description = BuildPersonalityDescription(result);
+
+            return result;
         }
+
+        /// <summary>
+        /// HP相关触发器：低HP时倾向谨慎或背水一战
+        /// </summary>
+        private void EvaluateHpTriggers(Dictionary<PlayerBehaviorType, float> scores, List<PersonalityTrigger> triggers)
+        {
+            if (_currentHpPercent <= HP_LOW_THRESHOLD)
+            {
+                float intensity = 1f - (_currentHpPercent / HP_LOW_THRESHOLD); // 越低越强
+
+                if (_currentHpPercent <= HP_CRITICAL_THRESHOLD)
+                {
+                    // 极低HP：触发背水一战
+                    float bonus = HP_TRIGGER_WEIGHT * intensity * 2f;
+                    AddTriggerScore(scores, PlayerBehaviorType.LowHPAggression, bonus, triggers,
+                        new PersonalityTrigger(PersonalityTriggerType.HPRelated, PlayerBehaviorType.LowHPAggression,
+                            bonus, true, $"HP危急({_currentHpPercent:P0})"));
+                }
+
+                // 低HP：倾向谨慎/防守
+                float cautionBonus = HP_TRIGGER_WEIGHT * intensity;
+                AddTriggerScore(scores, PlayerBehaviorType.QuickRetreat, cautionBonus, triggers,
+                    new PersonalityTrigger(PersonalityTriggerType.HPRelated, PlayerBehaviorType.QuickRetreat,
+                        cautionBonus, true, $"HP低({_currentHpPercent:P0})"));
+                AddTriggerScore(scores, PlayerBehaviorType.DefensiveStance, cautionBonus * 0.7f, triggers,
+                    new PersonalityTrigger(PersonalityTriggerType.HPRelated, PlayerBehaviorType.DefensiveStance,
+                        cautionBonus * 0.7f, true, $"HP低({_currentHpPercent:P0})"));
+            }
+        }
+
+        /// <summary>
+        /// 环境专精触发器：当前环境匹配时强化对应行为
+        /// </summary>
+        private void EvaluateEnvironmentTriggers(Dictionary<PlayerBehaviorType, float> scores, List<PersonalityTrigger> triggers)
+        {
+            if (_currentEnvironment == RoomEnvironmentType.None) return;
+
+            // 查找当前环境下已有的印记
+            var envImprints = GetImprintsForEnvironment(_currentEnvironment);
+            foreach (var imprint in envImprints)
+            {
+                if (imprint.ImprintLevel > 0)
+                {
+                    float bonus = ENV_TRIGGER_WEIGHT * (imprint.ImprintLevel / 5f); // 最高级时加成最大
+                    AddTriggerScore(scores, imprint.BehaviorType, bonus, triggers,
+                        new PersonalityTrigger(PersonalityTriggerType.EnvironmentSpecialist, imprint.BehaviorType,
+                            bonus, true, $"当前环境专精(Lv.{imprint.ImprintLevel})"));
+                }
+            }
+
+            // Boss房间：倾向优先击杀
+            if (_currentEnvironment.HasFlag(RoomEnvironmentType.Boss))
+            {
+                float bossBonus = ENV_TRIGGER_WEIGHT * 1.2f;
+                AddTriggerScore(scores, PlayerBehaviorType.FocusElite, bossBonus, triggers,
+                    new PersonalityTrigger(PersonalityTriggerType.EnvironmentSpecialist, PlayerBehaviorType.FocusElite,
+                        bossBonus, true, "Boss房间"));
+            }
+
+            // 宝藏房间：倾向收集
+            if (_currentEnvironment.HasFlag(RoomEnvironmentType.Treasure))
+            {
+                float treasureBonus = ENV_TRIGGER_WEIGHT * 1.0f;
+                AddTriggerScore(scores, PlayerBehaviorType.CollectLoot, treasureBonus, triggers,
+                    new PersonalityTrigger(PersonalityTriggerType.EnvironmentSpecialist, PlayerBehaviorType.CollectLoot,
+                        treasureBonus, true, "宝藏房间"));
+            }
+
+            // 陷阱密集区：倾向躲避
+            if (_currentEnvironment.HasFlag(RoomEnvironmentType.TrapDense))
+            {
+                float trapBonus = ENV_TRIGGER_WEIGHT * 0.8f;
+                AddTriggerScore(scores, PlayerBehaviorType.AvoidCombat, trapBonus, triggers,
+                    new PersonalityTrigger(PersonalityTriggerType.EnvironmentSpecialist, PlayerBehaviorType.AvoidCombat,
+                        trapBonus, true, "陷阱密集区"));
+            }
+        }
+
+        /// <summary>
+        /// 事件驱动触发器：特定事件临时提升相关性格
+        /// </summary>
+        private void EvaluateEventDrivenTriggers(Dictionary<PlayerBehaviorType, float> scores, List<PersonalityTrigger> triggers)
+        {
+            foreach (var kvp in _eventDrivenBonus)
+            {
+                if (kvp.Value > 0.01f)
+                {
+                    AddTriggerScore(scores, kvp.Key, kvp.Value * EVENT_TRIGGER_WEIGHT, triggers,
+                        new PersonalityTrigger(PersonalityTriggerType.EventDriven, kvp.Key,
+                            kvp.Value * EVENT_TRIGGER_WEIGHT, true, $"事件加成({kvp.Value:F1})"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 近因偏好：最近记录的行为获得额外权重
+        /// </summary>
+        private void EvaluateRecentBias(Dictionary<PlayerBehaviorType, float> scores, List<PersonalityTrigger> triggers)
+        {
+            if (_mostRecentRecordTime == DateTime.MinValue) return;
+
+            TimeSpan elapsed = DateTime.Now - _mostRecentRecordTime;
+            if (elapsed.TotalSeconds > 300) return; // 超过5分钟不触发
+
+            // 查找最近记录的行为
+            BehaviorImprint recent = null;
+            foreach (var imprint in _imprints)
+            {
+                if (recent == null || imprint.LastRecordedAt > recent.LastRecordedAt)
+                    recent = imprint;
+            }
+
+            if (recent != null && recent.ImprintLevel > 0)
+            {
+                float recencyFactor = Mathf.Max(0f, 1f - (float)elapsed.TotalSeconds / 300f);
+                float bonus = RECENT_TRIGGER_WEIGHT * recencyFactor * (recent.ImprintLevel / 5f);
+                AddTriggerScore(scores, recent.BehaviorType, bonus, triggers,
+                    new PersonalityTrigger(PersonalityTriggerType.RecentBias, recent.BehaviorType,
+                        bonus, true, $"近期行为({elapsed.TotalSeconds:F0}s前)"));
+            }
+        }
+
+        /// <summary>
+        /// 抑制触发器：某行为长期未触发时降低其竞争力
+        /// </summary>
+        private void EvaluateSuppressedTriggers(Dictionary<PlayerBehaviorType, float> scores, List<PersonalityTrigger> triggers)
+        {
+            foreach (var imprint in _imprints)
+            {
+                if (imprint.ImprintLevel > 0 && imprint.LastRecordedAt != default)
+                {
+                    TimeSpan elapsed = DateTime.Now - imprint.LastRecordedAt;
+                    if (elapsed.TotalSeconds > SUPPRESSION_THRESHOLD_SECONDS)
+                    {
+                        float suppressionFactor = Mathf.Min(1f, (float)(elapsed.TotalSeconds - SUPPRESSION_THRESHOLD_SECONDS) / 120f);
+                        float penalty = SUPPRESSED_TRIGGER_WEIGHT * suppressionFactor * imprint.ImprintLevel;
+                        AddTriggerScore(scores, imprint.BehaviorType, penalty, triggers,
+                            new PersonalityTrigger(PersonalityTriggerType.Suppressed, imprint.BehaviorType,
+                                penalty, true, $"久未使用({elapsed.TotalMinutes:F0}min)"));
+                    }
+                }
+            }
+        }
+
+        private void AddTriggerScore(Dictionary<PlayerBehaviorType, float> scores, PlayerBehaviorType behavior, float delta, List<PersonalityTrigger> triggers, PersonalityTrigger trigger)
+        {
+            if (!scores.ContainsKey(behavior))
+                scores[behavior] = 0f;
+            scores[behavior] += delta;
+            if (trigger.IsActive)
+                triggers.Add(trigger);
+        }
+
+        /// <summary>
+        /// 构建性格描述字符串（用于UI显示）
+        /// </summary>
+        private string BuildPersonalityDescription(PersonalityAnalysisResult result)
+        {
+            if (result.DominantBehavior == null) return "无记录";
+
+            var parts = new List<string>();
+            parts.Add($"核心性格: {GetBehaviorDisplayName(result.DominantBehavior.Value)}");
+
+            // 按权重排序触发器
+            var sortedTriggers = result.ActiveTriggers.FindAll(t => t.IsActive && t.Weight > 0.1f);
+            sortedTriggers.Sort((a, b) => b.Weight.CompareTo(a.Weight));
+
+            if (sortedTriggers.Count > 0)
+            {
+                var activeReasons = new List<string>();
+                foreach (var t in sortedTriggers.Take(3))
+                {
+                    if (!string.IsNullOrEmpty(t.Reason))
+                        activeReasons.Add($"{GetBehaviorDisplayName(t.Behavior)}↑({t.Reason})");
+                }
+                if (activeReasons.Count > 0)
+                    parts.Add("触发中: " + string.Join(", ", activeReasons));
+            }
+
+            return string.Join(" | ", parts);
+        }
+
+        /// <summary>
+        /// 获取行为类型的中文显示名称
+        /// </summary>
+        public static string GetBehaviorDisplayName(PlayerBehaviorType behavior)
+        {
+            switch (behavior)
+            {
+                case PlayerBehaviorType.UseFireSkill: return "火系";
+                case PlayerBehaviorType.UseIceSkill: return "冰系";
+                case PlayerBehaviorType.UseElectricSkill: return "电系";
+                case PlayerBehaviorType.UseShadowSkill: return "暗系";
+                case PlayerBehaviorType.UseHolySkill: return "神圣";
+                case PlayerBehaviorType.UseNatureSkill: return "自然";
+                case PlayerBehaviorType.FrequentDodge: return "闪避";
+                case PlayerBehaviorType.AggressiveAttack: return "进攻";
+                case PlayerBehaviorType.DefensiveStance: return "防守";
+                case PlayerBehaviorType.LowHPAggression: return "背水一战";
+                case PlayerBehaviorType.QuickRetreat: return "撤退";
+                case PlayerBehaviorType.FocusElite: return "精英杀手";
+                case PlayerBehaviorType.AvoidCombat: return "回避";
+                case PlayerBehaviorType.TriggerTrap: return "触发陷阱";
+                case PlayerBehaviorType.SolvePuzzle: return "解谜";
+                case PlayerBehaviorType.CollectLoot: return "收藏家";
+                case PlayerBehaviorType.UseHealing: return "治疗";
+                case PlayerBehaviorType.PetSynergy: return "协战";
+                case PlayerBehaviorType.SpecialInteraction: return "特殊互动";
+                default: return behavior.ToString();
+            }
+        }
+
+        /// <summary>
+        /// REQ-149: 获取主导性格的中文描述
+        /// </summary>
+        public string GetPersonalityDescription()
+        {
+            return GetDominantBehaviorEx().Description;
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
+        // 其他行为类型的等级排名
+        // ══════════════════════════════════════════════════════════════════════
 
         /// <summary>
         /// 获取所有行为类型的等级排名
@@ -330,7 +751,9 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             return result;
         }
 
-        // ── Persistence ─────────────────────────────────────────────────────
+        // ══════════════════════════════════════════════════════════════════════
+        // Persistence
+        // ══════════════════════════════════════════════════════════════════════
 
         public override Dictionary ExportSaveData()
         {
@@ -358,6 +781,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         {
             _imprints.Clear();
             _highestBehaviorLevel.Clear();
+            _eventDrivenBonus.Clear();
 
             if (data == null || !data.Contains("imprints")) return;
 
@@ -378,6 +802,9 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                 };
                 _imprints.Add(imprint);
                 UpdateHighestLevel(imprint.BehaviorType, imprint.ImprintLevel);
+
+                if (imprint.LastRecordedAt > _mostRecentRecordTime)
+                    _mostRecentRecordTime = imprint.LastRecordedAt;
             }
 
             GD.Print($"[PetMimicryData] Loaded {_imprints.Count} behavior imprints from save");
@@ -390,6 +817,8 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         {
             _imprints.Clear();
             _highestBehaviorLevel.Clear();
+            _eventDrivenBonus.Clear();
+            _mostRecentRecordTime = DateTime.MinValue;
             GD.Print("[PetMimicryData] All imprints reset");
         }
     }
