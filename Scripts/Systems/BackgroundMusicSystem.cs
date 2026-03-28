@@ -37,6 +37,11 @@ namespace ClawRPG.Scripts.Systems {
         
         // Current zone
         private string _currentZone = "default";
+
+        // ===== 战斗节拍感知 (REQ-131) =====
+        // 节奏强度映射: Calm→0.0, Normal→0.3, Intense→0.6, Frenzied→1.0
+        private float _rhythmIntensity = 0f;
+        private bool _rhythmSubscriptionActive = false;
         
         public override void _Ready() {
             _instance = this;
@@ -66,7 +71,10 @@ namespace ClawRPG.Scripts.Systems {
             
             // Setup music database
             InitializeMusicDatabase();
-            
+
+            // 订阅战斗节拍信号 (REQ-131)
+            SubscribeToRhythmEvents();
+
             GD.Print("BackgroundMusicSystem initialized");
         }
         
@@ -190,13 +198,23 @@ namespace ClawRPG.Scripts.Systems {
         public void StartBattleMusic(bool isBoss = false) {
             _inBattle = true;
             string trackKey = isBoss ? "battle_boss" : "battle_normal";
-            
+
             if (_musicDatabase.TryGetValue(trackKey, out var track)) {
                 _currentBattleTrack = track.Name;
                 CrossfadeTo(track.Name);
                 GD.Print($"[BGM] Starting {(isBoss ? "boss" : "normal")} battle music");
             }
-            
+
+            // 应用当前节奏强度到战斗音乐 (REQ-131)
+            var rhythmData = CombatRhythmData.Instance;
+            if (rhythmData != null) {
+                float targetIntensity = LevelToIntensity(rhythmData.GetCurrentLevel());
+                _rhythmIntensity = targetIntensity;
+                float rhythmBoost = targetIntensity * 0.3f;
+                float effectiveBattleVolume = Mathf.Clamp(_battleMusicVolume + rhythmBoost, 0f, 1f);
+                _battleMusicPlayer.VolumeDb = LinearToDb(effectiveBattleVolume);
+            }
+
             // Emit signal for battle start
             EmitSignal(nameof(BattleMusicStarted), isBoss);
         }
@@ -206,10 +224,11 @@ namespace ClawRPG.Scripts.Systems {
         /// </summary>
         public void StopBattleMusic() {
             if (_inBattle) {
-                _inBattle = false; 
+                _inBattle = false;
+                _rhythmIntensity = 0f; // 退出战斗重置节奏强度 (REQ-131)
                 CrossfadeToZoneMusic(_currentZone);
                 GD.Print("[BGM] Stopping battle music");
-                
+
                 EmitSignal(nameof(BattleMusicStopped));
             }
         }
@@ -346,9 +365,60 @@ namespace ClawRPG.Scripts.Systems {
             if (linear <= 0) return -80;
             return 20 * Mathf.Log(linear) / Mathf.Log(10);
         }
-        
+
+        #region 战斗节拍感知 (REQ-131)
+
+        private void SubscribeToRhythmEvents()
+        {
+            if (_rhythmSubscriptionActive) return;
+            var rhythmData = CombatRhythmData.Instance;
+            if (rhythmData == null)
+            {
+                GD.Print("[BGM] CombatRhythmData not found — rhythm sync disabled");
+                return;
+            }
+            rhythmData.RhythmLevelChanged += OnRhythmLevelChanged;
+            _rhythmSubscriptionActive = true;
+            GD.Print("[BGM] Subscribed to CombatRhythmData.RhythmLevelChanged");
+        }
+
+        private void OnRhythmLevelChanged(CombatRhythmData.RhythmLevel newLevel, CombatRhythmData.RhythmLevel oldLevel)
+        {
+            float targetIntensity = LevelToIntensity(newLevel);
+            _rhythmIntensity = targetIntensity;
+
+            if (!_inBattle) return;
+
+            // 根据节奏等级调整战斗音乐强度
+            // 基础音量 + 节奏增幅（最高+30%）
+            float rhythmBoost = targetIntensity * 0.3f;
+            float effectiveBattleVolume = _battleMusicVolume + rhythmBoost;
+            effectiveBattleVolume = Mathf.Clamp(effectiveBattleVolume, 0f, 1f);
+
+            // 应用到 battle music player
+            _battleMusicPlayer.VolumeDb = LinearToDb(effectiveBattleVolume);
+            GD.Print($"[BGM] Rhythm → {newLevel} (intensity={targetIntensity:F1}), battle volume: {effectiveBattleVolume:F2}");
+        }
+
+        private float LevelToIntensity(CombatRhythmData.RhythmLevel level)
+        {
+            return level switch
+            {
+                CombatRhythmData.RhythmLevel.Calm => 0.0f,
+                CombatRhythmData.RhythmLevel.Normal => 0.3f,
+                CombatRhythmData.RhythmLevel.Intense => 0.6f,
+                CombatRhythmData.RhythmLevel.Frenzied => 1.0f,
+                _ => 0f
+            };
+        }
+
+        /// <summary>
+        /// 获取当前节奏强度 (0.0–1.0)
+        /// </summary>
+        public float GetRhythmIntensity() => _rhythmIntensity;
+
         #endregion
-        
+
         #region Process
         
         public override void _Process(float delta) {

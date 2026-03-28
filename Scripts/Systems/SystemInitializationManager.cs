@@ -136,6 +136,7 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("combat", typeof(DepositTracker));
             RegisterSystemInGroup("combat", typeof(DepositCardGenerator));
             RegisterSystemInGroup("combat", typeof(DepositRunIntegration));
+            RegisterSystemInGroup("combat", typeof(CombatRhythmData)); // REQ-131: 战斗节拍感知音乐
             RegisterSystemInGroup("combat", typeof(StyleMasterySystem));
             RegisterSystemInGroup("combat", typeof(SkillTreeSystem));
             RegisterSystemInGroup("combat", typeof(SkillTreeResetSystem));
