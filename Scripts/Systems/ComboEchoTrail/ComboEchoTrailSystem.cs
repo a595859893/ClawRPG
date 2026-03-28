@@ -18,12 +18,13 @@ public partial class ComboEchoTrailSystem : BaseSystem
     private class EchoTrail
     {
         public string ComboId;
-        public List<Vector2> Points = new List<Vector2>();
+        public List<Vector2> WorldPoints = new List<Vector2>();
         public float Age;            // seconds since creation
         public float MaxAge = 3.0f; // fade out over 3 seconds
         public float Alpha = 1.0f;
         public bool IsRepeating;     // true if this combo was executed before
         public Color BaseColor;
+        public float RecordStartTime; // game time when recording started
     }
 
     private List<EchoTrail> _trails = new List<EchoTrail>();
@@ -159,7 +160,8 @@ public partial class ComboEchoTrailSystem : BaseSystem
             ComboId = comboId,
             Age = 0f,
             IsRepeating = _executedComboIds.Contains(comboId),
-            BaseColor = _GetComboColor(comboId)
+            BaseColor = _GetComboColor(comboId),
+            RecordStartTime = Time.GetTicksMsec() / 1000f
         };
         _executedComboIds.Add(comboId);
 
@@ -186,9 +188,9 @@ public partial class ComboEchoTrailSystem : BaseSystem
         var player = GetTree().GetFirstNodeInGroup("Player");
         if (player != null)
         {
-            // Store world position projected to screen
+            // Store world position
             var worldPos = player is Node2D node2d ? node2d.GlobalPosition : player.Position;
-            _currentTrail.Points.Add(worldPos);
+            _currentTrail.WorldPoints.Add(worldPos);
         }
     }
 
@@ -248,7 +250,7 @@ public partial class ComboEchoTrailSystem : BaseSystem
         for (int i = 0; i < _trails.Count && poolIdx < _pool.Count; i++)
         {
             var trail = _trails[i];
-            if (trail.Points.Count < 2)
+            if (trail.WorldPoints.Count < 2)
             {
                 if (_pool[poolIdx].InUse)
                 {
@@ -263,20 +265,37 @@ public partial class ComboEchoTrailSystem : BaseSystem
             tl.InUse = true;
             tl.Node.Visible = true;
 
-            // Set points
+            // Set points and per-point gradient (newer = brighter/thicker)
             tl.Node.ClearPoints();
-            foreach (var pt in trail.Points)
+            int pointCount = trail.WorldPoints.Count;
+
+            for (int j = 0; j < pointCount; j++)
             {
-                tl.Node.AddPoint(pt);
+                tl.Node.AddPoint(trail.WorldPoints[j]);
+
+                // Each point's age: older points = lower ratio (dimmer/thinner)
+                float pointAgeRatio = j / (float)Mathf.Max(pointCount - 1, 1); // 0=oldest, 1=newest
+                float fadeRatio = pointAgeRatio * trail.Alpha;               // fade with trail age too
+
+                // Color: base color with per-point alpha gradient + repeat darkening
+                Color ptColor = trail.BaseColor;
+                if (trail.IsRepeating)
+                {
+                    // Darken repeated combo trails for clear visual distinction
+                    ptColor = new Color(
+                        trail.BaseColor.R * 0.45f,
+                        trail.BaseColor.G * 0.45f,
+                        trail.BaseColor.B * 0.45f,
+                        1f
+                    );
+                }
+                ptColor.A = fadeRatio * 0.85f;
+                tl.Node.SetPointColor(j, ptColor);
+
+                // Width tapers: newer points thicker (4→1.5), scaled by trail age
+                float width = Mathf.Lerp(1.5f, 4f, pointAgeRatio) * Mathf.Max(trail.Alpha, 0.15f);
+                tl.Node.SetPointWidth(j, width);
             }
-
-            // Color: base color * alpha, repeating combos are more opaque
-            float repeatBoost = trail.IsRepeating ? 0.3f : 0f;
-            float finalAlpha = (trail.Alpha + repeatBoost * (1f - trail.Alpha)) * 0.8f;
-            tl.Node.DefaultColor = new Color(trail.BaseColor.R, trail.BaseColor.G, trail.BaseColor.B, finalAlpha);
-
-            // Width tapers with age (newer = thicker)
-            tl.Node.Width = Mathf.Lerp(1.5f, 4f, trail.Alpha);
 
             poolIdx++;
         }
