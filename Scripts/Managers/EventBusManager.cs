@@ -47,6 +47,11 @@ public class EventBusManager : ManagerBase
         public const string DamageTaken = "DamageTaken";
         public const string BattlefieldVariantStarted = "BattlefieldVariantStarted";
         public const string BattlefieldVariantEnded = "BattlefieldVariantEnded";
+
+        // REQ-118: 随机事件抽卡
+        public const string CombatEventCardDraw = "CombatEventCardDraw";
+        public const string CombatEventCardAccepted = "CombatEventCardAccepted";
+        public const string CombatEventCardRejected = "CombatEventCardRejected";
         
         // 游戏状态事件
         public const string GamePaused = "GamePaused";

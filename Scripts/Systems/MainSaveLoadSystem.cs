@@ -5,6 +5,7 @@ using ClawRPG.Scripts.Managers;
 using ClawRPG.Scripts.Combat;
 using ClawRPG.Scripts.Crafting;
 using ClawRPG.Scripts.Systems.PetMimicry;
+using ClawRPG.Scripts.Systems.EventCardPool;
 using CombatSkillCooldownSystem = global::CombatSkillCooldownSystem;
 using SummonSystem = global::ClawRPG.Scripts.SummonSystem;
 
@@ -29,6 +30,9 @@ namespace ClawRPG.Scripts.Systems
         // Pet Mimicry system reference - REQ-142-07
         private PetMimicryData _petMimicryData;
 
+        // Event Card Pool system reference - REQ-118
+        private EventCardPoolData _eventCardPoolData;
+
         public void Initialize(Main main)
         {
             _main = main;
@@ -48,6 +52,9 @@ namespace ClawRPG.Scripts.Systems
 
             // Pet Mimicry system - REQ-142-07
             _petMimicryData = PetMimicryData.Instance;
+
+            // Event Card Pool system - REQ-118
+            _eventCardPoolData = EventCardPoolData.Instance;
         }
 
         /// <summary>
@@ -114,6 +121,12 @@ namespace ClawRPG.Scripts.Systems
                 allData["petMimicry"] = _petMimicryData.ExportSaveData();
             }
 
+            // Event Card Pool persistence - REQ-118
+            if (_eventCardPoolData != null)
+            {
+                allData["eventCardPool"] = _eventCardPoolData.ExportSaveData();
+            }
+
             return allData;
         }
 
@@ -170,6 +183,12 @@ namespace ClawRPG.Scripts.Systems
             if (data.Contains("petMimicry"))
             {
                 _petMimicryData?.ImportSaveData(data["petMimicry"] as Dictionary);
+            }
+
+            // Event Card Pool persistence - REQ-118
+            if (data.Contains("eventCardPool"))
+            {
+                _eventCardPoolData?.ImportSaveData(data["eventCardPool"] as Dictionary);
             }
         }
 

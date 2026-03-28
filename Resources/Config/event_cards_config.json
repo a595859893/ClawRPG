@@ -1,0 +1,459 @@
+{
+  "version": "1.0",
+  "cards": [
+    {
+      "cardId": "resource_healing_spring",
+      "title": "治愈之泉",
+      "description": "战斗前发现一处散发温和光芒的泉水，饮用后恢复体力。",
+      "category": "Resource",
+      "rarity": "Common",
+      "triggerTiming": "OnDraw",
+      "minPlayerLevel": 1,
+      "effects": [
+        {
+          "effectType": "HealPlayer",
+          "amount": 30,
+          "target": "Player",
+          "duration": 0,
+          "description": "恢复 30 点生命"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 20,
+        "acceptText": "接受",
+        "rerollText": "寻找其他泉水"
+      }
+    },
+    {
+      "cardId": "resource_energy_elixir",
+      "title": "能量药剂",
+      "description": "一瓶闪烁光芒的魔法药剂，立即恢复能量。",
+      "category": "Resource",
+      "rarity": "Common",
+      "triggerTiming": "OnDraw",
+      "minPlayerLevel": 1,
+      "effects": [
+        {
+          "effectType": "EnergyBoost",
+          "amount": 3,
+          "target": "Player",
+          "duration": 0,
+          "description": "获得 3 点能量"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 15,
+        "acceptText": "接受",
+        "rerollText": "继续探索"
+      }
+    },
+    {
+      "cardId": "resource_gold_pouch",
+      "title": "遗失的钱袋",
+      "description": "路边发现一个鼓鼓的钱袋，里面装满了金币。",
+      "category": "Resource",
+      "rarity": "Uncommon",
+      "triggerTiming": "OnDraw",
+      "minPlayerLevel": 1,
+      "effects": [
+        {
+          "effectType": "GoldChange",
+          "amount": 80,
+          "target": "Player",
+          "duration": 0,
+          "description": "获得 80 金币"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 25,
+        "acceptText": "收下",
+        "rerollText": "不予理会"
+      }
+    },
+    {
+      "cardId": "resource_coin_curse",
+      "title": "诅咒金币",
+      "description": "一枚散发不祥气息的金币，捡起后受到诅咒。",
+      "category": "Resource",
+      "rarity": "Rare",
+      "triggerTiming": "OnDraw",
+      "minPlayerLevel": 3,
+      "effects": [
+        {
+          "effectType": "GoldChange",
+          "amount": 50,
+          "target": "Player",
+          "duration": 0,
+          "description": "获得 50 金币"
+        },
+        {
+          "effectType": "DebuffPlayer",
+          "amount": 1,
+          "target": "Player",
+          "duration": 30,
+          "description": "承受 30 秒诅咒：受到伤害 +10%"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 0,
+        "acceptText": "收下金币",
+        "rerollText": "不捡"
+      }
+    },
+    {
+      "cardId": "ally_mercenary",
+      "title": "雇佣兵支援",
+      "description": "一位经验丰富的雇佣兵加入你的战斗，持续1回合。",
+      "category": "Ally",
+      "rarity": "Uncommon",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 3,
+      "effects": [
+        {
+          "effectType": "TempAlly",
+          "amount": 1,
+          "target": "Player",
+          "duration": 30,
+          "description": "雇佣兵加入战斗（30秒）"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 40,
+        "acceptText": "雇佣",
+        "rerollText": "独自战斗"
+      }
+    },
+    {
+      "cardId": "ally_healer_nun",
+      "title": "朝圣治疗师",
+      "description": "一位朝圣者路过，为你提供短暂的治疗祝福。",
+      "category": "Ally",
+      "rarity": "Rare",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 5,
+      "effects": [
+        {
+          "effectType": "HealPlayer",
+          "amount": 50,
+          "target": "Player",
+          "duration": 0,
+          "description": "恢复 50 点生命"
+        },
+        {
+          "effectType": "BuffPlayer",
+          "amount": 0.15,
+          "target": "Player",
+          "duration": 20,
+          "description": "获得 20 秒 15% 增伤"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 35,
+        "acceptText": "接受祝福",
+        "rerollText": "婉拒"
+      }
+    },
+    {
+      "cardId": "ally_skeleton_minion",
+      "title": "骷髅仆从",
+      "description": "一只骷髅战士从阴影中现身，愿意为你而战。",
+      "category": "Ally",
+      "rarity": "Epic",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 8,
+      "effects": [
+        {
+          "effectType": "TempAlly",
+          "amount": 1,
+          "target": "Player",
+          "duration": 45,
+          "description": "骷髅仆从加入（45秒）"
+        },
+        {
+          "effectType": "BuffPlayer",
+          "amount": 0.2,
+          "target": "Player",
+          "duration": 45,
+          "description": "获得 45 秒 20% 增伤"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 50,
+        "acceptText": "命令骷髅",
+        "rerollText": "驱散骷髅"
+      }
+    },
+    {
+      "cardId": "terrain_scorched",
+      "title": "焦土地形",
+      "description": "战场被火焰灼烧，敌人会受到持续伤害。",
+      "category": "Terrain",
+      "rarity": "Uncommon",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 2,
+      "effects": [
+        {
+          "effectType": "TerrainEffect",
+          "amount": 5,
+          "target": "AllEnemies",
+          "duration": 30,
+          "description": "焦土：敌人每秒受到 5 点伤害"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 30,
+        "acceptText": "利用地形",
+        "rerollText": "寻找其他路线"
+      }
+    },
+    {
+      "cardId": "terrain_cover",
+      "title": "掩体环境",
+      "description": "战场中有可供躲避的掩体，减少受到的伤害。",
+      "category": "Terrain",
+      "rarity": "Rare",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 4,
+      "effects": [
+        {
+          "effectType": "ShieldPlayer",
+          "amount": 40,
+          "target": "Player",
+          "duration": 0,
+          "description": "获得 40 点临时护盾"
+        },
+        {
+          "effectType": "BuffPlayer",
+          "amount": 0.1,
+          "target": "Player",
+          "duration": 45,
+          "description": "掩体效果：受到伤害 -10%"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 35,
+        "acceptText": "利用掩体",
+        "rerollText": "继续前进"
+      }
+    },
+    {
+      "cardId": "terrain_static_air",
+      "title": "静电领域",
+      "description": "空气充满静电能量，攻击敌人时有几率造成连锁闪电。",
+      "category": "Terrain",
+      "rarity": "Epic",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 10,
+      "effects": [
+        {
+          "effectType": "BuffPlayer",
+          "amount": 0.25,
+          "target": "Player",
+          "duration": 60,
+          "description": "静电充能：攻击有 30% 几率连锁到额外敌人"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 45,
+        "acceptText": "引导闪电",
+        "rerollText": "绕开"
+      }
+    },
+    {
+      "cardId": "curse_blood_oath",
+      "title": "鲜血誓约",
+      "description": "古老黑暗仪式，以血为代价换取力量，但会持续失血。",
+      "category": "Curse",
+      "rarity": "Rare",
+      "triggerTiming": "OnDraw",
+      "minPlayerLevel": 6,
+      "effects": [
+        {
+          "effectType": "BuffPlayer",
+          "amount": 0.3,
+          "target": "Player",
+          "duration": 40,
+          "description": "获得 40 秒 30% 增伤"
+        },
+        {
+          "effectType": "DamagePlayer",
+          "amount": 2,
+          "target": "Player",
+          "duration": 40,
+          "description": "誓约代价：每秒受到 2 点伤害"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 0,
+        "acceptText": "接受誓约",
+        "rerollText": "拒绝"
+      }
+    },
+    {
+      "cardId": "curse_enemy_frenzy",
+      "title": "敌方狂化",
+      "description": "黑暗能量影响了战场，敌人变得更具攻击性。",
+      "category": "Curse",
+      "rarity": "Uncommon",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 3,
+      "effects": [
+        {
+          "effectType": "BuffEnemy",
+          "amount": 0.2,
+          "target": "AllEnemies",
+          "duration": 0,
+          "description": "敌人攻击力 +20%（永续）"
+        },
+        {
+          "effectType": "BuffPlayer",
+          "amount": 0.15,
+          "target": "Player",
+          "duration": 0,
+          "description": "但击杀敌人后获得 15% 额外金币"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 20,
+        "acceptText": "接受挑战",
+        "rerollText": "净化领域"
+      }
+    },
+    {
+      "cardId": "curse_vision_loss",
+      "title": "视野受损",
+      "description": "浓雾笼罩战场，所有人的视野都受到限制。",
+      "category": "Curse",
+      "rarity": "Epic",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 12,
+      "effects": [
+        {
+          "effectType": "BuffEnemy",
+          "amount": 0.15,
+          "target": "AllEnemies",
+          "duration": 0,
+          "description": "敌人攻击速度 +15%"
+        },
+        {
+          "effectType": "DebuffPlayer",
+          "amount": 1,
+          "target": "Player",
+          "duration": 0,
+          "description": "玩家暴击率 -10%"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 0,
+        "acceptText": "穿越迷雾",
+        "rerollText": "等待散去"
+      }
+    },
+    {
+      "cardId": "blessing_divine_shield",
+      "title": "神圣护盾",
+      "description": "神圣力量降临，为你套上一层免疫伤害的护盾。",
+      "category": "Blessing",
+      "rarity": "Rare",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 5,
+      "effects": [
+        {
+          "effectType": "ShieldPlayer",
+          "amount": 80,
+          "target": "Player",
+          "duration": 0,
+          "description": "获得 80 点临时护盾"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 30,
+        "acceptText": "接受护佑",
+        "rerollText": "依靠自己"
+      }
+    },
+    {
+      "cardId": "blessing_godspeed",
+      "title": "神速祝福",
+      "description": "众神赐予你风之速度，大幅提升行动效率。",
+      "category": "Blessing",
+      "rarity": "Epic",
+      "triggerTiming": "OnCombatStart",
+      "minPlayerLevel": 8,
+      "effects": [
+        {
+          "effectType": "BuffPlayer",
+          "amount": 0.35,
+          "target": "Player",
+          "duration": 50,
+          "description": "获得 50 秒 35% 攻击速度"
+        },
+        {
+          "effectType": "EnergyBoost",
+          "amount": 2,
+          "target": "Player",
+          "duration": 0,
+          "description": "立即获得 2 点能量"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 45,
+        "acceptText": "接受祝福",
+        "rerollText": "保持警惕"
+      }
+    },
+    {
+      "cardId": "blessing_last_stand",
+      "title": "背水一战",
+      "description": "绝境中的觉醒，低血量时爆发出惊人战斗力。",
+      "category": "Blessing",
+      "rarity": "Legendary",
+      "triggerTiming": "OnHalfHealth",
+      "minPlayerLevel": 10,
+      "effects": [
+        {
+          "effectType": "BuffPlayer",
+          "amount": 0.5,
+          "target": "Player",
+          "duration": 0,
+          "description": "血量低于 30% 时：伤害 +50%"
+        },
+        {
+          "effectType": "ShieldPlayer",
+          "amount": 30,
+          "target": "Player",
+          "duration": 0,
+          "description": "获得 30 点护盾"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 60,
+        "acceptText": "接受祝福",
+        "rerollText": "不冒险"
+      }
+    },
+    {
+      "cardId": "blessing_double_gold",
+      "title": "财富双倍",
+      "description": "幸运女神眷顾，接下来的战斗金币翻倍！",
+      "category": "Blessing",
+      "rarity": "Uncommon",
+      "triggerTiming": "OnDraw",
+      "minPlayerLevel": 1,
+      "effects": [
+        {
+          "effectType": "GoldChange",
+          "amount": 0,
+          "target": "Player",
+          "duration": 0,
+          "description": "本场战斗击杀金币翻倍"
+        }
+      ],
+      "acceptOption": {
+        "rerollCost": 25,
+        "acceptText": "接受祝福",
+        "rerollText": "继续探索"
+      }
+    }
+  ]
+}

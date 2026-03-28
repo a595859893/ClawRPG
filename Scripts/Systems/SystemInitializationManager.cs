@@ -141,6 +141,8 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("combat", typeof(StyleMasterySystem));
             RegisterSystemInGroup("combat", typeof(SkillTreeSystem));
             RegisterSystemInGroup("combat", typeof(SkillTreeResetSystem));
+            RegisterSystemInGroup("combat", typeof(EventCardPoolData)); // REQ-118: 随机事件抽卡系统
+            RegisterSystemInGroup("combat", typeof(EventCardPoolSystem)); // REQ-118
             RegisterSystemInGroup("combat", typeof(SkillSynergySystem));
             RegisterSystemInGroup("combat", typeof(SoulBondSystem));
             RegisterSystemInGroup("combat", typeof(ConstellationSystem));
