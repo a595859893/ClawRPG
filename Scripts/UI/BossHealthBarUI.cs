@@ -37,6 +37,11 @@ namespace ClawRPG.Scripts.UI {
         private Color _healthColorCritical = new Color(0.9f, 0.2f, 0.2f);
         private Color _enrageColorWarning = new Color(1f, 0.3f, 0f, 0.8f);
         private Color _enrageColorActive = new Color(1f, 0f, 0f, 1f);
+
+        // Confidence floor (REQ-119)
+        private const float ConfidenceFloorWarning = 0.30f;  // 30%: orange warning
+        private const float ConfidenceFloorCritical = 0.15f; // 15%: red danger
+        private bool _isPulsing = false;
         
         public override void _Ready()
         {
@@ -208,9 +213,18 @@ namespace ClawRPG.Scripts.UI {
                 
                 if (_fadeTimer <= 0)
                 {
-                    _isVisible = false; 
-                    Visible = false; 
+                    _isVisible = false;
+                    Visible = false;
                 }
+            }
+
+            // Danger pulse (REQ-119) — combine with fade alpha
+            if (_isPulsing)
+            {
+                PulseTimer += delta;
+                float pulse = Mathf.Sin(PulseTimer * Mathf.Pi * 2f / PulseInterval) * 0.3f + 0.7f;
+                float alpha = _fadeTimer > 0 ? Mathf.Clamp(_fadeTimer / FadeTime, 0f, 1f) : 1f;
+                _container.Modulate = new Color(pulse, pulse * 0.5f, pulse * 0.5f, alpha);
             }
         }
         
@@ -230,23 +244,36 @@ namespace ClawRPG.Scripts.UI {
             // Update health text
             _healthLabel.Text = $"{(int)currentHealth} / {(int)maxHealth}";
             
-            // Update health bar color based on percentage
+            // Update health bar color based on percentage (REQ-119: confidence floor)
             float healthPercent = currentHealth / maxHealth;
             StyleBoxFlat fillStyle = _healthBar.GetThemeStylebox("fill") as StyleBoxFlat;
             if (fillStyle != null)
             {
-                if (healthPercent > 0.5f)
+                Color targetColor;
+                bool shouldPulse = false;
+                if (healthPercent > ConfidenceFloorWarning)
                 {
-                    fillStyle.BgColor = _healthColorNormal;
+                    targetColor = _healthColorNormal;
                 }
-                else if (healthPercent > 0.25f)
+                else if (healthPercent > ConfidenceFloorCritical)
                 {
-                    fillStyle.BgColor = _healthColorWarning;
+                    targetColor = _healthColorWarning;
                 }
                 else
                 {
-                    fillStyle.BgColor = _healthColorCritical;
+                    targetColor = _healthColorCritical;
+                    shouldPulse = true;
                 }
+
+                // Smooth transition via Tween
+                if (fillStyle.BgColor != targetColor)
+                {
+                    Tween tween = CreateTween();
+                    tween.TweenProperty(fillStyle, "bg_color", targetColor, 0.3f);
+                }
+
+                // Danger pulse effect (red pulsing when <= 15%)
+                UpdateDangerPulse(shouldPulse);
             }
             
             // Update phase if boss has phases
@@ -263,6 +290,25 @@ namespace ClawRPG.Scripts.UI {
             UpdateEnrageDisplay(boss, delta);
         }
         
+        private void UpdateDangerPulse(bool shouldPulse)
+        {
+            if (shouldPulse && !_isPulsing)
+            {
+                _isPulsing = true;
+                // Start pulsing animation
+                PulseTimer = 0f;
+            }
+            else if (!shouldPulse && _isPulsing)
+            {
+                _isPulsing = false;
+                // Restore normal appearance
+                _container.Modulate = new Color(1f, 1f, 1f, 1f);
+            }
+        }
+
+        private float PulseTimer = 0f;
+        private const float PulseInterval = 0.5f;
+
         private void UpdateEnrageDisplay(Scripts.Boss boss, float delta)
         {
             bool isEnraged = boss.IsEnraged();
@@ -440,6 +486,8 @@ namespace ClawRPG.Scripts.UI {
         {
             _displayTimer = 0f;
             _fadeTimer = FadeTime;
+            _isPulsing = false;
+            PulseTimer = 0f;
         }
         
         /// <summary>
