@@ -227,13 +227,34 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
 
         private void OnActiveEffectExpired(MimicrySkillType skillType)
         {
+            // Bug 3 fix: 被动技能效果过期时同步 UI 状态
             switch (skillType)
             {
                 case MimicrySkillType.DodgeMaster:
                     // 移除闪避buff（宠物闪避率恢复正常）
+                    GD.Print($"[PetMimicrySkillSystem] DodgeMaster effect expired, dodge rate restored");
                     break;
                 case MimicrySkillType.LootInstinct:
                     // 关闭战利品加成
+                    GD.Print($"[PetMimicrySkillSystem] LootInstinct effect expired, bonus deactivated");
+                    break;
+                case MimicrySkillType.PuzzleInsight:
+                    GD.Print($"[PetMimicrySkillSystem] PuzzleInsight effect expired");
+                    break;
+                case MimicrySkillType.SpecialMorph:
+                    GD.Print($"[PetMimicrySkillSystem] SpecialMorph effect expired, form restored");
+                    break;
+                case MimicrySkillType.LastStand:
+                    GD.Print($"[PetMimicrySkillSystem] LastStand effect expired, damage bonus removed");
+                    break;
+                case MimicrySkillType.Rearguard:
+                    GD.Print($"[PetMimicrySkillSystem] Rearguard effect expired, movement bonus removed");
+                    break;
+                case MimicrySkillType.IronBulwark:
+                    GD.Print($"[PetMimicrySkillSystem] IronBulwark shield expired");
+                    break;
+                default:
+                    GD.Print($"[PetMimicrySkillSystem] Active effect {skillType} expired");
                     break;
             }
         }
@@ -682,6 +703,15 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         {
             float multiplier = baseDamage;
 
+            // REQ-150 Bug 1 fix: 应用 fidelity 修正系数
+            float fidelity = GetCurrentFidelity();
+            if (fidelity < 0.4f)
+                multiplier *= 0.7f;
+            else if (fidelity >= 0.7f)
+                multiplier *= 1.0f;
+            else
+                multiplier *= (0.7f + (fidelity - 0.4f) / 0.3f * 0.3f); // 线性插值 0.4→0.7
+
             // LastStand 低血狂暴加成
             if (_activeSkillEffects.ContainsKey(MimicrySkillType.LastStand))
             {
@@ -696,6 +726,23 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             }
 
             return Mathf.RoundToInt(multiplier);
+        }
+
+        /// <summary>
+        /// REQ-150 Bug 1 fix: 获取当前技能的 fidelity 值
+        /// </summary>
+        private float GetCurrentFidelity()
+        {
+            if (_mimicryData == null) return 0.5f;
+            var currentEnv = GetCurrentEnvironment();
+            // 遍历所有 imprints 找 fidelity 最高的
+            float bestFidelity = 0.5f; // 默认值
+            foreach (var imprint in _mimicryData.GetAllImprints())
+            {
+                if (imprint.Fidelity > bestFidelity)
+                    bestFidelity = imprint.Fidelity;
+            }
+            return bestFidelity;
         }
 
         /// <summary>
@@ -815,11 +862,19 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
 
         private void OnCombatEnded()
         {
-            // 战斗结束：清除所有激活效果
+            // 战斗结束：清除激活效果和战斗内状态，但保留 skillInstances（避免宠物"失忆"）
             _activeSkillEffects.Clear();
-            _skillInstances.Clear();
             _activeMutexGroups.Clear();
             _ownerAttackCooldown = 0f;
+
+            // Bug 2 fix: 保留 skillInstances，只重置运行时冷却/充能
+            foreach (var instance in _skillInstances.Values)
+            {
+                instance.CurrentCooldown = 0f;
+                instance.ChargeAccumulator = 0f;
+                if (instance.Definition.MaxCharges > 0)
+                    instance.CurrentCharges = instance.Definition.MaxCharges;
+            }
         }
 
         private void OnOwnerDamaged(float damageAmount)
