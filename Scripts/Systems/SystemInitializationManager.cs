@@ -126,6 +126,7 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("combat", typeof(ComboFatigueSystem));
             RegisterSystemInGroup("combat", typeof(ComboEchoTrailSystem));
             RegisterSystemInGroup("combat", typeof(ComboReplayRecorder)); // REQ-114-02
+            RegisterSystemInGroup("combat", typeof(ComboReplayPersistence)); // REQ-114-05
             RegisterSystemInGroup("combat", typeof(EnemyObserverSystem));
             RegisterSystemInGroup("combat", typeof(DepositData));
             RegisterSystemInGroup("combat", typeof(DepositTracker));
