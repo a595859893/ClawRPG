@@ -6,9 +6,21 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
     /// <summary>
     /// Boss AI - Handles boss decision making and behavior
     /// Part of BossMechanicsSystem refactoring
+    /// REQ-156: Boss 狂暴姿态 = 真实 AI 行为模式变化
     /// </summary>
     public partial class BossAI : BaseSystem
     {
+        /// <summary>
+        /// Boss AI 行为模式 (REQ-156)
+        /// Strategic: 策略模式，攻击有节奏、可预判
+        /// Enraged:   狂暴模式，攻击间隔缩短50%，攻击随机化
+        /// </summary>
+        public enum BossMode
+        {
+            Strategic,  // 默认策略模式
+            Enraged    // 狂暴模式
+        }
+
         private BossMechanicsSystem _bossSystem;
         private BossAbilityDatabase _abilityDb;
         private BossPhaseManager _phaseManager;
@@ -19,6 +31,12 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
         
         // Random for AI decisions
         private Random _random = new Random();
+
+        // REQ-156: 模式状态
+        private BossMode _currentMode = BossMode.Strategic;
+        
+        // REQ-156: 狂暴时攻击间隔缩减倍率（0.5 = 缩短50%）
+        private float _enragedAttackIntervalMultiplier = 0.5f;
         
         public BossAI(BossMechanicsSystem bossSystem, BossAbilityDatabase abilityDb, BossPhaseManager phaseManager)
         {
@@ -26,7 +44,54 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
             _abilityDb = abilityDb;
             _phaseManager = phaseManager;
         }
-        
+
+        // ========================
+        // REQ-156: 模式切换 API
+        // ========================
+
+        /// <summary>
+        /// 模式切换时发射的信号 (REQ-156)
+        /// 参数: (oldMode, newMode)
+        /// </summary>
+        [Signal]
+        public delegate void BossModeChangedEventHandler(BossMode oldMode, BossMode newMode);
+
+        /// <summary>
+        /// 切换 Boss AI 行为模式 (REQ-156)
+        /// Strategic: 正常决策间隔，权重选择
+        /// Enraged:   间隔缩短50%，攻击完全随机化
+        /// </summary>
+        public void SetMode(BossMode mode)
+        {
+            if (_currentMode == mode) return;
+
+            BossMode oldMode = _currentMode;
+            _currentMode = mode;
+            
+            GD.Print($"[BossAI] Mode changed: {oldMode} → {mode}");
+            EmitSignal(nameof(BossModeChanged), oldMode, mode);
+        }
+
+        /// <summary>
+        /// 获取当前行为模式 (REQ-156)
+        /// </summary>
+        public BossMode GetMode() => _currentMode;
+
+        /// <summary>
+        /// 是否处于狂暴模式 (REQ-156)
+        /// </summary>
+        public bool IsEnraged => _currentMode == BossMode.Enraged;
+
+        /// <summary>
+        /// 获取狂暴模式下攻击间隔倍率 (REQ-156)
+        /// 返回 0.5 表示狂暴时攻击间隔缩短为正常的一半
+        /// </summary>
+        public float GetEnragedAttackIntervalMultiplier() => _enragedAttackIntervalMultiplier;
+
+        // ========================
+        // 原有公开方法
+        // ========================
+
         /// <summary>
         /// Set AI decision interval
         /// </summary>
@@ -36,15 +101,23 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
         }
         
         /// <summary>
-        /// Update AI decision making
+        /// Update AI decision making (REQ-156)
+        /// Enraged 模式下决策频率提升（间隔缩短50%）
         /// </summary>
         public void Update(BossBattleState state, BossMechanicsData bossData, float delta)
         {
             if (state == null || bossData == null) return;
             
+            // REQ-156: Enraged 模式下决策间隔缩短
+            float effectiveInterval = _decisionInterval;
+            if (_currentMode == BossMode.Enraged)
+            {
+                effectiveInterval *= _enragedAttackIntervalMultiplier;
+            }
+            
             _decisionTimer += delta;
             
-            if (_decisionTimer >= _decisionInterval)
+            if (_decisionTimer >= effectiveInterval)
             {
                 _decisionTimer = 0f;
                 MakeDecision(state, bossData);
@@ -91,15 +164,24 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
         }
         
         /// <summary>
-        /// Select skill based on boss AI personality
+        /// Select skill based on boss AI personality (REQ-156)
+        /// Enraged 模式：攻击完全随机化，不再按权重选择
+        /// Strategic 模式：原有权重选择逻辑
         /// </summary>
         private string SelectSkill(BossBattleState state, BossMechanicsData bossData, List<string> availableSkills)
         {
             if (availableSkills.Count == 0) return null;
-            
-            // Simple random selection with bias towards less used skills
-            // Could be enhanced with boss-specific AI personalities
-            
+
+            // REQ-156: Enraged 模式下攻击完全随机化
+            if (_currentMode == BossMode.Enraged)
+            {
+                int idx = _random.Next(availableSkills.Count);
+                string enragedSkill = availableSkills[idx];
+                GD.Print($"[BossAI] Enraged mode: random skill selected = {enragedSkill}");
+                return enragedSkill;
+            }
+
+            // Strategic mode: 原有权重选择逻辑
             float healthPercent = state.CurrentHealth / state.MaxHealth;
             
             // In low health, prefer defensive/healing skills if available
@@ -120,7 +202,8 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
         }
         
         /// <summary>
-        /// Check and trigger enrage mechanic
+        /// Check and trigger enrage mechanic (REQ-156)
+        /// 狂暴触发时切换到 Enraged 模式，后续 SelectSkill 会切换为随机选择
         /// </summary>
         private void CheckEnrage(BossBattleState state, BossMechanicsData bossData)
         {
@@ -130,6 +213,9 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
             {
                 state.IsEnraged = true;
                 GD.Print($"[BossAI] Boss {bossData.BossName} is ENRAGED!");
+                
+                // REQ-156: 触发模式切换为 Enraged
+                SetMode(BossMode.Enraged);
             }
         }
         
