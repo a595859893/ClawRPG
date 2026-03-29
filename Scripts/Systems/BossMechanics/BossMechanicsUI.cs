@@ -36,6 +36,13 @@ public class BossMechanicsUI : Control
     private string _currentBattleId = "";
     private int _currentTab = 0;
 
+    // REQ-156-05: 狂暴模式切换视觉反馈
+    private Label _modeLabel;          // "☠️ ENRAGED" 脉冲标签
+    private float _pulseTimer = 0f;
+    private bool _isModeEnraged = false;
+    private float _shakeOffsetX = 0f;
+    private Label _attackTypeLabel;     // 当前攻击类型标签
+
     public override void _Ready()
     {
         _bossSystem = BossMechanicsSystem.Instance;
@@ -142,6 +149,18 @@ public class BossMechanicsUI : Control
         _enrageLabel.Text = "狂暴: 未激活";
         statusHBox.AddChild(_enrageLabel);
 
+        // REQ-156-05: 狂暴模式标签（初始隐藏）
+        _modeLabel = new Label();
+        _modeLabel.Text = "☠️ ENRAGED";
+        _modeLabel.Hide();
+        vbox.AddChild(_modeLabel);
+
+        // 当前攻击类型标签（REQ-156-05）
+        _attackTypeLabel = new Label();
+        _attackTypeLabel.Text = "";
+        _attackTypeLabel.Hide();
+        vbox.AddChild(_attackTypeLabel);
+
         // 技能列表
         var skillLabel = new Label();
         skillLabel.Text = "Boss技能:";
@@ -199,6 +218,9 @@ public class BossMechanicsUI : Control
             BossMechanicsSystem.BossSkillUsed += OnBossSkillUsed;
             BossMechanicsSystem.PlayerComboChanged += OnPlayerComboChanged;
         }
+
+        // REQ-156-05: 订阅模式切换信号
+        BossEnrageManager.OnBossModeChanged += OnBossModeChanged;
     }
 
     private void RefreshBossList()
@@ -381,6 +403,57 @@ public class BossMechanicsUI : Control
                 break;
             }
         }
+    }
+
+    /// <summary>
+    /// REQ-156-05: 模式切换视觉反馈
+    /// 收到 ModeChanged 信号时触发：
+    /// 1. 显示 ENRAGED 标签
+    /// 2. 触发屏幕轻微震动
+    /// 3. 重置脉冲动画计时器
+    /// </summary>
+    private void OnBossModeChanged(string battleInstanceId, int oldMode, int newMode)
+    {
+        if (newMode == 1) // Enraged mode
+        {
+            _isModeEnraged = true;
+            _pulseTimer = 0f;
+
+            // 显示 ENRAGED 标签
+            _modeLabel.Show();
+            _modeLabel.Modulate = new Color(1f, 0f, 0f, 1f);
+
+            // 攻击类型标签显示狂暴模式
+            _attackTypeLabel.Text = "⚡ 狂暴模式: 攻击随机化";
+            _attackTypeLabel.Modulate = new Color(1f, 0.3f, 0f, 1f);
+            _attackTypeLabel.Show();
+
+            GD.Print("[BossMechanicsUI] ENRAGED mode activated! Starting pulse animation.");
+        }
+        else // Strategic mode
+        {
+            _isModeEnraged = false;
+            _modeLabel.Hide();
+            _attackTypeLabel.Hide();
+        }
+    }
+
+    /// <summary>
+    /// REQ-156-05: 狂暴模式脉冲动画
+    /// </summary>
+    public override void _Process(float delta)
+    {
+        if (!_isModeEnraged || _modeLabel == null) return;
+
+        _pulseTimer += delta;
+
+        // 脉冲动画：0.5秒周期，在 0.3~1.0 之间波动
+        float pulse = 0.3f + 0.7f * (Mathf.Sin(_pulseTimer * Mathf.Pi * 2f) * 0.5f + 0.5f);
+        _modeLabel.modulate = new Color(1f, pulse * 0.3f, pulse * 0.3f, 1f);
+
+        // 轻微震动偏移（每帧微小抖动）
+        float shakeX = (Mathf.Sin(_pulseTimer * 30f) * 2f);
+        _modeLabel.RectPosition = new Vector2(shakeX, _modeLabel.RectPosition.y);
     }
 
     private void OnBossSkillUsed(string bossId, string skillId, string skillName)

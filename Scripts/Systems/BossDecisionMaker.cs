@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Characters;
 using ClawRPG.Scripts.AI;
+using ClawRPG.Scripts.Systems.BossMechanics;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
@@ -21,6 +22,20 @@ namespace ClawRPG.Scripts.Systems {
             _boss = boss;
             _context = new BTContext { Boss = boss };
             BuildBehaviorTree();
+
+            // REQ-156-04: 订阅模式切换信号，模式变化时重置行为树强制重新决策
+            BossEnrageManager.OnBossModeChanged += OnBossModeChanged;
+        }
+
+        /// <summary>
+        /// REQ-156-04: 模式切换时更新上下文并重置行为树
+        /// </summary>
+        private void OnBossModeChanged(string battleInstanceId, int oldMode, int newMode)
+        {
+            _context.BossMode = newMode;
+            // 重置行为树状态，强制下次 MakeDecision 重新评估
+            _root?.Reset();
+            GD.Print($"[BossDecisionMaker] Mode changed to {(newMode == 1 ? "Enraged" : "Strategic")}, tree reset for re-evaluation");
         }
         
         /// <summary>
@@ -29,10 +44,11 @@ namespace ClawRPG.Scripts.Systems {
         private void BuildBehaviorTree() {
             // Root selector: Priority-based decision making
             _root = new BTSelector(
-                // Priority 0: RAGE MODE - HP < 5% triggers aggressive rampage (REQ-127)
+                // Priority 0: ENRAGED MODE - BossMode == 1 covers both HP-rage and time-enrage (REQ-156)
+                // ModeChanged signal fires for both BossPhaseSystem.BossEnraged and BossRageTriggered
                 new BTSequence(
-                    new BTCondition(ctx => ctx.IsRageTriggered),
-                    CreateRageEvaluation()
+                    new BTCondition(ctx => ctx.BossMode == 1),
+                    CreateEnragedModeEvaluation()
                 ),
 
                 // Priority 1: Emergency healing when low health
@@ -140,8 +156,34 @@ namespace ClawRPG.Scripts.Systems {
         /// <summary>
         /// Create Rage mode evaluation - aggressive rapid attacks (REQ-127)
         /// </summary>
-        private BTNode CreateRageEvaluation() {
+        /// <summary>
+        /// REQ-156: Enraged 模式行为评估
+        /// - 攻击间隔缩短50%（BossAI层面处理）
+        /// - 攻击完全随机化（BossAI.SelectSkill 处理）
+        /// - 行为树层面：高风险高回报动作优先
+        /// </summary>
+        private BTNode CreateEnragedModeEvaluation() {
             return new BTScoreSelector()
+                .AddScoringNode(new BTScoringAction(ctx => {
+                    // Enraged专属攻击优先（enraged_burst, rapid_fire, desperate_strike）
+                    var enragedAbilities = new[] { "enraged_burst", "rapid_fire", "desperate_strike" };
+
+                    foreach (var ability in enragedAbilities) {
+                        if (!IsAbilityReady(ability)) continue;
+
+                        float score = 400f; // 最高优先级
+
+                        var abilityData = _boss.GetAbilityDatabase().GetValueOrDefault(ability);
+                        if (abilityData != null) {
+                            score += abilityData.DamageMultiplier * 100f;
+                        }
+
+                        if (score > ctx.Score) {
+                            ctx.Score = score;
+                            ctx.SelectedAbility = ability;
+                        }
+                    }
+                }))
                 .AddScoringNode(new BTScoringAction(ctx => {
                     // In rage mode, prioritize devastating abilities
                     var rageAbilities = new[] { "fire_breath", "dark_bolt", "lightning_chain", "ground_slam" };
@@ -170,8 +212,8 @@ namespace ClawRPG.Scripts.Systems {
                     }
                 }))
                 .AddScoringNode(new BTScoringAction(ctx => {
-                    // Fallback: rapid basic attacks
-                    var basicAbilities = new[] { "magic_missile", "ice_lance" };
+                    // Fallback: rapid basic attacks (乱拍感觉)
+                    var basicAbilities = new[] { "magic_missile", "ice_lance", "basic_attack" };
                     foreach (var ability in basicAbilities) {
                         if (!IsAbilityReady(ability)) continue;
 

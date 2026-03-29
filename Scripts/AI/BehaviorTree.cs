@@ -45,6 +45,10 @@ namespace ClawRPG.Scripts.AI {
         public bool IsEnraged => Boss.IsEnraged();
         public bool IsRageTriggered => Boss.IsRageTriggered(); // REQ-127: HP < 5% rage
         public float TimeSinceLastAbility { get; set; }
+
+        // REQ-156: Boss AI 行为模式 (0=Strategic, 1=Enraged)
+        // 由 BossEnrageManager.OnBossModeChanged 信号驱动更新
+        public int BossMode { get; set; } = 0;
     }
     
     /// <summary>
