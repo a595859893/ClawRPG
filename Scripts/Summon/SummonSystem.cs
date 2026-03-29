@@ -411,4 +411,3 @@ namespace ClawRPG.Scripts
             return true;
         }
     }
-}
