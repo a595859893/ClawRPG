@@ -51,12 +51,6 @@ namespace ClawRPG.Scripts.Systems {
             _musicPlayer = new AudioStreamPlayer();
             _musicPlayer.Name = "MusicPlayer";
             _musicPlayer.Bus = "Music";
-        }
-        
-        /// <summary>
-        /// 系统名称
-        /// </summary>
-        protected override string SystemName => "BackgroundMusic";
             AddChild(_musicPlayer);
             
             _battleMusicPlayer = new AudioStreamPlayer();
@@ -77,6 +71,11 @@ namespace ClawRPG.Scripts.Systems {
 
             GD.Print("BackgroundMusicSystem initialized");
         }
+        
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        protected override string SystemName => "BackgroundMusic";
         
         private void InitializeMusicDatabase() {
             // Zone music tracks (placeholder - would load actual audio files)
@@ -366,6 +365,8 @@ namespace ClawRPG.Scripts.Systems {
             return 20 * Mathf.Log(linear) / Mathf.Log(10);
         }
 
+        #endregion
+
         #region 战斗节拍感知 (REQ-131)
 
         private void SubscribeToRhythmEvents()
@@ -454,58 +455,56 @@ namespace ClawRPG.Scripts.Systems {
         
         #endregion
         
+        // ===== Data Classes =====
+        public class MusicTrack {
+            public string Name { get; set; } = "";
+            public MusicCategory Category { get; set; } = MusicCategory.Exploration;
+            public MusicIntensity Intensity { get; set; } = MusicIntensity.Low;
+        }
+        
+        public enum MusicCategory {
+            Exploration,
+            Battle,
+            Event,
+            Menu,
+            Cutscene
+        }
+        
+        public enum MusicIntensity {
+            Low,
+            Medium,
+            MediumHigh,
+            High
+        }
+        
         public override void _ExitTree() {
             if (_instance == this) {
                 _instance = null;
             }
         }
-    }
-    
-    #region Data Classes
-    
-    public class MusicTrack {
-        public string Name { get; set; } = "";
-        public MusicCategory Category { get; set; } = MusicCategory.Exploration;
-        public MusicIntensity Intensity { get; set; } = MusicIntensity.Low;
-    }
-    
-    public enum MusicCategory {
-        Exploration,
-        Battle,
-        Event,
-        Menu,
-        Cutscene
-    }
-    
-    public enum MusicIntensity {
-        Low,
-        Medium,
-        MediumHigh,
-        High
-    }
-    
-    #endregion
+        
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            var data = new Dictionary();
+            data["music_volume"] = _musicVolume;
+            data["battle_music_volume"] = _battleMusicVolume;
+            data["crossfade_duration"] = _crossfadeDuration;
+            return data;
+        }
 
-    /// <summary>
-    /// 导出保存数据
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        var data = new Dictionary();
-        data["music_volume"] = _musicVolume;
-        data["battle_music_volume"] = _battleMusicVolume;
-        data["crossfade_duration"] = _crossfadeDuration;
-        return data;
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+            if (data.Contains("music_volume")) _musicVolume = (float)data["music_volume"];
+            if (data.Contains("battle_music_volume")) _battleMusicVolume = (float)data["battle_music_volume"];
+            if (data.Contains("crossfade_duration")) _crossfadeDuration = (float)data["crossfade_duration"];
+        }
     }
 
-    /// <summary>
-    /// 导入保存数据
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        if (data == null) return;
-        if (data.Contains("music_volume")) _musicVolume = (float)data["music_volume"];
-        if (data.Contains("battle_music_volume")) _battleMusicVolume = (float)data["battle_music_volume"];
-        if (data.Contains("crossfade_duration")) _crossfadeDuration = (float)data["crossfade_duration"];
-    }
 }

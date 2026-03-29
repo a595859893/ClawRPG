@@ -149,7 +149,8 @@ public partial class SkillTreeResetUI : Control
         var data = SkillTreeResetData.Instance;
         
         // Update points and gold
-        _pointsLabel.Text = $"Available Points: {system.GetStatistics().TotalResets > 0 && data.FreeResetsRemaining == 0 ? "N/A" : "10"}";
+        string pointsText = system.GetStatistics().TotalResets > 0 && data.FreeResetsRemaining == 0 ? "N/A" : "10";
+        _pointsLabel.Text = $"Available Points: {pointsText}";
         _goldLabel.Text = $"Gold: 10000";
         
         // Update cost

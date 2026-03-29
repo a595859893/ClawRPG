@@ -110,24 +110,19 @@ namespace ClawRPG.Scripts
             if (summon == null) return false;
 
             if (summon.LevelRequirement > playerLevel)
-                return false;
-
+    
             if (_playerData.ActiveSummons.Count >= _playerData.MaxActiveSummons)
-                return false;
-
+    
             var unlocked = _playerData.UnlockedSummons.FirstOrDefault(s => s.SummonId == summonId);
             if (unlocked == null)
-                return false;
-
+    
             var active = _playerData.ActiveSummons.FirstOrDefault(a => a.SummonId == summonId && a.State == SummonState.Active);
             if (active != null)
-                return false;
-
+    
             // Check cooldown
             var onCooldown = _playerData.ActiveSummons.FirstOrDefault(a => a.SummonId == summonId && a.State == SummonState.Cooldown);
             if (onCooldown != null && DateTime.Now < onCooldown.CooldownEnd)
-                return false;
-
+    
             var newActive = new ActiveSummon
             {
                 SummonId = summonId,
@@ -414,7 +409,6 @@ namespace ClawRPG.Scripts
             if (data.ContainsKey("statistics"))
                 _statistics = (SummonStatistics)data["statistics"];
             return true;
-            return false;
         }
     }
 }

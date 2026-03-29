@@ -41,7 +41,7 @@ public class BossRushDatabase
         }},
         { 9, new List<BossRushBoss> {
             new BossRushBoss { Name = "Demon Emperor", Health = 50000, Attack = 620, Defense = 250, Speed = 115, Experience = 7500, Gold = 4000 },
-            BossRushBoss { Name = "Abyss Walker", Health = 48000, Attack = 650, Defense = 230, Speed = 135, Experience = 8000, Gold = 4200 }
+            new BossRushBoss { Name = "Abyss Walker", Health = 48000, Attack = 650, Defense = 230, Speed = 135, Experience = 8000, Gold = 4200 }
         }},
         { 10, new List<BossRushBoss> {
             new BossRushBoss { Name = "World Eater", Health = 80000, Attack = 700, Defense = 300, Speed = 120, Experience = 15000, Gold = 10000 },

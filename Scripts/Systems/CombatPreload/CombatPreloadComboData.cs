@@ -54,6 +54,7 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
     {
         Hidden,
         Showing,
+        CountingDown, // REQ-121: 确认后倒计时中，可换Combo（消耗Combo Point）
         Confirmed,
         Cancelled
     }

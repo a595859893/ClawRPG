@@ -424,3 +424,4 @@ namespace ClawRPG.Scripts.Systems {
                 _data.TotalExperience = (int)totalExp;
         }
     }
+}

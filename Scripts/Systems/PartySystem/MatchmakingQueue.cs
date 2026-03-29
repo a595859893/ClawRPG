@@ -475,4 +475,5 @@ namespace ClawRPG.Systems
             _averageWaitTime = (float)data.GetValueOrDefault("average_wait_time", 0f);
         }
     }
+    #endregion
 }

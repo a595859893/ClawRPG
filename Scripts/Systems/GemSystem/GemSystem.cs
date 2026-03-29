@@ -412,3 +412,5 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
                 _playerGemData.EquipmentSlots[key.ToString()] = slots;
             }
         }
+}
+}

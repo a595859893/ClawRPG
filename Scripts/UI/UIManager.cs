@@ -54,7 +54,7 @@ namespace ClawRPG.Scripts.UI
             // 创建 UI 根节点
             _uiRoot = new Control();
             _uiRoot.Name = "UIRoot";
-            _uiRoot.Set AnchorsPreset(Control.LayoutPreset.FullRect);
+            _uiRoot.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             _canvasLayer.AddChild(_uiRoot);
             
             // 初始化基础 UI

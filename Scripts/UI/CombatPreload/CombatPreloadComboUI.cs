@@ -21,6 +21,11 @@ public partial class CombatPreloadComboUI : Control
     private Button _cancelButton;
     private Label _comboLevelLabel;
     
+    // REQ-121: Buyback UI elements
+    private Label _countdownLabel;
+    private Label _comboPointLabel;
+    private HBoxContainer _countdownBox;
+    
     // 状态
     private string _selectedComboId = null;
     private bool _isVisible = false;
@@ -84,9 +89,32 @@ public partial class CombatPreloadComboUI : Control
         _comboLevelLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.6f));
         headerBox.AddChild(_comboLevelLabel);
         
+        // REQ-121: Combo Point display
+        _comboPointLabel = new Label();
+        _comboPointLabel.Text = "🔄 Combo Point: 1";
+        _comboPointLabel.AddThemeFontSizeOverride("font_size", 16);
+        _comboPointLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.7f, 0.2f));
+        headerBox.AddChild(_comboPointLabel);
+        
+        // REQ-121: Countdown box (hidden by default)
+        _countdownBox = new HBoxContainer();
+        _countdownBox.Visible = false;
+        headerBox.AddChild(_countdownBox);
+        
+        var countdownIcon = new Label();
+        countdownIcon.Text = "⏱️ ";
+        countdownIcon.AddThemeFontSizeOverride("font_size", 16);
+        _countdownBox.AddChild(countdownIcon);
+        
+        _countdownLabel = new Label();
+        _countdownLabel.Text = "3.0s";
+        _countdownLabel.AddThemeFontSizeOverride("font_size", 18);
+        _countdownLabel.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0.2f));
+        _countdownBox.AddChild(_countdownLabel);
+        
         // 副标题
         _subtitleLabel = new Label();
-        _subtitleLabel.Text = "选择本场战斗计划使用的Combo，确认后再进入战斗";
+        _subtitleLabel.Text = "选择本场战斗计划使用的Combo，确认后有3秒倒计时可更换（消耗Combo Point）";
         _subtitleLabel.AddThemeFontSizeOverride("font_size", 14);
         _subtitleLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
         _subtitleLabel.AutowrapMode = TextServer.AutowrapMode.Word;
@@ -129,6 +157,8 @@ public partial class CombatPreloadComboUI : Control
         CombatPreloadComboSystem.OnPreloadStateChanged += _OnStateChanged;
         CombatPreloadComboSystem.OnCombosUpdated += _OnCombosUpdated;
         CombatPreloadComboSystem.OnComboConfirmed += _OnComboConfirmed;
+        CombatPreloadComboSystem.OnComboPointChanged += _OnComboPointChanged; // REQ-121
+        CombatPreloadComboSystem.OnCountdownTick += _OnCountdownTick; // REQ-121
     }
 
     private void _OnStateChanged(CombatPreloadState state)
@@ -138,19 +168,98 @@ public partial class CombatPreloadComboUI : Control
             case CombatPreloadState.Showing:
                 Visible = true;
                 _isVisible = true;
+                _countdownBox.Visible = false;
                 _RefreshUI();
+                break;
+            case CombatPreloadState.CountingDown: // REQ-121
+                _countdownBox.Visible = true;
+                _UpdateComboPointDisplay();
+                _UpdateConfirmButtonText();
                 break;
             case CombatPreloadState.Hidden:
             case CombatPreloadState.Cancelled:
                 Visible = false;
                 _isVisible = false;
                 _selectedComboId = null;
+                _countdownBox.Visible = false;
                 break;
             case CombatPreloadState.Confirmed:
                 // 确认后隐藏
                 Visible = false;
                 _isVisible = false;
+                _countdownBox.Visible = false;
                 break;
+        }
+    }
+
+    // REQ-121: Combo Point changed handler
+    private void _OnComboPointChanged(int points)
+    {
+        _UpdateComboPointDisplay();
+        _UpdateConfirmButtonText();
+        // 刷新列表以更新按钮状态（禁用/启用）
+        if (_preloadSystem != null)
+        {
+            _RebuildComboList(_preloadSystem.GetAvailableCombos());
+        }
+    }
+
+    // REQ-121: Countdown tick handler
+    private void _OnCountdownTick(float secondsRemaining)
+    {
+        _countdownLabel.Text = $"{secondsRemaining:F1}s";
+        // Flash effect when time is low
+        if (secondsRemaining <= 1.5f)
+        {
+            _countdownLabel.AddThemeColorOverride("font_color", new Color(1f, 0.3f, 0.3f));
+        }
+        else if (secondsRemaining <= 2.5f)
+        {
+            _countdownLabel.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0.2f));
+        }
+    }
+
+    // REQ-121: Update Combo Point display
+    private void _UpdateComboPointDisplay()
+    {
+        if (_preloadSystem != null)
+        {
+            int points = _preloadSystem.GetComboPoint();
+            _comboPointLabel.Text = $"🔄 Combo Point: {points}";
+            // Change color when out of points
+            if (points <= 0)
+            {
+                _comboPointLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+            }
+            else
+            {
+                _comboPointLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.7f, 0.2f));
+            }
+        }
+    }
+
+    // REQ-121: Update confirm button text based on state
+    private void _UpdateConfirmButtonText()
+    {
+        if (_preloadSystem == null) return;
+        
+        if (_preloadSystem.GetState() == CombatPreloadState.CountingDown)
+        {
+            int points = _preloadSystem.GetComboPoint();
+            if (points <= 0)
+            {
+                _confirmButton.Text = "等待锁定...";
+                _confirmButton.Disabled = true;
+            }
+            else
+            {
+                _confirmButton.Text = "立即进入战斗";
+            }
+        }
+        else
+        {
+            _confirmButton.Text = "确认并进入战斗";
+            _confirmButton.Disabled = false;
         }
     }
 
@@ -333,10 +442,36 @@ public partial class CombatPreloadComboUI : Control
         footerBox.AddChild(rewardLabel);
         
         // 点击选择
+        // REQ-121: Disable buyback button when Combo Point is 0 during countdown
+        bool isCountingDown = _preloadSystem != null && _preloadSystem.GetState() == CombatPreloadState.CountingDown;
+        bool noComboPoint = _preloadSystem != null && _preloadSystem.GetComboPoint() <= 0;
+        bool isPendingCombo = _preloadSystem != null && _preloadSystem.GetPendingComboId() == combo.ComboId;
+        
         var selectBtn = new Button();
         selectBtn.CustomMinimumSize = new Vector2(80, 28);
-        selectBtn.Text = _selectedComboId == combo.ComboId ? "已选择" : "选择";
-        selectBtn.Pressed += () => _OnComboCardSelected(combo.ComboId);
+        if (isPendingCombo && isCountingDown)
+        {
+            selectBtn.Text = "锁定中";
+            selectBtn.Disabled = true;
+        }
+        else if (isCountingDown && noComboPoint)
+        {
+            selectBtn.Text = "无Point";
+            selectBtn.Disabled = true;
+        }
+        else if (_selectedComboId == combo.ComboId && !isCountingDown)
+        {
+            selectBtn.Text = "已选择";
+        }
+        else
+        {
+            selectBtn.Text = isCountingDown ? "更换" : "选择";
+        }
+        
+        if (!selectBtn.Disabled)
+        {
+            selectBtn.Pressed += () => _OnComboCardSelected(combo.ComboId);
+        }
         
         var btnContainer = new HBoxContainer();
         btnContainer.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
@@ -362,7 +497,21 @@ public partial class CombatPreloadComboUI : Control
     private void _OnComboCardSelected(string comboId)
     {
         _selectedComboId = comboId;
-        _preloadSystem.ConfirmCombo(comboId);
+        
+        // REQ-121: If already counting down, this is a buyback (costs 1 Combo Point)
+        if (_preloadSystem != null && _preloadSystem.GetState() == CombatPreloadState.CountingDown)
+        {
+            if (_preloadSystem.GetComboPoint() <= 0)
+            {
+                GD.Print("[CombatPreloadComboUI] No Combo Point remaining for buyback");
+                return;
+            }
+            _preloadSystem.BuybackCombo(comboId);
+        }
+        else
+        {
+            _preloadSystem.ConfirmCombo(comboId);
+        }
         
         // 刷新列表以更新按钮状态
         if (_preloadSystem != null)
@@ -394,6 +543,8 @@ public partial class CombatPreloadComboUI : Control
             CombatPreloadComboSystem.OnPreloadStateChanged -= _OnStateChanged;
             CombatPreloadComboSystem.OnCombosUpdated -= _OnCombosUpdated;
             CombatPreloadComboSystem.OnComboConfirmed -= _OnComboConfirmed;
+            CombatPreloadComboSystem.OnComboPointChanged -= _OnComboPointChanged;
+            CombatPreloadComboSystem.OnCountdownTick -= _OnCountdownTick;
         }
     }
 }

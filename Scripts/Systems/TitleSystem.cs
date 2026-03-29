@@ -578,3 +578,4 @@ public class TitleSystem : BaseSystem
             _totalTitlesUnlocked = Convert.ToInt32(data["total_titles_unlocked"]);
     }
 }
+}

@@ -383,6 +383,3 @@ public class ItemSmeltingUI : Control
         PopulateRecipes();
     }
 }
-
-// Required using statements
-using Godot;

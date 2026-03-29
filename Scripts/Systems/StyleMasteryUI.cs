@@ -322,6 +322,5 @@ public class StyleMasteryUI : Control
         {
             Hide();
         }
-    }
 }
 }

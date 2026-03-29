@@ -323,8 +323,3 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         }
     }
 }
-         }
-            }
-        }
-    }
-}

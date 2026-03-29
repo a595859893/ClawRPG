@@ -126,7 +126,7 @@ namespace ClawRPG.Scripts.Systems
         /// Attempt to craft using the specified recipe.
         /// </summary>
         /// <param name="recipeId">Recipe ID.</param>
-        <param name="itemId">Output parameter, ID of the crafted item on success.</param>
+        /// <param name="itemId">Output parameter, ID of the crafted item on success.</param>
         /// <param name="quantity">Output parameter, quantity of the crafted item on success.</param>
         /// <param name="message">Output parameter, result message of the operation.</param>
         /// <returns>Returns true if craft succeeded, otherwise false.</returns>

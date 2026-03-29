@@ -540,7 +540,3 @@ public class CharacterCreationUI : Control
         }
     }
 }
-ggle();
-        }
-    }
-}

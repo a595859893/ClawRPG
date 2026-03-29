@@ -38,11 +38,19 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
         private ProceduralDungeonSystem _dungeonSystem;
         private EnemyLifecycleManager _enemyLifecycleManager;
         
+        // REQ-121: Combo Buyback
+        private int _comboPoint = 1;
+        private float _countdownTimer = 0f;
+        private const float COUNTDOWN_SECONDS = 3f;
+        private string _pendingComboId = null;
+
         // Signals
         public static Action<CombatPreloadState> OnPreloadStateChanged;
         public static Action<List<CombatPreloadComboEntry>> OnCombosUpdated;
         public static Action<string> OnComboConfirmed; // confirmed comboId
         public static Action OnCombatEntered; // player confirmed and wants to start combat
+        public static Action<int> OnComboPointChanged; // REQ-121: combo point changed
+        public static Action<float> OnCountdownTick; // REQ-121: countdown seconds remaining
 
         public override void _Ready()
         {
@@ -74,6 +82,44 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
             GD.Print("[CombatPreloadComboSystem] Initialized");
         }
 
+        // REQ-121: Countdown timer
+        public override void _Process(float delta)
+        {
+            if (_state != CombatPreloadState.CountingDown)
+                return;
+            
+            _countdownTimer -= delta;
+            if (_countdownTimer <= 0f)
+            {
+                _countdownTimer = 0f;
+                // Countdown expired — lock in the pending combo
+                _LockInCombo();
+            }
+            else
+            {
+                OnCountdownTick?.Invoke(_countdownTimer);
+            }
+        }
+
+        /// <summary>
+        /// REQ-121: Lock in the pending combo after countdown expires
+        /// </summary>
+        private void _LockInCombo()
+        {
+            if (string.IsNullOrEmpty(_pendingComboId))
+            {
+                GD.PrintWrn("[CombatPreloadComboSystem] Countdown expired but no pending combo");
+                _state = CombatPreloadState.Confirmed;
+                OnPreloadStateChanged?.Invoke(_state);
+                OnCombatEntered?.Invoke();
+                return;
+            }
+            
+            _state = CombatPreloadState.Confirmed;
+            OnPreloadStateChanged?.Invoke(_state);
+            GD.Print($"[CombatPreloadComboSystem] Combo locked after countdown: {_pendingComboId}");
+        }
+
         /// <summary>
         /// 请求显示战斗前预览
         /// </summary>
@@ -86,6 +132,10 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
             }
             
             _LoadAvailableCombos();
+            _comboPoint = 1; // REQ-121: reset combo point per battle
+            _countdownTimer = 0f;
+            _pendingComboId = null;
+            OnComboPointChanged?.Invoke(_comboPoint);
             _state = CombatPreloadState.Showing;
             OnPreloadStateChanged?.Invoke(_state);
             OnCombosUpdated?.Invoke(_availableCombos);
@@ -191,31 +241,71 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
         }
 
         /// <summary>
-        /// 确认选择某个Combo作为本场战斗的计划
+        /// 确认选择某个Combo作为本场战斗的计划，开始3秒倒计时（REQ-121）
         /// </summary>
         public void ConfirmCombo(string comboId)
         {
-            if (_state != CombatPreloadState.Showing)
+            if (_state != CombatPreloadState.Showing && _state != CombatPreloadState.CountingDown)
             {
-                GD.PrintWrn("[CombatPreloadComboSystem] Cannot confirm when not showing");
+                GD.PrintWrn($"[CombatPreloadComboSystem] Cannot confirm when state is {_state}");
                 return;
             }
             
-            _state = CombatPreloadState.Confirmed;
+            _pendingComboId = comboId;
+            _countdownTimer = COUNTDOWN_SECONDS;
+            _state = CombatPreloadState.CountingDown;
             OnPreloadStateChanged?.Invoke(_state);
             OnComboConfirmed?.Invoke(comboId);
+            OnCountdownTick?.Invoke(_countdownTimer);
             
-            GD.Print($"[CombatPreloadComboSystem] Combo confirmed: {comboId}");
+            GD.Print($"[CombatPreloadComboSystem] Combo countdown started: {comboId} ({COUNTDOWN_SECONDS}s)");
         }
+
+        /// <summary>
+        /// REQ-121: 倒计时期间更换Combo，消耗1个Combo Point
+        /// </summary>
+        public void BuybackCombo(string newComboId)
+        {
+            if (_state != CombatPreloadState.CountingDown)
+            {
+                GD.PrintWrn($"[CombatPreloadComboSystem] Buyback only allowed during countdown, current state: {_state}");
+                return;
+            }
+            
+            if (_comboPoint <= 0)
+            {
+                GD.PrintWrn("[CombatPreloadComboSystem] No Combo Point remaining for buyback");
+                return;
+            }
+            
+            _comboPoint--;
+            _pendingComboId = newComboId;
+            _countdownTimer = COUNTDOWN_SECONDS; // Reset countdown
+            OnComboPointChanged?.Invoke(_comboPoint);
+            OnComboConfirmed?.Invoke(newComboId);
+            OnCountdownTick?.Invoke(_countdownTimer);
+            
+            GD.Print($"[CombatPreloadComboSystem] Combo buyback: {newComboId}, remaining Combo Point: {_comboPoint}");
+        }
+
+        /// <summary>
+        /// REQ-121: 获取当前剩余Combo Point
+        /// </summary>
+        public int GetComboPoint() => _comboPoint;
+
+        /// <summary>
+        /// REQ-121: 获取当前pending的comboId
+        /// </summary>
+        public string GetPendingComboId() => _pendingComboId;
 
         /// <summary>
         /// 确认并进入战斗（使用默认/无特定Combo）
         /// </summary>
         public void ConfirmAndEnterCombat()
         {
-            if (_state != CombatPreloadState.Showing)
+            if (_state != CombatPreloadState.Showing && _state != CombatPreloadState.CountingDown)
             {
-                GD.PrintWrn("[CombatPreloadComboSystem] Cannot enter combat when not showing");
+                GD.PrintWrn("[CombatPreloadComboSystem] Cannot enter combat when not showing or counting down");
                 return;
             }
             
@@ -267,9 +357,10 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
         private void OnCombatStarted(object[] args)
         {
             // 战斗开始时关闭预览
-            if (_state == CombatPreloadState.Showing)
+            if (_state == CombatPreloadState.Showing || _state == CombatPreloadState.CountingDown)
             {
                 _state = CombatPreloadState.Hidden;
+                _countdownTimer = 0f;
             }
         }
         

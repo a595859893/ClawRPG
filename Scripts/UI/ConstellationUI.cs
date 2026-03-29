@@ -49,7 +49,7 @@ public class ConstellationUI : Control
     {
         // Main panel
         var mainPanel = new PanelContainer();
-        mainPanel.SetAnchorsPreset(Control Preset.Center);
+        mainPanel.SetAnchorsPreset(Control.Preset.Center);
         mainPanel.CustomMinimumSize = new Vector2(900, 600);
         AddChild(mainPanel);
         

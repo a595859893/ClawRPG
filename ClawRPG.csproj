@@ -3,4 +3,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <OutputPath>bin/</OutputPath>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Templates are meant to be copied, not compiled -->
+    <Compile Remove="Templates/**" />
+  </ItemGroup>
 </Project>

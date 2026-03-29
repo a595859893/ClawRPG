@@ -48,7 +48,7 @@ public class PetEvolutionUI : Control
 
         // Tab container
         _tabContainer = new TabContainer();
-        _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags Vertical);
+        _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Vertical);
         _mainContainer.AddChild(_tabContainer);
 
         // Create tabs

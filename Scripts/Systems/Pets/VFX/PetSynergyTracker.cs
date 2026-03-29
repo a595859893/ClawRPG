@@ -100,8 +100,6 @@ namespace ClawRPG.Scripts.Systems.Pets.VFX {
             GD.Print($"[PetSynergyTracker] Synergy triggered! +{synergyDamageBonus * 100}% damage for {synergyDuration}s");
             UpdateSynergyUI();
         }
-            }
-        }
 
         private void ShowSynergyVFX() {
             // 通知 UI 显示金色爆发特效

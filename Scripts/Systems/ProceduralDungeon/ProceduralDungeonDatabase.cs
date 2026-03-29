@@ -167,7 +167,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
                 {
                     RoomTemplates[roomType] = new List<RoomTemplate>
                     {
-                        new RoomTemplate { TemplateId = $"{roomType.ToString().ToLower()}_default`, Width = 15, Height = 15, Description = $"{roomType} room" }
+                        new RoomTemplate { TemplateId = $"{roomType.ToString().ToLower()}_default", Width = 15, Height = 15, Description = $"{roomType} room" }
                     };
                 }
             }

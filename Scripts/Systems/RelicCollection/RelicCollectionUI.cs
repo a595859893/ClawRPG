@@ -292,8 +292,8 @@ namespace ClawRPG.Systems.Relics
             var filteredRelics = GetFilteredRelics();
             
             Console.WriteLine($"📦 Collection ({filteredRelics.Count} / {RelicCollectionDatabase.Relics.Count} unlocked)");
-            Console.WriteLine($"   [F] Filter Rarity: {(_filterRarity?.ToString() ?? "All"))}");
-            Console.WriteLine($"   [T] Filter Type: {(_filterType?.ToString() ?? "All"))}");
+            Console.WriteLine($"   [F] Filter Rarity: {(_filterRarity?.ToString() ?? "All")}");
+            Console.WriteLine($"   [T] Filter Type: {(_filterType?.ToString() ?? "All")}");
             Console.WriteLine();
             
             Console.WriteLine("┌─ RELICS ──────────────────────────────────────────────────┐");

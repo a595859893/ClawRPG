@@ -113,7 +113,5 @@ namespace ClawRPG.Systems.MultiplayerVote
             
             GD.Print($"[{SystemName}] All data reset");
         }
-
-        #endregion
     }
 }

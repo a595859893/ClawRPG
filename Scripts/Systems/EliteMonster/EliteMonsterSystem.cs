@@ -326,3 +326,4 @@ namespace ClawRPG.Scripts.Systems
         _data.AncientsSpawned = (int)(data.GetValueOrDefault("ancients_spawned", 0));
     }
 }
+}

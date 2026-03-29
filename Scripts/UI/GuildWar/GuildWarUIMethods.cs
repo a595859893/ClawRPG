@@ -518,8 +518,8 @@ namespace ClawRPG.Core.Systems.GuildWar
             {
                 // Ctrl+Shift+G - Toggle Guild War UI
                 if (keyEvent.Keycode == Key.G && 
-                    keyEvent.ModifierMask.HasFlag(KeyModifierMask Ctrl) &&
-                    keyEvent.ModifierMask.HasFlag(KeyModifierMask Shift))
+                    keyEvent.ModifierMask.HasFlag(KeyModifierMask.Ctrl) &&
+                    keyEvent.ModifierMask.HasFlag(KeyModifierMask.Shift))
                 {
                     ToggleUI();
                     GetViewport().SetInputAsHandled();

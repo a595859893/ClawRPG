@@ -22,7 +22,7 @@ namespace ClawRPG.Core.Systems
         RareSpawn,         // Rare creature spawns
         ResourceBurst,     // Resource nodes spawn
         Portal,            // Mysterious portal appears
-        NPC rescue         // Need to rescue NPC
+        NpcRescue         // Need to rescue NPC
     }
 
     /// <summary>

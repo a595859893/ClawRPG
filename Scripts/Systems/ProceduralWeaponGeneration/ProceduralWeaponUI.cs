@@ -81,7 +81,6 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             var generatorTab = new Control();
             generatorTab.Name = "Generator";
             _tabContainer.AddChild(generatorTab);
-);
             SetupGeneratorTab(generatorTab);
             
             // History tab

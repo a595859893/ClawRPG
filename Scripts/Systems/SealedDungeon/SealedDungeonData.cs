@@ -21,7 +21,7 @@ namespace ClawRPG.Systems.SealedDungeon {
         DragonLair,
         VoidPortal,
         CelestialGarden,
-        Eternal throne
+        EternalThrone
     }
 
     public class SealedDungeonData {

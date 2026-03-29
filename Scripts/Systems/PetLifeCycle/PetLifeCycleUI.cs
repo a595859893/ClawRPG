@@ -24,7 +24,7 @@ public class PetLifeCycleUI : Control
     {
         // 主容器
         var mainPanel = new PanelContainer();
-        mainPanel.SetAnchorsPreset(Control Preset.Center);
+        mainPanel.SetAnchorsPreset(Control.Preset.Center);
         mainPanel.CustomMinimumSize = new Vector2(800, 600);
         AddChild(mainPanel);
         
@@ -40,7 +40,7 @@ public class PetLifeCycleUI : Control
         
         // Tab容器
         _tabContainer = new TabContainer();
-        _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags Vertical);
+        _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Vertical);
         mainVBox.AddChild(_tabContainer);
         
         // 创建标签页
@@ -131,7 +131,7 @@ public class PetLifeCycleUI : Control
         
         // 宠物树形列表
         _petsTree = new Tree();
-        _petsTree.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags Vertical);
+        _petsTree.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Vertical);
         _petsTree.HideRoot = true;
         _petsTab.AddChild(_petsTree);
         

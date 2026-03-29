@@ -47,20 +47,20 @@ public class EnemyWeaknessUI : Control
     private void SetupUI()
     {
         // 主容器
-        var mainContainer = VBoxContainer.new();
+        var mainContainer = VBoxContainernew;
         mainContainer.SetAnchorsPreset(Control.LayoutPreset.Center);
         mainContainer.CustomMinimumSize = new Vector2(600, 500);
         AddChild(mainContainer);
 
         // 标题
-        _titleLabel = Label.new();
+        _titleLabel = Labelnew;
         _titleLabel.Text = "🎯 Enemy Weakness System";
         _titleLabel.Align = Label.AlignEnum.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainContainer.AddChild(_titleLabel);
 
         // Tab 容器
-        _tabContainer = TabContainer.new();
+        _tabContainer = TabContainernew;
         _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         mainContainer.AddChild(_tabContainer);
@@ -71,13 +71,13 @@ public class EnemyWeaknessUI : Control
         CreateStatisticsTab();
 
         // 测试按钮
-        var testButton = Button.new();
+        var testButton = Buttonnew;
         testButton.Text = "🧪 Test Weakness System";
         testButton.Pressed += () => OnTestButtonPressed();
         mainContainer.AddChild(testButton);
 
         // 关闭提示
-        var hintLabel = Label.new();
+        var hintLabel = Labelnew;
         hintLabel.Text = "Press ESC to close";
         hintLabel.Align = Label.AlignEnum.Center;
         hintLabel.AddThemeFontSizeOverride("font_size", 14);
@@ -86,21 +86,21 @@ public class EnemyWeaknessUI : Control
 
     private void CreateWeaknessListTab()
     {
-        var tab = VBoxContainer.new();
+        var tab = VBoxContainernew;
         tab.Name = "Weakness List";
         _tabContainer.AddChild(tab);
 
-        var title = Label.new();
+        var title = Labelnew;
         title.Text = "📋 All Weakness Types";
         title.AddThemeFontSizeOverride("font_size", 18);
         title.Align = Label.AlignEnum.Center;
         tab.AddChild(title);
 
-        var scroll = ScrollContainer.new();
+        var scroll = ScrollContainernew;
         scroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         tab.AddChild(scroll);
 
-        var list = VBoxContainer.new();
+        var list = VBoxContainernew;
         scroll.AddChild(list);
 
         // 显示所有弱点类型
@@ -108,7 +108,7 @@ public class EnemyWeaknessUI : Control
         {
             foreach (var weakness in _database.AllWeaknesses.Values)
             {
-                var item = Label.new();
+                var item = Labelnew;
                 item.Text = $"[{weakness.Type}] {weakness.Element}: {weakness.Description}";
                 list.AddChild(item);
             }
@@ -117,22 +117,22 @@ public class EnemyWeaknessUI : Control
 
     private void CreateEnemyInfoTab()
     {
-        var tab = VBoxContainer.new();
+        var tab = VBoxContainernew;
         tab.Name = "Enemy Info";
         _tabContainer.AddChild(tab);
 
-        var title = Label.new();
+        var title = Labelnew;
         title.Text = "👹 Enemy Weakness Info";
         title.AddThemeFontSizeOverride("font_size", 18);
         title.Align = Label.AlignEnum.Center;
         tab.AddChild(title);
 
         // 敌人选择
-        var enemySelectLabel = Label.new();
+        var enemySelectLabel = Labelnew;
         enemySelectLabel.Text = "Select Enemy:";
         tab.AddChild(enemySelectLabel);
 
-        var enemyOptionButton = OptionButton.new();
+        var enemyOptionButton = OptionButtonnew;
         enemyOptionButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         foreach (var enemy in _testEnemies)
         {
@@ -142,24 +142,24 @@ public class EnemyWeaknessUI : Control
         tab.AddChild(enemyOptionButton);
 
         // 弱点信息显示
-        _enemyList = VBoxContainer.new();
+        _enemyList = VBoxContainernew;
         _enemyList.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         tab.AddChild(_enemyList);
     }
 
     private void CreateStatisticsTab()
     {
-        var tab = VBoxContainer.new();
+        var tab = VBoxContainernew;
         tab.Name = "Statistics";
         _tabContainer.AddChild(tab);
 
-        var title = Label.new();
+        var title = Labelnew;
         title.Text = "📊 Weakness Statistics";
         title.AddThemeFontSizeOverride("font_size", 18);
         title.Align = Label.AlignEnum.Center;
         tab.AddChild(title);
 
-        _statisticsPanel = VBoxContainer.new();
+        _statisticsPanel = VBoxContainernew;
         _statisticsPanel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         tab.AddChild(_statisticsPanel);
 
@@ -180,7 +180,7 @@ public class EnemyWeaknessUI : Control
         }
 
         // 显示弱点
-        var weaknessTitle = Label.new();
+        var weaknessTitle = Labelnew;
         weaknessTitle.Text = "⚔️ Weaknesses:";
         weaknessTitle.AddThemeFontSizeOverride("font_size", 16);
         _enemyList.AddChild(weaknessTitle);
@@ -188,7 +188,7 @@ public class EnemyWeaknessUI : Control
         var weaknesses = _database.GetEnemyWeaknesses(enemyType);
         if (weaknesses.Count == 0)
         {
-            var noWeakness = Label.new();
+            var noWeakness = Labelnew;
             noWeakness.Text = "  No known weaknesses";
             _enemyList.AddChild(noWeakness);
         }
@@ -196,14 +196,14 @@ public class EnemyWeaknessUI : Control
         {
             foreach (var weakness in weaknesses)
             {
-                var item = Label.new();
+                var item = Labelnew;
                 item.Text = $"  • {weakness.Element}: {weakness.Description}";
                 _enemyList.AddChild(item);
             }
         }
 
         // 显示抗性
-        var resistanceTitle = Label.new();
+        var resistanceTitle = Labelnew;
         resistanceTitle.Text = "🛡️ Resistances:";
         resistanceTitle.AddThemeFontSizeOverride("font_size", 16);
         _enemyList.AddChild(resistanceTitle);
@@ -211,7 +211,7 @@ public class EnemyWeaknessUI : Control
         var config = _database.GetEnemyWeaknessConfig(enemyType);
         if (config == null || config.ResistanceIDs.Count == 0)
         {
-            var noResistance = Label.new();
+            var noResistance = Labelnew;
             noResistance.Text = "  No known resistances";
             _enemyList.AddChild(noResistance);
         }
@@ -222,7 +222,7 @@ public class EnemyWeaknessUI : Control
                 var resistance = _database.GetWeaknessConfig(resistanceId);
                 if (resistance != null)
                 {
-                    var item = Label.new();
+                    var item = Labelnew;
                     item.Text = $"  • {resistance.Element}: {resistance.Description}";
                     _enemyList.AddChild(item);
                 }
@@ -233,7 +233,7 @@ public class EnemyWeaknessUI : Control
         var hint = _system.GetWeaknessHint(enemyType);
         if (!string.IsNullOrEmpty(hint))
         {
-            var hintLabel = Label.new();
+            var hintLabel = Labelnew;
             hintLabel.Text = $"💡 Hint: {hint}";
             hintLabel.AddThemeFontSizeOverride("font_size", 14);
             _enemyList.AddChild(hintLabel);
@@ -249,32 +249,32 @@ public class EnemyWeaknessUI : Control
 
         if (_data == null)
         {
-            var noData = Label.new();
+            var noData = Labelnew;
             noData.Text = "No statistics available";
             _statisticsPanel.AddChild(noData);
             return;
         }
 
         // 显示统计
-        var totalActivations = Label.new();
+        var totalActivations = Labelnew;
         totalActivations.Text = $"Total Weakness Activations: {_data.TotalWeaknessActivations}";
         _statisticsPanel.AddChild(totalActivations);
 
-        var totalBonus = Label.new();
+        var totalBonus = Labelnew;
         totalBonus.Text = $"Total Bonus Damage: {_data.TotalBonusDamage}";
         _statisticsPanel.AddChild(totalBonus);
 
         // 弱点类型使用统计
         if (_data.WeaknessTypeUsage.Count > 0)
         {
-            var typeTitle = Label.new();
+            var typeTitle = Labelnew;
             typeTitle.Text = "By Weakness Type:";
             typeTitle.AddThemeFontSizeOverride("font_size", 14);
             _statisticsPanel.AddChild(typeTitle);
 
             foreach (var kvp in _data.WeaknessTypeUsage)
             {
-                var item = Label.new();
+                var item = Labelnew;
                 item.Text = $"  {kvp.Key}: {kvp.Value}";
                 _statisticsPanel.AddChild(item);
             }
@@ -283,14 +283,14 @@ public class EnemyWeaknessUI : Control
         // 元素使用统计
         if (_data.ElementUsage.Count > 0)
         {
-            var elementTitle = Label.new();
+            var elementTitle = Labelnew;
             elementTitle.Text = "By Element:";
             elementTitle.AddThemeFontSizeOverride("font_size", 14);
             _statisticsPanel.AddChild(elementTitle);
 
             foreach (var kvp in _data.ElementUsage)
             {
-                var item = Label.new();
+                var item = Labelnew;
                 item.Text = $"  {kvp.Key}: {kvp.Value}";
                 _statisticsPanel.AddChild(item);
             }

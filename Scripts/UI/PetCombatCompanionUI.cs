@@ -757,7 +757,7 @@ namespace ClawRPG.Scripts.UI
             }
         }
 
-        private void ConnectSignals
+        private void ConnectSignals()
         {
             if (_companionSystem != null)
             {
