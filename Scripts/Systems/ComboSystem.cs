@@ -707,7 +707,23 @@ public class ComboSystem : BaseSystem
     /// 获取未发现的连击数量（用于显示"还有X个未知连击"）
     /// </summary>
     public int GetUndiscoveredCount() => _combos.Count - _discoveredComboIds.Count;
-    
+
+    /// <summary>
+    /// 强制发现一个 combo（用于狂暴奖励等系统强制给予 combo 的场景）
+    /// </summary>
+    public void ForceDiscoverCombo(string comboId)
+    {
+        if (_combos.ContainsKey(comboId))
+        {
+            _MaybeDiscoverCombo(comboId);
+            GD.Print($"[ComboSystem] Force-discovered combo: {comboId}");
+        }
+        else
+        {
+            GD.PrintErr($"[ComboSystem] ForceDiscoverCombo: comboId '{comboId}' not found in database!");
+        }
+    }
+
     // Getters
     
     /// <summary>

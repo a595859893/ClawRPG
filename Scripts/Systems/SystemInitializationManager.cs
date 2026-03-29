@@ -101,6 +101,8 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("combat", typeof(MeditationDatabase));
             RegisterSystemInGroup("combat", typeof(EnchantmentSystem));
             RegisterSystemInGroup("combat", typeof(BossMechanicsSystem));
+            RegisterSystemInGroup("combat", typeof(BossEnrageManager)); // REQ-155: 狂暴倒计时决策点
+            RegisterSystemInGroup("combat", typeof(ComboDropSystem)); // REQ-155: 狂暴传说Combo掉落
             RegisterSystemInGroup("combat", typeof(ProceduralDungeonSystem));
             RegisterSystemInGroup("combat", typeof(ArenaTournamentSystem));
             RegisterSystemInGroup("combat", typeof(MythicPlusDungeonSystem));

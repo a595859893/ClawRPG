@@ -1,0 +1,70 @@
+{
+  "req_id": "REQ-155",
+  "title": "Boss 狂暴倒计时作为决策点",
+  "status": "in_progress",
+  "broken_down_at": "2026-03-29",
+  "sub_tasks": [
+    {
+      "id": "REQ-155-01",
+      "title": "BossEnrageManager.cs 骨架 + 事件订阅",
+      "description": "新建 BossEnrageManager.cs 单例，订阅 BossPhaseSystem.BossEnraged 信号，在狂暴触发时计算并发射传说 combo 掉落事件",
+      "estimated_hours": 1,
+      "status": "pending"
+    },
+    {
+      "id": "REQ-155-02",
+      "title": "BossHealthBarUI 狂暴倒计时显示",
+      "description": "BossHealthBarUI 增加倒计时 Label（格式：'狂暴: X秒'），监听 BossPhaseSystem.BossEnrageProgressChanged 信号，实时更新倒计时",
+      "estimated_hours": 1,
+      "status": "pending"
+    },
+    {
+      "id": "REQ-155-03",
+      "title": "ComboDropSystem.cs 传说 Combo 掉落",
+      "description": "新建 ComboDropSystem.cs 单例，订阅 BossEnrageManager.OnEnragedComboDrop，PickRandomLegendaryCombo() 从已发现传说 combo 中随机选一张（无可用传说时 fallback 到 Epic），触发 ComboSystem.RegisterForcedCombo() 强制应用",
+      "estimated_hours": 1.5,
+      "status": "pending"
+    },
+    {
+      "id": "REQ-155-04",
+      "title": "集成到 BossPhaseSystem + Main.tscn",
+      "description": "BossEnrageManager 和 ComboDropSystem 注册到 SystemInitializationManager (combat 组)，Main.tscn 添加对应节点",
+      "estimated_hours": 0.5,
+      "status": "pending"
+    },
+    {
+      "id": "REQ-155-05",
+      "title": "狂暴奖励通知 UI",
+      "description": "狂暴触发后屏幕显示简短金色文字 '传说Combo已准备！'（复用现有通知机制），通知消失后 combo 自动进入预览",
+      "estimated_hours": 1,
+      "status": "pending"
+    }
+  ],
+  "data_structures": {
+    "BossEnrageManager": {
+      "fields": [
+        "_enrageCountdownSeconds: float",
+        "_lastEmittedComboDrop: bool (instance field for current battle)"
+      ],
+      "methods": ["Initialize()", "OnBossEnraged(instanceId)", "RequestComboDrop()", "PickRandomLegendaryCombo(): ComboData"]
+    },
+    "ComboDropSystem": {
+      "fields": ["_dropQueue: List<ComboData>"],
+      "methods": ["OnEnragedComboDrop(comboId)", "ProcessDropQueue()", "GetDropNotificationText(): string"]
+    }
+  },
+  "integration_points": [
+    "BossPhaseSystem.BossEnraged → BossEnrageManager.OnBossEnraged()",
+    "BossPhaseSystem.BossEnrageProgressChanged → BossHealthBarUI._OnEnrageProgressChanged()",
+    "BossEnrageManager.OnEnragedComboDrop → ComboDropSystem.OnEnragedComboDrop()"
+  ],
+  "acceptance_criteria": [
+    "狂暴触发时 BossEnrageProgressChanged 停止更新，倒计时 Label 变为 '狂暴已触发'",
+    "狂暴触发后必定掉落一张传说 Combo（通过 ComboDropSystem + ComboSystem.RegisterForcedCombo）",
+    "狂暴倒计时在 BossHealthBar 上实时显示（每秒更新）"
+  ],
+  "risks": [
+    "如果 ComboDatabase 中没有传说 combo，fallback 到 Epic 需要正确处理",
+    "ComboSystem.RegisterForcedCombo 需要确认 API 存在且可调用"
+  ]
+}
