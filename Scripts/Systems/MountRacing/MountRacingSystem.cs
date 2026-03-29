@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ClawRPG.Systems {
+namespace ClawRPG.Systems;
     public partial class MountRacingSystem : BaseSystem {
         private MountRacingData _data;
         private MountRacingDatabase _database;
@@ -237,5 +237,4 @@ namespace ClawRPG.Systems {
             _data.ImportSaveData(data);
         }
     }
-}
-} // namespace ClawRPG.Systems
+

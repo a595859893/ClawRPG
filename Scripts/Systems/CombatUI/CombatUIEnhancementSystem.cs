@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Systems.CombatUI;
 
-namespace ClawRPG.Systems
-{
+namespace ClawRPG.Systems;
     /// <summary>
     /// Combat UI Enhancement System - 战斗UI增强系统核心
     /// 动态血条、技能冷却动画、战斗状态指示器、连击计数器
@@ -421,5 +420,4 @@ namespace ClawRPG.Systems
         if (data == null) return;
         Load(data);
     }
-}
-} // namespace ClawRPG.Systems
+
