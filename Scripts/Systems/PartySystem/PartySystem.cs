@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ClawRPG.Scripts.Systems.PartySystem;
 
 namespace ClawRPG.Scripts.Systems
@@ -23,16 +24,12 @@ public class PartySystem : BaseSystem
     private Dictionary<string, PartyData.Party> _parties = new Dictionary<string, PartyData.Party>();
     private Dictionary<int, PartyData.PartyInvite> _pendingInvites = new Dictionary<int, PartyData.PartyInvite>();
     private Dictionary<int, PartyData.PlayerPartyData> _playerData = new Dictionary<int, PartyData.PlayerPartyData>();
-    
+    private Dictionary<int, string> _playerPartyCache = new Dictionary<int, string>();
+
     private int _nextPartyId = 1;
 
-    // PartyOperations service for party creation/join/leave/invite logic
     private PartyOperations _partyOperations;
-
-    // SocialRelations service for friend/blacklist/social data logic
     private SocialRelations _socialRelations;
-
-    // PartyPersistence service for save/load logic
     private PartyPersistenceManager _partyPersistence;
 
     public Signal PartyCreated { get; } = new Signal();
@@ -53,41 +50,30 @@ public class PartySystem : BaseSystem
 
     public void Initialize()
     {
-        // Initialize PartyOperations with data references and signals
         _partyOperations = new PartyOperations(
-            ref _parties,
-            ref _pendingInvites,
-            ref _playerData,
-            ref _nextPartyId,
-            PartyCreated,
-            PartyDisbanded,
-            PlayerJoinedParty,
-            PlayerLeftParty,
-            PlayerKicked,
-            InviteSent,
-            InviteAccepted,
-            InviteDeclined,
-            LeaderChanged,
-            StateChanged
+            ref _parties, ref _pendingInvites, ref _playerData, ref _nextPartyId,
+            PartyCreated, PartyDisbanded, PlayerJoinedParty, PlayerLeftParty,
+            PlayerKicked, InviteSent, InviteAccepted, InviteDeclined, LeaderChanged, StateChanged
         );
 
-        // Initialize SocialRelations with data references and signals
         _socialRelations = new SocialRelations(
-            ref _playerData,
-            FriendAdded,
-            FriendRemoved,
-            PlayerBlocked,
-            PlayerUnblocked
+            ref _playerData, FriendAdded, FriendRemoved, PlayerBlocked, PlayerUnblocked
         );
 
-        // Initialize PartyPersistence with data references
         _partyPersistence = new PartyPersistenceManager(
-            ref _parties,
-            ref _pendingInvites,
-            ref _playerData
+            ref _parties, ref _pendingInvites, ref _playerData
         );
 
         GD.Print("[PartySystem] Initialized");
+    }
+
+    /// <summary>Rebuilds O(1) playerId→partyId cache from current _parties state.</summary>
+    private void RebuildPartyCache()
+    {
+        _playerPartyCache.Clear();
+        foreach (var kvp in _parties)
+            foreach (var m in kvp.Value.Members)
+                _playerPartyCache[m.PlayerId] = kvp.Key;
     }
 
     public PartyData.Party CreateParty(int leaderId, string leaderName, PartyData.PartyType type, string partyName = "")
@@ -130,8 +116,6 @@ public class PartySystem : BaseSystem
         return _partyOperations.DeclineInvite(playerId);
     }
 
-    // ==================== Social Relations ====================
-
     public bool AddFriend(int playerId, int friendId)
     {
         return _socialRelations.AddFriend(playerId, friendId);
@@ -147,10 +131,7 @@ public class PartySystem : BaseSystem
         return _socialRelations.IsFriend(playerId, otherId);
     }
 
-    public List<int> GetFriends(int playerId)
-    {
-        return _socialRelations.GetFriends(playerId);
-    }
+    public List<int> GetFriends(int playerId) => _socialRelations.GetFriends(playerId);
 
     public bool BlockPlayer(int playerId, int blockedId)
     {
@@ -192,132 +173,91 @@ public class PartySystem : BaseSystem
         _socialRelations.ClearSocialData(playerId);
     }
 
-    // ==================== Member Status ====================
-
     public bool SetMemberReady(int playerId, bool ready)
     {
-        string partyId = GetPlayerPartyId(playerId);
-        if (string.IsNullOrEmpty(partyId) || !_parties.ContainsKey(partyId))
-            return false;
-
-        var party = _parties[partyId];
-        var member = party.Members.Find(m => m.PlayerId == playerId);
-        if (member == null)
+        if (!TryGetMember(playerId, out var party, out var member))
             return false;
 
         member.IsReady = ready;
-
-        // Check if all members are ready
-        if (party.State == PartyData.PartyState.Forming)
+        if (party.State == PartyData.PartyState.Forming
+            && party.Members.All(m => m.IsReady)
+            && party.Members.Count >= 2)
         {
-            bool allReady = true;
-            foreach (var m in party.Members)
-            {
-                if (!m.IsReady)
-                {
-                    allReady = false;
-                    break;
-                }
-            }
-
-            if (allReady && party.Members.Count >= 2)
-            {
-                party.State = PartyData.PartyState.Ready;
-                StateChanged.Emit(partyId, (int)party.State);
-            }
+            party.State = PartyData.PartyState.Ready;
+            StateChanged.Emit(GetPlayerPartyId(playerId), (int)party.State);
         }
-
         return true;
     }
 
     public bool SetMemberRole(int playerId, PartyData.MemberRole role)
     {
+        if (!TryGetMember(playerId, out _, out var member))
+            return false;
+
         string partyId = GetPlayerPartyId(playerId);
-        if (string.IsNullOrEmpty(partyId) || !_parties.ContainsKey(partyId))
-            return false;
-
-        var party = _parties[partyId];
-        var member = party.Members.Find(m => m.PlayerId == playerId);
-        if (member == null)
-            return false;
-
         member.Role = role;
         RoleChanged.Emit(partyId, playerId, (int)role);
-
         return true;
     }
 
     public bool UpdateMemberPosition(int playerId, float x, float y)
     {
-        string partyId = GetPlayerPartyId(playerId);
-        if (string.IsNullOrEmpty(partyId) || !_parties.ContainsKey(partyId))
-            return false;
-
-        var party = _parties[partyId];
-        var member = party.Members.Find(m => m.PlayerId == playerId);
-        if (member == null)
+        if (!TryGetMember(playerId, out _, out var member))
             return false;
 
         member.PositionX = x;
         member.PositionY = y;
         member.LastUpdate = DateTime.Now;
-
         return true;
     }
 
     public bool UpdateMemberHealth(int playerId, float healthPercent)
     {
-        string partyId = GetPlayerPartyId(playerId);
-        if (string.IsNullOrEmpty(partyId) || !_parties.ContainsKey(partyId))
-            return false;
-
-        var party = _parties[partyId];
-        var member = party.Members.Find(m => m.PlayerId == playerId);
-        if (member == null)
+        if (!TryGetMember(playerId, out _, out var member))
             return false;
 
         member.HealthPercent = healthPercent;
         member.IsOnline = healthPercent > 0;
         member.LastUpdate = DateTime.Now;
-
         return true;
     }
 
+    /// <summary>Returns partyId for playerId using O(1) cache; rebuilds cache on miss.</summary>
     public string GetPlayerPartyId(int playerId)
     {
-        foreach (var kvp in _parties)
-        {
-            foreach (var member in kvp.Value.Members)
-            {
-                if (member.PlayerId == playerId)
-                    return kvp.Key;
-            }
-        }
-        return "";
+        if (_playerPartyCache.TryGetValue(playerId, out var cached))
+            return cached;
+
+        RebuildPartyCache();
+        return _playerPartyCache.TryGetValue(playerId, out cached) ? cached : "";
+    }
+
+    /// <summary>Helper: finds player's party and member. Rebuilds cache on miss. Returns false if not found.</summary>
+    private bool TryGetMember(int playerId, out PartyData.Party party, out PartyData.PartyMember member)
+    {
+        string partyId = GetPlayerPartyId(playerId);
+        party = null;
+        member = null;
+        if (string.IsNullOrEmpty(partyId) || !_parties.TryGetValue(partyId, out party))
+            return false;
+
+        member = party.Members.Find(m => m.PlayerId == playerId);
+        return member != null;
     }
 
     public PartyData.Party GetParty(string partyId)
-    {
-        return _parties.ContainsKey(partyId) ? _parties[partyId] : null;
-    }
+        => _parties.TryGetValue(partyId, out var p) ? p : null;
 
     public PartyData.Party GetPlayerParty(int playerId)
-    {
-        string partyId = GetPlayerPartyId(playerId);
-        return string.IsNullOrEmpty(partyId) ? null : GetParty(partyId);
-    }
+        => _parties.TryGetValue(GetPlayerPartyId(playerId), out var p) ? p : null;
 
     public List<PartyData.Party> GetAvailableParties()
     {
-        var available = new List<PartyData.Party>();
-        foreach (var party in _parties.Values)
-        {
-            if (party.State == PartyData.PartyState.Forming && party.Members.Count < party.MaxMembers)
-            {
-                available.Add(party);
-            }
-        }
-        return available;
+        var result = new List<PartyData.Party>();
+        foreach (var p in _parties.Values)
+            if (p.State == PartyData.PartyState.Forming && p.Members.Count < p.MaxMembers)
+                result.Add(p);
+        return result;
     }
 
     public bool HasPendingInvite(int playerId)
@@ -330,52 +270,28 @@ public class PartySystem : BaseSystem
         return _pendingInvites.ContainsKey(playerId) ? _pendingInvites[playerId] : null;
     }
 
-    public float GetExpShareBonus(int playerId)
-    {
-        var party = GetPlayerParty(playerId);
-        return party != null ? party.ExpShareBonus : 0f;
-    }
+    public float GetExpShareBonus(int playerId)    => GetPartyBonus(playerId, p => p.ExpShareBonus);
+    public float GetDropRateBonus(int playerId)   => GetPartyBonus(playerId, p => p.DropRateBonus);
+    public float GetPartyDamageBonus(int playerId) => GetPartyBonus(playerId, p => p.DamageBonus);
+    public float GetPartyDefenseBonus(int playerId) => GetPartyBonus(playerId, p => p.DefenseBonus);
 
-    public float GetDropRateBonus(int playerId)
+    private float GetPartyBonus(int playerId, Func<PartyData.Party, float> selector)
     {
         var party = GetPlayerParty(playerId);
-        return party != null ? party.DropRateBonus : 0f;
-    }
-
-    public float GetPartyDamageBonus(int playerId)
-    {
-        var party = GetPlayerParty(playerId);
-        return party != null ? party.DamageBonus : 0f;
-    }
-
-    public float GetPartyDefenseBonus(int playerId)
-    {
-        var party = GetPlayerParty(playerId);
-        return party != null ? party.DefenseBonus : 0f;
+        return party != null ? selector(party) : 0f;
     }
 
     public PartyData.PlayerPartyData GetPlayerPartyData(int playerId)
     {
-        EnsurePlayerData(playerId);
-        return _playerData[playerId];
-    }
-
-    private void EnsurePlayerData(int playerId)
-    {
         if (!_playerData.ContainsKey(playerId))
-        {
             _playerData[playerId] = new PartyData.PlayerPartyData();
-        }
+        return _playerData[playerId];
     }
 
     /// <summary>
     /// 导出保存数据 - 继承自 BaseSystem
     /// </summary>
     public override Dictionary ExportSaveData() => _partyPersistence.ExportSaveData();
-
-    /// <summary>
-    /// 导入保存数据 - 继承自 BaseSystem
-    /// </summary>
     public override void ImportSaveData(Dictionary data) => _partyPersistence.ImportSaveData(data);
 }
 }
