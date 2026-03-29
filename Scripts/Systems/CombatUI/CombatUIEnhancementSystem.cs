@@ -422,3 +422,4 @@ namespace ClawRPG.Systems
         Load(data);
     }
 }
+} // namespace ClawRPG.Systems

@@ -1,3 +1,6 @@
+namespace ClawRPG.Scripts.Framework
+{
+
 using Godot;
 using System.Collections;
 using System.Linq;
@@ -173,3 +176,5 @@ public class GameManager : BaseSystem
     public override Dictionary ExportSaveData() => new();
     public override void ImportSaveData(Dictionary data) { }
 }
+
+} // namespace ClawRPG.Scripts.Framework

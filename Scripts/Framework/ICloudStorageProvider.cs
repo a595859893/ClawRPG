@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ClawRPG.Framework
+namespace ClawRPG.Scripts.Framework
 {
     /// <summary>
     /// 云存储提供商接口，支持 Steam Cloud、Local File 等多种实现

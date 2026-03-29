@@ -1,3 +1,6 @@
+namespace ClawRPG.Scripts.Framework
+{
+
 using System;
 using System.Threading;
 
@@ -192,3 +195,5 @@ public abstract class SingletonUI<T> : Godot.Control where T : Godot.Control
         }
     }
 }
+
+} // namespace ClawRPG.Scripts.Framework

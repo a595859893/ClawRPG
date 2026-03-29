@@ -1,3 +1,6 @@
+namespace ClawRPG.Scripts.Framework
+{
+
 using Godot;
 using System;
 using System.Collections;
@@ -225,3 +228,5 @@ public class SaveSystem : BaseSystem
         ImportAllData(data);
     }
 }
+
+} // namespace ClawRPG.Scripts.Framework

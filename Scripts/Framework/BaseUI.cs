@@ -1,3 +1,6 @@
+namespace ClawRPG.Scripts.Framework
+{
+
 using Godot;
 using System;
 
@@ -107,3 +110,5 @@ public abstract class BaseUI : Control
             Show();
     }
 }
+
+} // namespace ClawRPG.Scripts.Framework

@@ -65,7 +65,6 @@ namespace ClawRPG.Scripts
         {
             GD.Print("[SummonSystem] Initialized");
         }
-        }
 
         /// <summary>
         /// 解锁召唤物
@@ -411,3 +410,4 @@ namespace ClawRPG.Scripts
             return true;
         }
     }
+}

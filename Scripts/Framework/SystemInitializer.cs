@@ -1,3 +1,6 @@
+namespace ClawRPG.Scripts.Framework
+{
+
 using Godot;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,16 +40,15 @@ public class SystemInitializer : BaseSystem
     }
     
     // ==================== BaseSystem 持久化接口 ====================
-    public override Dictionary<string, object> ExportSaveData()
+    public override Dictionary ExportSaveData()
     {
         // SystemInitializer 是初始化器，无持久化状态
-        return new Dictionary<string, object>();
+        return new Dictionary();
     }
 
-    public override bool ImportSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary data)
     {
         // SystemInitializer 是初始化器，无持久化状态
-        return true;
     }
     // ==================== 持久化接口结束 ====================
     
@@ -151,3 +153,5 @@ public class SystemInitializer : BaseSystem
         return system;
     }
 }
+
+} // namespace ClawRPG.Scripts.Framework

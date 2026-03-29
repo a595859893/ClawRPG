@@ -238,3 +238,4 @@ namespace ClawRPG.Systems {
         }
     }
 }
+} // namespace ClawRPG.Systems
