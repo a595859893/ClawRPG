@@ -40,6 +40,9 @@ namespace ClawRPG.Scripts.Systems
         // Combo Forget system reference - REQ-154
         private ComboForgetData _comboForgetData;
 
+        // Combat Log system reference - REQ-001
+        private CombatLogSystem _combatLogSystem;
+
         public void Initialize(Main main)
         {
             _main = main;
@@ -68,6 +71,9 @@ namespace ClawRPG.Scripts.Systems
             
             // Combo Forget system - REQ-154
             _comboForgetData = ComboForgetData.Instance;
+
+            // Combat Log system - REQ-001
+            _combatLogSystem = CombatLogSystem.Instance;
         }
 
         /// <summary>
@@ -152,6 +158,12 @@ namespace ClawRPG.Scripts.Systems
                 allData["comboForget"] = _comboForgetData.ExportSaveData();
             }
 
+            // Combat Log persistence - REQ-001
+            if (_combatLogSystem != null)
+            {
+                allData["combatLog"] = _combatLogSystem.ExportSaveData();
+            }
+
             return allData;
         }
 
@@ -226,6 +238,12 @@ namespace ClawRPG.Scripts.Systems
             if (data.Contains("comboForget"))
             {
                 _comboForgetData?.ImportSaveData(data["comboForget"] as Dictionary);
+            }
+
+            // Combat Log persistence - REQ-001
+            if (data.Contains("combatLog"))
+            {
+                _combatLogSystem?.ImportSaveData(data["combatLog"] as Dictionary);
             }
         }
 
