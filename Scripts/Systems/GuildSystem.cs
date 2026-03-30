@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.Guild;
 
 /// <summary>
 /// 公会系统 - 玩家公会管理
@@ -22,7 +23,8 @@ public partial class GuildSystem : BaseSystem {
     public List<GuildData> AvailableGuilds { get; private set; } = new List<GuildData>();
     
     // 公会公告板
-    public List<GuildAnnouncement> Announcements { get; private set; } = new List<GuildAnnouncement>();
+    public List<GuildAnnouncementData> Announcements => _announcementManager.Announcements;
+    private readonly GuildAnnouncementManager _announcementManager = new GuildAnnouncementManager();
 
     // 信号
     public delegate void GuildCreatedEventHandler(GuildData guild);
@@ -36,13 +38,6 @@ public partial class GuildSystem : BaseSystem {
     public delegate void ApplicationProcessedEventHandler(string applicationId, bool accepted);
 
     // 公会公告
-    public class GuildAnnouncement {
-        public string AnnouncementId { get; set; } = "";
-        public string Content { get; set; } = "";
-        public string AuthorName { get; set; } = "";
-        public DateTime PostTime { get; set; } = DateTime.Now;
-    }
-
     public override void _Ready() {
         Instance = this;
     }
@@ -525,19 +520,7 @@ public partial class GuildSystem : BaseSystem {
         var player = GetTree().CurrentScene.GetNode<Player>("Player");
         string playerName = player?.PlayerName ?? "Player";
 
-        var announcement = new GuildAnnouncement {
-            AnnouncementId = "ann_" + GD.Hash(content + DateTime.Now.ToString()).ToString(),
-            Content = content,
-            AuthorName = playerName,
-            PostTime = DateTime.Now
-        };
-
-        Announcements.Insert(0, announcement);
-        if (Announcements.Count > 20) {
-            Announcements.RemoveAt(Announcements.Count - 1);
-        }
-
-        return true;
+        return _announcementManager.PostAnnouncement(content, playerName);
     }
 
     // 是否有权限
