@@ -30,12 +30,17 @@ public class MysteryTreasureSystem : BaseSystem
     private int _maxActiveTreasures = 10;
     private int _regionTreasureMultiplier = 1;
 
-    // 信号定义
-    public Signal<string, Vector2> TreasureFound { get; }
-    public Signal<string, Dictionary<string, int>> TreasureOpened { get; }
-    public Signal<string> TreasureDiscovered { get; }
-    public Signal<int> GoldEarned { get; }
-    public Signal<int> ExpEarned { get; }
+    // 信号定义 (Godot 4 兼容)
+    [Signal]
+    public delegate void TreasureFoundDelegate(string treasureId, Vector2 position);
+    [Signal]
+    public delegate void TreasureOpenedDelegate(string treasureId, Dictionary<string, int> rewards);
+    [Signal]
+    public delegate void TreasureDiscoveredDelegate(string treasureId);
+    [Signal]
+    public delegate void GoldEarnedDelegate(int amount);
+    [Signal]
+    public delegate void ExpEarnedDelegate(int amount);
 
     public override void _Ready()
     {
@@ -97,7 +102,7 @@ public class MysteryTreasureSystem : BaseSystem
         _activeTreasures.Add(instance);
         
         // 发送信号
-        EmitSignal(nameof(TreasureFound), treasure.TreasureId, spawnPos);
+        EmitSignal(nameof(TreasureFoundDelegate), treasure.TreasureId, spawnPos);
     }
 
     // 获取随机生成位置
@@ -181,7 +186,7 @@ public class MysteryTreasureSystem : BaseSystem
         UpdatePlayerData(treasure, rewards);
         
         // 发送信号
-        EmitSignal(nameof(TreasureOpened), treasure.TreasureId, rewards);
+        EmitSignal(nameof(TreasureOpenedDelegate), treasure.TreasureId, rewards);
         
         // 移除已打开的宝藏
         _activeTreasures.Remove(instance);
@@ -199,7 +204,7 @@ public class MysteryTreasureSystem : BaseSystem
             var treasure = _database.GetTreasureById(instance.TreasureId);
             if (treasure != null)
             {
-                EmitSignal(nameof(TreasureDiscovered), treasure.TreasureId);
+                EmitSignal(nameof(TreasureDiscoveredDelegate), treasure.TreasureId);
             }
         }
     }
@@ -278,7 +283,7 @@ public class MysteryTreasureSystem : BaseSystem
         };
         
         _activeTreasures.Add(instance);
-        EmitSignal(nameof(TreasureFound), treasureId, spawnPos);
+        EmitSignal(nameof(TreasureFoundDelegate), treasureId, spawnPos);
     }
 
     // 强制生成随机宝藏

@@ -18,14 +18,21 @@ public partial class PetMorphSystem : BaseSystem
     private PetMorphData _data = new PetMorphData();
     private bool _isInitialized = false;
     
-    // 信号系统
-    public static Signal<string, string> MorphUnlocked { get; } = new Signal<string, string>();
-    public static Signal<string, string> MorphActivated { get; } = new Signal<string, string>();
-    public static Signal<string> MorphDeactivated { get; } = new Signal<string>();
-    public static Signal<string, string> MorphTransformed { get; } = new Signal<string, string>();
-    public static Signal<string, string> TransformationStarted { get; } = new Signal<string, string>();
-    public static Signal<string, string> TransformationCompleted { get; } = new Signal<string, string>();
-    public static Signal<string, string> TransformationFailed { get; } = new Signal<string, string>();
+    // 信号系统 (Godot 4 compatible)
+    [Signal]
+    public static delegate void MorphUnlockedDelegate(string petId, string morphId);
+    [Signal]
+    public static delegate void MorphActivatedDelegate(string petId, string morphId);
+    [Signal]
+    public static delegate void MorphDeactivatedDelegate(string petId);
+    [Signal]
+    public static delegate void MorphTransformedDelegate(string petId, string morphId);
+    [Signal]
+    public static delegate void TransformationStartedDelegate(string petId, string morphId);
+    [Signal]
+    public static delegate void TransformationCompletedDelegate(string petId, string morphId);
+    [Signal]
+    public static delegate void TransformationFailedDelegate(string petId, string morphId);
     
     /// <summary>
     /// 初始化系统

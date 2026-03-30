@@ -30,9 +30,12 @@ public class DailyQuestSystem : BaseSystem
 	private int _trialCount;
 	private int _arenaWinCount;
 
-	public Signal QuestUpdated { get; } = new Signal();
-	public Signal QuestCompleted { get; } = new Signal();
-	public Signal QuestClaimed { get; } = new Signal();
+	[Signal]
+	public delegate void QuestUpdatedDelegate();
+	[Signal]
+	public delegate void QuestCompletedDelegate();
+	[Signal]
+	public delegate void QuestClaimedDelegate();
 
 	public DailyQuestSystem()
 	{

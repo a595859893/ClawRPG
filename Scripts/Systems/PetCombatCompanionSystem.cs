@@ -15,17 +15,24 @@ namespace ClawRPG.Scripts.Systems
 
         private PetCombatCompanionData _companionData = new PetCombatCompanionData();
         
-        // Signals for UI and game integration
-        public Signal<string, int> ComboChainChanged { get; }
-        public Signal<string, string> RoleChanged { get; }
-        public Signal<string, float> SyncLevelChanged { get; }
-        public Signal<string, ComboType, float> ComboExecuted { get; }
-        public Signal<string, string> LearningUpdated { get; }
-        public Signal<string, Vector2> PositionRecommendation { get; }
+        // Signals for UI and game integration (Godot 4 compatible)
+        [Signal]
+        public delegate void ComboChainChangedDelegate(string petId, int chain);
+        [Signal]
+        public delegate void RoleChangedDelegate(string petId, string role);
+        [Signal]
+        public delegate void SyncLevelChangedDelegate(string petId, float syncLevel);
+        [Signal]
+        public delegate void ComboExecutedDelegate(string petId, ComboType comboType, float syncLevel);
+        [Signal]
+        public delegate void LearningUpdatedDelegate(string petId, string learning);
+        [Signal]
+        public delegate void PositionRecommendationDelegate(string petId, Vector2 position);
         /// <summary>
         /// 宠物协同攻击触发（REQ-136）：玩家combo触发后，宠物根据syncLevel概率发动协战
         /// </summary>
-        public Signal<string, string, float> SynergyAttackTriggered { get; } // petId, attackType, syncLevel
+        [Signal]
+        public delegate void SynergyAttackTriggeredDelegate(string petId, string attackType, float syncLevel);
 
         public override void _Ready()
         {

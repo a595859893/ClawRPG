@@ -85,10 +85,13 @@ public class CombatHUDEnhancementSystem : BaseSystem
 	private float _comboTimer;
 	private const float COMBO_TIMEOUT = 3.0f;
 	
-	// Signals
-	public Signal<CombatHUDEnhancementData.CombatRating> CombatEnded;
-	public Signal<int> ComboChanged;
-	public Signal<string> MilestoneReached;
+	// Signals (Godot 4 compatible)
+	[Signal]
+	public delegate void CombatEndedDelegate(CombatHUDEnhancementData.CombatRating rating);
+	[Signal]
+	public delegate void ComboChangedDelegate(int combo);
+	[Signal]
+	public delegate void MilestoneReachedDelegate(string milestone);
 	
 	public override void _Ready()
 	{

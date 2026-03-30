@@ -88,10 +88,13 @@ public class TitleSystem : BaseSystem
     private int _totalTitlesUnlocked = 0;
     private int _titlesByRarity => GetTitlesByRarityCount();
     
-    // Signals
-    public static Signal<string, TitleData> TitleUnlocked { get; } = new Signal<string, TitleData>();
-    public static Signal<string> TitleEquipped { get; } = new Signal<string>();
-    public static Signal<string, int, int> TitleProgressUpdated { get; } = new Signal<string, int, int>();
+    // Signals (Godot 4 compatible)
+    [Signal]
+    public static delegate void TitleUnlockedDelegate(string playerId, TitleData data);
+    [Signal]
+    public static delegate void TitleEquippedDelegate(string playerId);
+    [Signal]
+    public static delegate void TitleProgressUpdatedDelegate(string playerId, int current, int total);
 
     public override void _Ready()
     {

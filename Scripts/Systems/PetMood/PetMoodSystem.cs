@@ -13,10 +13,13 @@ namespace ClawRPG.Scripts.Systems.PetMood {
         private double _lastDecayTime = 0;
         private double _moodChangeChance = 0.3; // 30% 几率心情变化
         
-        // 信号
-        public static Signal<string, PetMoodType> PetMoodChanged { get; } = new Signal<string, PetMoodType>();
-        public static Signal<string, PetMoodEffect> MoodEffectTriggered { get; } = new Signal<string, PetMoodEffect>();
-        public static Signal<string> MoodDecayApplied { get; } = new Signal<string>();
+        // 信号 (Godot 4 compatible)
+        [Signal]
+        public static delegate void PetMoodChangedDelegate(string petId, PetMoodType mood);
+        [Signal]
+        public static delegate void MoodEffectTriggeredDelegate(string petId, PetMoodEffect effect);
+        [Signal]
+        public static delegate void MoodDecayAppliedDelegate(string petId);
         
         // 持久化
         private const string SAVE_KEY = "pet_mood_system";

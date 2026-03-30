@@ -32,21 +32,36 @@ public partial class PartySystem : BaseSystem
     private SocialRelations _socialRelations;
     private PartyPersistenceManager _partyPersistence;
 
-    public Signal PartyCreated { get; } = new Signal();
-    public Signal PartyDisbanded { get; } = new Signal();
-    public Signal PlayerJoinedParty { get; } = new Signal();
-    public Signal PlayerLeftParty { get; } = new Signal();
-    public Signal PlayerKicked { get; } = new Signal();
-    public Signal InviteSent { get; } = new Signal();
-    public Signal InviteAccepted { get; } = new Signal();
-    public Signal InviteDeclined { get; } = new Signal();
-    public Signal LeaderChanged { get; } = new Signal();
-    public Signal RoleChanged { get; } = new Signal();
-    public Signal StateChanged { get; } = new Signal();
-    public Signal FriendAdded { get; } = new Signal();
-    public Signal FriendRemoved { get; } = new Signal();
-    public Signal PlayerBlocked { get; } = new Signal();
-    public Signal PlayerUnblocked { get; } = new Signal();
+    [Signal]
+    public delegate void PartyCreatedDelegate();
+    [Signal]
+    public delegate void PartyDisbandedDelegate();
+    [Signal]
+    public delegate void PlayerJoinedPartyDelegate();
+    [Signal]
+    public delegate void PlayerLeftPartyDelegate();
+    [Signal]
+    public delegate void PlayerKickedDelegate();
+    [Signal]
+    public delegate void InviteSentDelegate();
+    [Signal]
+    public delegate void InviteAcceptedDelegate();
+    [Signal]
+    public delegate void InviteDeclinedDelegate();
+    [Signal]
+    public delegate void LeaderChangedDelegate();
+    [Signal]
+    public delegate void RoleChangedDelegate();
+    [Signal]
+    public delegate void StateChangedDelegate();
+    [Signal]
+    public delegate void FriendAddedDelegate();
+    [Signal]
+    public delegate void FriendRemovedDelegate();
+    [Signal]
+    public delegate void PlayerBlockedDelegate();
+    [Signal]
+    public delegate void PlayerUnblockedDelegate();
 
     public void Initialize()
     {

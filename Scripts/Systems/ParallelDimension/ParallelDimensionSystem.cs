@@ -24,12 +24,18 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
         private int _currentScore = 0;
         private DateTime _dimensionStartTime;
         
-        public Signal DimensionEntered { get; } = new Signal();
-        public Signal DimensionLeft { get; } = new Signal();
-        public Signal FloorCompleted { get; } = new Signal();
-        public Signal DimensionCompleted { get; } = new Signal();
-        public Signal DimensionMastered { get; } = new Signal();
-        public Signal ScoreUpdated { get; } = new Signal();
+        [Signal]
+        public delegate void DimensionEnteredDelegate();
+        [Signal]
+        public delegate void DimensionLeftDelegate();
+        [Signal]
+        public delegate void FloorCompletedDelegate();
+        [Signal]
+        public delegate void DimensionCompletedDelegate();
+        [Signal]
+        public delegate void DimensionMasteredDelegate();
+        [Signal]
+        public delegate void ScoreUpdatedDelegate();
         
         public override void _Ready() {
             _instance = this;
@@ -108,7 +114,7 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
             
             ScoreUpdated.Call();
             
-            EmitSignal(nameof(ScoreUpdated));
+            EmitSignal(nameof(ScoreUpdatedDelegate));
         }
         
         public void CompleteFloor() {

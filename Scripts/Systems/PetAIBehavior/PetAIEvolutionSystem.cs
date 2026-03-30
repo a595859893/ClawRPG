@@ -15,11 +15,15 @@ namespace ClawRPG.Scripts.Systems
 
         private PlayerPetAIEvolutionData _playerEvolutionData = new PlayerPetAIEvolutionData();
         
-        // Signals
-        public Signal<string, PetAIEvolutionType> EvolutionUnlocked { get; }
-        public Signal<string, float> ProgressUpdated { get; }
-        public Signal<string, PetAIEvolutionType, float> BonusActivated { get; }
-        public Signal<string, int> ComboUpdated { get; }
+        // Signals (Godot 4 compatible)
+        [Signal]
+        public delegate void EvolutionUnlockedDelegate(string petId, PetAIEvolutionType type);
+        [Signal]
+        public delegate void ProgressUpdatedDelegate(string petId, float progress);
+        [Signal]
+        public delegate void BonusActivatedDelegate(string petId, PetAIEvolutionType type, float bonus);
+        [Signal]
+        public delegate void ComboUpdatedDelegate(string petId, int combo);
 
         public override void _Ready()
         {

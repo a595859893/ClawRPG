@@ -30,11 +30,15 @@ public partial class SkillComboSystem : BaseSystem
     private string _lastCompletedComboId = "";
     public string LastCompletedComboId => _lastCompletedComboId;
     
-    // Signals
-    public Signal<string> ComboStarted { get; } = new Signal<string>();
-    public Signal<string, int> ComboCompleted { get; } = new Signal<string, int>();
-    public Signal<string, float> ComboBonusApplied { get; } = new Signal<string, float>();
-    public Signal<string> ComboFailed { get; } = new Signal<string>();
+    // Signals (Godot 4 compatible)
+    [Signal]
+    public delegate void ComboStartedDelegate(string comboId);
+    [Signal]
+    public delegate void ComboCompletedDelegate(string comboId, int chainCount);
+    [Signal]
+    public delegate void ComboBonusAppliedDelegate(string comboId, float bonus);
+    [Signal]
+    public delegate void ComboFailedDelegate(string comboId);
     
     public override void _Ready()
     {

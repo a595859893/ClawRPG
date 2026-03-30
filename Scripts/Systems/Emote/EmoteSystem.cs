@@ -9,11 +9,15 @@ namespace ClawRPG.Systems.Emote {
 
         private PlayerEmoteData playerData = new PlayerEmoteData();
         
-        // Signals
-        public static Signal<string> EmoteUnlocked { get; } = new Signal<string>();
-        public static Signal<string> EmoteUsed { get; } = new Signal<string>();
-        public static Signal<string> FavoriteEmoteAdded { get; } = new Signal<string>();
-        public static Signal<string> FavoriteEmoteRemoved { get; } = new Signal<string>();
+        // Signals (Godot 4 compatible)
+        [Signal]
+        public static delegate void EmoteUnlockedDelegate(string emoteId);
+        [Signal]
+        public static delegate void EmoteUsedDelegate(string emoteId);
+        [Signal]
+        public static delegate void FavoriteEmoteAddedDelegate(string emoteId);
+        [Signal]
+        public static delegate void FavoriteEmoteRemovedDelegate(string emoteId);
 
         public override void _Ready() {
             Instance = this;

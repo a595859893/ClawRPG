@@ -16,12 +16,17 @@ namespace ClawRPG.Scripts.Systems
         private PlayerPetAIData _playerPetAIData = new PlayerPetAIData();
         private Dictionary<string, PetAIData> _activePetAI = new Dictionary<string, PetAIData>();
         
-        // Signals
-        public Signal<string> BehaviorChanged { get; }
-        public Signal<string, string> StateChanged { get; }
-        public Signal<string, string> TargetSelected { get; }
-        public Signal<string, float> DamageAvoided { get; }
-        public Signal<string, Vector2> PositionUpdated { get; }
+        // Signals (Godot 4 compatible)
+        [Signal]
+        public delegate void BehaviorChangedDelegate(string petId);
+        [Signal]
+        public delegate void StateChangedDelegate(string petId, string newState);
+        [Signal]
+        public delegate void TargetSelectedDelegate(string petId, string targetId);
+        [Signal]
+        public delegate void DamageAvoidedDelegate(string petId, float damage);
+        [Signal]
+        public delegate void PositionUpdatedDelegate(string petId, Vector2 position);
 
         public override void _Ready()
         {

@@ -29,10 +29,13 @@ namespace ClawRPG.Scripts.Systems.WeaponResonance
 
         private IWeaponProvider _weaponProvider;
 
-        // Signals
-        public Signal<string> ResonanceActivated { get; } = new Signal<string>();
-        public Signal<string, bool> ResonanceChanged { get; } = new Signal<string, bool>();
-        public Signal<string, ResonanceEffect> ResonanceEffectUpdated { get; } = new Signal<string, ResonanceEffect>();
+        // Signals (Godot 4 compatible)
+        [Signal]
+        public delegate void ResonanceActivatedDelegate(string weaponType);
+        [Signal]
+        public delegate void ResonanceChangedDelegate(string weaponType, bool isActive);
+        [Signal]
+        public delegate void ResonanceEffectUpdatedDelegate(string weaponType, ResonanceEffect effect);
 
         // 共鸣特效节点引用（运行时动态创建）
         private Label _resonanceLabel;

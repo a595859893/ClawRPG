@@ -20,11 +20,15 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
         private ActiveChoiceEvent _currentEvent;
         private Random _random;
         
-        // Signals
-        public static Signal<ChoiceEventType, string> EventStarted { get; } = new Signal<ChoiceEventType, string>();
-        public static Signal<ChoiceEventType, string> EventEnded { get; } = new Signal<ChoiceEventType, string>();
-        public static Signal<ChoiceOption> OptionSelected { get; } = new Signal<ChoiceOption>();
-        public static Signal<int, int, List<string>> RewardGranted { get; } = new Signal<int, int, List<string>>();
+        // Signals (Godot 4 compatible)
+        [Signal]
+        public static delegate void EventStartedDelegate(ChoiceEventType type, string eventId);
+        [Signal]
+        public static delegate void EventEndedDelegate(ChoiceEventType type, string eventId);
+        [Signal]
+        public static delegate void OptionSelectedDelegate(ChoiceOption option);
+        [Signal]
+        public static delegate void RewardGrantedDelegate(int gold, int exp, List<string> items);
         
         public ChoiceEventSystem()
         {
