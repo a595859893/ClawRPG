@@ -13,7 +13,7 @@ public class GuildTechnologyUI : Control
 
     // 科技列表
     private System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, ItemList> categoryLists = new System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, ItemList>();
-    private System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, Array> categoryTechs = new System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, Array>();
+    private System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, Godot.Collections.Array> categoryTechs = new System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, Godot.Collections.Array>();
 
     // 详情面板
     private Panel detailPanel;

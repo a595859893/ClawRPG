@@ -14,12 +14,12 @@ public partial class RandomDungeonEventDatabase : BaseSystem
         GD.Print($"[RandomDungeonEventDatabase] Initialized");
     }
 
-    public override Dictionary<string, object> ExportSaveData()
+    public override Godot.Collections.Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary<string, object>(); // Configuration only, no runtime state to persist
+        return new Godot.Collections.Dictionary<string, object>(); // Configuration only, no runtime state to persist
     }
 
-    public override void ImportSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Godot.Collections.Dictionary<string, object> data)
     {
         // No runtime state to restore
     }
