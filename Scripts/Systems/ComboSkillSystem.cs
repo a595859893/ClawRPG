@@ -431,8 +431,8 @@ public class ComboSkillSystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData() {
-        var data = new Dictionary();
+    public override Dictionary<string, object> ExportSaveData() {
+        var data = new Dictionary<string, object>();
         // ComboSkillSystem 是静态配置数据库，无运行时持久化状态
         return data;
     }
@@ -440,7 +440,7 @@ public class ComboSkillSystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data) {
+    public override void ImportSaveData(Dictionary<string, object> data) {
         if (data == null) return;
         // ComboSkillSystem 是静态配置数据库，无运行时持久化状态
     }

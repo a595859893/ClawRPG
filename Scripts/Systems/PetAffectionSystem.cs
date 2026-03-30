@@ -229,8 +229,8 @@ namespace ClawRPG.Systems {
         /// <summary>
         /// Save affection data
         /// </summary>
-        protected override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             var petData = new Godot.Collections.Array();
             
             foreach (var kvp in _petAffection) {
@@ -252,7 +252,7 @@ namespace ClawRPG.Systems {
         /// <summary>
         /// Load affection data
         /// </summary>
-        protected override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
             if (data.ContainsKey("petAffection")) {

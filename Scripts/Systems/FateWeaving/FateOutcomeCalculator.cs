@@ -243,12 +243,12 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             return totalInfluence > 0 ? dominantInfluence / totalInfluence : 0f;
         }
 
-        public override Dictionary ExportSaveData() {
+        public override Dictionary<string, object> ExportSaveData() {
             // 结果计算器无持久化状态（纯计算）
-            return new Dictionary();
+            return new Dictionary<string, object>();
         }
 
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             // 无状态，无需处理
         }
 

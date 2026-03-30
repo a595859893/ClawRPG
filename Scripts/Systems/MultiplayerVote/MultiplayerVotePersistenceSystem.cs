@@ -49,9 +49,9 @@ namespace ClawRPG.Systems.MultiplayerVote
 
         #region Save/Load
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var saveData = new Dictionary();
+            var saveData = new Dictionary<string, object>();
             
             // 导出 PartyManagementSystem 数据
             if (_partySystem != null)
@@ -74,7 +74,7 @@ namespace ClawRPG.Systems.MultiplayerVote
             return saveData;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             
@@ -108,8 +108,8 @@ namespace ClawRPG.Systems.MultiplayerVote
         public void ResetAll()
         {
             // 重置各子系统数据
-            _partySystem?.ImportSaveData(new Dictionary());
-            _voteSystem?.ImportSaveData(new Dictionary());
+            _partySystem?.ImportSaveData(new Dictionary<string, object>());
+            _voteSystem?.ImportSaveData(new Dictionary<string, object>());
             
             GD.Print($"[{SystemName}] All data reset");
         }

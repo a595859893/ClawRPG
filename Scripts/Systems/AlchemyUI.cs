@@ -101,7 +101,7 @@ namespace ClawRPG.Scripts.Systems
             AlchemySystem.Instance.OnRecipeUnlocked += OnRecipeUnlocked;
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (!_isVisible) return;
             

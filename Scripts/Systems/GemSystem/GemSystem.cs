@@ -339,7 +339,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         /// <summary>
         /// 导出保存数据（继承自 BaseSystem）
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary {
                 { "owned_gems", _playerGemData.OwnedGems },
@@ -352,7 +352,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         /// 保存装备槽位数据
         /// </summary>
         private Dictionary SaveEquipmentSlots() {
-            var data = new Dictionary();
+            var data = new System.Collections.Generic.Dictionary<string, object>();
             foreach (var kvp in _playerGemData.EquipmentSlots) {
                 var slots = new Array();
                 foreach (var slot in kvp.Value) {
@@ -371,7 +371,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         /// <summary>
         /// 导入保存数据（继承自 BaseSystem）
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
         {
             if (data == null) return;
             

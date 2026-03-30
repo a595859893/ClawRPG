@@ -44,7 +44,7 @@ public partial class DamageNumberSystem : CanvasLayer
         Instance = this;
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // 清理过期标签
         for (int i = _activeLabels.Count - 1; i >= 0; i--)

@@ -57,7 +57,7 @@ namespace ClawRPG.Scripts.Combat
             Source = "";
             Target = "";
             IsPlayerAction = true;
-            Data = new Dictionary();
+            Data = new Dictionary<string, object>();
         }
     }
 

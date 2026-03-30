@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.AI;
+using ClawRPG.Scripts.Characters;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>

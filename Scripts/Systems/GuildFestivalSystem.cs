@@ -185,7 +185,7 @@ public class GuildFestivalSystem : BaseSystem
         return 1.0f;
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // 检查节日状态转换
         long now = OS.GetUnixTime();
@@ -209,7 +209,7 @@ public class GuildFestivalSystem : BaseSystem
     
     // === 数据持久化接口 ===
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, object>
         {
@@ -220,7 +220,7 @@ public class GuildFestivalSystem : BaseSystem
         return new Dictionary(data);
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

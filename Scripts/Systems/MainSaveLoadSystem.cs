@@ -90,7 +90,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public Dictionary ExportAllData()
         {
-            var allData = new Dictionary();
+            var allData = new Dictionary<string, object>();
 
             if (_gameStateManager != null)
             {
@@ -250,7 +250,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 重写基类的导出保存数据方法
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return ExportAllData();
         }
@@ -258,7 +258,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 重写基类的导入保存数据方法
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             ImportAllData(data);
         }

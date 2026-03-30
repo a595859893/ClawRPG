@@ -222,7 +222,7 @@ public class PetTalentSystem : BaseSystem
         }
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var saveData = new Godot.Collections.Dictionary();
 
@@ -242,7 +242,7 @@ public class PetTalentSystem : BaseSystem
         return saveData;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

@@ -45,7 +45,7 @@ public class DiceMasterSystem : BaseSystem
         Instance = this;
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (buffTimer > 0)
         {
@@ -242,7 +242,7 @@ public class DiceMasterSystem : BaseSystem
     }
     
     // 持久化支持
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -255,7 +255,7 @@ public class DiceMasterSystem : BaseSystem
         };
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

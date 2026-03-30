@@ -346,8 +346,8 @@ public class ComboChainDatabase : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData() {
-        var data = new Dictionary();
+    public override Dictionary<string, object> ExportSaveData() {
+        var data = new Dictionary<string, object>();
         // ComboChainDatabase 是静态配置数据库，无运行时持久化状态
         return data;
     }
@@ -355,7 +355,7 @@ public class ComboChainDatabase : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data) {
+    public override void ImportSaveData(Dictionary<string, object> data) {
         if (data == null) return;
         // ComboChainDatabase 是静态配置数据库，无运行时持久化状态
     }

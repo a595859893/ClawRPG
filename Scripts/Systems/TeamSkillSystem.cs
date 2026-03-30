@@ -162,7 +162,7 @@ public class TeamSkillSystem : BaseSystem
     /// <summary>
     /// 更新技能冷却和效果
     /// </summary>
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         _deltaTime = delta;
         UpdateCooldowns(delta);
@@ -434,15 +434,15 @@ public class TeamSkillSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary();
+        return new Dictionary<string, object>();
     }
 
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         // No persistent data needed
     }

@@ -60,7 +60,7 @@ public class CombatEffectOverlayUI : Control
         Hide();
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (Visible)
         {

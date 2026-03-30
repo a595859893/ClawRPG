@@ -394,7 +394,7 @@ public delegate void InteractionFailedEventHandler(string entityId, InteractionT
             _processTimer = 0f;
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             _processTimer += delta;
 
@@ -604,7 +604,7 @@ public delegate void InteractionFailedEventHandler(string entityId, InteractionT
         /// <summary>
         /// 序列化数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary
             {
@@ -620,7 +620,7 @@ public delegate void InteractionFailedEventHandler(string entityId, InteractionT
         /// <summary>
         /// 反序列化数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

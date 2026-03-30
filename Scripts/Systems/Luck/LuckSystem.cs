@@ -310,9 +310,9 @@ public partial class LuckSystem : BaseSystem
     /// <summary>
     /// Export save data (BaseSystem override)
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["baseLuck"] = _data.BaseLuck;
         data["activeModifiers"] = _data.ActiveModifiers;
         data["totalLuckyRolls"] = _data.TotalLuckyRolls;
@@ -325,7 +325,7 @@ public partial class LuckSystem : BaseSystem
     /// <summary>
     /// Import save data (BaseSystem override)
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

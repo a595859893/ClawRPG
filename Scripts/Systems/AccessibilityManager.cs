@@ -241,7 +241,7 @@ public delegate void TextSizeChanged(TextSizeLevel size);
         /// <summary>
         /// 导入保存数据 - 实现 BaseSystem 接口
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             Deserialize(new Dictionary<string, object>(data));

@@ -153,14 +153,14 @@ namespace ClawRPG.Scripts.Systems.ArenaTournament {
             _rankingMultipliers[ranking] = multiplier;
         }
         
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             data["baseGold"] = _baseGold;
             data["baseExp"] = _baseExp;
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data.Contains("baseGold")) {
                 _baseGold = (int)data["baseGold"];
             }

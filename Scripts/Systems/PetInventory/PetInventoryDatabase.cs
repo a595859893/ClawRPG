@@ -134,6 +134,6 @@ public class PetInventoryDatabase : BaseSystem {
         return RarityValueMultiplier.ContainsKey(rarity) ? RarityValueMultiplier[rarity] : 1.0f;
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary<string, object> ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary<string, object> data) { }
 }

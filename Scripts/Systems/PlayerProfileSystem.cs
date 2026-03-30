@@ -78,7 +78,7 @@ public class PlayerProfileSystem : BaseSystem
         LoadProfile();
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // 更新会话游戏时间
         _sessionPlayTime = (int)(DateTime.Now - _sessionStartTime).TotalSeconds;
@@ -347,9 +347,9 @@ public class PlayerProfileSystem : BaseSystem
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 玩家基本信息
         data["player_name"] = Profile.PlayerName;
@@ -394,7 +394,7 @@ public class PlayerProfileSystem : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

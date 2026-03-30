@@ -129,7 +129,7 @@ public class CombatRhythmUI : CanvasLayer
         GD.Print("[CombatRhythmUI] Subscribed to rhythm + combat events");
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // 延迟订阅（等待 CombatRhythmData 就绪）
         if (!_subscriptionActive)

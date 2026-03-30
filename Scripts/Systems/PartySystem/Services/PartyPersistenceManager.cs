@@ -30,7 +30,7 @@ public class PartyPersistenceManager
     /// </summary>
     public Dictionary ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
 
         // 保存队伍数据
         var partiesList = new Godot.Collections.Array();
@@ -87,7 +87,7 @@ public class PartyPersistenceManager
         data["pending_invites"] = invitesList;
 
         // 保存玩家数据
-        var playerDataDict = new Dictionary();
+        var playerDataDict = new Dictionary<string, object>();
         foreach (var kvp in _playerData)
         {
             var pd = new Dictionary

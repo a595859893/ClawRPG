@@ -294,12 +294,12 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 保存生成计时器
-            var timers = new Dictionary();
+            var timers = new Dictionary<string, object>();
             foreach (var kvp in _nextSpawnTime)
             {
                 timers[kvp.Key] = kvp.Value.ToString("o");
@@ -312,7 +312,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

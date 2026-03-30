@@ -251,7 +251,7 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         /// 序列化强化数据
         /// </summary>
         public Dictionary Serialize() {
-            var data = new Dictionary();
+            var data = new System.Collections.Generic.Dictionary<string, object>();
             var items = new Array<Dictionary>();
             
             foreach (var kvp in _enhancedItems) {
@@ -318,7 +318,7 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
         {
             return Serialize();
         }
@@ -326,7 +326,7 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
         {
             if (data == null) return;
             Deserialize(data);

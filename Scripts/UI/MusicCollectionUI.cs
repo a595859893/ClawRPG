@@ -27,7 +27,7 @@ namespace ClawRPG.Scripts.UI {
         private Button _btnSpecial;
         
         // Current filter
-        private MusicCategory? _currentCategory = null;
+        private BackgroundMusicSystem.MusicCategory? _currentCategory = null;
         private TrackRarity? _currentRarity = null;
         
         // Track item scene
@@ -73,11 +73,11 @@ namespace ClawRPG.Scripts.UI {
             _mainContainer.AddChild(_categoryTabs);
             
             _btnAll = CreateCategoryButton("All", null);
-            _btnExploration = CreateCategoryButton("Exploration", MusicCategory.Exploration);
-            _btnBattle = CreateCategoryButton("Battle", MusicCategory.Battle);
-            _btnEvent = CreateCategoryButton("Event", MusicCategory.Event);
-            _btnMenu = CreateCategoryButton("Menu", MusicCategory.Menu);
-            _btnSpecial = CreateCategoryButton("Special", MusicCategory.Special);
+            _btnExploration = CreateCategoryButton("Exploration", BackgroundMusicSystem.MusicCategory.Exploration);
+            _btnBattle = CreateCategoryButton("Battle", BackgroundMusicSystem.MusicCategory.Battle);
+            _btnEvent = CreateCategoryButton("Event", BackgroundMusicSystem.MusicCategory.Event);
+            _btnMenu = CreateCategoryButton("Menu", BackgroundMusicSystem.MusicCategory.Menu);
+            _btnSpecial = CreateCategoryButton("Special", BackgroundMusicSystem.MusicCategory.Special);
             
             // Stats label
             _statsLabel = new Label();
@@ -107,7 +107,7 @@ namespace ClawRPG.Scripts.UI {
             _mainContainer.AddChild(closeButton);
         }
         
-        private Button CreateCategoryButton(string text, MusicCategory? category) {
+        private Button CreateCategoryButton(string text, BackgroundMusicSystem.MusicCategory? category) {
             var button = new Button();
             button.Text = text;
             button.ToggleMode = true;
@@ -239,16 +239,16 @@ namespace ClawRPG.Scripts.UI {
         
         #region Event Handlers
         
-        private void OnCategorySelected(MusicCategory? category) {
+        private void OnCategorySelected(BackgroundMusicSystem.MusicCategory? category) {
             _currentCategory = category;
             
             // Update button states
             _btnAll.ButtonPressed = category == null;
-            _btnExploration.ButtonPressed = category == MusicCategory.Exploration;
-            _btnBattle.ButtonPressed = category == MusicCategory.Battle;
-            _btnEvent.ButtonPressed = category == MusicCategory.Event;
-            _btnMenu.ButtonPressed = category == MusicCategory.Menu;
-            _btnSpecial.ButtonPressed = category == MusicCategory.Special;
+            _btnExploration.ButtonPressed = category == BackgroundMusicSystem.MusicCategory.Exploration;
+            _btnBattle.ButtonPressed = category == BackgroundMusicSystem.MusicCategory.Battle;
+            _btnEvent.ButtonPressed = category == BackgroundMusicSystem.MusicCategory.Event;
+            _btnMenu.ButtonPressed = category == BackgroundMusicSystem.MusicCategory.Menu;
+            _btnSpecial.ButtonPressed = category == BackgroundMusicSystem.MusicCategory.Special;
             
             UpdateTrackGrid();
         }

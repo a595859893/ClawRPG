@@ -474,7 +474,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             RefreshAllTabs();
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             // Update active contract timers
             if (_system.Data.activeContracts.Count > 0)

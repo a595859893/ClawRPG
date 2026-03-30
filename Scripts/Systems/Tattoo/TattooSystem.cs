@@ -260,9 +260,9 @@ public class TattooSystem : BaseSystem
     
     #region Save System
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 序列化已解锁纹身
         var unlockedTattoos = new Array();
@@ -276,7 +276,7 @@ public class TattooSystem : BaseSystem
         data["unlocked_tattoos"] = unlockedTattoos;
         
         // 序列化已装备纹身 (slot -> tattoo_id)
-        var equippedTattoos = new Dictionary();
+        var equippedTattoos = new Dictionary<string, object>();
         foreach (var kvp in _data.AppliedTattoos)
         {
             equippedTattoos[kvp.Key] = kvp.Value;
@@ -284,7 +284,7 @@ public class TattooSystem : BaseSystem
         data["equipped_tattoos"] = equippedTattoos;
         
         // 序列化使用次数统计
-        var usageCount = new Dictionary();
+        var usageCount = new Dictionary<string, object>();
         foreach (var kvp in _data.TattooUsageCount)
         {
             usageCount[kvp.Key] = kvp.Value;
@@ -298,7 +298,7 @@ public class TattooSystem : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null)
         {

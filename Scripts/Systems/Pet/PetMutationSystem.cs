@@ -453,9 +453,9 @@ public partial class PetMutationSystem : BaseSystem
     /// <summary>
     /// Export save data (BaseSystem override)
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         var petMutationsData = new Dictionary<string, object>();
         foreach (var kvp in _petMutations)
         {
@@ -471,7 +471,7 @@ public partial class PetMutationSystem : BaseSystem
     /// <summary>
     /// Import save data (BaseSystem override)
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

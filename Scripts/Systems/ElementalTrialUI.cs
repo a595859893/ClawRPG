@@ -303,7 +303,7 @@ public class ElementalTrialUI : Control
         Visible = false; 
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (_isInTrial)
         {

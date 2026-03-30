@@ -458,7 +458,7 @@ public class ClassData
         return result;
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -471,7 +471,7 @@ public class ClassData
         };
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

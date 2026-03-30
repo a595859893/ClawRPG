@@ -372,9 +372,9 @@ public delegate void CounterAttackReadyEventHandler();
         }
         
         // ===== 持久化 =====
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["has_triggered_first_counter"] = _hasTriggeredFirstCounter;
             data["current_counter_type"] = (int)CurrentCounterType;
             data["counter_cooldown_timer"] = CounterCooldownTimer;
@@ -383,7 +383,7 @@ public delegate void CounterAttackReadyEventHandler();
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

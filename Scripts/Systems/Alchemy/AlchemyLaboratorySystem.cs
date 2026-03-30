@@ -190,9 +190,9 @@ public class AlchemyLaboratorySystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["is_unlocked"] = IsUnlocked;
         data["laboratory_level"] = LaboratoryLevel;
         data["total_researches_completed"] = TotalResearchesCompleted;
@@ -216,7 +216,7 @@ public class AlchemyLaboratorySystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

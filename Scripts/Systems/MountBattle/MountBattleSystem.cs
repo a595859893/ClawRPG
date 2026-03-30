@@ -469,7 +469,7 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
             return true;
         }
         
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             // 更新技能冷却
             foreach (var skillId in new List<string>(_skillCooldowns.Keys)) {
                 if (_skillCooldowns[skillId] > 0) {
@@ -506,9 +506,9 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 坐骑战斗属性
             data["is_mount_battle_enabled"] = _data.IsMountBattleEnabled;
@@ -527,7 +527,7 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
             data["unlocked_mount_skills"] = new Array(_data.UnlockedMountSkills);
             
             // 技能等级
-            var skillLevels = new Dictionary();
+            var skillLevels = new Dictionary<string, object>();
             foreach (var kvp in _data.SkillLevels)
             {
                 skillLevels[kvp.Key] = kvp.Value;
@@ -556,7 +556,7 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

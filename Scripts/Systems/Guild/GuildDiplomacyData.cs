@@ -52,7 +52,7 @@ public class GuildDiplomacyData : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var relationsData = new Godot.Array();
         foreach (var kvp in Relations)
@@ -77,7 +77,7 @@ public class GuildDiplomacyData : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

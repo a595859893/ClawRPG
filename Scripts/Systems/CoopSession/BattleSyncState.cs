@@ -379,11 +379,11 @@ namespace ClawRPG.Scripts.Systems.CoopSession
 
         #region 存档支持
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             lock (_lock)
             {
-                var data = new Dictionary();
+                var data = new Dictionary<string, object>();
                 
                 // 导出玩家状态
                 var playerStatesList = new Array();
@@ -412,7 +412,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

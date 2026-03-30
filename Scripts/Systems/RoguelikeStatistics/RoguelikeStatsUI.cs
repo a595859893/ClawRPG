@@ -188,7 +188,7 @@ Build:          {data.MostUsedBuild}
     
     public RoguelikeStatsSystem GetSystem() => _system;
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // Could add real-time update here
     }

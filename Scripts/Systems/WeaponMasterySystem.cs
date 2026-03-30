@@ -344,9 +344,9 @@ namespace ClawRPG.Scripts.Systems
 
         // ===== 持久化方法 =====
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 当前武器类型
             data["currentWeapon"] = (int)CurrentWeaponType;
@@ -355,7 +355,7 @@ namespace ClawRPG.Scripts.Systems
             var masteriesData = new List<Dictionary>();
             foreach (var kvp in Masteries)
             {
-                var masteryDict = new Dictionary();
+                var masteryDict = new Dictionary<string, object>();
                 masteryDict["type"] = (int)kvp.Key;
                 masteryDict["level"] = kvp.Value.Level;
                 masteryDict["experience"] = kvp.Value.Experience;
@@ -366,7 +366,7 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

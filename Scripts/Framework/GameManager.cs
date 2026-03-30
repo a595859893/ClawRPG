@@ -117,7 +117,7 @@ public class GameManager : BaseSystem
     /// </summary>
     public Dictionary ExportAllData()
     {
-        var allData = new Dictionary();
+        var allData = new Dictionary<string, object>();
         
         foreach (BaseSystem system in _systems)
         {
@@ -173,8 +173,8 @@ public class GameManager : BaseSystem
         GD.Print("[GameManager] All systems reset");
     }
 
-    public override Dictionary ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary data) { }
+    public override Dictionary<string, object> ExportSaveData() => new();
+    public override void ImportSaveData(Dictionary<string, object> data) { }
 }
 
 } // namespace ClawRPG.Scripts.Framework

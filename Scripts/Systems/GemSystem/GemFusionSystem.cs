@@ -202,16 +202,16 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new System.Collections.Generic.Dictionary<string, object>();
         
         // 玩家合成数据
         data["total_fusions"] = _playerFusionData.TotalFusions;
         data["successful_fusions"] = _playerFusionData.SuccessfulFusions;
         
         // 按宝石类型的合成次数
-        var fusionCountData = new Dictionary();
+        var fusionCountData = new System.Collections.Generic.Dictionary<string, object>();
         foreach (var kvp in _playerFusionData.FusionCountByGem)
         {
             fusionCountData[kvp.Key] = kvp.Value;
@@ -224,7 +224,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
     {
         if (data == null) return;
         

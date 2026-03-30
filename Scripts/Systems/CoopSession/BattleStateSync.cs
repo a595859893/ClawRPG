@@ -69,7 +69,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession {
             _syncInterval = Mathf.Max(0.01f, interval);
         }
         
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             base._Process(delta);
             
             _syncTimer += delta;
@@ -79,13 +79,13 @@ namespace ClawRPG.Scripts.Systems.CoopSession {
             }
         }
         
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             data["syncInterval"] = _syncInterval;
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data.Contains("syncInterval")) {
                 _syncInterval = (float)data["syncInterval"];
             }

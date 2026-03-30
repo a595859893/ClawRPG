@@ -280,9 +280,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Save affix data
         /// </summary>
-        protected override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            Dictionary data = new Dictionary();
+            Dictionary data = new Dictionary<string, object>();
             Godot.Collections.Array equipmentList = new Godot.Collections.Array();
             
             foreach (var kvp in _playerAffixData.EquipmentAffixes)
@@ -310,7 +310,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Load affix data
         /// </summary>
-        protected override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             _playerAffixData = new PlayerAffixData();
             

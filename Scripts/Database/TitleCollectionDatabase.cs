@@ -17,12 +17,12 @@ public partial class TitleCollectionDatabase : BaseSystem
         GD.Print($"[TitleCollectionDatabase] Initialized with {_titles.Count} titles");
     }
     
-    public override Dictionary ExportSaveData()
+    public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary();
+        return new System.Collections.Generic.Dictionary<string, object>();
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
     {
         // 称号数据是只读的，无状态需要持久化
     }

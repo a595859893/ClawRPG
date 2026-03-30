@@ -138,7 +138,7 @@ public class WorldEventUI : Control
         }
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         _refreshTimer += (int)(delta * 1000);
         if (_refreshTimer >= 500)

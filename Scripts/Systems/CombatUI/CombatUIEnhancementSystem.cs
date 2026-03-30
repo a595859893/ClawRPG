@@ -60,7 +60,7 @@ namespace ClawRPG.Systems;
             GD.Print("[CombatUIEnhancement] System initialized");
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             // Process trauma-based shake
             if (_trauma > 0f)
@@ -408,7 +408,7 @@ namespace ClawRPG.Systems;
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return Save();
         }
@@ -416,7 +416,7 @@ namespace ClawRPG.Systems;
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             Load(data);

@@ -271,9 +271,9 @@ namespace ClawRPG.Systems.Alchemy
         
         #region Save/Load
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             if (_inventory != null)
             {
@@ -283,7 +283,7 @@ namespace ClawRPG.Systems.Alchemy
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

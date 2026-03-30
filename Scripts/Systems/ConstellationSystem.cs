@@ -79,14 +79,14 @@ public class ConstellationSystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData() {
-        var data = new Dictionary();
+    public override Dictionary<string, object> ExportSaveData() {
+        var data = new Dictionary<string, object>();
         
         // 序列化已解锁的星座
         var unlockedList = new List<Dictionary>();
         foreach (var kvp in UnlockedConstellations)
         {
-            var constData = new Dictionary();
+            var constData = new Dictionary<string, object>();
             constData["constellationId"] = kvp.Key;
             constData["unlocked"] = kvp.Value.Unlocked;
             constData["activatedStars"] = kvp.Value.ActivatedStars;
@@ -110,7 +110,7 @@ public class ConstellationSystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data) {
+    public override void ImportSaveData(Dictionary<string, object> data) {
         if (data == null) return;
         
         // 反序列化已解锁的星座

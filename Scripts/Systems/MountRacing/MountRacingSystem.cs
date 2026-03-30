@@ -208,9 +208,9 @@ namespace ClawRPG.Systems;
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
 
             // 委托给数据层
             if (_data != null)
@@ -228,7 +228,7 @@ namespace ClawRPG.Systems;
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

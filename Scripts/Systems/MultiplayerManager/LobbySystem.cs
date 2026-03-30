@@ -367,9 +367,9 @@ namespace ClawRPG.Scripts.Systems
         
         #region 数据持久化
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             data["is_in_lobby"] = _isInLobby;
             data["current_lobby_id"] = _currentLobbyId;
@@ -379,7 +379,7 @@ namespace ClawRPG.Scripts.Systems
             
             lock (_playersLock)
             {
-                var playersData = new Dictionary();
+                var playersData = new Dictionary<string, object>();
                 foreach (var kvp in _lobbyPlayers)
                 {
                     playersData[kvp.Key.ToString()] = new Dictionary
@@ -396,7 +396,7 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

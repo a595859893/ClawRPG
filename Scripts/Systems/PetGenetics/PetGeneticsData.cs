@@ -62,7 +62,7 @@ public class PetGeneticsData : BaseSystem
             RareGenesCreated = (int)data["RareGenesCreated"];
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, Variant>();
 
@@ -118,7 +118,7 @@ public class PetGeneticsData : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

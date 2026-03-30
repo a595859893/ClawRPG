@@ -424,12 +424,12 @@ public class GuildLevelSystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData() {
-        var data = new Dictionary();
+    public override Dictionary<string, object> ExportSaveData() {
+        var data = new Dictionary<string, object>();
         
         var guildLevelsList = new List<Dictionary>();
         foreach (var kvp in _guildLevels) {
-            var guildData = new Dictionary();
+            var guildData = new Dictionary<string, object>();
             guildData["guildId"] = kvp.Key;
             guildData["level"] = kvp.Value.Level;
             guildData["experience"] = kvp.Value.Experience;
@@ -456,7 +456,7 @@ public class GuildLevelSystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data) {
+    public override void ImportSaveData(Dictionary<string, object> data) {
         if (data == null) return;
         
         _guildLevels.Clear();

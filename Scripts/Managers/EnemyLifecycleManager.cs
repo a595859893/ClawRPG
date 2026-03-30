@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Managers;
+using ClawRPG.Scripts.Characters;
 
 /// <summary>
 /// 敌人生命周期管理器 - 负责敌人的生成、AI 更新、死亡和状态管理
@@ -320,7 +321,7 @@ public class EnemyLifecycleManager : ManagerBase
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -333,7 +334,7 @@ public class EnemyLifecycleManager : ManagerBase
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

@@ -47,7 +47,7 @@ public class DailyRitualSystem : BaseSystem
         CheckDailyReset();
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (IsRitualActive)
         {
@@ -259,7 +259,7 @@ public class DailyRitualSystem : BaseSystem
     // Signal definitions
 
     // 数据持久化接口
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, object>
         {
@@ -287,7 +287,7 @@ public class DailyRitualSystem : BaseSystem
         return new Dictionary(data);
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 
@@ -365,7 +365,7 @@ public class DailyRitualSystem : BaseSystem
     /// <summary>
     /// 导出保存数据 - 实现 BaseSystem 接口
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -383,7 +383,7 @@ public class DailyRitualSystem : BaseSystem
     /// <summary>
     /// 导入保存数据 - 实现 BaseSystem 接口
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

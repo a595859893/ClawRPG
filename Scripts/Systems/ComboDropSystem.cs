@@ -108,13 +108,13 @@ public partial class ComboDropSystem : BaseSystem
         return epicIds[idx];
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         // Combo 掉落跟随 ComboSystem 的 discoveredCombos 持久化，无需单独存储
-        return new Dictionary();
+        return new Dictionary<string, object>();
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         // 无需单独恢复
     }

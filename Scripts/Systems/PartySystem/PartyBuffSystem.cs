@@ -241,9 +241,9 @@ namespace ClawRPG.Scripts.Systems
         
         #region Persistence
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // Export party buffs
             var buffsArray = new Array();
@@ -274,7 +274,7 @@ namespace ClawRPG.Scripts.Systems
             data["nextBuffId"] = _nextBuffId;
             
             // Export resource buffs
-            var resourceBuffs = new Dictionary();
+            var resourceBuffs = new Dictionary<string, object>();
             foreach (var kvp in _resourceBuffs)
             {
                 resourceBuffs[(int)kvp.Key] = kvp.Value;
@@ -284,7 +284,7 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

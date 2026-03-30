@@ -161,9 +161,9 @@ namespace ClawRPG.Scripts.Skills
         
         #region Persistence
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             var treesArray = new Array();
             foreach (var playerKvp in _skillTrees)
@@ -183,7 +183,7 @@ namespace ClawRPG.Scripts.Skills
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

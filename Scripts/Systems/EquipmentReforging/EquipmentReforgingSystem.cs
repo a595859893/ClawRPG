@@ -357,9 +357,9 @@ namespace Game.Scripts.Systems.EquipmentReforging
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 玩家洗练数据
         data["total_reforges"] = _playerData.TotalReforges;
@@ -367,7 +367,7 @@ namespace Game.Scripts.Systems.EquipmentReforging
         data["failed_reforges"] = _playerData.FailedReforges;
         
         // 按类型的洗练历史
-        var reforgeTypeHistoryData = new Dictionary();
+        var reforgeTypeHistoryData = new Dictionary<string, object>();
         foreach (var kvp in _playerData.ReforgeHistoryByType)
         {
             reforgeTypeHistoryData[kvp.Key] = kvp.Value;
@@ -380,7 +380,7 @@ namespace Game.Scripts.Systems.EquipmentReforging
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

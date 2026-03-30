@@ -381,9 +381,9 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
         /// <summary>
         /// Export save data (BaseSystem override)
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["totalInteractions"] = _data.totalInteractions;
             data["specialInteractions"] = _data.specialInteractions;
             data["petInteractions"] = _data.petInteractions;
@@ -395,7 +395,7 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
         /// <summary>
         /// Import save data (BaseSystem override)
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

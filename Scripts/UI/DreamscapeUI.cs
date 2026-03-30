@@ -362,7 +362,7 @@ public class DreamscapeUI : Control
         }
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (DreamscapeSystem.Instance.IsInDreamscape && Visible)
         {

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using MultiplayerEmoteSystem;
 
 namespace ClawRPG.Systems.MultiplayerEmote {
 /// <summary>
@@ -53,7 +54,7 @@ public class MultiplayerEmoteSystem : BaseSystem
         InitializeStatistics();
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // 更新活跃表情计时器
         UpdateActiveEmotes(delta);
@@ -423,9 +424,9 @@ public class MultiplayerEmoteSystem : BaseSystem
     /// <summary>
     /// 导出存档数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 统计数据
         data["total_emotes_used"] = _statistics.TotalEmotesUsed;
@@ -488,7 +489,7 @@ public class MultiplayerEmoteSystem : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

@@ -28,9 +28,9 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             // GuildTournamentBracketMain 是入口类，数据在_bracketSystem中
             return data;
         }
@@ -38,7 +38,7 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             // GuildTournamentBracketMain 是入口类，数据在_bracketSystem中

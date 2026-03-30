@@ -160,7 +160,7 @@ public class ChronicleUI : Control
         footerContainer.AddChild(hintLabel);
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (Visible)
         {

@@ -441,7 +441,7 @@ public class BossMechanicsUI : Control
     /// <summary>
     /// REQ-156-05: 狂暴模式脉冲动画
     /// </summary>
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!_isModeEnraged || _modeLabel == null) return;
 

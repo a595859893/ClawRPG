@@ -351,9 +351,9 @@ namespace ClawRPG.Systems.MultiplayerVote
 
         #region Save/Load
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var saveData = new Dictionary();
+            var saveData = new Dictionary<string, object>();
             
             // 导出队伍
             var partiesData = new List<Dictionary>();
@@ -411,7 +411,7 @@ namespace ClawRPG.Systems.MultiplayerVote
             return saveData;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

@@ -208,9 +208,9 @@ namespace ClawRPG.Scripts.Systems
             // Load from file system
         }
 
-        public System.Collections.Generic.Dictionary<string, object> GetStatistics()
+        public System.Collections.Generic.System.Collections.Generic.Dictionary<string, object> GetStatistics()
         {
-            return new System.Collections.Generic.Dictionary<string, object>
+            return new System.Collections.Generic.System.Collections.Generic.Dictionary<string, object>
             {
                 { "total_pets", PetSkillTrees.Count },
                 { "total_points_earned", TotalSkillPointsEarned },
@@ -220,15 +220,15 @@ namespace ClawRPG.Scripts.Systems
             };
         }
 
-        public override Dictionary ExportSaveData()
+        public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new System.Collections.Generic.Dictionary<string, object>();
             
             // 宠物技能树数据
-            var petTreesData = new Dictionary();
+            var petTreesData = new System.Collections.Generic.Dictionary<string, object>();
             foreach (var kvp in PetSkillTrees)
             {
-                var treeData = new Dictionary();
+                var treeData = new System.Collections.Generic.Dictionary<string, object>();
                 treeData["pet_id"] = kvp.Value.PetId;
                 treeData["pet_type"] = kvp.Value.PetType;
                 treeData["total_skill_points"] = kvp.Value.TotalSkillPoints;
@@ -243,7 +243,7 @@ namespace ClawRPG.Scripts.Systems
                 treeData["unlocked_nodes"] = unlockedNodeIds;
                 
                 // 保存节点状态
-                var nodeStatuses = new Dictionary();
+                var nodeStatuses = new System.Collections.Generic.Dictionary<string, object>();
                 foreach (var statusKvp in kvp.Value.NodeStatuses)
                 {
                     nodeStatuses[statusKvp.Key] = (int)statusKvp.Value;
@@ -263,7 +263,7 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
         {
             if (data == null) return;
             

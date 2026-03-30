@@ -426,7 +426,7 @@ public class TreasureHuntManager : BaseSystem
         }
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, Variant>();
 
@@ -461,7 +461,7 @@ public class TreasureHuntManager : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

@@ -351,9 +351,9 @@ public class DailyDungeonSystem : BaseSystem
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         data["current_floor"] = _currentFloor;
         data["enemies_defeated"] = _enemiesDefeated;
@@ -368,7 +368,7 @@ public class DailyDungeonSystem : BaseSystem
         var playerDataList = new List<Dictionary>();
         foreach (var kvp in PlayerDungeonData)
         {
-            var pd = new Dictionary();
+            var pd = new Dictionary<string, object>();
             pd["dungeon_id"] = kvp.Key;
             pd["best_floor"] = kvp.Value.BestFloor;
             pd["times_completed"] = kvp.Value.TimesCompleted;
@@ -382,7 +382,7 @@ public class DailyDungeonSystem : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

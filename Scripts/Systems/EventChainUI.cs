@@ -157,7 +157,7 @@ namespace ClawRPG.Scripts.Systems {
             mainVBox.AddChild(hintLabel);
         }
 
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             // 可选：更新UI显示
         }
 

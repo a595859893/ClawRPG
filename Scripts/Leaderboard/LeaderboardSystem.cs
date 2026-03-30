@@ -45,7 +45,7 @@ public delegate void RewardClaimed(string playerId, LeaderboardType type, int ra
             InitializeLeaderboards();
         }
 
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             UpdateTimers(delta);
         }
 

@@ -360,9 +360,9 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["total_completed"] = _data.totalCompleted;
             data["total_failed"] = _data.totalFailed;
             data["total_gold_earned"] = _data.totalGoldEarned;
@@ -371,7 +371,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             data["best_streak"] = _data.bestStreak;
             
             // Serialize completion counts
-            var completionCounts = new Dictionary();
+            var completionCounts = new Dictionary<string, object>();
             foreach (var kvp in _data.contractCompletionCount)
             {
                 completionCounts[kvp.Key] = kvp.Value;
@@ -382,7 +382,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             var activeContractsData = new List<Dictionary>();
             foreach (var contract in _data.activeContracts)
             {
-                var contractData = new Dictionary();
+                var contractData = new Dictionary<string, object>();
                 contractData["contract_id"] = contract.contractId;
                 contractData["title"] = contract.title;
                 contractData["description"] = contract.description;
@@ -415,7 +415,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

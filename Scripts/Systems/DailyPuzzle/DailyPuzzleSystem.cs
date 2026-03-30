@@ -200,9 +200,9 @@ public class DailyPuzzleSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         data["current_daily_puzzle_id"] = _data.CurrentDailyPuzzleId;
         data["last_puzzle_date"] = _data.LastPuzzleDate.ToString("o");
@@ -245,7 +245,7 @@ public class DailyPuzzleSystem : BaseSystem
     /// <summary>
     /// Import save data
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

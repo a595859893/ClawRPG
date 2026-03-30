@@ -223,7 +223,7 @@ public class DailyDungeonUI : Control
         combatContainer.AddChild(_exitButton);
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!Visible || _combatUI == null)
             return;

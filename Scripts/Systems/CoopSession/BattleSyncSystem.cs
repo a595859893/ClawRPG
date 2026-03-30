@@ -198,7 +198,7 @@ public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int 
             GD.Print("[BattleSyncSystem] System initialized");
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (!IsInitialized || string.IsNullOrEmpty(_currentSessionId))
                 return;
@@ -362,12 +362,12 @@ public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int 
 
         #region 存档支持
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return _eventHandlerModule.ExportSaveData();
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             _eventHandlerModule.ImportSaveData(data);
         }

@@ -196,9 +196,9 @@ namespace ClawRPG.Systems.GuildHall {
         /// <summary>
         /// 导出保存数据 (BaseSystem 接口)
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["guild_id"] = _data.GuildId;
             data["guild_name"] = _data.GuildName;
             data["hall_level"] = _data.HallLevel;
@@ -242,7 +242,7 @@ namespace ClawRPG.Systems.GuildHall {
         /// <summary>
         /// 导入保存数据 (BaseSystem 接口)
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

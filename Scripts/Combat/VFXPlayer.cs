@@ -479,13 +479,13 @@ namespace ClawRPG.Scripts.Combat {
         
         #region Save/Load
         
-        public override Dictionary ExportSaveData() {
+        public override Dictionary<string, object> ExportSaveData() {
             return new Dictionary {
                 { "active_vfx_count", activeVFXNodes.Count }
             };
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             // VFX Player不需要持久化
         }
         

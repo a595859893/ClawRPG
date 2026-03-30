@@ -428,7 +428,7 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
             var challenges = GetChallengesByType(challengeType);
             if (challenges.Count == 0)
             {
-                return new Dictionary();
+                return new Dictionary<string, object>();
             }
 
             var random = new Random();
@@ -484,15 +484,15 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
         /// <summary>
         /// Database class typically doesn't need save data
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            return new Dictionary();
+            return new Dictionary<string, object>();
         }
 
         /// <summary>
         /// Database class typically doesn't need load data
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             // No data to load for database class
         }

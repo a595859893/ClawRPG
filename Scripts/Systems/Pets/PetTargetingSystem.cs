@@ -242,12 +242,12 @@ namespace ClawRPG.Scripts.Systems.Pets
             return true;
         }
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            return new Dictionary();
+            return new Dictionary<string, object>();
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             // 无持久化数据
         }

@@ -108,7 +108,7 @@ namespace ClawRPG.Scripts.Systems
             UpdateRegionEffects();
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (_player == null || CurrentRegion == null)
                 return;
@@ -282,15 +282,15 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            return new Dictionary();
+            return new Dictionary<string, object>();
         }
 
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             // No persistent data needed
         }

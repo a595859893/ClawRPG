@@ -531,9 +531,9 @@ public class TitleSystem : BaseSystem
     }
     
     // ===== 持久化 =====
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 保存已解锁称号
         data["unlocked_titles"] = new Array(_unlockedTitles);
@@ -547,7 +547,7 @@ public class TitleSystem : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

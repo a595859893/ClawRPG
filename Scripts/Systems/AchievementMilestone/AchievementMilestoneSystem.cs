@@ -274,7 +274,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导出保存数据 (BaseSystem 接口) - 复用 Save 方法
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             // 复用已有的 Save 方法，转换为 Godot Dictionary
             var internalData = new Dictionary<string, object>();
@@ -287,7 +287,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导入保存数据 (BaseSystem 接口) - 复用 Load 方法
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null || data.Count == 0)
                 return;
@@ -304,7 +304,7 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         private Dictionary ConvertToGodotDictionary(Dictionary<string, object> internalData)
         {
-            var godotDict = new Dictionary();
+            var godotDict = new Dictionary<string, object>();
             foreach (var kvp in internalData)
             {
                 godotDict[kvp.Key] = ConvertValueToGodot(kvp.Value);

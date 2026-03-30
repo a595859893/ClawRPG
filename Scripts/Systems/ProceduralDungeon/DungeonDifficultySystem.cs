@@ -140,15 +140,15 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
         {
-            return new Dictionary();
+            return new System.Collections.Generic.Dictionary<string, object>();
         }
 
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
         {
             // 无需持久化数据
         }

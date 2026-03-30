@@ -25,7 +25,7 @@ namespace ClawRPG.Scripts.Systems
             LoadData();
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             _tickTimer += delta;
             if (_tickTimer >= TICK_INTERVAL)
@@ -435,15 +435,15 @@ namespace ClawRPG.Scripts.Systems
         }
         
         // ===== 持久化 =====
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 保存宠物情绪数据
-            var emotionsData = new Dictionary();
+            var emotionsData = new Dictionary<string, object>();
             foreach (var kvp in _petEmotions)
             {
-                var petData = new Dictionary();
+                var petData = new Dictionary<string, object>();
                 petData["pet_id"] = kvp.Key;
                 petData["happiness"] = kvp.Value.Happiness;
                 petData["energy"] = kvp.Value.Energy;
@@ -452,7 +452,7 @@ namespace ClawRPG.Scripts.Systems
                 petData["dominant_emotion"] = (int)kvp.Value.DominantEmotion;
                 
                 // 保存情绪值字典
-                var emotionValues = new Dictionary();
+                var emotionValues = new Dictionary<string, object>();
                 foreach (var emotion in kvp.Value.CurrentEmotions)
                 {
                     emotionValues[(int)emotion.Key] = emotion.Value;
@@ -464,7 +464,7 @@ namespace ClawRPG.Scripts.Systems
             data["pet_emotions"] = emotionsData;
             
             // 保存统计数据
-            var stats = new Dictionary();
+            var stats = new Dictionary<string, object>();
             stats["total_changes"] = TotalEmotionChanges;
             stats["dominant_counts"] = DominantEmotionCounts;
             data["pet_emotion_stats"] = stats;
@@ -472,7 +472,7 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

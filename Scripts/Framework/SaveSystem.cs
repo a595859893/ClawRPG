@@ -80,7 +80,7 @@ public class SaveSystem : BaseSystem
     /// </summary>
     public Dictionary ExportAllData()
     {
-        var allData = new Dictionary();
+        var allData = new Dictionary<string, object>();
         
         foreach (var kvp in _saveables)
         {
@@ -215,7 +215,7 @@ public class SaveSystem : BaseSystem
     /// <summary>
     /// 导出保存数据 - 实现 BaseSystem 接口
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return ExportAllData();
     }
@@ -223,7 +223,7 @@ public class SaveSystem : BaseSystem
     /// <summary>
     /// 导入保存数据 - 实现 BaseSystem 接口
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         ImportAllData(data);
     }

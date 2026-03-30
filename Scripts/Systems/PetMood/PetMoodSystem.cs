@@ -289,7 +289,7 @@ namespace ClawRPG.Scripts.Systems.PetMood {
             }
         }
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             // 保存衰减计时器状态
             double currentTime = Time.GetUnixTimeFromSystem();
@@ -304,7 +304,7 @@ namespace ClawRPG.Scripts.Systems.PetMood {
             };
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

@@ -395,7 +395,7 @@ namespace ClawRPG.Scripts.Combat {
         
         #region 保存/加载
         
-        public override Dictionary ExportSaveData() {
+        public override Dictionary<string, object> ExportSaveData() {
             return new Dictionary {
                 { "player_data", new Dictionary<string, int> {
                     { "total_damage_numbers", PlayerData.TotalDamageNumbers },
@@ -410,7 +410,7 @@ namespace ClawRPG.Scripts.Combat {
             };
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null || !data.ContainsKey("player_data")) return;
             
             var playerData = (Dictionary)data["player_data"];

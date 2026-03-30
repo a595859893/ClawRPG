@@ -32,7 +32,7 @@ namespace ClawRPG.Systems
             _playerData = new MountExpeditionData.PlayerExpeditionData();
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             CheckExpeditions();
         }
@@ -439,7 +439,7 @@ namespace ClawRPG.Systems
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return GetSaveData();
         }
@@ -447,7 +447,7 @@ namespace ClawRPG.Systems
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data != null)
             {

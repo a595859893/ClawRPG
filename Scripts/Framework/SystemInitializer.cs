@@ -40,13 +40,13 @@ public class SystemInitializer : BaseSystem
     }
     
     // ==================== BaseSystem 持久化接口 ====================
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         // SystemInitializer 是初始化器，无持久化状态
-        return new Dictionary();
+        return new Dictionary<string, object>();
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         // SystemInitializer 是初始化器，无持久化状态
     }

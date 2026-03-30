@@ -117,14 +117,14 @@ namespace ClawRPG.Scripts.Database
         public new IEnumerable<string> GetAllKeys() => _achievements.Keys;
 
         // BaseSystem overrides for save/load
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var saveData = new Dictionary();
+            var saveData = new Dictionary<string, object>();
             ExportSaveDataInternal(saveData);
             return saveData;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             ImportSaveDataInternal(data);

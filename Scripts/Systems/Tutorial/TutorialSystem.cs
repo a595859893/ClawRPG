@@ -321,7 +321,7 @@ public class TutorialSystem : BaseSystem
         // Emit signal for UI to show completion
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!_isTutorialActive) return;
 
@@ -432,18 +432,18 @@ public class TutorialSystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
-        var completed = new Dictionary();
+        var completed = new Dictionary<string, object>();
         foreach (var kvp in _data.CompletedTutorials)
         {
             completed[kvp.Key] = kvp.Value;
         }
         data["completed"] = completed;
         
-        var progress = new Dictionary();
+        var progress = new Dictionary<string, object>();
         foreach (var kvp in _data.TutorialProgress)
         {
             progress[kvp.Key] = kvp.Value;
@@ -466,7 +466,7 @@ public class TutorialSystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

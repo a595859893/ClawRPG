@@ -66,7 +66,7 @@ public class MysteryTreasureSystem : BaseSystem
         GD.Print("MysteryTreasureSystem initialized");
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         _spawnTimer += delta;
         if (_spawnTimer >= _spawnInterval)
@@ -395,9 +395,9 @@ public class MysteryTreasureSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 保存玩家数据
         var rarityCount = new Godot.Collections.Dictionary();
@@ -432,7 +432,7 @@ public class MysteryTreasureSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

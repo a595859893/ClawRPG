@@ -479,9 +479,9 @@ public partial class DreamRealmSystem : BaseSystem
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         data["current_realm"] = (int)_currentRealm;
         data["current_state"] = (int)_currentState;
@@ -503,7 +503,7 @@ public partial class DreamRealmSystem : BaseSystem
         var statsData = new List<Dictionary>();
         foreach (var kvp in _realmStats)
         {
-            var sd = new Dictionary();
+            var sd = new Dictionary<string, object>();
             sd["realm_type"] = (int)kvp.Key;
             sd["times_entered"] = kvp.Value.TimesEntered;
             sd["best_score"] = kvp.Value.BestScore;
@@ -515,7 +515,7 @@ public partial class DreamRealmSystem : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

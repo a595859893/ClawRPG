@@ -30,7 +30,7 @@ public partial class InventoryUI
         }
     }
     
-    public override void _Process(float delta) {
+    public override void _Process(double delta) {
         if (_dragStartTimer > 0 && _dragSlot != null) {
             _dragStartTimer -= delta;
             if (_dragStartTimer <= 0) {

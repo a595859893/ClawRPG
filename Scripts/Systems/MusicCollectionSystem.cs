@@ -36,49 +36,49 @@ namespace ClawRPG.Scripts.Systems {
         
         private void InitializeTrackDatabase() {
             // Exploration tracks
-            AddTrack("bgm_default", "Default Theme", MusicCategory.Exploration, true, "Default exploration theme");
-            AddTrack("bgm_forest", "Forest Theme", MusicCategory.Exploration, true, "Peaceful forest ambience");
-            AddTrack("bgm_town", "Town Theme", MusicCategory.Exploration, true, "Busy town atmosphere");
-            AddTrack("bgm_mountain", "Mountain Theme", MusicCategory.Exploration, false, "Rocky mountain trails");
-            AddTrack("bgm_desert", "Desert Theme", MusicCategory.Exploration, false, "Hot desert winds");
-            AddTrack("bgm_ocean", "Ocean Theme", MusicCategory.Exploration, false, "Calm ocean waves");
-            AddTrack("bgm_volcano", "Volcano Theme", MusicCategory.Exploration, false, "Volcanic danger");
-            AddTrack("bgm_ice", "Ice Theme", MusicCategory.Exploration, false, "Frozen tundra");
-            AddTrack("bgm_swamp", "Swamp Theme", MusicCategory.Exploration, false, "Mysterious swamp");
-            AddTrack("bgm_ruins", "Ancient Ruins", MusicCategory.Exploration, false, "Forgotten ruins");
-            AddTrack("bgm_castle", "Castle Theme", MusicCategory.Exploration, false, "Majestic castle");
-            AddTrack("bgm_underwater", "Underwater Theme", MusicCategory.Exploration, false, "Deep ocean depths");
+            AddTrack("bgm_default", "Default Theme", BackgroundMusicSystem.MusicCategory.Exploration, true, "Default exploration theme");
+            AddTrack("bgm_forest", "Forest Theme", BackgroundMusicSystem.MusicCategory.Exploration, true, "Peaceful forest ambience");
+            AddTrack("bgm_town", "Town Theme", BackgroundMusicSystem.MusicCategory.Exploration, true, "Busy town atmosphere");
+            AddTrack("bgm_mountain", "Mountain Theme", BackgroundMusicSystem.MusicCategory.Exploration, false, "Rocky mountain trails");
+            AddTrack("bgm_desert", "Desert Theme", BackgroundMusicSystem.MusicCategory.Exploration, false, "Hot desert winds");
+            AddTrack("bgm_ocean", "Ocean Theme", BackgroundMusicSystem.MusicCategory.Exploration, false, "Calm ocean waves");
+            AddTrack("bgm_volcano", "Volcano Theme", BackgroundMusicSystem.MusicCategory.Exploration, false, "Volcanic danger");
+            AddTrack("bgm_ice", "Ice Theme", BackgroundMusicSystem.MusicCategory.Exploration, false, "Frozen tundra");
+            AddTrack("bgm_swamp", "Swamp Theme", BackgroundMusicSystem.MusicCategory.Exploration, false, "Mysterious swamp");
+            AddTrack("bgm_ruins", "Ancient Ruins", BackgroundMusicSystem.MusicCategory.Exploration, false, "Forgotten ruins");
+            AddTrack("bgm_castle", "Castle Theme", BackgroundMusicSystem.MusicCategory.Exploration, false, "Majestic castle");
+            AddTrack("bgm_underwater", "Underwater Theme", BackgroundMusicSystem.MusicCategory.Exploration, false, "Deep ocean depths");
             
             // Battle tracks
-            AddTrack("battle_normal", "Normal Battle", MusicCategory.Battle, true, "Standard combat music");
-            AddTrack("battle_boss", "Boss Battle", MusicCategory.Battle, true, "Epic boss fight");
-            AddTrack("battle_miniboss", "Mini Boss", MusicCategory.Battle, false, "Mini boss encounter");
-            AddTrack("battle_final", "Final Battle", MusicCategory.Battle, false, "Final confrontation");
-            AddTrack("battle_pvp", "PvP Arena", MusicCategory.Battle, false, "Player vs player");
-            AddTrack("battle_siege", "Siege Battle", MusicCategory.Battle, false, "Castle siege");
+            AddTrack("battle_normal", "Normal Battle", BackgroundMusicSystem.MusicCategory.Battle, true, "Standard combat music");
+            AddTrack("battle_boss", "Boss Battle", BackgroundMusicSystem.MusicCategory.Battle, true, "Epic boss fight");
+            AddTrack("battle_miniboss", "Mini Boss", BackgroundMusicSystem.MusicCategory.Battle, false, "Mini boss encounter");
+            AddTrack("battle_final", "Final Battle", BackgroundMusicSystem.MusicCategory.Battle, false, "Final confrontation");
+            AddTrack("battle_pvp", "PvP Arena", BackgroundMusicSystem.MusicCategory.Battle, false, "Player vs player");
+            AddTrack("battle_siege", "Siege Battle", BackgroundMusicSystem.MusicCategory.Battle, false, "Castle siege");
             
             // Event tracks
-            AddTrack("event_victory", "Victory Fanfare", MusicCategory.Event, true, "Celebration music");
-            AddTrack("event_defeat", "Defeat Theme", MusicCategory.Event, true, "Sad reflection");
-            AddTrack("event_shop", "Shop Theme", MusicCategory.Event, true, "Merchant tunes");
-            AddTrack("event_inn", "Inn Theme", MusicCategory.Event, true, "Cozy tavern");
-            AddTrack("event_festival", "Festival Theme", MusicCategory.Event, false, "Grand festival");
-            AddTrack("event_wedding", "Wedding March", MusicCategory.Event, false, "Celebration of love");
-            AddTrack("event_funeral", "Memorial Theme", MusicCategory.Event, false, "Honoring the fallen");
+            AddTrack("event_victory", "Victory Fanfare", BackgroundMusicSystem.MusicCategory.Event, true, "Celebration music");
+            AddTrack("event_defeat", "Defeat Theme", BackgroundMusicSystem.MusicCategory.Event, true, "Sad reflection");
+            AddTrack("event_shop", "Shop Theme", BackgroundMusicSystem.MusicCategory.Event, true, "Merchant tunes");
+            AddTrack("event_inn", "Inn Theme", BackgroundMusicSystem.MusicCategory.Event, true, "Cozy tavern");
+            AddTrack("event_festival", "Festival Theme", BackgroundMusicSystem.MusicCategory.Event, false, "Grand festival");
+            AddTrack("event_wedding", "Wedding March", BackgroundMusicSystem.MusicCategory.Event, false, "Celebration of love");
+            AddTrack("event_funeral", "Memorial Theme", BackgroundMusicSystem.MusicCategory.Event, false, "Honoring the fallen");
             
             // Menu tracks
-            AddTrack("menu_main", "Main Menu", MusicCategory.Menu, true, "Title screen music");
-            AddTrack("menu_options", "Options Theme", MusicCategory.Menu, true, "Settings music");
-            AddTrack("menu_credits", "Credits Theme", MusicCategory.Menu, false, "End credits");
+            AddTrack("menu_main", "Main Menu", BackgroundMusicSystem.MusicCategory.Menu, true, "Title screen music");
+            AddTrack("menu_options", "Options Theme", BackgroundMusicSystem.MusicCategory.Menu, true, "Settings music");
+            AddTrack("menu_credits", "Credits Theme", BackgroundMusicSystem.MusicCategory.Menu, false, "End credits");
             
             // Special tracks
-            AddTrack("special_secret", "Secret Theme", MusicCategory.Special, false, "Hidden discovery");
-            AddTrack("special_dream", "Dream Sequence", MusicCategory.Special, false, "Mysterious dreams");
-            AddTrack("special_memory", "Memory Lane", MusicCategory.Special, false, "Nostalgic moments");
-            AddTrack("special_final", "Final Farewell", MusicCategory.Special, false, "Emotional goodbye");
+            AddTrack("special_secret", "Secret Theme", BackgroundMusicSystem.MusicCategory.Special, false, "Hidden discovery");
+            AddTrack("special_dream", "Dream Sequence", BackgroundMusicSystem.MusicCategory.Special, false, "Mysterious dreams");
+            AddTrack("special_memory", "Memory Lane", BackgroundMusicSystem.MusicCategory.Special, false, "Nostalgic moments");
+            AddTrack("special_final", "Final Farewell", BackgroundMusicSystem.MusicCategory.Special, false, "Emotional goodbye");
         }
         
-        private void AddTrack(string id, string name, MusicCategory category, bool defaultUnlocked, string description) {
+        private void AddTrack(string id, string name, BackgroundMusicSystem.MusicCategory category, bool defaultUnlocked, string description) {
             _trackDatabase[id] = new MusicCollectionEntry {
                 Id = id,
                 Name = name,
@@ -94,17 +94,17 @@ namespace ClawRPG.Scripts.Systems {
             }
         }
         
-        private string GetUnlockCondition(MusicCategory category) {
+        private string GetUnlockCondition(BackgroundMusicSystem.MusicCategory category) {
             switch (category) {
-                case MusicCategory.Exploration:
+                case BackgroundMusicSystem.MusicCategory.Exploration:
                     return "Default";
-                case MusicCategory.Battle:
+                case BackgroundMusicSystem.MusicCategory.Battle:
                     return "Default";
-                case MusicCategory.Event:
+                case BackgroundMusicSystem.MusicCategory.Event:
                     return "Default";
-                case MusicCategory.Menu:
+                case BackgroundMusicSystem.MusicCategory.Menu:
                     return "Default";
-                case MusicCategory.Special:
+                case BackgroundMusicSystem.MusicCategory.Special:
                     return "Complete the game";
                 default:
                     return "Unknown";
@@ -134,7 +134,7 @@ namespace ClawRPG.Scripts.Systems {
         /// <summary>
         /// Get tracks by category
         /// </summary>
-        public List<MusicCollectionEntry> GetTracksByCategory(MusicCategory category) {
+        public List<MusicCollectionEntry> GetTracksByCategory(BackgroundMusicSystem.MusicCategory category) {
             var result = new List<MusicCollectionEntry>();
             foreach (var track in _unlockedTracks.Values) {
                 if (track.Category == category) {
@@ -417,9 +417,9 @@ public delegate void AllTracksUnlocked();
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 已解锁曲目
             var unlocked = new Array();
@@ -440,7 +440,7 @@ public delegate void AllTracksUnlocked();
             data["times_played"] = _timesPlayed;
             
             // 曲目数据
-            var trackData = new Dictionary();
+            var trackData = new Dictionary<string, object>();
             foreach (var track in _unlockedTracks.Values) {
                 var trackInfo = new Dictionary
                 {
@@ -457,7 +457,7 @@ public delegate void AllTracksUnlocked();
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             
@@ -511,7 +511,7 @@ public delegate void AllTracksUnlocked();
     public class MusicCollectionEntry {
         public string Id { get; set; } = "";
         public string Name { get; set; } = "";
-        public MusicCategory Category { get; set; } = MusicCategory.Exploration;
+        public BackgroundMusicSystem.MusicCategory Category { get; set; } = BackgroundMusicSystem.MusicCategory.Exploration;
         public bool IsUnlocked { get; set; } = false;
         public string Description { get; set; } = "";
         public string UnlockCondition { get; set; } = "";

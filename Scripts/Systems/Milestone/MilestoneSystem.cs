@@ -383,9 +383,9 @@ public partial class MilestoneSystem : BaseSystem
     /// <summary>
     /// Export save data (BaseSystem override)
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["milestones"] = _data.Milestones;
         data["categoryProgress"] = _data.CategoryProgress;
         data["statistics"] = _data.Statistics;
@@ -395,7 +395,7 @@ public partial class MilestoneSystem : BaseSystem
     /// <summary>
     /// Import save data (BaseSystem override)
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

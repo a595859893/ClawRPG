@@ -49,7 +49,7 @@ public class NetworkQualityUI : Control
         vbox.AddChild(_latencyLabel);
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         _timer += delta;
         if (_timer >= _updateInterval)

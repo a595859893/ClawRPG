@@ -275,14 +275,14 @@ namespace ClawRPG.Scripts.Combat {
         
         #region Save/Load
         
-        public override Dictionary ExportSaveData() {
+        public override Dictionary<string, object> ExportSaveData() {
             return new Dictionary {
                 { "cached_meshes_count", cachedMeshes.Count },
                 { "cached_materials_count", cachedMaterials.Count }
             };
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             // Library不需要持久化运行时缓存
         }
         

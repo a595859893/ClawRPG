@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using ClawRPG.Scripts.Characters;
 
 /// <summary>
 /// 敌人事件数据

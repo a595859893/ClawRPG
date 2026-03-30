@@ -120,7 +120,7 @@ namespace ClawRPG.Scripts.UI
             mainContainer.SelfModulate = new Color(1f, 1f, 1f, 0.98f);
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (!_isVisible)
                 return;

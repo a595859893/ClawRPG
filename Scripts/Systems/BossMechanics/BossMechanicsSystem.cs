@@ -108,7 +108,7 @@ public class BossMechanicsSystem : BaseSystem
         // 模式变化信号（可用于UI显示等）
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         UpdateBossBattles(delta);
     }
@@ -401,9 +401,9 @@ public class BossMechanicsSystem : BaseSystem
     public BossPatternSystem GetPatternSystem() => _patternSystem;
 
     // 存档支持
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 导出统计数据
         data["totalBossesDefeated"] = _playerStats.TotalBossesDefeated;
@@ -444,7 +444,7 @@ public class BossMechanicsSystem : BaseSystem
         var battlesData = new Godot.Collections.Array();
         foreach (var battle in _activeBossBattles)
         {
-            var battleData = new Dictionary();
+            var battleData = new Dictionary<string, object>();
             battleData["instanceId"] = battle.Key;
             
             // 委托给子系统导出
@@ -459,7 +459,7 @@ public class BossMechanicsSystem : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

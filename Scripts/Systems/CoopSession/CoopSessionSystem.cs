@@ -504,9 +504,9 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// <summary>
         /// 存档支持 (BaseSystem override)
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["ActiveSessions"] = _activeSessions.Values.ToList();
             data["PlayerHistories"] = _playerHistories.Values.ToList();
             data["CurrentSessionId"] = _currentSessionId;
@@ -516,7 +516,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// <summary>
         /// 读档支持 (BaseSystem override)
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             _activeSessions.Clear();
             _playerHistories.Clear();

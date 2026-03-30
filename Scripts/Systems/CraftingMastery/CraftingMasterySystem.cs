@@ -303,15 +303,15 @@ public class CraftingMasterySystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // Convert mastery data to serializable format
-        var masteryDict = new Dictionary();
+        var masteryDict = new Dictionary<string, object>();
         foreach (var kvp in masteryData)
         {
-            var mastery = new Dictionary();
+            var mastery = new Dictionary<string, object>();
             mastery["level"] = kvp.Value.Level;
             mastery["total_crafts"] = kvp.Value.TotalCrafts;
             mastery["successful_crafts"] = kvp.Value.SuccessfulCrafts;
@@ -327,7 +327,7 @@ public class CraftingMasterySystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

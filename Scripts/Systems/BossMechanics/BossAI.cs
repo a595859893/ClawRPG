@@ -294,14 +294,14 @@ public delegate void BossModeChangedEventHandler(BossMode oldMode, BossMode newM
             return loot;
         }
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["decisionInterval"] = _decisionInterval;
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data.Contains("decisionInterval")) {
                 _decisionInterval = Convert.ToSingle(data["decisionInterval"]);

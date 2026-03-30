@@ -400,7 +400,7 @@ public class SurvivalChallengeUI : Control
         // 连接系统信号
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (_system.IsChallengeActive)
         {

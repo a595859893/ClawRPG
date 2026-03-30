@@ -50,7 +50,7 @@ public class PartyManager : BaseSystem
         GD.Print("[PartyManager] Initialized");
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!IsInParty) return;
         SyncMemberState();
@@ -556,9 +556,9 @@ public class PartyManager : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         data["party_id"] = _partyId;
         data["is_leader"] = _isLeader;
@@ -570,7 +570,7 @@ public class PartyManager : BaseSystem
         {
             foreach (var kvp in _members)
             {
-                var member = new Dictionary();
+                var member = new Dictionary<string, object>();
                 member["player_id"] = kvp.Value.PlayerId;
                 member["player_name"] = kvp.Value.PlayerName;
                 member["level"] = kvp.Value.Level;
@@ -589,7 +589,7 @@ public class PartyManager : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

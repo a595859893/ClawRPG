@@ -237,9 +237,9 @@ public class ArtifactFusionSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["total_fusions"] = Data.TotalFusions;
         data["successful_fusions"] = Data.SuccessfulFusions;
         data["legendary_fusions"] = Data.LegendaryFusions;
@@ -250,7 +250,7 @@ public class ArtifactFusionSystem : BaseSystem
         var historyArray = new Godot.Array();
         foreach (var record in Data.FusionHistory)
         {
-            var recordDict = new Dictionary();
+            var recordDict = new Dictionary<string, object>();
             recordDict["artifact1"] = record.Artifact1;
             recordDict["artifact2"] = record.Artifact2;
             recordDict["result_artifact"] = record.ResultArtifact;
@@ -267,7 +267,7 @@ public class ArtifactFusionSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

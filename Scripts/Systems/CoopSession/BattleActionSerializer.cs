@@ -132,12 +132,12 @@ namespace ClawRPG.Scripts.Systems.CoopSession {
             }
         }
         
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             // 加载数据
         }
     }

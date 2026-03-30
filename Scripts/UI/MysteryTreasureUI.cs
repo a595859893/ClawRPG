@@ -144,7 +144,7 @@ public class MysteryTreasureUI : Control
         _mainVBox.AddChild(refreshButton);
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (Visible)
         {

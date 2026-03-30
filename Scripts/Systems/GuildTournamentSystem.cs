@@ -382,9 +382,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Save tournament data
         /// </summary>
-        protected override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            Dictionary data = new Dictionary();
+            Dictionary data = new Dictionary<string, object>();
             
             // Save current tournament
             if (_currentTournament != null)
@@ -438,7 +438,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Load tournament data
         /// </summary>
-        protected override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null)
                 return;

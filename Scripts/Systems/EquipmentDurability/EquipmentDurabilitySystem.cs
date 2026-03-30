@@ -346,15 +346,15 @@ public delegate void EquipmentBrokenEventHandler(string itemId);
 public delegate void EquipmentRepairedEventHandler(string itemId, int cost);
     
     // ===== 持久化 =====
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 保存装备耐久度
         var durabilityList = new Array();
         foreach (var kvp in _playerData.EquippedDurability)
         {
-            var itemData = new Dictionary();
+            var itemData = new Dictionary<string, object>();
             itemData["item_id"] = kvp.Key;
             itemData["current"] = kvp.Value.CurrentDurability;
             itemData["max"] = kvp.Value.MaxDurability;
@@ -370,7 +370,7 @@ public delegate void EquipmentRepairedEventHandler(string itemId, int cost);
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

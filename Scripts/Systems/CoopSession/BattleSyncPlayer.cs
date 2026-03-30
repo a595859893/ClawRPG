@@ -467,9 +467,9 @@ public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int 
         /// <summary>
         /// 导出持久化数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 序列化玩家状态
             var playerStatesData = new ArrayList();
@@ -539,7 +539,7 @@ public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int 
         /// <summary>
         /// 导入持久化数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null)
             {

@@ -234,7 +234,7 @@ public class ConfidenceFloorHealthBar : Control
         // 颜色更新完成回调
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         float percent = _maxHealth > 0 ? _currentHealth / _maxHealth : 0;
 

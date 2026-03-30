@@ -257,7 +257,7 @@ namespace Framework
         
         public Dictionary ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             var entries = new List<Dictionary>();
             foreach (var kvp in _comboStates)

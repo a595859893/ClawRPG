@@ -218,8 +218,8 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             base.Reset();
         }
 
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             var excludedList = new Godot.Collections.Array();
             foreach (var id in _excludedChoices) {
                 excludedList.Add(id);
@@ -228,7 +228,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             _excludedChoices.Clear();
 

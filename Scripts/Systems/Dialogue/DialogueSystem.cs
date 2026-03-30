@@ -504,9 +504,9 @@ public delegate void ChoiceMade(DialogueChoice choice);
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 对话树通常从数据库加载，不需要保存
         // 只保存当前对话状态
@@ -525,7 +525,7 @@ public delegate void ChoiceMade(DialogueChoice choice);
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

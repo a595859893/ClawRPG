@@ -480,9 +480,9 @@ public delegate void ExpeditionAbandonedEventHandler(int dungeonType);
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         if (_currentExpedition != null)
         {
@@ -507,7 +507,7 @@ public delegate void ExpeditionAbandonedEventHandler(int dungeonType);
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

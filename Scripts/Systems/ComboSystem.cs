@@ -224,7 +224,7 @@ public class ComboSystem : BaseSystem
         }
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         _deltaTime = delta;
         _UpdateComboTimers(delta);
@@ -795,13 +795,13 @@ public class ComboSystem : BaseSystem
     /// <summary>
     /// 导出存档数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["comboPoints"] = _comboPoints;
         data["comboLevel"] = _comboLevel;
         
-        var progressData = new Dictionary();
+        var progressData = new Dictionary<string, object>();
         foreach (var progress in _playerCombos)
         {
             progressData[progress.Key] = progress.Value.timesExecuted;
@@ -821,7 +821,7 @@ public class ComboSystem : BaseSystem
     /// 导入存档数据
     /// </summary>
     /// <param name="data">存档数据字典</param>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

@@ -397,9 +397,9 @@ public class EconomicDashboardSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 金币统计
         data["total_gold_in_circulation"] = _data.TotalGoldInCirculation;
@@ -439,7 +439,7 @@ public class EconomicDashboardSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

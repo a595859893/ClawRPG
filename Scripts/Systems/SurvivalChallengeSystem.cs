@@ -526,9 +526,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 保存数据
         /// </summary>
-        protected override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var saveDict = new Dictionary();
+            var saveDict = new Dictionary<string, object>();
             
             var bestWaves = new Godot.Collections.Dictionary();
             foreach (var kvp in _playerData.BestWaves)
@@ -566,7 +566,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 加载数据
         /// </summary>
-        protected override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

@@ -64,7 +64,7 @@ namespace ClawRPG.Scripts.Combat
             GD.Print("[CombatUISystem] Combat UI System initialized");
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             // Update combo timer
             if (_currentCombo.CurrentCombo > 0)
@@ -606,7 +606,7 @@ namespace ClawRPG.Scripts.Combat
 
         #region BaseSystem Persistence
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, Variant>();
             
@@ -635,7 +635,7 @@ namespace ClawRPG.Scripts.Combat
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

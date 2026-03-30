@@ -248,7 +248,7 @@ public class FriendSystem : BaseSystem
     // 存档支持
     public Dictionary SaveData()
     {
-        var data = new Dictionary();
+        var data = new System.Collections.Generic.Dictionary<string, object>();
         
         var friendsList = new Array<Dictionary>();
         foreach (var friend in _friends.Values)
@@ -270,12 +270,12 @@ public class FriendSystem : BaseSystem
     
     #region Data Persistence
     
-    public override Dictionary ExportSaveData()
+    public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
     {
         return SaveData();
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
     {
         if (data == null) return;
         LoadData(data);

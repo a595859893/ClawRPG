@@ -330,9 +330,9 @@ public delegate void OnSecretCategoryComplete(SecretAchievementCategory category
 
         // ===== 持久化方法 =====
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 统计数据
             data["totalDiscovered"] = _totalDiscovered;
@@ -340,10 +340,10 @@ public delegate void OnSecretCategoryComplete(SecretAchievementCategory category
             data["totalExpEarned"] = _totalExpEarned;
             
             // 玩家成就数据
-            var achievementsData = new Dictionary();
+            var achievementsData = new Dictionary<string, object>();
             foreach (var kvp in _playerAchievements)
             {
-                var achievementDict = new Dictionary();
+                var achievementDict = new Dictionary<string, object>();
                 achievementDict["isDiscovered"] = kvp.Value.IsDiscovered;
                 achievementDict["progress"] = kvp.Value.Progress;
                 achievementDict["discoveredAt"] = kvp.Value.DiscoveredAt.ToString("o");
@@ -354,7 +354,7 @@ public delegate void OnSecretCategoryComplete(SecretAchievementCategory category
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

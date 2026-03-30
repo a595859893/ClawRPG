@@ -230,7 +230,7 @@ public class CombatHUDEnhancementSystem : BaseSystem
 		else if (kills == 50) MilestoneReached.Emit("Kill50");
 	}
 	
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if (_currentSession == null || !_currentSession.IsActive) return;
 		
@@ -325,9 +325,9 @@ public class CombatHUDEnhancementSystem : BaseSystem
 	/// <summary>
 	/// Export save data for persistence
 	/// </summary>
-	public override Dictionary ExportSaveData()
+	public override Dictionary<string, object> ExportSaveData()
 	{
-		var data = new Dictionary();
+		var data = new Dictionary<string, object>();
 		data["session_start_time"] = _sessionStartTime;
 		// Note: Current session data is runtime state, not persisted
 		return data;
@@ -336,7 +336,7 @@ public class CombatHUDEnhancementSystem : BaseSystem
 	/// <summary>
 	/// Import save data from persistence
 	/// </summary>
-	public override void ImportSaveData(Dictionary data)
+	public override void ImportSaveData(Dictionary<string, object> data)
 	{
 		if (data == null) return;
 		

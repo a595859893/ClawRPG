@@ -56,9 +56,9 @@ public class ProceduralStoryData : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 统计数据
         data["total_stories_started"] = TotalStoriesStarted;
@@ -90,7 +90,7 @@ public class ProceduralStoryData : BaseSystem
             }
             storyDict["completed_chapters"] = completedChapters;
             
-            var choices = new Dictionary();
+            var choices = new Dictionary<string, object>();
             foreach (var choice in kvp.Value.Choices)
             {
                 choices[choice.Key] = choice.Value;
@@ -126,7 +126,7 @@ public class ProceduralStoryData : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

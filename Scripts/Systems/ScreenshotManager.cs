@@ -138,7 +138,7 @@ public class ScreenshotManager : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -150,7 +150,7 @@ public class ScreenshotManager : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data.Contains("screenshot_folder"))
             ScreenshotFolder = data["screenshot_folder"].ToString();

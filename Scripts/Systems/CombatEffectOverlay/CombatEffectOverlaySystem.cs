@@ -58,7 +58,7 @@ public class CombatEffectOverlaySystem : BaseSystem
         _slowMotionTimer = 0f;
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         UpdateScreenEffects(delta);
         UpdateCameraShake(delta);
@@ -570,9 +570,9 @@ public class CombatEffectOverlaySystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["total_screen_flashes"] = _data.TotalScreenFlashes;
         data["total_camera_shakes"] = _data.TotalCameraShakes;
         data["total_slow_motions"] = _data.TotalSlowMotions;
@@ -584,7 +584,7 @@ public class CombatEffectOverlaySystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

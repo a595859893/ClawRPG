@@ -116,7 +116,7 @@ public class CharacterCreationData
 
     public Dictionary ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // Character Info
         data["character_name"] = CharacterName;

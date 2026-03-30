@@ -270,7 +270,7 @@ namespace ClawRPG.Scripts.Systems {
         /// <summary>
         /// 导出保存数据 - 实现 BaseSystem 接口
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary(Serialize());
         }
@@ -278,7 +278,7 @@ namespace ClawRPG.Scripts.Systems {
         /// <summary>
         /// 导入保存数据 - 实现 BaseSystem 接口
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             Deserialize(new Dictionary<string, object>(data));

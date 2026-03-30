@@ -47,7 +47,7 @@ namespace ClawRPG.Scripts.Combat
             GD.Print("[CombatPersistenceSystem] Initialized");
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             _comboTimer -= delta;
             _killStreakTimer -= delta;
@@ -465,9 +465,9 @@ namespace ClawRPG.Scripts.Combat
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
 
             // 统计信息
             var stats = new Dictionary
@@ -534,7 +534,7 @@ namespace ClawRPG.Scripts.Combat
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

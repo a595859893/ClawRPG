@@ -213,7 +213,7 @@ public class CombatHUDEnhancementUI : Control
 		}
 	}
 	
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if (!_isVisible || _combatSystem == null) return;
 		

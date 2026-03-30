@@ -57,7 +57,7 @@ public delegate void DropCollected(string itemId, int quantity);
             GD.Print("[SecretBossSystem] 隐藏Boss系统已初始化");
         }
         
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             base._Process(delta);
             CheckBossConditions();
             UpdateBossTimers(delta);
@@ -442,12 +442,12 @@ public delegate void DropCollected(string itemId, int quantity);
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 玩家击杀统计
-            var killCountDict = new Dictionary();
+            var killCountDict = new Dictionary<string, object>();
             foreach (var kvp in _killCount)
             {
                 killCountDict[kvp.Key] = kvp.Value;
@@ -458,7 +458,7 @@ public delegate void DropCollected(string itemId, int quantity);
             data["current_combo"] = _currentCombo;
             
             // Boss出现冷却
-            var bossCooldowns = new Dictionary();
+            var bossCooldowns = new Dictionary<string, object>();
             foreach (var kvp in _bossCooldowns)
             {
                 bossCooldowns[kvp.Key] = kvp.Value;
@@ -466,7 +466,7 @@ public delegate void DropCollected(string itemId, int quantity);
             data["boss_cooldowns"] = bossCooldowns;
             
             // 世界状态标志
-            var worldFlags = new Dictionary();
+            var worldFlags = new Dictionary<string, object>();
             foreach (var kvp in _worldFlags)
             {
                 worldFlags[kvp.Key] = kvp.Value;
@@ -484,7 +484,7 @@ public delegate void DropCollected(string itemId, int quantity);
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

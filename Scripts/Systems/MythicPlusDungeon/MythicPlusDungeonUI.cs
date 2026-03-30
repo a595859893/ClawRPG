@@ -527,7 +527,7 @@ public class MythicPlusDungeonUI : Control
         }
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (_isVisible && _tabContainer?.GetCurrentTab() == 0)
         {

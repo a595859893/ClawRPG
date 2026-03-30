@@ -357,22 +357,22 @@ public partial class TradeSystem : BaseSystem {
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 交易历史
         var records = new List<Dictionary>();
         foreach (var record in TradeHistory)
         {
-            var recordDict = new Dictionary();
+            var recordDict = new Dictionary<string, object>();
             recordDict["record_id"] = record.RecordId;
             recordDict["completed_at"] = record.CompletedAt.ToString("o");
             
             // 交易详情（简化）
             if (record.TradeOffer != null)
             {
-                var offerDict = new Dictionary();
+                var offerDict = new Dictionary<string, object>();
                 offerDict["offer_id"] = record.TradeOffer.OfferId;
                 offerDict["player1_name"] = record.TradeOffer.Player1Name;
                 offerDict["player2_name"] = record.TradeOffer.Player2Name;
@@ -393,7 +393,7 @@ public partial class TradeSystem : BaseSystem {
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

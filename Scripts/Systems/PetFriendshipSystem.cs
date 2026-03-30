@@ -282,18 +282,18 @@ public class PetFriendshipSystem : BaseSystem
     }
 
         // ===== 持久化 =====
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 保存友谊数据
-        var friendshipsData = new Dictionary();
+        var friendshipsData = new Dictionary<string, object>();
         foreach (var outerKvp in friendships)
         {
-            var innerDict = new Dictionary();
+            var innerDict = new Dictionary<string, object>();
             foreach (var innerKvp in outerKvp.Value)
             {
-                var friendship = new Dictionary();
+                var friendship = new Dictionary<string, object>();
                 friendship["pet_id"] = innerKvp.Value.PetId;
                 friendship["friend_pet_id"] = innerKvp.Value.FriendPetId;
                 friendship["level"] = innerKvp.Value.FriendshipLevel;
@@ -307,7 +307,7 @@ public class PetFriendshipSystem : BaseSystem
         data["friendships"] = friendshipsData;
         
         // 保存已装备技能
-        var skillsData = new Dictionary();
+        var skillsData = new Dictionary<string, object>();
         foreach (var kvp in equippedSkills)
         {
             skillsData[kvp.Key.ToString()] = kvp.Value;
@@ -321,7 +321,7 @@ public class PetFriendshipSystem : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

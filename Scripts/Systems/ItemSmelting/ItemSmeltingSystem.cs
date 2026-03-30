@@ -56,7 +56,7 @@ public class ItemSmeltingSystem : BaseSystem
         GD.Print($"Started smelting: {recipe.Name} x{itemCount}");
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!IsSmelting) return;
         
@@ -254,9 +254,9 @@ public class ItemSmeltingSystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
 
         // 当前锻造状态
         data["current_recipe_id"] = CurrentRecipeId;
@@ -280,7 +280,7 @@ public class ItemSmeltingSystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

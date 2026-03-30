@@ -220,7 +220,7 @@ public class RaidBossUI : Control
         }
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // Update raid status
         UpdateRaidStatus();

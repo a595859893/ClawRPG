@@ -551,9 +551,9 @@ namespace ClawRPG.Core.Systems
         /// <summary>
         /// Export save data (BaseSystem override)
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["totalEventsParticipated"] = _playerData.TotalEventsParticipated;
             data["eventsCompleted"] = _playerData.EventsCompleted;
             data["eventsFailed"] = _playerData.EventsFailed;
@@ -569,7 +569,7 @@ namespace ClawRPG.Core.Systems
         /// <summary>
         /// Import save data (BaseSystem override)
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

@@ -373,15 +373,15 @@ public delegate void SlotEmpty(int slotIndex);
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 快捷栏数据
         var slotsData = new List<Dictionary>();
         for (int i = 0; i < 8; i++)
         {
-            var slotDict = new Dictionary();
+            var slotDict = new Dictionary<string, object>();
             slotDict["item_id"] = _slots[i].ItemId;
             slotDict["item_count"] = _slots[i].ItemCount;
             slotDict["slot_type"] = (int)_slots[i].SlotType;
@@ -395,7 +395,7 @@ public delegate void SlotEmpty(int slotIndex);
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

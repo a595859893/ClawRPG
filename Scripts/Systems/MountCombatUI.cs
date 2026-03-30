@@ -314,7 +314,7 @@ namespace ClawRPG.Scripts.UI {
             _combatStatsLabel.Text = $"伤害: {instance.CombatDamageDealt} | 击杀: {instance.CombatKills}";
         }
 
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             if (Visible && _currentMountId != null) {
                 UpdateCooldownDisplay();
                 UpdateCombatStats();

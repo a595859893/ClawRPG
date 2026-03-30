@@ -229,7 +229,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 获取持久化数据（用于 SaveLoadSystem）
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary
             {
@@ -245,7 +245,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 导入持久化数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

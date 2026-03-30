@@ -48,7 +48,7 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
         private EventBusManager _eventBus;
         private bool _combatStartedThisSession = false;
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             // 检查临时盟友过期
             if (_tempAllyActive && _tempAllyEndTime > 0 && OS.GetUnixTime() > _tempAllyEndTime)
@@ -342,7 +342,7 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
         }
 
         // ========== 持久化 ==========
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary {
                 { "rerollCount", _data.RerollCount },
@@ -353,7 +353,7 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

@@ -277,7 +277,7 @@ public delegate void BuffListChanged();
 	}
 	
 	// 每帧更新
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		List<ActiveBuff> toRemove = new List<ActiveBuff>();
 		
@@ -509,9 +509,9 @@ public delegate void BuffListChanged();
 	}
 	
 	// ===== 持久化 =====
-	public override Dictionary ExportSaveData()
+	public override Dictionary<string, object> ExportSaveData()
 	{
-		var data = new Dictionary();
+		var data = new Dictionary<string, object>();
 		
 		// 保存统计数据
 		data["total_buffs_applied"] = _playerBuffData.TotalBuffsApplied;
@@ -524,7 +524,7 @@ public delegate void BuffListChanged();
 		var activeBuffsData = new Array();
 		foreach (var buff in _activeBuffs)
 		{
-			var buffData = new Dictionary();
+			var buffData = new Dictionary<string, object>();
 			buffData["id"] = buff.Info.Id;
 			buffData["time_remaining"] = buff.TimeRemaining;
 			buffData["stack_count"] = buff.StackCount;
@@ -536,7 +536,7 @@ public delegate void BuffListChanged();
 		return data;
 	}
 	
-	public override void ImportSaveData(Dictionary data)
+	public override void ImportSaveData(Dictionary<string, object> data)
 	{
 		if (data == null) return;
 		

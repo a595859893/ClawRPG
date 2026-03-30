@@ -230,15 +230,15 @@ public class EnemyWeaknessSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 敌人弱点追踪数据
         var enemyWeaknessesData = new Array();
         foreach (var kvp in _data.EnemyWeaknesses)
         {
-            var enemyData = new Dictionary();
+            var enemyData = new Dictionary<string, object>();
             enemyData["enemy_type"] = kvp.Key;
             
             var weaknessesArray = new Array();
@@ -277,14 +277,14 @@ public class EnemyWeaknessSystem : BaseSystem
         data["total_weakness_activations"] = _data.TotalWeaknessActivations;
         data["total_bonus_damage"] = _data.TotalBonusDamage;
         
-        var weaknessTypeUsageData = new Dictionary();
+        var weaknessTypeUsageData = new Dictionary<string, object>();
         foreach (var kvp in _data.WeaknessTypeUsage)
         {
             weaknessTypeUsageData[kvp.Key] = kvp.Value;
         }
         data["weakness_type_usage"] = weaknessTypeUsageData;
         
-        var elementUsageData = new Dictionary();
+        var elementUsageData = new Dictionary<string, object>();
         foreach (var kvp in _data.ElementUsage)
         {
             elementUsageData[kvp.Key] = kvp.Value;
@@ -297,7 +297,7 @@ public class EnemyWeaknessSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

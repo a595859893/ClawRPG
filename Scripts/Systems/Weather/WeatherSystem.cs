@@ -154,7 +154,7 @@ public class WeatherSystem : BaseSystem
         global_weather_timer = 0;
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!is_weather_enabled) return;
         
@@ -525,7 +525,7 @@ public class WeatherSystem : BaseSystem
         UpdateWeatherEffects();
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, Variant>();
 
@@ -557,7 +557,7 @@ public class WeatherSystem : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null || player_data == null) return;
 

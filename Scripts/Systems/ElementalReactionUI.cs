@@ -37,7 +37,7 @@ public class ElementalReactionUI : Control
         GD.Print("[ElementalReactionUI] Initialized - Press E to toggle");
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // 检查快捷键
         if (Input.IsActionJustPressed("elemental_reaction_toggle"))

@@ -432,9 +432,9 @@ namespace ClawRPG.Modules.MultiplayerVote
         /// <summary>
         /// Export save data
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // Export active votes
             var votes = new List<Dictionary>();
@@ -476,7 +476,7 @@ namespace ClawRPG.Modules.MultiplayerVote
         /// <summary>
         /// Import save data
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

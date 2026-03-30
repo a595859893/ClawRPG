@@ -387,7 +387,7 @@ namespace ClawRPG.Scripts.UI {
             EndTutorial();
         }
 
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             if (!_isActive || _currentStep == null) return;
             
             // 计时器

@@ -39,11 +39,11 @@ public class FactionSystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
-        var reputations = new Dictionary();
+        var reputations = new Dictionary<string, object>();
         foreach (var kvp in playerReputation)
         {
             reputations[kvp.Key] = kvp.Value;
@@ -56,7 +56,7 @@ public class FactionSystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null || !data.Contains("reputations")) return;
         

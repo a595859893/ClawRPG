@@ -35,7 +35,7 @@ public class ElementalResonanceSystem : BaseSystem
         Instance = this;
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // Update element timers
         List<int> expiredTargets = new List<int>();
@@ -255,15 +255,15 @@ public class ElementalResonanceSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 保存目标元素状态
         var targetsArray = new Godot.Array();
         foreach (var kvp in targetElements)
         {
-            var targetData = new Dictionary();
+            var targetData = new Dictionary<string, object>();
             targetData["target_id"] = kvp.Key;
             
             var elementsArray = new Godot.Array();
@@ -283,7 +283,7 @@ public class ElementalResonanceSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

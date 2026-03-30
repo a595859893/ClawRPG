@@ -297,7 +297,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导出持久化数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return Persistence.ExportSaveData();
         }
@@ -305,7 +305,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导入持久化数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             // 先导入数据
             Persistence.ImportSaveData(data);

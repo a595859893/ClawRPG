@@ -320,9 +320,9 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new System.Collections.Generic.Dictionary<string, object>();
             
             // 统计数据
             if (Statistics != null)
@@ -357,7 +357,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
         {
             if (data == null) return;
             

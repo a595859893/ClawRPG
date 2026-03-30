@@ -248,9 +248,9 @@ public class BossPhaseSystem : BaseSystem
     /// <summary>
     /// 导出阶段系统数据 (Override基类无参方法)
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
 
         // 从当前关联的battle导出数据
         if (_currentBattle != null)
@@ -270,7 +270,7 @@ public class BossPhaseSystem : BaseSystem
     /// <summary>
     /// 导入阶段系统数据 (Override基类无参方法)
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 
@@ -295,7 +295,7 @@ public class BossPhaseSystem : BaseSystem
     /// </summary>
     public Dictionary ExportSaveData(BossBattleInstance battle)
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
 
         if (battle != null)
         {

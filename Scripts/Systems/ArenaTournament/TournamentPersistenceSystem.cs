@@ -28,9 +28,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导出保存数据 - 序列化所有锦标赛和玩家进度
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             var core = ArenaTournamentCoreSystem.Instance;
             if (core == null) return data;
@@ -207,7 +207,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导入保存数据 - 反序列化所有锦标赛和玩家进度
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

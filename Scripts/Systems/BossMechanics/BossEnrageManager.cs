@@ -132,14 +132,14 @@ public partial class BossEnrageManager : BaseSystem
         return _currentMode == 0 ? "Strategic" : "Enraged";
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         // 狂暴管理器不保留跨存档数据（每场战斗独立）
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         // 无需持久化
     }

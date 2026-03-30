@@ -310,7 +310,7 @@ namespace ClawRPG.Scripts.Systems.PetFoster
             saveSystem?.Set("pet_foster_data", _playerData);
         }
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             // 使用 JSON 序列化 PlayerFosterData
             string jsonStr = Godot.JSON.Stringify(_playerData);
@@ -323,7 +323,7 @@ namespace ClawRPG.Scripts.Systems.PetFoster
             };
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

@@ -54,9 +54,9 @@ public class CrossServerBattleMain : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         // CrossServerBattleMain 是容器系统，无持久化状态
         return data;
     }
@@ -64,7 +64,7 @@ public class CrossServerBattleMain : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         // CrossServerBattleMain 是容器系统，无持久化状态

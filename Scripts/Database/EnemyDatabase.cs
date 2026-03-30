@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using ClawRPG.Scripts.Data.Enemy;
 
 namespace ClawRPG.Scripts.Database
 {
@@ -276,9 +277,9 @@ namespace ClawRPG.Scripts.Database
         
         #region Persistence
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 导出子系统数据
             if (_spawnLogic != null)
@@ -289,7 +290,7 @@ namespace ClawRPG.Scripts.Database
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

@@ -209,9 +209,9 @@ namespace ClawRPG.Scripts.Items {
         /// <summary>
         /// 导出保存数据 - 实现 BaseSystem 持久化接口
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var equippedSetsData = new Dictionary();
+            var equippedSetsData = new Dictionary<string, object>();
             foreach (var kvp in _equippedSets)
             {
                 var equipmentList = new Godot.Collections.Array();
@@ -244,7 +244,7 @@ namespace ClawRPG.Scripts.Items {
         /// <summary>
         /// 导入保存数据 - 实现 BaseSystem 持久化接口
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

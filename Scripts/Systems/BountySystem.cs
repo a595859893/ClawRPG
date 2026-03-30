@@ -443,9 +443,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Export save data for persistence - implements BaseSystem
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["activeBounties"] = ActiveBounties.Select(b => new Dictionary
             {
                 ["id"] = b.Id,
@@ -471,7 +471,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// Import save data from persistence - implements BaseSystem
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

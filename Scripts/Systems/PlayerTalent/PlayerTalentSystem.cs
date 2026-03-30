@@ -318,19 +318,19 @@ public class PlayerTalentSystem : BaseSystem
     /// <summary>
     /// 导出保存数据 - 继承自 BaseSystem
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["unlocked_talents"] = new Godot.Collections.Array(PlayerData.UnlockedTalents);
         data["total_points_spent"] = PlayerData.TotalPointsSpent;
         data["available_points"] = _availablePoints;
         
-        var treePoints = new Dictionary();
+        var treePoints = new Dictionary<string, object>();
         foreach (var kvp in PlayerData.TreePoints)
             treePoints[kvp.Key.ToString()] = kvp.Value;
         data["tree_points"] = treePoints;
         
-        var unlockedTrees = new Dictionary();
+        var unlockedTrees = new Dictionary<string, object>();
         foreach (var kvp in PlayerData.UnlockedTrees)
             unlockedTrees[kvp.Key.ToString()] = kvp.Value;
         data["unlocked_trees"] = unlockedTrees;
@@ -341,7 +341,7 @@ public class PlayerTalentSystem : BaseSystem
     /// <summary>
     /// 导入保存数据 - 继承自 BaseSystem
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

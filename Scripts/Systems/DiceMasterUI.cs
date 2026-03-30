@@ -141,7 +141,7 @@ public class DiceMasterUI : Control
         diceButtons.AddChild(btn);
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!IsVisibleInTree()) return;
         

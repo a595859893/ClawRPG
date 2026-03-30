@@ -389,7 +389,7 @@ public class EquipmentEnhancementSystem : BaseSystem
         GD.Print($"[EquipmentEnhancementSystem] Loaded {PlayerData.TotalEnhancements} enhancements");
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -402,7 +402,7 @@ public class EquipmentEnhancementSystem : BaseSystem
         };
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

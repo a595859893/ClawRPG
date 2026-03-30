@@ -393,9 +393,9 @@ public class TeamSystem : BaseSystem
     }
     
     // ===== 持久化 =====
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 保存队伍状态
         data["is_in_team"] = _isInTeam;
@@ -415,7 +415,7 @@ public class TeamSystem : BaseSystem
             var membersData = new Array();
             foreach (var member in _currentTeam.Members)
             {
-                var memberData = new Dictionary();
+                var memberData = new Dictionary<string, object>();
                 memberData["player_id"] = member.PlayerId;
                 memberData["player_name"] = member.PlayerName;
                 memberData["is_ready"] = member.IsReady;
@@ -435,7 +435,7 @@ public class TeamSystem : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

@@ -249,9 +249,9 @@ public partial class PetPerformanceData : BaseSystem
 
     // ===== SaveData =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         var recordsList = new List<Dictionary>();
         foreach (var r in _records)
         {
@@ -270,7 +270,7 @@ public partial class PetPerformanceData : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         _records.Clear();
         if (!data.Contains("records")) return;

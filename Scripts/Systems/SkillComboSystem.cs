@@ -352,12 +352,12 @@ public partial class SkillComboSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // Combo usage count
-        var usageCount = new Dictionary();
+        var usageCount = new Dictionary<string, object>();
         foreach (var kvp in _playerData.ComboUsageCount)
         {
             usageCount[kvp.Key] = kvp.Value;
@@ -365,7 +365,7 @@ public partial class SkillComboSystem : BaseSystem
         data["combo_usage_count"] = usageCount;
         
         // Combo streak best
-        var streakBest = new Dictionary();
+        var streakBest = new Dictionary<string, object>();
         foreach (var kvp in _playerData.ComboStreakBest)
         {
             streakBest[kvp.Key] = kvp.Value;
@@ -389,7 +389,7 @@ public partial class SkillComboSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

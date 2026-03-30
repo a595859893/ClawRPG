@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Modules.MultiplayerVote;
 
 namespace ClawRPG.Systems.MultiplayerVote
 {
@@ -286,12 +287,12 @@ namespace ClawRPG.Systems.MultiplayerVote
 
         #region Save/Load
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return _persistenceSystem.ExportSaveData();
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             _persistenceSystem.ImportSaveData(data);
         }

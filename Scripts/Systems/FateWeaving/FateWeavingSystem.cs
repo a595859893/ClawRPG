@@ -316,9 +316,9 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
         /// <summary>
         /// 导出保存数据 (BaseSystem 接口)
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 保存玩家属性
             var playerStats = new Godot.Collections.Dictionary();
@@ -354,7 +354,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
         /// <summary>
         /// 导入保存数据 (BaseSystem 接口)
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

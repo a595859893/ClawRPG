@@ -128,12 +128,12 @@ namespace ClawRPG.Scripts.Systems
             _playerStats.Clear();
         }
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
 
             // Serialize boss damage records
-            var bossRecordsData = new Dictionary();
+            var bossRecordsData = new Dictionary<string, object>();
             foreach (var kvp in _bossDamageRecords)
             {
                 var recordsList = new List<Dictionary>();
@@ -153,7 +153,7 @@ namespace ClawRPG.Scripts.Systems
             data["boss_damage_records"] = bossRecordsData;
 
             // Serialize player stats
-            var playerStatsData = new Dictionary();
+            var playerStatsData = new Dictionary<string, object>();
             foreach (var kvp in _playerStats)
             {
                 playerStatsData[kvp.Key] = new Dictionary
@@ -170,7 +170,7 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

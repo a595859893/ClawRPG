@@ -422,7 +422,7 @@ namespace ClawRPG.Scripts.Systems {
 
         #region Process
         
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             // Handle crossfade
             if (_isCrossfading) {
                 _crossfadeTimer += delta;
@@ -480,9 +480,9 @@ public delegate void TrackChanged(string trackName);
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["music_volume"] = _musicVolume;
             data["battle_music_volume"] = _battleMusicVolume;
             data["crossfade_duration"] = _crossfadeDuration;
@@ -492,7 +492,7 @@ public delegate void TrackChanged(string trackName);
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             if (data.Contains("music_volume")) _musicVolume = (float)data["music_volume"];

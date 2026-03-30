@@ -272,7 +272,7 @@ public delegate void ChallengeCompletedEventHandler(string challengeId);
 public delegate void ChallengeProgressUpdatedEventHandler(string challengeId, int current, int target);
 public delegate void RewardsClaimedEventHandler(int gold, int exp);
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, Variant>();
 
@@ -307,7 +307,7 @@ public delegate void RewardsClaimedEventHandler(int gold, int exp);
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null || Data == null) return;
 

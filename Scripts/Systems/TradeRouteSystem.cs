@@ -355,9 +355,9 @@ public partial class TradeRouteSystem : BaseSystem
     }
 
     // Save/Load
-    protected override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var saveData = new Dictionary();
+        var saveData = new Dictionary<string, object>();
         
         var routes = new Godot.Collections.Array();
         foreach (var route in _data.ActiveRoutes.Values)

@@ -99,9 +99,9 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             // MainModuleSystem 主要负责模块组件初始化，无持久化状态
             return data;
         }
@@ -109,7 +109,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             base.ImportSaveData(data);
             // MainModuleSystem 主要负责模块组件初始化，无持久化状态

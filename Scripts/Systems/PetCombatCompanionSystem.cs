@@ -575,9 +575,9 @@ namespace ClawRPG.Scripts.Systems
         }
         
         // ===== 持久化 =====
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             data["active_pet_id"] = _companionData.ActivePetId ?? "";
             data["current_role"] = _companionData.CurrentRole ?? "";
@@ -600,7 +600,7 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

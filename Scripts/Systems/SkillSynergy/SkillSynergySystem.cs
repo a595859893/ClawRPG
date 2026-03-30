@@ -30,7 +30,7 @@ public class SkillSynergySystem : BaseSystem
         LoadData();
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // 更新序列超时
         if (_sequenceTimer > 0)
@@ -457,7 +457,7 @@ public class SkillSynergySystem : BaseSystem
         // 通知 UI 刷新
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, Variant>();
 
@@ -505,7 +505,7 @@ public class SkillSynergySystem : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null || _data == null) return;
 

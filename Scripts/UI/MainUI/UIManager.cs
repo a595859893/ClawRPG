@@ -115,12 +115,12 @@ namespace ClawRPG.UI
             // 可以扩展为显示 toast 或通知
         }
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 导出 UI 状态
-            var states = new Dictionary();
+            var states = new Dictionary<string, object>();
             foreach (var kvp in _uiStates)
             {
                 states[kvp.Key] = kvp.Value;
@@ -130,7 +130,7 @@ namespace ClawRPG.UI
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

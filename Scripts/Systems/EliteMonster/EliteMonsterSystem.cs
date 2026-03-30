@@ -272,9 +272,9 @@ public delegate void EliteDefeatedEventHandler(int instanceId, string eliteType,
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         data["current_floor"] = _currentFloor;
         data["current_combo"] = _currentCombo;
@@ -299,7 +299,7 @@ public delegate void EliteDefeatedEventHandler(int instanceId, string eliteType,
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

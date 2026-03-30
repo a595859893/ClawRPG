@@ -180,7 +180,7 @@ public class WeatherUI : Control
             $"最喜爱天气: {stats["favorite_weather"]} ({stats["favorite_time"]:F1}秒)";
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         RefreshDisplay();
     }

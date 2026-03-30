@@ -83,7 +83,7 @@ namespace ClawRPG.Scripts.UI {
             QuestManager.OnQuestTurnedIn += OnQuestTurnedIn;
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             timer += delta;
             if (timer >= updateInterval)

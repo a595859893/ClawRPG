@@ -175,7 +175,7 @@ public class BossRushUI : Control
         UpdateUI();
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (bossRushSystem != null && bossRushSystem.IsInRush())
         {

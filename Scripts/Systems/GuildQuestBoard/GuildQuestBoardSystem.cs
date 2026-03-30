@@ -435,7 +435,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var questsArray = new Godot.Array();
             foreach (var quest in _data.availableQuests.Values)
@@ -474,7 +474,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

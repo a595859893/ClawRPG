@@ -38,7 +38,7 @@ namespace ClawRPG.Scripts.Systems
             LoadPlayerData();
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             _spawnTimer += delta;
             

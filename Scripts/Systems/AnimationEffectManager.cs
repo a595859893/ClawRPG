@@ -273,9 +273,9 @@ public partial class AnimationEffectManager : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["enable_attack_trail"] = _enableAttackTrail;
         data["attack_trail_color"] = _attackTrailColor.ToHtml();
         data["trail_width"] = _trailWidth;
@@ -285,7 +285,7 @@ public partial class AnimationEffectManager : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         if (data.Contains("enable_attack_trail")) _enableAttackTrail = (bool)data["enable_attack_trail"];

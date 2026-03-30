@@ -392,15 +392,15 @@ public partial class RankedSystem : BaseSystem
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 玩家排名数据
         var ranksData = new List<Dictionary>();
         foreach (var kvp in playerRanks)
         {
-            var rankDict = new Dictionary();
+            var rankDict = new Dictionary<string, object>();
             rankDict["playerName"] = kvp.Key;
             rankDict["tier"] = (int)kvp.Value.tier;
             rankDict["division"] = (int)kvp.Value.division;
@@ -420,7 +420,7 @@ public partial class RankedSystem : BaseSystem
         var historyData = new List<Dictionary>();
         foreach (var match in matchHistory)
         {
-            var matchDict = new Dictionary();
+            var matchDict = new Dictionary<string, object>();
             matchDict["matchId"] = match.matchId;
             matchDict["playerName"] = match.playerName;
             matchDict["opponentName"] = match.opponentName;
@@ -440,7 +440,7 @@ public partial class RankedSystem : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

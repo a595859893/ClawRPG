@@ -12,7 +12,7 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
     /// 在战斗开始前展示可用的Combo序列，让玩家确认后再进入战斗
     /// 解决"放了之后才发现不好玩"的问题
     /// </summary>
-    public class CombatPreloadComboSystem : BaseSystem
+    public partial class CombatPreloadComboSystem : BaseSystem
     {
         private static CombatPreloadComboSystem _instance;
         public static CombatPreloadComboSystem Instance => _instance;
@@ -83,12 +83,12 @@ namespace ClawRPG.Scripts.Systems.CombatPreload
         }
 
         // REQ-121: Countdown timer
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (_state != CombatPreloadState.CountingDown)
                 return;
             
-            _countdownTimer -= delta;
+            _countdownTimer -= (float)delta;
             if (_countdownTimer <= 0f)
             {
                 _countdownTimer = 0f;

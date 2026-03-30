@@ -424,9 +424,9 @@ public class StyleMasterySystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // Serialize mastered styles
         var masteredStylesData = new List<Dictionary>();
@@ -474,7 +474,7 @@ public class StyleMasterySystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null || data.Count == 0) return;
         

@@ -287,7 +287,7 @@ public partial class MainSaveLoad : Node
     /// </summary>
     public Dictionary ExportSaveData()
     {
-        var allData = new Dictionary();
+        var allData = new Dictionary<string, object>();
         
         // 游戏状态数据
         var gameStateManager = GetNodeOrNull<GameStateManager>("../GameStateManager");

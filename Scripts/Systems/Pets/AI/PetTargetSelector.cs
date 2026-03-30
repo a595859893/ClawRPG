@@ -259,14 +259,14 @@ namespace ClawRPG.Systems.Pets.AI {
             return score;
         }
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["strategy"] = (int)_currentStrategy;
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data.Contains("strategy")) {
                 _currentStrategy = (TargetStrategy)(int)data["strategy"];

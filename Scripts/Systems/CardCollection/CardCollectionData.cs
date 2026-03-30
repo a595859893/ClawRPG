@@ -47,7 +47,7 @@ public class CardCollectionData
     /// </summary>
     public Dictionary ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 卡牌收藏
         data["owned_cards"] = new Dictionary(OwnedCards);

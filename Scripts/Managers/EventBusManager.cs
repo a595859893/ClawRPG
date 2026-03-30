@@ -339,16 +339,16 @@ public class EventBusManager : ManagerBase
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         // 事件总线不保存数据
-        return new Dictionary();
+        return new Dictionary<string, object>();
     }
     
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         // 事件总线不加载数据
     }

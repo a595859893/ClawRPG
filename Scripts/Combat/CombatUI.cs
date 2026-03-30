@@ -325,7 +325,7 @@ namespace ClawRPG.Scripts.Combat
             // CombatUISystem.Instance.Connect(CombatUISystem.SignalKill, this, nameof(OnKill));
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             UpdatePlayerInfo();
             UpdateComboDisplay();

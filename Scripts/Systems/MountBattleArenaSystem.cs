@@ -331,9 +331,9 @@ public partial class MountBattleArenaSystem : BaseSystem
         return null;
     }
     
-    protected override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // Save player data
         data["total_battles"] = _playerData.TotalBattles;
@@ -370,7 +370,7 @@ public partial class MountBattleArenaSystem : BaseSystem
         return data;
     }
     
-    protected override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

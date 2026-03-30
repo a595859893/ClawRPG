@@ -46,7 +46,7 @@ namespace GameSystems
             GD.Print("Pet Expedition System initialized");
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             // 检查远征是否完成
             CheckExpeditions();
@@ -451,7 +451,7 @@ namespace GameSystems
             }
         }
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, Variant>();
 
@@ -507,7 +507,7 @@ namespace GameSystems
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null || PlayerData == null) return;
 

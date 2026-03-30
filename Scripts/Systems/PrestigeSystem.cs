@@ -254,9 +254,9 @@ namespace ClawRPG.Scripts.Systems
         }
         
         // ===== 持久化 =====
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["prestige_level"] = PrestigeLevel;
             data["prestige_points"] = PrestigePoints;
             data["total_prestige_points_earned"] = TotalPrestigePointsEarned;
@@ -264,7 +264,7 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

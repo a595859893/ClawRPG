@@ -142,12 +142,12 @@ namespace ClawRPG.Systems.Emote {
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             data["emote_unlocked"] = new Godot.Array(playerData.UnlockedEmotes);
             data["emote_favorites"] = new Godot.Array(playerData.FavoriteEmotes);
             
-            var usageDict = new Dictionary();
+            var usageDict = new Dictionary<string, object>();
             foreach (var kvp in playerData.EmoteUsageCount) {
                 usageDict[kvp.Key] = kvp.Value;
             }
@@ -160,7 +160,7 @@ namespace ClawRPG.Systems.Emote {
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
             if (data.Contains("emote_unlocked")) {

@@ -401,15 +401,15 @@ public class EquipmentSetSystem : BaseSystem
     }
     
     // ===== 持久化 =====
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 保存已解锁套装
         data["unlocked_sets"] = new Array(UnlockedSets);
         
         // 保存已装备部件
-        var equippedData = new Dictionary();
+        var equippedData = new Dictionary<string, object>();
         foreach (var kvp in EquippedPieces)
         {
             equippedData[kvp.Key] = kvp.Value;
@@ -419,7 +419,7 @@ public class EquipmentSetSystem : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

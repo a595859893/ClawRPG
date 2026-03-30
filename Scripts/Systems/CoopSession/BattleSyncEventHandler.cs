@@ -364,11 +364,11 @@ public delegate void BattleActionReceivedEventHandler(BattleSyncData.BattleActio
 
         #region 存档支持
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             lock (_lock)
             {
-                var data = new Dictionary();
+                var data = new Dictionary<string, object>();
                 data["current_session_id"] = _currentSessionId;
                 
                 var playerStatesList = new Array();
@@ -392,7 +392,7 @@ public delegate void BattleActionReceivedEventHandler(BattleSyncData.BattleActio
             }
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

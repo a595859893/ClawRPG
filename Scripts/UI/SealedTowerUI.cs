@@ -265,7 +265,7 @@ public class SealedTowerUI : Control
         UpdateDisplay();
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (_isVisible && SealedTowerManager.Instance?.IsInTower == true)
         {

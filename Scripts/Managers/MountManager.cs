@@ -37,9 +37,9 @@ namespace ClawRPG.Scripts.Mounts {
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             var mounts = new Array();
             foreach (var kvp in _ownedMounts)
@@ -55,7 +55,7 @@ namespace ClawRPG.Scripts.Mounts {
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             
@@ -158,7 +158,7 @@ namespace ClawRPG.Scripts.Mounts {
             }
         }
 
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             // 可以在这里处理坐骑相关的实时更新
         }
 

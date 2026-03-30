@@ -116,13 +116,13 @@ namespace ClawRPG.Systems.MultiplayerVote
             return _voteSystem.SetReady(playerId, ready);
         }
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             // 加载数据
         }

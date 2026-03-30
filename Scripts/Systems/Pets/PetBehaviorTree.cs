@@ -458,7 +458,7 @@ namespace ClawRPG.Scripts.Systems.Pets
             }
         }
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary
             {
@@ -467,7 +467,7 @@ namespace ClawRPG.Scripts.Systems.Pets
             };
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             if (data.Contains("fireBreathCooldown"))

@@ -141,7 +141,7 @@ public class TeamSkillUI : Control
     /// <summary>
     /// 处理输入
     /// </summary>
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // 更新冷却显示
         var skills = TeamSkillSystem.Instance.GetAllSkills();

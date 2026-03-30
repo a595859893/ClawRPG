@@ -118,7 +118,7 @@ public class SkillSynergyData : BaseSystem
             TotalBonusHealing = (float)data["total_bonus_healing"];
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, Variant>();
 
@@ -164,7 +164,7 @@ public class SkillSynergyData : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

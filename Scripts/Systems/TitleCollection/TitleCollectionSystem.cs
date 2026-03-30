@@ -194,10 +194,10 @@ public class TitleCollectionSystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData() {
-        var data = new Dictionary();
+    public override Dictionary<string, object> ExportSaveData() {
+        var data = new Dictionary<string, object>();
         
-        var titlesDict = new Dictionary();
+        var titlesDict = new Dictionary<string, object>();
         foreach (var kvp in _data.CollectedTitles) {
             titlesDict[kvp.Key] = kvp.Value;
         }
@@ -215,7 +215,7 @@ public class TitleCollectionSystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data) {
+    public override void ImportSaveData(Dictionary<string, object> data) {
         if (data == null) return;
         
         if (data.Contains("collectedTitles")) {

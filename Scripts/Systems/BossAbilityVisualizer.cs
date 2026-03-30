@@ -575,8 +575,8 @@ namespace ClawRPG.Scripts.UI {
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             data["maxConcurrentVisuals"] = _maxConcurrentVisuals;
             return data;
         }
@@ -584,7 +584,7 @@ namespace ClawRPG.Scripts.UI {
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
             if (data.Contains("maxConcurrentVisuals")) {

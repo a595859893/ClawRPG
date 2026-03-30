@@ -298,7 +298,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             }
         }
         
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             if (Visible) {
                 _UpdateInfo();
             }

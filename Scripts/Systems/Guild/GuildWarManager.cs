@@ -337,13 +337,13 @@ public delegate void PointsUpdatedSignal(int warId, int guildId, int points);
     // Save war data
     public Dictionary SaveData()
     {
-        Dictionary data = new Dictionary();
+        Dictionary data = new Dictionary<string, object>();
         
         // Save active wars
         Array warsArray = new Godot.Array();
         foreach (var war in guildWars.Values)
         {
-            Dictionary warDict = new Dictionary();
+            Dictionary warDict = new Dictionary<string, object>();
             warDict["warId"] = war.warId;
             warDict["attackerGuildId"] = war.attackerGuildId;
             warDict["defenderGuildId"] = war.defenderGuildId;
@@ -360,7 +360,7 @@ public delegate void PointsUpdatedSignal(int warId, int guildId, int points);
         Array historyArray = new Godot.Array();
         foreach (var entry in warHistory)
         {
-            Dictionary entryDict = new Dictionary();
+            Dictionary entryDict = new Dictionary<string, object>();
             entryDict["warId"] = entry.warId;
             entryDict["attackerGuildId"] = entry.attackerGuildId;
             entryDict["defenderGuildId"] = entry.defenderGuildId;
@@ -432,7 +432,7 @@ public delegate void PointsUpdatedSignal(int warId, int guildId, int points);
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return SaveData();
     }
@@ -440,7 +440,7 @@ public delegate void PointsUpdatedSignal(int warId, int guildId, int points);
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         LoadData(data);
     }

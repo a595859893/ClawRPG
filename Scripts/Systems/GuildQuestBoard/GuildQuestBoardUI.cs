@@ -320,7 +320,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
             }
         }
         
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             _refreshTimer += delta;
             if (_refreshTimer >= REFRESH_INTERVAL) {
                 _refreshTimer = 0;

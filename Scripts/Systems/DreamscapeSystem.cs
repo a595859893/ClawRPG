@@ -316,14 +316,14 @@ public class DreamscapeSystem : BaseSystem
         }
     }
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, object>();
         data["player_data"] = PlayerData;
         return new Dictionary(data);
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data.ContainsKey("player_data"))
         {

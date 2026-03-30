@@ -562,9 +562,9 @@ public partial class GameSettings : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // Audio settings
         data["master_volume"] = _masterVolume;
@@ -595,7 +595,7 @@ public partial class GameSettings : BaseSystem
         var keyBindingsArray = new Godot.Array();
         foreach (var kvp in _keyBindings)
         {
-            var binding = new Dictionary();
+            var binding = new Dictionary<string, object>();
             binding["action"] = kvp.Key;
             binding["key"] = kvp.Value;
             keyBindingsArray.Add(binding);
@@ -608,7 +608,7 @@ public partial class GameSettings : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

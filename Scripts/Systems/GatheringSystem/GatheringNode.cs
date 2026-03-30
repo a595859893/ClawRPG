@@ -191,7 +191,7 @@ public partial class GatheringNode : BaseSystem2D
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -207,7 +207,7 @@ public partial class GatheringNode : BaseSystem2D
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
     {
         if (data == null) return;
         

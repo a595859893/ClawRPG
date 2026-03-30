@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Characters;
 
 /// <summary>
 /// Per-enemy component that tracks player combo usage patterns and applies countermeasures.

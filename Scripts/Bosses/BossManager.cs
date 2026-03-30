@@ -342,9 +342,9 @@ namespace ClawRPG.Scripts.Bosses {
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             data["is_boss_active"] = _isBossActive;
             data["boss_defeated"] = _bossDefeated;
@@ -360,7 +360,7 @@ namespace ClawRPG.Scripts.Bosses {
         /// <summary>
         /// Import save data on game load
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

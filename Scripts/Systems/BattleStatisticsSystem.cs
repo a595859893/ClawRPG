@@ -392,12 +392,12 @@ public class BattleStatisticsSystem : BaseSystem
         return "user://battle_stats.save";
     }
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return _stats.ToDictionary();
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

@@ -45,7 +45,7 @@ public class PetBehaviorLogger : Node
         GD.Print("[PetBehaviorLogger] Initialized");
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         _cooldownAccumulator += delta;
         if (_cooldownAccumulator >= COOLDOWN_DURATION)

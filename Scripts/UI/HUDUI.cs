@@ -159,7 +159,7 @@ namespace ClawRPG.Scripts.UI
             GD.Print($"[HUDUI] Adding status effect: {effectName}");
         }
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary
             {
@@ -168,7 +168,7 @@ namespace ClawRPG.Scripts.UI
             };
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             base.ImportSaveData(data);
             Refresh();

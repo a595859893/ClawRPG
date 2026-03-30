@@ -22,7 +22,7 @@ public class CharacterCreationMain : BaseSystem
         GD.Print("[CharacterCreationMain] System initialized");
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // Handle toggle input
         if (Input.IsKeyPressed(Key.C) && Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.Shift))
@@ -65,9 +65,9 @@ public class CharacterCreationMain : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         // CharacterCreationMain 是容器系统，无持久化状态
         return data;
     }
@@ -75,7 +75,7 @@ public class CharacterCreationMain : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         // CharacterCreationMain 是容器系统，无持久化状态

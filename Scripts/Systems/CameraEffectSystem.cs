@@ -246,9 +246,9 @@ namespace ClawRPG.Scripts.UI {
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["default_fov"] = defaultFOV;
             data["max_fov"] = maxFOV;
             data["fov_transition_speed"] = fovTransitionSpeed;
@@ -262,7 +262,7 @@ namespace ClawRPG.Scripts.UI {
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             if (data.Contains("default_fov")) defaultFOV = (float)data["default_fov"];

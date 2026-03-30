@@ -216,8 +216,8 @@ namespace ClawRPG.Scripts.Systems.Combat
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             data["totalDamageNumbers"] = TotalDamageNumbers;
             data["criticalHits"] = CriticalHits;
             data["totalDamage"] = TotalDamage;
@@ -228,7 +228,7 @@ namespace ClawRPG.Scripts.Systems.Combat
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
             if (data.Contains("totalDamageNumbers")) TotalDamageNumbers = (int)data["totalDamageNumbers"];

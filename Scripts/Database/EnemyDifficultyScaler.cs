@@ -122,15 +122,15 @@ namespace ClawRPG.Scripts.Database {
             return _difficultyMultiplier;
         }
         
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             data["difficulty"] = (int)_currentDifficulty;
             data["playerLevel"] = _playerLevel;
             data["multiplier"] = _difficultyMultiplier;
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
             if (data.Contains("difficulty")) {

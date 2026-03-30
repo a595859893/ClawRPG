@@ -17,7 +17,7 @@ public class PetLifeCycleData : BaseSystem
     // 历史记录
     public List<LifeCycleHistoryEntry> History = new List<LifeCycleHistoryEntry>();
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, Variant>();
 
@@ -65,7 +65,7 @@ public class PetLifeCycleData : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

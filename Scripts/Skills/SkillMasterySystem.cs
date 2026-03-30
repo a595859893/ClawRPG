@@ -492,9 +492,9 @@ public delegate void SkillUnlockedEventHandler(string skillId);
         
         #region Save/Load
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // Mastery data
             var masteriesArray = new Array();
@@ -532,7 +532,7 @@ public delegate void SkillUnlockedEventHandler(string skillId);
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

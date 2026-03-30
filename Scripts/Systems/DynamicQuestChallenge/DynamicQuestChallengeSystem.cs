@@ -53,7 +53,7 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
         /// <summary>
         /// Export save data
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             if (_data != null)
             {
@@ -65,7 +65,7 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
             }
             return new Dictionary
             {
-                { "data", new Dictionary() },
+                { "data", new Dictionary<string, object>() },
                 { "system_name", SystemName }
             };
         }
@@ -73,7 +73,7 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
         /// <summary>
         /// Import save data
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             base.ImportSaveData(data);
             if (data.Contains("data") && data["data"] is Dictionary dictData)
@@ -176,7 +176,7 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
                 }
             }
 
-            return new Dictionary();
+            return new Dictionary<string, object>();
         }
 
         /// <summary>

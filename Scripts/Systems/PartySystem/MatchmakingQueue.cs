@@ -67,7 +67,7 @@ namespace ClawRPG.Systems
             Instance = this;
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             _matchmakingTimer += delta;
             
@@ -451,9 +451,9 @@ namespace ClawRPG.Systems
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
 
             // 队列状态不需要持久化（运行时状态）
             // 但可以保存一些统计信息
@@ -466,7 +466,7 @@ namespace ClawRPG.Systems
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

@@ -204,7 +204,7 @@ namespace ClawRPG.Scripts
         /// </summary>
         public Dictionary ExportAllData()
         {
-            return _saveLoad?.ExportAllData() ?? new Dictionary();
+            return _saveLoad?.ExportAllData() ?? new Dictionary<string, object>();
         }
 
         /// <summary>

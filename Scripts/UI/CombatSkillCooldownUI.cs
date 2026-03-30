@@ -342,7 +342,7 @@ public class CombatSkillCooldownUI : Control
 		}
 	}
 	
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		_cooldownSystem._Process(delta);
 	}

@@ -251,9 +251,9 @@ namespace ClawRPG.Scripts.Systems.AI.Flocking
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            return new Dictionary()
+            return new Dictionary<string, object>()
             {
                 ["separation_weight"] = _separationWeight,
                 ["alignment_weight"] = _alignmentWeight,
@@ -268,7 +268,7 @@ namespace ClawRPG.Scripts.Systems.AI.Flocking
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data.Contains("separation_weight")) _separationWeight = Convert.ToSingle(data["separation_weight"]);
             if (data.Contains("alignment_weight")) _alignmentWeight = Convert.ToSingle(data["alignment_weight"]);

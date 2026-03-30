@@ -392,7 +392,7 @@ namespace ClawRPG.Systems.Meditation
         public Color Color { get; set; }
         public string IconPath { get; set; }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary<string, object> ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary<string, object> data) { }
     }
 } // namespace ClawRPG.Systems.Meditation

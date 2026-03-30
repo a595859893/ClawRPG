@@ -378,7 +378,7 @@ public partial class LootDropSystem : BaseSystem
         return Math.Max(0, targetCount - _pityCounters[poolId]);
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary
         {
@@ -389,7 +389,7 @@ public partial class LootDropSystem : BaseSystem
         };
         
         // Export rarity drops
-        var rarityDrops = new Dictionary();
+        var rarityDrops = new Dictionary<string, object>();
         foreach (var kvp in _playerData.RarityDrops)
         {
             rarityDrops[kvp.Key] = kvp.Value;
@@ -397,7 +397,7 @@ public partial class LootDropSystem : BaseSystem
         data["rarityDrops"] = rarityDrops;
         
         // Export pity counters
-        var pityData = new Dictionary();
+        var pityData = new Dictionary<string, object>();
         foreach (var kvp in _pityCounters)
         {
             pityData[kvp.Key] = kvp.Value;
@@ -407,7 +407,7 @@ public partial class LootDropSystem : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

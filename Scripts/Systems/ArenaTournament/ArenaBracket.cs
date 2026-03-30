@@ -165,14 +165,14 @@ namespace ClawRPG.Scripts.Systems.ArenaTournament {
             };
         }
         
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             data["currentPhase"] = (int)_currentPhase;
             data["currentRound"] = _currentRound;
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data.Contains("currentPhase")) {
                 _currentPhase = (TournamentPhase)(int)data["currentPhase"];
             }

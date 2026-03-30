@@ -118,7 +118,7 @@ public partial class DynamicQuestSystem : BaseSystem
         GenerateDailyQuests();
     }
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary<string, object>
         {
@@ -130,7 +130,7 @@ public partial class DynamicQuestSystem : BaseSystem
         };
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         base.ImportSaveData(data);
         if (data == null) return;

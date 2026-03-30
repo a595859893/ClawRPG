@@ -88,9 +88,9 @@ public class ComboFatigueData : BaseSystem
     /// <summary>
     /// Export save data.
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         data["comboHistory"] = new Godot.Collections.Array(ComboHistory);
         
@@ -107,7 +107,7 @@ public class ComboFatigueData : BaseSystem
     /// <summary>
     /// Import save data.
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

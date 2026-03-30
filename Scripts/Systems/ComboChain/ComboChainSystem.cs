@@ -46,7 +46,7 @@ public delegate void ComboLevelUp(int newLevel, string levelName);
         }
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (_data == null) return;
         
@@ -276,9 +276,9 @@ public delegate void ComboLevelUp(int newLevel, string levelName);
     // 获取统计信息
     public Dictionary GetStatistics()
     {
-        if (_data == null) return new Dictionary();
+        if (_data == null) return new Dictionary<string, object>();
         
-        var stats = new Dictionary();
+        var stats = new Dictionary<string, object>();
         stats["totalChains"] = _data.TotalChains;
         stats["totalChainHits"] = _data.TotalChainHits;
         stats["maxChainEver"] = _data.MaxChainEver;
@@ -345,9 +345,9 @@ public delegate void ComboLevelUp(int newLevel, string levelName);
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["total_chains"] = _data != null ? _data.TotalChains : 0;
         data["total_chain_hits"] = _data != null ? _data.TotalChainHits : 0;
         data["max_chain_ever"] = _data != null ? _data.MaxChainEver : 0;
@@ -362,7 +362,7 @@ public delegate void ComboLevelUp(int newLevel, string levelName);
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null || _data == null) return;
         

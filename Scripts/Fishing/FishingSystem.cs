@@ -152,7 +152,7 @@ namespace ClawRPG.Scripts.Fishing
         
         #region 游戏循环
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (_currentSession == null) return;
             

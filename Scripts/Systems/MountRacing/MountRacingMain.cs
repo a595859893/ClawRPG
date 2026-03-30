@@ -47,8 +47,8 @@ namespace ClawRPG.Systems {
         /// <summary>
         /// Exports mount racing data for persistence.
         /// </summary>
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             
             if (_mountRacingData != null) {
                 data["racing_history"] = SerializeRacingHistory(_mountRacingData.RacingHistory);
@@ -66,7 +66,7 @@ namespace ClawRPG.Systems {
         /// <summary>
         /// Imports mount racing data from persistence.
         /// </summary>
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null || _mountRacingData == null) return;
             
             if (data.Contains("racing_history")) {
@@ -99,7 +99,7 @@ namespace ClawRPG.Systems {
         }
         
         private Dictionary SerializeRacingHistory(Dictionary<string, MountRacingRecord> history) {
-            var result = new Dictionary();
+            var result = new Dictionary<string, object>();
             foreach (var kvp in history) {
                 var record = new Dictionary {
                     ["track_id"] = kvp.Value.TrackId,

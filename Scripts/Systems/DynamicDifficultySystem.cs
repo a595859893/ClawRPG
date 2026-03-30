@@ -398,9 +398,9 @@ public delegate void RecommendationChanged(DynamicDifficultyData.DifficultyLevel
     #region 存档支持
 
     // 获取存档数据
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        Dictionary data = new Dictionary();
+        Dictionary data = new Dictionary<string, object>();
         
         data["currentDifficulty"] = (int)_playerData.CurrentDifficulty;
         data["recommendedDifficulty"] = (int)_playerData.RecommendedDifficulty;
@@ -408,7 +408,7 @@ public delegate void RecommendationChanged(DynamicDifficultyData.DifficultyLevel
         data["sessionsSinceLastAdjustment"] = _playerData.SessionsSinceLastAdjustment;
 
         // 技能档案
-        Dictionary profile = new Dictionary();
+        Dictionary profile = new Dictionary<string, object>();
         profile["totalSessions"] = _playerData.SkillProfile.TotalSessions;
         profile["wins"] = _playerData.SkillProfile.Wins;
         profile["losses"] = _playerData.SkillProfile.Losses;
@@ -420,7 +420,7 @@ public delegate void RecommendationChanged(DynamicDifficultyData.DifficultyLevel
     }
 
     // 加载存档数据
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

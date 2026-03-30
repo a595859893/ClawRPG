@@ -41,15 +41,15 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
         /// <summary>
         /// Export save data (UI class - no data to save)
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            return new Dictionary();
+            return new Dictionary<string, object>();
         }
 
         /// <summary>
         /// Import save data (UI class - no data to load)
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             // UI class - no data to import
         }

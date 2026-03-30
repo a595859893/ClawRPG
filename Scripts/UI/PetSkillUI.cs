@@ -59,7 +59,7 @@ namespace ClawRPG.Scripts.UI
             GD.Print("宠物技能界面已加载");
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             // 更新冷却显示
             if (_selectedPet != null && _skillSystem != null)

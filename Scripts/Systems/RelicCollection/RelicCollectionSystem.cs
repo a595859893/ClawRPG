@@ -311,7 +311,7 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 导出存档数据
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary
             {
@@ -323,7 +323,7 @@ namespace ClawRPG.Scripts.Systems
         }
 
         // 导入存档数据
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

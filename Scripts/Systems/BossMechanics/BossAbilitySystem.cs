@@ -429,9 +429,9 @@ public class BossAbilitySystem : BaseSystem
     /// <summary>
     /// 导出技能系统数据 (Override基类无参方法)
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
 
         // 导出激活的技能列表
         var activatedArray = new Godot.Collections.Array();
@@ -466,7 +466,7 @@ public class BossAbilitySystem : BaseSystem
     /// <summary>
     /// 导入技能系统数据 (Override基类无参方法)
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 
@@ -510,7 +510,7 @@ public class BossAbilitySystem : BaseSystem
     /// </summary>
     public Dictionary ExportSaveData(BossBattleInstance battle)
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
 
         if (battle != null)
         {

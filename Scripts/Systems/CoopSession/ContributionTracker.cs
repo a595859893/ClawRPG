@@ -424,7 +424,7 @@ public delegate void RewardsDistributedEventHandler(Array results);
 
     #region 存档支持
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         lock (_lock)
         {
@@ -432,7 +432,7 @@ public delegate void RewardsDistributedEventHandler(Array results);
         }
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         lock (_lock)
         {

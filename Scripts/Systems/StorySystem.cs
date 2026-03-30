@@ -482,9 +482,9 @@ public delegate void RewardClaimed(StoryReward reward);
 
         // ===== 持久化方法 =====
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 当前章节ID
             data["currentChapterId"] = currentChapterId;
@@ -505,7 +505,7 @@ public delegate void RewardClaimed(StoryReward reward);
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

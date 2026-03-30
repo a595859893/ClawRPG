@@ -337,7 +337,7 @@ public class TutorialUI : Control
             RefreshStatistics(statsTab);
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (_isVisible && _tutorialSystem.IsAnyTutorialActive())
         {

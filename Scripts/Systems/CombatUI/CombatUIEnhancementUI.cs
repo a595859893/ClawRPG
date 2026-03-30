@@ -179,7 +179,7 @@ namespace ClawRPG.Systems
             return sep;
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (!_isVisible || _system == null)
                 return;

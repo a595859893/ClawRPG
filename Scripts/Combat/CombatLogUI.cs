@@ -643,7 +643,7 @@ namespace ClawRPG.Scripts.Combat
         
         #endregion
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             // Update statistics periodically
             if (Engine.GetFramesDrawn() % 30 == 0)

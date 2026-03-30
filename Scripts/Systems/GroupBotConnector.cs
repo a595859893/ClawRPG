@@ -379,7 +379,7 @@ public class GroupBotConnector : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -393,7 +393,7 @@ public class GroupBotConnector : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data.Contains("bot_api_url"))
             BotApiUrl = data["bot_api_url"].ToString();

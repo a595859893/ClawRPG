@@ -113,7 +113,7 @@ namespace ClawRPG.Scripts.Combat {
             AddChild(_renderer);
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             UpdateEffects(delta);
             if (_renderer != null)
@@ -702,13 +702,13 @@ namespace ClawRPG.Scripts.Combat {
             _particlePositions.Clear();
         }
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             // Visualizer is stateless for saves — no persistent state to export
-            return new Dictionary();
+            return new Dictionary<string, object>();
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             // No persistent state to restore

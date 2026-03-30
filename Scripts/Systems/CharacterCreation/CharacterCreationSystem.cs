@@ -345,9 +345,9 @@ public class CharacterCreationSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["character_name"] = _data.CharacterName;
         data["selected_class"] = _data.SelectedClass;
         data["selected_background"] = _data.SelectedBackground;
@@ -368,7 +368,7 @@ public class CharacterCreationSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

@@ -104,7 +104,7 @@ public partial class GatheringSystem : BaseSystem
                 { "efficiency", tool.efficiency }
             };
         }
-        return new Dictionary();
+        return new System.Collections.Generic.Dictionary<string, object>();
     }
     
     public Array<Dictionary> GetAllTools()
@@ -222,9 +222,9 @@ public partial class GatheringSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new System.Collections.Generic.Dictionary<string, object>();
         
         // 采集统计
         foreach (var kvp in gatheringStats)
@@ -236,7 +236,7 @@ public partial class GatheringSystem : BaseSystem
         var toolsData = new Array();
         foreach (var kvp in tools)
         {
-            toolsData.Add(new System.Collections.Generic.Dictionary<string, object>
+            toolsData.Add(new System.Collections.Generic.System.Collections.Generic.Dictionary<string, object>
             {
                 { "tool_id", kvp.Value.toolId },
                 { "tool_name", kvp.Value.toolName },
@@ -254,7 +254,7 @@ public partial class GatheringSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
     {
         if (data == null) return;
         

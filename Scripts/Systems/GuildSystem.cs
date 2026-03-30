@@ -608,12 +608,12 @@ public partial class GuildSystem : BaseSystem {
     
     #region Data Persistence
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return SaveData();
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         LoadData(new Dictionary<string, object>(data));

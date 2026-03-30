@@ -158,8 +158,8 @@ public delegate void MailSent(bool success, string message);
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             
             var mailBoxList = new List<Dictionary>();
             foreach (var kvp in _mailBox)
@@ -167,7 +167,7 @@ public delegate void MailSent(bool success, string message);
                 var playerMails = new List<Dictionary>();
                 foreach (var mail in kvp.Value)
                 {
-                    var mailDict = new Dictionary();
+                    var mailDict = new Dictionary<string, object>();
                     mailDict["id"] = mail.Id;
                     mailDict["sender"] = mail.Sender;
                     mailDict["receiver"] = mail.Receiver;
@@ -181,7 +181,7 @@ public delegate void MailSent(bool success, string message);
                     mailDict["isDeleted"] = mail.IsDeleted;
                     playerMails.Add(mailDict);
                 }
-                var playerEntry = new Dictionary();
+                var playerEntry = new Dictionary<string, object>();
                 playerEntry["playerId"] = kvp.Key;
                 playerEntry["mails"] = playerMails;
                 mailBoxList.Add(playerEntry);
@@ -194,7 +194,7 @@ public delegate void MailSent(bool success, string message);
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
             _mailBox.Clear();

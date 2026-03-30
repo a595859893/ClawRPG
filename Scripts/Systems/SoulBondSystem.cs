@@ -283,15 +283,15 @@ public class SoulBondSystem : BaseSystem
 
     // ===== 持久化方法 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 活跃的灵魂连接
         var activeBondsData = new List<Dictionary>();
         foreach (var bond in ActiveBonds)
         {
-            var bondDict = new Dictionary();
+            var bondDict = new Dictionary<string, object>();
             bondDict["partner_id"] = bond.PartnerId;
             bondDict["partner_name"] = bond.PartnerName;
             bondDict["bond_level"] = bond.BondLevel;
@@ -307,7 +307,7 @@ public class SoulBondSystem : BaseSystem
         var bondHistoryData = new List<Dictionary>();
         foreach (var record in BondHistory)
         {
-            var recordDict = new Dictionary();
+            var recordDict = new Dictionary<string, object>();
             recordDict["partner_id"] = record.PartnerId;
             recordDict["partner_name"] = record.PartnerName;
             recordDict["bond_level"] = record.BondLevel;
@@ -326,7 +326,7 @@ public class SoulBondSystem : BaseSystem
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

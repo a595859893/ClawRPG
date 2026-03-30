@@ -356,13 +356,13 @@ namespace ClawRPG.Scripts.Combat {
         
         #region Save/Load
         
-        public override Dictionary ExportSaveData() {
+        public override Dictionary<string, object> ExportSaveData() {
             return new Dictionary {
                 { "statistics", GetStatistics() }
             };
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             // Pool不需要持久化运行时数据
         }
         

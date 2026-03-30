@@ -142,15 +142,15 @@ namespace ClawRPG.Scripts.Systems.CoopSession {
             _predictionThreshold = Mathf.Max(0f, threshold);
         }
         
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             data["mode"] = (int)_currentMode;
             data["interpolationDelay"] = _interpolationDelay;
             data["predictionThreshold"] = _predictionThreshold;
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (data.Contains("mode")) {
                 _currentMode = (CompensationMode)(int)data["mode"];
             }

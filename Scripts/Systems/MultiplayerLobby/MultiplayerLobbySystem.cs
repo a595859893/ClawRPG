@@ -532,9 +532,9 @@ namespace ClawRPG.Systems
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             // MultiplayerLobbySystem 是运行时系统，主要状态由 MultiplayerLobbyData 管理
             return data;
         }
@@ -542,7 +542,7 @@ namespace ClawRPG.Systems
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             // MultiplayerLobbySystem 是运行时系统，主要状态由 MultiplayerLobbyData 管理

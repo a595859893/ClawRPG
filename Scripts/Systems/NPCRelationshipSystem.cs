@@ -330,12 +330,12 @@ namespace ClawRPG.Systems {
         
         #region Data Persistence
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary(GetSaveData());
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             LoadFromSaveData(new Dictionary<string, object>(data));

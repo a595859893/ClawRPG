@@ -398,9 +398,9 @@ public class SocialSharingSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 导出子系统数据
         if (_screenshotManager != null)
@@ -425,7 +425,7 @@ public class SocialSharingSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         // 导入子系统数据
         if (_screenshotManager != null)
@@ -436,7 +436,7 @@ public class SocialSharingSystem : BaseSystem
         if (_botConnector != null)
         {
             // 提取 bot 相关配置
-            var botData = new Dictionary();
+            var botData = new Dictionary<string, object>();
             foreach (var kvp in data)
             {
                 if (kvp.Key.ToString().StartsWith("bot_"))

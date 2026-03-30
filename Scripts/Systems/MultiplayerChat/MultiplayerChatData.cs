@@ -139,9 +139,9 @@ public class MultiplayerChatData : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // 玩家名称
         data["player_name"] = PlayerName;
@@ -151,7 +151,7 @@ public class MultiplayerChatData : BaseSystem
         data["total_emotes_used"] = TotalEmotesUsed;
         
         // 每个频道的消息数
-        var messagesPerChannel = new Dictionary();
+        var messagesPerChannel = new Dictionary<string, object>();
         foreach (var kvp in MessagesPerChannel)
         {
             messagesPerChannel[kvp.Key.ToString()] = kvp.Value;
@@ -162,7 +162,7 @@ public class MultiplayerChatData : BaseSystem
         data["ignored_players"] = new Array(IgnoredPlayers);
         
         // 频道设置
-        var channelSettingsData = new Dictionary();
+        var channelSettingsData = new Dictionary<string, object>();
         foreach (var kvp in ChannelSettings)
         {
             var settings = new Dictionary
@@ -180,7 +180,7 @@ public class MultiplayerChatData : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

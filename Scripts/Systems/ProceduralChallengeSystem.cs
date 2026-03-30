@@ -29,7 +29,7 @@ public class ProceduralChallengeSystem : BaseSystem
         ProceduralChallengeDatabase.Initialize();
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // Refresh challenges periodically
         if (Time.GetTicksMsec() / 1000f - _lastRefreshTime > _challengeRefreshInterval)
@@ -353,7 +353,7 @@ public class ProceduralChallengeSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         Dictionary<string, object> data = new Dictionary<string, object>();
 
@@ -396,7 +396,7 @@ public class ProceduralChallengeSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

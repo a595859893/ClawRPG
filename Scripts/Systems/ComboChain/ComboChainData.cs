@@ -42,8 +42,8 @@ public class ComboChainData : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData() {
-        var data = new Dictionary();
+    public override Dictionary<string, object> ExportSaveData() {
+        var data = new Dictionary<string, object>();
         data["currentChain"] = CurrentChain;
         data["maxChain"] = MaxChain;
         data["isChainActive"] = IsChainActive;
@@ -52,7 +52,7 @@ public class ComboChainData : BaseSystem
         var historyList = new List<Dictionary>();
         foreach (var record in ChainHistory)
         {
-            var recordDict = new Dictionary();
+            var recordDict = new Dictionary<string, object>();
             recordDict["chainLevel"] = record.ChainLevel;
             recordDict["damage"] = record.Damage;
             recordDict["bonusDamage"] = record.BonusDamage;
@@ -79,7 +79,7 @@ public class ComboChainData : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

@@ -358,12 +358,12 @@ namespace ClawRPG.Systems.Alchemy
             _nextMaterialId = 1001;
         }
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary
             {
                 ["nextMaterialId"] = _nextMaterialId,
-                ["materials"] = new Dictionary()
+                ["materials"] = new Dictionary<string, object>()
             };
             
             var materialsData = (Dictionary)data["materials"];
@@ -375,7 +375,7 @@ namespace ClawRPG.Systems.Alchemy
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

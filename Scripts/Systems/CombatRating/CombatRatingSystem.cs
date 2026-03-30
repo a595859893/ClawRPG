@@ -354,9 +354,9 @@ public class CombatRatingSystem : BaseSystem
 	}
 	
 	// ===== 持久化 =====
-	public override Dictionary ExportSaveData()
+	public override Dictionary<string, object> ExportSaveData()
 	{
-		var exportData = new Dictionary();
+		var exportData = new Dictionary<string, object>();
 		exportData["total_battles"] = data.totalBattles;
 		exportData["total_score"] = data.totalScore;
 		exportData["highest_score"] = data.highestScore;
@@ -375,7 +375,7 @@ public class CombatRatingSystem : BaseSystem
 		foreach (var record in data.ratingHistory)
 		{
 			if (count >= 50) break;
-			var recordData = new Dictionary();
+			var recordData = new Dictionary<string, object>();
 			recordData["battle_id"] = record.battleId;
 			recordData["grade"] = (int)record.grade;
 			recordData["score"] = record.score;
@@ -400,7 +400,7 @@ public class CombatRatingSystem : BaseSystem
 		return exportData;
 	}
 	
-	public override void ImportSaveData(Dictionary data)
+	public override void ImportSaveData(Dictionary<string, object> data)
 	{
 		if (data == null) return;
 		

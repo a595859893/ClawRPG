@@ -49,7 +49,7 @@ public class MountRaceSystem : BaseSystem
 		_playerProgress = new MountRaceData.PlayerRaceProgress();
 	}
 
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if (!_isRacing || _currentRace == null)
 			return;
@@ -377,7 +377,7 @@ public class MountRaceSystem : BaseSystem
 	// Save/Load
 	public Dictionary GetSaveData()
 	{
-		var data = new Dictionary();
+		var data = new Dictionary<string, object>();
 		
 		// Save best times
 		var bestTimesArray = new Godot.Collections.Array();
@@ -437,9 +437,9 @@ public class MountRaceSystem : BaseSystem
 
 	// ===== 持久化方法 =====
 
-	public override Dictionary ExportSaveData()
+	public override Dictionary<string, object> ExportSaveData()
 	{
-		var data = new Dictionary();
+		var data = new Dictionary<string, object>();
 		
 		// 玩家竞速进度
 		data["best_times"] = _playerProgress.BestTimes;
@@ -455,7 +455,7 @@ public class MountRaceSystem : BaseSystem
 		return data;
 	}
 
-	public override void ImportSaveData(Dictionary data)
+	public override void ImportSaveData(Dictionary<string, object> data)
 	{
 		if (data == null) return;
 		

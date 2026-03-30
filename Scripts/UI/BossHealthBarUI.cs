@@ -225,7 +225,7 @@ namespace ClawRPG.Scripts.UI {
             vbox.AddChild(_enrageLabel);
         }
         
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (_currentBoss == null || !IsInstanceValid(_currentBoss))
             {

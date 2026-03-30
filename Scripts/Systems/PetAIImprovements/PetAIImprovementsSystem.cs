@@ -108,7 +108,7 @@ public class PetAIImprovementsSystem : BaseSystem
             { "best_combo", 0 }
         };
 
-        public Dictionary enemyTypeKills = new Dictionary();
+        public Dictionary enemyTypeKills = new Dictionary<string, object>();
         public int adaptationLevel = 1;
         public int blockCount = 0;
         public int healCount = 0;
@@ -303,7 +303,7 @@ public class PetAIImprovementsSystem : BaseSystem
         GD.Print($"[PetAI] Initialized for pet: {petId} with personality: {personality.GetStateName()}");
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         base._Process(delta);
         
@@ -339,7 +339,7 @@ public class PetAIImprovementsSystem : BaseSystem
 
     private Dictionary CollectSituation()
     {
-        var situation = new Dictionary();
+        var situation = new Dictionary<string, object>();
 
         // 玩家血量
         var player = GetTree().GetFirstNodeInGroup("player");
@@ -553,7 +553,7 @@ public class PetAIImprovementsSystem : BaseSystem
         };
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -577,7 +577,7 @@ public class PetAIImprovementsSystem : BaseSystem
         };
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         base.ImportSaveData(data);
 

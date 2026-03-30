@@ -128,6 +128,6 @@ public class DailyLoginBonusDatabase : BaseSystem
         return cumulativeDays > 0 && cumulativeDays % 30 == 0;
     }
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary<string, object> ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary<string, object> data) { }
 }

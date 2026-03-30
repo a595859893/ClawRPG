@@ -137,7 +137,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// </summary>
         public Dictionary ExportSaveData(Dictionary<int, PlayerContribution> contributions, string sessionId)
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             data["session_id"] = sessionId;
             
             var contributionsList = new Godot.Collections.Array();

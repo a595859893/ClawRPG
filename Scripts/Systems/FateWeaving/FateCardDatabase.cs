@@ -138,9 +138,9 @@ namespace ClawRPG.Scripts.Systems.FateWeaving
 
         #region BaseSystem Persistence
 
-        public override Dictionary ExportSaveData() => new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() => new Dictionary<string, object>();
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
         }

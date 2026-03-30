@@ -539,9 +539,9 @@ namespace ClawRPG.Scripts.Systems {
 
         // ===== 持久化方法 =====
 
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 玩家事件数据
             data["event_trigger_count"] = _playerData.EventTriggerCount;
@@ -560,7 +560,7 @@ namespace ClawRPG.Scripts.Systems {
             var activeEventsData = new List<Dictionary>();
             foreach (var kvp in _activeEvents)
             {
-                var eventDict = new Dictionary();
+                var eventDict = new Dictionary<string, object>();
                 eventDict["event_id"] = kvp.Key;
                 eventDict["config"] = kvp.Value;
                 activeEventsData.Add(eventDict);
@@ -573,7 +573,7 @@ namespace ClawRPG.Scripts.Systems {
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

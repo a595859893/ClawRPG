@@ -146,7 +146,7 @@ namespace ClawRPG.Scripts.UI {
             }
         }
         
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             _updateTimer += delta;
             
             if (_updateTimer >= 0.5f) {

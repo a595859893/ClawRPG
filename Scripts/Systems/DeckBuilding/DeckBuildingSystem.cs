@@ -270,9 +270,9 @@ namespace ClawRPG.Systems
         public DeckBuildingDatabase GetDatabase() => _database;
         
         // ===== 持久化 =====
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 保存当前套牌
             data["current_deck"] = new Array(_data.CurrentDeck);
@@ -287,7 +287,7 @@ namespace ClawRPG.Systems
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

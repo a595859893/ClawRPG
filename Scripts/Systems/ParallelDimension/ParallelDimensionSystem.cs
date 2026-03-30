@@ -209,8 +209,8 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
             return ParallelDimensionDatabase.GetUnlockedDimensions();
         }
 
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
 
             var dimensionStates = new List<Dictionary>();
             foreach (var dim in ParallelDimensionDatabase.GetAllDimensions()) {
@@ -232,7 +232,7 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
             return data;
         }
 
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             if (!data.Contains("dimension_states")) return;
 
             var dimensionStates = (Godot.Collections.Array)data["dimension_states"];

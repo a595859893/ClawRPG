@@ -373,7 +373,7 @@ public partial class PartyUI : Control
         PartySystem.Instance.PlayerLeftParty += OnPlayerLeftParty;
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (Visible)
         {

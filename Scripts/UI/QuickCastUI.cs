@@ -145,7 +145,7 @@ public partial class QuickCastUI : Control
         return separator;
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!_isInitialized || !_isVisible) return;
         

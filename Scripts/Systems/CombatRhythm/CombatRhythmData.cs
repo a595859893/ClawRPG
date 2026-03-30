@@ -163,7 +163,7 @@ public delegate void RhythmIntensityUpdatedEventHandler(RhythmLevel level, int r
     /// <summary>
     /// 每帧驱动：清理过期记录并检查等级变化
     /// </summary>
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!_inCombat) return;
 
@@ -227,14 +227,14 @@ public delegate void RhythmIntensityUpdatedEventHandler(RhythmLevel level, int r
 
     // ===== 持久化 =====
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["last_battle_level"] = (int)_lastBattleLevel;
         return data;
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         if (data.Contains("last_battle_level"))

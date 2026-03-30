@@ -249,10 +249,10 @@ namespace Game.Systems.Pets
         /// </summary>
         public Dictionary Save()
         {
-            Dictionary data = new Dictionary();
+            Dictionary data = new Dictionary<string, object>();
             
             // 保存已拥有装备
-            Dictionary ownedData = new Dictionary();
+            Dictionary ownedData = new Dictionary<string, object>();
             foreach (var kvp in _playerData.OwnedEquipment)
             {
                 ownedData[kvp.Key] = new Godot.Collections.Array(kvp.Value);
@@ -263,7 +263,7 @@ namespace Game.Systems.Pets
             Godot.Collections.Array equippedList = new Godot.Collections.Array();
             foreach (var kvp in _playerData.EquippedEquipment)
             {
-                Dictionary equipEntry = new Dictionary();
+                Dictionary equipEntry = new Dictionary<string, object>();
                 equipEntry["pet_id"] = kvp.Key;
                 equipEntry["equipment_id"] = kvp.Value;
                 equippedList.Add(equipEntry);

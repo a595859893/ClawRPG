@@ -284,7 +284,7 @@ namespace ClawRPG.Scripts.Systems
 
         #region Save System
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Godot.Dictionary();
             
@@ -319,7 +319,7 @@ namespace ClawRPG.Scripts.Systems
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

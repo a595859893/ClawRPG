@@ -61,7 +61,7 @@ public class MarketTrendSystem : BaseSystem
     /// Persists market summary stats and current trends. Price history and predictions are not persisted
     /// as they are regenerated dynamically based on market activity.
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         Dictionary<string, object> data = new Dictionary<string, object>();
 
@@ -94,7 +94,7 @@ public class MarketTrendSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence.
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

@@ -39,9 +39,9 @@ public class ArenaTournamentMain : BaseSystem
     public ArenaTournamentSystem GetSystem() => _system;
     public ArenaTournamentUI GetUI() => _ui;
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         if (_system != null)
         {
             data["system"] = _system.ExportSaveData();
@@ -49,7 +49,7 @@ public class ArenaTournamentMain : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         if (data.Contains("system") && _system != null)

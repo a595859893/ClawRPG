@@ -187,8 +187,8 @@ namespace ClawRPG.Scripts.Database {
 
         #region BaseSystem Persistence
 
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
+        public override Dictionary<string, object> ExportSaveData() => new();
+        public override void ImportSaveData(Dictionary<string, object> data) { }
 
         #endregion
     }

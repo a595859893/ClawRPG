@@ -112,7 +112,7 @@ public delegate void BattleStatsUpdated(int damageDealt, int damageTaken, int en
         return true;
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (_currentState != BattleState.BattleActive)
             return;
@@ -474,7 +474,7 @@ public delegate void BattleStatsUpdated(int damageDealt, int damageTaken, int en
         }
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         // 导出战斗状态和玩家数据
         return new Godot.Collections.Dictionary
@@ -494,7 +494,7 @@ public delegate void BattleStatsUpdated(int damageDealt, int damageTaken, int en
         };
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

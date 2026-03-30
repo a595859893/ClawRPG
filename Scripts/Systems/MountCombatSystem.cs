@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Characters;
 
 namespace ClawRPG.Scripts.Mounts {
     /// <summary>
@@ -28,7 +29,7 @@ namespace ClawRPG.Scripts.Mounts {
             GD.Print("[MountCombatSystem] Initialized");
         }
 
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             // 更新冷却时间
             _cooldownTimer += delta;
             if (_cooldownTimer >= 1.0f) {
@@ -488,9 +489,9 @@ namespace ClawRPG.Scripts.Mounts {
         /// <summary>
         /// Export save data for persistence
         /// </summary>
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             var mountCombatList = new Array();
             
             foreach (var kvp in _mountCombatData)
@@ -508,7 +509,7 @@ namespace ClawRPG.Scripts.Mounts {
                 };
                 
                 // 序列化冷却
-                var cooldowns = new Dictionary();
+                var cooldowns = new Dictionary<string, object>();
                 foreach (var cd in kvp.Value.SkillCooldowns)
                 {
                     cooldowns[cd.Key] = cd.Value;
@@ -525,7 +526,7 @@ namespace ClawRPG.Scripts.Mounts {
         /// <summary>
         /// Import save data from persistence
         /// </summary>
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

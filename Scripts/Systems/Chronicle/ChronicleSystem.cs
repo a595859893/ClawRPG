@@ -143,7 +143,7 @@ public class ChronicleSystem : BaseSystem
     public List<LoreEntry> GetDiscoveredLore() => discoveredLore;
     public Dictionary<string, bool> GetStoryFlags() => storyFlags;
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary<string, object>
         {
@@ -154,7 +154,7 @@ public class ChronicleSystem : BaseSystem
         };
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         base.ImportSaveData(data);
         if (data == null) return;

@@ -620,9 +620,9 @@ public class MultiplayerManager : BaseSystem
     
     #region 数据持久化
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         if (Session != null) data["session"] = Session.ExportSaveData();
         if (NetworkSync != null) data["network_sync"] = NetworkSync.ExportSaveData();
@@ -631,7 +631,7 @@ public class MultiplayerManager : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

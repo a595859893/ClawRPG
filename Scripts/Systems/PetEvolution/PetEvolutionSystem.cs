@@ -460,9 +460,9 @@ public partial class PetEvolutionSystem : BaseSystem
     /// <summary>
     /// Export save data (BaseSystem override)
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         data["evolvedPets"] = _data.EvolvedPets;
         data["totalEvolutions"] = _data.TotalEvolutions;
         data["legendaryEvolutions"] = _data.LegendaryEvolutions;
@@ -476,7 +476,7 @@ public partial class PetEvolutionSystem : BaseSystem
     /// <summary>
     /// Import save data (BaseSystem override)
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

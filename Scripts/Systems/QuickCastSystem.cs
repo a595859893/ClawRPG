@@ -83,7 +83,7 @@ public partial class QuickCastSystem : BaseSystem
         }
     }
     
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         // Update global cooldown
         if (_globalCooldownRemaining > 0)
@@ -506,9 +506,9 @@ public partial class QuickCastSystem : BaseSystem
     /// <summary>
     /// Export save data for persistence
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         var slots = new Array();
         foreach (var slot in _quickSlots)
@@ -528,7 +528,7 @@ public partial class QuickCastSystem : BaseSystem
         data["successful_casts"] = _successfulCasts;
         
         // Item usage count
-        var usageCount = new Dictionary();
+        var usageCount = new Dictionary<string, object>();
         foreach (var kvp in _itemUsageCount)
         {
             usageCount[kvp.Key] = kvp.Value;
@@ -541,7 +541,7 @@ public partial class QuickCastSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         

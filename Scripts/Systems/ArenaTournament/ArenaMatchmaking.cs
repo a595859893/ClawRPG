@@ -87,7 +87,7 @@ namespace ClawRPG.Scripts.Systems.ArenaTournament {
             return _playerMatchStates.GetValueOrDefault(playerId, MatchState.Cancelled);
         }
         
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             base._Process(delta);
             
             _timer += delta;
@@ -97,12 +97,12 @@ namespace ClawRPG.Scripts.Systems.ArenaTournament {
             }
         }
         
-        public override Dictionary ExportSaveData() {
-            var data = new Dictionary();
+        public override Dictionary<string, object> ExportSaveData() {
+            var data = new Dictionary<string, object>();
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data) {
+        public override void ImportSaveData(Dictionary<string, object> data) {
             // 加载数据
         }
     }

@@ -334,9 +334,9 @@ public class DailyQuestSystem : BaseSystem
 	/// <summary>
 	/// 导出保存数据（实现 BaseSystem 接口）
 	/// </summary>
-	public override Dictionary ExportSaveData()
+	public override Dictionary<string, object> ExportSaveData()
 	{
-		var data = new Dictionary();
+		var data = new Dictionary<string, object>();
 		data["lastRefreshDate"] = _lastRefreshDate.ToString("o");
 		data["totalQuestsCompleted"] = _totalQuestsCompleted;
 		data["totalQuestsClaimed"] = _totalQuestsClaimed;
@@ -374,7 +374,7 @@ public class DailyQuestSystem : BaseSystem
 	/// <summary>
 	/// 导入保存数据（实现 BaseSystem 接口）
 	/// </summary>
-	public override void ImportSaveData(Dictionary data)
+	public override void ImportSaveData(Dictionary<string, object> data)
 	{
 		Load(data);
 	}

@@ -50,7 +50,7 @@ namespace ClawRPG.Scripts.Systems {
             LoadSettings();
         }
         
-        public override void _Process(float delta) {
+        public override void _Process(double delta) {
             // Advance time
             _currentTime += delta * _timeScale * (24f / _dayDuration);
             if (_currentTime >= 24f) {
@@ -159,7 +159,7 @@ namespace ClawRPG.Scripts.Systems {
         
         #region Data Persistence
         
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary
             {
@@ -169,7 +169,7 @@ namespace ClawRPG.Scripts.Systems {
             };
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

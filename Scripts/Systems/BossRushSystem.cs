@@ -60,7 +60,7 @@ public class BossRushSystem : BaseSystem
         rng.Randomize();
     }
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
         var dict = new Godot.Dictionary();
         dict["CurrentStage"] = data.CurrentStage;

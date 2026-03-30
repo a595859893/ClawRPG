@@ -306,7 +306,7 @@ public partial class PartySystem : BaseSystem
     /// <summary>
     /// 导出保存数据 - 继承自 BaseSystem
     /// </summary>
-    public override Dictionary ExportSaveData() => _partyPersistence.ExportSaveData();
-    public override void ImportSaveData(Dictionary data) => _partyPersistence.ImportSaveData(data);
+    public override Dictionary<string, object> ExportSaveData() => _partyPersistence.ExportSaveData();
+    public override void ImportSaveData(Dictionary<string, object> data) => _partyPersistence.ImportSaveData(data);
 }
 }

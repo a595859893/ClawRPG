@@ -412,9 +412,9 @@ public class PetAchievementSystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         // Export pet achievements
         var petAchievementsData = new Dictionary<string, Dictionary[]>();
@@ -472,7 +472,7 @@ public class PetAchievementSystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
         
@@ -573,7 +573,7 @@ public class PetAchievementSystem : BaseSystem
     // Helper: Convert achievement to dictionary
     private Dictionary AchievementToDict(PetAchievementData.Achievement achievement)
     {
-        var dict = new Dictionary();
+        var dict = new Dictionary<string, object>();
         dict["id"] = achievement.Id;
         dict["name"] = achievement.Name;
         dict["description"] = achievement.Description;
@@ -615,7 +615,7 @@ public class PetAchievementSystem : BaseSystem
         var array = new Godot.Collections.Array();
         foreach (var kvp in dict)
         {
-            var item = new Dictionary();
+            var item = new Dictionary<string, object>();
             item["key"] = kvp.Key;
             item["value"] = kvp.Value;
             array.Add(item);

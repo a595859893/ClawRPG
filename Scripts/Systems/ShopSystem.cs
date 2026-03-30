@@ -556,15 +556,15 @@ namespace GameSystems
         }
         
         // ===== 持久化 =====
-        public override Dictionary ExportSaveData()
+        public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Dictionary();
+            var data = new Dictionary<string, object>();
             
             // 保存玩家商店数据
-            var playerShopData = new Dictionary();
+            var playerShopData = new Dictionary<string, object>();
             foreach (var kvp in _playerShopData)
             {
-                var shopData = new Dictionary();
+                var shopData = new Dictionary<string, object>();
                 shopData["shop_id"] = kvp.Key;
                 shopData["unlock_time"] = kvp.Value.UnlockTime.ToString("o");
                 shopData["total_purchases"] = kvp.Value.TotalPurchases;
@@ -574,7 +574,7 @@ namespace GameSystems
                 var itemRecords = new Array();
                 foreach (var record in kvp.Value.PurchaseRecords)
                 {
-                    var recordData = new Dictionary();
+                    var recordData = new Dictionary<string, object>();
                     recordData["item_id"] = record.Key;
                     recordData["count"] = record.Value;
                     itemRecords.Add(recordData);
@@ -591,7 +591,7 @@ namespace GameSystems
             return data;
         }
         
-        public override void ImportSaveData(Dictionary data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
             

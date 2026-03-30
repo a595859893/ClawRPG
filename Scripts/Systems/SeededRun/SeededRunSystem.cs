@@ -43,9 +43,9 @@ public class SeededRunSystem : BaseSystem
         GD.Print("[SeededRunSystem] Initialized - Total runs: " + TotalSeededRuns);
     }
     
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Dictionary();
+        var data = new Dictionary<string, object>();
         
         data["total_seeded_runs"] = _data.TotalSeededRuns;
         data["last_used_seed"] = _data.LastUsedSeed ?? "";
@@ -57,7 +57,7 @@ public class SeededRunSystem : BaseSystem
         {
             foreach (var kvp in _data.SeedHistory)
             {
-                var record = new Dictionary();
+                var record = new Dictionary<string, object>();
                 record["seed"] = kvp.Key;
                 record["run_count"] = kvp.Value.RunCount;
                 record["best_floor"] = kvp.Value.BestFloor;
@@ -77,7 +77,7 @@ public class SeededRunSystem : BaseSystem
         return data;
     }
     
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null)
         {

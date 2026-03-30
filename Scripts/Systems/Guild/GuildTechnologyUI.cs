@@ -266,7 +266,7 @@ public class GuildTechnologyUI : Control
         RefreshTechList();
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         refreshTimer += delta;
         if (refreshTimer >= 1.0f)
