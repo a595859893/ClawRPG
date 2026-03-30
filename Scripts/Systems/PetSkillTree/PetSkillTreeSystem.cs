@@ -208,9 +208,9 @@ namespace ClawRPG.Scripts.Systems
             // Load from file system
         }
 
-        public System.Collections.Generic.System.Collections.Generic.Dictionary<string, object> GetStatistics()
+        public Dictionary<string, object> GetStatistics()
         {
-            return new System.Collections.Generic.System.Collections.Generic.Dictionary<string, object>
+            return new Dictionary<string, object>
             {
                 { "total_pets", PetSkillTrees.Count },
                 { "total_points_earned", TotalSkillPointsEarned },

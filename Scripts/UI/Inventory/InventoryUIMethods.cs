@@ -8,21 +8,6 @@ namespace ClawRPG.Scripts.UI
 {
 public partial class InventoryUI
 {
-    public override void _Ready()
-    {
-        SetupUI();
-        _player = GetTree().GetFirstNodeInGroup("player") as Player;
-        
-        // Connect to inventory manager
-        if (InventoryManager.Instance != null)
-        {
-            InventoryManager.Instance.InventoryUpdated += OnInventoryUpdated;
-        }
-        
-        RefreshInventory();
-        Hide();
-    }
-    
     public override void _Input(InputEvent evt)
     {
         // Toggle with I key

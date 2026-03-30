@@ -45,7 +45,7 @@ namespace ClawRPG.Scripts.UI {
         private bool hasTarget = false; 
         
         // 目标类型
-        private enum TargetType
+        public enum TargetType
         {
             None,
             NPC,

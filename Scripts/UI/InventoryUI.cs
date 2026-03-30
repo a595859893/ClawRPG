@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Items;
 
 namespace ClawRPG.Scripts.UI
 {
@@ -36,6 +37,14 @@ namespace ClawRPG.Scripts.UI
             base._Ready();
             Instance = this;
             LoadNodes();
+            SetupUI();
+            _player = GetTree().GetFirstNodeInGroup("player") as Player;
+            if (InventoryManager.Instance != null)
+            {
+                InventoryManager.Instance.InventoryUpdated += OnInventoryUpdated;
+            }
+            RefreshInventory();
+            Hide();
         }
 
         private void LoadNodes()
