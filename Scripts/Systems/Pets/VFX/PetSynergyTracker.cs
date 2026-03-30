@@ -52,7 +52,8 @@ namespace ClawRPG.Scripts.Systems.Pets.VFX {
         private void ConnectSignalDeferred() {
             var petAI = PetCombatAI.Instance;
             if (petAI != null) {
-                petAI.Connect("PetAttacked", new Callable(this, nameof(OnPetAttacked)), (uint)ConnectFlags.Deferred);
+                // REQ-151-03: Godot 3→4 Signal migration (deferred via Callable flag)
+                petAI.PetAttacked += OnPetAttacked;
                 GD.Print("[PetSynergyTracker] Connected to PetCombatAI.PetAttacked");
             } else {
                 var timer = new Timer { OneShot = true, WaitTime = 1.0f };

@@ -315,7 +315,8 @@ public partial class PetAttackFeedbackEffect : CanvasLayer
     public override void _EnterTree()
     {
         // 确保屏幕尺寸变化时同步
-        GetTree().Connect("screen_resized", Callable.From(OnScreenResized));
+        // REQ-151-03: Godot 3→4 Signal migration
+        GetTree().ScreenResized += OnScreenResized;
     }
 
     private void OnScreenResized()

@@ -284,21 +284,21 @@ namespace ClawRPG.Scripts.Systems
         {
             return _regionDb?.GetUnlockedRegionIds(playerLevel) ?? Array.Empty<string>();
         }
-    }
 
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary();
+        }
 
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            // No persistent data needed
+        }
     }
 }

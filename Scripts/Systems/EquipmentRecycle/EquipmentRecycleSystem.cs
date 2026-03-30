@@ -275,48 +275,4 @@ namespace ClawRPG.Scripts.Systems.EquipmentRecycle
         public string FavoriteRarity { get; set; } = "";
     }
     
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        var data = new Dictionary();
-        
-        // 回收统计
-        data["total_recycled"] = stats.TotalRecycled;
-        data["total_gold_earned"] = stats.TotalGoldEarned;
-        data["favorite_rarity"] = stats.FavoriteRarity;
-        
-        // 获得的材料
-        var materialsData = new Dictionary();
-        foreach (var kvp in stats.MaterialsObtained)
-        {
-            materialsData[kvp.Key] = kvp.Value;
-        }
-        data["materials_obtained"] = materialsData;
-        
-        return data;
-    }
-    
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        if (data == null) return;
-        
-        if (data.Contains("total_recycled")) stats.TotalRecycled = (int)data["total_recycled"];
-        if (data.Contains("total_gold_earned")) stats.TotalGoldEarned = (int)data["total_gold_earned"];
-        if (data.Contains("favorite_rarity")) stats.FavoriteRarity = (string)data["favorite_rarity"];
-        
-        stats.MaterialsObtained.Clear();
-        if (data.Contains("materials_obtained"))
-        {
-            var materialsData = (Dictionary)data["materials_obtained"];
-            foreach (var kvp in materialsData)
-            {
-                stats.MaterialsObtained[kvp.Key] = (int)kvp.Value;
-            }
-        }
-    }
 }

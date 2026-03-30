@@ -123,9 +123,10 @@ public class BattlefieldVariantUI : CanvasLayer
     {
         if (BattlefieldVariantSystem.Instance != null)
         {
-            BattlefieldVariantSystem.Instance.Connect("VariantSelected", this, nameof(OnVariantSelected));
-            BattlefieldVariantSystem.Instance.Connect("VariantEffectTriggered", this, nameof(OnVariantEffectTriggered));
-            BattlefieldVariantSystem.Instance.Connect("VariantExited", this, nameof(OnVariantExited));
+            // REQ-151-03: Godot 3→4 Signal migration
+            BattlefieldVariantSystem.Instance.VariantSelected += OnVariantSelected;
+            BattlefieldVariantSystem.Instance.VariantEffectTriggered += OnVariantEffectTriggered;
+            BattlefieldVariantSystem.Instance.VariantExited += OnVariantExited;
         }
     }
 
@@ -172,7 +173,8 @@ public class BattlefieldVariantUI : CanvasLayer
         _fadeTween.TweenProperty(this, "modulate:a", 1.0f, 0.3f);
         _fadeTween.TweenInterval(_introDisplayDuration);
         _fadeTween.TweenProperty(this, "modulate:a", 0.0f, 0.5f);
-        _fadeTween.Connect("finished", this, nameof(OnIntroFadeFinished));
+        // REQ-151-03: Godot 3→4 Signal migration
+        _fadeTween.Connect(Tween.SignalName.Finished, Callable.From((Action)OnIntroFadeFinished));
     }
 
     private void OnIntroFadeFinished()
@@ -198,7 +200,8 @@ public class BattlefieldVariantUI : CanvasLayer
         _fadeTween.TweenProperty(_effectLabel, "modulate:a", 1.0f, 0.2f);
         _fadeTween.TweenInterval(_effectLabelDuration);
         _fadeTween.TweenProperty(_effectLabel, "modulate:a", 0.0f, 0.4f);
-        _fadeTween.Connect("finished", this, nameof(OnEffectLabelFadeFinished));
+        // REQ-151-03: Godot 3→4 Signal migration
+        _fadeTween.Connect(Tween.SignalName.Finished, Callable.From((Action)OnEffectLabelFadeFinished));
     }
 
     private void OnEffectLabelFadeFinished()

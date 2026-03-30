@@ -238,22 +238,22 @@ namespace ClawRPG.Scripts.Systems {
                 playerPetStories.Remove(petId);
             }
         }
-    }
 
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary<string, object> ExportSaveData()
-    {
-        return Serialize();
-    }
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            return Serialize();
+        }
 
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary<string, object> data)
-    {
-        if (data == null) return;
-        Deserialize(data);
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            Deserialize(data);
+        }
     }
 }

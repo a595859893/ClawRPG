@@ -155,7 +155,8 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
                 Text = "接受",
                 CustomMinimumSize = new Vector2(160, 45)
             };
-            _acceptButton.Connect("pressed", this, nameof(OnAcceptPressed));
+            // REQ-151-03: Godot 3→4 Signal migration
+            _acceptButton.Pressed += OnAcceptPressed;
             _acceptButton.Set("custom_fonts/font", CreateDefaultFont(16));
             buttonBox.AddChild(_acceptButton);
 
@@ -167,7 +168,8 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
                 Text = "重新抽卡",
                 CustomMinimumSize = new Vector2(160, 45)
             };
-            _rerollButton.Connect("pressed", this, nameof(OnRerollPressed));
+            // REQ-151-03: Godot 3→4 Signal migration
+            _rerollButton.Pressed += OnRerollPressed;
             _rerollButton.Set("custom_fonts/font", CreateDefaultFont(16));
             buttonBox.AddChild(_rerollButton);
 

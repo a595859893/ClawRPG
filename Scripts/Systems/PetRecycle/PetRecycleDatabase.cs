@@ -409,7 +409,4 @@ namespace ClawRPG.Scripts.Systems.PetRecycle {
         public int BaseValue { get; set; } = 0;
         public string Rarity { get; set; } = "Common";
     }
-
-        public override Dictionary ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary data) { }
 }

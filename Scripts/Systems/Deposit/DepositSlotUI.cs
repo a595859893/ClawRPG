@@ -59,8 +59,9 @@ public class DepositSlotUI : Control
         // Subscribe to deposit updates
         if (DepositData.Instance != null)
         {
-            DepositData.Instance.Connect(nameof(DepositData.DepositUpdated), this, nameof(OnDepositUpdated));
-            DepositData.Instance.Connect(nameof(DepositData.DepositLevelChanged), this, nameof(OnDepositLevelChanged));
+            // REQ-151-03: Godot 3→4 Signal migration
+            DepositData.Instance.DepositUpdated += OnDepositUpdated;
+            DepositData.Instance.DepositLevelChanged += OnDepositLevelChanged;
 
             // Initial display
             RefreshAllSlots();
