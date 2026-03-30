@@ -390,28 +390,28 @@ public class DailyDungeonDatabase
         }
     }
 
-    public static string GetDifficultyName(Difficulty difficulty)
+    public static string GetDifficultyName(DifficultyLevel difficulty)
     {
         switch (difficulty)
         {
-            case Difficulty.Easy: return "简单";
-            case Difficulty.Normal: return "普通";
-            case Difficulty.Hard: return "困难";
-            case Difficulty.Epic: return "史诗";
-            case Difficulty.Legendary: return "传奇";
+            case DifficultyLevel.Easy: return "简单";
+            case DifficultyLevel.Normal: return "普通";
+            case DifficultyLevel.Hard: return "困难";
+            case DifficultyLevel.Epic: return "史诗";
+            case DifficultyLevel.Legendary: return "传奇";
             default: return "未知";
         }
     }
 
-    public static Color GetDifficultyColor(Difficulty difficulty)
+    public static Color GetDifficultyColor(DifficultyLevel difficulty)
     {
         switch (difficulty)
         {
-            case Difficulty.Easy: return new Color(0.2f, 0.8f, 0.2f);
-            case Difficulty.Normal: return new Color(0.2f, 0.6f, 1.0f);
-            case Difficulty.Hard: return new Color(1.0f, 0.6f, 0.0f);
-            case Difficulty.Epic: return new Color(0.6f, 0.2f, 1.0f);
-            case Difficulty.Legendary: return new Color(1.0f, 0.2f, 0.2f);
+            case DifficultyLevel.Easy: return new Color(0.2f, 0.8f, 0.2f);
+            case DifficultyLevel.Normal: return new Color(0.2f, 0.6f, 1.0f);
+            case DifficultyLevel.Hard: return new Color(1.0f, 0.6f, 0.0f);
+            case DifficultyLevel.Epic: return new Color(0.6f, 0.2f, 1.0f);
+            case DifficultyLevel.Legendary: return new Color(1.0f, 0.2f, 0.2f);
             default: return Colors.White;
         }
     }
