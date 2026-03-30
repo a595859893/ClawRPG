@@ -5,6 +5,7 @@ using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Database;
 using ClawRPG.Scripts.UI;
+using ClawRPG.Scripts.Framework;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -141,6 +142,8 @@ namespace ClawRPG.Scripts.Characters {
         
         public void TakeDamage(int damage, bool isCrit = false, Vector2 fromDirection = default)
         {
+            Invariant.Assert(!IsDead, "TakeDamage called on dead enemy: {0}", EnemyName);
+            Invariant.Assert(damage >= 0, "TakeDamage negative damage for {0}: {1}", EnemyName, damage);
             if (IsDead) return;
             
             // REQ-129: Apply counter defense if enemy has recognized our combo
@@ -153,6 +156,8 @@ namespace ClawRPG.Scripts.Characters {
             }
             
             CurrentHealth -= actualDamage;
+            Invariant.Assert(CurrentHealth >= 0, "Health went negative after TakeDamage for {0}: {1}", EnemyName, CurrentHealth);
+            Invariant.Assert(CurrentHealth <= MaxHealth, "Health exceeded MaxHealth after TakeDamage for {0}: {1} > {2}", EnemyName, CurrentHealth, MaxHealth);
             
             // Track statistics
             StatisticsManager.Instance.RecordDamageDealt(damage);
@@ -183,6 +188,7 @@ namespace ClawRPG.Scripts.Characters {
         
         private void Die()
         {
+            Invariant.Assert(CurrentHealth <= 0, "Die called but health is {0} for {1}", CurrentHealth, EnemyName);
             IsDead = true;
             
             GD.Print(EnemyName + " defeated!");

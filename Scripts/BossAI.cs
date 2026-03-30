@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using ClawRPG.Scripts.Framework;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -42,6 +43,8 @@ namespace ClawRPG.Scripts.Characters {
         public void ForceSetState(BossAIState newState)
         {
             if (_currentState == newState) return;
+            
+            Invariant.Assert(_stateTimer >= 0, "BossAI ForceSetState: previous timer negative from {0}: {1}", _currentState, _stateTimer);
             
             _currentState = newState;
             _stateTimer = GetStateDuration(newState);
@@ -137,8 +140,15 @@ namespace ClawRPG.Scripts.Characters {
         {
             if (_currentState == newState) return;
             
+            // Invariant: state timer from previous state should have been non-negative
+            Invariant.Assert(_stateTimer >= 0, "BossAI state timer was negative before transition from {0}: {1}", _currentState, _stateTimer);
+            
             _currentState = newState;
             _stateTimer = GetStateDuration(newState);
+            
+            // Invariant: new state timer must be positive
+            Invariant.Assert(_stateTimer > 0, "BossAI new state {0} has non-positive duration: {1}", newState, _stateTimer);
+            
             OnStateChanged?.Invoke(newState);
         }
         
