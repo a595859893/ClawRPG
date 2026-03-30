@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+namespace ClawRPG.Systems.MultiplayerEmote {
 /// <summary>
 /// 多人表情系统
 /// 处理表情使用、同步和显示
@@ -573,4 +574,5 @@ public class MultiplayerEmoteSystem : BaseSystem
     {
         Instance = null;
     }
+}
 }

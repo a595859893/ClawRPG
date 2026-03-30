@@ -46,9 +46,9 @@ namespace ClawRPG.Scripts.Items {
         public float Damage { get; set; }
         public float AttackSpeed { get; set; }
         public float CriticalChance { get; set; }
-        public WeaponType WeaponType { get; set; }
+        public WeaponCategory WeaponType { get; set; }
         
-        public enum WeaponType { Sword, Axe, Bow, Staff, Dagger }
+        public enum WeaponCategory { Sword, Axe, Bow, Staff, Dagger }
         
         public Weapon()
         {
@@ -63,9 +63,9 @@ namespace ClawRPG.Scripts.Items {
     {
         public float Defense { get; set; }
         public float HealthBonus { get; set; }
-        public ArmorType ArmorType { get; set; }
+        public ArmorCategory ArmorType { get; set; }
         
-        public enum ArmorType { Helmet, Chest, Legs, Shield }
+        public enum ArmorCategory { Helmet, Chest, Legs, Shield }
         
         public Armor()
         {

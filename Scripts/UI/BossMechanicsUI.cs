@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+namespace ClawRPG.UI {
 public class BossMechanicsUI : Control
 {
     private Label _titleLabel;
@@ -196,8 +197,6 @@ public class BossMechanicsUI : Control
         closeButton.Pressed += () => ToggleUI();
         mainContainer.AddChild(closeButton);
     }
-    
-    private VBoxContainer _timerContainer;
     
     private void PopulateBossList()
     {
@@ -434,4 +433,5 @@ public class BossMechanicsUI : Control
             UpdateActiveBattle();
         }
     }
+}
 }

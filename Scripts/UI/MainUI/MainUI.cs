@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts
     /// </summary>
     public partial class MainUI : Node
     {
-        private Main _main;
+        private Main _mainNode;
         private UIManager _uiManager;
         private UIPanelController _panelController;
         private UIStyles _uiStyles;
@@ -20,7 +20,7 @@ namespace ClawRPG.Scripts
         
         public void Initialize(Main main)
         {
-            _main = main;
+            _mainNode = main;
             
             // 初始化 UI 管理器
             _uiManager = new UIManager();

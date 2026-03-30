@@ -24,7 +24,7 @@ public class MultiplayerChatData : BaseSystem
     }
     
     // Channel settings
-    public class ChannelSettings
+    public class ChannelConfig
     {
         public bool Enabled = true;
         public bool Muted = false;
@@ -51,7 +51,7 @@ public class MultiplayerChatData : BaseSystem
         {
             ChannelMessages[channel] = new List<ChatMessage>();
             MessagesPerChannel[channel] = 0;
-            ChannelSettings[channel] = new ChannelSettings();
+            ChannelSettings[channel] = new ChannelConfig();
         }
     }
     

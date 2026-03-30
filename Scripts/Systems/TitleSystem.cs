@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 称号系统 - 管理玩家称号的解锁、装备和展示
     /// </summary>
-    public class TitleSystem : BaseSystem
+    public class TitleData : Resource
     {
     public string TitleId { get; set; }
     public string TitleName { get; set; }

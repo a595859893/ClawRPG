@@ -31,10 +31,8 @@ public enum MythicAffix
     Bursting,       // 爆发 - 死亡爆炸
     Infested,       // 感染 - 小怪召唤
     Skittish,       // 惊慌 - 仇恨不稳定
-    Necrotic,       // 坏死 - 护盾移除
     Inspiring,      // 激励 - 附近敌人增益
     Prideful,       // 骄傲 - 击杀召唤护卫
-    Volcanic,       // 火山 - 远程AOE
     Storming,       // 风暴 - 视野减少
     Entangling,     // 缠绕 - 减速
     Discording,     // 混乱 - 伤害反射
@@ -46,12 +44,8 @@ public enum MythicAffix
     Incorporeal,    // 虚化 - 敌人虚化
     Awakened,       // 觉醒 - 召唤Boss
     Dueling,        // 决斗 - 敌人联手
-    Sanguine,       // 血池
     Felburst,       // 邪能爆发
     Grenade,        // 手雷
-    Infested,       // 寄生虫
-    Raging,         // 狂暴
-    Bolstering,     // 强化
     Thundering,     // 雷鸣
     FelReaver,      // 邪能破坏者
     Reflective,     // 反射

@@ -10,7 +10,7 @@ namespace ClawRPG.Core.Systems.GuildWar
     public class GuildWarDatabase : DatabaseBase
     {
         private static GuildWarDatabase _instance;
-        public static GuildWarDatabase Instance => _instance ??= new GuildWarDatabase();
+        public static GuildWarDatabase Singleton => _instance ??= new GuildWarDatabase();
 
         // War type configurations
         private Dictionary<GuildWarType, GuildWarTypeConfig> _warTypeConfigs;

@@ -17,11 +17,11 @@ namespace ClawRPG.Scripts.Database
         /// <summary>
         /// 静态实例引用（兼容原有访问模式）
         /// </summary>
-        public static AchievementDatabase Instance { get; private set; }
+        public static AchievementDatabase Singleton { get; private set; }
 
         public AchievementDatabase()
         {
-            Instance = this;
+            Singleton = this;
             _achievements = new Dictionary<string, Achievement>();
         }
 

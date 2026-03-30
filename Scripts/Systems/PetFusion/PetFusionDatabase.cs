@@ -25,48 +25,48 @@ public class PetFusionDatabase {
     };
     
     // 融合配方 - 定义哪些宠物类型可以融合
-    private static readonly Dictionary<string, List<FusionRecipe>> FusionRecipes = new Dictionary<string, List<FusionRecipe>> {
+    private static readonly Dictionary<string, List<PetFusionRecipe>> PetFusionRecipes = new Dictionary<string, List<PetFusionRecipe>> {
         // 火系融合
-        { "Fire", new List<FusionRecipe> {
-            new FusionRecipe { ResultType = "Inferno Wolf", Rarity = "Rare", RequiredTypes = new List<string> { "Fire", "Beast" } },
-            new FusionRecipe { ResultType = "Phoenix", Rarity = "Legendary", RequiredTypes = new List<string> { "Fire", "Elemental" } },
-            new FusionRecipe { ResultType = "Volcanic Dragon", Rarity = "Epic", RequiredTypes = new List<string> { "Fire", "Dragon" } },
+        { "Fire", new List<PetFusionRecipe> {
+            new PetFusionRecipe { ResultType = "Inferno Wolf", Rarity = "Rare", RequiredTypes = new List<string> { "Fire", "Beast" } },
+            new PetFusionRecipe { ResultType = "Phoenix", Rarity = "Legendary", RequiredTypes = new List<string> { "Fire", "Elemental" } },
+            new PetFusionRecipe { ResultType = "Volcanic Dragon", Rarity = "Epic", RequiredTypes = new List<string> { "Fire", "Dragon" } },
         }},
         // 水系融合
-        { "Water", new List<FusionRecipe> {
-            new FusionRecipe { ResultType = "Sea Serpent", Rarity = "Rare", RequiredTypes = new List<string> { "Water", "Beast" } },
-            new FusionRecipe { ResultType = "Tidal Guardian", Rarity = "Epic", RequiredTypes = new List<string> { "Water", "Elemental" } },
-            new FusionRecipe { ResultType = "Ocean Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Water", "Dragon" } },
+        { "Water", new List<PetFusionRecipe> {
+            new PetFusionRecipe { ResultType = "Sea Serpent", Rarity = "Rare", RequiredTypes = new List<string> { "Water", "Beast" } },
+            new PetFusionRecipe { ResultType = "Tidal Guardian", Rarity = "Epic", RequiredTypes = new List<string> { "Water", "Elemental" } },
+            new PetFusionRecipe { ResultType = "Ocean Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Water", "Dragon" } },
         }},
         // 冰系融合
-        { "Ice", new List<FusionRecipe> {
-            new FusionRecipe { ResultType = "Frost Bear", Rarity = "Rare", RequiredTypes = new List<string> { "Ice", "Beast" } },
-            new FusionRecipe { ResultType = "Winter Spirit", Rarity = "Epic", RequiredTypes = new List<string> { "Ice", "Elemental" } },
-            new FusionRecipe { ResultType = "Glacial Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Ice", "Dragon" } },
+        { "Ice", new List<PetFusionRecipe> {
+            new PetFusionRecipe { ResultType = "Frost Bear", Rarity = "Rare", RequiredTypes = new List<string> { "Ice", "Beast" } },
+            new PetFusionRecipe { ResultType = "Winter Spirit", Rarity = "Epic", RequiredTypes = new List<string> { "Ice", "Elemental" } },
+            new PetFusionRecipe { ResultType = "Glacial Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Ice", "Dragon" } },
         }},
         // 雷电系融合
-        { "Lightning", new List<FusionRecipe> {
-            new FusionRecipe { ResultType = "Thunder Panther", Rarity = "Rare", RequiredTypes = new List<string> { "Lightning", "Beast" } },
-            new FusionRecipe { ResultType = "Storm Elemental", Rarity = "Epic", RequiredTypes = new List<string> { "Lightning", "Elemental" } },
-            new FusionRecipe { ResultType = "Thunder Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Lightning", "Dragon" } },
+        { "Lightning", new List<PetFusionRecipe> {
+            new PetFusionRecipe { ResultType = "Thunder Panther", Rarity = "Rare", RequiredTypes = new List<string> { "Lightning", "Beast" } },
+            new PetFusionRecipe { ResultType = "Storm Elemental", Rarity = "Epic", RequiredTypes = new List<string> { "Lightning", "Elemental" } },
+            new PetFusionRecipe { ResultType = "Thunder Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Lightning", "Dragon" } },
         }},
         // 暗影系融合
-        { "Shadow", new List<FusionRecipe> {
-            new FusionRecipe { ResultType = "Shadow Wolf", Rarity = "Rare", RequiredTypes = new List<string> { "Shadow", "Beast" } },
-            new FusionRecipe { ResultType = "Void Walker", Rarity = "Epic", RequiredTypes = new List<string> { "Shadow", "Elemental" } },
-            new FusionRecipe { ResultType = "Abyss Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Shadow", "Dragon" } },
+        { "Shadow", new List<PetFusionRecipe> {
+            new PetFusionRecipe { ResultType = "Shadow Wolf", Rarity = "Rare", RequiredTypes = new List<string> { "Shadow", "Beast" } },
+            new PetFusionRecipe { ResultType = "Void Walker", Rarity = "Epic", RequiredTypes = new List<string> { "Shadow", "Elemental" } },
+            new PetFusionRecipe { ResultType = "Abyss Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Shadow", "Dragon" } },
         }},
         // 光明系融合
-        { "Holy", new List<FusionRecipe> {
-            new FusionRecipe { ResultType = "Light Lion", Rarity = "Rare", RequiredTypes = new List<string> { "Holy", "Beast" } },
-            new FusionRecipe { ResultType = "Celestial Being", Rarity = "Epic", RequiredTypes = new List<string> { "Holy", "Elemental" } },
-            new FusionRecipe { ResultType = "Divine Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Holy", "Dragon" } },
+        { "Holy", new List<PetFusionRecipe> {
+            new PetFusionRecipe { ResultType = "Light Lion", Rarity = "Rare", RequiredTypes = new List<string> { "Holy", "Beast" } },
+            new PetFusionRecipe { ResultType = "Celestial Being", Rarity = "Epic", RequiredTypes = new List<string> { "Holy", "Elemental" } },
+            new PetFusionRecipe { ResultType = "Divine Dragon", Rarity = "Legendary", RequiredTypes = new List<string> { "Holy", "Dragon" } },
         }},
         // 普通系融合
-        { "Common", new List<FusionRecipe> {
-            new FusionRecipe { ResultType = "Mighty Bear", Rarity = "Uncommon", RequiredTypes = new List<string> { "Common", "Beast" } },
-            new FusionRecipe { ResultType = "Ancient Golem", Rarity = "Rare", RequiredTypes = new List<string> { "Common", "Elemental" } },
-            new FusionRecipe { ResultType = "Elder Dragon", Rarity = "Epic", RequiredTypes = new List<string> { "Common", "Dragon" } },
+        { "Common", new List<PetFusionRecipe> {
+            new PetFusionRecipe { ResultType = "Mighty Bear", Rarity = "Uncommon", RequiredTypes = new List<string> { "Common", "Beast" } },
+            new PetFusionRecipe { ResultType = "Ancient Golem", Rarity = "Rare", RequiredTypes = new List<string> { "Common", "Elemental" } },
+            new PetFusionRecipe { ResultType = "Elder Dragon", Rarity = "Epic", RequiredTypes = new List<string> { "Common", "Dragon" } },
         }}
     };
     
@@ -79,11 +79,11 @@ public class PetFusionDatabase {
     }
     
     // 获取融合配方
-    public static List<FusionRecipe> GetRecipesForPetType(string petType) {
-        if (FusionRecipes.ContainsKey(petType)) {
-            return FusionRecipes[petType];
+    public static List<PetFusionRecipe> GetRecipesForPetType(string petType) {
+        if (PetFusionRecipes.ContainsKey(petType)) {
+            return PetFusionRecipes[petType];
         }
-        return new List<FusionRecipe>();
+        return new List<PetFusionRecipe>();
     }
     
     // 获取随机稀有度
@@ -150,10 +150,10 @@ public class PetFusionDatabase {
             default: return 0.9f;
         }
     }
-}
 
-public class FusionRecipe {
+public class PetFusionRecipe {
     public string ResultType { get; set; } = "";
     public string Rarity { get; set; } = "Common";
     public List<string> RequiredTypes { get; set; } = new List<string>();
+}
 }

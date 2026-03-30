@@ -52,7 +52,7 @@ namespace ClawRPG.Scripts.Data
         public DateTime Timestamp { get; set; }
     }
 
-    public class PetLearningData
+    public partial class PetLearningData
     {
         public string PetId { get; set; }
         public Dictionary<string, int> EnemyTypeKills { get; set; } = new Dictionary<string, int>();

@@ -15,8 +15,6 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         public static CoopSessionSystem Instance => _instance ??= new CoopSessionSystem();
 
         protected override string SystemName => "CoopSessionSystem";
-        private static CoopSessionSystem _instance;
-        public static CoopSessionSystem Instance => _instance ??= new CoopSessionSystem();
 
         private readonly Dictionary<string, CoopSession> _activeSessions;
         private readonly Dictionary<int, CoopSessionHistory> _playerHistories;

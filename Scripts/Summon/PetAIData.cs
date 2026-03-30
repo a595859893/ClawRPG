@@ -47,7 +47,7 @@ namespace ClawRPG.Scripts.Data
     /// <summary>
     /// 宠物AI状态
     /// </summary>
-    public enum PetAIState
+    public partial enum PetAIState
     {
         Idle,           // 空闲
         Patrolling,     // 巡逻
@@ -90,7 +90,7 @@ namespace ClawRPG.Scripts.Data
     /// <summary>
     /// 宠物学习数据
     /// </summary>
-    public class PetLearningData
+    public partial class PetLearningData
     {
         public string SummonId { get; set; }
         public Dictionary<string, int> EnemyTypeKills { get; set; }
@@ -127,7 +127,7 @@ namespace ClawRPG.Scripts.Data
     /// <summary>
     /// 宠物AI玩家数据
     /// </summary>
-    public class PlayerPetAIData
+    public partial class PlayerPetAIData
     {
         public List<PetAIInstance> ActivePetAIs { get; set; }
         public Dictionary<string, PetLearningData> LearningData { get; set; }

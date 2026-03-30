@@ -8,8 +8,6 @@ public partial class MilestoneSystem : BaseSystem
     public static MilestoneSystem Instance => _instance ?? (_instance = new MilestoneSystem());
     
     protected override string SystemName => "MilestoneSystem";
-    private static MilestoneSystem _instance;
-    public static MilestoneSystem Instance => _instance ?? (_instance = new MilestoneSystem());
     
     private MilestoneData _data = new MilestoneData();
     private MilestoneDatabase _database = MilestoneDatabase.Instance;

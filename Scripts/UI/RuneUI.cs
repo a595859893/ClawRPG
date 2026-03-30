@@ -9,12 +9,10 @@ public partial class RuneUI : Control
 {
     private RuneSystem _runeSystem;
     private VBoxContainer _mainContainer;
-    private TabContainer _tabContainer;
     
     // Rune list
     private GridContainer _runeGrid;
     private OptionButton _filterTypeButton;
-    private OptionButton _filterRarityButton;
     private Label _runeCountLabel;
     
     // Equipped runes panel
@@ -26,7 +24,6 @@ public partial class RuneUI : Control
     private Label _detailsName;
     private Label _detailsDescription;
     private Label _detailsType;
-    private Label _detailsRarity;
     private Label _detailsSlot;
     private Label _detailsLevel;
     private VBoxContainer _bonusesContainer;

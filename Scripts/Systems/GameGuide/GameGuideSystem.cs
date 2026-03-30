@@ -8,8 +8,6 @@ public partial class GameGuideSystem : BaseSystem
     private static GameGuideSystem _instance;
     
     protected override string SystemName => "GameGuideSystem";
-    private static GameGuideData _data;
-    private static GameGuideSystem _instance;
     
     public static GameGuideSystem Instance
     {

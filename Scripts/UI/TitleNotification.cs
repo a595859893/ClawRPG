@@ -148,13 +148,13 @@ namespace ClawRPG.Scripts.UI {
             }
         }
         
-        private string GetRarityName(TitleSystem.TitleRarity rarity) {
+        private string GetRarityName(TitleRarity rarity) {
             switch (rarity) {
-                case TitleSystem.TitleRarity.Common: return "普通";
-                case TitleSystem.TitleRarity.Uncommon: return "优秀";
-                case TitleSystem.TitleRarity.Rare: return "稀有";
-                case TitleSystem.TitleRarity.Epic: return "史诗";
-                case TitleSystem.TitleRarity.Legendary: return "传说";
+                case TitleRarity.Common: return "普通";
+                case TitleRarity.Uncommon: return "优秀";
+                case TitleRarity.Rare: return "稀有";
+                case TitleRarity.Epic: return "史诗";
+                case TitleRarity.Legendary: return "传说";
                 default: return "";
             }
         }

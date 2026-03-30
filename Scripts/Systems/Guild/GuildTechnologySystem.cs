@@ -8,8 +8,6 @@ public partial class GuildTechnologySystem : BaseSystem
     public static GuildTechnologySystem Instance => _instance ??= new GuildTechnologySystem();
 
     protected override string SystemName => "GuildTechnologySystem";
-    private static GuildTechnologySystem _instance;
-    public static GuildTechnologySystem Instance => _instance ??= new GuildTechnologySystem();
 
     public GuildTechnologyData Data { get; private set; } = new GuildTechnologyData();
     public event Action<string, int> OnTechnologyLevelUp;

@@ -8,8 +8,6 @@ public partial class LuckSystem : BaseSystem
     public static LuckSystem Instance => _instance;
     
     protected override string SystemName => "LuckSystem";
-    private static LuckSystem _instance;
-    public static LuckSystem Instance => _instance;
     
     private LuckData _data;
     private Random _random = new Random();

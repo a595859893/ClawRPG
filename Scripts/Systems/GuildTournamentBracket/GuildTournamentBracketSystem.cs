@@ -23,7 +23,6 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
         
         protected override string SystemName => "GuildTournamentBracketSystem";
         // 单例
-        private static GuildTournamentBracketSystem _instance;
         public static GuildTournamentBracketSystem Instance {
             get {
                 if (_instance == null) {

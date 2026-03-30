@@ -18,13 +18,13 @@ namespace ClawRPG.Scripts.Database
         /// <summary>
         /// 静态实例引用（兼容原有访问模式）
         /// </summary>
-        public static RuneDatabase Instance { get; private set; }
+        public static RuneDatabase Singleton { get; private set; }
 
         public override object Instance => Instance;
 
         public RuneDatabase()
         {
-            Instance = this;
+            Singleton = this;
             Initialize();
         }
 

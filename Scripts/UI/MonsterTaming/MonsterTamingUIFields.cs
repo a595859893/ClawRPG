@@ -37,7 +37,6 @@ public partial class MonsterTamingUI : Control
     private Button _feedButton;
     private Button _battleButton;
     private Button _playButton;
-    private Button _captureButton;
     private Label _methodLabel;
     
     private TameableMonster _selectedMonster;

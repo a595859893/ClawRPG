@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TitleCollectionUI : Control
+public partial class TitleCollectionUI : Control
 {
     private Button _closeButton;
     private TabContainer _tabContainer;

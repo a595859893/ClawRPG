@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+namespace ClawRPG.Systems.AuctionHouse {
 public class AuctionItem
 {
     public string ItemId { get; set; }
@@ -15,4 +16,5 @@ public class AuctionItem
     public long ExpireTime { get; set; }
     public string Rarity { get; set; }
     public string Category { get; set; }
+}
 }

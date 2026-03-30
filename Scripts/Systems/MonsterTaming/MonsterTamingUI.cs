@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MonsterTamingUI : Control
+public partial class MonsterTamingUI : Control
 {
     private MonsterTamingSystem _system;
     private Label _titleLabel;

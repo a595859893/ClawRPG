@@ -2,7 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Database;
 
-public class RuneUI : Control
+public partial class RuneUI : Control
 {
     private TabContainer _tabContainer;
     private VBoxContainer _overviewTab;

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TitleCollectionDatabase : Object
+public partial class TitleCollectionDatabase : BaseSystem
 {
     // 标题稀有度颜色
     public static readonly Godot.Color CommonColor = new Godot.Color(0.7f, 0.7f, 0.7f);
@@ -12,7 +12,7 @@ public class TitleCollectionDatabase : Object
     public static readonly Godot.Color LegendaryColor = new Godot.Color(1.0f, 0.6f, 0.0f);
     
     // 标题配置列表
-    private static List<Dictionary> _titles = new List<Dictionary>
+    private static List<Dictionary> _titleConfigs = new List<Dictionary>
     {
         // Combat Titles
         new Dictionary { {"id", "warrior_legend"}, {"name", "Warrior Legend"}, {"category", "Combat"}, {"rarity", "Legendary"}, {"requirement", "Defeat 10000 enemies"}, {"description", "A legendary warrior known throughout the realm"} },
@@ -68,12 +68,12 @@ public class TitleCollectionDatabase : Object
     
     public static List<Dictionary> GetAllTitles()
     {
-        return _titles;
+        return _titleConfigs;
     }
     
     public static Dictionary GetTitleById(string id)
     {
-        foreach (var title in _titles)
+        foreach (var title in _titleConfigs)
         {
             if ((string)title["id"] == id)
             {
@@ -86,7 +86,7 @@ public class TitleCollectionDatabase : Object
     public static List<Dictionary> GetTitlesByCategory(string category)
     {
         List<Dictionary> result = new List<Dictionary>();
-        foreach (var title in _titles)
+        foreach (var title in _titleConfigs)
         {
             if ((string)title["category"] == category)
             {
@@ -99,7 +99,7 @@ public class TitleCollectionDatabase : Object
     public static List<Dictionary> GetTitlesByRarity(string rarity)
     {
         List<Dictionary> result = new List<Dictionary>();
-        foreach (var title in _titles)
+        foreach (var title in _titleConfigs)
         {
             if ((string)title["rarity"] == rarity)
             {

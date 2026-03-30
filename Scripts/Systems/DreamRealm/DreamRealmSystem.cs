@@ -79,7 +79,7 @@ public partial class DreamRealmSystem : BaseSystem
     };
 
     // 区域统计数据
-    private Dictionary<RealmType, RealmStats> _realmStats = new Dictionary<RealmType, RealmStats>();
+    private Dictionary<RealmType, RealmStats> _realmStats = new Dictionary<RealmType, RealmStatsData>();
 
     // 梦境之力加成
     private Dictionary<string, float> _dreamBuffs = new Dictionary<string, float>
@@ -107,7 +107,7 @@ public partial class DreamRealmSystem : BaseSystem
     [Signal]
     public void TreasureFound(DreamTreasure treasure);
 
-    public class RealmStats
+    public class RealmStatsData
     {
         public int timesVisited;
         public int enemiesDefeated;
@@ -145,7 +145,7 @@ public partial class DreamRealmSystem : BaseSystem
     {
         foreach (RealmType realm in Enum.GetValues(typeof(RealmType)))
         {
-            _realmStats[realm] = new RealmStats();
+            _realmStats[realm] = new RealmStatsData();
         }
     }
 
@@ -489,7 +489,7 @@ public partial class DreamRealmSystem : BaseSystem
     public float DreamPowerMultiplier => _dreamPowerMultiplier;
     public bool IsInDream => _currentState == DreamState.Active;
     public Dictionary<RealmType, bool> UnlockedRealms => _unlockedRealms;
-    public Dictionary<RealmType, RealmStats> RealmStats => _realmStats;
+    public Dictionary<RealmType, RealmStatsData> RealmStatsMap => _realmStats;
 
     // ===== 持久化方法 =====
 
@@ -564,7 +564,7 @@ public partial class DreamRealmSystem : BaseSystem
             {
                 foreach (var sd in statsData)
                 {
-                    var rs = new RealmStats();
+                    var rs = new RealmStatsData();
                     rs.TimesEntered = (int)(sd.GetValueOrDefault("times_entered", 0));
                     rs.BestScore = (int)(sd.GetValueOrDefault("best_score", 0));
                     rs.TotalRewards = (int)(sd.GetValueOrDefault("total_rewards", 0));
