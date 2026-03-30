@@ -147,21 +147,25 @@ namespace ClawRPG.Scripts.Systems {
                 obj.QueueFree();
             }
         }
-    }
 
-    /// <summary>
-    /// Export save data for persistence
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        return new Dictionary();
-    }
+        #region Persistence
 
-    /// <summary>
-    /// Import save data from persistence
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        // No persistent data needed
+        /// <summary>
+        /// Export save data for persistence
+        /// </summary>
+        public override Dictionary ExportSaveData()
+        {
+            return new Dictionary();
+        }
+
+        /// <summary>
+        /// Import save data from persistence
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            // No persistent data needed
+        }
+
+        #endregion
     }
 }

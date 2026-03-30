@@ -181,60 +181,64 @@ namespace ClawRPG.Systems;
         public int GetWinCount(string trackId) {
             return _data.GetWinCount(trackId);
         }
-    }
-    
-    public class RaceResult {
-        public string TrackId;
-        public string MountId;
-        public int Time;
-        public int Rank;
-        public int GoldReward;
-        public int ExpReward;
-        public string Title;
-        public bool IsNewBestTime;
-    }
-    
-    public class RacingStatistics {
-        public int TotalRaces;
-        public int TotalWins;
-        public float WinRate;
-        public int TotalGoldEarned;
-        public int TotalExpEarned;
-        public int TracksUnlocked;
-        public Dictionary<string, int> BestTimes;
-    }
 
-    /// <summary>
-    /// 导出保存数据
-    /// </summary>
-    public override Dictionary ExportSaveData()
-    {
-        var data = new Dictionary();
+        #region Persistence
 
-        // 委托给数据层
-        if (_data != null)
+        public class RaceResult {
+            public string TrackId;
+            public string MountId;
+            public int Time;
+            public int Rank;
+            public int GoldReward;
+            public int ExpReward;
+            public string Title;
+            public bool IsNewBestTime;
+        }
+
+        public class RacingStatistics {
+            public int TotalRaces;
+            public int TotalWins;
+            public float WinRate;
+            public int TotalGoldEarned;
+            public int TotalExpEarned;
+            public int TracksUnlocked;
+            public Dictionary<string, int> BestTimes;
+        }
+
+        /// <summary>
+        /// 导出保存数据
+        /// </summary>
+        public override Dictionary ExportSaveData()
         {
-            var dataData = _data.ExportSaveData();
-            foreach (var kvp in dataData)
+            var data = new Dictionary();
+
+            // 委托给数据层
+            if (_data != null)
             {
-                data[kvp.Key] = kvp.Value;
+                var dataData = _data.ExportSaveData();
+                foreach (var kvp in dataData)
+                {
+                    data[kvp.Key] = kvp.Value;
+                }
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// 导入保存数据
+        /// </summary>
+        public override void ImportSaveData(Dictionary data)
+        {
+            if (data == null) return;
+
+            // 委托给数据层
+            if (_data != null)
+            {
+                _data.ImportSaveData(data);
             }
         }
 
-        return data;
-    }
-
-    /// <summary>
-    /// 导入保存数据
-    /// </summary>
-    public override void ImportSaveData(Dictionary data)
-    {
-        if (data == null) return;
-
-        // 委托给数据层
-        if (_data != null)
-        {
-            _data.ImportSaveData(data);
-        }
+        #endregion
     }
 

@@ -312,43 +312,51 @@ public class ItemSmeltingDatabase : BaseSystem
         }
         return available;
     }
-}
 
-public class SmeltingRecipe
-{
-    public string Id;
-    public string Name;
-    public string InputType;
-    public string InputRarity;
-    public Dictionary<string, int> OutputMaterials = new Dictionary<string, int>();
-    public int GoldCost;
-    public float SuccessRate;
-    public int RequiredLevel;
-}
+    #region Data Types
 
-public class MaterialInfo
-{
-    public string Id;
-    public string Name;
-    public string Category;
-    public int BaseValue;
-}
+    public class SmeltingRecipe
+    {
+        public string Id;
+        public string Name;
+        public string InputType;
+        public string InputRarity;
+        public Dictionary<string, int> OutputMaterials = new Dictionary<string, int>();
+        public int GoldCost;
+        public float SuccessRate;
+        public int RequiredLevel;
+    }
 
-/// <summary>
-/// 导出保存数据
-/// </summary>
-public override Dictionary ExportSaveData()
-{
-    var data = new Dictionary();
-    // ItemSmeltingDatabase 是静态配置数据，不需要持久化
-    return data;
-}
+    public class MaterialInfo
+    {
+        public string Id;
+        public string Name;
+        public string Category;
+        public int BaseValue;
+    }
 
-/// <summary>
-/// 导入保存数据
-/// </summary>
-public override void ImportSaveData(Dictionary data)
-{
-    if (data == null) return;
-    // ItemSmeltingDatabase 是静态配置数据，不需要持久化
+    #endregion
+
+    #region Persistence
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        // ItemSmeltingDatabase 是静态配置数据，不需要持久化
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        // ItemSmeltingDatabase 是静态配置数据，不需要持久化
+    }
+
+    #endregion
 }

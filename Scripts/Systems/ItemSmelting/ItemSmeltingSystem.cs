@@ -234,60 +234,68 @@ public class ItemSmeltingSystem : BaseSystem
         }
         return result;
     }
-}
 
-public class SmeltingStatistics
-{
-    public int TotalSmelts;
-    public int TotalItemsSmelted;
-    public int TotalMaterialsGenerated;
-    public int GoldSpent;
-    public float AverageMaterialsPerSmelt;
-    public float SuccessRate;
-}
+    #region Data Types
 
-/// <summary>
-/// 导出保存数据
-/// </summary>
-public override Dictionary ExportSaveData()
-{
-    var data = new Dictionary();
-    
-    // 当前锻造状态
-    data["current_recipe_id"] = CurrentRecipeId;
-    data["current_item_count"] = CurrentItemCount;
-    data["is_smelting"] = IsSmelting;
-    data["smelt_progress"] = SmeltProgress;
-    
-    // 委托给数据层
-    if (_data != null)
+    public class SmeltingStatistics
     {
-        var dataData = _data.ExportSaveData();
-        foreach (var kvp in dataData)
+        public int TotalSmelts;
+        public int TotalItemsSmelted;
+        public int TotalMaterialsGenerated;
+        public int GoldSpent;
+        public float AverageMaterialsPerSmelt;
+        public float SuccessRate;
+    }
+
+    #endregion
+
+    #region Persistence
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+
+        // 当前锻造状态
+        data["current_recipe_id"] = CurrentRecipeId;
+        data["current_item_count"] = CurrentItemCount;
+        data["is_smelting"] = IsSmelting;
+        data["smelt_progress"] = SmeltProgress;
+
+        // 委托给数据层
+        if (_data != null)
         {
-            data[kvp.Key] = kvp.Value;
+            var dataData = _data.ExportSaveData();
+            foreach (var kvp in dataData)
+            {
+                data[kvp.Key] = kvp.Value;
+            }
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+
+        // 当前锻造状态
+        CurrentRecipeId = (string)data.GetValueOrDefault("current_recipe_id", "");
+        CurrentItemCount = (int)data.GetValueOrDefault("current_item_count", 1);
+        IsSmelting = (bool)data.GetValueOrDefault("is_smelting", false);
+        SmeltProgress = (float)data.GetValueOrDefault("smelt_progress", 0f);
+
+        // 委托给数据层
+        if (_data != null)
+        {
+            _data.ImportSaveData(data);
         }
     }
-    
-    return data;
-}
 
-/// <summary>
-/// 导入保存数据
-/// </summary>
-public override void ImportSaveData(Dictionary data)
-{
-    if (data == null) return;
-    
-    // 当前锻造状态
-    CurrentRecipeId = (string)data.GetValueOrDefault("current_recipe_id", "");
-    CurrentItemCount = (int)data.GetValueOrDefault("current_item_count", 1);
-    IsSmelting = (bool)data.GetValueOrDefault("is_smelting", false);
-    SmeltProgress = (float)data.GetValueOrDefault("smelt_progress", 0f);
-    
-    // 委托给数据层
-    if (_data != null)
-    {
-        _data.ImportSaveData(data);
-    }
+    #endregion
 }
