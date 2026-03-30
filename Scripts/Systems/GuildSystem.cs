@@ -17,7 +17,7 @@ public partial class GuildSystem : BaseSystem {
     public GuildData CurrentGuild { get; private set; }
     
     // 玩家申请列表
-    public List<GuildApplication> MyApplications { get; private set; } = new List<GuildApplication>();
+    public List<GuildApplication> MyApplications => _applicationManager.MyApplications;
     
     // 可加入的公会列表
     public List<GuildData> AvailableGuilds { get; private set; } = new List<GuildData>();
@@ -25,6 +25,9 @@ public partial class GuildSystem : BaseSystem {
     // 公会公告板
     public List<GuildAnnouncementData> Announcements => _announcementManager.Announcements;
     private readonly GuildAnnouncementManager _announcementManager = new GuildAnnouncementManager();
+    
+    // 公会申请管理
+    private readonly GuildApplicationManager _applicationManager = new GuildApplicationManager();
 
     // 信号
     public delegate void GuildCreatedEventHandler(GuildData guild);
@@ -190,74 +193,14 @@ public partial class GuildSystem : BaseSystem {
         return null;
     }
 
-    // 申请加入公会
+    // 申请加入公会（委托给 GuildApplicationManager）
     public bool ApplyToGuild(string guildId, string message = "") {
-        if (PlayerData.GuildId != "") {
-            GD.PrintErr("玩家已有公会");
-            return false;
-        }
-
-        var guild = FindGuild(guildId);
-        if (guild == null) {
-            GD.PrintErr("公会不存在");
-            return false;
-        }
-
-        var player = GetTree().CurrentScene.GetNode<Player>("Player");
-        string playerId = player?.PlayerId ?? "player1";
-        string playerName = player?.PlayerName ?? "Player";
-
-        var application = new GuildApplication {
-            ApplicationId = "app_" + GD.Hash(playerId + guildId).ToString(),
-            GuildId = guildId,
-            PlayerId = playerId,
-            PlayerName = playerName,
-            Message = message,
-            PlayerLevel = player?.Level ?? 1,
-            ApplyTime = DateTime.Now
-        };
-
-        MyApplications.Add(application);
-        
-        // 注：单人模式申请存储在本地（服务器功能）
-        
-        GD.Print($"已申请加入公会: {guild.Name}");
-        return true;
+        return _applicationManager.ApplyToGuild(guildId, message);
     }
 
-    // 处理申请
+    // 处理申请（委托给 GuildApplicationManager）
     public bool ProcessApplication(string applicationId, bool accept) {
-        if (!HasPermission(GuildPermission.Invite)) {
-            GD.PrintErr("没有权限处理申请");
-            return false;
-        }
-
-        var app = CurrentGuild.Applications?.Find(a => a.ApplicationId == applicationId);
-        if (app == null) {
-            GD.PrintErr("申请不存在");
-            return false;
-        }
-
-        app.IsAccepted = accept;
-        
-        if (accept) {
-            // 自动加入公会
-            var member = new GuildMember {
-                PlayerId = app.PlayerId,
-                PlayerName = app.PlayerName,
-                Level = GuildLevel.Recruit,
-                Permissions = GuildPermission.Invite,
-                JoinDate = DateTime.Now,
-                LastActive = DateTime.Now,
-                IsOnline = false
-            };
-            CurrentGuild.Members.Add(member);
-            CurrentGuild.CurrentMembers++;
-        }
-
-        GD.Print($"申请处理: {(accept ? "接受" : "拒绝")} {app.PlayerName}");
-        EmitSignal(SignalName.ApplicationProcessed, applicationId, accept);
-        return true;
+        return _applicationManager.ProcessApplication(applicationId, accept);
     }
 
     // 踢出成员
