@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
 
 public class BuffSystem : BaseSystem
 {
@@ -67,26 +68,40 @@ public class BuffSystem : BaseSystem
 			GD.PrintErr($"BuffSystem: Buff {buffId} not found!");
 			return;
 		}
-		
+
+		// 不变量：buffId 有效，MaxStacks 合法
+		Invariant.Assert(!string.IsNullOrEmpty(buffId), "ApplyBuff: buffId is null or empty");
+		Invariant.AssertRange(buffInfo.MaxStacks, 1, int.MaxValue, "MaxStacks");
+
 		// 检查是否已经有这个buff
 		ActiveBuff existingBuff = FindBuff(buffId);
-		
+
 		if (existingBuff != null)
 		{
+			// 不变量：已有 buff 的层数在合法范围内
+			Invariant.AssertRange(existingBuff.StackCount, 1, existingBuff.Info.MaxStacks, "existingBuff.StackCount");
+
 			// 如果可以叠加
 			if (buffInfo.CanStack && existingBuff.StackCount < buffInfo.MaxStacks)
 			{
 				existingBuff.StackCount++;
 				existingBuff.CurrentValue = buffInfo.StartValue * existingBuff.StackCount;
-				existingBuff.TimeRemaining = customDuration > 0 ? customDuration : buffInfo.Duration;
-				
+				float newDuration = customDuration > 0 ? customDuration : buffInfo.Duration;
+				existingBuff.TimeRemaining = newDuration;
+
+				// 不变量：叠加后层数不超过上限，持续时间为正或永久(-1)
+				Invariant.AssertRange(existingBuff.StackCount, 1, buffInfo.MaxStacks, "StackCount after stacking");
+				Invariant.Assert(newDuration < 0 || newDuration >= 0, "Buff duration must be -1 (permanent) or non-negative");
+
 				EmitSignal(nameof(BuffStackChanged), buffId, existingBuff.StackCount);
 				EmitSignal(nameof(BuffApplied), buffId, existingBuff.StackCount);
 			}
 			else
 			{
 				// 刷新持续时间
-				existingBuff.TimeRemaining = customDuration > 0 ? customDuration : buffInfo.Duration;
+				float newDuration = customDuration > 0 ? customDuration : buffInfo.Duration;
+				existingBuff.TimeRemaining = newDuration;
+				Invariant.Assert(newDuration < 0 || newDuration >= 0, "Buff duration must be -1 (permanent) or non-negative");
 			}
 		}
 		else
@@ -127,6 +142,9 @@ public class BuffSystem : BaseSystem
 		ActiveBuff buff = FindBuff(buffId);
 		if (buff != null)
 		{
+			// 不变量：被移除的 buff 必须是活跃列表中的成员
+			Invariant.Assert(_activeBuffs.Contains(buff), "RemoveBuff: buff not in _activeBuffs list — possible duplicate removal");
+
 			_activeBuffs.Remove(buff);
 			EmitSignal(nameof(BuffRemoved), buffId);
 			
@@ -282,6 +300,10 @@ public class BuffSystem : BaseSystem
 			if (buff.Info.TickDamage != 0 && buff.Info.TickInterval > 0)
 			{
 				buff.TickTimer += delta;
+				// 不变量：TickTimer 不应过度累积（超过 2 倍 interval 说明逻辑卡顿）
+				Invariant.Assert(buff.TickTimer < buff.Info.TickInterval * 2,
+					"TickTimer overflow: {0} >= {1} * 2 — possible logic stall", buff.TickTimer, buff.Info.TickInterval);
+
 				if (buff.TickTimer >= buff.Info.TickInterval)
 				{
 					buff.TickTimer = 0;
@@ -345,13 +367,17 @@ public class BuffSystem : BaseSystem
 		_dodgeBonus = 0f;
 		_shieldValue = 0f;
 		
-		_isInvincible = false; 
-		_isFrozen = false; 
-		_isStunned = false; 
-		_isSilenced = false; 
-		_isRooted = false; 
+		_isInvincible = false;
+		_isFrozen = false;
+		_isStunned = false;
+		_isSilenced = false;
+		_isRooted = false;
 		_slowMultiplier = 1f;
 		_weakMultiplier = 1f;
+
+		// 不变量：累加期间各 bonus 值保持非负（逻辑上它们应该都是正的，只是防御/虚弱可能产生负值）
+		// Slow/Weak multipliers 取最小值，理论上 [0, 1]，极端情况可能超出
+		// 累加类 bonus 允许多 buff 叠加，只要最终结算时在合理范围即可
 		
 		// 累加所有buff的效果
 		foreach (var buff in _activeBuffs)
@@ -449,14 +475,20 @@ public class BuffSystem : BaseSystem
 	// 护盾吸收伤害
 	public float AbsorbShieldDamage(float damage)
 	{
+		// 不变量：伤害值必须非负
+		Invariant.Assert(damage >= 0, "AbsorbShieldDamage: damage must be non-negative, got {0}", damage);
+
 		if (_shieldValue <= 0) return damage;
-		
+
 		float absorbed = Mathf.Min(damage, _shieldValue);
 		_shieldValue -= absorbed;
 		float remaining = damage - absorbed;
-		
+
+		// 不变量：护盾值不能为负
+		Invariant.Assert(_shieldValue >= 0, "AbsorbShieldDamage: _shieldValue went negative: {0}", _shieldValue);
+
 		EmitSignal(nameof(ShieldChanged), _shieldValue);
-		
+
 		return remaining;
 	}
 	
