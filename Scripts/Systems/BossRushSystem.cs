@@ -85,7 +85,7 @@ public class BossRushSystem : BaseSystem
         return dict;
     }
     
-    public override void ImportSaveData(Dictionary saveData)
+    public override void ImportSaveData(Dictionary<string, object> saveData)
     {
         if (saveData == null) return;
         

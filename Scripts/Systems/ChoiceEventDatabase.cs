@@ -24,8 +24,6 @@ namespace ClawRPG.Scripts.Systems
         // 事件冷却数据（按玩家ID索引）
         private Dictionary<string, Dictionary<string, DateTime>> _eventCooldowns = new Dictionary<string, Dictionary<string, DateTime>>();
 
-        public override object Instance => Instance;
-
         public override void Initialize()
         {
             InitializeEventsFromConfig();

@@ -23,9 +23,9 @@ namespace ClawRPG.Systems.Meditation
         private WeakReference<MeditationCooldownSystem> _cooldownSystemRef;
 
         // Signals
-        public Signals Signals;
+        public MeditationCoreSignals Signals;
 
-        public class Signals : GodotObject
+        public class MeditationCoreSignals : GodotObject
         {
             public delegate void MeditationStartedHandler(string playerId, MeditationType type);
             public delegate void MeditationCompletedHandler(string playerId, MeditationType type, List<string> benefits);
@@ -62,7 +62,7 @@ namespace ClawRPG.Systems.Meditation
         {
             base._Ready();
             Instance = this;
-            Signals = new Signals();
+            Signals = new MeditationCoreSignals();
             InitializeSystems();
         }
 

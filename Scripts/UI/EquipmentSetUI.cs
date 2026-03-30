@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Game.EquipmentSetDataSpace;
+using Game;
 
 namespace Game
 {

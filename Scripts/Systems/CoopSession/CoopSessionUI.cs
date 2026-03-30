@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ClawRPG.Scripts.Systems;
-using ClawRPG.Scripts.Systems.UI;
+using ClawRPG.Scripts.UI;
 
 namespace ClawRPG.Scripts.Systems.CoopSession
 {

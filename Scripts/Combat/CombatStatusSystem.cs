@@ -63,14 +63,12 @@ namespace ClawRPG.Scripts.Combat
         /// <summary>
         /// Import save data
         /// </summary>
-        public override bool ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data != null)
             {
                 LoadSaveData(data);
-                return true;
             }
-            return false;
         }
 
         /// <summary>

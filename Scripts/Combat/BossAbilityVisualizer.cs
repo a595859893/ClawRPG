@@ -17,7 +17,7 @@ namespace ClawRPG.Scripts.Combat {
             _parent = parent;
         }
 
-        public override void _Draw()
+        public void _Draw()
         {
             if (_parent == null) return;
             _parent.DrawEffects();
@@ -432,7 +432,7 @@ namespace ClawRPG.Scripts.Combat {
             }
         }
         
-        public override void _Draw()
+        public void _Draw()
         {
             // Drawing is handled by EffectRenderer child
         }

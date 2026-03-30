@@ -230,7 +230,7 @@ namespace ClawRPG.Scripts.Characters {
 
         public Dictionary<string, BossAbility> GetAbilityDatabase() => _bossData.AbilityDatabase;
 
-        public override void Die()
+        public void Die()
         {
             GD.Print($"*** BOSS DEFEATED: {BossTitle} ***");
             OnPhaseChange = null;

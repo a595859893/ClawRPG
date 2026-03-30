@@ -20,12 +20,12 @@ namespace ClawRPG.Systems.Meditation
         private MeditationCooldownSystem _cooldownSystem;
 
         // Aggregated signals - combines all subsystem signals
-        public Signals Signals;
+        public MeditationUISignals Signals;
 
         /// <summary>
         /// Aggregated signals from all meditation subsystems
         /// </summary>
-        public class Signals : GodotObject
+        public class MeditationUISignals : GodotObject
         {
             public delegate void MeditationStartedHandler(string playerId, MeditationType type);
             public delegate void MeditationCompletedHandler(string playerId, MeditationType type, List<string> benefits);
@@ -76,7 +76,7 @@ namespace ClawRPG.Systems.Meditation
         {
             base._Ready();
             Instance = this;
-            Signals = new Signals();
+            Signals = new MeditationUISignals();
 
             // Get references to sibling systems
             InitializeSubsystemReferences();

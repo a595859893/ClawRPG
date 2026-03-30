@@ -40,7 +40,7 @@ public enum MythicAffix
     Shrouding,      // 笼罩 - 隐身
     Elitist,        // 精英 - 增强敌人
     Reaping,        // 收割 - 死亡鬼魂
-    Explosive,      // 爆炸 - 炸弹
+    ExplosiveAlt,   // 爆炸 - 炸弹 (rename to avoid duplicate)
     Incorporeal,    // 虚化 - 敌人虚化
     Awakened,       // 觉醒 - 召唤Boss
     Dueling,        // 决斗 - 敌人联手

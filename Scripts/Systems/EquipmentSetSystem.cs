@@ -290,7 +290,7 @@ public class EquipmentSetSystem : BaseSystem
         List<EquipmentSet> result = new List<EquipmentSet>();
         foreach (var set in Sets.Values)
         {
-            if (set.Rarity == rarity)
+            if (set.RarityLevel == rarity)
                 result.Add(set);
         }
         return result;
@@ -464,7 +464,7 @@ public class EquipmentSet
     public string Description { get; set; }
     public Dictionary<string, string> Pieces { get; set; } // slot -> item name
     public Dictionary<int, string> Bonuses { get; set; } // piece count -> bonus description
-    public Rarity Rarity { get; set; }
+    public Rarity RarityLevel { get; set; }
 
     public EquipmentSet(string id, string name, string description, 
         Dictionary<string, string> pieces, Dictionary<int, string> bonuses, EquipmentSet.Rarity rarity)
@@ -474,6 +474,6 @@ public class EquipmentSet
         Description = description;
         Pieces = pieces;
         Bonuses = bonuses;
-        Rarity = rarity;
+        RarityLevel = rarity;
     }
 }

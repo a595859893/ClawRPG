@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using ClawRPG.Scripts.Systems.Meditation;
+using ClawRPG.Systems.Meditation;
 
 namespace ClawRPG.Scripts.Systems.Enchantment
 {

@@ -93,15 +93,11 @@ namespace ClawRPG.Scripts.Data
     public partial class PetLearningData
     {
         public string SummonId { get; set; }
-        public Dictionary<string, int> EnemyTypeKills { get; set; }
         public Dictionary<string, int> DamageTakenByType { get; set; }
         public Dictionary<string, float> AdaptationLevels { get; set; }
-        public int SuccessfulDodges { get; set; }
-        public int FailedDodges { get; set; }
         public int SmartRetreats { get; set; }
         public int Overextensions { get; set; }
         public float OverallAdaptation { get; set; }
-        public DateTime LastLearningUpdate { get; set; }
     }
 
     /// <summary>

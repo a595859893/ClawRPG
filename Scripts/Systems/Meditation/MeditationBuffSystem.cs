@@ -16,9 +16,9 @@ namespace ClawRPG.Systems.Meditation
         private Dictionary<string, List<MeditationBuff>> _activeBuffs = new Dictionary<string, List<MeditationBuff>>();
 
         // Signals
-        public Signals Signals;
+        public MeditationSignals Signals;
 
-        public class Signals : GodotObject
+        public class MeditationSignals : GodotObject
         {
             public delegate void BuffAppliedHandler(string playerId, MeditationType type, string statAffected, float value);
             public delegate void BuffExpiredHandler(string playerId, MeditationType type);
@@ -41,7 +41,7 @@ namespace ClawRPG.Systems.Meditation
         {
             base._Ready();
             Instance = this;
-            Signals = new Signals();
+            Signals = new MeditationSignals();
 
             // Initialize timer for buff expiration checking
             var timer = new Timer();

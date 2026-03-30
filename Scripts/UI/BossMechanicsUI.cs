@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.BossMechanics;
 
 namespace ClawRPG.UI {
 public class BossMechanicsUI : Control
@@ -12,7 +13,7 @@ public class BossMechanicsUI : Control
     private VBoxContainer _statsTab;
     private VBoxContainer _loreTab;
     
-    private VScrollContainer _bossScroll;
+    private ScrollContainer _bossScroll;
     private VBoxContainer _bossContainer;
     
     private Label _activeBossLabel;
@@ -80,7 +81,7 @@ public class BossMechanicsUI : Control
         bossListLabel.AddThemeFontSizeOverride("font_size", 18);
         _bossListTab.AddChild(bossListLabel);
         
-        _bossScroll = new VScrollContainer();
+        _bossScroll = new ScrollContainer();
         _bossScroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _bossListTab.AddChild(_bossScroll);
         

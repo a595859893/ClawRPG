@@ -19,14 +19,6 @@ namespace ClawRPG.Systems {
         }
         
         protected override string SystemName => "FateRelicSystem";
-        public static FateRelicSystem Instance {
-            get {
-                if (_instance == null) {
-                    _instance = new FateRelicSystem();
-                }
-                return _instance;
-            }
-        }
         
         private PlayerFateRelicData _playerData;
         private Dictionary<string, FateRelic> _ownedRelics;

@@ -106,7 +106,7 @@ public class TitleCollectionSystem : BaseSystem
     // 获取收集进度
     public float GetCollectionProgress()
     {
-        int total = TitleCollectionDatabase.GetAllTitles().Count;
+        int total = TitleCollectionDatabase.GetAllTitleConfigs().Count;
         int collected = _data.CollectedTitles.Count;
         return total > 0 ? (float)collected / total : 0;
     }
@@ -117,7 +117,7 @@ public class TitleCollectionSystem : BaseSystem
         return new Godot.Collections.Dictionary
         {
             { "total_collected", _data.TotalTitlesCollected },
-            { "total_available", TitleCollectionDatabase.GetAllTitles().Count },
+            { "total_available", TitleCollectionDatabase.GetAllTitleConfigs().Count },
             { "legendary", _data.LegendaryTitles },
             { "epic", _data.EpicTitles },
             { "rare", _data.RareTitles },

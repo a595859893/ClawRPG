@@ -66,7 +66,7 @@ public partial class TitleCollectionDatabase : BaseSystem
         new Dictionary { {"id", "completionist"}, {"name", "Completionist"}, {"category", "Special"}, {"rarity", "Epic"}, {"requirement", "Collect 30+ titles"}, {"description", "One who completes everything"} },
     };
     
-    public static List<Dictionary> GetAllTitles()
+    public static List<Dictionary> GetAllTitleConfigs()
     {
         return _titleConfigs;
     }

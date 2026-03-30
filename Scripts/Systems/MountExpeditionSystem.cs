@@ -17,14 +17,13 @@ namespace ClawRPG.Systems
         private MountExpeditionData.PlayerExpeditionData _playerData;
         private Random _random = new Random();
         
-        // 信号系统
-        public static SignalExpeditionStarted OnExpeditionStarted { get; } = new SignalExpeditionStarted();
-        public static SignalExpeditionCompleted OnExpeditionCompleted { get; } = new SignalExpeditionCompleted();
-        public static SignalExpeditionFailed OnExpeditionFailed { get; } = new SignalExpeditionFailed();
-        
-        public class SignalExpeditionStarted : Godot.Signal {}
-        public class SignalExpeditionCompleted : Godot.Signal {}
-        public class SignalExpeditionFailed : Godot.Signal {}
+        // Godot 4 compatible signal system
+        [Signal]
+        public delegate void ExpeditionStarted();
+        [Signal]
+        public delegate void ExpeditionCompleted();
+        [Signal]
+        public delegate void ExpeditionFailed();
         
         public override void _Ready()
         {
@@ -88,7 +87,7 @@ namespace ClawRPG.Systems
                     }
                 }
                 
-                OnExpeditionCompleted.Emit();
+                ExpeditionCompleted?.Invoke();
             }
             else
             {
@@ -96,7 +95,7 @@ namespace ClawRPG.Systems
                 result.GoldReward = zone.MinGoldReward / 5;
                 result.ExpReward = zone.MinExpReward / 5;
                 
-                OnExpeditionFailed.Emit();
+                ExpeditionFailed?.Invoke();
             }
             
             // 更新统计
@@ -207,7 +206,7 @@ namespace ClawRPG.Systems
             };
             
             _playerData.ActiveExpeditions.Add(expedition);
-            OnExpeditionStarted.Emit();
+            ExpeditionStarted?.Invoke();
             
             GD.Print($"[MountExpedition] Started expedition: {zone.Name} for {mountId}");
             return true;

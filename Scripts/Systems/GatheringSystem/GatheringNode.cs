@@ -191,9 +191,9 @@ public partial class GatheringNode : BaseSystem2D
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override System.Collections.Generic.Dictionary<string, object> ExportSaveData()
+    public override Godot.Collections.Dictionary ExportSaveData()
     {
-        return new Dictionary
+        return new Godot.Collections.Dictionary
         {
             { "node_id", nodeId },
             { "resource_type", (int)resourceType },
@@ -207,7 +207,7 @@ public partial class GatheringNode : BaseSystem2D
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
+    public override void ImportSaveData(Godot.Collections.Dictionary data)
     {
         if (data == null) return;
         

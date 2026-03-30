@@ -29,7 +29,7 @@ namespace ClawRPG.Core.Systems.GuildWar
 
         public override object Instance => _instance ??= new GuildWarDatabase();
 
-        public void Initialize()
+        public override void Initialize()
         {
             _warTypeConfigs = new Dictionary<GuildWarType, GuildWarTypeConfig>
             {

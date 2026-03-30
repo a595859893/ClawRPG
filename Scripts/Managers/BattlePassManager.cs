@@ -28,7 +28,7 @@ public class BattlePassManager : BaseSystem
         public List<BattlePassChallenge> Challenges { get; set; }
     }
     
-    private class BattlePassReward
+    public class BattlePassReward
     {
         public int Level { get; set; }
         public string Name { get; set; }
@@ -37,7 +37,7 @@ public class BattlePassManager : BaseSystem
         public string ItemId { get; set; }
     }
     
-    private class BattlePassChallenge
+    public class BattlePassChallenge
     {
         public int ChallengeId { get; set; }
         public string Name { get; set; }

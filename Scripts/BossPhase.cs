@@ -241,9 +241,9 @@ namespace ClawRPG.Scripts.Characters {
         }
 
         /// <summary>
-        /// Animate rage shader
+        /// Animate rage shader (looping version)
         /// </summary>
-        private void AnimateRageShader()
+        private void AnimateRageShaderLoop()
         {
             if (_data.RageMaterial == null) return;
 

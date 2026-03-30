@@ -57,7 +57,7 @@ namespace ClawRPG.UI
         /// <summary>
         /// Export save data (UI class - no data to save)
         /// </summary>
-        public override Dictionary<string, object> ExportSaveData()
+        public Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary<string, object>();
         }
@@ -65,7 +65,7 @@ namespace ClawRPG.UI
         /// <summary>
         /// Import save data (UI class - no data to load)
         /// </summary>
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public void ImportSaveData(Dictionary<string, object> data)
         {
             // UI class - no data to import
         }
