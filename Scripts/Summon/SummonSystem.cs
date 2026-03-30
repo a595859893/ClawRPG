@@ -393,7 +393,7 @@ namespace ClawRPG.Scripts
         /// <summary>
         /// 导入存档数据
         /// </summary>
-        public override bool ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data.ContainsKey("unlocked_summons"))
                 _playerData.UnlockedSummons = (List<UnlockedSummon>)data["unlocked_summons"];
@@ -407,7 +407,6 @@ namespace ClawRPG.Scripts
                 _playerData.TotalDamageDealt = (int)data["total_damage_dealt"];
             if (data.ContainsKey("statistics"))
                 _statistics = (SummonStatistics)data["statistics"];
-            return true;
         }
     }
 }

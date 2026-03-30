@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ClawRPG.Scripts.Items;
 
+namespace ClawRPG.Scripts.UI
+{
 public partial class InventoryUI
 {
     public override void _Ready()
@@ -428,4 +430,5 @@ public partial class InventoryUI
         _isVisible = false; 
         _mainPanel.Visible = false; 
     }
+}
 }

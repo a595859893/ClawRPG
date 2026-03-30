@@ -13,8 +13,6 @@ namespace ClawRPG.Scripts.Systems {
         private static SkillDatabaseV2 _instance;
         public static new SkillDatabaseV2 StaticInstance => _instance ??= new SkillDatabaseV2();
 
-        public override object Instance => StaticInstance;
-
         private Dictionary<int, SkillData> _skills = new();
 
         public SkillDatabaseV2()

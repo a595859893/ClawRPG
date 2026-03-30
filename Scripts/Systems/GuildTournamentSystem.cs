@@ -18,17 +18,6 @@ namespace ClawRPG.Scripts.Systems
             Initialize();
         }
 
-        protected override void Initialize()
-        {
-            GD.Print("GuildTournamentSystem initialized");
-            _currentTournament = new TournamentData
-            {
-                State = TournamentState.Registration,
-                RegisteredGuilds = new List<int>()
-            };
-            IsInitialized = true;
-        }
-
         // Tournament states
         public enum TournamentState
         {

@@ -322,9 +322,9 @@ public class QuickModeRewardSystem : BaseSystem
     /// <summary>
     /// 导出保存数据
     /// </summary>
-    public override Godot.Collections.Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        return new Godot.Collections.Dictionary
+        return new Dictionary<string, object>
         {
             ["quick_mode_wins"] = _quickModeWins,
             ["quick_mode_plays"] = _quickModePlays,
@@ -338,7 +338,7 @@ public class QuickModeRewardSystem : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override void ImportSaveData(Godot.Collections.Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

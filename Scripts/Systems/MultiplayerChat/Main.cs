@@ -98,10 +98,8 @@ public class MultiplayerChatMain : BaseSystem
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public override bool ImportSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
-        if (data == null) return false;
         // MultiplayerChatMain 是容器系统，无持久化状态
-        return true;
     }
 }

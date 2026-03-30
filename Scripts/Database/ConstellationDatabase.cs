@@ -445,14 +445,13 @@ public class ConstellationDatabase : BaseSystem
         return data;
     }
 
-    public override bool ImportSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
-        if (data == null) return false;
+        if (data == null) return;
         // 加载配置数据
         if (data.ContainsKey("constellations"))
         {
             // 如有需要可在此处理玩家解锁状态
         }
-        return true;
     }
 }

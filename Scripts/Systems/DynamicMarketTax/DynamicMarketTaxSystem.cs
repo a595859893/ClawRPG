@@ -58,9 +58,9 @@ public class MarketTaxData : BaseSystem
         };
     }
 
-    public override bool ImportSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
-        if (data == null) return false;
+        if (data == null) return;
         
         if (data.ContainsKey("baseTaxRate")) BaseTaxRate = Convert.ToSingle(data["baseTaxRate"]);
         if (data.ContainsKey("currentDynamicTaxRate")) CurrentDynamicTaxRate = Convert.ToSingle(data["currentDynamicTaxRate"]);
@@ -74,8 +74,6 @@ public class MarketTaxData : BaseSystem
         if (data.ContainsKey("marketTrend")) MarketTrend = data["marketTrend"]?.ToString();
         if (data.ContainsKey("consecutiveHighActivity")) ConsecutiveHighActivity = Convert.ToInt32(data["consecutiveHighActivity"]);
         if (data.ContainsKey("consecutiveLowActivity")) ConsecutiveLowActivity = Convert.ToInt32(data["consecutiveLowActivity"]);
-        
-        return true;
     }
     // ==================== 持久化接口结束 ====================
 }
@@ -482,9 +480,9 @@ public class DynamicMarketTaxSystem : BaseSystem
     /// <summary>
     /// Import save data from persistence
     /// </summary>
-    public override bool ImportSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
-        if (data == null) return false;
+        if (data == null) return;
         
         if (data.ContainsKey("base_tax_rate")) _data.BaseTaxRate = Convert.ToSingle(data["base_tax_rate"]);
         if (data.ContainsKey("current_dynamic_tax_rate")) _data.CurrentDynamicTaxRate = Convert.ToSingle(data["current_dynamic_tax_rate"]);
@@ -510,7 +508,5 @@ public class DynamicMarketTaxSystem : BaseSystem
                 _activityHistory.Add(Convert.ToSingle(activity));
             }
         }
-        
-        return true;
     }
 }

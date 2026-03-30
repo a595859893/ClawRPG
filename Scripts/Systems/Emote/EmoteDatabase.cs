@@ -9,7 +9,7 @@ namespace ClawRPG.Systems.Emote
     public class EmoteDatabase : DatabaseBase
     {
         private static EmoteDatabase _instance;
-        public static EmoteDatabase Instance => _instance ??= new EmoteDatabase();
+        public static new EmoteDatabase Instance => _instance ??= new EmoteDatabase();
 
         private Dictionary<string, Emote> _emotes;
 

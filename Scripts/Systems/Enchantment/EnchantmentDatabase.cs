@@ -18,8 +18,6 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         private Dictionary<EnchantmentTier, List<string>> _tierCache;
         private Dictionary<EnchantmentType, List<string>> _typeCache;
 
-        public override object Instance => Instance;
-
         /// <summary>
         /// 初始化附魔数据库
         /// </summary>

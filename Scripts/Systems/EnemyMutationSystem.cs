@@ -383,29 +383,7 @@ namespace ClawRPG.Scripts.Systems
         {
             _activeMutations.Remove(enemyId);
         }
-        
         // === 数据持久化接口 ===
-        
-        public override Dictionary<string, object> ExportSaveData()
-        {
-            return new Dictionary(GetSaveData());
-        }
-        
-        public override void ImportSaveData(Dictionary<string, object> data)
-        {
-            if (data == null) return;
-            
-            if (data.ContainsKey("mutation_enabled"))
-                _mutationEnabled = Convert.ToBoolean(data["mutation_enabled"]);
-            if (data.ContainsKey("mutation_chance"))
-                _mutationChance = Convert.ToSingle(data["mutation_chance"]);
-            if (data.ContainsKey("max_rarity"))
-                _maxRarity = (EnemyRarity)Convert.ToInt32(data["max_rarity"]);
-            if (data.ContainsKey("total_encountered"))
-                _statistics.TotalMutationsEncountered = Convert.ToInt32(data["total_encountered"]);
-            if (data.ContainsKey("total_killed"))
-                _statistics.TotalMutationsKilled = Convert.ToInt32(data["total_killed"]);
-        }
         
         /// <summary>
         /// 存档数据

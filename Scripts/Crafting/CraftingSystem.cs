@@ -379,9 +379,9 @@ namespace ClawRPG.Scripts.Crafting {
         /// <summary>
         /// Import save data
         /// </summary>
-        public override bool ImportSaveData(Dictionary<string, object> data)
+        public override void ImportSaveData(Dictionary<string, object> data)
         {
-            if (data == null) return false;
+            if (data == null) return;
             
             if (data.ContainsKey("crafting_stats"))
             {
@@ -413,7 +413,6 @@ namespace ClawRPG.Scripts.Crafting {
                     }
                 }
             }
-            return true;
         }
         
         /// <summary>
