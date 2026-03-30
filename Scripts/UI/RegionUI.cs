@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.UI
     /// <summary>
     /// Region UI - Shows current region and allows teleportation
     /// </summary>
-    [GodotClass]
+    
     public class RegionUI : Control
     {
         [Export] public Color LockedColor { get; set; } = new Color(0.3f, 0.3f, 0.3f, 0.7f);

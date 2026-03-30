@@ -1,10 +1,10 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawrRPG.Scripts.Systems;
-using ClawrRPG.Scripts.UI;
+using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.UI;
 
-namespace ClawrRPG.Scripts.UI {
+namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 公告板系统 - 整合显示世界事件、每日挑战和成就进度的综合面板
     /// 应用数据驱动设计模式：从 insights.md 学习

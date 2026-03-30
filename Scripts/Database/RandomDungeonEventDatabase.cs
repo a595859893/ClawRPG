@@ -24,9 +24,9 @@ public partial class RandomDungeonEventDatabase : BaseSystem
         // No runtime state to restore
     }
     // Event rarity weights by floor
-    public Dictionary<string, float> GetRarityWeights(int floor)
+    public System.Collections.Generic.Dictionary<string, float> GetRarityWeights(int floor)
     {
-        var weights = new Dictionary<string, float>
+        var weights = new System.Collections.Generic.Dictionary<string, float>
         {
             { "Common", 50f },
             { "Uncommon", 30f },
@@ -55,9 +55,9 @@ public partial class RandomDungeonEventDatabase : BaseSystem
     }
     
     // Category weights for random selection
-    public Dictionary<string, float> GetCategoryWeights()
+    public System.Collections.Generic.Dictionary<string, float> GetCategoryWeights()
     {
-        return new Dictionary<string, float>
+        return new System.Collections.Generic.Dictionary<string, float>
         {
             { "Treasure", 20f },
             { "Combat", 15f },
@@ -73,9 +73,9 @@ public partial class RandomDungeonEventDatabase : BaseSystem
     }
     
     // Event cooldown periods (seconds)
-    public Dictionary<string, float> GetEventCooldowns()
+    public System.Collections.Generic.Dictionary<string, float> GetEventCooldowns()
     {
-        return new Dictionary<string, float>
+        return new System.Collections.Generic.Dictionary<string, float>
         {
             { "ambush", 60f },
             { "surprise_attack", 120f },
@@ -124,9 +124,9 @@ public partial class RandomDungeonEventDatabase : BaseSystem
     }
     
     // Initialize event database
-    public Dictionary<string, Dictionary> InitializeEventDatabase()
+    public System.Collections.Generic.Dictionary<string, Dictionary> InitializeEventDatabase()
     {
-        var database = new Dictionary<string, Dictionary>();
+        var database = new System.Collections.Generic.Dictionary<string, Dictionary>();
         
         // Add all events to database
         // This mirrors the event database in RandomDungeonEventSystem

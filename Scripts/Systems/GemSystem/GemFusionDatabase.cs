@@ -7,10 +7,10 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     /// 宝石合成配方数据库
     /// </summary>
     public static class GemFusionDatabase {
-        private static Dictionary<string, GemFusionRecipe> _recipes;
+        private static System.Collections.Generic.Dictionary<string, GemFusionRecipe> _recipes;
         
         public static void Initialize() {
-            _recipes = new Dictionary<string, GemFusionRecipe>();
+            _recipes = new System.Collections.Generic.Dictionary<string, GemFusionRecipe>();
             LoadFusionRecipes();
         }
         

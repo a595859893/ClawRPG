@@ -1,7 +1,6 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.Events;
 
 namespace ClawRPG.Scripts.Managers
 {

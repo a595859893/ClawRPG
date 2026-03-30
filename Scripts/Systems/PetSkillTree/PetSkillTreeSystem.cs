@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems
         private static PetSkillTreeSystem _instance;
         public static PetSkillTreeSystem Instance => _instance ??= new PetSkillTreeSystem();
 
-        public Dictionary<string, PetSkillTreeData.PetSkillTree> PetSkillTrees = new Dictionary<string, PetSkillTreeData.PetSkillTree>();
+        public System.Collections.Generic.Dictionary<string, PetSkillTreeData.PetSkillTree> PetSkillTrees = new System.Collections.Generic.Dictionary<string, PetSkillTreeData.PetSkillTree>();
         
         public int TotalSkillPointsEarned { get; private set; }
         public int TotalSkillPointsSpent { get; private set; }
@@ -161,9 +161,9 @@ namespace ClawRPG.Scripts.Systems
             return skillTree.NodeStatuses.GetValueOrDefault(nodeId, PetSkillTreeData.SkillNodeStatus.Locked);
         }
 
-        public Dictionary<string, float> GetTotalBonuses(string petId)
+        public System.Collections.Generic.Dictionary<string, float> GetTotalBonuses(string petId)
         {
-            var bonuses = new Dictionary<string, float>();
+            var bonuses = new System.Collections.Generic.Dictionary<string, float>();
             if (!PetSkillTrees.TryGetValue(petId, out var skillTree))
                 return bonuses;
             
@@ -208,9 +208,9 @@ namespace ClawRPG.Scripts.Systems
             // Load from file system
         }
 
-        public Dictionary<string, object> GetStatistics()
+        public System.Collections.Generic.Dictionary<string, object> GetStatistics()
         {
-            return new Dictionary<string, object>
+            return new System.Collections.Generic.Dictionary<string, object>
             {
                 { "total_pets", PetSkillTrees.Count },
                 { "total_points_earned", TotalSkillPointsEarned },
@@ -291,7 +291,7 @@ namespace ClawRPG.Scripts.Systems
                         TotalSkillPoints = (int)treeData["total_skill_points"],
                         UsedSkillPoints = (int)treeData["used_skill_points"],
                         UnlockedNodes = new List<PetSkillTreeData.SkillNode>(),
-                        NodeStatuses = new Dictionary<string, PetSkillTreeData.SkillNodeStatus>()
+                        NodeStatuses = new System.Collections.Generic.Dictionary<string, PetSkillTreeData.SkillNodeStatus>()
                     };
                     
                     // 恢复节点状态

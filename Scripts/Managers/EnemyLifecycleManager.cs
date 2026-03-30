@@ -2,7 +2,6 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Managers;
-using ClawRPG.Scripts.Events;
 
 /// <summary>
 /// 敌人生命周期管理器 - 负责敌人的生成、AI 更新、死亡和状态管理

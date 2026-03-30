@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using ClawRPG.Scripts.Characters;
-using ClawRPG.Scripts.Events;
 using ClawRPG.Scripts.Managers;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.ProceduralDungeon;

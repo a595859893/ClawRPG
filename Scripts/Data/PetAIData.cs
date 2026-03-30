@@ -63,7 +63,7 @@ namespace ClawRPG.Scripts.Data
     }
 
     [Serializable]
-    public class PlayerPetAIData
+    public partial class PlayerPetAIData
     {
         public Dictionary<string, PetAIData> PetAIStates = new Dictionary<string, PetAIData>();
         public int TotalEnemiesDefeated;

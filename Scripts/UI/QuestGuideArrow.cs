@@ -1,11 +1,11 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawrRPG.Scripts.Quests;
-using ClawrRPG.Scripts.Characters;
-using ClawrRPG.Scripts.Systems;
+using ClawRPG.Scripts.Quests;
+using ClawRPG.Scripts.Characters;
+using ClawRPG.Scripts.Systems;
 
-namespace ClawrRPG.Scripts.UI {
+namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 任务指引箭头 - 在屏幕上显示指向任务目标的箭头
     /// 应用数据驱动设计模式：从 insights.md 学习

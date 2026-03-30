@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using ClawRPG.Scripts.Events;
 
 namespace ClawRPG.Scripts.Systems
 {

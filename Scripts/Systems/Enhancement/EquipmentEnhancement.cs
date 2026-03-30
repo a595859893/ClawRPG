@@ -80,7 +80,7 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         public const string EnhanceStoneLegendary = "405";
         
         // 玩家数据
-        private Dictionary<string, EnhancementData> _enhancedItems = new();
+        private System.Collections.Generic.Dictionary<string, EnhancementData> _enhancedItems = new();
         private Player _player;
         
         // Tutorial tracking
@@ -117,8 +117,8 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         /// <summary>
         /// 获取强化所需材料
         /// </summary>
-        public Dictionary<string, int> GetRequiredMaterials(int level, EnhancementType type) {
-            var materials = new Dictionary<string, int>();
+        public System.Collections.Generic.Dictionary<string, int> GetRequiredMaterials(int level, EnhancementType type) {
+            var materials = new System.Collections.Generic.Dictionary<string, int>();
             
             // 基础材料数量基于等级和类型
             int baseCount = level + 1;
@@ -298,9 +298,9 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         /// <summary>
         /// 获取玩家强化石数量
         /// </summary>
-        public Dictionary<string, int> GetPlayerEnhancementStones() {
+        public System.Collections.Generic.Dictionary<string, int> GetPlayerEnhancementStones() {
             var inventory = _player?.GetInventory();
-            var stones = new Dictionary<string, int>();
+            var stones = new System.Collections.Generic.Dictionary<string, int>();
             
             string[] stoneIds = {
                 EnhanceStoneCommon,

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using ClawRPG.Scripts.Events;
 using ClawRPG.Scripts.Managers;
 using ClawRPG.Scripts.Systems.Pets;
 

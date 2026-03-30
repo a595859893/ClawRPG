@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace ClawRPG.Scripts.Systems
 {
 
-public class PartyUI : Control
+public partial class PartyUI : Control
 {
     // Godot 4 C# event Actions (migrated from Godot 3 .Connect())
     public Action OnClosePressed;

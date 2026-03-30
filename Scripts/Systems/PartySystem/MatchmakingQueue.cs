@@ -8,7 +8,7 @@ namespace ClawRPG.Systems
     /// 快速模式匹配队列系统
     /// 支持普通队列和快速队列(quick_queue)优先级匹配
     /// </summary>
-    public class MatchmakingQueue : BaseSystem
+    public partial class MatchmakingQueue : BaseSystem
     {
         public static MatchmakingQueue Instance { get; private set; }
 

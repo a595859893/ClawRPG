@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Bosses {
     /// <summary>
     /// Boss definition data class
     /// </summary>
-    [GodotClass]
+    
     public class BossData : Object
     {
         public string Id { get; set; }

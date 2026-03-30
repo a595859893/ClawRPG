@@ -2,7 +2,6 @@ using Godot;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Managers;
 using ClawRPG.Scripts.Systems;
-using ClawRPG.Scripts.Events;
 
 /// <summary>
 /// Integrates the deposit system with the run lifecycle.

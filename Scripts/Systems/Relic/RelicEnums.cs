@@ -4,18 +4,6 @@ using System;
 namespace ClawRPG.Systems;
 
 /// <summary>
-/// 圣物稀有度
-/// </summary>
-public enum RelicRarity
-{
-    Common,      // 普通 - 白色
-    Uncommon,    // 优秀 - 绿色
-    Rare,       // 稀有 - 蓝色
-    Epic,       // 史诗 - 紫色
-    Legendary    // 传说 - 橙色
-}
-
-/// <summary>
 /// 圣物槽位类型
 /// </summary>
 public enum RelicSlotType

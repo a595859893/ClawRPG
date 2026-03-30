@@ -16,14 +16,14 @@ namespace ClawRPG.Systems {
         }
         
         private static void InitializeRelic(string id, string name, string description, 
-            RelicRarity rarity, RelicType type, params RelicEffect[] effects) {
+            FateRelicRarity rarity, FateRelicType type, params FateRelicEffect[] effects) {
             var relic = new FateRelic {
                 Id = id,
                 Name = name,
                 Description = description,
                 Rarity = rarity,
                 Type = type,
-                Effects = new List<RelicEffect>(effects)
+                Effects = new List<FateRelicEffect>(effects)
             };
             _relics[id] = relic;
         }
@@ -31,188 +31,188 @@ namespace ClawRPG.Systems {
         private static void InitializeRelics() {
             // Combat Relics - Common
             InitializeRelic("combat_001", "Rusty Blade", "Increases attack damage by 5%",
-                RelicRarity.Common, RelicType.Combat,
-                new RelicEffect { Stat = "attack_bonus", Value = 0.05f, Description = "+5% Attack Damage" });
+                FateRelicRarity.Common, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "attack_bonus", Value = 0.05f, Description = "+5% Attack Damage" });
             
             InitializeRelic("combat_002", "Sharp Stone", "Increases critical hit chance by 3%",
-                RelicRarity.Common, RelicType.Combat,
-                new RelicEffect { Stat = "crit_rate", Value = 0.03f, Description = "+3% Critical Chance" });
+                FateRelicRarity.Common, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "crit_rate", Value = 0.03f, Description = "+3% Critical Chance" });
             
             InitializeRelic("combat_003", "Warrior's Mark", "Increases damage against elite enemies by 10%",
-                RelicRarity.Common, RelicType.Combat,
-                new RelicEffect { Stat = "elite_damage", Value = 0.10f, Description = "+10% Elite Damage" });
+                FateRelicRarity.Common, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "elite_damage", Value = 0.10f, Description = "+10% Elite Damage" });
             
             // Combat Relics - Uncommon
             InitializeRelic("combat_004", "Berserker's Fury", "Attack speed +8%, but defense -5%",
-                RelicRarity.Uncommon, RelicType.Combat,
-                new RelicEffect { Stat = "attack_speed", Value = 0.08f, Description = "+8% Attack Speed" },
-                new RelicEffect { Stat = "defense", Value = -0.05f, Description = "-5% Defense" });
+                FateRelicRarity.Uncommon, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "attack_speed", Value = 0.08f, Description = "+8% Attack Speed" },
+                new FateRelicEffect { Stat = "defense", Value = -0.05f, Description = "-5% Defense" });
             
             InitializeRelic("combat_005", "Vampiric Amulet", "Life steal +5% on hit",
-                RelicRarity.Uncommon, RelicType.Combat,
-                new RelicEffect { Stat = "lifesteal", Value = 0.05f, Description = "+5% Life Steal" });
+                FateRelicRarity.Uncommon, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "lifesteal", Value = 0.05f, Description = "+5% Life Steal" });
             
             InitializeRelic("combat_006", "Chain Breaker", "Combo damage +15% per combo point",
-                RelicRarity.Uncommon, RelicType.Combat,
-                new RelicEffect { Stat = "combo_damage", Value = 0.15f, Description = "+15% Combo Damage" });
+                FateRelicRarity.Uncommon, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "combo_damage", Value = 0.15f, Description = "+15% Combo Damage" });
             
             // Combat Relics - Rare
             InitializeRelic("combat_007", "Dragon's Breath", "Fire damage +20%, chance to burn enemies",
-                RelicRarity.Rare, RelicType.Combat,
-                new RelicEffect { Stat = "fire_damage", Value = 0.20f, Description = "+20% Fire Damage" },
-                new RelicEffect { Stat = "burn_chance", Value = 0.10f, Description = "10% Burn Chance" });
+                FateRelicRarity.Rare, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "fire_damage", Value = 0.20f, Description = "+20% Fire Damage" },
+                new FateRelicEffect { Stat = "burn_chance", Value = 0.10f, Description = "10% Burn Chance" });
             
             InitializeRelic("combat_008", "Thunder God's Blessing", "Lightning damage +25%, chance to stun",
-                RelicRarity.Rare, RelicType.Combat,
-                new RelicEffect { Stat = "lightning_damage", Value = 0.25f, Description = "+25% Lightning Damage" },
-                new RelicEffect { Stat = "stun_chance", Value = 0.08f, Description = "8% Stun Chance" });
+                FateRelicRarity.Rare, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "lightning_damage", Value = 0.25f, Description = "+25% Lightning Damage" },
+                new FateRelicEffect { Stat = "stun_chance", Value = 0.08f, Description = "8% Stun Chance" });
             
             InitializeRelic("combat_009", "Assassin's Shadow", "Backstab damage +40%",
-                RelicRarity.Rare, RelicType.Combat,
-                new RelicEffect { Stat = "backstab_damage", Value = 0.40f, Description = "+40% Backstab Damage" });
+                FateRelicRarity.Rare, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "backstab_damage", Value = 0.40f, Description = "+40% Backstab Damage" });
             
             // Combat Relics - Epic
             InitializeRelic("combat_010", "War God's Wrath", "All damage +15%, but health -10%",
-                RelicRarity.Epic, RelicType.Combat,
-                new RelicEffect { Stat = "all_damage", Value = 0.15f, Description = "+15% All Damage" },
-                new RelicEffect { Stat = "max_health", Value = -0.10f, Description = "-10% Max Health" });
+                FateRelicRarity.Epic, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "all_damage", Value = 0.15f, Description = "+15% All Damage" },
+                new FateRelicEffect { Stat = "max_health", Value = -0.10f, Description = "-10% Max Health" });
             
             InitializeRelic("combat_011", "Blood Moon Pendant", "Life steal +10%, damage increases when low HP",
-                RelicRarity.Epic, RelicType.Combat,
-                new RelicEffect { Stat = "lifesteal", Value = 0.10f, Description = "+10% Life Steal" },
-                new RelicEffect { Stat = "low_hp_damage", Value = 0.25f, Description = "+25% Damage Below 30% HP" });
+                FateRelicRarity.Epic, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "lifesteal", Value = 0.10f, Description = "+10% Life Steal" },
+                new FateRelicEffect { Stat = "low_hp_damage", Value = 0.25f, Description = "+25% Damage Below 30% HP" });
             
             // Combat Relics - Legendary
             InitializeRelic("combat_012", "Godslayer", "Boss damage +50%, but combat takes longer",
-                RelicRarity.Legendary, RelicType.Combat,
-                new RelicEffect { Stat = "boss_damage", Value = 0.50f, Description = "+50% Boss Damage" },
-                new RelicEffect { Stat = "enemy_health", Value = 0.10f, Description = "+10% Enemy Health" });
+                FateRelicRarity.Legendary, FateRelicType.Combat,
+                new FateRelicEffect { Stat = "boss_damage", Value = 0.50f, Description = "+50% Boss Damage" },
+                new FateRelicEffect { Stat = "enemy_health", Value = 0.10f, Description = "+10% Enemy Health" });
             
             // Defense Relics - Common
             InitializeRelic("defense_001", "Iron Shield", "Defense +5%",
-                RelicRarity.Common, RelicType.Defense,
-                new RelicEffect { Stat = "defense_bonus", Value = 0.05f, Description = "+5% Defense" });
+                FateRelicRarity.Common, FateRelicType.Defense,
+                new FateRelicEffect { Stat = "defense_bonus", Value = 0.05f, Description = "+5% Defense" });
             
             InitializeRelic("defense_002", "Stone Skin", "Take 3% less damage from all sources",
-                RelicRarity.Common, RelicType.Defense,
-                new RelicEffect { Stat = "damage_reduction", Value = 0.03f, Description = "-3% Damage Taken" });
+                FateRelicRarity.Common, FateRelicType.Defense,
+                new FateRelicEffect { Stat = "damage_reduction", Value = 0.03f, Description = "-3% Damage Taken" });
             
             // Defense Relics - Uncommon
             InitializeRelic("defense_003", "Thorn Mail", "Reflect 5% damage to attackers",
-                RelicRarity.Uncommon, RelicType.Defense,
-                new RelicEffect { Stat = "damage_reflect", Value = 0.05f, Description = "5% Damage Reflect" });
+                FateRelicRarity.Uncommon, FateRelicType.Defense,
+                new FateRelicEffect { Stat = "damage_reflect", Value = 0.05f, Description = "5% Damage Reflect" });
             
             InitializeRelic("defense_004", "Guardian Angel", "One free death per dungeon floor",
-                RelicRarity.Uncommon, RelicType.Defense,
-                new RelicEffect { Stat = "free_death", Value = 1f, Description = "1 Free Death/Floor" });
+                FateRelicRarity.Uncommon, FateRelicType.Defense,
+                new FateRelicEffect { Stat = "free_death", Value = 1f, Description = "1 Free Death/Floor" });
             
             // Defense Relics - Rare
             InitializeRelic("defense_005", "Frost Barrier", "Ice damage +15%, chance to freeze attackers",
-                RelicRarity.Rare, RelicType.Defense,
-                new RelicEffect { Stat = "ice_damage", Value = 0.15f, Description = "+15% Ice Damage" },
-                new RelicEffect { Stat = "freeze_reflect", Value = 0.08f, Description = "8% Freeze Reflect" });
+                FateRelicRarity.Rare, FateRelicType.Defense,
+                new FateRelicEffect { Stat = "ice_damage", Value = 0.15f, Description = "+15% Ice Damage" },
+                new FateRelicEffect { Stat = "freeze_reflect", Value = 0.08f, Description = "8% Freeze Reflect" });
             
             // Defense Relics - Epic
             InitializeRelic("defense_006", "Divine Shield", "Invincible for 3 seconds every 30 seconds",
-                RelicRarity.Epic, RelicType.Defense,
-                new RelicEffect { Stat = "invincibility", Value = 3f, Description = "3s Invincibility/30s" });
+                FateRelicRarity.Epic, FateRelicType.Defense,
+                new FateRelicEffect { Stat = "invincibility", Value = 3f, Description = "3s Invincibility/30s" });
             
             // Defense Relics - Legendary
             InitializeRelic("defense_007", "World Tree's Blessing", "Health +25%, Regen +50%",
-                RelicRarity.Legendary, RelicType.Defense,
-                new RelicEffect { Stat = "max_health", Value = 0.25f, Description = "+25% Max Health" },
-                new RelicEffect { Stat = "health_regen", Value = 0.50f, Description = "+50% Health Regen" });
+                FateRelicRarity.Legendary, FateRelicType.Defense,
+                new FateRelicEffect { Stat = "max_health", Value = 0.25f, Description = "+25% Max Health" },
+                new FateRelicEffect { Stat = "health_regen", Value = 0.50f, Description = "+50% Health Regen" });
             
             // Utility Relics - Common
             InitializeRelic("utility_001", "Quick Boots", "Movement speed +5%",
-                RelicRarity.Common, RelicType.Utility,
-                new RelicEffect { Stat = "movement_speed", Value = 0.05f, Description = "+5% Movement Speed" });
+                FateRelicRarity.Common, FateRelicType.Utility,
+                new FateRelicEffect { Stat = "movement_speed", Value = 0.05f, Description = "+5% Movement Speed" });
             
             InitializeRelic("utility_002", "Mana Crystal", "Max mana +8%",
-                RelicRarity.Common, RelicType.Utility,
-                new RelicEffect { Stat = "max_mana", Value = 0.08f, Description = "+8% Max Mana" });
+                FateRelicRarity.Common, FateRelicType.Utility,
+                new FateRelicEffect { Stat = "max_mana", Value = 0.08f, Description = "+8% Max Mana" });
             
             // Utility Relics - Uncommon
             InitializeRelic("utility_003", "Time Watch", "Cooldown reduction +10%",
-                RelicRarity.Uncommon, RelicType.Utility,
-                new RelicEffect { Stat = "cooldown_reduction", Value = 0.10f, Description = "-10% Cooldowns" });
+                FateRelicRarity.Uncommon, FateRelicType.Utility,
+                new FateRelicEffect { Stat = "cooldown_reduction", Value = 0.10f, Description = "-10% Cooldowns" });
             
             InitializeRelic("utility_004", "XP Crystal", "Experience gain +10%",
-                RelicRarity.Uncommon, RelicType.Utility,
-                new RelicEffect { Stat = "exp_gain", Value = 0.10f, Description = "+10% XP Gain" });
+                FateRelicRarity.Uncommon, FateRelicType.Utility,
+                new FateRelicEffect { Stat = "exp_gain", Value = 0.10f, Description = "+10% XP Gain" });
             
             // Utility Relics - Rare
             InitializeRelic("utility_005", "Dimensional Ring", "Extra inventory slot +2",
-                RelicRarity.Rare, RelicType.Utility,
-                new RelicEffect { Stat = "inventory_slots", Value = 2f, Description = "+2 Inventory Slots" });
+                FateRelicRarity.Rare, FateRelicType.Utility,
+                new FateRelicEffect { Stat = "inventory_slots", Value = 2f, Description = "+2 Inventory Slots" });
             
             InitializeRelic("utility_006", "Ancient Compass", "Reveal hidden passages and secrets",
-                RelicRarity.Rare, RelicType.Utility,
-                new RelicEffect { Stat = "secret_detection", Value = 1f, Description = "Reveal Secrets" });
+                FateRelicRarity.Rare, FateRelicType.Utility,
+                new FateRelicEffect { Stat = "secret_detection", Value = 1f, Description = "Reveal Secrets" });
             
             // Utility Relics - Epic
             InitializeRelic("utility_007", "Phoenix Feather", "Revive once with 50% HP on death",
-                RelicRarity.Epic, RelicType.Utility,
-                new RelicEffect { Stat = "revive", Value = 0.50f, Description = "1 Revive @ 50% HP" });
+                FateRelicRarity.Epic, FateRelicType.Utility,
+                new FateRelicEffect { Stat = "revive", Value = 0.50f, Description = "1 Revive @ 50% HP" });
             
             // Utility Relics - Legendary
             InitializeRelic("utility_008", "Time Stopper", "Use any skill once without cooldown",
-                RelicRarity.Legendary, RelicType.Utility,
-                new RelicEffect { Stat = "time_stop", Value = 1f, Description = "1 Skill No Cooldown" });
+                FateRelicRarity.Legendary, FateRelicType.Utility,
+                new FateRelicEffect { Stat = "time_stop", Value = 1f, Description = "1 Skill No Cooldown" });
             
             // Economic Relics - Common
             InitializeRelic("economy_001", "Lucky Coin", "Gold find +5%",
-                RelicRarity.Common, RelicType.Economic,
-                new RelicEffect { Stat = "gold_find", Value = 0.05f, Description = "+5% Gold Find" });
+                FateRelicRarity.Common, FateRelicType.Economic,
+                new FateRelicEffect { Stat = "gold_find", Value = 0.05f, Description = "+5% Gold Find" });
             
             InitializeRelic("economy_002", "Merchant's Scale", "Shop prices -3%",
-                RelicRarity.Common, RelicType.Economic,
-                new RelicEffect { Stat = "shop_discount", Value = 0.03f, Description = "-3% Shop Prices" });
+                FateRelicRarity.Common, FateRelicType.Economic,
+                new FateRelicEffect { Stat = "shop_discount", Value = 0.03f, Description = "-3% Shop Prices" });
             
             // Economic Relics - Uncommon
             InitializeRelic("economic_003", "Treasure Hunter", "Rare item drop rate +15%",
-                RelicRarity.Uncommon, RelicType.Economic,
-                new RelicEffect { Stat = "rare_drop", Value = 0.15f, Description = "+15% Rare Drops" });
+                FateRelicRarity.Uncommon, FateRelicType.Economic,
+                new FateRelicEffect { Stat = "rare_drop", Value = 0.15f, Description = "+15% Rare Drops" });
             
             InitializeRelic("economy_004", "Golden Touch", "Gold from enemies +10%",
-                RelicRarity.Uncommon, RelicType.Economic,
-                new RelicEffect { Stat = "enemy_gold", Value = 0.10f, Description = "+10% Enemy Gold" });
+                FateRelicRarity.Uncommon, FateRelicType.Economic,
+                new FateRelicEffect { Stat = "enemy_gold", Value = 0.10f, Description = "+10% Enemy Gold" });
             
             // Economic Relics - Rare
             InitializeRelic("economy_005", "Investment Master", "Investment returns +25%",
-                RelicRarity.Rare, RelicType.Economic,
-                new RelicEffect { Stat = "investment_return", Value = 0.25f, Description = "+25% Investment" });
+                FateRelicRarity.Rare, FateRelicType.Economic,
+                new FateRelicEffect { Stat = "investment_return", Value = 0.25f, Description = "+25% Investment" });
             
             // Economic Relics - Epic
             InitializeRelic("economy_006", "Dragon's Hoard", "Gold find +30%, but attract more enemies",
-                RelicRarity.Epic, RelicType.Economic,
-                new RelicEffect { Stat = "gold_find", Value = 0.30f, Description = "+30% Gold Find" },
-                new RelicEffect { Stat = "enemy_spawn", Value = 0.15f, Description = "+15% Enemy Spawn" });
+                FateRelicRarity.Epic, FateRelicType.Economic,
+                new FateRelicEffect { Stat = "gold_find", Value = 0.30f, Description = "+30% Gold Find" },
+                new FateRelicEffect { Stat = "enemy_spawn", Value = 0.15f, Description = "+15% Enemy Spawn" });
             
             // Economic Relics - Legendary
             InitializeRelic("economy_007", "King's Fortune", "All currency gains +40%",
-                RelicRarity.Legendary, RelicType.Economic,
-                new RelicEffect { Stat = "all_currency", Value = 0.40f, Description = "+40% All Currency" });
+                FateRelicRarity.Legendary, FateRelicType.Economic,
+                new FateRelicEffect { Stat = "all_currency", Value = 0.40f, Description = "+40% All Currency" });
             
             // Special Relics - Rare
             InitializeRelic("special_001", "Mystery Box", "Random effect each floor",
-                RelicRarity.Rare, RelicType.Special,
-                new RelicEffect { Stat = "random_effect", Value = 1f, Description = "Random Floor Effect" });
+                FateRelicRarity.Rare, FateRelicType.Special,
+                new FateRelicEffect { Stat = "random_effect", Value = 1f, Description = "Random Floor Effect" });
             
             // Special Relics - Epic
             InitializeRelic("special_002", "Chaos Gem", "All stats +5% but random negative effect",
-                RelicRarity.Epic, RelicType.Special,
-                new RelicEffect { Stat = "all_stats", Value = 0.05f, Description = "+5% All Stats" },
-                new RelicEffect { Stat = "random_negative", Value = -0.10f, Description = "Random -10% Stat" });
+                FateRelicRarity.Epic, FateRelicType.Special,
+                new FateRelicEffect { Stat = "all_stats", Value = 0.05f, Description = "+5% All Stats" },
+                new FateRelicEffect { Stat = "random_negative", Value = -0.10f, Description = "Random -10% Stat" });
             
             // Special Relics - Legendary
             InitializeRelic("special_003", "Wish Dragon", "One wish granted at critical moment",
-                RelicRarity.Legendary, RelicType.Special,
-                new RelicEffect { Stat = "wish_grant", Value = 1f, Description = "1 Wish Grant" });
+                FateRelicRarity.Legendary, FateRelicType.Special,
+                new FateRelicEffect { Stat = "wish_grant", Value = 1f, Description = "1 Wish Grant" });
             
             InitializeRelic("special_004", "Fate Weave", "All relic effects +20%",
-                RelicRarity.Legendary, RelicType.Special,
-                new RelicEffect { Stat = "relic_boost", Value = 0.20f, Description = "+20% All Relic Effects" });
+                FateRelicRarity.Legendary, FateRelicType.Special,
+                new FateRelicEffect { Stat = "relic_boost", Value = 0.20f, Description = "+20% All Relic Effects" });
         }
         
         public static FateRelic GetRelic(string id) {
@@ -259,14 +259,14 @@ namespace ClawRPG.Systems {
             float roll = (float)random.NextDouble();
             
             float cumulative = 0f;
-            foreach (var rarity in RelicRarity.All) {
+            foreach (var rarity in FateRelicRarity.All) {
                 cumulative += rarity.DropRate;
                 if (roll <= cumulative) {
                     return GetRandomRelic(rarity);
                 }
             }
             
-            return GetRandomRelic(RelicRarity.Common);
+            return GetRandomRelic(FateRelicRarity.Common);
         }
         
         public static int GetTotalRelicCount() {
@@ -275,7 +275,7 @@ namespace ClawRPG.Systems {
         
         public static Dictionary<string, int> GetRelicCountByRarity() {
             var counts = new Dictionary<string, int>();
-            foreach (var rarity in RelicRarity.All) {
+            foreach (var rarity in FateRelicRarity.All) {
                 counts[rarity.Name] = GetRelicsByRarity(rarity).Count;
             }
             return counts;

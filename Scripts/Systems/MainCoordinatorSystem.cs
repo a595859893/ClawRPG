@@ -3,7 +3,6 @@ using System;
 using ClawRPG.Scripts.Managers;
 using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.UI;
-using ClawRPG.Scripts.Events;
 
 namespace ClawRPG.Scripts.Systems
 {

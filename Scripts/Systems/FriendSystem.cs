@@ -14,12 +14,12 @@ public class FriendSystem : BaseSystem
     public static FriendSystem Instance => _instance;
 
     // 好友数据
-    private Dictionary<string, FriendData> _friends = new Dictionary<string, FriendData>();
-    private Dictionary<string, FriendRequest> _pendingRequests = new Dictionary<string, FriendRequest>();
+    private System.Collections.Generic.Dictionary<string, FriendData> _friends = new System.Collections.Generic.Dictionary<string, FriendData>();
+    private System.Collections.Generic.Dictionary<string, FriendRequest> _pendingRequests = new System.Collections.Generic.Dictionary<string, FriendRequest>();
     private Array<string> _blockedPlayers = new Array<string>();
     
     // 聊天记录
-    private Dictionary<string, Array<ChatMessage>> _chatHistory = new Dictionary<string, Array<ChatMessage>>();
+    private System.Collections.Generic.Dictionary<string, Array<ChatMessage>> _chatHistory = new System.Collections.Generic.Dictionary<string, Array<ChatMessage>>();
 
     // 信号
     [Signal] public delegate void FriendListUpdated();

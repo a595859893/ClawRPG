@@ -7,8 +7,8 @@ public partial class GatheringSystem : BaseSystem
 {
     public static GatheringSystem Instance;
     
-    private Dictionary<string, GatheringTool> tools = new Dictionary<string, GatheringTool>();
-    private Dictionary<string, int> gatheringStats = new Dictionary<string, int>
+    private System.Collections.Generic.Dictionary<string, GatheringTool> tools = new System.Collections.Generic.Dictionary<string, GatheringTool>();
+    private System.Collections.Generic.Dictionary<string, int> gatheringStats = new System.Collections.Generic.Dictionary<string, int>
     {
         { "total_gathers", 0 },
         { "herbs_gathered", 0 },
@@ -199,7 +199,7 @@ public partial class GatheringSystem : BaseSystem
     {
         if (data.Contains("gathering_stats"))
         {
-            gatheringStats = new Dictionary<string, int>((Dictionary)data["gathering_stats"]);
+            gatheringStats = new System.Collections.Generic.Dictionary<string, int>((Dictionary)data["gathering_stats"]);
         }
     }
     
@@ -215,7 +215,7 @@ public partial class GatheringSystem : BaseSystem
     {
         if (data.Contains("gathering_stats"))
         {
-            gatheringStats = new Dictionary<string, int>((Dictionary)data["gathering_stats"]);
+            gatheringStats = new System.Collections.Generic.Dictionary<string, int>((Dictionary)data["gathering_stats"]);
         }
     }
     
@@ -236,7 +236,7 @@ public partial class GatheringSystem : BaseSystem
         var toolsData = new Array();
         foreach (var kvp in tools)
         {
-            toolsData.Add(new Dictionary<string, object>
+            toolsData.Add(new System.Collections.Generic.Dictionary<string, object>
             {
                 { "tool_id", kvp.Value.toolId },
                 { "tool_name", kvp.Value.toolName },

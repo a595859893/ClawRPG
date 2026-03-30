@@ -9,7 +9,7 @@ public class MountEvolutionSystem : BaseSystem
     public static MountEvolutionSystem Instance => _instance ??= new MountEvolutionSystem();
 
     // 玩家坐骑进化数据: mountId -> PlayerMountEvolution
-    private Dictionary<string, MountEvolutionData.PlayerMountEvolution> _playerEvolutions;
+    private System.Collections.Generic.Dictionary<string, MountEvolutionData.PlayerMountEvolution> _playerEvolutions;
 
     // 进化事件信号
     public static Action<string, string, MountEvolutionData.EvolutionStage> OnMountEvolved;
@@ -18,7 +18,7 @@ public class MountEvolutionSystem : BaseSystem
 
     public MountEvolutionSystem()
     {
-        _playerEvolutions = new Dictionary<string, MountEvolutionData.PlayerMountEvolution>();
+        _playerEvolutions = new System.Collections.Generic.Dictionary<string, MountEvolutionData.PlayerMountEvolution>();
     }
 
     protected override void Initialize()
@@ -362,14 +362,14 @@ public class MountEvolutionSystem : BaseSystem
     /// <summary>
     /// 存档数据
     /// </summary>
-    public Dictionary<string, Dictionary<string, object>> SaveData()
+    public System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, object>> SaveData()
     {
-        var data = new Dictionary<string, Dictionary<string, object>>();
+        var data = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, object>>();
         
         foreach (var kvp in _playerEvolutions)
         {
             var evolution = kvp.Value;
-            data[kvp.Key] = new Dictionary<string, object>
+            data[kvp.Key] = new System.Collections.Generic.Dictionary<string, object>
             {
                 { "currentStage", (int)evolution.CurrentStage },
                 { "evolvedType", (int)evolution.EvolvedType },
@@ -385,7 +385,7 @@ public class MountEvolutionSystem : BaseSystem
     /// <summary>
     /// 加载存档数据
     /// </summary>
-    public void LoadData(Dictionary<string, Dictionary<string, object>> data)
+    public void LoadData(System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, object>> data)
     {
         if (data == null) return;
         
@@ -433,13 +433,13 @@ public class MountEvolutionSystem : BaseSystem
         if (data == null) return;
         
         // 转换为所需的格式
-        var typedData = new Dictionary<string, Dictionary<string, object>>();
+        var typedData = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, object>>();
         foreach (Dictionary key in data.Keys)
         {
             var keyStr = key.ToString();
             if (data[key] is Dictionary valDict)
             {
-                var converted = new Dictionary<string, object>();
+                var converted = new System.Collections.Generic.Dictionary<string, object>();
                 foreach (Dictionary valKey in valDict.Keys)
                 {
                     converted[valKey.ToString()] = valDict[valKey];

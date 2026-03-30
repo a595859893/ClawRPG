@@ -68,7 +68,7 @@ namespace ClawRPG.Systems {
                     Description = relic.Description,
                     Rarity = relic.Rarity,
                     Type = relic.Type,
-                    Effects = new List<RelicEffect>(relic.Effects),
+                    Effects = new List<FateRelicEffect>(relic.Effects),
                     IsEquipped = false,
                     IsActive = true,
                     StackCount = 1

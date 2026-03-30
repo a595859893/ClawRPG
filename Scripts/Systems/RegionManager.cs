@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Manages region transitions and environmental effects
     /// </summary>
-    [GodotClass]
+    
     public class RegionManager : BaseSystem
     {
         public static RegionManager Instance { get; private set; }

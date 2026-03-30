@@ -57,7 +57,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+10% Defense" },
                 { 4, "+20% Attack, +10% Defense" }
             },
-            rarity: Rarity.Common
+            rarity: EquipmentSet.Rarity.Common
         ));
 
         AddSet(new EquipmentSet(
@@ -74,7 +74,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+15% Attack against Bosses" },
                 { 4, "+30% Attack against Bosses, +20% Fire Resistance" }
             },
-            rarity: Rarity.Epic
+            rarity: EquipmentSet.Rarity.Epic
         ));
 
         // Mage Sets - Magic focus
@@ -92,7 +92,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+15% Magic Damage" },
                 { 4, "+30% Magic Damage, +20% Mana Regen" }
             },
-            rarity: Rarity.Rare
+            rarity: EquipmentSet.Rarity.Rare
         ));
 
         AddSet(new EquipmentSet(
@@ -109,7 +109,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+20% Ice Damage" },
                 { 4, "+40% Ice Damage, Enemies frozen take +10% damage" }
             },
-            rarity: Rarity.Epic
+            rarity: EquipmentSet.Rarity.Epic
         ));
 
         // Ranger Sets - Speed and crit focus
@@ -127,7 +127,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+15% Critical Chance" },
                 { 4, "+30% Critical Chance, +20% Attack Speed" }
             },
-            rarity: Rarity.Rare
+            rarity: EquipmentSet.Rarity.Rare
         ));
 
         // Healer Sets - Support focus
@@ -145,7 +145,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+20% Healing Received" },
                 { 4, "+40% Healing Received, +25% Holy Damage" }
             },
-            rarity: Rarity.Rare
+            rarity: EquipmentSet.Rarity.Rare
         ));
 
         // Elemental Sets
@@ -163,7 +163,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+25% Fire Damage" },
                 { 4, "+50% Fire Damage, Enemies burn for extra damage" }
             },
-            rarity: Rarity.Epic
+            rarity: EquipmentSet.Rarity.Epic
         ));
 
         AddSet(new EquipmentSet(
@@ -180,7 +180,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+25% Lightning Damage" },
                 { 4, "+50% Lightning Damage, Chance to stun enemies" }
             },
-            rarity: Rarity.Epic
+            rarity: EquipmentSet.Rarity.Epic
         ));
 
         // Legendary Sets
@@ -198,7 +198,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+20% All Damage" },
                 { 4, "+40% All Damage, +15% Critical Chance" }
             },
-            rarity: Rarity.Legendary
+            rarity: EquipmentSet.Rarity.Legendary
         ));
 
         AddSet(new EquipmentSet(
@@ -215,7 +215,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+30% Defense, +20% Health" },
                 { 4, "+50% Defense, +40% Health, Reflect 10% damage" }
             },
-            rarity: Rarity.Legendary
+            rarity: EquipmentSet.Rarity.Legendary
         ));
 
         // Beginner Sets
@@ -233,7 +233,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+5% All Stats" },
                 { 4, "+10% All Stats, +5% Movement Speed" }
             },
-            rarity: Rarity.Common
+            rarity: EquipmentSet.Rarity.Common
         ));
 
         // Nature Sets
@@ -251,7 +251,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+20% Nature Damage, +10% Health Regen" },
                 { 4, "+40% Nature Damage, +20% Health Regen" }
             },
-            rarity: Rarity.Rare
+            rarity: EquipmentSet.Rarity.Rare
         ));
 
         // Poison Sets
@@ -269,7 +269,7 @@ public class EquipmentSetSystem : BaseSystem
                 { 2, "+25% Poison Damage" },
                 { 4, "+50% Poison Damage, Enemies take poison damage over time" }
             },
-            rarity: Rarity.Epic
+            rarity: EquipmentSet.Rarity.Epic
         ));
     }
 
@@ -285,7 +285,7 @@ public class EquipmentSetSystem : BaseSystem
     }
 
     // Get sets by rarity
-    public List<EquipmentSet> GetSetsByRarity(Rarity rarity)
+    public List<EquipmentSet> GetSetsByRarity(EquipmentSet.Rarity rarity)
     {
         List<EquipmentSet> result = new List<EquipmentSet>();
         foreach (var set in Sets.Values)
@@ -450,6 +450,15 @@ public class EquipmentSetSystem : BaseSystem
 // Equipment Set data class
 public class EquipmentSet
 {
+    public enum Rarity
+    {
+        Common,
+        Uncommon,
+        Rare,
+        Epic,
+        Legendary
+    }
+
     public string Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
@@ -458,7 +467,7 @@ public class EquipmentSet
     public Rarity Rarity { get; set; }
 
     public EquipmentSet(string id, string name, string description, 
-        Dictionary<string, string> pieces, Dictionary<int, string> bonuses, Rarity rarity)
+        Dictionary<string, string> pieces, Dictionary<int, string> bonuses, EquipmentSet.Rarity rarity)
     {
         Id = id;
         Name = name;
@@ -467,14 +476,4 @@ public class EquipmentSet
         Bonuses = bonuses;
         Rarity = rarity;
     }
-}
-
-// Rarity enum
-public enum Rarity
-{
-    Common,
-    Uncommon,
-    Rare,
-    Epic,
-    Legendary
 }

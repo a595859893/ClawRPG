@@ -1,10 +1,10 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawrRPG.Scripts.Quests;
-using ClawrRPG.Scripts.Systems;
+using ClawRPG.Scripts.Quests;
+using ClawRPG.Scripts.Systems;
 
-namespace ClawrRPG.Scripts.UI {
+namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 任务追踪器 UI - 在屏幕左上角显示当前任务进度
     /// 应用数据驱动设计模式：从 insights.md 学习

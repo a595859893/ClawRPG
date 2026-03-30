@@ -33,20 +33,20 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         public string Description;
         public GemType Type;
         public GemRarity Rarity;
-        public Dictionary<string, float> Attributes; // 属性加成
+        public System.Collections.Generic.Dictionary<string, float> Attributes; // 属性加成
         public int Value; // 价值金币
         public string Icon; // 图标资源路径
         
         public GemData() {
-            Attributes = new Dictionary<string, float>();
+            Attributes = new System.Collections.Generic.Dictionary<string, float>();
         }
         
-        public GemData(string gemId, string name, GemType type, GemRarity rarity, Dictionary<string, float> attrs, int value) {
+        public GemData(string gemId, string name, GemType type, GemRarity rarity, System.Collections.Generic.Dictionary<string, float> attrs, int value) {
             GemId = gemId;
             Name = name;
             Type = type;
             Rarity = rarity;
-            Attributes = attrs != null ? new Dictionary<string, float>(attrs) : new Dictionary<string, float>();
+            Attributes = attrs != null ? new System.Collections.Generic.Dictionary<string, float>(attrs) : new System.Collections.Generic.Dictionary<string, float>();
             Value = value;
             Description = GetDescription();
         }
@@ -141,12 +141,12 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     /// </summary>
     [System.Serializable]
     public class PlayerGemData {
-        public Dictionary<string, int> OwnedGems; // 宝石ID -> 数量
-        public Dictionary<string, List<EquipmentGemSlot>> EquipmentSlots; // 装备ID -> 宝石槽位
+        public System.Collections.Generic.Dictionary<string, int> OwnedGems; // 宝石ID -> 数量
+        public System.Collections.Generic.Dictionary<string, List<EquipmentGemSlot>> EquipmentSlots; // 装备ID -> 宝石槽位
         
         public PlayerGemData() {
-            OwnedGems = new Dictionary<string, int>();
-            EquipmentSlots = new Dictionary<string, List<EquipmentGemSlot>>();
+            OwnedGems = new System.Collections.Generic.Dictionary<string, int>();
+            EquipmentSlots = new System.Collections.Generic.Dictionary<string, List<EquipmentGemSlot>>();
         }
         
         public int GetGemCount(string gemId) {

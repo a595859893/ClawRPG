@@ -6,33 +6,33 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// Fate Relic data structures for roguelike-style relic collection
     /// </summary>
-    public class RelicRarity : Godot.Object {
+    public class FateRelicRarity : Godot.Object {
         public string Name { get; set; }
         public string Color { get; set; }
         public float DropRate { get; set; }
         
-        public static RelicRarity Common = new RelicRarity { Name = "Common", Color = "#9E9E9E", DropRate = 0.50f };
-        public static RelicRarity Uncommon = new RelicRarity { Name = "Uncommon", Color = "#4CAF50", DropRate = 0.25f };
-        public static RelicRarity Rare = new RelicRarity { Name = "Rare", Color = "#2196F3", DropRate = 0.15f };
-        public static RelicRarity Epic = new RelicRarity { Name = "Epic", Color = "#9C27B0", DropRate = 0.08f };
-        public static RelicRarity Legendary = new RelicRarity { Name = "Legendary", Color = "#FF9800", DropRate = 0.02f };
+        public static FateRelicRarity Common = new FateRelicRarity { Name = "Common", Color = "#9E9E9E", DropRate = 0.50f };
+        public static FateRelicRarity Uncommon = new FateRelicRarity { Name = "Uncommon", Color = "#4CAF50", DropRate = 0.25f };
+        public static FateRelicRarity Rare = new FateRelicRarity { Name = "Rare", Color = "#2196F3", DropRate = 0.15f };
+        public static FateRelicRarity Epic = new FateRelicRarity { Name = "Epic", Color = "#9C27B0", DropRate = 0.08f };
+        public static FateRelicRarity Legendary = new FateRelicRarity { Name = "Legendary", Color = "#FF9800", DropRate = 0.02f };
         
-        public static RelicRarity[] All = new[] { Common, Uncommon, Rare, Epic, Legendary };
+        public static FateRelicRarity[] All = new[] { Common, Uncommon, Rare, Epic, Legendary };
     }
     
-    public class RelicType : Godot.Object {
+    public class FateRelicType : Godot.Object {
         public string Name { get; set; }
         
-        public static RelicType Combat = new RelicType { Name = "Combat" };
-        public static RelicType Defense = new RelicType { Name = "Defense" };
-        public static RelicType Utility = new RelicType { Name = "Utility" };
-        public static RelicType Economic = new RelicType { Name = "Economic" };
-        public static RelicType Special = new RelicType { Name = "Special" };
+        public static FateRelicType Combat = new FateRelicType { Name = "Combat" };
+        public static FateRelicType Defense = new FateRelicType { Name = "Defense" };
+        public static FateRelicType Utility = new FateRelicType { Name = "Utility" };
+        public static FateRelicType Economic = new FateRelicType { Name = "Economic" };
+        public static FateRelicType Special = new FateRelicType { Name = "Special" };
         
-        public static RelicType[] All = new[] { Combat, Defense, Utility, Economic, Special };
+        public static FateRelicType[] All = new[] { Combat, Defense, Utility, Economic, Special };
     }
     
-    public class RelicEffect : Godot.Object {
+    public class FateRelicEffect : Godot.Object {
         public string Stat { get; set; }
         public float Value { get; set; }
         public string Description { get; set; }
@@ -42,15 +42,15 @@ namespace ClawRPG.Systems {
         public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public RelicRarity Rarity { get; set; }
-        public RelicType Type { get; set; }
-        public List<RelicEffect> Effects { get; set; }
+        public FateRelicRarity Rarity { get; set; }
+        public FateRelicType Type { get; set; }
+        public List<FateRelicEffect> Effects { get; set; }
         public bool IsEquipped { get; set; }
         public bool IsActive { get; set; }
         public int StackCount { get; set; }
         
         public FateRelic() {
-            Effects = new List<RelicEffect>();
+            Effects = new List<FateRelicEffect>();
             IsEquipped = false;
             IsActive = true;
             StackCount = 1;

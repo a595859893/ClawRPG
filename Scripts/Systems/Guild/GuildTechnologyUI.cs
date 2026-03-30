@@ -12,8 +12,8 @@ public class GuildTechnologyUI : Control
     private TabContainer tabContainer;
 
     // 科技列表
-    private Dictionary<GuildTechnologyData.TechCategory, ItemList> categoryLists = new Dictionary<GuildTechnologyData.TechCategory, ItemList>();
-    private Dictionary<GuildTechnologyData.TechCategory, Array> categoryTechs = new Dictionary<GuildTechnologyData.TechCategory, Array>();
+    private System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, ItemList> categoryLists = new System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, ItemList>();
+    private System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, Array> categoryTechs = new System.Collections.Generic.Dictionary<GuildTechnologyData.TechCategory, Array>();
 
     // 详情面板
     private Panel detailPanel;

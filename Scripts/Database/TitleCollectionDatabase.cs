@@ -7,7 +7,7 @@ public partial class TitleCollectionDatabase : BaseSystem
 {
     public static TitleCollectionDatabase Instance { get; private set; }
     
-    private Dictionary<string, TitleCollectionData.Title> _titles = new();
+    private System.Collections.Generic.Dictionary<string, TitleCollectionData.Title> _titles = new();
     
     protected override void Initialize()
     {
@@ -499,9 +499,9 @@ public partial class TitleCollectionDatabase : BaseSystem
         return _titles.ContainsKey(id) ? _titles[id] : null;
     }
     
-    public Dictionary<string, TitleCollectionData.Title> GetAllTitles()
+    public System.Collections.Generic.Dictionary<string, TitleCollectionData.Title> GetAllTitles()
     {
-        return new Dictionary<string, TitleCollectionData.Title>(_titles);
+        return new System.Collections.Generic.Dictionary<string, TitleCollectionData.Title>(_titles);
     }
     
     public List<TitleCollectionData.Title> GetTitlesByCategory(TitleCollectionData.TitleCategory category)

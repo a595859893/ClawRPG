@@ -202,7 +202,7 @@ namespace ClawRPG.Systems.UI {
             
             // Sort by rarity (legendary first)
             relics.Sort((a, b) => {
-                int rarityCompare = Array.IndexOf(RelicRarity.All, b.Rarity).CompareTo(Array.IndexOf(RelicRarity.All, a.Rarity));
+                int rarityCompare = Array.IndexOf(FateRelicRarity.All, b.Rarity).CompareTo(Array.IndexOf(FateRelicRarity.All, a.Rarity));
                 if (rarityCompare != 0) return rarityCompare;
                 return string.Compare(a.Name, b.Name);
             });

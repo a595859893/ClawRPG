@@ -2,12 +2,12 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ClawRPG.Scripts.Systems.PartySystem;
+using ClawRPG.Scripts.Systems;
 
-namespace ClawRPG.Scripts.Systems
+namespace ClawRPG.Scripts.Systems.PartySystem
 {
 
-public class PartySystem : BaseSystem
+public partial class PartySystem : BaseSystem
 {
     private static PartySystem _instance;
     public static PartySystem Instance

@@ -4,7 +4,7 @@ using Godot;
 /// </summary>
 using System;
 using System.Collections.Generic;
-using ElementalReactionData;
+using static ElementalReactionData;
 
 public class ElementalReactionUI : Control
 {

@@ -1,7 +1,6 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Project;
 using ClawRPG.Scripts.Data.Enemy;
 using ClawRPG.Scripts.Database.Loaders;
 

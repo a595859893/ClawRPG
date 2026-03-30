@@ -1,7 +1,6 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.Events;
 using ClawRPG.Scripts.Managers;
 using ClawRPG.Scripts.Systems.ProceduralDungeon;
 using ClawRPG.Scripts.Systems;

@@ -333,9 +333,9 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         /// <param name="recipeId">Recipe ID.</param>
         /// <returns>Dictionary of material ID to required quantity.</returns>
-        public Dictionary<int, int> GetRequiredMaterials(int recipeId)
+        public System.Collections.Generic.Dictionary<int, int> GetRequiredMaterials(int recipeId)
         {
-            var requirements = new Dictionary<int, int>();
+            var requirements = new System.Collections.Generic.Dictionary<int, int>();
             var recipe = AlchemyDatabase.Instance.GetRecipe(recipeId);
             
             if (recipe != null)
@@ -354,9 +354,9 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         /// <param name="recipeId">Recipe ID.</param>
         /// <returns>Dictionary of material ID to missing quantity.</returns>
-        public Dictionary<int, int> GetMissingMaterials(int recipeId)
+        public System.Collections.Generic.Dictionary<int, int> GetMissingMaterials(int recipeId)
         {
-            var missing = new Dictionary<int, int>();
+            var missing = new System.Collections.Generic.Dictionary<int, int>();
             var recipe = AlchemyDatabase.Instance.GetRecipe(recipeId);
             var inventory = PlayerInventory.Instance;
 
@@ -407,7 +407,7 @@ namespace ClawRPG.Scripts.Systems
             if (data.Contains("recipe_usage_count"))
             {
                 var dict = (Dictionary)data["recipe_usage_count"];
-                _playerData.RecipeUsageCount = new Dictionary<int, int>();
+                _playerData.RecipeUsageCount = new System.Collections.Generic.Dictionary<int, int>();
                 foreach (var kvp in dict)
                 {
                     _playerData.RecipeUsageCount[(int)kvp.Key] = (int)kvp.Value;

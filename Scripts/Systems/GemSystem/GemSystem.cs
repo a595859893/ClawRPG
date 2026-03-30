@@ -31,7 +31,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         private GemDatabase _gemDatabase;
         
         // 每个装备类型的默认槽位数
-        private Dictionary<string, int> _defaultSlotCount = new Dictionary<string, int> {
+        private System.Collections.Generic.Dictionary<string, int> _defaultSlotCount = new System.Collections.Generic.Dictionary<string, int> {
             { "weapon", 3 },
             { "armor", 4 },
             { "helmet", 2 },
@@ -215,8 +215,8 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         /// <summary>
         /// 获取装备已镶嵌的宝石属性加成
         /// </summary>
-        public Dictionary<string, float> GetEquipmentGemBonuses(string equipmentId, string equipmentType) {
-            var bonuses = new Dictionary<string, float>();
+        public System.Collections.Generic.Dictionary<string, float> GetEquipmentGemBonuses(string equipmentId, string equipmentType) {
+            var bonuses = new System.Collections.Generic.Dictionary<string, float>();
             var slots = GetEquipmentSlots(equipmentId, equipmentType);
             
             foreach (var slot in slots) {
@@ -247,8 +247,8 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         /// <summary>
         /// 获取玩家拥有的所有宝石
         /// </summary>
-        public Dictionary<string, int> GetOwnedGems() {
-            return new Dictionary<string, int>(_playerGemData.OwnedGems);
+        public System.Collections.Generic.Dictionary<string, int> GetOwnedGems() {
+            return new System.Collections.Generic.Dictionary<string, int>(_playerGemData.OwnedGems);
         }
         
         /// <summary>
@@ -262,7 +262,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         /// <summary>
         /// 批量添加宝石（用于奖励）
         /// </summary>
-        public void AddGems(Dictionary<string, int> gems) {
+        public void AddGems(System.Collections.Generic.Dictionary<string, int> gems) {
             foreach (var gem in gems) {
                 _playerGemData.AddGem(gem.Key, gem.Value);
             }
@@ -377,7 +377,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             
             if (data.Contains("owned_gems")) {
                 var gems = data["owned_gems"] as Dictionary;
-                _playerGemData.OwnedGems = new Dictionary<string, int>();
+                _playerGemData.OwnedGems = new System.Collections.Generic.Dictionary<string, int>();
                 foreach (var key in gems.Keys) {
                     _playerGemData.OwnedGems[key.ToString()] = (int)gems[key];
                 }
@@ -394,7 +394,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         private void LoadEquipmentSlots(Dictionary data) {
             if (data == null) return;
             
-            _playerGemData.EquipmentSlots = new Dictionary<string, List<EquipmentGemSlot>>();
+            _playerGemData.EquipmentSlots = new System.Collections.Generic.Dictionary<string, List<EquipmentGemSlot>>();
             foreach (var key in data.Keys) {
                 var slotsArray = data[key] as Array;
                 var slots = new List<EquipmentGemSlot>();

@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Database {
     /// <summary>
     /// Represents a game region/zone with its properties
     /// </summary>
-    [GodotClass]
+    
     public class RegionType : Resource
     {
         [Export] public string RegionId { get; set; } = "";
@@ -36,7 +36,7 @@ namespace ClawRPG.Scripts.Database {
     /// <summary>
     /// Database managing all game regions/zones
     /// </summary>
-    [GodotClass]
+    
     public class RegionDatabase : BaseSystem
     {
         public static RegionDatabase Instance { get; private set; }

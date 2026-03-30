@@ -14,10 +14,10 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         public int SourceGemCount; // 需要的源宝石数量
         public int GoldCost; // 金币费用
         public float SuccessRate; // 成功率 (0-1)
-        public Dictionary<string, int> Materials; // 额外材料 (材料ID -> 数量)
+        public System.Collections.Generic.Dictionary<string, int> Materials; // 额外材料 (材料ID -> 数量)
         
         public GemFusionRecipe() {
-            Materials = new Dictionary<string, int>();
+            Materials = new System.Collections.Generic.Dictionary<string, int>();
         }
         
         public GemFusionRecipe(string recipeId, string resultGemId, string sourceGemId, 
@@ -28,7 +28,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             SourceGemCount = sourceGemCount;
             GoldCost = goldCost;
             SuccessRate = Mathf.Clamp01(successRate);
-            Materials = new Dictionary<string, int>();
+            Materials = new System.Collections.Generic.Dictionary<string, int>();
         }
     }
     
@@ -39,10 +39,10 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     public class PlayerFusionData {
         public int TotalFusions; // 总合成次数
         public int SuccessfulFusions; // 成功次数
-        public Dictionary<string, int> FusionCountByGem; // 按宝石ID统计合成次数
+        public System.Collections.Generic.Dictionary<string, int> FusionCountByGem; // 按宝石ID统计合成次数
         
         public PlayerFusionData() {
-            FusionCountByGem = new Dictionary<string, int>();
+            FusionCountByGem = new System.Collections.Generic.Dictionary<string, int>();
         }
         
         public float GetSuccessRate() {

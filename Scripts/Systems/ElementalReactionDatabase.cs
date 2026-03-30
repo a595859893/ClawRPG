@@ -4,7 +4,7 @@ using Godot;
 /// </summary>
 using System;
 using System.Collections.Generic;
-using ElementalReactionData;
+using static ElementalReactionData;
 
 /// <summary>
 /// 元素反应数据库 - 配置元素反应效果

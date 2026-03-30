@@ -47,7 +47,7 @@ namespace ClawRPG.Scripts.Data
     /// <summary>
     /// 宠物AI状态
     /// </summary>
-    public partial enum PetAIState
+    public enum SummonPetAIState
     {
         Idle,           // 空闲
         Patrolling,     // 巡逻

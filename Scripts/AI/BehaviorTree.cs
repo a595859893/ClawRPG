@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Characters;
 
 namespace ClawRPG.Scripts.AI {
     /// <summary>
