@@ -466,9 +466,9 @@ public partial class GuildSystem : BaseSystem {
         return _announcementManager.PostAnnouncement(content, playerName);
     }
 
-    // 是否有权限
+    // 是否有权限（委托给 GuildPermissionHandler）
     public bool HasPermission(GuildPermission permission) {
-        return (PlayerData.Permissions & permission) == permission;
+        return GuildPermissionHandler.HasPermission(PlayerData.Permissions, permission);
     }
 
     // 获取公会加成
