@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using GameSystems;
+using ClawRPG.Scripts.Mounts;
+using ClawRPG.Scripts.UI;
+using ClawRPG.Scripts.Systems.Emote;
 
 namespace ClawRPG.Scripts.Systems
 {
@@ -18,7 +21,7 @@ namespace ClawRPG.Scripts.Systems
         private MountManager _mountManager;
         private BookmarkSystem _bookmarkSystem;
         private AutoBookmarkSystem _autoBookmarkSystem;
-        private EnhancementSystem _enhancementSystem;
+        private EquipmentEnhancementSystem _enhancementSystem;
         private AutoPotionSystem _autoPotionSystem;
         private EnchantmentSystem _enchantmentSystem;
         private BountyManager _bountyManager;

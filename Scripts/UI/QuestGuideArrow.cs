@@ -5,6 +5,22 @@ using ClawRPG.Scripts.Quests;
 using ClawRPG.Scripts.Characters;
 using ClawRPG.Scripts.Systems;
 
+/// <summary>
+/// 2D integer vector struct (Godot 4.2 compatibility - Vector2i introduced in Godot 4.3)
+/// </summary>
+public struct Vector2i {
+    public int X { get; set; }
+    public int Y { get; set; }
+    public Vector2i(int x, int y) { X = x; Y = y; }
+    public static implicit operator Vector2(Vector2i v) => new Vector2(v.X, v.Y);
+    public static Vector2i operator -(Vector2i a, Vector2i b) => new Vector2i(a.X - b.X, a.Y - b.Y);
+    public static Vector2i operator +(Vector2i a, Vector2i b) => new Vector2i(a.X + b.X, a.Y + b.Y);
+    public static bool operator ==(Vector2i a, Vector2i b) => a.X == b.X && a.Y == b.Y;
+    public static bool operator !=(Vector2i a, Vector2i b) => !(a == b);
+    public override bool Equals(object obj) => obj is Vector2i v && v.X == X && v.Y == Y;
+    public override int GetHashCode() => HashCode.Combine(X, Y);
+}
+
 namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 任务指引箭头 - 在屏幕上显示指向任务目标的箭头

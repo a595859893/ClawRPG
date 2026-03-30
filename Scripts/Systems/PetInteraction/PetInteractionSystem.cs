@@ -18,13 +18,6 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
         }
 
         protected override string SystemName => "PetInteractionSystem";
-        private static PetInteractionSystem _instance;
-        public static PetInteractionSystem Instance {
-            get {
-                if (_instance == null) _instance = new PetInteractionSystem();
-                return _instance;
-            }
-        }
 
         private PetInteractionData _data = new PetInteractionData();
         private PetInteractionDatabase _database = PetInteractionDatabase.Instance;

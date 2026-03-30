@@ -22,15 +22,6 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
         }
         
         protected override string SystemName => "GuildTournamentBracketSystem";
-        // 单例
-        public static GuildTournamentBracketSystem Instance {
-            get {
-                if (_instance == null) {
-                    _instance = new GuildTournamentBracketSystem();
-                }
-                return _instance;
-            }
-        }
         
         // 当前锦标赛数据
         private GuildTournamentBracketData _currentTournament;

@@ -31,7 +31,7 @@ namespace ClawRPG.Scripts.UI {
         
         // 引用
         private Player _player;
-        private EnhancementSystem _enhancementSystem;
+        private EquipmentEnhancementSystem _enhancementSystem;
         private EnhancementEffect _enhancementEffect;
         
         // 颜色
