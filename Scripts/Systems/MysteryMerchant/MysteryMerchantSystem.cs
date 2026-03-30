@@ -22,11 +22,15 @@ namespace ClawRPG.Scripts.Systems
         private float _spawnTimer = 0f;
         private Random _random = new Random();
         
-        // 信号
-        public static Signal<MysteryMerchant> MerchantSpawned { get; } = new Signal<MysteryMerchant>();
-        public static Signal<MysteryMerchant> MerchantExpired { get; } = new Signal<MysteryMerchant>();
-        public static Signal<string, int, int> ItemPurchased { get; } = new Signal<string, int, int>();
-        public static Signal<MysteryMerchant> MerchantRefreshed { get; } = new Signal<MysteryMerchant>();
+        // Godot 4 signals
+        [Signal]
+        public static delegate void MerchantSpawned(MysteryMerchant merchant);
+        [Signal]
+        public static delegate void MerchantExpired(MysteryMerchant merchant);
+        [Signal]
+        public static delegate void ItemPurchased(string itemId, int quantity, int price);
+        [Signal]
+        public static delegate void MerchantRefreshed(MysteryMerchant merchant);
         
         public override void _Ready()
         {
@@ -113,7 +117,7 @@ namespace ClawRPG.Scripts.Systems
             GenerateMerchantItems(merchant, itemCount, config);
             
             _activeMerchants.Add(merchant);
-            MerchantSpawned?.Invoke(merchant);
+            EmitSignal(nameof(MerchantSpawned), merchant);
         }
         
         // 生成商品
@@ -213,7 +217,7 @@ namespace ClawRPG.Scripts.Systems
         {
             merchant.IsActive = false;
             _activeMerchants.Remove(merchant);
-            MerchantExpired?.Invoke(merchant);
+            EmitSignal(nameof(MerchantExpired), merchant);
         }
         
         // 购买商品
@@ -270,7 +274,7 @@ namespace ClawRPG.Scripts.Systems
             }
             
             SavePlayerData();
-            ItemPurchased?.Invoke(item.ItemId, 1, item.Price);
+            EmitSignal(nameof(ItemPurchased), item.ItemId, 1, item.Price);
             
             return true;
         }
@@ -299,7 +303,7 @@ namespace ClawRPG.Scripts.Systems
                 GenerateMerchantItems(merchant, itemCount, config);
             }
             
-            MerchantRefreshed?.Invoke(merchant);
+            EmitSignal(nameof(MerchantRefreshed), merchant);
             return true;
         }
         
