@@ -211,3 +211,94 @@ public class BossBattleInstance
     public List<string> SummonedMonsters { get; set; } = new List<string>();
     public bool IsAlive => CurrentHealth > 0;
 }
+
+// =====================
+// 新增: 运行时数据结构 (原本缺失,导致CS编译错误)
+// =====================
+
+/// <summary>
+/// Boss 阶段运行时数据 - 用于AI/技能/阶段决策
+/// </summary>
+public class BossPhaseData
+{
+    public int PhaseNumber { get; set; }
+    public string PhaseName { get; set; }
+    public float HealthPercentage { get; set; }
+    public float AttackMultiplier { get; set; } = 1.0f;
+    public List<string> SpawnEnemies { get; set; } = new List<string>();
+
+    public BossPhaseData() { }
+
+    public BossPhaseData(int phaseNumber, string phaseName, float healthPercent)
+    {
+        PhaseNumber = phaseNumber;
+        PhaseName = phaseName;
+        HealthPercentage = healthPercent;
+    }
+}
+
+/// <summary>
+/// Boss Mechanics 运行时数据 - 包含boss战斗所需的配置和状态数据
+/// </summary>
+public class BossMechanicsData
+{
+    // 基础信息
+    public string BossId { get; set; }
+    public string BossName { get; set; }
+    public int BossLevel { get; set; }
+    public float MaxHealth { get; set; }
+    public float Attack { get; set; }
+    public float Defense { get; set; }
+
+    // 阶段
+    public List<BossPhaseData> Phases { get; set; } = new List<BossPhaseData>();
+
+    // 狂暴
+    public float EnrageTime { get; set; }
+    public bool HasEnrageMechanic { get; set; }
+    public float EnrageThreshold { get; set; }
+
+    // 召唤
+    public bool CanSummonMinions { get; set; }
+    public float MinionSpawnHealthPercent { get; set; }
+    public int MaxMinionCount { get; set; }
+    public List<string> MinionTypes { get; set; } = new List<string>();
+
+    // 技能
+    public List<string> Skills { get; set; } = new List<string>();
+
+    // 狂暴计时器
+    public List<EnrageTimerConfig> EnrageTimers { get; set; } = new List<EnrageTimerConfig>();
+
+    // 掉落
+    public string[] LootTable { get; set; } = Array.Empty<string>();
+    public float[] LootWeights { get; set; } = Array.Empty<float>();
+    public int MinLootCount { get; set; }
+    public int MaxLootCount { get; set; }
+
+    // 弱点
+    public string WeaknessElement { get; set; }
+    public float WeaknessMultiplier { get; set; } = 1.0f;
+
+    public BossMechanicsData()
+    {
+        HasEnrageMechanic = false;
+        CanSummonMinions = false;
+        MinionSpawnHealthPercent = 0.5f;
+        MaxMinionCount = 4;
+        MinLootCount = 1;
+        MaxLootCount = 3;
+        WeaknessMultiplier = 1.0f;
+    }
+}
+
+/// <summary>
+/// 狂暴计时器配置
+/// </summary>
+public class EnrageTimerConfig
+{
+    public float TimeThreshold { get; set; }
+    public float AttackMultiplier { get; set; } = 1.0f;
+    public float SpeedMultiplier { get; set; } = 1.0f;
+    public string EffectId { get; set; }
+}
