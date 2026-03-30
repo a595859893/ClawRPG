@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 using Game.Systems.Pets;
+using ClawRPG.Scripts.UI;
 
 public class PetEquipmentEnhancementUI : Control
 {

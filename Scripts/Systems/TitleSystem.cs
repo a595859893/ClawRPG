@@ -90,11 +90,11 @@ public class TitleSystem : BaseSystem
     
     // Signals (Godot 4 compatible)
     [Signal]
-    public static delegate void TitleUnlockedDelegate(string playerId, TitleData data);
+    public delegate void TitleUnlockedDelegate(string playerId, TitleData data);
     [Signal]
-    public static delegate void TitleEquippedDelegate(string playerId);
+    public delegate void TitleEquippedDelegate(string playerId);
     [Signal]
-    public static delegate void TitleProgressUpdatedDelegate(string playerId, int current, int total);
+    public delegate void TitleProgressUpdatedDelegate(string playerId, int current, int total);
 
     public override void _Ready()
     {

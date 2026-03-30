@@ -21,7 +21,7 @@ public class TattooSystem : BaseSystem
     private TattooDatabase _database;
     
     private bool _isInitialized = false;
-    public override bool IsInitialized => _isInitialized;
+    public new bool IsInitialized => _isInitialized;
     
     protected override string SystemName => "TattooSystem";
     

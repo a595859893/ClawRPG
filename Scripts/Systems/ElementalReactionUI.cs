@@ -346,19 +346,19 @@ public class ElementalReactionUI : Control
     public void Toggle()
     {
         if (_isVisible)
-            Hide();
+            HideUI();
         else
-            Show();
+            ShowUI();
     }
 
-    public override void Show()
+    public void ShowUI()
     {
         base.Show();
         _isVisible = true;
         RefreshStats();
     }
 
-    public override void Hide()
+    public void HideUI()
     {
         base.Hide();
         _isVisible = false;

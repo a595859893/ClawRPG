@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ClawRPG.Scripts.Characters;
 using ClawRPG.Scripts.Items;
 using ClawRPG.Scripts.Database;
+using ClawRPG.Scripts.Data.Enemy;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>

@@ -11,13 +11,13 @@ namespace ClawRPG.Systems.Emote {
         
         // Signals (Godot 4 compatible)
         [Signal]
-        public static delegate void EmoteUnlockedDelegate(string emoteId);
+        public delegate void EmoteUnlockedDelegate(string emoteId);
         [Signal]
-        public static delegate void EmoteUsedDelegate(string emoteId);
+        public delegate void EmoteUsedDelegate(string emoteId);
         [Signal]
-        public static delegate void FavoriteEmoteAddedDelegate(string emoteId);
+        public delegate void FavoriteEmoteAddedDelegate(string emoteId);
         [Signal]
-        public static delegate void FavoriteEmoteRemovedDelegate(string emoteId);
+        public delegate void FavoriteEmoteRemovedDelegate(string emoteId);
 
         public override void _Ready() {
             Instance = this;

@@ -24,13 +24,13 @@ namespace ClawRPG.Scripts.Systems
         
         // Godot 4 signals
         [Signal]
-        public static delegate void MerchantSpawned(MysteryMerchant merchant);
+        public delegate void MerchantSpawned(MysteryMerchant merchant);
         [Signal]
-        public static delegate void MerchantExpired(MysteryMerchant merchant);
+        public delegate void MerchantExpired(MysteryMerchant merchant);
         [Signal]
-        public static delegate void ItemPurchased(string itemId, int quantity, int price);
+        public delegate void ItemPurchased(string itemId, int quantity, int price);
         [Signal]
-        public static delegate void MerchantRefreshed(MysteryMerchant merchant);
+        public delegate void MerchantRefreshed(MysteryMerchant merchant);
         
         public override void _Ready()
         {

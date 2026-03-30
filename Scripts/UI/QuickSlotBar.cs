@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using ClawRPG.Scripts.Items;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>

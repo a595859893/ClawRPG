@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using ClawRPG.Scripts.UI;
 
 namespace ClawRPG.Scripts.Systems.EquipmentRecycle
 {

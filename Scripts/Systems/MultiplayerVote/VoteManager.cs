@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Modules.MultiplayerVote;
 
 namespace ClawRPG.Systems.MultiplayerVote
 {

@@ -76,10 +76,10 @@ public class PetSynthesisSystem : BaseSystem
         return true;
     }
     
-    public SynthesisResult StartSynthesis(int pet1Id, int pet2Id)
+    public PetSynthesisData.SynthesisResult StartSynthesis(int pet1Id, int pet2Id)
     {
         if (!CanSynthesize(pet1Id, pet2Id))
-            return SynthesisResult.Failure;
+            return PetSynthesisData.SynthesisResult.Failure;
             
         var pet1 = _petManager.GetPet(pet1Id);
         var pet2 = _petManager.GetPet(pet2Id);
@@ -89,7 +89,7 @@ public class PetSynthesisSystem : BaseSystem
         
         int goldCost = recipe != null ? recipe.GoldCost : 500;
         float successRate = recipe != null ? recipe.SuccessRate : 0.5f;
-        var synthesisType = recipe != null ? recipe.SynthesisType : GetRandomSynthesisType(pet1, pet2);
+        var synthesisType = recipe != null ? recipe.PetSynthesisData.SynthesisType : GetRandomPetSynthesisData.SynthesisType(pet1, pet2);
         
         // Deduct gold
         _player.Gold -= goldCost;
@@ -109,10 +109,10 @@ public class PetSynthesisSystem : BaseSystem
         
         // Update statistics
         _data.TotalSyntheses++;
-        if (result != SynthesisResult.Failure)
+        if (result != PetSynthesisData.SynthesisResult.Failure)
         {
             _data.SuccessfulSyntheses++;
-            if (result == SynthesisResult.Legendary)
+            if (result == PetSynthesisData.SynthesisResult.Legendary)
                 _data.LegendarySyntheses++;
         }
         
@@ -127,10 +127,10 @@ public class PetSynthesisSystem : BaseSystem
         {
             Pet1Id = pet1Id,
             Pet2Id = pet2Id,
-            ResultPetId = result != SynthesisResult.Failure ? _petManager.GetNextPetId() : -1,
-            ResultPetType = result != SynthesisResult.Failure ? (recipe != null ? recipe.ResultPetType : "Unknown") : "None",
+            ResultPetId = result != PetSynthesisData.SynthesisResult.Failure ? _petManager.GetNextPetId() : -1,
+            ResultPetType = result != PetSynthesisData.SynthesisResult.Failure ? (recipe != null ? recipe.ResultPetType : "Unknown") : "None",
             ResultRarity = result.ToString(),
-            WasSuccessful = result != SynthesisResult.Failure,
+            WasSuccessful = result != PetSynthesisData.SynthesisResult.Failure,
             GoldCost = goldCost,
             Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
@@ -140,7 +140,7 @@ public class PetSynthesisSystem : BaseSystem
         _data.SynthesisHistory[pet1Id].Add(record);
         
         // Emit result signal
-        if (result != SynthesisResult.Failure)
+        if (result != PetSynthesisData.SynthesisResult.Failure)
         {
             EmitSignal(SignalSynthesisCompleted, record.ResultPetId, result.ToString());
         }
@@ -152,12 +152,12 @@ public class PetSynthesisSystem : BaseSystem
         return result;
     }
     
-    private SynthesisResult PerformSynthesis(object pet1, object pet2, PetSynthesisRecipe recipe, SynthesisType type, float successRate)
+    private PetSynthesisData.SynthesisResult PerformSynthesis(object pet1, object pet2, PetSynthesisRecipe recipe, PetSynthesisData.SynthesisType type, float successRate)
     {
         // Roll for rarity
         var resultRarity = PetSynthesisDatabase.Instance.RollRarity(successRate);
         
-        if (resultRarity == SynthesisResult.Failure)
+        if (resultRarity == PetSynthesisData.SynthesisResult.Failure)
         {
             // Remove pets on failure
             if (_petManager != null)
@@ -165,7 +165,7 @@ public class PetSynthesisSystem : BaseSystem
                 _petManager.RemovePet(_data.SynthesisPet1Id);
                 _petManager.RemovePet(_data.SynthesisPet2Id);
             }
-            return SynthesisResult.Failure;
+            return PetSynthesisData.SynthesisResult.Failure;
         }
         
         // Determine result pet
@@ -203,33 +203,33 @@ public class PetSynthesisSystem : BaseSystem
         return resultRarity;
     }
     
-    private SynthesisType GetRandomSynthesisType(object pet1, object pet2)
+    private PetSynthesisData.SynthesisType GetRandomPetSynthesisData.SynthesisType(object pet1, object pet2)
     {
         var random = new Random();
-        var types = Enum.GetValues(typeof(SynthesisType));
-        return (SynthesisType)types.GetValue(random.Next(types.Length));
+        var types = Enum.GetValues(typeof(PetSynthesisData.SynthesisType));
+        return (PetSynthesisData.SynthesisType)types.GetValue(random.Next(types.Length));
     }
     
-    private void ApplyRarityBonus(object pet, SynthesisResult rarity)
+    private void ApplyRarityBonus(object pet, PetSynthesisData.SynthesisResult rarity)
     {
         // Apply stat bonuses based on rarity
         float bonusMultiplier = 1.0f;
         
         switch (rarity)
         {
-            case SynthesisResult.Common:
+            case PetSynthesisData.SynthesisResult.Common:
                 bonusMultiplier = 1.0f;
                 break;
-            case SynthesisResult.Uncommon:
+            case PetSynthesisData.SynthesisResult.Uncommon:
                 bonusMultiplier = 1.2f;
                 break;
-            case SynthesisResult.Rare:
+            case PetSynthesisData.SynthesisResult.Rare:
                 bonusMultiplier = 1.4f;
                 break;
-            case SynthesisResult.Epic:
+            case PetSynthesisData.SynthesisResult.Epic:
                 bonusMultiplier = 1.7f;
                 break;
-            case SynthesisResult.Legendary:
+            case PetSynthesisData.SynthesisResult.Legendary:
                 bonusMultiplier = 2.0f;
                 break;
         }

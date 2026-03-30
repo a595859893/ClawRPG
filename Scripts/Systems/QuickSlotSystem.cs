@@ -1,6 +1,8 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.UI;
+using ClawRPG.Scripts.Items;
 
 /// <summary>
 /// 快速栏数据 - 定义一个快捷栏槽位的配置

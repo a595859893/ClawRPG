@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ClawRPG")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4d0fe07c2e889cdc3244fde92cd53dbaebc58676")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4801c9d8b7e600c91ba11063fb9111b8409ed5b4")]
 [assembly: System.Reflection.AssemblyProductAttribute("ClawRPG")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ClawRPG")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

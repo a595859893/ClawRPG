@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.UI;
 
 public partial class TradeUI : Control {
     private static TradeUI Instance { get; set; }

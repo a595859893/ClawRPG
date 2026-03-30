@@ -22,7 +22,7 @@ public class PetSynthesisDatabase
     public Dictionary<string, List<string>> ElementalCombinations = new Dictionary<string, List<string>>();
     
     // Rarity weights for synthesis
-    public Dictionary<SynthesisResult, float> RarityWeights = new Dictionary<SynthesisResult, float>();
+    public Dictionary<PetSynthesisData.SynthesisResult, float> RarityWeights = new Dictionary<PetSynthesisData.SynthesisResult, float>();
     
     public PetSynthesisDatabase()
     {
@@ -42,11 +42,11 @@ public class PetSynthesisDatabase
             Pet1Type = "FireWolf",
             Pet2Type = "FireWolf",
             ResultPetType = "InfernoWolf",
-            ResultRarity = SynthesisResult.Rare,
+            ResultRarity = PetSynthesisData.SynthesisResult.Rare,
             RequiredLevel = 10,
             GoldCost = 1000,
             SuccessRate = 0.5f,
-            SynthesisType = SynthesisType.ElementalFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.ElementalFusion
         });
         
         Recipes.Add(new PetSynthesisRecipe
@@ -57,11 +57,11 @@ public class PetSynthesisDatabase
             Pet1Type = "FirePet",
             Pet2Type = "WaterPet",
             ResultPetType = "SteamDragon",
-            ResultRarity = SynthesisResult.Epic,
+            ResultRarity = PetSynthesisData.SynthesisResult.Epic,
             RequiredLevel = 15,
             GoldCost = 1500,
             SuccessRate = 0.35f,
-            SynthesisType = SynthesisType.ElementalFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.ElementalFusion
         });
         
         Recipes.Add(new PetSynthesisRecipe
@@ -72,11 +72,11 @@ public class PetSynthesisDatabase
             Pet1Type = "IcePet",
             Pet2Type = "FirePet",
             ResultPetType = "ThermalElemental",
-            ResultRarity = SynthesisResult.Rare,
+            ResultRarity = PetSynthesisData.SynthesisResult.Rare,
             RequiredLevel = 12,
             GoldCost = 1200,
             SuccessRate = 0.4f,
-            SynthesisType = SynthesisType.ElementalFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.ElementalFusion
         });
         
         Recipes.Add(new PetSynthesisRecipe
@@ -87,11 +87,11 @@ public class PetSynthesisDatabase
             Pet1Type = "LightningPet",
             Pet2Type = "WaterPet",
             ResultPetType = "StormSerpent",
-            ResultRarity = SynthesisResult.Epic,
+            ResultRarity = PetSynthesisData.SynthesisResult.Epic,
             RequiredLevel = 18,
             GoldCost = 2000,
             SuccessRate = 0.3f,
-            SynthesisType = SynthesisType.ElementalFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.ElementalFusion
         });
         
         // Beast Fusion Recipes
@@ -103,11 +103,11 @@ public class PetSynthesisDatabase
             Pet1Type = "Wolf",
             Pet2Type = "Wolf",
             ResultPetType = "AlphaWolf",
-            ResultRarity = SynthesisResult.Uncommon,
+            ResultRarity = PetSynthesisData.SynthesisResult.Uncommon,
             RequiredLevel = 5,
             GoldCost = 500,
             SuccessRate = 0.6f,
-            SynthesisType = SynthesisType.BeastFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.BeastFusion
         });
         
         Recipes.Add(new PetSynthesisRecipe
@@ -118,11 +118,11 @@ public class PetSynthesisDatabase
             Pet1Type = "Bear",
             Pet2Type = "Wolf",
             ResultPetType = "FenrisBear",
-            ResultRarity = SynthesisResult.Rare,
+            ResultRarity = PetSynthesisData.SynthesisResult.Rare,
             RequiredLevel = 12,
             GoldCost = 1500,
             SuccessRate = 0.4f,
-            SynthesisType = SynthesisType.BeastFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.BeastFusion
         });
         
         // Mythical Fusion Recipes
@@ -134,11 +134,11 @@ public class PetSynthesisDatabase
             Pet1Type = "Dragon",
             Pet2Type = "Dragon",
             ResultPetType = "ElderDragon",
-            ResultRarity = SynthesisResult.Legendary,
+            ResultRarity = PetSynthesisData.SynthesisResult.Legendary,
             RequiredLevel = 25,
             GoldCost = 5000,
             SuccessRate = 0.15f,
-            SynthesisType = SynthesisType.MythicalFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.MythicalFusion
         });
         
         Recipes.Add(new PetSynthesisRecipe
@@ -149,11 +149,11 @@ public class PetSynthesisDatabase
             Pet1Type = "Phoenix",
             Pet2Type = "Dragon",
             ResultPetType = "SolarPhoenix",
-            ResultRarity = SynthesisResult.Legendary,
+            ResultRarity = PetSynthesisData.SynthesisResult.Legendary,
             RequiredLevel = 30,
             GoldCost = 8000,
             SuccessRate = 0.1f,
-            SynthesisType = SynthesisType.MythicalFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.MythicalFusion
         });
         
         // Shadow Fusion Recipes
@@ -165,11 +165,11 @@ public class PetSynthesisDatabase
             Pet1Type = "ShadowPet",
             Pet2Type = "ShadowPet",
             ResultPetType = "VoidWalker",
-            ResultRarity = SynthesisResult.Epic,
+            ResultRarity = PetSynthesisData.SynthesisResult.Epic,
             RequiredLevel = 20,
             GoldCost = 3000,
             SuccessRate = 0.25f,
-            SynthesisType = SynthesisType.ShadowFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.ShadowFusion
         });
         
         // Celestial Fusion Recipes
@@ -181,11 +181,11 @@ public class PetSynthesisDatabase
             Pet1Type = "CelestialPet",
             Pet2Type = "CelestialPet",
             ResultPetType = "DivineGuardian",
-            ResultRarity = SynthesisResult.Legendary,
+            ResultRarity = PetSynthesisData.SynthesisResult.Legendary,
             RequiredLevel = 28,
             GoldCost = 6000,
             SuccessRate = 0.12f,
-            SynthesisType = SynthesisType.CelestialFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.CelestialFusion
         });
         
         // Chaos Fusion Recipes
@@ -197,11 +197,11 @@ public class PetSynthesisDatabase
             Pet1Type = "ChaosPet",
             Pet2Type = "ChaosPet",
             ResultPetType = "ChaosLord",
-            ResultRarity = SynthesisResult.Legendary,
+            ResultRarity = PetSynthesisData.SynthesisResult.Legendary,
             RequiredLevel = 30,
             GoldCost = 10000,
             SuccessRate = 0.08f,
-            SynthesisType = SynthesisType.ChaosFusion
+            PetSynthesisData.SynthesisType = PetSynthesisData.SynthesisType.ChaosFusion
         });
     }
     
@@ -218,12 +218,12 @@ public class PetSynthesisDatabase
     
     private void InitializeRarityWeights()
     {
-        RarityWeights[SynthesisResult.Failure] = 0.15f;
-        RarityWeights[SynthesisResult.Common] = 0.30f;
-        RarityWeights[SynthesisResult.Uncommon] = 0.25f;
-        RarityWeights[SynthesisResult.Rare] = 0.18f;
-        RarityWeights[SynthesisResult.Epic] = 0.09f;
-        RarityWeights[SynthesisResult.Legendary] = 0.03f;
+        RarityWeights[PetSynthesisData.SynthesisResult.Failure] = 0.15f;
+        RarityWeights[PetSynthesisData.SynthesisResult.Common] = 0.30f;
+        RarityWeights[PetSynthesisData.SynthesisResult.Uncommon] = 0.25f;
+        RarityWeights[PetSynthesisData.SynthesisResult.Rare] = 0.18f;
+        RarityWeights[PetSynthesisData.SynthesisResult.Epic] = 0.09f;
+        RarityWeights[PetSynthesisData.SynthesisResult.Legendary] = 0.03f;
     }
     
     public PetSynthesisRecipe GetRecipe(string pet1Type, string pet2Type)
@@ -239,12 +239,12 @@ public class PetSynthesisDatabase
         return null;
     }
     
-    public List<PetSynthesisRecipe> GetRecipesByType(SynthesisType type)
+    public List<PetSynthesisRecipe> GetRecipesByType(PetSynthesisData.SynthesisType type)
     {
         var result = new List<PetSynthesisRecipe>();
         foreach (var recipe in Recipes)
         {
-            if (recipe.SynthesisType == type)
+            if (recipe.PetSynthesisData.SynthesisType == type)
                 result.Add(recipe);
         }
         return result;
@@ -261,7 +261,7 @@ public class PetSynthesisDatabase
         return result;
     }
     
-    public SynthesisResult RollRarity(float successRate)
+    public PetSynthesisData.SynthesisResult RollRarity(float successRate)
     {
         var random = new Random();
         float roll = (float)random.NextDouble();
@@ -269,7 +269,7 @@ public class PetSynthesisDatabase
         // If synthesis failed
         if (roll > successRate)
         {
-            return SynthesisResult.Failure;
+            return PetSynthesisData.SynthesisResult.Failure;
         }
         
         // Roll for rarity among successful outcomes
@@ -278,16 +278,16 @@ public class PetSynthesisDatabase
         
         foreach (var kvp in RarityWeights)
         {
-            if (kvp.Key == SynthesisResult.Failure) continue;
+            if (kvp.Key == PetSynthesisData.SynthesisResult.Failure) continue;
             cumulative += kvp.Value;
             if (rarityRoll <= cumulative)
                 return kvp.Key;
         }
         
-        return SynthesisResult.Common;
+        return PetSynthesisData.SynthesisResult.Common;
     }
     
-    public string GetRandomResultPet(SynthesisResult rarity, SynthesisType type)
+    public string GetRandomResultPet(PetSynthesisData.SynthesisResult rarity, PetSynthesisData.SynthesisType type)
     {
         var random = new Random();
         
@@ -295,106 +295,106 @@ public class PetSynthesisDatabase
         
         switch (type)
         {
-            case SynthesisType.ElementalFusion:
+            case PetSynthesisData.SynthesisType.ElementalFusion:
                 switch (rarity)
                 {
-                    case SynthesisResult.Common:
+                    case PetSynthesisData.SynthesisResult.Common:
                         candidates = new List<string> { "FlameSpirit", "WaterSprite", "IceShard", "SparkElemental" };
                         break;
-                    case SynthesisResult.Uncommon:
+                    case PetSynthesisData.SynthesisResult.Uncommon:
                         candidates = new List<string> { "MagmaGuardian", "TideLord", "FrostWyrm", "ThunderSpirit" };
                         break;
-                    case SynthesisResult.Rare:
+                    case PetSynthesisData.SynthesisResult.Rare:
                         candidates = new List<string> { "InfernoBeast", "AbyssalKraken", "BlizzardGiant", "StormTitan" };
                         break;
-                    case SynthesisResult.Epic:
+                    case PetSynthesisData.SynthesisResult.Epic:
                         candidates = new List<string> { "SteamDragon", "ThermalElemental", "StormSerpent" };
                         break;
-                    case SynthesisResult.Legendary:
+                    case PetSynthesisData.SynthesisResult.Legendary:
                         candidates = new List<string> { "SolarPhoenix", "CosmicLeviathan" };
                         break;
                 }
                 break;
                 
-            case SynthesisType.BeastFusion:
+            case PetSynthesisData.SynthesisType.BeastFusion:
                 switch (rarity)
                 {
-                    case SynthesisResult.Common:
+                    case PetSynthesisData.SynthesisResult.Common:
                         candidates = new List<string> { "WildCat", "DireWolf", "ForestBear" };
                         break;
-                    case SynthesisResult.Uncommon:
+                    case PetSynthesisData.SynthesisResult.Uncommon:
                         candidates = new List<string> { "AlphaWolf", "IronBear", "ShadowHound" };
                         break;
-                    case SynthesisResult.Rare:
+                    case PetSynthesisData.SynthesisResult.Rare:
                         candidates = new List<string> { "FenrisBear", "Nightstalker", "TitanBeast" };
                         break;
-                    case SynthesisResult.Epic:
+                    case PetSynthesisData.SynthesisResult.Epic:
                         candidates = new List<string> { "AncientTitan", "PhantomBeast" };
                         break;
-                    case SynthesisResult.Legendary:
+                    case PetSynthesisData.SynthesisResult.Legendary:
                         candidates = new List<string> { "PrimordialBeast", "WorldEater" };
                         break;
                 }
                 break;
                 
-            case SynthesisType.MythicalFusion:
+            case PetSynthesisData.SynthesisType.MythicalFusion:
                 switch (rarity)
                 {
-                    case SynthesisResult.Rare:
+                    case PetSynthesisData.SynthesisResult.Rare:
                         candidates = new List<string> { "YoungDragon", "CelestialDrake" };
                         break;
-                    case SynthesisResult.Epic:
+                    case PetSynthesisData.SynthesisResult.Epic:
                         candidates = new List<string> { "ElderDragon", "PhoenixDrake" };
                         break;
-                    case SynthesisResult.Legendary:
+                    case PetSynthesisData.SynthesisResult.Legendary:
                         candidates = new List<string> { "SolarPhoenix", "CosmicDragon", "DivineBeast" };
                         break;
                 }
                 break;
                 
-            case SynthesisType.ShadowFusion:
+            case PetSynthesisData.SynthesisType.ShadowFusion:
                 switch (rarity)
                 {
-                    case SynthesisResult.Uncommon:
+                    case PetSynthesisData.SynthesisResult.Uncommon:
                         candidates = new List<string> { "DarkSprite", "ShadowWolf" };
                         break;
-                    case SynthesisResult.Rare:
+                    case PetSynthesisData.SynthesisResult.Rare:
                         candidates = new List<string> { "NightmareHound", "ShadowStalker" };
                         break;
-                    case SynthesisResult.Epic:
+                    case PetSynthesisData.SynthesisResult.Epic:
                         candidates = new List<string> { "VoidWalker", "AbyssalHunter" };
                         break;
-                    case SynthesisResult.Legendary:
+                    case PetSynthesisData.SynthesisResult.Legendary:
                         candidates = new List<string> { "LordOfShadows", "EternalDarkness" };
                         break;
                 }
                 break;
                 
-            case SynthesisType.CelestialFusion:
+            case PetSynthesisData.SynthesisType.CelestialFusion:
                 switch (rarity)
                 {
-                    case SynthesisResult.Rare:
+                    case PetSynthesisData.SynthesisResult.Rare:
                         candidates = new List<string> { "LightSpirit", "StarAngel" };
                         break;
-                    case SynthesisResult.Epic:
+                    case PetSynthesisData.SynthesisResult.Epic:
                         candidates = new List<string> { "CelestialGuardian", "RadiantSeraph" };
                         break;
-                    case SynthesisResult.Legendary:
+                    case PetSynthesisData.SynthesisResult.Legendary:
                         candidates = new List<string> { "DivineGuardian", "Archangel", "HeavenlyKnight" };
                         break;
                 }
                 break;
                 
-            case SynthesisType.ChaosFusion:
+            case PetSynthesisData.SynthesisType.ChaosFusion:
                 switch (rarity)
                 {
-                    case SynthesisResult.Rare:
+                    case PetSynthesisData.SynthesisResult.Rare:
                         candidates = new List<string> { "ChaosImp", "UnstableSpirit" };
                         break;
-                    case SynthesisResult.Epic:
+                    case PetSynthesisData.SynthesisResult.Epic:
                         candidates = new List<string> { "ChaosSpawn", "AnomalyEntity" };
                         break;
-                    case SynthesisResult.Legendary:
+                    case PetSynthesisData.SynthesisResult.Legendary:
                         candidates = new List<string> { "ChaosLord", "EntropyMaster", "RealityBreaker" };
                         break;
                 }
@@ -416,9 +416,9 @@ public class PetSynthesisRecipe
     public string Pet1Type { get; set; }
     public string Pet2Type { get; set; }
     public string ResultPetType { get; set; }
-    public SynthesisResult ResultRarity { get; set; }
+    public PetSynthesisData.SynthesisResult ResultRarity { get; set; }
     public int RequiredLevel { get; set; }
     public int GoldCost { get; set; }
     public float SuccessRate { get; set; }
-    public SynthesisType SynthesisType { get; set; }
+    public PetSynthesisData.SynthesisType PetSynthesisData.SynthesisType { get; set; }
 }

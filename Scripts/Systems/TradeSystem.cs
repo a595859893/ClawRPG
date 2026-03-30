@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.UI;
 
 /// <summary>
 /// Trade system that handles player-to-player item trading.
