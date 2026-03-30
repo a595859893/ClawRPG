@@ -20,10 +20,10 @@ public class MultiplayerManager : BaseSystem
     public LobbySystem Lobby { get; private set; }
     
     // 信号 - 委托给子系统
-    [Signal] public delegate void RoomCreatedEventHandler(string roomId);
-    [Signal] public delegate void RoomJoinedEventHandler(string roomId);
-    [Signal] public delegate void RoomLeftEventHandler();
-    [Signal] public delegate void ConnectionFailedEventHandler(string reason);
+    public delegate void RoomCreatedEventHandler(string roomId);
+    public delegate void RoomJoinedEventHandler(string roomId);
+    public delegate void RoomLeftEventHandler();
+    public delegate void ConnectionFailedEventHandler(string reason);
     
     // 兼容旧接口的属性
     public bool IsInRoom => Session?.IsInRoom ?? false;

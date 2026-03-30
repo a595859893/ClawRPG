@@ -14,10 +14,10 @@ public class RelicSystem : BaseSystem
     private PlayerRelicData _playerData = new();
     
     // 信号
-    [Signal] public delegate void RelicPurchased(string relicId);
-    [Signal] public delegate void RelicEquipped(string relicId);
-    [Signal] public delegate void RelicUnequipped(string relicId);
-    [Signal] public delegate void RelicSlotUnlocked(int newSlotCount);
+    public delegate void RelicPurchased(string relicId);
+    public delegate void RelicEquipped(string relicId);
+    public delegate void RelicUnequipped(string relicId);
+    public delegate void RelicSlotUnlocked(int newSlotCount);
     
     public override void _Ready()
     {

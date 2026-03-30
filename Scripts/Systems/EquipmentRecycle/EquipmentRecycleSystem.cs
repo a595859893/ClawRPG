@@ -41,11 +41,8 @@ namespace ClawRPG.Scripts.Systems.EquipmentRecycle
         private RecycleStats stats = new RecycleStats();
 
         // 信号
-        [Signal]
-        public delegate void RecycleCompletedEventHandler(string itemName, int goldReward, List<string> materials);
-
-        [Signal]
-        public delegate void RecycleFailedEventHandler(string reason);
+public delegate void RecycleCompletedEventHandler(string itemName, int goldReward, List<string> materials);
+public delegate void RecycleFailedEventHandler(string reason);
 
         public override void _Ready()
         {

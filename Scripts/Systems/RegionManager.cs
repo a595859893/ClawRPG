@@ -11,17 +11,11 @@ namespace ClawRPG.Scripts.Systems
     {
         public static RegionManager Instance { get; private set; }
 
-        [Signal]
-        [Signal]
-    public delegate void RegionChanged(string newRegionId, string regionName);
+        public delegate void RegionChanged(string newRegionId, string regionName);
 
-        [Signal]
-        [Signal]
-    public delegate void EnvironmentalDamage(float damage);
+        public delegate void EnvironmentalDamage(float damage);
 
-        [Signal]
-        [Signal]
-    public delegate void RegionEntryEffect(string regionId, Color effectColor);
+        public delegate void RegionEntryEffect(string regionId, Color effectColor);
 
         private RegionDatabase _regionDb;
         private Player _player;

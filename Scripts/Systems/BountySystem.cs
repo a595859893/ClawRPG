@@ -187,13 +187,13 @@ namespace ClawRPG.Scripts.Systems
 
         public List<Bounty> ActiveBounties { get; private set; } = new List<Bounty>();
         
-        // 信号系统
-        public Signal1<Bounty> OnBountyAccepted { get; } = new Signal1<Bounty>();
-        public Signal1<Bounty> OnBountyProgressUpdated { get; } = new Signal1<Bounty>();
-        public Signal1<Bounty> OnBountyCompleted { get; } = new Signal1<Bounty>();
-        public Signal1<Bounty> OnBountyClaimed { get; } = new Signal1<Bounty>();
-        public Signal1<Bounty> OnBountyExpired { get; } = new Signal1<Bounty>();
-        public Signal OnBountiesRefreshed { get; } = new Signal();
+        // 信号系统 (C# events, Godot 4 compatible)
+        public event Action<Bounty> OnBountyAccepted;
+        public event Action<Bounty> OnBountyProgressUpdated;
+        public event Action<Bounty> OnBountyCompleted;
+        public event Action<Bounty> OnBountyClaimed;
+        public event Action<Bounty> OnBountyExpired;
+        public event Action OnBountiesRefreshed;
 
         private int _maxActiveBounties = 3;
         private DateTime _lastRefreshTime;

@@ -279,6 +279,5 @@ public class DiceMasterSystem : BaseSystem
     }
     
     // Signal
-    [Signal]
-    public delegate void DiceRolled(int roll, int maxValue);
+public delegate void DiceRolled(int roll, int maxValue);
 }

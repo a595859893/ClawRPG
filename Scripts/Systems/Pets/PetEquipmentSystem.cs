@@ -14,10 +14,10 @@ namespace Game.Systems.Pets
         private PlayerPetEquipmentData _playerData = new PlayerPetEquipmentData();
         
         // 信号
-        [Signal] public delegate void EquipmentPurchased(string equipmentId);
-        [Signal] public delegate void EquipmentEquipped(string petId, string equipmentId);
-        [Signal] public delegate void EquipmentUnequipped(string petId, string equipmentId);
-        [Signal] public delegate void DataLoaded();
+        public delegate void EquipmentPurchased(string equipmentId);
+        public delegate void EquipmentEquipped(string petId, string equipmentId);
+        public delegate void EquipmentUnequipped(string petId, string equipmentId);
+        public delegate void DataLoaded();
         
         public override void _Ready()
         {

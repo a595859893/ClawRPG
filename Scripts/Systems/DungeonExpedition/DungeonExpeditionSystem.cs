@@ -473,17 +473,10 @@ public partial class DungeonExpeditionSystem : BaseSystem
     }
 
     // Signals
-    [Signal]
-    public delegate void ExpeditionStartedEventHandler(int dungeonType, int difficulty);
-    
-    [Signal]
-    public delegate void FloorCompletedEventHandler(int currentFloor, int maxFloor);
-    
-    [Signal]
-    public delegate void ExpeditionCompletedEventHandler(int dungeonType, int success, int gold, int exp);
-    
-    [Signal]
-    public delegate void ExpeditionAbandonedEventHandler(int dungeonType);
+public delegate void ExpeditionStartedEventHandler(int dungeonType, int difficulty);
+public delegate void FloorCompletedEventHandler(int currentFloor, int maxFloor);
+public delegate void ExpeditionCompletedEventHandler(int dungeonType, int success, int gold, int exp);
+public delegate void ExpeditionAbandonedEventHandler(int dungeonType);
 
     // ===== 持久化方法 =====
 

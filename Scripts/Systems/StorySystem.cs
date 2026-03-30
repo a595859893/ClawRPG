@@ -300,21 +300,11 @@ namespace ClawRPG.Scripts.Systems {
 
     public class StoryManager : BaseSystem {
         public static StoryManager Instance { get; private set; }
-        
-        [Signal]
-        public delegate void ChapterUnlocked(StoryChapter chapter);
-        
-        [Signal]
-        public delegate void ChapterCompleted(StoryChapter chapter);
-        
-        [Signal]
-        public delegate void ObjectiveProgressUpdated(StoryObjective objective);
-        
-        [Signal]
-        public delegate void ObjectiveCompleted(StoryObjective objective);
-        
-        [Signal]
-        public delegate void RewardClaimed(StoryReward reward);
+public delegate void ChapterUnlocked(StoryChapter chapter);
+public delegate void ChapterCompleted(StoryChapter chapter);
+public delegate void ObjectiveProgressUpdated(StoryObjective objective);
+public delegate void ObjectiveCompleted(StoryObjective objective);
+public delegate void RewardClaimed(StoryReward reward);
         
         private StoryDatabase database;
         private int currentChapterId = 1;

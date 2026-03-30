@@ -25,15 +25,15 @@ public partial class GuildSystem : BaseSystem {
     public List<GuildAnnouncement> Announcements { get; private set; } = new List<GuildAnnouncement>();
 
     // 信号
-    [Signal] public delegate void GuildCreatedEventHandler(GuildData guild);
-    [Signal] public delegate void GuildJoinedEventHandler(GuildData guild);
-    [Signal] public delegate void GuildLeftEventHandler();
-    [Signal] public delegate void MemberJoinedEventHandler(GuildMember member);
-    [Signal] public delegate void MemberLeftEventHandler(string playerId);
-    [Signal] public delegate void GuildLevelUpEventHandler(int newLevel);
-    [Signal] public delegate void ContributionChangedEventHandler(int newContribution);
-    [Signal] public delegate void ApplicationReceivedEventHandler(GuildApplication app);
-    [Signal] public delegate void ApplicationProcessedEventHandler(string applicationId, bool accepted);
+    public delegate void GuildCreatedEventHandler(GuildData guild);
+    public delegate void GuildJoinedEventHandler(GuildData guild);
+    public delegate void GuildLeftEventHandler();
+    public delegate void MemberJoinedEventHandler(GuildMember member);
+    public delegate void MemberLeftEventHandler(string playerId);
+    public delegate void GuildLevelUpEventHandler(int newLevel);
+    public delegate void ContributionChangedEventHandler(int newContribution);
+    public delegate void ApplicationReceivedEventHandler(GuildApplication app);
+    public delegate void ApplicationProcessedEventHandler(string applicationId, bool accepted);
 
     // 公会公告
     public class GuildAnnouncement {

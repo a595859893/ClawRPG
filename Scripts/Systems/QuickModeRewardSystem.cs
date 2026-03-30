@@ -19,9 +19,9 @@ public class QuickModeRewardSystem : BaseSystem
     private int _consecutiveQuickWins = 0;
 
     // 信号系统
-    [Signal] public delegate void QuickModeRewardGranted(int gold, int exp, string rewardType);
-    [Signal] public delegate void QuickModeAchievementUnlocked(string achievementId);
-    [Signal] public delegate void QuickModeStatsUpdated(string statName, int value);
+    public delegate void QuickModeRewardGranted(int gold, int exp, string rewardType);
+    public delegate void QuickModeAchievementUnlocked(string achievementId);
+    public delegate void QuickModeStatsUpdated(string statName, int value);
 
     public override void _Ready()
     {

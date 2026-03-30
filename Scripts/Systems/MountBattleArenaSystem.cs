@@ -18,14 +18,14 @@ public partial class MountBattleArenaSystem : BaseSystem
         }
     }
     
-    // 信号系统
-    public static Signal1<string> OnBattleStarted { get; } = new Signal1<string>();
-    public static Signal1<string> OnBattleEnded { get; } = new Signal1<string>();
-    public static Signal2<string, bool> OnBattleCompleted { get; } = new Signal2<string, bool>(); // arenaId, victory
-    public static Signal2<int, int> OnWaveStarted { get; } = new Signal2<int, int>(); // currentWave, totalWaves
-    public static Signal1<int> OnWaveCompleted { get; } = new Signal1<int>(); // waveNumber
-    public static Signal0 OnBattleVictory { get; } = new Signal0();
-    public static Signal0 OnBattleDefeat { get; } = new Signal0();
+    // 信号系统 (C# events, Godot 4 compatible)
+    public static event Action<string> OnBattleStarted;
+    public static event Action<string> OnBattleEnded;
+    public static event Action<string, bool> OnBattleCompleted; // arenaId, victory
+    public static event Action<int, int> OnWaveStarted; // currentWave, totalWaves
+    public static event Action<int> OnWaveCompleted; // waveNumber
+    public static event Action OnBattleVictory;
+    public static event Action OnBattleDefeat;
     
     private MountBattleArenaData.MountBattleInstance _currentBattle;
     private MountBattleArenaData.PlayerMountArenaData _playerData;

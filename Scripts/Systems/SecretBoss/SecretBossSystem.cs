@@ -45,17 +45,10 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
         private int _totalDropsCollected = 0;
         
         // 信号
-        [Signal]
-        public delegate void BossSpawned(SecretBossData boss, Vector3 position);
-        
-        [Signal]
-        public delegate void BossDefeated(SecretBossData boss);
-        
-        [Signal]
-        public delegate void BossConditionMet(SecretBossData boss);
-        
-        [Signal]
-        public delegate void DropCollected(string itemId, int quantity);
+public delegate void BossSpawned(SecretBossData boss, Vector3 position);
+public delegate void BossDefeated(SecretBossData boss);
+public delegate void BossConditionMet(SecretBossData boss);
+public delegate void DropCollected(string itemId, int quantity);
         
         public override void _Ready() {
             base._Ready();

@@ -52,14 +52,9 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         private const float OWNER_ATTACK_COOLDOWN = 1f; // 主人攻击后1秒窗口
 
         // ── Signals ─────────────────────────────────────────────────────────
-        [Signal]
-        public delegate void MimicrySkillUsedEventHandler(PlayerBehaviorType skillType, MimicrySkillType mimSkill, Vector2 worldPosition);
-
-        [Signal]
-        public delegate void MimicrySkillLearnedEventHandler(PlayerBehaviorType behavior, int newLevel);
-
-        [Signal]
-        public delegate void MimicrySkillReadyEventHandler(PlayerBehaviorType skillType, bool isReady);
+public delegate void MimicrySkillUsedEventHandler(PlayerBehaviorType skillType, MimicrySkillType mimSkill, Vector2 worldPosition);
+public delegate void MimicrySkillLearnedEventHandler(PlayerBehaviorType behavior, int newLevel);
+public delegate void MimicrySkillReadyEventHandler(PlayerBehaviorType skillType, bool isReady);
 
         public override void _Ready()
         {

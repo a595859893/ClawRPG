@@ -51,14 +51,14 @@ namespace ClawRPG.Scripts.Systems
         private string _localPlayerName = "Player";
         
         // 信号
-        [Signal] public delegate void LobbyJoinedEventHandler(string lobbyId);
-        [Signal] public delegate void LobbyLeftEventHandler();
-        [Signal] public delegate void PlayerJoinedLobbyEventHandler(int playerId, string playerName);
-        [Signal] public delegate void PlayerLeftLobbyEventHandler(int playerId);
-        [Signal] public delegate void PlayerReadyEventHandler(int playerId, bool isReady);
-        [Signal] public delegate void HostChangedEventHandler(int newHostId);
-        [Signal] public delegate void LobbyFullEventHandler();
-        [Signal] public delegate void LobbyErrorEventHandler(string error);
+        public delegate void LobbyJoinedEventHandler(string lobbyId);
+        public delegate void LobbyLeftEventHandler();
+        public delegate void PlayerJoinedLobbyEventHandler(int playerId, string playerName);
+        public delegate void PlayerLeftLobbyEventHandler(int playerId);
+        public delegate void PlayerReadyEventHandler(int playerId, bool isReady);
+        public delegate void HostChangedEventHandler(int newHostId);
+        public delegate void LobbyFullEventHandler();
+        public delegate void LobbyErrorEventHandler(string error);
         
         public bool IsInLobby => _isInLobby;
         public bool IsHost => _isLobbyHost;

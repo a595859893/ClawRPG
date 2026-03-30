@@ -29,12 +29,9 @@ namespace ClawRPG.Systems {
         private Dictionary<string, List<MailData>> _mailBox = new Dictionary<string, List<MailData>>();
         
         // 信号系统
-        [Signal]
-    public delegate void MailReceived(string playerId, int unreadCount);
-        [Signal]
-    public delegate void MailDeleted(string playerId);
-        [Signal]
-    public delegate void MailSent(bool success, string message);
+public delegate void MailReceived(string playerId, int unreadCount);
+public delegate void MailDeleted(string playerId);
+public delegate void MailSent(bool success, string message);
 
         public override void _Ready() {
             Instance = this;

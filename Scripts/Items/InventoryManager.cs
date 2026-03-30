@@ -38,11 +38,7 @@ namespace ClawRPG.Scripts.Items
     public class InventoryManager : BaseSystem
     {
         public static InventoryManager Instance { get; private set; }
-
-        [Signal]
         public Action InventoryUpdated;
-
-        [Signal]
         public Action ItemUsed;
 
         [Export]

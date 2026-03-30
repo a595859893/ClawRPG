@@ -22,17 +22,9 @@ public class MountRaceSystem : BaseSystem
 	}
 
 	public static SignalContainer.Signals Signals { get; } = new SignalContainer.Signals();
-
-	[Signal]
 	public Action RaceStarted;
-
-	[Signal]
 	public Action RaceFinished;
-
-	[Signal]
 	public Action CheckpointReached;
-
-	[Signal]
 	public Action RacePositionUpdate;
 
 	private MountRaceData.RaceState _currentState = MountRaceData.RaceState.Waiting;

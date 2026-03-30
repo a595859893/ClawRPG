@@ -90,12 +90,9 @@ namespace ClawRPG.Scripts.Systems {
         public static BookmarkSystem Instance { get; private set; }
         
         // Signals for bookmark events
-        [Signal] [Signal]
-    public delegate void OnBookmarkAdded(Bookmark bookmark);
-        [Signal] [Signal]
-    public delegate void OnBookmarkRemoved(int bookmarkId);
-        [Signal] [Signal]
-    public delegate void OnBookmarkUpdated(Bookmark bookmark);
+        [Signal] public delegate void OnBookmarkAdded(Bookmark bookmark);
+        [Signal] public delegate void OnBookmarkRemoved(int bookmarkId);
+        [Signal] public delegate void OnBookmarkUpdated(Bookmark bookmark);
         
         // Player's bookmarks
         public List<Bookmark> PlayerBookmarks { get; private set; } = new();

@@ -35,22 +35,11 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         private float _focusBonus = 0f;
         
         // 事件信号
-        [Signal]
         public Action EnchantmentStarted;
-        
-        [Signal]
         public Action EnchantmentCompleted;
-        
-        [Signal]
         public Action EnchantmentSuccess;
-        
-        [Signal]
         public Action EnchantmentFailed;
-        
-        [Signal]
         public Action EnchantmentUnlocked;
-        
-        [Signal]
         public Action FocusPointsChanged;
         
         public override void _Ready()

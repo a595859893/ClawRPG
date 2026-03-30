@@ -33,13 +33,11 @@ public partial class ContributionTracker : BaseSystem
     /// <summary>贡献更新信号</summary>
     /// <param name="playerId">玩家ID</param>
     /// <param name="contribution">贡献数据</param>
-    [Signal]
-    public delegate void ContributionUpdatedEventHandler(int playerId, PlayerContribution contribution);
+public delegate void ContributionUpdatedEventHandler(int playerId, PlayerContribution contribution);
     
     /// <summary>收益分配完成信号</summary>
     /// <param name="results">分配结果</param>
-    [Signal]
-    public delegate void RewardsDistributedEventHandler(Array results);
+public delegate void RewardsDistributedEventHandler(Array results);
 
     #endregion
 

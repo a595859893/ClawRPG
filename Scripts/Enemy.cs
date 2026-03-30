@@ -417,9 +417,7 @@ namespace ClawRPG.Scripts.Characters {
             EmitSignal(nameof(PatternRecognized), comboId, threatLevel);
             GD.Print($"{EnemyName} recognized combo pattern: {comboId} (threat: {threatLevel:F2})");
         }
-        
-        [Signal]
-        public delegate void PatternRecognizedEventHandler(string comboId, float threatLevel);
+public delegate void PatternRecognizedEventHandler(string comboId, float threatLevel);
         
         // === End Counter Mode ===
         

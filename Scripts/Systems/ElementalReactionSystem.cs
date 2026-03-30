@@ -39,11 +39,8 @@ public class ElementalReactionSystem : BaseSystem
     public Dictionary<ReactionType, int> ReactionCountByType { get; private set; } = new Dictionary<ReactionType, int>();
 
     // 信号
-    [Signal]
     public Action<ReactionType, ElementType, ElementType, float> reaction_triggered;
-    [Signal]
     public Action<NodeId, ElementType, float> element_applied;
-    [Signal]
     public Action<NodeId, string, float> stat_changed;
 
     public override void _Ready()

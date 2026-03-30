@@ -28,11 +28,8 @@ namespace ClawRPG.Scripts.Systems
         private float? _spawnChanceOverride;
         
         // Signal for elite spawn
-        [Signal]
-        public delegate void EliteSpawnedEventHandler(int instanceId, string eliteType, string tier);
-        
-        [Signal]
-        public delegate void EliteDefeatedEventHandler(int instanceId, string eliteType, int goldBonus, int expBonus);
+public delegate void EliteSpawnedEventHandler(int instanceId, string eliteType, string tier);
+public delegate void EliteDefeatedEventHandler(int instanceId, string eliteType, int goldBonus, int expBonus);
         
         public override void _Ready()
         {

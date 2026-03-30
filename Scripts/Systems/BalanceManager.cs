@@ -15,11 +15,7 @@ namespace ClawRPG.Scripts.Systems {
         private bool _configLoaded = false; 
 
         // 信号系统
-        [Signal]
-        public static void ConfigReloaded() { }
         
-        [Signal]
-        public static void BalanceChanged(string category, string parameter, float oldValue, float newValue) { }
 
         public override void _Ready() {
             Instance = this;

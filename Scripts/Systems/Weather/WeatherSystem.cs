@@ -135,10 +135,10 @@ public class WeatherSystem : BaseSystem
     private PlayerWeatherData player_data;
     
     // Signals
-    [Signal] public delegate void WeatherChanged(WeatherType old_type, WeatherType new_type);
-    [Signal] public delegate void WeatherIntensityChanged(WeatherIntensity intensity);
-    [Signal] public delegate void WeatherTransitionStarted(WeatherType from, WeatherType to);
-    [Signal] public delegate void WeatherTransitionEnded(WeatherType new_weather);
+    public delegate void WeatherChanged(WeatherType old_type, WeatherType new_type);
+    public delegate void WeatherIntensityChanged(WeatherIntensity intensity);
+    public delegate void WeatherTransitionStarted(WeatherType from, WeatherType to);
+    public delegate void WeatherTransitionEnded(WeatherType new_weather);
     
     public override void _Ready()
     {

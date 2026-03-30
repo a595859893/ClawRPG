@@ -31,7 +31,7 @@ namespace ClawRPG.Scripts.UI {
         // 饰品外观数据库
         private Dictionary<string, AccessoryVisual> _accessoryVisuals = new Dictionary<string, AccessoryVisual>();
 
-        [Signal] public delegate void OnVisualChanged(string slot, string visualId);
+        public delegate void OnVisualChanged(string slot, string visualId);
 
         public override void _Ready() {
             Instance = this;

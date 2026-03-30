@@ -8,14 +8,6 @@ public class DailyLoginBonusSystem : BaseSystem
     private DailyLoginBonusDatabase _database;
     
     // 事件信号
-    [Signal]
-    public void BonusClaimed(int day, int gold, int exp, int diamonds);
-    
-    [Signal]
-    public void StreakUpdated(int newStreak, int bestStreak);
-    
-    [Signal]
-    public void MonthlyBonusClaimed(int cumulativeDays);
     
     public override void _Ready()
     {

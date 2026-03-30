@@ -23,9 +23,9 @@ namespace ClawRPG.Scripts.Systems
         private Random _random = new Random();
         
         // Signals
-        [Signal] public delegate void BossSpawnedEventHandler(WorldBossData.ActiveWorldBoss boss);
-        [Signal] public delegate void BossEscapedEventHandler(WorldBossData.ActiveWorldBoss boss);
-        [Signal] public delegate void BossDefeatedEventHandler(WorldBossData.ActiveWorldBoss boss);
+        public delegate void BossSpawnedEventHandler(WorldBossData.ActiveWorldBoss boss);
+        public delegate void BossEscapedEventHandler(WorldBossData.ActiveWorldBoss boss);
+        public delegate void BossDefeatedEventHandler(WorldBossData.ActiveWorldBoss boss);
         
         public override void _Ready()
         {

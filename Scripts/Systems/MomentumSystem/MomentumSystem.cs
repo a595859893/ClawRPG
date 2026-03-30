@@ -6,18 +6,6 @@ public partial class MomentumSystem : BaseSystem
 {
     public static MomentumSystem Instance { get; private set; }
     
-    [Signal]
-    public void MomentumChanged(MomentumData.MomentumType type, MomentumData.MomentumState state, int level);
-    
-    [Signal]
-    public void MomentumCharged(MomentumData.MomentumType type);
-    
-    [Signal]
-    public void MomentumOvercharged(MomentumData.MomentumType type);
-    
-    [Signal]
-    public void MomentumLost(MomentumData.MomentumType type);
-    
     private MomentumData.PlayerMomentumData _playerData;
     private Dictionary<MomentumData.MomentumType, MomentumData.MomentumInstance> _activeMomenta;
     private bool _isInitialized = false;

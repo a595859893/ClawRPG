@@ -21,12 +21,9 @@ namespace ClawRPG.Scripts.Systems
         private int _totalExpEarned = 0;
         
         // Signals
-        [Signal]
-    public delegate void OnAchievementProgress(string achievementId, int progress, int condition);
-        [Signal]
-    public delegate void OnAchievementDiscovered(string achievementId, int goldReward, int expReward);
-        [Signal]
-    public delegate void OnSecretCategoryComplete(SecretAchievementCategory category, int discovered, int total);
+public delegate void OnAchievementProgress(string achievementId, int progress, int condition);
+public delegate void OnAchievementDiscovered(string achievementId, int goldReward, int expReward);
+public delegate void OnSecretCategoryComplete(SecretAchievementCategory category, int discovered, int total);
 
         public int TotalDiscovered => _totalDiscovered;
         public int TotalGoldEarned => _totalGoldEarned;

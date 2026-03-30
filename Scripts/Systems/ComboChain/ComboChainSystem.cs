@@ -29,17 +29,10 @@ public class ComboChainSystem : BaseSystem
     private List<ChainBonusConfig> _activeBonuses = new List<ChainBonusConfig>();
     
     // 事件信号
-    [Signal]
-    public delegate void ChainStarted(int chainCount);
-    
-    [Signal]
-    public delegate void ChainEnded(int maxChain, float totalDamage);
-    
-    [Signal]
-    public delegate void ChainBonusActivated(int chainRequired, string effectName);
-    
-    [Signal]
-    public delegate void ComboLevelUp(int newLevel, string levelName);
+public delegate void ChainStarted(int chainCount);
+public delegate void ChainEnded(int maxChain, float totalDamage);
+public delegate void ChainBonusActivated(int chainRequired, string effectName);
+public delegate void ComboLevelUp(int newLevel, string levelName);
     
     public override void _Ready()
     {

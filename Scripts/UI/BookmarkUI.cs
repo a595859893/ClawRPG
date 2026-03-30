@@ -37,8 +37,7 @@ namespace ClawRPG.Scripts.UI {
         private BookmarkCategory? _currentFilter = null;
         
         // Signal for when player wants to travel to a bookmark
-        [Signal] [Signal]
-    public delegate void OnTravelToBookmark(Bookmark bookmark);
+        [Signal] public delegate void OnTravelToBookmark(Bookmark bookmark);
         
         public override void _Ready() {
             SetupUI();

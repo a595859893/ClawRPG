@@ -37,16 +37,11 @@ public class SealedTowerManager : BaseSystem
     private List<TowerFloor> _floors = new List<TowerFloor>();
     
     // Signals
-    [Signal]
-    public delegate void FloorChanged(int floor);
-    [Signal]
-    public delegate void RunStarted();
-    [Signal]
-    public delegate void RunEnded(bool victory, int floorsCleared, int enemiesDefeated);
-    [Signal]
-    public delegate void BoonAcquired(string boonId);
-    [Signal]
-    public delegate void CurseAcquired(string curseId);
+public delegate void FloorChanged(int floor);
+public delegate void RunStarted();
+public delegate void RunEnded(bool victory, int floorsCleared, int enemiesDefeated);
+public delegate void BoonAcquired(string boonId);
+public delegate void CurseAcquired(string curseId);
     
     public override void _Ready()
     {

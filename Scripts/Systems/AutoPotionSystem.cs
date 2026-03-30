@@ -36,8 +36,8 @@ namespace ClawRPG.Scripts.Systems
         private const int BUFF_POTION_MAX = 212;
 
         // 信号
-        [Signal] public delegate void AutoPotionUsedEventHandler(string potionType, int itemId);
-        [Signal] public delegate void AutoPotionSettingsChangedEventHandler();
+        public delegate void AutoPotionUsedEventHandler(string potionType, int itemId);
+        public delegate void AutoPotionSettingsChangedEventHandler();
 
         public override void _Ready()
         {

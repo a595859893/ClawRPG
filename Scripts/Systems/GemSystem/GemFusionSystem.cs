@@ -10,8 +10,8 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         public static GemFusionSystem Instance { get; private set; }
         
         // 信号
-        [Signal] public delegate void FusionCompleted(string resultGemId, bool success);
-        [Signal] public delegate void FusionStarted(string sourceGemId);
+        public delegate void FusionCompleted(string resultGemId, bool success);
+        public delegate void FusionStarted(string sourceGemId);
         
         private PlayerFusionData _playerFusionData;
         private GemSystem _gemSystem;

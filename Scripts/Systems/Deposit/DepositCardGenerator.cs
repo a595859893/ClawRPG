@@ -127,6 +127,5 @@ public class DepositCardGenerator : Node
     }
 
     // ── Signals ────────────────────────────────────────────────────────────
-    [Signal]
-    public delegate void DepositCardGenerated(DepositData.DepositType type, int level, string cardId);
+public delegate void DepositCardGenerated(DepositData.DepositType type, int level, string cardId);
 }

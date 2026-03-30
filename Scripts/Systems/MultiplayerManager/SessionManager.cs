@@ -39,10 +39,10 @@ namespace ClawRPG.Scripts.Systems
         private HashSet<int> _kickedPlayers = new HashSet<int>();
         
         // 信号
-        [Signal] public delegate void RoomCreatedEventHandler(string roomId);
-        [Signal] public delegate void RoomJoinedEventHandler(string roomId);
-        [Signal] public delegate void RoomLeftEventHandler();
-        [Signal] public delegate void ConnectionFailedEventHandler(string reason);
+        public delegate void RoomCreatedEventHandler(string roomId);
+        public delegate void RoomJoinedEventHandler(string roomId);
+        public delegate void RoomLeftEventHandler();
+        public delegate void ConnectionFailedEventHandler(string reason);
         
         public bool IsInRoom => !string.IsNullOrEmpty(_currentRoomId);
         public bool IsHost => _isHost;

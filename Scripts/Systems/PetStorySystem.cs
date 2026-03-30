@@ -8,12 +8,8 @@ namespace ClawRPG.Scripts.Systems {
     /// </summary>
     public class PetStorySystem : BaseSystem {
         public static PetStorySystem Instance { get; private set; }
-        
-        [Signal]
-        public delegate void StoryUnlocked(int petId, PetStory story);
-        
-        [Signal]
-        public delegate void StoryRead(int petId, int storyId);
+public delegate void StoryUnlocked(int petId, PetStory story);
+public delegate void StoryRead(int petId, int storyId);
         
         private PetStoryDatabase database;
         private Dictionary<int, PlayerPetStoryData> playerPetStories = new Dictionary<int, PlayerPetStoryData>();

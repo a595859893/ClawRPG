@@ -31,14 +31,9 @@ namespace ClawRPG.Scripts.Leaderboard {
         private LeaderboardDatabase _database;
 
         // 信号
-        [Signal]
-        public delegate void LeaderboardUpdated(LeaderboardType type);
-
-        [Signal]
-        public delegate void RankChanged(string playerId, LeaderboardType type, int oldRank, int newRank);
-
-        [Signal]
-        public delegate void RewardClaimed(string playerId, LeaderboardType type, int rank, RankReward reward);
+public delegate void LeaderboardUpdated(LeaderboardType type);
+public delegate void RankChanged(string playerId, LeaderboardType type, int oldRank, int newRank);
+public delegate void RewardClaimed(string playerId, LeaderboardType type, int rank, RankReward reward);
 
         public override void _Ready() {
             _instance = this;

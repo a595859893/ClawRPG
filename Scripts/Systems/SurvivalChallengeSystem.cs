@@ -83,7 +83,7 @@ namespace ClawRPG.Scripts.Systems
             // 检查金币
             if (config.EntryFee > 0)
             {
-                var playerStats = _player.Get("Player") as Godot.Object;
+                var playerStats = _player.Get("Player") as GodotObject;
                 if (playerStats != null)
                 {
                     int playerGold = (int)playerStats.Get("Gold");
@@ -425,7 +425,7 @@ namespace ClawRPG.Scripts.Systems
         {
             if (_player == null) return;
             
-            var playerStats = _player.Get("Player") as Godot.Object;
+            var playerStats = _player.Get("Player") as GodotObject;
             if (playerStats != null)
             {
                 if (gold > 0)

@@ -268,14 +268,9 @@ public partial class WeeklyChallengeSystem : BaseSystem
     }
     
     // Signals
-    [Signal]
-    public delegate void ChallengeCompletedEventHandler(string challengeId);
-    
-    [Signal]
-    public delegate void ChallengeProgressUpdatedEventHandler(string challengeId, int current, int target);
-    
-    [Signal]
-    public delegate void RewardsClaimedEventHandler(int gold, int exp);
+public delegate void ChallengeCompletedEventHandler(string challengeId);
+public delegate void ChallengeProgressUpdatedEventHandler(string challengeId, int current, int target);
+public delegate void RewardsClaimedEventHandler(int gold, int exp);
 
     public override Dictionary ExportSaveData()
     {

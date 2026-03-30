@@ -20,11 +20,11 @@ namespace ClawRPG.Systems.MultiplayerVote
         private Dictionary<string, PartyStatistics> _playerStatistics = new Dictionary<string, PartyStatistics>();
         
         // Signals - 转发到主系统
-        [Signal] public delegate void PartyCreatedEventHandler(Party party);
-        [Signal] public delegate void PartyJoinedEventHandler(string partyId, PartyMember member);
-        [Signal] public delegate void PartyLeftEventHandler(string partyId, string playerId);
-        [Signal] public delegate void PartyMemberKickedEventHandler(string partyId, string playerId);
-        [Signal] public delegate void PartyLeaderChangedEventHandler(string partyId, string newLeaderId);
+        public delegate void PartyCreatedEventHandler(Party party);
+        public delegate void PartyJoinedEventHandler(string partyId, PartyMember member);
+        public delegate void PartyLeftEventHandler(string partyId, string playerId);
+        public delegate void PartyMemberKickedEventHandler(string partyId, string playerId);
+        public delegate void PartyLeaderChangedEventHandler(string partyId, string newLeaderId);
         
         public override void _Ready()
         {

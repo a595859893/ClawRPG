@@ -341,14 +341,9 @@ public class EquipmentDurabilitySystem : BaseSystem
     }
 
     // 信号
-    [Signal]
-    public delegate void DurabilityChangedEventHandler(string itemId, int current, int max);
-    
-    [Signal]
-    public delegate void EquipmentBrokenEventHandler(string itemId);
-    
-    [Signal]
-    public delegate void EquipmentRepairedEventHandler(string itemId, int cost);
+public delegate void DurabilityChangedEventHandler(string itemId, int current, int max);
+public delegate void EquipmentBrokenEventHandler(string itemId);
+public delegate void EquipmentRepairedEventHandler(string itemId, int cost);
     
     // ===== 持久化 =====
     public override Dictionary ExportSaveData()

@@ -12,10 +12,10 @@ public class CollectibleSystem : BaseSystem
 
 	public PlayerCollectibleData Data { get; private set; } = new PlayerCollectibleData();
 
-	// Signals
-	public Signal1<string> CollectibleDiscovered { get; } = new Signal1<string>();
-	public Signal1<string> CategoryCompleted { get; } = new Signal1<string>();
-	public Signal1<string> AllCollectiblesCompleted { get; } = new Signal1<string>();
+	// Signals (C# events, Godot 4 compatible)
+	public event Action<string> CollectibleDiscovered;
+	public event Action<string> CategoryCompleted;
+	public event Action<string> AllCollectiblesCompleted;
 
 	private CollectibleSystem() { }
 

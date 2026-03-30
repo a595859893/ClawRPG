@@ -28,10 +28,10 @@ namespace ClawRPG.Scripts.Systems
         private const int MaxCloudSlots = 10;
         
         // 信号
-        [Signal] public delegate void OnCloudSyncStartEventHandler();
-        [Signal] public delegate void OnCloudSyncCompleteEventHandler(bool success);
-        [Signal] public delegate void OnCloudSyncErrorEventHandler(string error);
-        [Signal] public delegate void OnConflictDetectedEventHandler(int slot, SaveDataManager.SaveData localData, SaveDataManager.SaveData cloudData);
+        public delegate void OnCloudSyncStartEventHandler();
+        public delegate void OnCloudSyncCompleteEventHandler(bool success);
+        public delegate void OnCloudSyncErrorEventHandler(string error);
+        public delegate void OnConflictDetectedEventHandler(int slot, SaveDataManager.SaveData localData, SaveDataManager.SaveData cloudData);
         
         protected override void Initialize()
         {

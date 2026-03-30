@@ -18,9 +18,9 @@ public class SkillSynergySystem : BaseSystem
     private int _currentComboChain = 0;
 
     // 信号
-    [Signal] public void SynergyTriggered(string synergyId, string synergyName, string message);
-    [Signal] public void SynergyExpired(string synergyId);
-    [Signal] public void SynergyStackChanged(string synergyId, int newStacks);
+    
+    
+    
 
     public override void _Ready()
     {

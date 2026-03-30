@@ -146,11 +146,8 @@ public class DepositData : Node
     }
 
     // ── Signals ────────────────────────────────────────────────────────────
-    [Signal]
-    public delegate void DepositUpdated(DepositType type);
-
-    [Signal]
-    public delegate void DepositLevelChanged(DepositType type, int newLevel);
+public delegate void DepositUpdated(DepositType type);
+public delegate void DepositLevelChanged(DepositType type, int newLevel);
 
     // ── Save System ────────────────────────────────────────────────────────
 

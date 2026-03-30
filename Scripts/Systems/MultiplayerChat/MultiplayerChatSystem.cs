@@ -290,14 +290,9 @@ public class MultiplayerChatSystem : BaseSystem
     }
     
     // Signals
-    [Signal]
-    public delegate void MessageReceived(string message, MultiplayerChatData.ChatChannel channel, bool isEmote = false);
-    
-    [Signal]
-    public delegate void ChannelChanged(MultiplayerChatData.ChatChannel channel);
-    
-    [Signal]
-    public delegate void ClearRequested();
+public delegate void MessageReceived(string message, MultiplayerChatData.ChatChannel channel, bool isEmote = false);
+public delegate void ChannelChanged(MultiplayerChatData.ChatChannel channel);
+public delegate void ClearRequested();
     
     /// <summary>
     /// 导出保存数据

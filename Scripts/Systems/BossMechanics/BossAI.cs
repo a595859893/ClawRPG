@@ -53,8 +53,7 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
         /// 模式切换时发射的信号 (REQ-156)
         /// 参数: (oldMode, newMode)
         /// </summary>
-        [Signal]
-        public delegate void BossModeChangedEventHandler(BossMode oldMode, BossMode newMode);
+public delegate void BossModeChangedEventHandler(BossMode oldMode, BossMode newMode);
 
         /// <summary>
         /// 切换 Boss AI 行为模式 (REQ-156)

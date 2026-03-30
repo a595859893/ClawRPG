@@ -29,17 +29,10 @@ public class DynamicDifficultySystem : BaseSystem
     private DynamicDifficultyDatabase _database;
 
     // 信号
-    [Signal]
-    public delegate void DifficultyChanged(DynamicDifficultyData.DifficultyLevel newDifficulty, DynamicDifficultyData.DifficultyLevel oldDifficulty);
-
-    [Signal]
-    public delegate void SkillProfileUpdated(DynamicDifficultyData.PlayerSkillProfile profile);
-
-    [Signal]
-    public delegate void SessionStatsUpdated(DynamicDifficultyData.SessionStats stats);
-
-    [Signal]
-    public delegate void RecommendationChanged(DynamicDifficultyData.DifficultyLevel recommended);
+public delegate void DifficultyChanged(DynamicDifficultyData.DifficultyLevel newDifficulty, DynamicDifficultyData.DifficultyLevel oldDifficulty);
+public delegate void SkillProfileUpdated(DynamicDifficultyData.PlayerSkillProfile profile);
+public delegate void SessionStatsUpdated(DynamicDifficultyData.SessionStats stats);
+public delegate void RecommendationChanged(DynamicDifficultyData.DifficultyLevel recommended);
 
     public override void _Ready()
     {

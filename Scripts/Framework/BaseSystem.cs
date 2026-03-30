@@ -3,6 +3,7 @@ namespace ClawRPG.Scripts.Framework
 
 using Godot;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// 所有游戏系统的基类
@@ -45,16 +46,16 @@ public abstract class BaseSystem : Node
     /// 导出保存数据 - 子类重写此方法实现数据持久化
     /// </summary>
     /// <returns>可序列化的字典数据</returns>
-    public virtual Dictionary ExportSaveData()
+    public virtual Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary();
+        return new Dictionary<string, object>();
     }
     
     /// <summary>
     /// 导入保存数据 - 子类重写此方法实现数据加载
     /// </summary>
     /// <param name="data">保存的字典数据</param>
-    public virtual void ImportSaveData(Dictionary data)
+    public virtual void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
     }

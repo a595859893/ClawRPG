@@ -21,12 +21,12 @@ namespace ClawRPG.Scripts.Systems {
         public static SaveSystem Instance { get; private set; }
         
         // Signals - 转发自子系统
-        [Signal] public delegate void OnSaveCompleteEventHandler(int slot, bool success);
-        [Signal] public delegate void OnLoadCompleteEventHandler(int slot, bool success);
-        [Signal] public delegate void OnAutoSaveEventHandler(int slot);
-        [Signal] public delegate void OnCloudSyncStartEventHandler();
-        [Signal] public delegate void OnCloudSyncCompleteEventHandler(bool success);
-        [Signal] public delegate void OnCloudSyncErrorEventHandler(string error);
+        public delegate void OnSaveCompleteEventHandler(int slot, bool success);
+        public delegate void OnLoadCompleteEventHandler(int slot, bool success);
+        public delegate void OnAutoSaveEventHandler(int slot);
+        public delegate void OnCloudSyncStartEventHandler();
+        public delegate void OnCloudSyncCompleteEventHandler(bool success);
+        public delegate void OnCloudSyncErrorEventHandler(string error);
         
         // Type aliases for backward compatibility
         public class SaveData : SaveDataManager.SaveData { }

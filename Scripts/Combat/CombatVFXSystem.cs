@@ -31,10 +31,10 @@ namespace ClawRPG.Scripts.Combat {
         [Export] private bool enableComboEffects = true;
         
         // 信号
-        [Signal] public delegate void DamageNumberCreatedEventHandler(DamageNumberType type, float value);
-        [Signal] public delegate void VFXPlayedEventHandler(VFXType type, Vector3 position);
-        [Signal] public delegate void ScreenEffectTriggeredEventHandler(ScreenEffectType type);
-        [Signal] public delegate void ComboMilestoneReachedEventHandler(int comboCount, string milestone);
+        public delegate void DamageNumberCreatedEventHandler(DamageNumberType type, float value);
+        public delegate void VFXPlayedEventHandler(VFXType type, Vector3 position);
+        public delegate void ScreenEffectTriggeredEventHandler(ScreenEffectType type);
+        public delegate void ComboMilestoneReachedEventHandler(int comboCount, string milestone);
         
         protected override void Initialize() {
             Instance = this;

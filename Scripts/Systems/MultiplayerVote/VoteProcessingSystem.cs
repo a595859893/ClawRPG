@@ -30,9 +30,9 @@ namespace ClawRPG.Systems.MultiplayerVote
         private Func<string, PartyStatistics> _getOrCreateStatisticsFunc;
         
         // Signals - 转发到主系统
-        [Signal] public delegate void VoteStartedEventHandler(ActiveVote vote);
-        [Signal] public delegate void VoteEndedEventHandler(ActiveVote vote, bool passed);
-        [Signal] public delegate void VoteUpdatedEventHandler(ActiveVote vote);
+        public delegate void VoteStartedEventHandler(ActiveVote vote);
+        public delegate void VoteEndedEventHandler(ActiveVote vote, bool passed);
+        public delegate void VoteUpdatedEventHandler(ActiveVote vote);
         
         public override void _Ready()
         {

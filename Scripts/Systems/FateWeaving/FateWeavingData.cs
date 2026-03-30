@@ -46,7 +46,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
         public int UnlockTier { get; set; }
     }
 
-    public class FateWeavingData : Godot.Object {
+    public class FateWeavingData : GodotObject {
         public Dictionary<FatePathType, float> PathAffinity { get; set; } = new Dictionary<FatePathType, FatePathType> {
             { FatePathType.Hero, 0f },
             { FatePathType.AntiHero, 0f },

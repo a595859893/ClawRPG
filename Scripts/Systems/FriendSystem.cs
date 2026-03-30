@@ -22,10 +22,10 @@ public class FriendSystem : BaseSystem
     private System.Collections.Generic.Dictionary<string, Array<ChatMessage>> _chatHistory = new System.Collections.Generic.Dictionary<string, Array<ChatMessage>>();
 
     // 信号
-    [Signal] public delegate void FriendListUpdated();
-    [Signal] public delegate void FriendRequestReceived(string fromPlayer, string message);
-    [Signal] public delegate void ChatMessageReceived(string fromPlayer, string message);
-    [Signal] public delegate void FriendStatusChanged(string playerName, bool isOnline);
+    public delegate void FriendListUpdated();
+    public delegate void FriendRequestReceived(string fromPlayer, string message);
+    public delegate void ChatMessageReceived(string fromPlayer, string message);
+    public delegate void FriendStatusChanged(string playerName, bool isOnline);
 
     public override void _Ready()
     {

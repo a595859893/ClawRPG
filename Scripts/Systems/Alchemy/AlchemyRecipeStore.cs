@@ -18,8 +18,8 @@ namespace ClawRPG.Systems.Alchemy
         private int _nextRecipeId = 2001;
         
         // Signals
-        [Signal] public delegate void CraftSuccessEventHandler(int recipeId, int resultItemId, int quantity);
-        [Signal] public delegate void CraftFailedEventHandler(int recipeId, string reason);
+        public delegate void CraftSuccessEventHandler(int recipeId, int resultItemId, int quantity);
+        public delegate void CraftFailedEventHandler(int recipeId, string reason);
         
         public override void _Ready()
         {

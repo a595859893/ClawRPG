@@ -13,11 +13,11 @@ namespace ClawRPG.Scripts.Mounts {
         private Dictionary<string, MountCombatData.MountCombatInstance> _mountCombatData = new Dictionary<string, MountCombatData.MountCombatInstance>();
         
         // 信号系统
-        [Signal] public delegate void OnMountSkillUsed(string mountId, string skillId, Vector2 targetPosition);
-        [Signal] public delegate void OnMountSkillReady(string mountId, string skillId);
-        [Signal] public delegate void OnMountCombatStart(string mountId);
-        [Signal] public delegate void OnMountCombatEnd(string mountId, int damageDealt, int damageTaken, int kills);
-        [Signal] public delegate void OnMountCombatStatsUpdated(string mountId, float damage, float attackSpeed);
+        public delegate void OnMountSkillUsed(string mountId, string skillId, Vector2 targetPosition);
+        public delegate void OnMountSkillReady(string mountId, string skillId);
+        public delegate void OnMountCombatStart(string mountId);
+        public delegate void OnMountCombatEnd(string mountId, int damageDealt, int damageTaken, int kills);
+        public delegate void OnMountCombatStatsUpdated(string mountId, float damage, float attackSpeed);
 
         // 冷却更新计时
         private float _cooldownTimer = 0f;

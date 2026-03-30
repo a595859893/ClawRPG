@@ -34,7 +34,7 @@ namespace ClawRPG.Scripts.UI {
         private string _selectedAccessoryId = "";
         
         // 信号
-        [Signal] public delegate void OnVisualEquipped(string slot, string visualId);
+        public delegate void OnVisualEquipped(string slot, string visualId);
 
         public override void _Ready() {
             SetupUI();

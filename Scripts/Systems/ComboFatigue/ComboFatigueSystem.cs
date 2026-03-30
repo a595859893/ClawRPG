@@ -28,12 +28,10 @@ public class ComboFatigueSystem : BaseSystem
     private ComboFatigueData _data;
     
     // Signal emitted when a combo's adaptation level changes
-    [Signal]
-    public delegate void AdaptationChanged(string comboId, float adaptationLevel, float damageMultiplier);
+public delegate void AdaptationChanged(string comboId, float adaptationLevel, float damageMultiplier);
     
     // Signal emitted when a new combo is used (for UI feedback)
-    [Signal]
-    public delegate void ComboSwitched(string newComboId, string previousComboId);
+public delegate void ComboSwitched(string newComboId, string previousComboId);
     
     public override void _Ready()
     {

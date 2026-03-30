@@ -30,8 +30,8 @@ namespace ClawRPG.Systems.Achievement
         private int _goldSpent;
         
         // Signals
-        [Signal] public delegate void AchievementUnlockedEventHandler(string achievementId);
-        [Signal] public delegate void AchievementProgressUpdatedEventHandler(string achievementId, int progress);
+        public delegate void AchievementUnlockedEventHandler(string achievementId);
+        public delegate void AchievementProgressUpdatedEventHandler(string achievementId, int progress);
         
         public override void _Ready()
         {

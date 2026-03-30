@@ -31,10 +31,8 @@ public partial class RandomEventSystem : BaseSystem
     private float _currentEventDuration;
     
     // Signal for UI updates
-    [Signal] public static void EventTriggered(RandomEventData eventData) { }
-    [Signal] public static void EventEnded(RandomEventData eventData) { }
-    [Signal] public static void EffectApplied(string effectType, float duration) { }
-    [Signal] public static void EffectExpired(string effectType) { }
+    public static void EventEnded(RandomEventData eventData) { }
+    public static void EffectExpired(string effectType) { }
     
     public override void _Ready()
     {

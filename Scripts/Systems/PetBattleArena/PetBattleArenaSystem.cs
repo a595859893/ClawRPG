@@ -40,26 +40,13 @@ public class PetBattleArenaSystem : BaseSystem
     private PlayerPetBattleData _playerData = new PlayerPetBattleData();
     
     // Signals
-    [Signal]
-    public delegate void BattleStarted(string arenaId);
-    
-    [Signal]
-    public delegate void BattleEnded(bool victory, int wavesCleared, int damageDealt);
-    
-    [Signal]
-    public delegate void WaveStarted(int waveNumber, int totalWaves);
-    
-    [Signal]
-    public delegate void WaveCompleted(int waveNumber);
-    
-    [Signal]
-    public delegate void PetDamaged(int currentHealth, int maxHealth);
-    
-    [Signal]
-    public delegate void EnemyDefeated(string enemyId);
-    
-    [Signal]
-    public delegate void BattleStatsUpdated(int damageDealt, int damageTaken, int enemiesDefeated);
+public delegate void BattleStarted(string arenaId);
+public delegate void BattleEnded(bool victory, int wavesCleared, int damageDealt);
+public delegate void WaveStarted(int waveNumber, int totalWaves);
+public delegate void WaveCompleted(int waveNumber);
+public delegate void PetDamaged(int currentHealth, int maxHealth);
+public delegate void EnemyDefeated(string enemyId);
+public delegate void BattleStatsUpdated(int damageDealt, int damageTaken, int enemiesDefeated);
     
     public override void _Ready()
     {

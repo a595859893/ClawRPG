@@ -360,8 +360,6 @@ public class FactionSystem : BaseSystem
     }
     
     // Signal
-    [Signal]
-    public void ReputationChanged(string factionId, int newReputation);
 }
 
 // Faction class

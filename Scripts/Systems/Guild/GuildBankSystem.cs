@@ -13,12 +13,12 @@ public partial class GuildBankSystem : BaseSystem {
     public int MaxGoldPerDeposit { get; set; } = 100000;
     
     // 信号
-    [Signal] public delegate void ItemDepositedEventHandler(GuildBankItem item);
-    [Signal] public delegate void ItemWithdrawnEventHandler(GuildBankItem item);
-    [Signal] public delegate void GoldDepositedEventHandler(int amount);
-    [Signal] public delegate void GoldWithdrawnEventHandler(int amount);
-    [Signal] public delegate void BankUpdatedEventHandler();
-    [Signal] public delegate void PermissionChangedEventHandler();
+    public delegate void ItemDepositedEventHandler(GuildBankItem item);
+    public delegate void ItemWithdrawnEventHandler(GuildBankItem item);
+    public delegate void GoldDepositedEventHandler(int amount);
+    public delegate void GoldWithdrawnEventHandler(int amount);
+    public delegate void BankUpdatedEventHandler();
+    public delegate void PermissionChangedEventHandler();
     
     public override void _Ready() {
         Instance = this;

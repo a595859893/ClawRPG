@@ -37,9 +37,9 @@ namespace ClawRPG.Scripts.Systems
         private bool _isReady = false;
         
         // 信号
-        [Signal] public delegate void PlayerJoinedEventHandler(int playerId, string playerName);
-        [Signal] public delegate void PlayerLeftEventHandler(int playerId);
-        [Signal] public delegate void PlayerStateUpdateEventHandler(int playerId, NetworkPlayer player);
+        public delegate void PlayerJoinedEventHandler(int playerId, string playerName);
+        public delegate void PlayerLeftEventHandler(int playerId);
+        public delegate void PlayerStateUpdateEventHandler(int playerId, NetworkPlayer player);
         
         public bool IsReady => _isReady;
         public int PlayerCount => _networkPlayers.Count;

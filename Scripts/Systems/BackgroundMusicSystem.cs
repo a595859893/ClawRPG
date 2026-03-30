@@ -443,15 +443,9 @@ namespace ClawRPG.Scripts.Systems {
         #endregion
         
         #region Signals
-        
-        [Signal]
-        public delegate void BattleMusicStarted(bool isBoss);
-        
-        [Signal]
-        public delegate void BattleMusicStopped();
-        
-        [Signal]
-        public delegate void TrackChanged(string trackName);
+public delegate void BattleMusicStarted(bool isBoss);
+public delegate void BattleMusicStopped();
+public delegate void TrackChanged(string trackName);
         
         #endregion
         

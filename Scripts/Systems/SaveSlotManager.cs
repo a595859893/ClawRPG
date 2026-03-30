@@ -22,9 +22,9 @@ namespace ClawRPG.Scripts.Systems
         private const float AutoSaveInterval = 300f; // 5 minutes
 
         // 信号
-        [Signal] public delegate void OnSaveCompleteEventHandler(int slot, bool success);
-        [Signal] public delegate void OnLoadCompleteEventHandler(int slot, bool success);
-        [Signal] public delegate void OnAutoSaveEventHandler(int slot);
+        public delegate void OnSaveCompleteEventHandler(int slot, bool success);
+        public delegate void OnLoadCompleteEventHandler(int slot, bool success);
+        public delegate void OnAutoSaveEventHandler(int slot);
 
         protected override void Initialize()
         {

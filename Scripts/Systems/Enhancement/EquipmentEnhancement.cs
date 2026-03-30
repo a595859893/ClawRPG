@@ -60,17 +60,11 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         private const float LevelFailurePenalty = 0.08f; // 每级失败率增加8%
         
         // 信号
-        [Signal]
-        [Signal]
-    public delegate void OnEnhancementStarted(string itemId, int level);
+        public delegate void OnEnhancementStarted(string itemId, int level);
         
-        [Signal]
-        [Signal]
-    public delegate void OnEnhancementComplete(string itemId, int level, EnhancementResult result);
+        public delegate void OnEnhancementComplete(string itemId, int level, EnhancementResult result);
         
-        [Signal]
-        [Signal]
-    public delegate void OnEnhancementMaterialsChanged();
+        public delegate void OnEnhancementMaterialsChanged();
         
         // 强化石物品ID (与ItemSystem中的ID对应)
         public const string EnhanceStoneCommon = "401";

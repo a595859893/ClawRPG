@@ -12,11 +12,6 @@ public class EnemyWeaknessSystem : BaseSystem
     private Dictionary<int, List<EnemyWeaknessDatabase.WeaknessConfig>> _activeWeaknesses = new Dictionary<int, List<EnemyWeaknessDatabase.WeaknessConfig>>();
 
     // 信号
-    [Signal]
-    public void WeaknessActivated(int entityId, string weaknessId, float bonusDamage);
-
-    [Signal]
-    public void ResistanceTriggered(int entityId, string resistanceId, float reducedDamage);
 
     public override void _Ready()
     {

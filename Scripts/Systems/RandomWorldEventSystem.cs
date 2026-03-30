@@ -25,9 +25,9 @@ namespace ClawRPG.Scripts.Systems {
         private float _checkInterval = 30f; // 每30秒检查一次
         
         // 信号
-        [Signal] public delegate void EventTriggeredEventHandler(WorldEventConfig config);
-        [Signal] public delegate void EventExpiredEventHandler(string eventId);
-        [Signal] public delegate void EventRewardClaimedEventHandler(string eventId, int gold, int exp);
+        public delegate void EventTriggeredEventHandler(WorldEventConfig config);
+        public delegate void EventExpiredEventHandler(string eventId);
+        public delegate void EventRewardClaimedEventHandler(string eventId, int gold, int exp);
 
         public override void _Ready() {
             Instance = this;

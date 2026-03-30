@@ -401,18 +401,10 @@ namespace ClawRPG.Scripts.Systems {
         #endregion
         
         #region Signals
-        
-        [Signal]
-        public delegate void TrackUnlocked(string trackId);
-        
-        [Signal]
-        public delegate void FavoriteAdded(string trackId);
-        
-        [Signal]
-        public delegate void FavoriteRemoved(string trackId);
-        
-        [Signal]
-        public delegate void AllTracksUnlocked();
+public delegate void TrackUnlocked(string trackId);
+public delegate void FavoriteAdded(string trackId);
+public delegate void FavoriteRemoved(string trackId);
+public delegate void AllTracksUnlocked();
         
         #endregion
         

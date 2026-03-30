@@ -92,20 +92,6 @@ public partial class DreamRealmSystem : BaseSystem
     };
 
     // 信号
-    [Signal]
-    public void DreamEntered(RealmType realm);
-
-    [Signal]
-    public void DreamExited();
-
-    [Signal]
-    public void RealmUnlocked(RealmType realm);
-
-    [Signal]
-    public void LevelUp(int newLevel);
-
-    [Signal]
-    public void TreasureFound(DreamTreasure treasure);
 
     public class RealmStatsData
     {

@@ -71,12 +71,8 @@ public partial class CombatRhythmData : BaseSystem
     private bool _inCombat = false;
 
     // ===== 事件信号 =====
-
-    [Signal]
-    public delegate void RhythmLevelChangedEventHandler(RhythmLevel newLevel, RhythmLevel oldLevel);
-
-    [Signal]
-    public delegate void RhythmIntensityUpdatedEventHandler(RhythmLevel level, int recentDamageCount, float windowSeconds);
+public delegate void RhythmLevelChangedEventHandler(RhythmLevel newLevel, RhythmLevel oldLevel);
+public delegate void RhythmIntensityUpdatedEventHandler(RhythmLevel level, int recentDamageCount, float windowSeconds);
 
     // ===== 公开 API =====
 

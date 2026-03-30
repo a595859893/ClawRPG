@@ -104,14 +104,9 @@ namespace ClawRPG.Scripts.Systems
         private bool _hasTriggeredFirstCounter = false; 
         
         // Signals
-        [Signal]
-        public delegate void CounterAttackPerformedEventHandler(CounterType type, float damage);
-        
-        [Signal]
-        public delegate void CounterAttack窗口EventHandler(bool isActive);
-        
-        [Signal]
-        public delegate void CounterAttackReadyEventHandler();
+public delegate void CounterAttackPerformedEventHandler(CounterType type, float damage);
+public delegate void CounterAttack窗口EventHandler(bool isActive);
+public delegate void CounterAttackReadyEventHandler();
         
         public override void _Ready()
         {

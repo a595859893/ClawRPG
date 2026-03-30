@@ -13,10 +13,10 @@ public class BattlefieldVariantSystem : BaseSystem
     public static BattlefieldVariantSystem Instance => _instance;
 
     // Signals
-    [Signal] public delegate void VariantSelectedEventHandler(BattlefieldVariantType variant);
-    [Signal] public delegate void VariantEffectTriggeredEventHandler(BattlefieldVariantType variant, string effectDesc);
-    [Signal] public delegate void VariantExitedEventHandler(BattlefieldVariantType variant);
-    [Signal] public delegate void VariantDamageAppliedEventHandler(float damage);
+    public delegate void VariantSelectedEventHandler(BattlefieldVariantType variant);
+    public delegate void VariantEffectTriggeredEventHandler(BattlefieldVariantType variant, string effectDesc);
+    public delegate void VariantExitedEventHandler(BattlefieldVariantType variant);
+    public delegate void VariantDamageAppliedEventHandler(float damage);
 
     // 运行时数据
     private BattlefieldVariantRuntimeData _runtimeData = new BattlefieldVariantRuntimeData();

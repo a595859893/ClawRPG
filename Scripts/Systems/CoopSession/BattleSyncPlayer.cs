@@ -56,39 +56,17 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         #endregion
 
         #region 信号定义
-
-        [Signal]
-        public delegate void BattleActionReceivedEventHandler(BattleSyncData.BattleAction action);
-
-        [Signal]
-        public delegate void PlayerStateUpdatedEventHandler(int playerId, BattleSyncData.PlayerBattleState state);
-
-        [Signal]
-        public delegate void PlayerHealthChangedEventHandler(int playerId, float currentHealth, float maxHealth, float change);
-
-        [Signal]
-        public delegate void PlayerManaChangedEventHandler(int playerId, float currentMana, float maxMana, float change);
-
-        [Signal]
-        public delegate void BuffAppliedEventHandler(int playerId, BattleSyncData.BuffState buff);
-
-        [Signal]
-        public delegate void BuffRemovedEventHandler(int playerId, string buffId);
-
-        [Signal]
-        public delegate void EnemyStateUpdatedEventHandler(int enemyId, BattleSyncData.EnemyBattleState state);
-
-        [Signal]
-        public delegate void EnemyKilledEventHandler(int enemyId, int killerId);
-
-        [Signal]
-        public delegate void PlayerDiedEventHandler(int playerId);
-
-        [Signal]
-        public delegate void PlayerRevivedEventHandler(int playerId);
-
-        [Signal]
-        public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int newTargetId);
+public delegate void BattleActionReceivedEventHandler(BattleSyncData.BattleAction action);
+public delegate void PlayerStateUpdatedEventHandler(int playerId, BattleSyncData.PlayerBattleState state);
+public delegate void PlayerHealthChangedEventHandler(int playerId, float currentHealth, float maxHealth, float change);
+public delegate void PlayerManaChangedEventHandler(int playerId, float currentMana, float maxMana, float change);
+public delegate void BuffAppliedEventHandler(int playerId, BattleSyncData.BuffState buff);
+public delegate void BuffRemovedEventHandler(int playerId, string buffId);
+public delegate void EnemyStateUpdatedEventHandler(int enemyId, BattleSyncData.EnemyBattleState state);
+public delegate void EnemyKilledEventHandler(int enemyId, int killerId);
+public delegate void PlayerDiedEventHandler(int playerId);
+public delegate void PlayerRevivedEventHandler(int playerId);
+public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int newTargetId);
 
         #endregion
 

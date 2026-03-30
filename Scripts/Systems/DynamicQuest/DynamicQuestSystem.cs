@@ -101,11 +101,11 @@ public partial class DynamicQuestSystem : BaseSystem
     private int _questCounter = 0;
     
     // Signals
-    [Signal] public delegate void QuestGeneratedEventHandler(Quest quest);
-    [Signal] public delegate void QuestStartedEventHandler(Quest quest);
-    [Signal] public delegate void QuestCompletedEventHandler(Quest quest);
-    [Signal] public delegate void QuestFailedEventHandler(Quest quest);
-    [Signal] public delegate void QuestProgressEventHandler(Quest quest, int progress);
+    public delegate void QuestGeneratedEventHandler(Quest quest);
+    public delegate void QuestStartedEventHandler(Quest quest);
+    public delegate void QuestCompletedEventHandler(Quest quest);
+    public delegate void QuestFailedEventHandler(Quest quest);
+    public delegate void QuestProgressEventHandler(Quest quest, int progress);
     
     public override void _Ready()
     {

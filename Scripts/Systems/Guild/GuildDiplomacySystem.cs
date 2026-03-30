@@ -9,9 +9,9 @@ public class GuildDiplomacySystem : BaseSystem
     private GuildSystem guildSystem;
     
     // 信号
-    [Signal] public delegate void RelationChanged(string guildId, GuildDiplomacyData.RelationType newType);
-    [Signal] public delegate void TreatySigned(string guildId, GuildDiplomacyData.RelationType type, int duration);
-    [Signal] public delegate void TreatyBroken(string guildId);
+    public delegate void RelationChanged(string guildId, GuildDiplomacyData.RelationType newType);
+    public delegate void TreatySigned(string guildId, GuildDiplomacyData.RelationType type, int duration);
+    public delegate void TreatyBroken(string guildId);
     
     // 关系加成配置
     private Dictionary<GuildDiplomacyData.RelationType, Dictionary<string, float>> RelationBonuses = new Dictionary<GuildDiplomacyData.RelationType, Dictionary<string, float>>

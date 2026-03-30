@@ -18,7 +18,7 @@ namespace ClawRPG.Scripts.Systems
         // Player statistics
         private Dictionary<string, WorldBossData.PlayerWorldBossStats> _playerStats = new Dictionary<string, WorldBossData.PlayerWorldBossStats>();
         
-        [Signal] public delegate void BossDamagedEventHandler(string bossInstanceId, string playerId, int damage);
+        public delegate void BossDamagedEventHandler(string bossInstanceId, string playerId, int damage);
         
         public override void _Ready()
         {

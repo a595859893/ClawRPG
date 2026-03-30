@@ -14,12 +14,12 @@ public partial class CookingSystem : BaseSystem
     private int[] _expPerLevel = { 0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5500 };
 
     // Signals
-    [Signal] public delegate void RecipeLearnedEventHandler(string recipeId, string recipeName);
-    [Signal] public delegate void CookingStartedEventHandler(string recipeId);
-    [Signal] public delegate void CookingProgressEventHandler(float progress);
-    [Signal] public delegate void CookingCompletedEventHandler(string recipeId, bool success);
-    [Signal] public delegate void LevelUpEventHandler(int newLevel, int exp);
-    [Signal] public delegate void BuffAppliedEventHandler(string statName, float value, int duration);
+    public delegate void RecipeLearnedEventHandler(string recipeId, string recipeName);
+    public delegate void CookingStartedEventHandler(string recipeId);
+    public delegate void CookingProgressEventHandler(float progress);
+    public delegate void CookingCompletedEventHandler(string recipeId, bool success);
+    public delegate void LevelUpEventHandler(int newLevel, int exp);
+    public delegate void BuffAppliedEventHandler(string statName, float value, int duration);
 
     public override void _Ready()
     {

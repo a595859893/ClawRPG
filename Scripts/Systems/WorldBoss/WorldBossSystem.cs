@@ -26,10 +26,10 @@ namespace ClawRPG.Scripts.Systems
         private List<WorldBossData.ActiveWorldBoss> _activeBosses = new List<WorldBossData.ActiveWorldBoss>();
         
         // Signals - 委托给子系统
-        [Signal] public delegate void BossSpawnedEventHandler(WorldBossData.ActiveWorldBoss boss);
-        [Signal] public delegate void BossDamagedEventHandler(string bossInstanceId, string playerId, int damage);
-        [Signal] public delegate void BossDefeatedEventHandler(WorldBossData.ActiveWorldBoss boss);
-        [Signal] public delegate void BossEscapedEventHandler(WorldBossData.ActiveWorldBoss boss);
+        public delegate void BossSpawnedEventHandler(WorldBossData.ActiveWorldBoss boss);
+        public delegate void BossDamagedEventHandler(string bossInstanceId, string playerId, int damage);
+        public delegate void BossDefeatedEventHandler(WorldBossData.ActiveWorldBoss boss);
+        public delegate void BossEscapedEventHandler(WorldBossData.ActiveWorldBoss boss);
         
         public override void _Ready()
         {

@@ -14,12 +14,12 @@ public partial class RandomDungeonEventDatabase : BaseSystem
         GD.Print($"[RandomDungeonEventDatabase] Initialized");
     }
 
-    public override Dictionary ExportSaveData()
+    public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary(); // Configuration only, no runtime state to persist
+        return new Dictionary<string, object>(); // Configuration only, no runtime state to persist
     }
 
-    public override void ImportSaveData(Dictionary data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         // No runtime state to restore
     }

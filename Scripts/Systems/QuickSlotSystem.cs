@@ -39,12 +39,9 @@ public partial class QuickSlotSystem : BaseSystem
     private QuickSlotData[] _slots = new QuickSlotData[8];
     
     // Signals
-    [Signal]
-    public delegate void SlotUpdated(int slotIndex, QuickSlotData data);
-    [Signal]
-    public delegate void SlotUsed(int slotIndex, QuickSlotData data);
-    [Signal]
-    public delegate void SlotEmpty(int slotIndex);
+public delegate void SlotUpdated(int slotIndex, QuickSlotData data);
+public delegate void SlotUsed(int slotIndex, QuickSlotData data);
+public delegate void SlotEmpty(int slotIndex);
     
     public override void _Ready()
     {

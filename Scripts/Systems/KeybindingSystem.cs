@@ -14,11 +14,8 @@ namespace ClawRPG.Systems {
         private Dictionary<string, KeybindingAction> _keybindings = new Dictionary<string, KeybindingAction>();
         
         // 事件信号
-        [Signal]
-        public delegate void KeybindingChanged(string actionName, Key oldKey, Key newKey);
-        
-        [Signal]
-        public delegate void KeybindingsReset();
+public delegate void KeybindingChanged(string actionName, Key oldKey, Key newKey);
+public delegate void KeybindingsReset();
 
         public override void _Ready()
         {

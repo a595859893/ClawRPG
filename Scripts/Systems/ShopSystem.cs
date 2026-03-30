@@ -69,11 +69,8 @@ namespace GameSystems
         private Dictionary<string, DateTime> _lastRefresh = new Dictionary<string, DateTime>();
 
         // 信号
-        [Signal]
         public static readonly SignalPurchaseCompleted PurchaseCompleted;
-        [Signal]
         public static readonly SignalShopRefreshed ShopRefreshed;
-        [Signal]
         public static readonly SignalItemSold ItemSold;
 
         public override void _Ready()

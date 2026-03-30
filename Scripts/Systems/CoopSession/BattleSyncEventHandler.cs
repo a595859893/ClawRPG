@@ -78,27 +78,13 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         #endregion
 
         #region 信号定义
-
-        [Signal]
-        public delegate void PlayerStateUpdatedEventHandler(int playerId, BattleSyncData.PlayerBattleState state);
-
-        [Signal]
-        public delegate void PlayerHealthChangedEventHandler(int playerId, float currentHealth, float maxHealth, float change);
-
-        [Signal]
-        public delegate void PlayerManaChangedEventHandler(int playerId, float currentMana, float maxMana, float change);
-
-        [Signal]
-        public delegate void EnemyStateUpdatedEventHandler(int enemyId, BattleSyncData.EnemyBattleState state);
-
-        [Signal]
-        public delegate void BattleSnapshotReceivedEventHandler(BattleSyncData.BattleSnapshot snapshot);
-
-        [Signal]
-        public delegate void SyncLatencyWarningEventHandler(float latencyMs);
-
-        [Signal]
-        public delegate void BattleActionReceivedEventHandler(BattleSyncData.BattleAction action);
+public delegate void PlayerStateUpdatedEventHandler(int playerId, BattleSyncData.PlayerBattleState state);
+public delegate void PlayerHealthChangedEventHandler(int playerId, float currentHealth, float maxHealth, float change);
+public delegate void PlayerManaChangedEventHandler(int playerId, float currentMana, float maxMana, float change);
+public delegate void EnemyStateUpdatedEventHandler(int enemyId, BattleSyncData.EnemyBattleState state);
+public delegate void BattleSnapshotReceivedEventHandler(BattleSyncData.BattleSnapshot snapshot);
+public delegate void SyncLatencyWarningEventHandler(float latencyMs);
+public delegate void BattleActionReceivedEventHandler(BattleSyncData.BattleAction action);
 
         #endregion
 

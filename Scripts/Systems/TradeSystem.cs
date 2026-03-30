@@ -55,32 +55,32 @@ public partial class TradeSystem : BaseSystem {
     /// <summary>
     /// Emitted when a new trade is started.
     /// </summary>
-    [Signal] public delegate void TradeStartedEventHandler();
+    public delegate void TradeStartedEventHandler();
     
     /// <summary>
     /// Emitted when a trade offer is updated.
     /// </summary>
-    [Signal] public delegate void OfferUpdatedEventHandler(TradeOffer offer);
+    public delegate void OfferUpdatedEventHandler(TradeOffer offer);
     
     /// <summary>
     /// Emitted when a trade is accepted by both parties.
     /// </summary>
-    [Signal] public delegate void TradeAcceptedEventHandler();
+    public delegate void TradeAcceptedEventHandler();
     
     /// <summary>
     /// Emitted when a trade is completed successfully.
     /// </summary>
-    [Signal] public delegate void TradeCompletedEventHandler(TradeRecord record);
+    public delegate void TradeCompletedEventHandler(TradeRecord record);
     
     /// <summary>
     /// Emitted when a trade is cancelled.
     /// </summary>
-    [Signal] public delegate void TradeCancelledEventHandler();
+    public delegate void TradeCancelledEventHandler();
     
     /// <summary>
     /// Emitted when a trade fails.
     /// </summary>
-    [Signal] public delegate void TradeFailedEventHandler(string reason);
+    public delegate void TradeFailedEventHandler(string reason);
 
     public override void _Ready() {
         Instance = this;

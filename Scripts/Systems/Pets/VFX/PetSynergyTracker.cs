@@ -23,10 +23,10 @@ namespace ClawRPG.Scripts.Systems.Pets.VFX {
         private Timer _decayTimer;
 
         // 信号
-        [Signal] public delegate void SynergyCountUpdatedEventHandler(int count, int threshold);
-        [Signal] public delegate void SynergyTriggeredEventHandler(float damageBonus, float duration);
-        [Signal] public delegate void SynergyExpiredEventHandler();
-        [Signal] public delegate void SynergyAccumulatedEventHandler(int count);
+        public delegate void SynergyCountUpdatedEventHandler(int count, int threshold);
+        public delegate void SynergyTriggeredEventHandler(float damageBonus, float duration);
+        public delegate void SynergyExpiredEventHandler();
+        public delegate void SynergyAccumulatedEventHandler(int count);
 
         public override void _Ready() {
             Instance = this;

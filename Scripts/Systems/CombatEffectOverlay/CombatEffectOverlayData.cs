@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CombatEffectOverlayData : Godot.Object
+public class CombatEffectOverlayData : GodotObject
 {
     // Screen overlay effects state
     public bool RedOverlayActive { get; set; }

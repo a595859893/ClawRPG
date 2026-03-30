@@ -15,14 +15,10 @@ public class CombatSkillCooldownSystem : BaseSystem
 	private CombatSkillCooldownData.PlayerSkillCooldownData _playerCooldownData;
 	
 	// 信号系统
-	[Signal]
-    public delegate void CooldownStarted(string skillId, string skillName, float cooldownTime);
-	[Signal]
-    public delegate void CooldownUpdated(string skillId, float remainingTime);
-	[Signal]
-    public delegate void CooldownReady(string skillId, string skillName);
-	[Signal]
-    public delegate void SkillUsed(string skillId, string skillName);
+public delegate void CooldownStarted(string skillId, string skillName, float cooldownTime);
+public delegate void CooldownUpdated(string skillId, float remainingTime);
+public delegate void CooldownReady(string skillId, string skillName);
+public delegate void SkillUsed(string skillId, string skillName);
 	
 	public override void _Ready()
 	{

@@ -65,11 +65,8 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         private Dictionary<PlayerBehaviorType, Color> _currentOverlayColors = new Dictionary<PlayerBehaviorType, Color>();
 
         // ── Signals ─────────────────────────────────────────────────────────
-        [Signal]
-        public delegate void ImprintVisualDecayedEventHandler(PlayerBehaviorType behavior, float strength);
-
-        [Signal]
-        public delegate void ImprintVisualRefreshedEventHandler(PlayerBehaviorType behavior, int newLevel);
+public delegate void ImprintVisualDecayedEventHandler(PlayerBehaviorType behavior, float strength);
+public delegate void ImprintVisualRefreshedEventHandler(PlayerBehaviorType behavior, int newLevel);
 
         public override void _Ready()
         {

@@ -89,14 +89,9 @@ public class GuildWarManager : BaseSystem
     }
     
     // Declare signals
-    [Signal]
-    public delegate void WarStartedSignal(int warId, int attackerGuildId, int defenderGuildId);
-    
-    [Signal]
-    public delegate void WarEndedSignal(int warId, int winningGuildId, int attackerPoints, int defenderPoints);
-    
-    [Signal]
-    public delegate void PointsUpdatedSignal(int warId, int guildId, int points);
+public delegate void WarStartedSignal(int warId, int attackerGuildId, int defenderGuildId);
+public delegate void WarEndedSignal(int warId, int winningGuildId, int attackerPoints, int defenderPoints);
+public delegate void PointsUpdatedSignal(int warId, int guildId, int points);
     
     // Declare signal invocations
     private void EmitWarStarted(int warId, int attackerGuildId, int defenderGuildId)

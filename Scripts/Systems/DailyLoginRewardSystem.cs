@@ -58,9 +58,9 @@ namespace 悬疑RPG
         private PlayerDailyLoginData playerData = new PlayerDailyLoginData();
         
         // 信号
-        [Signal] public delegate void LoginDaysUpdatedEventHandler(int consecutiveDays, int totalDays);
-        [Signal] public delegate void RewardClaimedEventHandler(int day, List<string> items, List<int> counts, int gold, int exp);
-        [Signal] public delegate void NewDayAvailableEventHandler();
+        public delegate void LoginDaysUpdatedEventHandler(int consecutiveDays, int totalDays);
+        public delegate void RewardClaimedEventHandler(int day, List<string> items, List<int> counts, int gold, int exp);
+        public delegate void NewDayAvailableEventHandler();
 
         public override void _Ready()
         {

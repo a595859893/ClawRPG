@@ -376,15 +376,9 @@ namespace ClawRPG.Scripts.Systems
     public partial class CompanionInteractionSystem : BaseSystem
     {
         public static CompanionInteractionSystem Instance { get; private set; }
-
-        [Signal]
-        public delegate void InteractionStartedEventHandler(string entityId, InteractionType entityType, InteractionAction action);
-
-        [Signal]
-        public delegate void InteractionCompletedEventHandler(string entityId, InteractionType entityType, InteractionAction action, int affectionGain, int happinessGain);
-
-        [Signal]
-        public delegate void InteractionFailedEventHandler(string entityId, InteractionType entityType, InteractionAction action, string reason);
+public delegate void InteractionStartedEventHandler(string entityId, InteractionType entityType, InteractionAction action);
+public delegate void InteractionCompletedEventHandler(string entityId, InteractionType entityType, InteractionAction action, int affectionGain, int happinessGain);
+public delegate void InteractionFailedEventHandler(string entityId, InteractionType entityType, InteractionAction action, string reason);
 
         private Dictionary<string, InteractionInstance> _activeInteractions;
         private PlayerInteractionData _playerData;

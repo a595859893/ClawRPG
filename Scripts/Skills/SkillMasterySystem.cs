@@ -112,30 +112,14 @@ namespace ClawRPG.Scripts.Skills {
         public static SkillMasterySystem Instance => _instance;
         
         #region Signals
-        
-        [Signal]
-        public delegate void MasteryLevelUpEventHandler(int skillId, int newLevel, MasteryRank rank);
-        
-        [Signal]
-        public delegate void MasteryXPChangedEventHandler(int skillId, int xp, int totalXP);
-        
-        [Signal]
-        public delegate void ComboStartedEventHandler(int comboId, string comboName);
-        
-        [Signal]
-        public delegate void ComboCompletedEventHandler(int comboId, string comboName, float damageMultiplier);
-        
-        [Signal]
-        public delegate void ComboFailedEventHandler(int comboId, string reason);
-        
-        [Signal]
-        public delegate void RuneEquippedEventHandler(int skillId, int slot, int runeId);
-        
-        [Signal]
-        public delegate void RuneUnequippedEventHandler(int skillId, int slot);
-        
-        [Signal]
-        public delegate void SkillUnlockedEventHandler(string skillId);
+public delegate void MasteryLevelUpEventHandler(int skillId, int newLevel, MasteryRank rank);
+public delegate void MasteryXPChangedEventHandler(int skillId, int xp, int totalXP);
+public delegate void ComboStartedEventHandler(int comboId, string comboName);
+public delegate void ComboCompletedEventHandler(int comboId, string comboName, float damageMultiplier);
+public delegate void ComboFailedEventHandler(int comboId, string reason);
+public delegate void RuneEquippedEventHandler(int skillId, int slot, int runeId);
+public delegate void RuneUnequippedEventHandler(int skillId, int slot);
+public delegate void SkillUnlockedEventHandler(string skillId);
         
         #endregion
         

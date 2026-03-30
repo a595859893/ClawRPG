@@ -11,8 +11,7 @@ namespace ClawRPG.Scripts.Systems {
         public static AutoBookmarkSystem Instance { get; private set; }
         
         // Signals
-        [Signal] [Signal]
-    public delegate void OnAutoBookmarkAdded(Bookmark bookmark, string trigger);
+        [Signal] public delegate void OnAutoBookmarkAdded(Bookmark bookmark, string trigger);
         
         // Settings
         [Export] public bool AutoBookmarkBoss = true;

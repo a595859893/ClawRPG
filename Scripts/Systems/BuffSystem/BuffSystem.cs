@@ -39,20 +39,13 @@ public class BuffSystem : BaseSystem
 	private PlayerBuffData _playerBuffData = new PlayerBuffData();
 	
 	// 信号
-	[Signal]
-	public delegate void BuffApplied(string buffId, int stackCount);
-	[Signal]
-	public delegate void BuffRemoved(string buffId);
-	[Signal]
-	public delegate void BuffTick(string buffId, float value);
-	[Signal]
-	public delegate void BuffStackChanged(string buffId, int newStack);
-	[Signal]
-	public delegate void ShieldChanged(float newShield);
-	[Signal]
-	public delegate void StateChanged(string state, bool isActive);
-	[Signal]
-	public delegate void BuffListChanged();
+public delegate void BuffApplied(string buffId, int stackCount);
+public delegate void BuffRemoved(string buffId);
+public delegate void BuffTick(string buffId, float value);
+public delegate void BuffStackChanged(string buffId, int newStack);
+public delegate void ShieldChanged(float newShield);
+public delegate void StateChanged(string state, bool isActive);
+public delegate void BuffListChanged();
 	
 	public override void _Ready()
 	{

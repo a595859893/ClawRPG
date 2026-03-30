@@ -33,15 +33,12 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         private float _decayAccumulator = 0f;
 
         // ── Signals ────────────────────────────────────────────────────────
-        [Signal]
-        public delegate void ImprintLevelChangedEventHandler(
+public delegate void ImprintLevelChangedEventHandler(
             PlayerBehaviorType behavior,
             RoomEnvironmentType environment,
             int oldLevel,
             int newLevel);
-
-        [Signal]
-        public delegate void ImprintXpGainedEventHandler(
+public delegate void ImprintXpGainedEventHandler(
             PlayerBehaviorType behavior,
             RoomEnvironmentType environment,
             float xpGained,

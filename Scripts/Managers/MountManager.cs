@@ -13,13 +13,13 @@ namespace ClawRPG.Scripts.Mounts {
         private string _activeMountId = null;
 
         // 信号系统
-        [Signal] public delegate void OnMountAdded(string mountId);
-        [Signal] public delegate void OnMountRemoved(string mountId);
-        [Signal] public delegate void OnMountActivated(string mountId);
-        [Signal] public delegate void OnMountDeactivated();
-        [Signal] public delegate void OnMountLevelUp(string mountId, int newLevel);
-        [Signal] public delegate void OnMountExperienceGained(string mountId, int exp);
-        [Signal] public delegate void OnMountEffectTriggered(string mountId, Vector2 position);
+        public delegate void OnMountAdded(string mountId);
+        public delegate void OnMountRemoved(string mountId);
+        public delegate void OnMountActivated(string mountId);
+        public delegate void OnMountDeactivated();
+        public delegate void OnMountLevelUp(string mountId, int newLevel);
+        public delegate void OnMountExperienceGained(string mountId, int exp);
+        public delegate void OnMountEffectTriggered(string mountId, Vector2 position);
 
         // Shader material for mount trail effect
         private ShaderMaterial _mountTrailMaterial;

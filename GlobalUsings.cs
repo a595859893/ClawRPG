@@ -9,6 +9,6 @@ global using System.Collections.Generic;
 global using System.Collections;
 global using System.Linq;
 
-// Disambiguate: prefer non-generic Dictionary from System.Collections
-// Files needing generic Dictionary should use Dictionary<TKey, TValue> explicitly
-global using Dictionary = System.Collections.Dictionary;
+// System.Collections.Generic.Dictionary<TKey, TValue> is available as Dictionary<TKey, TValue>
+// For untyped Godot dictionaries, use Godot.Collections.Dictionary or the Dictionary alias below:
+global using Dictionary = Godot.Collections.Dictionary;

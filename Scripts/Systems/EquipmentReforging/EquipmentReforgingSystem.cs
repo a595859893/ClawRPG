@@ -22,17 +22,11 @@ namespace Game.Scripts.Systems.EquipmentReforging
         };
 
         // 信号
-        [Signal]
-        [Signal]
-    public delegate void ReforgeStarted(string equipmentId, ReforgeType type);
+        public delegate void ReforgeStarted(string equipmentId, ReforgeType type);
 
-        [Signal]
-        [Signal]
-    public delegate void ReforgeCompleted(string equipmentId, bool success, Dictionary<string, float> newAttributes);
+        public delegate void ReforgeCompleted(string equipmentId, bool success, Dictionary<string, float> newAttributes);
 
-        [Signal]
-        [Signal]
-    public delegate void ReforgeFailed(string equipmentId, string reason);
+        public delegate void ReforgeFailed(string equipmentId, string reason);
 
         public override void _Ready()
         {

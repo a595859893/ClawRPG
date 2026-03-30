@@ -34,80 +34,67 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         /// <summary>
         /// 战斗操作已广播（本地或远程）
         /// </summary>
-        [Signal]
-        public delegate void BattleActionReceivedEventHandler(BattleSyncData.BattleAction action);
+public delegate void BattleActionReceivedEventHandler(BattleSyncData.BattleAction action);
 
         /// <summary>
         /// 玩家状态更新
         /// </summary>
-        [Signal]
-        public delegate void PlayerStateUpdatedEventHandler(int playerId, BattleSyncData.PlayerBattleState state);
+public delegate void PlayerStateUpdatedEventHandler(int playerId, BattleSyncData.PlayerBattleState state);
 
         /// <summary>
         /// 玩家生命值变化
         /// </summary>
-        [Signal]
-        public delegate void PlayerHealthChangedEventHandler(int playerId, float currentHealth, float maxHealth, float change);
+public delegate void PlayerHealthChangedEventHandler(int playerId, float currentHealth, float maxHealth, float change);
 
         /// <summary>
         /// 玩家魔法值变化
         /// </summary>
-        [Signal]
-        public delegate void PlayerManaChangedEventHandler(int playerId, float currentMana, float maxMana, float change);
+public delegate void PlayerManaChangedEventHandler(int playerId, float currentMana, float maxMana, float change);
 
         /// <summary>
         /// Buff已应用
         /// </summary>
-        [Signal]
-        public delegate void BuffAppliedEventHandler(int playerId, BattleSyncData.BuffState buff);
+public delegate void BuffAppliedEventHandler(int playerId, BattleSyncData.BuffState buff);
 
         /// <summary>
         /// Buff已移除
         /// </summary>
-        [Signal]
-        public delegate void BuffRemovedEventHandler(int playerId, string buffId);
+public delegate void BuffRemovedEventHandler(int playerId, string buffId);
 
         /// <summary>
         /// 敌人状态更新
         /// </summary>
-        [Signal]
-        public delegate void EnemyStateUpdatedEventHandler(int enemyId, BattleSyncData.EnemyBattleState state);
+public delegate void EnemyStateUpdatedEventHandler(int enemyId, BattleSyncData.EnemyBattleState state);
 
         /// <summary>
         /// 敌人死亡
         /// </summary>
-        [Signal]
-        public delegate void EnemyKilledEventHandler(int enemyId, int killerId);
+public delegate void EnemyKilledEventHandler(int enemyId, int killerId);
 
         /// <summary>
         /// 玩家死亡
         /// </summary>
-        [Signal]
-        public delegate void PlayerDiedEventHandler(int playerId);
+public delegate void PlayerDiedEventHandler(int playerId);
 
         /// <summary>
         /// 玩家复活
         /// </summary>
-        [Signal]
-        public delegate void PlayerRevivedEventHandler(int playerId);
+public delegate void PlayerRevivedEventHandler(int playerId);
 
         /// <summary>
         /// 同步延迟警告
         /// </summary>
-        [Signal]
-        public delegate void SyncLatencyWarningEventHandler(float latencyMs);
+public delegate void SyncLatencyWarningEventHandler(float latencyMs);
 
         /// <summary>
         /// 战斗快照同步（用于新玩家加入或全量同步）
         /// </summary>
-        [Signal]
-        public delegate void BattleSnapshotReceivedEventHandler(BattleSyncData.BattleSnapshot snapshot);
+public delegate void BattleSnapshotReceivedEventHandler(BattleSyncData.BattleSnapshot snapshot);
 
         /// <summary>
         /// 仇恨转移（用于配合玩法：吸引仇恨）
         /// </summary>
-        [Signal]
-        public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int newTargetId);
+public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int newTargetId);
 
         #endregion
 

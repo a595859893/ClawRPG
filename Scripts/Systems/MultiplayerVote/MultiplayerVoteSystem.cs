@@ -23,14 +23,14 @@ namespace ClawRPG.Systems.MultiplayerVote
         private MultiplayerVotePersistenceSystem _persistenceSystem;
         
         // 向后兼容的 Signals
-        [Signal] public delegate void VoteStartedEventHandler(ActiveVote vote);
-        [Signal] public delegate void VoteEndedEventHandler(ActiveVote vote, bool passed);
-        [Signal] public delegate void VoteUpdatedEventHandler(ActiveVote vote);
-        [Signal] public delegate void PartyCreatedEventHandler(Party party);
-        [Signal] public delegate void PartyJoinedEventHandler(string partyId, PartyMember member);
-        [Signal] public delegate void PartyLeftEventHandler(string partyId, string playerId);
-        [Signal] public delegate void PartyMemberKickedEventHandler(string partyId, string playerId);
-        [Signal] public delegate void PartyLeaderChangedEventHandler(string partyId, string newLeaderId);
+        public delegate void VoteStartedEventHandler(ActiveVote vote);
+        public delegate void VoteEndedEventHandler(ActiveVote vote, bool passed);
+        public delegate void VoteUpdatedEventHandler(ActiveVote vote);
+        public delegate void PartyCreatedEventHandler(Party party);
+        public delegate void PartyJoinedEventHandler(string partyId, PartyMember member);
+        public delegate void PartyLeftEventHandler(string partyId, string playerId);
+        public delegate void PartyMemberKickedEventHandler(string partyId, string playerId);
+        public delegate void PartyLeaderChangedEventHandler(string partyId, string newLeaderId);
 
         public override void _Ready()
         {

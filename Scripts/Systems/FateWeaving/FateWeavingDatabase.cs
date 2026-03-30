@@ -13,7 +13,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
     ///
     /// 保留向后兼容的 public API，底层委托给相应子系统
     /// </summary>
-    public class FateWeavingDatabase : Godot.Object {
+    public class FateWeavingDatabase : GodotObject {
 
         private static FateWeavingDatabase _instance;
         public static FateWeavingDatabase Instance {

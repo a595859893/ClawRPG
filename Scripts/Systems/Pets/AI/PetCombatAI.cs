@@ -38,8 +38,8 @@ namespace ClawRPG.Scripts.Systems.Pets
         private PetAIState _currentState = PetAIState.Idle;
         
         // 信号
-        [Signal] public delegate void PetAttackedEventHandler(Node2D enemy, int damage);
-        [Signal] public delegate void PetStateChangedEventHandler(PetAIState newState);
+        public delegate void PetAttackedEventHandler(Node2D enemy, int damage);
+        public delegate void PetStateChangedEventHandler(PetAIState newState);
         
         public override void _Ready()
         {

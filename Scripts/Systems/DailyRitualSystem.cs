@@ -257,20 +257,6 @@ public class DailyRitualSystem : BaseSystem
     }
 
     // Signal definitions
-    [Signal]
-    public void RitualStarted(string ritualId);
-    
-    [Signal]
-    public void RitualCompleted(string ritualId);
-    
-    [Signal]
-    public void RitualCancelled();
-    
-    [Signal]
-    public void RitualUnlocked(string ritualId);
-    
-    [Signal]
-    public void BonusesCleared();
 
     // 数据持久化接口
     public override Dictionary ExportSaveData()

@@ -49,17 +49,10 @@ namespace ClawRPG.Systems {
         private float _sfxVolume = 1.0f;
 
         // 事件信号
-        [Signal]
-        public delegate void AccessibilitySettingsChanged();
-        
-        [Signal]
-        public delegate void ColorBlindModeChanged(ColorBlindMode mode);
-        
-        [Signal]
-        public delegate void UIScaleChanged(UIScaleLevel scale);
-        
-        [Signal]
-        public delegate void TextSizeChanged(TextSizeLevel size);
+public delegate void AccessibilitySettingsChanged();
+public delegate void ColorBlindModeChanged(ColorBlindMode mode);
+public delegate void UIScaleChanged(UIScaleLevel scale);
+public delegate void TextSizeChanged(TextSizeLevel size);
 
         public override void _Ready()
         {

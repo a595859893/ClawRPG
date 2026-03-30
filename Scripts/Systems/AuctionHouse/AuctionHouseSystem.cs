@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AuctionHouseSystem : BaseSystem
+public partial class AuctionHouseSystem : BaseSystem
 {
     private AuctionHouseData _data;
     private const int LISTING_FEE_PERCENT = 5;
@@ -369,10 +369,9 @@ public class AuctionHouseSystem : BaseSystem
         return GetSaveData();
     }
 
-    public override bool ImportSaveData(Dictionary<string, object> data)
+    public override void ImportSaveData(Dictionary<string, object> data)
     {
         LoadSaveData(data);
-        return true;
     }
     // ==================== 持久化接口结束 ====================
     

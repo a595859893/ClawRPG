@@ -16,12 +16,12 @@ namespace ClawRPG.Scripts.Quests {
             }
         }
 
-        // 信号系统
-        public Signal0 DialogueStarted { get; }
-        public Signal0 DialogueEnded { get; }
-        public Signal1<string> NodeChanged { get; }
-        public Signal1<DialogueOption> OptionSelected { get; }
-        public Signal1<DialogueReward> RewardGranted { get; }
+        // 信号系统 (C# events, Godot 4 compatible)
+        public event Action DialogueStarted;
+        public event Action DialogueEnded;
+        public event Action<string> NodeChanged;
+        public event Action<DialogueOption> OptionSelected;
+        public event Action<DialogueReward> RewardGranted;
 
         private Dialogue _currentDialogue;
         private DialogueNode _currentNode;
@@ -35,11 +35,6 @@ namespace ClawRPG.Scripts.Quests {
         public bool IsInDialogue => _isInDialogue;
 
         public DialogueManager() {
-            DialogueStarted = new Signal0();
-            DialogueEnded = new Signal0();
-            NodeChanged = new Signal1<string>();
-            OptionSelected = new Signal1<DialogueOption>();
-            RewardGranted = new Signal1<DialogueReward>();
             _completedDialogues = new HashSet<string>();
         }
 
@@ -70,8 +65,8 @@ namespace ClawRPG.Scripts.Quests {
             }
 
             _isInDialogue = true;
-            DialogueStarted.Call();
-            NodeChanged.Call(_currentNode.Id);
+            DialogueStarted?.Invoke();
+            NodeChanged?.Invoke(_currentNode.Id);
             
             GD.Print($"[DialogueManager] Started dialogue: {dialogue.Id} with NPC: {npcId}");
             return true;
@@ -83,7 +78,7 @@ namespace ClawRPG.Scripts.Quests {
         public void SelectOption(DialogueOption option) {
             if (_currentDialogue == null || _currentNode == null) return;
 
-            OptionSelected.Call(option);
+            OptionSelected?.Invoke(option);
 
             // 发放奖励
             if (option.RewardGold > 0 || !string.IsNullOrEmpty(option.RewardItemId)) {
@@ -106,7 +101,7 @@ namespace ClawRPG.Scripts.Quests {
                 if (nextNode != null) {
                     if (CheckNodeUnlock(nextNode)) {
                         _currentNode = nextNode;
-                        NodeChanged.Call(_currentNode.Id);
+                        NodeChanged?.Invoke(_currentNode.Id);
                         
                         if (_currentNode.IsEndNode) {
                             EndDialogue();
@@ -116,7 +111,7 @@ namespace ClawRPG.Scripts.Quests {
                         var availableNode = FindNextAvailableNode(nextNode);
                         if (availableNode != null) {
                             _currentNode = availableNode;
-                            NodeChanged.Call(_currentNode.Id);
+                            NodeChanged?.Invoke(_currentNode.Id);
                             
                             if (_currentNode.IsEndNode) {
                                 EndDialogue();
@@ -143,7 +138,7 @@ namespace ClawRPG.Scripts.Quests {
                 var nextNode = DialogueDatabase.Instance.GetNode(_currentDialogue.Id, _currentNode.NextNodeId);
                 if (nextNode != null && CheckNodeUnlock(nextNode)) {
                     _currentNode = nextNode;
-                    NodeChanged.Call(_currentNode.Id);
+                    NodeChanged?.Invoke(_currentNode.Id);
                     
                     if (_currentNode.IsEndNode) {
                         EndDialogue();
@@ -172,7 +167,7 @@ namespace ClawRPG.Scripts.Quests {
             _currentNode = null;
             _currentNpcId = null;
             
-            DialogueEnded.Call();
+            DialogueEnded?.Invoke();
             GD.Print("[DialogueManager] Dialogue ended");
         }
 
@@ -258,7 +253,7 @@ namespace ClawRPG.Scripts.Quests {
                 }
             }
 
-            RewardGranted.Call(reward);
+            RewardGranted?.Invoke(reward);
         }
 
         /// <summary>

@@ -30,9 +30,9 @@ public partial class CombatStanceSystem : BaseSystem
     private bool isStanceActive = false;
     
     // 信号
-    [Signal] public delegate void StanceChangedEventHandler(StanceType newStance, StanceType oldStance);
-    [Signal] public delegate void StanceExpiredEventHandler();
-    [Signal] public delegate void StanceLevelUpEventHandler(int newLevel);
+    public delegate void StanceChangedEventHandler(StanceType newStance, StanceType oldStance);
+    public delegate void StanceExpiredEventHandler();
+    public delegate void StanceLevelUpEventHandler(int newLevel);
     
     public override void _Ready()
     {
