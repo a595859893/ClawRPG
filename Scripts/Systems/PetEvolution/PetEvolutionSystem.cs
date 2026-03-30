@@ -18,7 +18,7 @@ public partial class PetEvolutionSystem : BaseSystem
     protected override string SystemName => "PetEvolutionSystem";
 
     private PetEvolutionData _data;
-    
+
     public PetEvolutionData Data
     {
         get { return _data; }
@@ -54,7 +54,7 @@ public partial class PetEvolutionSystem : BaseSystem
 
         var record = _data.EvolvedPets[petId];
         var chain = PetEvolutionDatabase.EvolutionChains[petType];
-        
+
         // Find current tier
         int currentTier = 0;
         for (int i = 0; i < chain.Count; i++)
@@ -86,7 +86,7 @@ public partial class PetEvolutionSystem : BaseSystem
             // Initialize pet evolution record
             var chain = PetEvolutionDatabase.EvolutionChains[petType];
             var initialForm = chain[0];
-            
+
             var record = new PetEvolutionRecord
             {
                 PetId = petId,
@@ -96,7 +96,7 @@ public partial class PetEvolutionSystem : BaseSystem
                 RequiredPoints = chain.Count > 1 ? chain[1].RequiredPoints : 0,
                 IsEvolved = false
             };
-            
+
             _data.EvolvedPets[petId] = record;
             result.Message = "Pet evolution record initialized";
             return result;
@@ -104,7 +104,7 @@ public partial class PetEvolutionSystem : BaseSystem
 
         var petRecord = _data.EvolvedPets[petId];
         var evolutionChain = PetEvolutionDatabase.EvolutionChains[petType];
-        
+
         // Find current form index
         int currentIndex = -1;
         for (int i = 0; i < evolutionChain.Count; i++)
@@ -123,7 +123,7 @@ public partial class PetEvolutionSystem : BaseSystem
         }
 
         var nextForm = evolutionChain[currentIndex + 1];
-        
+
         if (petRecord.EvolutionPoints < nextForm.RequiredPoints)
         {
             result.Message = $"Need {nextForm.RequiredPoints} evolution points, have {petRecord.EvolutionPoints}";
@@ -134,19 +134,19 @@ public partial class PetEvolutionSystem : BaseSystem
         string originalForm = petRecord.CurrentForm;
         petRecord.CurrentForm = nextForm.FormName;
         petRecord.IsEvolved = nextForm.Tier >= evolutionChain.Count;
-        
+
         if (!petRecord.IsEvolved && currentIndex + 2 < evolutionChain.Count)
         {
             petRecord.TargetForm = evolutionChain[currentIndex + 2].FormName;
             petRecord.RequiredPoints = evolutionChain[currentIndex + 2].RequiredPoints;
         }
-        
+
         petRecord.LastEvolutionTime = DateTime.Now;
-        
+
         // Update statistics
         _data.TotalEvolutions++;
         _data.TotalEvolutionPoints += petRecord.EvolutionPoints;
-        
+
         switch (nextForm.Rarity)
         {
             case "Legendary":
@@ -177,9 +177,9 @@ public partial class PetEvolutionSystem : BaseSystem
         result.Rarity = nextForm.Rarity;
         result.Tier = nextForm.Tier;
         result.Message = $"{originalForm} evolved to {nextForm.FormName}!";
-        
+
         SaveData();
-        
+
         return result;
     }
 
@@ -194,7 +194,7 @@ public partial class PetEvolutionSystem : BaseSystem
             // Initialize record
             var chain = PetEvolutionDatabase.EvolutionChains[petType];
             var initialForm = chain[0];
-            
+
             _data.EvolvedPets[petId] = new PetEvolutionRecord
             {
                 PetId = petId,
@@ -209,7 +209,7 @@ public partial class PetEvolutionSystem : BaseSystem
         {
             var record = _data.EvolvedPets[petId];
             var chain = PetEvolutionDatabase.EvolutionChains[petType];
-            
+
             // Check if already at max evolution
             int currentIndex = -1;
             for (int i = 0; i < chain.Count; i++)
@@ -220,13 +220,13 @@ public partial class PetEvolutionSystem : BaseSystem
                     break;
                 }
             }
-            
+
             if (currentIndex >= 0 && currentIndex < chain.Count - 1)
             {
                 record.EvolutionPoints += points;
             }
         }
-        
+
         SaveData();
     }
 
@@ -257,7 +257,7 @@ public partial class PetEvolutionSystem : BaseSystem
         progress.CurrentForm = record.CurrentForm;
         progress.CurrentPoints = record.EvolutionPoints;
         progress.RequiredPoints = record.RequiredPoints;
-        
+
         int currentIndex = -1;
         for (int i = 0; i < evolutionChain.Count; i++)
         {
@@ -280,7 +280,7 @@ public partial class PetEvolutionSystem : BaseSystem
             progress.IsMaxEvolution = true;
         }
 
-        progress.ProgressPercent = progress.RequiredPoints > 0 
+        progress.ProgressPercent = progress.RequiredPoints > 0
             ? Mathf.Min(100, (int)((float)progress.CurrentPoints / progress.RequiredPoints * 100))
             : 100;
 
@@ -429,34 +429,34 @@ public partial class PetEvolutionSystem : BaseSystem
             _data.TotalEvolutionPoints = (int)stats.Get("total_points", 0);
         }
     }
-}
 
-public class EvolutionResult
-{
-    public bool Success { get; set; }
-    public string NewForm { get; set; } = "";
-    public string Rarity { get; set; } = "";
-    public int Tier { get; set; }
-    public string Message { get; set; } = "";
-}
+    #region Data Types
 
-public class EvolutionProgress
-{
-    public string CurrentForm { get; set; } = "";
-    public string NextForm { get; set; } = "";
-    public string NextRarity { get; set; } = "";
-    public int CurrentPoints { get; set; }
-    public int RequiredPoints { get; set; }
-    public int ProgressPercent { get; set; }
-    public bool CanEvolve { get; set; }
-    public bool IsMaxEvolution { get; set; }
-}
+    public class EvolutionResult
+    {
+        public bool Success { get; set; }
+        public string NewForm { get; set; } = "";
+        public string Rarity { get; set; } = "";
+        public int Tier { get; set; }
+        public string Message { get; set; } = "";
+    }
 
-/// <summary>
-/// PetEvolutionSystem partial class for BaseSystem integration
-/// </summary>
-public partial class PetEvolutionSystem
-{
+    public class EvolutionProgress
+    {
+        public string CurrentForm { get; set; } = "";
+        public string NextForm { get; set; } = "";
+        public string NextRarity { get; set; } = "";
+        public int CurrentPoints { get; set; }
+        public int RequiredPoints { get; set; }
+        public int ProgressPercent { get; set; }
+        public bool CanEvolve { get; set; }
+        public bool IsMaxEvolution { get; set; }
+    }
+
+    #endregion
+
+    #region Persistence
+
     /// <summary>
     /// Export save data (BaseSystem override)
     /// </summary>
@@ -472,14 +472,14 @@ public partial class PetEvolutionSystem
         data["evolutionHistory"] = _data.EvolutionHistory;
         return data;
     }
-    
+
     /// <summary>
     /// Import save data (BaseSystem override)
     /// </summary>
     public override void ImportSaveData(Dictionary data)
     {
         if (data == null) return;
-        
+
         if (data.Contains("evolvedPets"))
         {
             _data.EvolvedPets = (Dictionary<int, PetEvolutionRecord>)data["evolvedPets"];
@@ -509,4 +509,6 @@ public partial class PetEvolutionSystem
             _data.EvolutionHistory = (List<EvolutionHistoryEntry>)data["evolutionHistory"];
         }
     }
+
+    #endregion
 }

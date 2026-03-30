@@ -340,39 +340,47 @@ public class ArtifactFusionDatabase : BaseSystem
                 return "Unknown Artifact";
         }
     }
-}
 
-public class FusionRecipe
-{
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string Description { get; set; } = "";
-    public string Artifact1 { get; set; } = "";
-    public string Artifact2 { get; set; } = "";
-    public string ResultArtifact { get; set; } = "";
-    public string ResultRarity { get; set; } = "Common";
-    public float SuccessRate { get; set; } = 0.5f;
-    public int RequiredLevel { get; set; } = 1;
-    public int GoldCost { get; set; } = 100;
-    public bool IsRandomResult { get; set; } = false;
-    public FusionType FusionType { get; set; } = FusionType.Mixed;
-}
+    #region Data Types
 
-/// <summary>
-/// 导出保存数据
-/// </summary>
-public override Dictionary ExportSaveData()
-{
-    var data = new Dictionary();
-    // ArtifactFusionDatabase 是静态配置数据，不需要持久化
-    return data;
-}
+    public class FusionRecipe
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Artifact1 { get; set; } = "";
+        public string Artifact2 { get; set; } = "";
+        public string ResultArtifact { get; set; } = "";
+        public string ResultRarity { get; set; } = "Common";
+        public float SuccessRate { get; set; } = 0.5f;
+        public int RequiredLevel { get; set; } = 1;
+        public int GoldCost { get; set; } = 100;
+        public bool IsRandomResult { get; set; } = false;
+        public FusionType FusionType { get; set; } = FusionType.Mixed;
+    }
 
-/// <summary>
-/// 导入保存数据
-/// </summary>
-public override void ImportSaveData(Dictionary data)
-{
-    if (data == null) return;
-    // ArtifactFusionDatabase 是静态配置数据，不需要持久化
+    #endregion
+
+    #region Persistence
+
+    /// <summary>
+    /// 导出保存数据
+    /// </summary>
+    public override Dictionary ExportSaveData()
+    {
+        var data = new Dictionary();
+        // ArtifactFusionDatabase 是静态配置数据，不需要持久化
+        return data;
+    }
+
+    /// <summary>
+    /// 导入保存数据
+    /// </summary>
+    public override void ImportSaveData(Dictionary data)
+    {
+        if (data == null) return;
+        // ArtifactFusionDatabase 是静态配置数据，不需要持久化
+    }
+
+    #endregion
 }

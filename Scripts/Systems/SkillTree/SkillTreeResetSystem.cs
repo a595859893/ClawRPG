@@ -355,34 +355,40 @@ public partial class SkillTreeResetSystem : BaseSystem
         
         return count;
     }
-}
 
-public class SkillTreeResetResult
-{
-    public bool Success { get; set; }
-    public string ErrorMessage { get; set; }
-    public string ResetType { get; set; } // "Free" or "Paid"
-    public int PointsRecovered { get; set; }
-    public int GoldSpent { get; set; }
-    public int TotalResets { get; set; }
-    public int FreeResetsRemaining { get; set; }
-}
+    #region Data Types
 
-public class SkillTreeResetStatistics
-{
-    public int TotalResets { get; set; }
-    public int FreeResetsUsed { get; set; }
-    public int PaidResetsUsed { get; set; }
-    public int FreeResetsRemaining { get; set; }
-    public int TotalPointsRecovered { get; set; }
-    public int TotalGoldSpent { get; set; }
-    public int MaxPointsInSingleReset { get; set; }
-    public int AveragePointsPerReset { get; set; }
-    public float RefundPercentage { get; set; }
-}
+    public class SkillTreeResetResult
+    {
+        public bool Success { get; set; }
+        public string ErrorMessage { get; set; }
+        public string ResetType { get; set; } // "Free" or "Paid"
+        public int PointsRecovered { get; set; }
+        public int GoldSpent { get; set; }
+        public int TotalResets { get; set; }
+        public int FreeResetsRemaining { get; set; }
+    }
 
-public partial class SkillTreeResetSystem
-{
-    public override Dictionary ExportSaveData() => new();
+    public class SkillTreeResetStatistics
+    {
+        public int TotalResets { get; set; }
+        public int FreeResetsUsed { get; set; }
+        public int PaidResetsUsed { get; set; }
+        public int FreeResetsRemaining { get; set; }
+        public int TotalPointsRecovered { get; set; }
+        public int TotalGoldSpent { get; set; }
+        public int MaxPointsInSingleReset { get; set; }
+        public int AveragePointsPerReset { get; set; }
+        public float RefundPercentage { get; set; }
+    }
+
+    #endregion
+
+    #region Persistence
+
+    public override Dictionary ExportSaveData() => new Dictionary();
+
     public override void ImportSaveData(Dictionary data) { }
+
+    #endregion
 }
