@@ -14,9 +14,14 @@ namespace ClawRPG.Scripts.Systems {
         private Boss _boss;
         private BTContext _context;
         private BTSelector _root;
-        
+
         // Ability evaluation cache
         private Dictionary<string, float> _abilityScores = new Dictionary<string, float>();
+
+        /// <summary>
+        /// Fired when the boss selects an ability — payload carries the full intent data for UI display (REQ-160).
+        /// </summary>
+        public event Action<BossIntentData> OnIntentSelected;
         
         public BossDecisionMaker(Boss boss) {
             _boss = boss;
@@ -112,14 +117,72 @@ namespace ClawRPG.Scripts.Systems {
         /// </summary>
         private void ApplyDecision() {
             if (_context.SelectedAbility != null) {
+                // REQ-160: Build and emit intent data before the ability fires
+                var intentData = BuildIntentData(_context.SelectedAbility);
+                OnIntentSelected?.Invoke(intentData);
+
                 _boss.TryUseAbility(_context.SelectedAbility);
                 _context.TimeSinceLastAbility = 0;
             }
-            
+
             // Apply state change
             if (_context.DesiredState != BossAIState.Idle) {
                 _boss.ForceSetState(_context.DesiredState);
             }
+        }
+
+        /// <summary>
+        /// REQ-160: Construct BossIntentData from a selected ability ID.
+        /// </summary>
+        private BossIntentData BuildIntentData(string abilityId) {
+            var data = new BossIntentData {
+                AbilityId = abilityId,
+                IntentType = BossIntentType.Damage
+            };
+
+            var abilityDb = _boss.GetAbilityDatabase();
+            if (abilityDb != null && abilityDb.TryGetValue(abilityId, out var ability)) {
+                data.AbilityName = ability.AbilityName;
+
+                // Try to classify via BossSkillType if available on the ability
+                if (ability is BossAbility ba) {
+                    // Infer intent type from ability characteristics
+                    if (ba.IsAoE || ba.AoERadius > 0) {
+                        data.IsAoE = true;
+                    }
+                    // Classify based on ability name heuristics (covers all current abilities)
+                    data.IntentType = ClassifyIntentFromAbility(ba);
+                    data.MinDamage = (int)(ba.DamageMultiplier * _boss.AttackPower);
+                    data.MaxDamage = (int)(ba.DamageMultiplier * _boss.AttackPower * 1.3f); // +30% variance
+                } else {
+                    data.AbilityName = ability.AbilityName ?? abilityId;
+                    data.MinDamage = 0;
+                    data.MaxDamage = 0;
+                }
+            } else {
+                data.AbilityName = abilityId;
+                data.MinDamage = 0;
+                data.MaxDamage = 0;
+            }
+
+            // Check enrage state
+            data.IsEnraged = _boss.IsEnraged();
+
+            return data;
+        }
+
+        private BossIntentType ClassifyIntentFromAbility(BossAbility ability) {
+            var name = ability.AbilityName.ToLowerInvariant();
+
+            if (name.Contains("heal") || name.Contains("shield") || name.Contains("buff"))
+                return BossIntentType.Buff;
+            if (name.Contains("curse") || name.Contains("poison") || name.Contains("debuff") || name.Contains("slow"))
+                return BossIntentType.Debuff;
+            if (name.Contains("teleport") || name.Contains("retreat"))
+                return BossIntentType.Defend;
+            if (name.Contains("summon") || name.Contains("enrage"))
+                return BossIntentType.Special;
+            return BossIntentType.Damage;
         }
         
         private bool HasMultipleTargets() {

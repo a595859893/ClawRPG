@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Systems.BossMechanics;
 
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
@@ -36,6 +37,8 @@ namespace ClawRPG.Scripts.Characters {
         public event Action<string> OnSpecialAbility;
         public event Action<string> OnAbilityWarmingUp;
         public event Action<BossAIState> OnAIStateChanged;
+        // REQ-160: Intent display system
+        public event Action<BossIntentData> OnIntentSelected;
 
         public override void _Ready()
         {
@@ -100,6 +103,8 @@ namespace ClawRPG.Scripts.Characters {
             _bossPhase.OnEnrage += () => OnEnrage?.Invoke();
             _bossAbilities.OnAbilityUsed += (ability) => OnSpecialAbility?.Invoke(ability);
             _bossAbilities.OnAbilityWarmingUp += (ability) => OnAbilityWarmingUp?.Invoke(ability);
+            // REQ-160: Forward intent selection events from decision maker
+            _decisionMaker.OnIntentSelected += (intent) => OnIntentSelected?.Invoke(intent);
         }
 
         /// <summary>

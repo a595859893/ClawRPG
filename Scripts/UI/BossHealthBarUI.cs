@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.BossMechanics;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
@@ -15,11 +16,18 @@ namespace ClawRPG.Scripts.UI {
         private Label _healthLabel;
         private Label _phaseLabel;
         private TextureRect _bossIcon;
-        
+
         // Enrage UI Components
         private ProgressBar _enrageBar;
         private Label _enrageLabel;
         private Label _enrageWarningLabel;
+
+        // REQ-160: Intent display components
+        private HBoxContainer _intentContainer;
+        private Label _intentLabel;
+        private TextureRect _intentIcon;
+        private Label _intentDamageLabel;
+        private BossIntentData _currentIntent;
         
         // State
         private Node2D _currentBoss;
@@ -42,6 +50,14 @@ namespace ClawRPG.Scripts.UI {
         private const float ConfidenceFloorWarning = 0.30f;  // 30%: orange warning
         private const float ConfidenceFloorCritical = 0.15f; // 15%: red danger
         private bool _isPulsing = false;
+
+        // REQ-160: Intent type colors
+        private readonly Color _intentDamage = new Color(0.95f, 0.2f, 0.2f);   // Red
+        private readonly Color _intentBuff = new Color(0.95f, 0.85f, 0.2f);   // Yellow
+        private readonly Color _intentDebuff = new Color(0.7f, 0.2f, 0.9f);   // Purple
+        private readonly Color _intentDefend = new Color(0.2f, 0.5f, 0.95f);  // Blue
+        private readonly Color _intentSpecial = new Color(0.4f, 0.1f, 0.5f);  // Dark purple
+        private readonly Color _intentEnraged = new Color(1f, 0.3f, 0f);      // Orange-red for enrage
         
         public override void _Ready()
         {
@@ -95,7 +111,32 @@ namespace ClawRPG.Scripts.UI {
             _bossNameLabel.AddThemeFontSizeOverride("font_size", 18);
             _bossNameLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.7f));
             nameHBox.AddChild(_bossNameLabel);
-            
+
+            // REQ-160: Intent display row — hidden until boss selects an ability
+            _intentContainer = new HBoxContainer();
+            _intentContainer.Alignment = BoxContainer.AlignmentMode.Center;
+            _intentContainer.HorizontalAlignment = HorizontalAlignment.Center;
+            _intentContainer.Visible = false;
+            _intentContainer.CustomMinimumSize = new Vector2(360, 28);
+            vbox.AddChild(_intentContainer);
+
+            _intentIcon = new TextureRect();
+            _intentIcon.CustomMinimumSize = new Vector2(20, 20);
+            _intentIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            _intentContainer.AddChild(_intentIcon);
+
+            _intentLabel = new Label();
+            _intentLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _intentLabel.AddThemeFontSizeOverride("font_size", 13);
+            _intentLabel.AddThemeColorOverride("font_color", new Color(1f, 1f, 1f));
+            _intentContainer.AddChild(_intentLabel);
+
+            _intentDamageLabel = new Label();
+            _intentDamageLabel.HorizontalAlignment = HorizontalAlignment.Left;
+            _intentDamageLabel.AddThemeFontSizeOverride("font_size", 12);
+            _intentDamageLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.6f));
+            _intentContainer.AddChild(_intentDamageLabel);
+
             // Health bar
             _healthBar = new ProgressBar();
             _healthBar.CustomMinimumSize = new Vector2(360, 24);
@@ -463,21 +504,109 @@ namespace ClawRPG.Scripts.UI {
             // Reset fade
             _fadeTimer = 0f;
             _container.Modulate = new Color(1f, 1f, 1f, 1f);
-            
+
+            // Subscribe to boss events
+            UnsubscribeFromBossEvents(); // clean up any previous subscription
+            SubscribeToBossEvents();
+
             // Show
             Visible = true;
             _isVisible = true;
             _displayTimer = AutoHideTime;
-            
+
             // Update immediately
             UpdateBossHealth();
         }
-        
+
+        /// <summary>
+        /// REQ-160: Subscribe to boss intent events
+        /// </summary>
+        private void SubscribeToBossEvents()
+        {
+            if (_currentBoss is Scripts.Boss boss) {
+                boss.OnIntentSelected += OnBossIntentSelected;
+            }
+        }
+
+        /// <summary>
+        /// REQ-160: Unsubscribe from boss intent events
+        /// </summary>
+        private void UnsubscribeFromBossEvents()
+        {
+            if (_currentBoss is Scripts.Boss boss) {
+                boss.OnIntentSelected -= OnBossIntentSelected;
+            }
+            _currentIntent = null;
+            _intentContainer.Visible = false;
+        }
+
+        /// <summary>
+        /// REQ-160: Handler for BossDecisionMaker's intent selection signal.
+        /// Shows the intent UI with the ability name, type icon, and damage range.
+        /// </summary>
+        private void OnBossIntentSelected(BossIntentData intent)
+        {
+            _currentIntent = intent;
+            UpdateIntentDisplay(intent);
+
+            // Keep health bar visible while boss is preparing an attack
+            _displayTimer = AutoHideTime;
+        }
+
+        /// <summary>
+        /// REQ-160: Refresh the intent display based on current BossIntentData.
+        /// </summary>
+        private void UpdateIntentDisplay(BossIntentData intent)
+        {
+            if (intent == null) {
+                _intentContainer.Visible = false;
+                return;
+            }
+
+            // Pick color based on intent type
+            Color intentColor = intent.IntentType switch {
+                BossIntentType.Damage => _intentDamage,
+                BossIntentType.Buff => _intentBuff,
+                BossIntentType.Debuff => _intentDebuff,
+                BossIntentType.Defend => _intentDefend,
+                BossIntentType.Special => _intentSpecial,
+                _ => Colors.White
+            };
+
+            // Enraged state makes intent glow orange
+            if (intent.IsEnraged) {
+                intentColor = _intentEnraged;
+            }
+
+            // Build the icon emoji (Godot Label supports basic emoji as text on most fonts)
+            string icon = intent.IntentType switch {
+                BossIntentType.Damage => intent.IsAoE ? "💥" : "⚔️",
+                BossIntentType.Buff => intent.AbilityName?.ToLowerInvariant().Contains("heal") == true ? "💚" : "🛡️",
+                BossIntentType.Debuff => "☠️",
+                BossIntentType.Defend => "🏃",
+                BossIntentType.Special => intent.AbilityName?.ToLowerInvariant().Contains("summon") == true ? "👹" : "⚡",
+                _ => "❓"
+            };
+
+            _intentIcon.Modulate = intentColor;
+            _intentLabel.Text = $"  {icon} {intent.AbilityName}";
+            _intentLabel.AddThemeColorOverride("font_color", intentColor);
+
+            string damageText = intent.GetDisplayString();
+            _intentDamageLabel.Text = intent.IntentType == BossIntentType.Damage
+                ? $"  → {damageText}"
+                : "";
+            _intentDamageLabel.AddThemeColorOverride("font_color", intentColor);
+
+            _intentContainer.Visible = true;
+        }
+
         /// <summary>
         /// Hide boss health bar
         /// </summary>
         public void HideBossHealth()
         {
+            UnsubscribeFromBossEvents();
             _currentBoss = null;
             StartFadeOut();
         }
