@@ -291,7 +291,7 @@ public partial class RuneUI : Control
         var db = RuneDatabase.Instance;
         var unlocked = RuneSystem.Instance.GetUnlockedRunes();
         
-        foreach (var rune in db.Runes.Values)
+        foreach (var rune in db.GetAllRunes())
         {
             // Check filters
             if (slotIndex > 0)
@@ -313,7 +313,7 @@ public partial class RuneUI : Control
         }
     }
     
-    private PanelContainer CreateRunePanel(RuneDatabase.RuneDefinition rune)
+    private PanelContainer CreateRunePanel(RuneData rune)
     {
         var panel = new PanelContainer();
         panel.CustomMinimumSize = new Vector2(200, 100);
@@ -361,7 +361,7 @@ public partial class RuneUI : Control
         return panel;
     }
     
-    private void ShowRuneDetails(RuneDatabase.RuneDefinition rune)
+    private void ShowRuneDetails(RuneData rune)
     {
         int level = RuneSystem.Instance.GetRuneLevel(rune.Id);
         float levelMult = 1f + (level - 1) * 0.2f;
