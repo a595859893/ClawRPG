@@ -1,1 +1,4 @@
 check-syntax.sh
+
+# Godot-specific
+.godot/
