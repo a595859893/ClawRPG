@@ -112,8 +112,8 @@ namespace ClawRPG.Scripts.Managers
             
             try
             {
-                var saveSystem = new SaveSystem();
-                if (saveSystem.HasSave(0))
+                var saveSystem = SaveSystem.Instance;
+                if (saveSystem != null && saveSystem.HasSave(0))
                 {
                     GD.Print("[GameInitializationManager] Found save file, loading...");
                     var data = saveSystem.LoadGame(0);
@@ -204,7 +204,12 @@ namespace ClawRPG.Scripts.Managers
             
             try
             {
-                var saveSystem = new SaveSystem();
+                var saveSystem = SaveSystem.Instance;
+                if (saveSystem == null)
+                {
+                    GD.PrintErr("[GameInitializationManager] SaveSystem.Instance is null");
+                    return;
+                }
                 saveSystem.SaveGame(0, CreateSaveData());
                 GD.Print("[GameInitializationManager] Game saved successfully!");
             }

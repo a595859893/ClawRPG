@@ -82,12 +82,15 @@ public class SaveLoadManager : ManagerBase
     {
         GD.Print("[SaveLoadManager] Initialized");
         
-        _saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
+        _saveSystem = GetNodeOrNull<SaveSystem>("/root/SaveSystem");
         if (_saveSystem == null)
         {
+            // Fallback: create and add to scene tree.
+            // SaveSystem._Ready() will set SaveSystem.Instance = this
             _saveSystem = new SaveSystem();
             _saveSystem.Name = "SaveSystem";
             GetTree().Root.AddChild(_saveSystem);
+            GD.Print("[SaveLoadManager] SaveSystem not found in scene, created new instance");
         }
         
         NotifyInitialized();

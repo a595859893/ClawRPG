@@ -52,8 +52,8 @@ public partial class MainSaveLoad : Node
     /// </summary>
     public void LoadGameData()
     {
-        var saveSystem = new SaveSystem();
-        if (saveSystem.HasSave(0))
+        var saveSystem = SaveSystem.Instance;
+        if (saveSystem != null && saveSystem.HasSave(0))
         {
             GD.Print("Found save file, loading...");
             var data = saveSystem.LoadGame(0);
@@ -175,7 +175,12 @@ public partial class MainSaveLoad : Node
     {
         GD.Print("Loading game from slot: " + saveSlot);
         
-        var saveSystem = new SaveSystem();
+        var saveSystem = SaveSystem.Instance;
+        if (saveSystem == null)
+        {
+            GD.PrintErr("[MainSaveLoad] SaveSystem.Instance is null — SaveSystem node not found in scene tree");
+            return;
+        }
         var saveData = saveSystem.LoadGame(saveSlot);
         
         if (saveData != null)
