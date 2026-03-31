@@ -128,11 +128,59 @@ namespace ClawRPG.Scripts.UI {
             return style;
         }
         
+        private int _lastTrackedStep = 0;
+
         private void ConnectSignals()
         {
-            // ComboSystem 被合并到 SkillComboSystem；原有 OnComboChanged/OnComboMilestone/OnComboBroken
-            // 事件不存在（ComboSystem 从未实现它们），此 UI 暂时禁用连击显示
-            // TODO: 后续可接入 SkillComboSystem.ComboCompleted 信号实现连击显示
+            var skillCombo = global::SkillComboSystem.Instance;
+            if (skillCombo != null)
+            {
+                skillCombo.ComboStarted += OnComboStarted;
+                skillCombo.ComboCompleted += OnComboCompleted;
+                skillCombo.ComboFailed += OnComboFailed;
+                global::SkillComboSystem.ComboProgressUpdated += OnComboProgressUpdated;
+            }
+        }
+
+        private void OnComboStarted(string comboId)
+        {
+            _lastTrackedStep = 0;
+            OnComboChanged(1, 1);
+        }
+
+        private void OnComboCompleted(string comboId, int streak)
+        {
+            if (streak > 0)
+            {
+                OnComboChanged(streak, streak);
+            }
+            else
+            {
+                OnComboBroken();
+            }
+        }
+
+        private void OnComboFailed(string comboId)
+        {
+            OnComboBroken();
+        }
+
+        private void OnComboProgressUpdated(string comboId, int step, float timeRemaining)
+        {
+            if (step > 0)
+            {
+                OnComboChanged(step, step);
+                // Fire milestone at thresholds
+                if (step >= 25 && _lastTrackedStep < 25) OnComboMilestone(25, 0, 0);
+                if (step >= 50 && _lastTrackedStep < 50) OnComboMilestone(50, 0, 0);
+                if (step >= 75 && _lastTrackedStep < 75) OnComboMilestone(75, 0, 0);
+                _lastTrackedStep = step;
+            }
+            // Update decay progress bar
+            if (_comboProgressBar != null && _isVisible)
+            {
+                _comboProgressBar.Value = Mathf.Max(0, timeRemaining);
+            }
         }
         
         private void OnComboChanged(int newCombo, int maxCombo)
@@ -221,13 +269,9 @@ namespace ClawRPG.Scripts.UI {
         
         public override void _Process(double delta)
         {
-            // Update progress bar (combo decay timer)
-            var comboSystem = GetTree().GetFirstNodeInGroup("ComboSystem") as ComboSystem;
-            if (comboSystem != null && comboSystem.CurrentCombo > 0 && _comboProgressBar != null)
-            {
-                // This is a simple approximation
-                _comboProgressBar.Value = Mathf.Max(0, _comboProgressBar.Value - (float)delta);
-            }
+            // Progress bar decay is now handled by OnComboProgressUpdated (timeRemaining parameter)
+            // This method is kept for potential future use but the decay tracking
+            // is now signal-driven via SkillComboSystem.ComboProgressUpdated
         }
     }
 }
