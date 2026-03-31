@@ -1,6 +1,0 @@
-/project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.csproj.AssemblyReference.cache
-/project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.GeneratedMSBuildEditorConfig.editorconfig
-/project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.AssemblyInfoInputs.cache
-/project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.AssemblyInfo.cs
-/project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.csproj.CoreCompileInputs.cache
-/project/ClawRPG/.godot/mono/temp/obj/Debug/ClawRPG.sourcelink.json
