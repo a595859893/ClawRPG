@@ -311,6 +311,26 @@ namespace ClawRPG.Scripts.Characters {
             _statusEffects.Add(effect);
             GD.Print(EnemyName + " affected by: " + effect.Type);
         }
+
+        /// <summary>
+        /// Apply a status effect from the skill system (EffectType variant).
+        /// </summary>
+        public void ApplyStatusEffect(StatusEffect.EffectType effectType, float value, float duration)
+        {
+            var effect = new StatusEffect(effectType, value, duration);
+            _statusEffects.Add(effect);
+            GD.Print(EnemyName + " affected by: " + effectType);
+        }
+
+        /// <summary>
+        /// Apply a status effect from boss abilities (StatusEffectType variant).
+        /// </summary>
+        public void ApplyStatusEffect(StatusEffectType effectType, float value, float duration)
+        {
+            var effect = StatusEffect.FromEffectType(effectType, value, duration);
+            _statusEffects.Add(effect);
+            GD.Print(EnemyName + " affected by: " + effectType);
+        }
         
         private void UpdateStatusEffects(float dt)
         {
