@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 宠物友谊系统 - 管理宠物之间的友谊关系和互动
 /// </summary>
-public class PetFriendshipSystem : BaseSystem
+public partial class PetFriendshipSystem : BaseSystem
 {
     public static PetFriendshipSystem Instance { get; private set; }
 
@@ -14,6 +14,12 @@ public class PetFriendshipSystem : BaseSystem
 
     public int TotalBonds { get; private set; }
     public int MaxLevelBonds { get; private set; }
+
+    /// <summary>
+    /// 有历史友谊的宠物重逢时触发
+    /// </summary>
+    [Signal]
+    public delegate void PetReunionEventHandler(int petIdA, int petIdB, int historicalFriendship, int totalBattles);
 
     public override void _Ready()
     {
@@ -300,6 +306,8 @@ public class PetFriendshipSystem : BaseSystem
                 friendship["exp"] = innerKvp.Value.Experience;
                 friendship["last_interaction"] = innerKvp.Value.LastInteraction.ToString("o");
                 friendship["bonds_of_war"] = innerKvp.Value.IsBondsOfWar;
+                friendship["max_friendship"] = innerKvp.Value.MaxFriendship;
+                friendship["total_battles"] = innerKvp.Value.TotalBattles;
                 innerDict[innerKvp.Key.ToString()] = friendship;
             }
             friendshipsData[outerKvp.Key.ToString()] = innerDict;
@@ -317,8 +325,60 @@ public class PetFriendshipSystem : BaseSystem
         // 保存统计数据
         data["total_bonds"] = TotalBonds;
         data["max_level_bonds"] = MaxLevelBonds;
-        
+
+        // 保存社交记忆（跨游戏局次历史）
+        data["social_memory"] = PetSocialMemoryDatabase.Instance.ExportSaveData();
+
         return data;
+    }
+
+    /// <summary>
+    /// 加载社交记忆：用历史最高友谊更新当前友谊（取较大值）
+    /// 在 ImportSaveData 之后调用
+    /// </summary>
+    public void LoadSocialMemories()
+    {
+        var memories = PetSocialMemoryDatabase.Instance.GetAllMemories();
+        foreach (var memory in memories)
+        {
+            var currentFriendship = GetFriendship(memory.PetIdA, memory.PetIdB);
+            if (currentFriendship != null)
+            {
+                // 取历史最高友谊与当前友谊的较大值
+                int newLevel = Math.Max(currentFriendship.FriendshipLevel, memory.MaxFriendship);
+                bool hasHistory = currentFriendship.MaxFriendship > 0
+                    ? currentFriendship.MaxFriendship < memory.MaxFriendship
+                    : memory.MaxFriendship > 0;
+
+                // 更新 MaxFriendship 历史记录
+                currentFriendship.MaxFriendship = Math.Max(currentFriendship.MaxFriendship, memory.MaxFriendship);
+                // 累计历史战斗次数（跨局次）
+                currentFriendship.TotalBattles = currentFriendship.TotalBattles + memory.TotalBattles;
+
+                if (hasHistory && memory.MaxFriendship > currentFriendship.FriendshipLevel)
+                {
+                    // 历史友谊高于当前值，触发重逢叙事
+                    GD.Print($"[PetFriendship] Pet reunion! {memory.PetIdA} & {memory.PetIdB} have history: level {memory.MaxFriendship}, {memory.TotalBattles} battles");
+                    EmitSignal(SignalName.PetReunion, memory.PetIdA, memory.PetIdB, memory.MaxFriendship, memory.TotalBattles);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 同步当前友谊到社交记忆（在游戏保存时调用）
+    /// </summary>
+    public void SaveSocialMemories()
+    {
+        PetSocialMemoryDatabase.Instance.SyncFromCurrentSession(friendships);
+    }
+
+    /// <summary>
+    /// 清除所有社交记忆（新游戏时调用）
+    /// </summary>
+    public void ClearSocialMemories()
+    {
+        PetSocialMemoryDatabase.Instance.ClearAllMemories();
     }
     
     public override void ImportSaveData(Dictionary<string, object> data)
@@ -348,7 +408,11 @@ public class PetFriendshipSystem : BaseSystem
                         FriendshipLevel = Convert.ToInt32(friendshipDict["level"]),
                         Experience = Convert.ToInt32(friendshipDict["exp"]),
                         LastInteraction = DateTime.Parse(friendshipDict["last_interaction"].ToString()),
-                        IsBondsOfWar = Convert.ToBoolean(friendshipDict["bonds_of_war"])
+                        IsBondsOfWar = Convert.ToBoolean(friendshipDict["bonds_of_war"]),
+                        MaxFriendship = friendshipDict.ContainsKey("max_friendship")
+                            ? Convert.ToInt32(friendshipDict["max_friendship"]) : 0,
+                        TotalBattles = friendshipDict.ContainsKey("total_battles")
+                            ? Convert.ToInt32(friendshipDict["total_battles"]) : 0
                     };
                     
                     friendships[smallerId][largerId] = friendship;
@@ -372,5 +436,14 @@ public class PetFriendshipSystem : BaseSystem
             TotalBonds = Convert.ToInt32(data["total_bonds"]);
         if (data.ContainsKey("max_level_bonds"))
             MaxLevelBonds = Convert.ToInt32(data["max_level_bonds"]);
+
+        // 恢复社交记忆
+        if (data.ContainsKey("social_memory"))
+        {
+            PetSocialMemoryDatabase.Instance.ImportSaveData((Dictionary)data["social_memory"]);
+        }
+
+        // 用历史最高友谊更新当前友谊
+        LoadSocialMemories();
     }
 }

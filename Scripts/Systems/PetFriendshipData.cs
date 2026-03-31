@@ -13,6 +13,16 @@ public class PetFriendshipData : Resource
     public int Experience { get; set; }
     public DateTime LastInteraction { get; set; }
     public bool IsBondsOfWar { get; set; }
+
+    /// <summary>
+    /// 历史最高友谊等级（跨所有游戏局次）
+    /// </summary>
+    public int MaxFriendship { get; set; }
+
+    /// <summary>
+    /// 共同战斗总次数（跨所有游戏局次）
+    /// </summary>
+    public int TotalBattles { get; set; }
 }
 
 public class PetFriendshipDatabase
