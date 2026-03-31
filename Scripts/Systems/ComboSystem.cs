@@ -482,6 +482,14 @@ public class ComboSystem : BaseSystem
                 progress.isActive = true;
                 ComboProgressUpdated?.Emit(progress.comboId, progress.currentStep, progress.timeRemaining);
             }
+            else
+            {
+                // REQ-171: Wrong skill during active combo — emit ComboFailed for visual feedback
+                if (expectedStep > 0 && combo.comboType != ComboData.ComboType.Chaos)
+                {
+                    ComboFailed?.Emit(progress.comboId);
+                }
+            }
         }
     }
 
