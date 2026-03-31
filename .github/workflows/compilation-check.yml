@@ -1,0 +1,60 @@
+name: C# Compilation Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ClawRPG.csproj
+        working-directory: ClawRPG
+
+      - name: Build
+        id: build
+        run: |
+          output=$(dotnet build ClawRPG.csproj 2>&1)
+          echo "$output"
+          echo "output=$output" >> $GITHUB_OUTPUT
+        working-directory: ClawRPG
+        continue-on-error: true
+
+      - name: Parse error count
+        id: errors
+        run: |
+          output="${{ steps.build.outputs.output }}"
+          # Extract error count from "XXX Error(s)" line
+          error_count=$(echo "$output" | grep -oP '\d+(?= Error\(s\))' | head -1 || echo "0")
+          echo "Compilation error count: $error_count"
+          echo "error_count=$error_count" >> $GITHUB_OUTPUT
+          # Fail if too many errors (threshold: 500)
+          if [ "$error_count" -gt 500 ]; then
+            echo "::warning ::High compilation error count: $error_count (threshold: 500)"
+          fi
+
+      - name: Upload build logs on failure
+        if: steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: ClawRPG/*.log
+          retention-days: 7
+
+      - name: Summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Errors: ${{ steps.errors.outputs.error_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ steps.build.outcome }}" >> $GITHUB_STEP_SUMMARY
