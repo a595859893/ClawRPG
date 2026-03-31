@@ -14,7 +14,8 @@ namespace ClawRPG.Scripts.Systems
     public class ChoiceEventDatabase : DatabaseBase
     {
         private static ChoiceEventDatabase _instance;
-        public static new ChoiceEventDatabase Instance => _instance ??= new ChoiceEventDatabase();
+        public static ChoiceEventDatabase Instance => _instance ??= new ChoiceEventDatabase();
+        public override object Instance => _instance ??= new ChoiceEventDatabase();
 
         private Dictionary<string, ChoiceEventRewards> _events = new Dictionary<string, ChoiceEventRewards>();
 

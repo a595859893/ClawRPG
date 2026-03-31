@@ -17,6 +17,7 @@ public class ComboSkillSystem : BaseSystem
         Parallel,
         Chain,
         Conditional
+        // Note: Chaos combo 通过 ComboData.ComboType.Chaos 实现，不在此枚举扩展
     }
 
     public enum TriggerCondition

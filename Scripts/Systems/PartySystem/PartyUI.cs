@@ -61,14 +61,14 @@ public partial class PartyUI : Control
     private VBoxContainer _historyContainer;
 
     // Create Party Dialog
-    private WindowDialog _createDialog;
+    private ConfirmationDialog _createDialog;
     private OptionButton _partyTypeOption;
     private LineEdit _partyNameInput;
     private Button _confirmCreateButton;
     private Button _cancelCreateButton;
 
     // Invite Dialog
-    private WindowDialog _inviteDialog;
+    private ConfirmationDialog _inviteDialog;
     private LineEdit _playerIdInput;
     private Button _sendInviteButton;
     private Button _cancelInviteButton;
@@ -268,7 +268,7 @@ public partial class PartyUI : Control
 
     private void SetupCreateDialog()
     {
-        _createDialog = new WindowDialog();
+        _createDialog = new ConfirmationDialog();
         _createDialog.Title = "创建队伍";
         _createDialog.CustomMinimumSize = new Vector2(300, 200);
         AddChild(_createDialog);
@@ -314,7 +314,7 @@ public partial class PartyUI : Control
 
     private void SetupInviteDialog()
     {
-        _inviteDialog = new WindowDialog();
+        _inviteDialog = new ConfirmationDialog();
         _inviteDialog.Title = "邀请玩家";
         _inviteDialog.CustomMinimumSize = new Vector2(300, 150);
         AddChild(_inviteDialog);

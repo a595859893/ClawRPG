@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Systems.WeaponResonance
 {
@@ -138,9 +139,9 @@ namespace ClawRPG.Scripts.Systems.WeaponResonance
         }
 
         /// <summary>
-        /// 根据 WeaponMasterySystem.WeaponType 获取共鸣效果
+        /// 根据 WeaponType 获取共鸣效果
         /// </summary>
-        public static ResonanceEffect GetEffect(WeaponMasterySystem.WeaponType type)
+        public static ResonanceEffect GetEffect(WeaponType type)
         {
             return GetEffect(type.ToString());
         }

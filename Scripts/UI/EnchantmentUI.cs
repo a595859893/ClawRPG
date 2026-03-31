@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.Enchantment;
 using ClawRPG.Scripts.Items;
+using EnchantmentData = ClawRPG.Scripts.Systems.Enchantment.EnchantmentRecord;
 
 public partial class EnchantmentUI : Control
 {

@@ -755,7 +755,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         // Persistence
         // ══════════════════════════════════════════════════════════════════════
 
-        public override Dictionary<string, object> ExportSaveData()
+        public Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, object>();
             var imprintList = new List<Dictionary>();
@@ -777,7 +777,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             return data;
         }
 
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public void ImportSaveData(Dictionary<string, object> data)
         {
             _imprints.Clear();
             _highestBehaviorLevel.Clear();

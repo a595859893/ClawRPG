@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Game;
+using SetType = Game.EquipmentSetData.SetType;
+using SetRarity = Game.EquipmentSetData.SetRarity;
 
 namespace Game
 {

@@ -11,7 +11,8 @@ namespace ClawRPG.Scripts.Systems.Enchantment
     public class EnchantmentDatabase : DatabaseBase
     {
         private static EnchantmentDatabase _instance;
-        public static new EnchantmentDatabase Instance => _instance ??= new EnchantmentDatabase();
+        public static EnchantmentDatabase Instance => _instance ??= new EnchantmentDatabase();
+        public override object Instance => _instance ??= new EnchantmentDatabase();
 
         // 附魔记录缓存
         private Dictionary<string, EnchantmentRecord> _enchantments;
@@ -21,7 +22,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         /// <summary>
         /// 初始化附魔数据库
         /// </summary>
-        public void Initialize()
+        public override void Initialize()
         {
             _enchantments = new Dictionary<string, EnchantmentRecord>();
             _tierCache = new Dictionary<EnchantmentTier, List<string>>();

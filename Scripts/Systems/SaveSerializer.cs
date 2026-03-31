@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using GameSystems;
 using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.UI;
-using ClawRPG.Scripts.Systems.Emote;
+using ClawRPG.Systems.Emote;
+using ClawRPG.Scripts.Systems.Enchantment;
 
 namespace ClawRPG.Scripts.Systems
 {

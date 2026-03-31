@@ -6,8 +6,8 @@ using ClawRPG.Scripts.Combat;
 using ClawRPG.Scripts.Crafting;
 using ClawRPG.Scripts.Systems.PetMimicry;
 using ClawRPG.Scripts.Systems.EventCardPool;
+using ClawRPG.Scripts.UI;
 using Framework;
-using CombatSkillCooldownSystem = global::CombatSkillCooldownSystem;
 using SummonSystem = global::ClawRPG.Scripts.SummonSystem;
 
 namespace ClawRPG.Scripts.Systems

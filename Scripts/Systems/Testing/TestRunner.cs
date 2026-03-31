@@ -150,7 +150,7 @@ namespace ClawRPG.Scripts.Systems.Testing
                 var elite = new SimEnemyState { Id = "goblin_elite", Name = "Goblin Elite", MaxHealth = 60, CurrentHealth = 60, Attack = 16, Defense = 4, EliteMultiplier = 2.0f };
 
                 var r1 = CombatSimulator.Run(new SimPlayerState { MaxHealth = 100, CurrentHealth = 100, Attack = 10, Defense = 5 },
-                    new List<SimEnemyState> { normal.Clone() });
+                    new List<SimEnemyState> { Clone(normal) });
                 var r2 = CombatSimulator.Run(new SimPlayerState { MaxHealth = 100, CurrentHealth = 100, Attack = 10, Defense = 5 },
                     new List<SimEnemyState> { elite });
 
@@ -181,8 +181,8 @@ namespace ClawRPG.Scripts.Systems.Testing
                 var highLevel = new SimPlayerState { MaxHealth = 150, CurrentHealth = 150, Attack = 18, Defense = 8 };
                 var enemy = new SimEnemyState { Id = "wolf", Name = "Wolf", MaxHealth = 40, CurrentHealth = 40, Attack = 10, Defense = 3 };
 
-                var r1 = CombatSimulator.Run(lowLevel, new List<SimEnemyState> { enemy.Clone() });
-                var r2 = CombatSimulator.Run(highLevel, new List<SimEnemyState> { enemy.Clone() });
+                var r1 = CombatSimulator.Run(lowLevel, new List<SimEnemyState> { Clone(enemy) });
+                var r2 = CombatSimulator.Run(highLevel, new List<SimEnemyState> { Clone(enemy) });
 
                 bool ok = r2.TotalDamageDealt > r1.TotalDamageDealt;
                 if (verbose)
@@ -329,7 +329,7 @@ namespace ClawRPG.Scripts.Systems.Testing
         /// <summary>
         /// 扩展 SimEnemyState 以支持 ICloneable 模式
         /// </summary>
-        private static SimEnemyState Clone(this SimEnemyState e)
+        private static SimEnemyState Clone(SimEnemyState e)
         {
             return new SimEnemyState
             {

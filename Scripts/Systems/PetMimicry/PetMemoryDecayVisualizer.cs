@@ -53,7 +53,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         private Node2D _overlayNode;
 
         /// <summary>宠物主 Sprite 引用</summary>
-        private Sprite _petSprite;
+        private Sprite2D _petSprite;
 
         /// <summary>原始 Sprite 调制颜色</summary>
         private Color _originalModulate = Colors.White;
