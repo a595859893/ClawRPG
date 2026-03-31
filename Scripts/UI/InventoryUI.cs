@@ -2,12 +2,14 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Items;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.UI
 {
     /// <summary>
     /// InventoryUI - 背包UI管理
     /// 处理物品显示、拖拽、装备、背包分页等功能
+    /// 支持战利品过滤器（REQ-102）
     /// </summary>
     public partial class InventoryUI : BaseUI
     {
@@ -18,7 +20,8 @@ namespace ClawRPG.Scripts.UI
         private Player _player;
 
         // 背包数据
-        private List<ItemData> _items = new List<ItemData>();
+        private List<ItemData> _allItems = new List<ItemData>();   // 全量物品（过滤前）
+        private List<ItemData> _items = new List<ItemData>();      // 当前页显示物品（过滤后）
         private int _selectedSlot = -1;
         private int _currentPage = 0;
         private const int ITEMS_PER_PAGE = 24;
@@ -32,12 +35,20 @@ namespace ClawRPG.Scripts.UI
         private Control _itemTooltip;
         private Control _equipmentPanel;
 
+        // 过滤器相关 (REQ-102)
+        private InventoryFilterSystem _filterSystem;
+        private HBoxContainer _filterBar;
+        private Label _hiddenCountLabel;
+        private Button _clearFilterButton;
+        private readonly Dictionary<string, Button> _presetButtons = new Dictionary<string, Button>();
+
         public override void _Ready()
         {
             base._Ready();
             Instance = this;
             LoadNodes();
             SetupUI();
+            SetupFilterSystem();
             _player = GetTree().GetFirstNodeInGroup("player") as Player;
             if (InventoryManager.Instance != null)
             {
@@ -62,6 +73,11 @@ namespace ClawRPG.Scripts.UI
                     _goldLabel = inv.GetNodeOrNull<Label>("VBox/GoldLabel");
                     _itemTooltip = inv.GetNodeOrNull<Control>("ItemTooltip");
                     _equipmentPanel = inv.GetNodeOrNull<Control>("EquipmentPanel");
+                    
+                    // REQ-102: Filter bar nodes
+                    _filterBar = inv.GetNodeOrNull<HBoxContainer>("VBox/FilterBar");
+                    _hiddenCountLabel = inv.GetNodeOrNull<Label>("VBox/FilterBar/HiddenCountLabel");
+                    _clearFilterButton = inv.GetNodeOrNull<Button>("VBox/FilterBar/ClearFilterButton");
                 }
             }
 
@@ -82,6 +98,7 @@ namespace ClawRPG.Scripts.UI
                 _equipmentPanel = GetNodeOrNull<Control>("EquipmentPanel");
 
             ConnectButtons();
+            ConnectFilterButtons();
         }
 
         private void ConnectButtons()
@@ -90,6 +107,90 @@ namespace ClawRPG.Scripts.UI
                 _prevPageButton.Pressed += OnPrevPage;
             if (_nextPageButton != null)
                 _nextPageButton.Pressed += OnNextPage;
+        }
+
+        // ===== REQ-102: Loot Filter =====
+
+        private void SetupFilterSystem()
+        {
+            if (InventoryFilterSystem.Instance != null)
+            {
+                _filterSystem = InventoryFilterSystem.Instance;
+                _filterSystem.OnFilterChanged += OnFilterChanged;
+                _filterSystem.OnPresetApplied += OnPresetApplied;
+                BuildFilterBarPresets();
+            }
+
+            if (_clearFilterButton != null)
+                _clearFilterButton.Pressed += OnClearFilter;
+
+            // F key toggles rarity filter
+        }
+
+        private void BuildFilterBarPresets()
+        {
+            if (_filterBar == null || _filterSystem == null) return;
+
+            // Remove existing preset buttons (keep system buttons like ClearFilter)
+            foreach (var btn in _presetButtons.Values)
+            {
+                btn.QueueFree();
+            }
+            _presetButtons.Clear();
+
+            var presets = _filterSystem.GetAvailablePresets();
+            foreach (var (id, name) in presets)
+            {
+                var btn = new Button
+                {
+                    Text = name,
+                    ToggleMode = true,
+                    Pressed = (_filterSystem.FilterData.ActivePresetId == id)
+                };
+                btn.Pressed += () => OnPresetButtonPressed(id);
+                _filterBar.AddChild(btn);
+                _presetButtons[id] = btn;
+            }
+        }
+
+        private void OnPresetButtonPressed(string presetId)
+        {
+            _filterSystem.ApplyPreset(presetId);
+        }
+
+        private void OnPresetApplied(string presetId)
+        {
+            // Update button states
+            foreach (var kvp in _presetButtons)
+            {
+                if (kvp.Key != null)
+                    kvp.Value.Pressed = (kvp.Key == presetId);
+            }
+        }
+
+        private void OnFilterChanged()
+        {
+            _currentPage = 0;  // Reset to first page when filter changes
+            if (_filterSystem != null)
+                _filterSystem.InvalidateCache();
+            Refresh();
+        }
+
+        private void OnClearFilter()
+        {
+            if (_filterSystem != null)
+            {
+                _filterSystem.UseCustomRules();
+                _filterSystem.ClearCustomRules();
+            }
+            foreach (var btn in _presetButtons.Values)
+                btn.Pressed = false;
+        }
+
+        private void ConnectFilterButtons()
+        {
+            if (_clearFilterButton != null)
+                _clearFilterButton.Pressed += OnClearFilter;
         }
 
         public void Initialize(Main main)
@@ -103,7 +204,16 @@ namespace ClawRPG.Scripts.UI
         {
             if (_player != null && _player.HasMethod("GetInventory"))
             {
-                _items = (List<ItemData>)_player.Get("GetInventory").DynamicInvoke();
+                _allItems = (List<ItemData>)_player.Get("GetInventory").DynamicInvoke();
+            }
+            // Apply filter if system exists
+            if (_filterSystem != null)
+            {
+                _items = _filterSystem.ApplyFilter(_allItems);
+            }
+            else
+            {
+                _items = new List<ItemData>(_allItems);
             }
             Refresh();
         }
@@ -126,6 +236,23 @@ namespace ClawRPG.Scripts.UI
             UpdateItemGrid();
             UpdatePageControls();
             UpdateGoldDisplay();
+            UpdateFilterHiddenCount();
+        }
+
+        private void UpdateFilterHiddenCount()
+        {
+            if (_hiddenCountLabel == null || _filterSystem == null) return;
+
+            int hidden = _filterSystem.GetHiddenCount(_allItems);
+            if (hidden > 0)
+            {
+                _hiddenCountLabel.Text = $"还有 {hidden} 件物品被隐藏";
+                _hiddenCountLabel.Visible = true;
+            }
+            else
+            {
+                _hiddenCountLabel.Visible = false;
+            }
         }
 
         private void UpdateItemGrid()
@@ -259,15 +386,25 @@ namespace ClawRPG.Scripts.UI
 
         public void AddItem(ItemData item)
         {
-            _items.Add(item);
+            _allItems.Add(item);
+            // Re-apply filter
+            if (_filterSystem != null)
+                _items = _filterSystem.ApplyFilter(_allItems);
+            else
+                _items = new List<ItemData>(_allItems);
             Refresh();
         }
 
         public void RemoveItem(int slotIndex)
         {
-            if (slotIndex >= 0 && slotIndex < _items.Count)
+            if (slotIndex >= 0 && slotIndex < _allItems.Count)
             {
-                _items.RemoveAt(slotIndex);
+                _allItems.RemoveAt(slotIndex);
+                // Re-apply filter
+                if (_filterSystem != null)
+                    _items = _filterSystem.ApplyFilter(_allItems);
+                else
+                    _items = new List<ItemData>(_allItems);
                 Refresh();
             }
         }
@@ -296,7 +433,58 @@ namespace ClawRPG.Scripts.UI
                 _prevPageButton.Pressed -= OnPrevPage;
             if (_nextPageButton != null)
                 _nextPageButton.Pressed -= OnNextPage;
+            if (_clearFilterButton != null)
+                _clearFilterButton.Pressed -= OnClearFilter;
+            if (_filterSystem != null)
+            {
+                _filterSystem.OnFilterChanged -= OnFilterChanged;
+                _filterSystem.OnPresetApplied -= OnPresetApplied;
+            }
             Instance = null;
+        }
+
+        public override void _Input(InputEvent evt)
+        {
+            // REQ-102: F key toggles rarity filter cycling
+            if (Visible && evt is InputEventKey key && key.Pressed && key.Keycode == Key.F)
+            {
+                CycleRarityFilter();
+            }
+        }
+
+        private int _rarityFilterIndex = -1;  // -1 = no filter
+
+        private void CycleRarityFilter()
+        {
+            if (_filterSystem == null) return;
+
+            string[] rarityOrder = { "Common", "Uncommon", "Rare", "Epic", "Legendary" };
+            _rarityFilterIndex++;
+
+            if (_rarityFilterIndex >= rarityOrder.Length)
+            {
+                // Turn off filter
+                _rarityFilterIndex = -1;
+                _filterSystem.UseCustomRules();
+                _filterSystem.ClearCustomRules();
+                GD.Print("[InventoryUI] Rarity filter cleared");
+            }
+            else
+            {
+                string rarity = rarityOrder[_rarityFilterIndex];
+                _filterSystem.UseCustomRules();
+                _filterSystem.ClearCustomRules();
+                _filterSystem.ToggleCustomRule(FilterDimension.Rarity, rarity, rarity, true);
+                GD.Print($"[InventoryUI] Rarity filter set to: {rarity}");
+            }
+        }
+
+        /// <summary>
+        /// Reloads inventory from player and re-applies filter.
+        /// </summary>
+        public void RefreshInventory()
+        {
+            LoadInventoryData();
         }
     }
 
