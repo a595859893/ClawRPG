@@ -156,6 +156,46 @@
       "requiredComboLevel": 2,
       "comboType": "Utility",
       "comboRarity": "Uncommon"
+    },
+    {
+      "comboId": "combo_chaos_fire",
+      "comboName": "混沌火焰风暴",
+      "description": "从火焰技能池中随机抽取技能组合，每次触发效果都不同",
+      "skillSequence": [],
+      "damageMultiplier": 2.5,
+      "cooldownReduction": 0.2,
+      "comboPointReward": 30,
+      "effectName": "混沌之炎",
+      "requiredComboLevel": 5,
+      "comboType": "Chaos",
+      "comboRarity": "Epic",
+      "skillPool": ["fire_skill", "fire_skill", "fire_skill"],
+      "poolSizeMin": 2,
+      "poolSizeMax": 3,
+      "rarityWeights": {
+        "fire_skill": 1.0
+      }
+    },
+    {
+      "comboId": "combo_chaos_elemental",
+      "comboName": "混沌元素风暴",
+      "description": "随机组合火/冰/雷技能，元素之力难以预测",
+      "skillSequence": [],
+      "damageMultiplier": 3.0,
+      "cooldownReduction": 0.25,
+      "comboPointReward": 40,
+      "effectName": "元素混沌",
+      "requiredComboLevel": 7,
+      "comboType": "Chaos",
+      "comboRarity": "Legendary",
+      "skillPool": ["fire_skill", "ice_skill", "lightning_skill"],
+      "poolSizeMin": 2,
+      "poolSizeMax": 3,
+      "rarityWeights": {
+        "fire_skill": 0.4,
+        "ice_skill": 0.3,
+        "lightning_skill": 0.3
+      }
     }
   ]
 }

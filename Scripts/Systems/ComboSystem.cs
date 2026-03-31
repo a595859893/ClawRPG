@@ -525,13 +525,17 @@ public class ComboSystem : BaseSystem
         _comboPoints += combo.comboPointReward;
         _CheckLevelUp();
         
+        // Apply rarity multiplier to cooldown reduction (consistency with _ExecuteCombo, REQ-167-03)
+        float rarityMultiplier = _GetRarityDamageMultiplier(combo.comboRarity);
+        float effectiveCdReduction = combo.cooldownReduction * rarityMultiplier;
+
         // Apply cooldown reduction
         try
         {
             var bonus = new ClawRPG.Scripts.Systems.ComboBonus
             {
                 Name = combo.comboName,
-                CooldownReduction = combo.cooldownReduction,
+                CooldownReduction = effectiveCdReduction,
                 DamageMultiplier = 1f,
                 Duration = 5f
             };
@@ -542,8 +546,8 @@ public class ComboSystem : BaseSystem
             // SkillComboSystem may not be available
         }
         
-        // TODO: Execute each selected skill in order (requires skill system integration)
-        // For now, log the selected skills
+        // Skills are already executed by the player during collection phase.
+        // ChaosComboExecuted signal (emitted above) drives the UI display (REQ-167-05).
         GD.Print($"[ComboSystem] Chaos Combo '{combo.comboName}' executed with skills: {string.Join(", ", selectedSkills)}");
         
         // Reset progress for potential re-trigger
