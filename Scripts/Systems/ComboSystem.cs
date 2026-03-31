@@ -76,6 +76,10 @@ public class ComboSystem : BaseSystem
     /// 当可用 combo 列表因遗忘/唤醒而变化时触发
     /// </summary>
     public static Action ComboAvailabilityChanged;
+    /// <summary>
+    /// 连击失败时触发（超时或按错技能）
+    /// </summary>
+    public static Action<string> ComboFailed;
     
     public override void _Ready()
     {
@@ -414,6 +418,11 @@ public class ComboSystem : BaseSystem
                 if (progress.timeRemaining <= 0)
                 {
                     // Combo failed - reset progress
+                    // REQ-168: Emit ComboFailed signal if there was active progress before timeout
+                    if (progress.currentStep > 0)
+                    {
+                        ComboFailed?.Emit(progress.comboId);
+                    }
                     progress.currentStep = 0;
                     progress.isActive = false;
                 }
@@ -788,6 +797,58 @@ public class ComboSystem : BaseSystem
     /// 获取连击时间窗口
     /// </summary>
     public float GetComboWindow() => _comboWindow;
+
+    // === REQ-168: Combo Intent Display ===
+    /// <summary>
+    /// 获取指定 combo 的下一个预期技能 ID（REQ-168）
+    /// 返回 null 如果 combo 不存在、已完成或未激活
+    /// </summary>
+    public string GetExpectedSkill(string comboId)
+    {
+        if (!_playerCombos.TryGetValue(comboId, out var progress))
+            return null;
+
+        if (!progress.isActive || progress.currentStep == 0)
+            return null;
+
+        if (!_combos.TryGetValue(comboId, out var combo))
+            return null;
+
+        // Chaos Combo 不适用此方法
+        if (combo.comboType == ComboData.ComboType.Chaos)
+            return null;
+
+        if (progress.currentStep >= combo.skillSequence.Count)
+            return null;
+
+        return combo.skillSequence[progress.currentStep];
+    }
+
+    /// <summary>
+    /// 获取当前激活的 combo 中进度最高的一个的预期技能（用于 UI 显示）
+    /// </summary>
+    public (string comboId, string expectedSkillId) GetActiveComboIntent()
+    {
+        string bestComboId = null;
+        string bestSkillId = null;
+        int bestStep = 0;
+
+        foreach (var progress in _playerCombos.Values)
+        {
+            if (progress.isActive && progress.currentStep > bestStep)
+            {
+                string skillId = GetExpectedSkill(progress.comboId);
+                if (skillId != null)
+                {
+                    bestStep = progress.currentStep;
+                    bestComboId = progress.comboId;
+                    bestSkillId = skillId;
+                }
+            }
+        }
+
+        return (bestComboId, bestSkillId);
+    }
     
     /// <summary>
     /// 获取已解锁的连击列表（排除休眠 combo）
