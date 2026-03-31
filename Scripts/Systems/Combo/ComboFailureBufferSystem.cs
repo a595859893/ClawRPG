@@ -48,7 +48,9 @@ public partial class ComboFailureBufferSystem : BaseSystem
 
         var systemNode = new Node();
         systemNode.Name = "ComboFailureBufferSystem";
-        systemNode.AddChild(new ComboFailureBufferSystem());
+        var newInstance = new ComboFailureBufferSystem();
+        Instance = newInstance;
+        systemNode.AddChild(newInstance);
 
         var tree = Engine.GetMainLoop()?.GetTree();
         if (tree?.CurrentScene != null)

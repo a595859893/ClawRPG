@@ -30,7 +30,10 @@ namespace ClawRPG.Scripts.Systems.PetSynergy
         /// <summary>友谊等级 6-15 触发的中动作</summary>
         public string MediumGestureAnim;
 
-        /// <summary>友谊等级 16-20 触发的华丽特效</summary>
+        /// <summary>友谊等级 16-20 触发的华丽特效（VFX 场景路径）</summary>
         public string HighTierEffectScene;
+
+        /// <summary>友谊等级 16-20 触发的高等级动画名（优先于 VFX）</summary>
+        public string HighTierGestureAnim;
     }
 }

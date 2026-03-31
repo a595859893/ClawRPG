@@ -33,6 +33,7 @@ namespace ClawRPG.Scripts.Systems.PetSynergy
                     TimingOffset = 0.3f,
                     SmallGestureAnim = "nod",
                     MediumGestureAnim = "jump",
+                    HighTierGestureAnim = "special_sync",
                     HighTierEffectScene = "res://Effects/PetSynergy/PetSynergyVFX.tscn"
                 },
 
@@ -46,6 +47,7 @@ namespace ClawRPG.Scripts.Systems.PetSynergy
                     TimingOffset = 0.35f,
                     SmallGestureAnim = "tail_wag",
                     MediumGestureAnim = "spin",
+                    HighTierGestureAnim = "special_guard",
                     HighTierEffectScene = "res://Effects/PetSynergy/PetSynergyVFX.tscn"
                 },
 
@@ -59,6 +61,7 @@ namespace ClawRPG.Scripts.Systems.PetSynergy
                     TimingOffset = 0.4f,
                     SmallGestureAnim = "roar",
                     MediumGestureAnim = "element_burst",
+                    HighTierGestureAnim = "special_element",
                     HighTierEffectScene = "res://Effects/PetSynergy/PetSynergyVFX.tscn"
                 },
 
@@ -72,6 +75,7 @@ namespace ClawRPG.Scripts.Systems.PetSynergy
                     TimingOffset = 0.5f,
                     SmallGestureAnim = "sit",
                     MediumGestureAnim = "dance",
+                    HighTierGestureAnim = "special_victory",
                     HighTierEffectScene = "res://Effects/PetSynergy/PetSynergyVFX.tscn"
                 },
 
@@ -85,6 +89,7 @@ namespace ClawRPG.Scripts.Systems.PetSynergy
                     TimingOffset = 0.25f,
                     SmallGestureAnim = "paw",
                     MediumGestureAnim = "flip",
+                    HighTierGestureAnim = "special_highfive",
                     HighTierEffectScene = "res://Effects/PetSynergy/PetSynergyVFX.tscn"
                 }
             };
@@ -98,7 +103,7 @@ namespace ClawRPG.Scripts.Systems.PetSynergy
             var entry = SynergySkills.Find(s => s.SkillId == skillId);
             if (entry == null) return null;
 
-            if (friendshipLevel >= 16) return entry.HighTierEffectScene != null ? entry.HighTierEffectScene : entry.MediumGestureAnim;
+            if (friendshipLevel >= 16) return entry.HighTierGestureAnim ?? entry.MediumGestureAnim;
             if (friendshipLevel >= 6) return entry.MediumGestureAnim;
             return entry.SmallGestureAnim;
         }
@@ -118,6 +123,7 @@ namespace ClawRPG.Scripts.Systems.PetSynergy
                         best = skill;
                 }
             }
+            if (SynergySkills.Count == 0) return null;
             return best ?? SynergySkills[0];
         }
 

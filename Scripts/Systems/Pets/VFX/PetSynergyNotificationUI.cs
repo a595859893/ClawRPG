@@ -18,6 +18,7 @@ namespace ClawRPG.Scripts.Systems.Pets.VFX
         [Export] private bool _enabled = true;
 
         private bool _isShowing = false;
+        private Timer _connectTimer;
 
         public override void _Ready()
         {
@@ -55,6 +56,13 @@ namespace ClawRPG.Scripts.Systems.Pets.VFX
                 timer.Timeout += () => ConnectToTrigger();
                 AddChild(timer);
                 timer.Start();
+                // Stop and free previous retry timer to prevent node leak
+                if (_connectTimer != null && _connectTimer.IsValid())
+                {
+                    _connectTimer.Stop();
+                    _connectTimer.QueueFree();
+                }
+                _connectTimer = timer;
             }
         }
 
