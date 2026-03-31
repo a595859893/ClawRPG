@@ -22,6 +22,12 @@ public class ComboConfigEntry
     [JsonPropertyName("requiredComboLevel")] public int RequiredComboLevel { get; set; }
     [JsonPropertyName("comboType")] public string ComboType { get; set; }
     [JsonPropertyName("comboRarity")] public string ComboRarity { get; set; }
+
+    // === REQ-167: Chaos Combo 专用字段 ===
+    [JsonPropertyName("skillPool")] public List<string> SkillPool { get; set; }
+    [JsonPropertyName("poolSizeMin")] public int PoolSizeMin { get; set; } = 2;
+    [JsonPropertyName("poolSizeMax")] public int PoolSizeMax { get; set; } = 4;
+    [JsonPropertyName("rarityWeights")] public Dictionary<string, float> RarityWeights { get; set; }
 }
 
 /// <summary>
@@ -85,6 +91,24 @@ public class ComboData : Resource
     /// </summary>
     [Export] public Rarity comboRarity;
 
+    // === REQ-167: Chaos Combo 专用字段 ===
+    /// <summary>
+    /// 技能池（Chaos Combo 从中随机抽取），非 Chaos combo 为空
+    /// </summary>
+    [Export] public List<string> skillPool = new List<string>();
+    /// <summary>
+    /// Chaos Combo 每次触发随机抽取的技能数量下限
+    /// </summary>
+    [Export] public int poolSizeMin = 2;
+    /// <summary>
+    /// Chaos Combo 每次触发随机抽取的技能数量上限
+    /// </summary>
+    [Export] public int poolSizeMax = 4;
+    /// <summary>
+    /// 技能稀有度权重（技能ID -> 权重），未定义默认为 1.0
+    /// </summary>
+    [Export] public Dictionary<string, float> rarityWeights = new Dictionary<string, float>();
+
     /// <summary>
     /// 连击类型枚举
     /// </summary>
@@ -94,7 +118,8 @@ public class ComboData : Resource
         Defensive,
         Support,
         Utility,
-        Special
+        Special,
+        Chaos  // REQ-167: 随机从技能池抽取技能组合
     }
 
     /// <summary>
@@ -135,4 +160,10 @@ public class ComboProgress
     /// 已执行次数
     /// </summary>
     public int timesExecuted = 0;
+
+    // === REQ-167: Chaos Combo 专用进度字段 ===
+    /// <summary>
+    /// Chaos Combo 已收集的技能池技能列表（去重）
+    /// </summary>
+    public List<string> collectedPoolSkills = new List<string>();
 }

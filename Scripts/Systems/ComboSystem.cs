@@ -59,6 +59,15 @@ public class ComboSystem : BaseSystem
     /// 连击等级变化时触发
     /// </summary>
     public static Action<int> ComboLevelChanged;
+    // === REQ-167: Chaos Combo 信号 ===
+    /// <summary>
+    /// Chaos Combo 进度更新时触发（技能被收集）
+    /// </summary>
+    public static Action<string, int, List<string>, float> ChaosComboProgressUpdated;
+    /// <summary>
+    /// Chaos Combo 执行时触发，参数：comboId, 本次随机选中的技能列表
+    /// </summary>
+    public static Action<string, List<string>> ChaosComboExecuted;
     /// <summary>
     /// 发现新连击时触发
     /// </summary>
@@ -161,7 +170,12 @@ public class ComboSystem : BaseSystem
                     effectName = entry.EffectName,
                     requiredComboLevel = entry.RequiredComboLevel,
                     comboType = _ParseComboType(entry.ComboType),
-                    comboRarity = _ParseRarity(entry.ComboRarity)
+                    comboRarity = _ParseRarity(entry.ComboRarity),
+                    // REQ-167: Chaos Combo 字段
+                    skillPool = entry.SkillPool ?? new List<string>(),
+                    poolSizeMin = entry.PoolSizeMin > 0 ? entry.PoolSizeMin : 2,
+                    poolSizeMax = entry.PoolSizeMax > 0 ? entry.PoolSizeMax : 4,
+                    rarityWeights = entry.RarityWeights ?? new Dictionary<string, float>()
                 };
                 _combos[combo.comboId] = combo;
             }
@@ -183,6 +197,7 @@ public class ComboSystem : BaseSystem
             "support" => ComboData.ComboType.Support,
             "utility" => ComboData.ComboType.Utility,
             "special" => ComboData.ComboType.Special,
+            "chaos" => ComboData.ComboType.Chaos,  // REQ-167
             _ => ComboData.ComboType.Offensive
         };
     }
@@ -422,6 +437,14 @@ public class ComboSystem : BaseSystem
             // Skip if combo level requirement not met
             if (_comboLevel < combo.requiredComboLevel) continue;
             
+            // === REQ-167: Chaos Combo 处理 ===
+            if (combo.comboType == ComboData.ComboType.Chaos)
+            {
+                _HandleChaosComboSkill(progress, combo, skillId);
+                continue;
+            }
+            
+            // === Regular combo handling ===
             int expectedStep = progress.currentStep;
             
             // Check if this skill matches the expected skill in sequence
@@ -433,7 +456,7 @@ public class ComboSystem : BaseSystem
                 progress.timeRemaining = _comboWindow;
                 progress.isActive = true;
                 
-                ComboProgressUpdated?.Invoke(progress.comboId, progress.currentStep, progress.timeRemaining);
+                ComboProgressUpdated?.Emit(progress.comboId, progress.currentStep, progress.timeRemaining);
                 
                 // Check if combo is complete
                 if (progress.currentStep >= combo.skillSequence.Count)
@@ -448,9 +471,142 @@ public class ComboSystem : BaseSystem
                 progress.currentStep = 1;
                 progress.timeRemaining = _comboWindow;
                 progress.isActive = true;
-                ComboProgressUpdated?.Invoke(progress.comboId, progress.currentStep, progress.timeRemaining);
+                ComboProgressUpdated?.Emit(progress.comboId, progress.currentStep, progress.timeRemaining);
             }
         }
+    }
+
+    // === REQ-167: Chaos Combo 技能处理 ===
+    private void _HandleChaosComboSkill(ComboProgress progress, ComboData combo, string skillId)
+    {
+        // Ignore if skill not in the pool
+        if (combo.skillPool == null || !combo.skillPool.Contains(skillId))
+            return;
+        
+        // Ignore if already collected (no duplicates in pool)
+        if (progress.collectedPoolSkills != null && progress.collectedPoolSkills.Contains(skillId))
+            return;
+        
+        // Add to collected pool
+        progress.collectedPoolSkills ??= new List<string>();
+        progress.collectedPoolSkills.Add(skillId);
+        progress.timeRemaining = _comboWindow;
+        progress.isActive = true;
+        progress.currentStep = progress.collectedPoolSkills.Count;
+        
+        ChaosComboProgressUpdated?.Emit(combo.comboId, progress.collectedPoolSkills.Count, 
+            progress.collectedPoolSkills, progress.timeRemaining);
+        
+        // Check if we've collected enough skills from the pool
+        int minPool = Math.Max(combo.poolSizeMin, 1);
+        if (progress.collectedPoolSkills.Count >= minPool)
+        {
+            _ExecuteChaosCombo(progress.comboId);
+        }
+    }
+    
+    // === REQ-167: Chaos Combo 随机抽取执行 ===
+    private void _ExecuteChaosCombo(string comboId)
+    {
+        if (!_combos.TryGetValue(comboId, out var combo)) return;
+        
+        var progress = _playerCombos[comboId];
+        
+        // Randomly select skills from pool
+        var selectedSkills = _SelectRandomSkillsFromPool(combo);
+        
+        // Store selected skills for execution
+        progress.collectedPoolSkills = selectedSkills;
+        
+        // Emit signal with selected skills for UI display (REQ-167-05)
+        ChaosComboExecuted?.Emit(comboId, selectedSkills);
+        
+        // Award combo points
+        _comboPoints += combo.comboPointReward;
+        _CheckLevelUp();
+        
+        // Apply cooldown reduction
+        try
+        {
+            var bonus = new ClawRPG.Scripts.Systems.ComboBonus
+            {
+                Name = combo.comboName,
+                CooldownReduction = combo.cooldownReduction,
+                DamageMultiplier = 1f,
+                Duration = 5f
+            };
+            ClawRPG.Scripts.Systems.SkillComboSystem.Instance?.ApplyComboBonus(bonus);
+        }
+        catch (Exception)
+        {
+            // SkillComboSystem may not be available
+        }
+        
+        // TODO: Execute each selected skill in order (requires skill system integration)
+        // For now, log the selected skills
+        GD.Print($"[ComboSystem] Chaos Combo '{combo.comboName}' executed with skills: {string.Join(", ", selectedSkills)}");
+        
+        // Reset progress for potential re-trigger
+        progress.collectedPoolSkills.Clear();
+        progress.currentStep = 0;
+        progress.isActive = false;
+        progress.timesExecuted++;
+    }
+    
+    // === REQ-167: 加权随机抽取算法 ===
+    private List<string> _SelectRandomSkillsFromPool(ComboData combo)
+    {
+        if (combo.skillPool == null || combo.skillPool.Count == 0)
+            return new List<string>();
+        
+        var pool = combo.skillPool;
+        int minCount = Math.Max(combo.poolSizeMin, 1);
+        int maxCount = Math.Max(combo.poolSizeMax, minCount);
+        int targetCount = GD.RandRange(minCount, maxCount);
+        targetCount = Math.Min(targetCount, pool.Count);
+        
+        // Build weighted list
+        var weightedPool = new List<(string skillId, float weight)>();
+        foreach (var skillId in pool)
+        {
+            float weight = 1.0f;
+            if (combo.rarityWeights != null && combo.rarityWeights.TryGetValue(skillId, out var w))
+                weight = w;
+            weightedPool.Add((skillId, weight));
+        }
+        
+        // Weighted random selection without duplicates
+        var selected = new List<string>();
+        var available = new List<(string skillId, float weight)>(weightedPool);
+        var rng = new RandomNumberGenerator();
+        rng.Randomize();
+        
+        while (selected.Count < targetCount && available.Count > 0)
+        {
+            // Calculate total weight
+            float totalWeight = 0f;
+            foreach (var item in available)
+                totalWeight += item.weight;
+            
+            // Select by weighted random
+            float roll = (float)rng.RandDouble() * totalWeight;
+            float cumulative = 0f;
+            int selectedIdx = 0;
+            for (int i = 0; i < available.Count; i++)
+            {
+                cumulative += available[i].weight;
+                if (roll <= cumulative)
+                {
+                    selectedIdx = i;
+                    break;
+                }
+            }
+            
+            selected.Add(available[selectedIdx].skillId);
+            available.RemoveAt(selectedIdx);
+        }
+        
+        return selected;
     }
     
     private void _ExecuteCombo(string comboId)
