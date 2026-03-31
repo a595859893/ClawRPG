@@ -6,6 +6,12 @@ using System.Text.Json.Serialization;
 using Framework;
 
 // Data structures moved to ComboData.cs
+
+/// <summary>
+/// 连击系统 - 管理玩家连击技能的系统
+/// 玩家按顺序使用特定技能可以触发强力的连击效果
+/// </summary>
+public class ComboSystem : BaseSystem
 {
     /// <summary>
     /// 单例实例
