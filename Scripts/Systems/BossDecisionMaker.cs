@@ -9,6 +9,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Boss AI Decision Maker using Behavior Tree
     /// Provides intelligent skill selection based on combat context
+    /// REQ-164: Adds charge mechanism for high-threat abilities.
     /// </summary>
     public class BossDecisionMaker {
         private Boss _boss;
@@ -18,10 +19,26 @@ namespace ClawRPG.Scripts.Systems {
         // Ability evaluation cache
         private Dictionary<string, float> _abilityScores = new Dictionary<string, float>();
 
+        // REQ-164: Charge mechanism state
+        private bool _isCharging = false;
+        private float _chargeTimer = 0f;
+        private float _chargeDuration = 0f;
+        private string _chargingAbilityId = null;
+
         /// <summary>
         /// Fired when the boss selects an ability — payload carries the full intent data for UI display (REQ-160).
         /// </summary>
         public event Action<BossIntentData> OnIntentSelected;
+        
+        /// <summary>
+        /// REQ-164: Fired when boss enters charge state. String = ability ID being charged.
+        /// </summary>
+        public event Action<string, float> OnBossCharging;
+        
+        /// <summary>
+        /// REQ-164: Fired when boss charge is interrupted (player interrupt skill).
+        /// </summary>
+        public event Action<string> OnBossChargeInterrupted;
         
         public BossDecisionMaker(Boss boss) {
             _boss = boss;
@@ -93,7 +110,8 @@ namespace ClawRPG.Scripts.Systems {
         }
         
         /// <summary>
-        /// Evaluate and make decision
+        /// Evaluate and make decision.
+        /// REQ-164: If selected ability needs charging, enters charge state instead of immediate execution.
         /// </summary>
         public void MakeDecision(Character target, float deltaTime) {
             // Update context
@@ -104,12 +122,110 @@ namespace ClawRPG.Scripts.Systems {
             _context.Score = 0;
             _context.TimeSinceLastAbility += deltaTime;
             
-            // Execute behavior tree
+            // Execute behavior tree (REQ-165: now scores first, then executes)
             _root.Reset();
             _root.Execute(_context);
             
-            // Apply decision
-            ApplyDecision();
+            // REQ-164: Check if selected ability needs charging
+            string selectedAbility = _context.SelectedAbility;
+            if (selectedAbility != null && NeedsCharge(selectedAbility)) {
+                // Enter charge state — do NOT call ApplyDecision() immediately
+                _isCharging = true;
+                _chargeDuration = GetChargeDuration(selectedAbility);
+                _chargeTimer = 0f;
+                _chargingAbilityId = selectedAbility;
+                
+                // Emit charging signal so UI can show charge animation + countdown
+                OnBossCharging?.Invoke(selectedAbility, _chargeDuration);
+                
+                // Emit intent (REQ-160) for the UI to display what the boss is charging
+                var intentData = BuildIntentData(selectedAbility);
+                OnIntentSelected?.Invoke(intentData);
+            } else {
+                // No charge needed — execute immediately
+                ApplyDecision();
+            }
+        }
+        
+        /// <summary>
+        /// REQ-164: Called from boss's _Process() to update charge timer.
+        /// </summary>
+        public void Update(float delta) {
+            if (!_isCharging) return;
+            
+            _chargeTimer += delta;
+            
+            if (_chargeTimer >= _chargeDuration) {
+                // Charge complete — execute the ability
+                _isCharging = false;
+                _chargeTimer = 0f;
+                ApplyDecision();
+            }
+        }
+        
+        /// <summary>
+        /// REQ-164: Interrupt the current charge. Called by player interrupt skills.
+        /// Returns true if there was an active charge to interrupt.
+        /// </summary>
+        public bool InterruptCharge() {
+            if (!_isCharging) return false;
+            
+            string interruptedAbility = _chargingAbilityId;
+            _isCharging = false;
+            _chargeTimer = 0f;
+            _chargingAbilityId = null;
+            
+            OnBossChargeInterrupted?.Invoke(interruptedAbility);
+            GD.Print($"[BossDecisionMaker] Charge interrupted: {interruptedAbility}");
+            return true;
+        }
+        
+        /// <summary>
+        /// REQ-164: Returns true if the ability needs a charge window.
+        /// High-threat abilities (AoE, Heal, Shield, Summon) require charge.
+        /// </summary>
+        private bool NeedsCharge(string abilityId) {
+            if (string.IsNullOrEmpty(abilityId)) return false;
+            
+            string lower = abilityId.ToLowerInvariant();
+            
+            // Abilities that always need charge (high threat, player can counter)
+            string[] chargeKeywords = { "aoe", "fireball", "heal", "shield", "summon", "enrage", "mass", "ultimate" };
+            foreach (var kw in chargeKeywords) {
+                if (lower.Contains(kw)) return true;
+            }
+            
+            // Check if the ability has AoE flag
+            var abilityDb = _boss.GetAbilityDatabase();
+            if (abilityDb.TryGetValue(abilityId, out var ability)) {
+                if (ability.IsAoE) return true;
+            }
+            
+            return false;
+        }
+        
+        /// <summary>
+        /// REQ-164: Get charge duration for an ability.
+        /// </summary>
+        private float GetChargeDuration(string abilityId) {
+            if (string.IsNullOrEmpty(abilityId)) return 0f;
+            
+            string lower = abilityId.ToLowerInvariant();
+            
+            // Different charge durations based on threat level
+            if (lower.Contains("ultimate") || lower.Contains("enrage")) return 3.0f;  // Longest for ultimate abilities
+            if (lower.Contains("heal")) return 2.0f;                                  // 2s for healing
+            if (lower.Contains("shield")) return 1.5f;                               // 1.5s for shielding
+            if (lower.Contains("summon")) return 1.5f;                               // 1.5s for summoning
+            if (lower.Contains("aoe") || lower.Contains("fireball") || lower.Contains("mass")) return 1.0f; // 1s for AoE
+            
+            // Check AoE flag for default
+            var abilityDb = _boss.GetAbilityDatabase();
+            if (abilityDb.TryGetValue(abilityId, out var ability)) {
+                if (ability.IsAoE) return 1.0f;
+            }
+            
+            return 0f; // No charge for normal abilities
         }
         
         /// <summary>

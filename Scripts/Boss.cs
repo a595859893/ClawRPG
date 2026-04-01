@@ -174,6 +174,9 @@ namespace ClawRPG.Scripts.Characters {
             // Check phase transition
             _bossPhase.CheckPhaseTransition();
 
+            // REQ-164: Update charge timer
+            _decisionMaker?.Update(dt);
+
             base._PhysicsProcess(delta);
         }
 
