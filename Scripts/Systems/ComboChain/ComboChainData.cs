@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ComboChainData : BaseSystem
+public partial class ComboChainData : BaseSystem
 {
     // 当前连击状态
     public int CurrentChain { get; set; } = 0;

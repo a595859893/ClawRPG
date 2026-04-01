@@ -8,7 +8,7 @@ namespace ClawRPG.Systems.MultiplayerEmote {
 /// 多人表情系统
 /// 处理表情使用、同步和显示
 /// </summary>
-public class MultiplayerEmoteSystem : BaseSystem
+public partial class MultiplayerEmoteSystem : BaseSystem
 {
     public static MultiplayerEmoteSystem Instance { get; private set; }
 

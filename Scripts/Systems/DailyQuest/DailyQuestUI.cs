@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DailyQuestUI : Control
+public partial class DailyQuestUI : Control
 {
 	private VBoxContainer _questListContainer;
 	private Label _titleLabel;

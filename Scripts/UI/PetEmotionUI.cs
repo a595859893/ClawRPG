@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI
     /// <summary>
     /// Pet Emotion UI - displays pet emotional states
     /// </summary>
-    public class PetEmotionUI : Control
+    public partial class PetEmotionUI : Control
     {
         private PetEmotionSystem _emotionSystem;
         private Control _mainPanel;

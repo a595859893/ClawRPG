@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildDiplomacyUI : Control
+public partial class GuildDiplomacyUI : Control
 {
     // 外交界面
     private GuildDiplomacySystem diplomacySystem;

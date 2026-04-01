@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Managers
     /// <summary>
     /// 玩家生成管理器 - 负责玩家的生成、位置管理和重生逻辑
     /// </summary>
-    public class PlayerSpawnManager : BaseSystem
+    public partial class PlayerSpawnManager : BaseSystem
     {
         public static PlayerSpawnManager Instance { get; private set; }
         

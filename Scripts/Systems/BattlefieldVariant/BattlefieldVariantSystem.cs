@@ -7,7 +7,7 @@ using ClawRPG.Scripts.Managers;
 /// 战场变体系统（REQ-115）
 /// 每场战斗随机分配一个战场变体，为战斗添加环境策略层
 /// </summary>
-public class BattlefieldVariantSystem : BaseSystem
+public partial class BattlefieldVariantSystem : BaseSystem
 {
     private static BattlefieldVariantSystem _instance;
     public static BattlefieldVariantSystem Instance => _instance;

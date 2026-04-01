@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RandomNameDatabase : BaseSystem
+public partial class RandomNameDatabase : BaseSystem
 {
     // Culture-based first names
     public static readonly Dictionary<string, string[]> FirstNames = new Dictionary<string, string[]>

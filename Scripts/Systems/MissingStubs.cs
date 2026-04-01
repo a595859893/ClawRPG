@@ -7,10 +7,10 @@ namespace ClawRPG.Scripts.Systems
     public class PetSystem { }
     public class PetData { }
     public class PetBreedingResult { }
+    public class PetAIContext { }
     public class PetLifeCycleEntry { }
     public class LifeStage { }
     public class LifeCycleHistoryEntry { }
-    public class PetAIContext { }
 
     // ── Player / Save ───────────────────────────────────────────────
     public class PlayerData { }
@@ -24,12 +24,22 @@ namespace ClawRPG.Scripts.Systems
     // ── Item ───────────────────────────────────────────────────────
     public class EquipmentData { }
     public class EnchantmentAttribute { }
+    public class EnchantmentData { }
 
     // ── Boss ──────────────────────────────────────────────────────
     public class BossSkillData { }
 
     // ── Arena ──────────────────────────────────────────────────────
-    public class ArenaTournamentData { }
+    public class ArenaTournamentData
+    {
+        public class Tournament
+        {
+            public int Id;
+            public string Name = "";
+            public int PlayerCount;
+            public bool IsActive;
+        }
+    }
 
     // ── Artifact ───────────────────────────────────────────────────
     public class ArtifactData { }
@@ -41,9 +51,6 @@ namespace ClawRPG.Scripts.Systems
 
     // ── Pet Battle ────────────────────────────────────────────────
     public enum ArenaType { Normal, Ranked, Tournament }
-
-    // ── Pet (type already exists in Pets namespace; enum stubs here) ──
-    public enum PetRarityEnum { Common, Uncommon, Rare, Epic, Legendary }
 
     // ── Multiplayer Vote ──────────────────────────────────────────
     public enum VoteStatus { Pending, Accepted, Rejected, Expired }
@@ -74,17 +81,12 @@ namespace ClawRPG.Scripts.Systems
     // ── Misc ──────────────────────────────────────────────────────
     public class GetRandomPetSynthesisData { }
 
-    // ── Title System ───────────────────────────────────────────────
+    // ── Title System ──────────────────────────────────────────────
     public class Title { }
-    public enum TitleType { Combat, Exploration, Social, Special }
+    public enum TitleType { Level, Combat, Quest, Exploration, Social, Special }
 }
 
 namespace ClawRPG.Scripts.UI
 {
     public class ComboBox : Godot.Control { }
-}
-
-namespace ClawRPG.Scripts
-{
-    public class Boss { }
 }

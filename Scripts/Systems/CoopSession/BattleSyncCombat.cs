@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
     /// <summary>
     /// 战斗操作处理 - 攻击、技能、伤害、治疗、Buff管理
     /// </summary>
-    public class BattleSyncCombat : BaseSystem
+    public partial class BattleSyncCombat : BaseSystem
     {
         // 线程安全锁
         protected readonly object _lock = new object();

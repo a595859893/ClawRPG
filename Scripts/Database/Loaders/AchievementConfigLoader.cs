@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
 using ClawRPG.Scripts.Data;
+using AchievementDifficulty = ClawRPG.Scripts.Data.AchievementDifficulty;
 
 namespace ClawRPG.Scripts.Database.Loaders
 {

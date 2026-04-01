@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class MultiplayerChatUI : Control
+public partial class MultiplayerChatUI : Control
 {
     private MultiplayerChatSystem _chatSystem;
     private MultiplayerChatData _chatData;

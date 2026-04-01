@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ChronicleUI : Control
+public partial class ChronicleUI : Control
 {
     private VBoxContainer mainContainer;
     private TabContainer tabContainer;

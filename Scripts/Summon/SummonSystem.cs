@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts
     /// <summary>
     /// 召唤系统 - 管理玩家的召唤物
     /// </summary>
-    public class SummonSystem : BaseSystem
+    public partial class SummonSystem : BaseSystem
     {
         private static SummonSystem _instance;
         public static new SummonSystem Instance

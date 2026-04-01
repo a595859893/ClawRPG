@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TutorialUI : Control
+public partial class TutorialUI : Control
 {
     private TutorialSystem _tutorialSystem;
     private Control _tutorialPanel;

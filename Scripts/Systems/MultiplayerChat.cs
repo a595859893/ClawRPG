@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 多人游戏聊天系统
 /// 支持大厅、队伍、私聊消息
 /// </summary>
-public class MultiplayerChat : BaseSystem
+public partial class MultiplayerChat : BaseSystem
 {
     public static MultiplayerChat Instance { get; private set; }
 

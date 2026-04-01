@@ -11,7 +11,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
     /// Combo回放录制器（REQ-114-02）
     /// 职责：订阅战斗事件，录制玩家操作序列，战斗结束时生成回放数据
     /// </summary>
-    public class ComboReplayRecorder : BaseSystem
+    public partial class ComboReplayRecorder : BaseSystem
     {
         private static ComboReplayRecorder _instance;
         public static ComboReplayRecorder Instance => _instance ??= new ComboReplayRecorder();

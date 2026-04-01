@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class EnemyWeaknessUI : Control
+public partial class EnemyWeaknessUI : Control
 {
     // 引用
     private EnemyWeaknessSystem _system;

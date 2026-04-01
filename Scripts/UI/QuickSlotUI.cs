@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class QuickSlotUI : Control
+public partial class QuickSlotUI : Control
 {
     private HBoxContainer _slotContainer;
     private QuickSlotItem[] _slotItems = new QuickSlotItem[8];

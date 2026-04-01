@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildHeritageUI : Control
+public partial class GuildHeritageUI : Control
 {
     private Label _titleLabel;
     private Label _heritagePointsLabel;

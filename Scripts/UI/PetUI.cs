@@ -3,9 +3,8 @@ using System;
 using System.Collections.Generic;
 using Godot.Collections;
 using ClawRPG.Scripts.Systems.Pets;
-    using PetsPet = ClawRPG.Scripts.Systems.Pets.Pet;
-    using PetsPetType = ClawRPG.Scripts.Systems.Pets.PetType;
-    using PetsPetRarity = ClawRPG.Scripts.Systems.Pets.PetRarity;
+using Pet = ClawRPG.Scripts.Systems.Pets.Pet;
+using PetRarity = ClawRPG.Scripts.Systems.Pets.PetRarity;
 using PetSystem = ClawRPG.Scripts.Systems.Pets.PetManager;
 
 namespace ClawRPG.Scripts.UI
@@ -42,7 +41,7 @@ namespace ClawRPG.Scripts.UI
         [Export] private Button _releaseButton;
         
         private PetSystem _petManager;
-        private PetsPet _selectedPet;
+        private ClawRPG.Scripts.Systems.Pets.Pet _selectedPet;
         private Array<Button> _petButtons = new Array<Button>();
         private bool _isVisible = false; 
 
@@ -147,13 +146,13 @@ namespace ClawRPG.Scripts.UI
             }
         }
 
-        private void OnPetButtonPressed(PetsPet pet)
+        private void OnPetButtonPressed(ClawRPG.Scripts.Systems.Pets.Pet pet)
         {
             _selectedPet = pet;
             UpdatePetDetails(pet);
         }
 
-        private void UpdatePetDetails(PetsPet pet)
+        private void UpdatePetDetails(ClawRPG.Scripts.Systems.Pets.Pet pet)
         {
             if (pet == null) return;
 
@@ -220,7 +219,7 @@ namespace ClawRPG.Scripts.UI
             }
 
             // 更新按钮状态
-            bool isActive = _petManager.ActivePet == (PetsPet)pet;
+            bool isActive = _petManager.ActivePet == (Pet)pet;
             if (_activateButton != null)
             {
                 _activateButton.Text = isActive ? "已激活" : "激活";
@@ -232,7 +231,7 @@ namespace ClawRPG.Scripts.UI
         {
             if (_selectedPet != null)
             {
-                _petManager.SetActivePet((PetsPet)_selectedPet);
+                _petManager.SetActivePet((Pet)_selectedPet);
                 RefreshPetList();
             }
         }
@@ -241,18 +240,18 @@ namespace ClawRPG.Scripts.UI
         {
             if (_selectedPet != null && _selectedPet != _petManager.ActivePet)
             {
-                _petManager.RemovePet((PetsPet)_selectedPet);
+                _petManager.RemovePet((Pet)_selectedPet);
                 _selectedPet = null;
                 RefreshPetList();
             }
         }
 
-        private void OnPetListChanged(PetsPet pet)
+        private void OnPetListChanged(ClawRPG.Scripts.Systems.Pets.Pet pet)
         {
             RefreshPetList();
         }
 
-        private void OnActivePetChanged(PetsPet pet)
+        private void OnActivePetChanged(ClawRPG.Scripts.Systems.Pets.Pet pet)
         {
             RefreshPetList();
         }
@@ -283,7 +282,7 @@ namespace ClawRPG.Scripts.UI
             };
         }
 
-        private string GetPetTypeName(PetType type)
+        private string GetPetTypeName(ClawRPG.Scripts.Systems.Pets.PetType type)
         {
             return type switch
             {

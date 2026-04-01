@@ -5,7 +5,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class StyleMasterySystem : BaseSystem
+public partial class StyleMasterySystem : BaseSystem
 {
     // Style configurations (from original StyleMasteryDatabase)
     public Dictionary<string, StyleConfig> Styles = new Dictionary<string, StyleConfig>();

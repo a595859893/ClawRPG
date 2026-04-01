@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 鉴定系统 - 为未鉴装备生成随机属性
 /// 支持多种鉴定方法（免费/标准/高级/ premium），不同方法产出不同数量和品质的属性的
 /// </summary>
-public class IdentificationSystem : BaseSystem
+public partial class IdentificationSystem : BaseSystem
 {
     /// <summary>
     /// 获取系统单例实例

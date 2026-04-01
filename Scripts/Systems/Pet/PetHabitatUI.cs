@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace GameSystems
 {
-    public class PetHabitatUI : Control
+    public partial class PetHabitatUI : Control
     {
         private static PetHabitatUI _instance;
         public static PetHabitatUI Instance => _instance;

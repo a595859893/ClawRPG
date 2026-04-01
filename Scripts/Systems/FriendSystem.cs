@@ -7,7 +7,7 @@ using Godot.Collections;
 /// 好友系统 - 玩家好友关系管理
 /// 支持添加、删除、拉黑、好友状态等功能
 /// </summary>
-public class FriendSystem : BaseSystem
+public partial class FriendSystem : BaseSystem
 {
     // 单例
     private static FriendSystem _instance;

@@ -300,7 +300,7 @@ namespace ClawRPG.Scripts.Crafting {
     /// <summary>
     /// Crafting system - handles player crafting operations
     /// </summary>
-    public class CraftingSystem : BaseSystem
+    public partial class CraftingSystem : BaseSystem
     {
         private static CraftingSystem _instance;
         public static new CraftingSystem Instance

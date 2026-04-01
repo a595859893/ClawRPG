@@ -1,8 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.UI;
 
-public class CombatSkillCooldownUI : Control
+public partial class CombatSkillCooldownUI : Control
 {
 	private CombatSkillCooldownSystem _cooldownSystem;
 	

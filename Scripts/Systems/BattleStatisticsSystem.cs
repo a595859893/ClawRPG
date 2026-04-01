@@ -67,7 +67,7 @@ public class BattleRecord
 /// 战斗统计系统 - 追踪和管理玩家战斗相关统计数据
 /// 继承自 BaseSystem，实现数据持久化
 /// </summary>
-public class BattleStatisticsSystem : BaseSystem
+public partial class BattleStatisticsSystem : BaseSystem
 {
     private BattleStatsData _stats = new BattleStatsData();
     private bool _battleActive = false;

@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Hotkey Help UI - displays control hints
     /// </summary>
-    public class HotkeyHelpUI : Control
+    public partial class HotkeyHelpUI : Control
     {
         private VBoxContainer _container;
         private bool _isVisible = true;

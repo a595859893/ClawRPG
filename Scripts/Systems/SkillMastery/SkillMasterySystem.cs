@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Skill Mastery System - Manages skill mastery progression
     /// </summary>
-    public class SkillMasterySystem : BaseSystem
+    public partial class SkillMasterySystem : BaseSystem
     {
         private static SkillMasterySystem _instance;
         public static SkillMasterySystem Instance => _instance ?? new SkillMasterySystem();

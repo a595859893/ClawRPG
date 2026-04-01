@@ -8,7 +8,7 @@ namespace ClawRPG.Systems;
 /// <summary>
 /// 遗物界面
 /// </summary>
-public class RelicUI : Control
+public partial class RelicUI : Control
 {
     private VBoxContainer _mainContainer;
     private HBoxContainer _headerContainer;

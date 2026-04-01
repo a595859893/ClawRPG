@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 装备强化UI - 强化系统的界面控制
 /// 允许玩家选择强化类型并查看强化结果
 /// </summary>
-public class EquipmentEnhancementUI : Control
+public partial class EquipmentEnhancementUI : Control
 {
     private Panel _mainPanel;
     private VBoxContainer _mainContainer;

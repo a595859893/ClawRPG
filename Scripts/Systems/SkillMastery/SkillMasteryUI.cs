@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Skill Mastery UI - Display and manage skill mastery
     /// </summary>
-    public class SkillMasteryUI : Control
+    public partial class SkillMasteryUI : Control
     {
         private VBoxContainer _mainContainer;
         private VBoxContainer _skillListContainer;

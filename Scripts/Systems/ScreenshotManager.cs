@@ -6,7 +6,7 @@ namespace ClawRPG.Systems
 /// <summary>
 /// 截图管理器 - 负责游戏画面截图功能
 /// </summary>
-public class ScreenshotManager : BaseSystem
+public partial class ScreenshotManager : BaseSystem
 {
     public static ScreenshotManager Instance { get; private set; }
 

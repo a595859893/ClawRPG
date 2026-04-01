@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetEggSystem : BaseSystem
+public partial class PetEggSystem : BaseSystem
 {
     public static PetEggSystem Instance;
     

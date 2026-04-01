@@ -6,7 +6,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// NPC日程系统 - 管理NPC的日常活动和时间表
     /// </summary>
-    public class NPCScheduleSystem : BaseSystem
+    public partial class NPCScheduleSystem : BaseSystem
     {
         public static NPCScheduleSystem Instance { get; private set; }
 

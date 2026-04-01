@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 队伍技能系统
 /// 队伍共享技能、团队增益、协同效果
 /// </summary>
-public class TeamSkillSystem : BaseSystem
+public partial class TeamSkillSystem : BaseSystem
 {
     public static TeamSkillSystem Instance { get; private set; }
 

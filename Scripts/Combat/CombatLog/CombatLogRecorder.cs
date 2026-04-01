@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Combat
     /// CombatLogRecorder - 战斗日志记录器
     /// 负责记录各种战斗事件：伤害、治疗、击杀、技能等
     /// </summary>
-    public class CombatLogRecorder : BaseSystem
+    public partial class CombatLogRecorder : BaseSystem
     {
         private static CombatLogRecorder _instance;
         public static CombatLogRecorder Instance => _instance;

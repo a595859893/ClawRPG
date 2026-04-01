@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class PetExpeditionUI : Control
+public partial class PetExpeditionUI : Control
 {
     private Control _mainPanel;
     private VBoxContainer _zoneContainer;

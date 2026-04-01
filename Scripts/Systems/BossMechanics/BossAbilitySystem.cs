@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Boss技能系统 - 负责Boss技能/机制（伤害、治疗、护盾、召唤等）
 /// </summary>
-public class BossAbilitySystem : BaseSystem
+public partial class BossAbilitySystem : BaseSystem
 {
     public static BossAbilitySystem Instance { get; private set; }
 

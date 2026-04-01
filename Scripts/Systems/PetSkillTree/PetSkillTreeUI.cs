@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ClawRPG.Scripts.UI
 {
-    public class PetSkillTreeUI : Control
+    public partial class PetSkillTreeUI : Control
     {
         private static PetSkillTreeUI _instance;
         public static PetSkillTreeUI Instance => _instance;

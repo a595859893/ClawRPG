@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class ProceduralStorySystem : BaseSystem
+public partial class ProceduralStorySystem : BaseSystem
 {
     // References
     private ProceduralStoryData _data;

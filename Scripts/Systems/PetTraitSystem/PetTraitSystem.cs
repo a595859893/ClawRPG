@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Core system for managing pet traits.
     /// </summary>
-    public class PetTraitSystem : BaseSystem
+    public partial class PetTraitSystem : BaseSystem
     {
         public static PetTraitSystem Instance { get; private set; }
         

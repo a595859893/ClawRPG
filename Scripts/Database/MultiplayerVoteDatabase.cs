@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ClawRPG.Systems.MultiplayerVote;
 
 namespace ClawRPG.Modules.MultiplayerVote
 {
@@ -12,7 +13,7 @@ namespace ClawRPG.Modules.MultiplayerVote
         public static MultiplayerVoteDatabase Instance => _instance ??= new MultiplayerVoteDatabase();
 
         // Vote configurations
-        public Dictionary<VoteType, VoteConfig> VoteConfigs { get; private set; } = new Dictionary<VoteType, VoteConfig>();
+        public Dictionary<VoteType, VoteResults.VoteConfig> VoteConfigs { get; private set; } = new Dictionary<VoteType, VoteResults.VoteConfig>();
         
         // Party settings
         public int DefaultMaxMembers { get; set; } = 4;
@@ -29,7 +30,7 @@ namespace ClawRPG.Modules.MultiplayerVote
         private void InitializeVoteConfigs()
         {
             // Kick Player
-            VoteConfigs[VoteType.KickPlayer] = new VoteConfig
+            VoteConfigs[VoteType.KickPlayer] = new VoteResults.VoteConfig
             {
                 Type = VoteType.KickPlayer,
                 Name = "Kick Player",
@@ -41,7 +42,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
 
             // Start Game
-            VoteConfigs[VoteType.StartGame] = new VoteConfig
+            VoteConfigs[VoteType.StartGame] = new VoteResults.VoteConfig
             {
                 Type = VoteType.StartGame,
                 Name = "Start Game",
@@ -53,7 +54,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
 
             // Pause Game
-            VoteConfigs[VoteType.PauseGame] = new VoteConfig
+            VoteConfigs[VoteType.PauseGame] = new VoteResults.VoteConfig
             {
                 Type = VoteType.PauseGame,
                 Name = "Pause Game",
@@ -65,7 +66,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
 
             // Surrender
-            VoteConfigs[VoteType.Surrender] = new VoteConfig
+            VoteConfigs[VoteType.Surrender] = new VoteResults.VoteConfig
             {
                 Type = VoteType.Surrender,
                 Name = "Surrender",
@@ -77,7 +78,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
 
             // Map Vote
-            VoteConfigs[VoteType.MapVote] = new VoteConfig
+            VoteConfigs[VoteType.MapVote] = new VoteResults.VoteConfig
             {
                 Type = VoteType.MapVote,
                 Name = "Map Vote",
@@ -89,7 +90,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
 
             // Difficulty Vote
-            VoteConfigs[VoteType.DifficultyVote] = new VoteConfig
+            VoteConfigs[VoteType.DifficultyVote] = new VoteResults.VoteConfig
             {
                 Type = VoteType.DifficultyVote,
                 Name = "Difficulty Vote",
@@ -101,7 +102,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
 
             // Ready Check
-            VoteConfigs[VoteType.ReadyCheck] = new VoteConfig
+            VoteConfigs[VoteType.ReadyCheck] = new VoteResults.VoteConfig
             {
                 Type = VoteType.ReadyCheck,
                 Name = "Ready Check",
@@ -113,7 +114,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
 
             // Invite Player
-            VoteConfigs[VoteType.InvitePlayer] = new VoteConfig
+            VoteConfigs[VoteType.InvitePlayer] = new VoteResults.VoteConfig
             {
                 Type = VoteType.InvitePlayer,
                 Name = "Invite Player",
@@ -125,7 +126,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
 
             // Promote Leader
-            VoteConfigs[VoteType.PromoteLeader] = new VoteConfig
+            VoteConfigs[VoteType.PromoteLeader] = new VoteResults.VoteConfig
             {
                 Type = VoteType.PromoteLeader,
                 Name = "Promote Leader",
@@ -137,7 +138,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
 
             // Cancel Match
-            VoteConfigs[VoteType.CancelMatch] = new VoteConfig
+            VoteConfigs[VoteType.CancelMatch] = new VoteResults.VoteConfig
             {
                 Type = VoteType.CancelMatch,
                 Name = "Cancel Match",
@@ -149,7 +150,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             };
         }
 
-        public VoteConfig GetVoteConfig(VoteType type)
+        public VoteResults.VoteConfig GetVoteConfig(VoteType type)
         {
             return VoteConfigs.ContainsKey(type) ? VoteConfigs[type] : null;
         }

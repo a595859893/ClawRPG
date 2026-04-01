@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 卡牌收藏界面控制器
 /// 负责显示和管理玩家的卡牌收藏、卡包购买以及统计信息
 /// </summary>
-public class CardCollectionUI : Control
+public partial class CardCollectionUI : Control
 {
     private CardCollectionSystem _system;
     private CardCollectionDatabase _database;

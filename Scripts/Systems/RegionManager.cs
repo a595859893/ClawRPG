@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// Manages region transitions and environmental effects
     /// </summary>
     
-    public class RegionManager : BaseSystem
+    public partial class RegionManager : BaseSystem
     {
         public static RegionManager Instance { get; private set; }
 

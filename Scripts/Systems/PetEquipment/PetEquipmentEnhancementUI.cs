@@ -5,7 +5,7 @@ using Godot.Collections;
 using Game.Systems.Pets;
 using ClawRPG.Scripts.UI;
 
-public class PetEquipmentEnhancementUI : Control
+public partial class PetEquipmentEnhancementUI : Control
 {
     private Control _mainPanel;
     private VBoxContainer _equipmentList;

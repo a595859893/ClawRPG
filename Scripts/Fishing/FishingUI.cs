@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Fishing
     /// <summary>
     /// 钓鱼系统UI界面
     /// </summary>
-    public class FishingUI : Control
+    public partial class FishingUI : Control
     {
         // UI组件
         private PanelContainer _mainPanel;

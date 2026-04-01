@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 装备强化系统 - 管理装备的强化操作和属性加成
 /// 支持多种强化类型（攻击、防御、生命等），包含成功/暴击/失败机制
 /// </summary>
-public class EquipmentEnhancementSystem : BaseSystem
+public partial class EquipmentEnhancementSystem : BaseSystem
 {
     private static EquipmentEnhancementSystem _instance;
     /// <summary>

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ArtifactFusionSystem : BaseSystem
+public partial class ArtifactFusionSystem : BaseSystem
 {
     public static ArtifactFusionSystem Instance { get; private set; }
     
@@ -118,9 +118,9 @@ public class ArtifactFusionSystem : BaseSystem
         return record;
     }
     
-    public List<FusionRecipe> GetAvailableRecipes()
+    public List<ArtifactFusionDatabase.FusionRecipe> GetAvailableRecipes()
     {
-        List<FusionRecipe> available = new List<FusionRecipe>();
+        List<ArtifactFusionDatabase.FusionRecipe> available = new List<ArtifactFusionDatabase.FusionRecipe>();
         foreach (var recipe in ArtifactFusionDatabase.Recipes)
         {
             if (recipe.RequiredLevel <= GetPlayerLevel())
@@ -131,9 +131,9 @@ public class ArtifactFusionSystem : BaseSystem
         return available;
     }
     
-    public List<FusionRecipe> GetUnlockedRecipes()
+    public List<ArtifactFusionDatabase.FusionRecipe> GetUnlockedRecipes()
     {
-        List<FusionRecipe> unlocked = new List<FusionRecipe>();
+        List<ArtifactFusionDatabase.FusionRecipe> unlocked = new List<ArtifactFusionDatabase.FusionRecipe>();
         foreach (var recipeId in Data.UnlockedRecipes)
         {
             var recipe = ArtifactFusionDatabase.GetRecipe(recipeId);

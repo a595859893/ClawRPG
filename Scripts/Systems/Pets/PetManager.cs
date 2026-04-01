@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// <summary>
     /// 宠物管理器 - 管理玩家拥有的宠物
     /// </summary>
-    public class PetManager : BaseSystem
+    public partial class PetManager : BaseSystem
     {
         // 玩家宠物列表
         private List<Pet> _ownedPets = new List<Pet>();

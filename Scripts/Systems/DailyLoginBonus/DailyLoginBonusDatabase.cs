@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DailyLoginBonusDatabase : BaseSystem
+public partial class DailyLoginBonusDatabase : BaseSystem
 {
     // 每日奖励配置（7天循环）
     public List<Dictionary<string, object>> DailyRewards { get; private set; } = new List<Dictionary<string, object>>

@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Costume UI - costume shop and equipment interface
     /// </summary>
-    public class CostumeUI : Control
+    public partial class CostumeUI : Control
     {
         private Control _mainPanel;
         private VBoxContainer _costumeList;

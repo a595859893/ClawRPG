@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class WeatherUI : Control
+public partial class WeatherUI : Control
 {
     private Label title_label;
     private Label weather_type_label;

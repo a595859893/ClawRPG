@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 坐骑竞速系统 - 坐骑竞速比赛管理
 /// 支持计时赛、障碍赛等多种模式
 /// </summary>
-public class MountRaceSystem : BaseSystem
+public partial class MountRaceSystem : BaseSystem
 {
 	private static MountRaceSystem _instance;
 	public static MountRaceSystem Instance

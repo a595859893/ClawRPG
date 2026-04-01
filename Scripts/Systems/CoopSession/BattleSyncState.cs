@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
     /// <summary>
     /// 战斗状态管理 - 玩家/敌人状态、波次管理
     /// </summary>
-    public class BattleSyncState : BaseSystem
+    public partial class BattleSyncState : BaseSystem
     {
         // 玩家战斗状态
         protected Dictionary<int, BattleSyncData.PlayerBattleState> _playerStates;

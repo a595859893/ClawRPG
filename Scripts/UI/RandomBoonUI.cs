@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RandomBoonUI : Control
+public partial class RandomBoonUI : Control
 {
     private PanelContainer _mainPanel;
     private VBoxContainer _mainVBox;

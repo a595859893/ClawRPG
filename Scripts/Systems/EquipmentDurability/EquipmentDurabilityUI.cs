@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class EquipmentDurabilityUI : Control
+public partial class EquipmentDurabilityUI : Control
 {
     private PanelContainer _mainPanel;
     private VBoxContainer _content;

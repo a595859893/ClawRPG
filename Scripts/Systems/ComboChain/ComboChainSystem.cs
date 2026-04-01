@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ComboChainSystem : BaseSystem
+public partial class ComboChainSystem : BaseSystem
 {
     // 单例实例
     private static ComboChainSystem _instance;
@@ -26,7 +26,7 @@ public class ComboChainSystem : BaseSystem
     private float _chainTimeLimit = 3.0f;
     
     // 当前活跃的加成效果
-    private List<ChainBonusConfig> _activeBonuses = new List<ChainBonusConfig>();
+    private List<ComboChainDatabase.ChainBonusConfig> _activeBonuses = new List<ComboChainDatabase.ChainBonusConfig>();
     
     // 事件信号
 public delegate void ChainStarted(int chainCount);
@@ -268,7 +268,7 @@ public delegate void ComboLevelUp(int newLevel, string levelName);
     }
     
     // 获取当前活跃加成
-    public List<ChainBonusConfig> GetActiveBonuses()
+    public List<ComboChainDatabase.ChainBonusConfig> GetActiveBonuses()
     {
         return _activeBonuses;
     }

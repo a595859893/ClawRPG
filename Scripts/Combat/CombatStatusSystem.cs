@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Combat
     /// <summary>
     /// Combat status tracking system - tracks real-time combat statistics
     /// </summary>
-    public class CombatStatusSystem : BaseSystem
+    public partial class CombatStatusSystem : BaseSystem
     {
         private static CombatStatusSystem _instance;
         public static new CombatStatusSystem Instance

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CombatSkillCooldownSystem : BaseSystem
+public partial class CombatSkillCooldownSystem : BaseSystem
 {
 	private static CombatSkillCooldownSystem _instance;
 	public static new CombatSkillCooldownSystem Instance

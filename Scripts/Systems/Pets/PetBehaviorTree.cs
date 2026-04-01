@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// 宠物行为树系统 - 执行具体行为
     /// 职责：跟随玩家、攻击敌人、战术移动、特殊能力
     /// </summary>
-    public class PetBehaviorTree : BaseSystem
+    public partial class PetBehaviorTree : BaseSystem
     {
         private static PetBehaviorTree _instance;
         public static PetBehaviorTree Instance => _instance ??= new PetBehaviorTree();

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Combo Fatigue persistent data.
 /// Tracks recent combo usage and per-combo adaptation levels.
 /// </summary>
-public class ComboFatigueData : BaseSystem
+public partial class ComboFatigueData : BaseSystem
 {
     // Recent combo history (combo skill IDs)
     public List<string> ComboHistory { get; set; } = new List<string>();

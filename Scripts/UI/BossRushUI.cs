@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.UI.BossRush;
 
-public class BossRushUI : Control
+public partial class BossRushUI : Control
 {
     private BossRushSystem bossRushSystem;
     private Control mainContainer;

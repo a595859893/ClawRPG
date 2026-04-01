@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class CrossServerBattleUI : Control
+public partial class CrossServerBattleUI : Control
 {
     private CrossServerBattleSystem _system;
     private TabContainer _tabContainer;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 动态难度用户界面。显示和管理动态难度设置面板。
 /// </summary>
-public class DynamicDifficultyUI : Control
+public partial class DynamicDifficultyUI : Control
 {
     // 单例
     private static DynamicDifficultyUI _instance;

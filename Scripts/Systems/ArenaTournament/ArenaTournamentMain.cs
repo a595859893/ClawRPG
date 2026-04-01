@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class ArenaTournamentMain : BaseSystem
+public partial class ArenaTournamentMain : BaseSystem
 {
     private ArenaTournamentSystem _system;
     private ArenaTournamentUI _ui;

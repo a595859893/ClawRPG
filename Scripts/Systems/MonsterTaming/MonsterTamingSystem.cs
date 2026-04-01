@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MonsterTamingSystem : BaseSystem
+public partial class MonsterTamingSystem : BaseSystem
 {
     private MonsterTamingData _data;
     private Random _random = new Random();

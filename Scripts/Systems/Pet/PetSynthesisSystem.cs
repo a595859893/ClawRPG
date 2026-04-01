@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetSynthesisSystem : BaseSystem
+public partial class PetSynthesisSystem : BaseSystem
 {
     private static PetSynthesisSystem _instance;
     public static PetSynthesisSystem Instance
@@ -123,7 +123,7 @@ public class PetSynthesisSystem : BaseSystem
         _data.SynthesisProgress = 0.0f;
         
         // Record synthesis
-        var record = new PetSynthesisRecord
+        var record = new PetSynthesisData.PetSynthesisRecord
         {
             Pet1Id = pet1Id,
             Pet2Id = pet2Id,
@@ -136,7 +136,7 @@ public class PetSynthesisSystem : BaseSystem
         };
         
         if (!_data.SynthesisHistory.ContainsKey(pet1Id))
-            _data.SynthesisHistory[pet1Id] = new List<PetSynthesisRecord>();
+            _data.SynthesisHistory[pet1Id] = new List<PetSynthesisData.PetSynthesisRecord>();
         _data.SynthesisHistory[pet1Id].Add(record);
         
         // Emit result signal
@@ -246,16 +246,16 @@ public class PetSynthesisSystem : BaseSystem
         return _data;
     }
     
-    public List<PetSynthesisRecord> GetSynthesisHistory(int petId)
+    public List<PetSynthesisData.PetSynthesisRecord> GetSynthesisHistory(int petId)
     {
         if (_data.SynthesisHistory.ContainsKey(petId))
             return _data.SynthesisHistory[petId];
-        return new List<PetSynthesisRecord>();
+        return new List<PetSynthesisData.PetSynthesisRecord>();
     }
     
-    public List<PetSynthesisRecord> GetAllSynthesisHistory()
+    public List<PetSynthesisData.PetSynthesisRecord> GetAllSynthesisHistory()
     {
-        var allHistory = new List<PetSynthesisRecord>();
+        var allHistory = new List<PetSynthesisData.PetSynthesisRecord>();
         foreach (var kvp in _data.SynthesisHistory)
         {
             allHistory.AddRange(kvp.Value);
@@ -379,12 +379,12 @@ public class PetSynthesisSystem : BaseSystem
                 {
                     if (int.TryParse(kvp.Key, out var pet1Id))
                     {
-                        var records = new List<PetSynthesisRecord>();
+                        var records = new List<PetSynthesisData.PetSynthesisRecord>();
                         var recordsList = (List<Variant>)kvp.Value;
                         foreach (var recordVar in recordsList)
                         {
                             var rData = (Dictionary<string, Variant>)recordVar;
-                            var record = new PetSynthesisRecord
+                            var record = new PetSynthesisData.PetSynthesisRecord
                             {
                                 Pet1Id = (int)rData["pet1Id"],
                                 Pet2Id = (int)rData["pet2Id"],

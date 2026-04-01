@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Managers
     /// <summary>
     /// 游戏状态管理器 - 负责管理游戏状态（标题、游戏中、暂停、游戏结束）
     /// </summary>
-    public class GameStateManager : BaseSystem
+    public partial class GameStateManager : BaseSystem
     {
         public static GameStateManager Instance { get; private set; }
         

@@ -5,7 +5,7 @@ using Godot.Collections;
 
 namespace ClawRPG.Scripts.Systems
 {
-    public class PetSkillTreeSystem : BaseSystem
+    public partial class PetSkillTreeSystem : BaseSystem
     {
         private static PetSkillTreeSystem _instance;
         public static PetSkillTreeSystem Instance => _instance ??= new PetSkillTreeSystem();

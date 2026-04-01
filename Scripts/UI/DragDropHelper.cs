@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+using ClawRPG.Scripts.Items;
+
 namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Drag and drop helper for inventory items to quick slots
@@ -13,7 +15,7 @@ namespace ClawRPG.Scripts.UI {
         private bool _isDragging = false; 
         private string _draggedItemId = "";
         private int _draggedQuantity = 0;
-        private ItemType _draggedItemType;
+        private Item.ItemType _draggedItemType;
         
         public event Action<string, int> OnItemDroppedOnQuickSlot;
         
@@ -66,13 +68,13 @@ namespace ClawRPG.Scripts.UI {
         /// <summary>
         /// Start dragging an item
         /// </summary>
-        public void StartDrag(string itemId, int quantity, ItemType itemType) {
+        public void StartDrag(string itemId, int quantity, Item.ItemType itemType) {
             if (string.IsNullOrEmpty(itemId)) return;
             
             _isDragging = true;
             _draggedItemId = itemId;
             _draggedQuantity = quantity;
-            _draggedItemType = itemType;
+            _draggedItem.ItemType = itemType;
             
             // Get item name for preview
             var item = ItemDatabase.Instance?.GetItem(itemId);
@@ -130,7 +132,7 @@ namespace ClawRPG.Scripts.UI {
                 
                 if (slotIndex >= 0 && slotIndex < QuickSlotSystem.SlotCount) {
                     // Only consumables can be assigned to quick slots
-                    if (_draggedItemType == ItemType.Consumable) {
+                    if (_draggedItem.ItemType == Item.ItemType.Consumable) {
                         OnItemDroppedOnQuickSlot?.Invoke(_draggedItemId, slotIndex);
                         
                         // Show feedback

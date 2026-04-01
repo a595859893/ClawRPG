@@ -51,7 +51,7 @@ public class PlayerProfileData
 /// <summary>
 /// 玩家档案系统 - 显示玩家游戏统计和进度
 /// </summary>
-public class PlayerProfileSystem : BaseSystem
+public partial class PlayerProfileSystem : BaseSystem
 {
     public static PlayerProfileSystem Instance { get; private set; }
     

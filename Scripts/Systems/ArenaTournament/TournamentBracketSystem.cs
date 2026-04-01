@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 锦标赛赛程系统 - 负责比赛对阵生成和赛程管理
     /// </summary>
-    public class TournamentBracketSystem : BaseSystem
+    public partial class TournamentBracketSystem : BaseSystem
     {
         private static TournamentBracketSystem _instance;
         public static TournamentBracketSystem Instance => _instance;

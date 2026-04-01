@@ -9,7 +9,7 @@ namespace ClawRPG.Systems
     /// Combat UI Enhancement UI - 战斗UI增强系统控制面板
     /// 显示动态血条、技能冷却、战斗状态、连击计数
     /// </summary>
-    public class CombatUIEnhancementUI : Control
+    public partial class CombatUIEnhancementUI : Control
     {
         private CombatUIEnhancementSystem _system;
         

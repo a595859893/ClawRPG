@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SkillTreeSystem : BaseSystem
+public partial class SkillTreeSystem : BaseSystem
 {
     private static SkillTreeSystem _instance;
     public static SkillTreeSystem Instance => _instance ??= new SkillTreeSystem();

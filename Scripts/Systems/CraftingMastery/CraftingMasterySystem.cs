@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CraftingMasterySystem : BaseSystem
+public partial class CraftingMasterySystem : BaseSystem
 {
     // Singleton instance
     public static CraftingMasterySystem Instance { get; private set; }

@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 成就里程碑UI界面
     /// </summary>
-    public class AchievementMilestoneUI : Control
+    public partial class AchievementMilestoneUI : Control
     {
         private Control _mainPanel;
         private VBoxContainer _milestoneList;

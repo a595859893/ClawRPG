@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// 宠物目标选择系统 - 选择攻击/治疗目标
     /// 职责：敌人优先级评估、智能目标选择、目标评分
     /// </summary>
-    public class PetTargetingSystem : BaseSystem
+    public partial class PetTargetingSystem : BaseSystem
     {
         private static PetTargetingSystem _instance;
         public static PetTargetingSystem Instance => _instance ??= new PetTargetingSystem();

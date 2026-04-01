@@ -27,7 +27,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 初始化模块组件
         /// </summary>
-        public void InitializeModules(PlayerSpawnManager playerSpawnManager, EnemySpawnManager enemySpawnManager)
+        public void InitializeModules(PlayerSpawnManager playerSpawnManager, ClawRPG.Scripts.Managers.EnemySpawnManager enemySpawnManager)
         {
             // 输入处理
             _mainInput = new MainInput { Name = "MainInput" };

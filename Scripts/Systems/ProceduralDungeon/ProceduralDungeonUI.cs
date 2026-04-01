@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
     /// <summary>
     /// 程序化地下城UI
     /// </summary>
-    public class ProceduralDungeonUI : Control
+    public partial class ProceduralDungeonUI : Control
     {
         private ProceduralDungeonSystem _dungeonSystem;
         

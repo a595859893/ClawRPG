@@ -1,6 +1,8 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Framework;
 
 namespace ClawRPG.Systems {
     /// <summary>
@@ -74,7 +76,7 @@ namespace ClawRPG.Systems {
             {
                 var result = Godot.JSON.Parse(json);
                 if (result.Error != Error.Ok) return null;
-                return FromDict(result.Result.AsGodotDictionary());
+                return FromDict(result.Result.AsDictionary());
             }
             catch
             {
@@ -82,7 +84,7 @@ namespace ClawRPG.Systems {
             }
         }
 
-        private static KeybindingProfile FromDict(GodotDictionary dict)
+        private static KeybindingProfile FromDict(Dictionary dict)
         {
             var profile = new KeybindingProfile();
             if (dict.ContainsKey("version")) profile.Version = (int)(long)dict["version"];
@@ -93,7 +95,7 @@ namespace ClawRPG.Systems {
 
             if (dict.ContainsKey("keybindings"))
             {
-                var kb = (GodotDictionary)dict["keybindings"];
+                var kb = (Dictionary)dict["keybindings"];
                 foreach (var kvp in kb)
                 {
                     profile.Keybindings[kvp.Key.ToString()] = kvp.Value.ToString();

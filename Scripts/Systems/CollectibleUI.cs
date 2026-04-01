@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Collectible UI - displays collectible collection, details and progress
 /// </summary>
-public class CollectibleUI : Control
+public partial class CollectibleUI : Control
 {
 	private Label _titleLabel;
 	private Label _progressLabel;

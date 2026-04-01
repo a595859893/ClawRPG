@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DailyDungeonUI : Control
+public partial class DailyDungeonUI : Control
 {
     private VBoxContainer _mainContainer;
     private ScrollContainer _dungeonList;

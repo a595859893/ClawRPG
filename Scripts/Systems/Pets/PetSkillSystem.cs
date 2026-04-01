@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// <summary>
     /// 宠物技能系统管理器
     /// </summary>
-    public class PetSkillSystem : BaseSystem
+    public partial class PetSkillSystem : BaseSystem
     {
         private static PetSkillSystem _instance;
         public static PetSkillSystem Instance => _instance ??= new PetSkillSystem();

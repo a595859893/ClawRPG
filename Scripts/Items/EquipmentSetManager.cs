@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Items {
     /// <summary>
     /// Equipment set manager - calculates and manages active set bonuses
     /// </summary>
-    public class EquipmentSetManager : BaseSystem
+    public partial class EquipmentSetManager : BaseSystem
     {
         private static EquipmentSetManager _instance;
         public static EquipmentSetManager Instance => _instance;

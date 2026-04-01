@@ -1,8 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.UI;
 
-public class SurvivalChallengeUI : Control
+public partial class SurvivalChallengeUI : Control
 {
     private SurvivalChallengeSystem _system;
     

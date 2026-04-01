@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Costume system manager - handles purchasing, equipping, and managing costumes
     /// </summary>
-    public class CostumeSystem : BaseSystem
+    public partial class CostumeSystem : BaseSystem
     {
         public static CostumeSystem Instance { get; private set; }
         

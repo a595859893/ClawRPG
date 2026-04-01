@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 竞技场锦标赛系统 - 管理所有锦标赛活动（整合层）
     /// </summary>
-    public class ArenaTournamentSystem : BaseSystem
+    public partial class ArenaTournamentSystem : BaseSystem
     {
         // 单例
         private static ArenaTournamentSystem _instance;

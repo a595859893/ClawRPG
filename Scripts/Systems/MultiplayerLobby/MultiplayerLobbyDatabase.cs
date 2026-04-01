@@ -8,7 +8,7 @@ namespace ClawRPG.Systems
     /// 多人游戏大厅配置数据库
     /// 游戏模式、难度配置、房间设置
     /// </summary>
-    public class MultiplayerLobbyDatabase : BaseSystem
+    public partial class MultiplayerLobbyDatabase : BaseSystem
     {
         public static MultiplayerLobbyDatabase Instance { get; private set; }
         

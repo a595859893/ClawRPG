@@ -15,7 +15,7 @@ namespace ClawRPG.Scripts.Systems
         private Node2D _enemies;
         private Node2D _items;
         private PlayerSpawnManager _playerSpawnManager;
-        private EnemySpawnManager _enemySpawnManager;
+        private ClawRPG.Scripts.Managers.EnemySpawnManager _enemySpawnManager;
         
         public PackedScene PlayerScene { get; set; }
         public PackedScene EnemyScene { get; set; }
@@ -54,7 +54,7 @@ namespace ClawRPG.Scripts.Systems
             _main.AddChild(_playerSpawnManager);
 
             // 敌人生成管理器
-            _enemySpawnManager = new EnemySpawnManager { Name = "EnemySpawnManager" };
+            _enemySpawnManager = new ClawRPG.Scripts.Managers.EnemySpawnManager { Name = "EnemySpawnManager" };
             _enemySpawnManager.SetDefaultEnemyScene(EnemyScene);
             _main.AddChild(_enemySpawnManager);
 
@@ -135,7 +135,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 获取 EnemySpawnManager
         /// </summary>
-        public EnemySpawnManager GetEnemySpawnManager() => _enemySpawnManager;
+        public ClawRPG.Scripts.Managers.EnemySpawnManager GetEnemySpawnManager() => _enemySpawnManager;
 
         /// <summary>
         /// 导出保存数据

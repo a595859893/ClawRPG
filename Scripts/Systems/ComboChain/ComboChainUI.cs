@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ComboChainUI : Control
+public partial class ComboChainUI : Control
 {
     // UI 组件
     private Label _chainCountLabel;

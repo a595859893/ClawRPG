@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RandomQuestUI : Control
+public partial class RandomQuestUI : Control
 {
     private VBoxContainer _mainContainer;
     private TabContainer _tabContainer;

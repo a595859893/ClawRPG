@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Pet AI Improvements System
 /// Enhanced pet AI with personality, learning, and adaptive behaviors
 /// </summary>
-public class PetAIImprovementsSystem : BaseSystem
+public partial class PetAIImprovementsSystem : BaseSystem
 {
     // 信号定义 (C# 事件)
     public event Action<string> OnAiStateChanged;

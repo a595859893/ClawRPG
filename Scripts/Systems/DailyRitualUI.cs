@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 每日仪式UI - 显示仪式界面
 /// </summary>
-public class DailyRitualUI : Control
+public partial class DailyRitualUI : Control
 {
     private VBoxContainer _mainContainer;
     private HBoxContainer _headerContainer;

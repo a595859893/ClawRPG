@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
     /// <summary>
     /// 战斗网络同步 - 消息序列化、网络广播、延迟补偿
     /// </summary>
-    public class BattleSyncNetwork : BaseSystem
+    public partial class BattleSyncNetwork : BaseSystem
     {
         // 延迟补偿器引用
         protected BattleLagCompensation _lagCompensation;

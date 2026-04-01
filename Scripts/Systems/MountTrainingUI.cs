@@ -6,7 +6,7 @@ using ClawRPG.Scripts.Data;
 /// <summary>
 /// 坐骑训练界面 - 显示和管理坐骑训练项目的UI
 /// </summary>
-public class MountTrainingUI : Control
+public partial class MountTrainingUI : Control
 {
     private MountTrainingSystem system;
     private MountTrainingDatabase database;

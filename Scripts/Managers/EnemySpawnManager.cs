@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Managers
     /// <summary>
     /// 敌人生成管理器 - 负责敌人的生成、波次管理和敌人生成配置
     /// </summary>
-    public class EnemySpawnManager : BaseSystem
+    public partial class EnemySpawnManager : BaseSystem
     {
         public static EnemySpawnManager Instance { get; private set; }
         

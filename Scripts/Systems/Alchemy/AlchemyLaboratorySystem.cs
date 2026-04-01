@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AlchemyLaboratorySystem : BaseSystem
+public partial class AlchemyLaboratorySystem : BaseSystem
 {
     public static AlchemyLaboratorySystem Instance { get; private set; }
 

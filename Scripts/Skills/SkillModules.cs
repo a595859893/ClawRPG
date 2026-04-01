@@ -27,7 +27,7 @@ namespace ClawRPG.Scripts.Skills {
         public string IconPath { get; set; } = "";
         
         // Elemental type - for elemental reactions
-        public ElementType Element { get; set; } = ElementType.None;
+        public ElementalReactionData.ElementType Element { get; set; } = ElementType.None;
         
         // Dynamic effects list (the core of modular design)
         public List<SkillEffectData> Effects { get; set; } = new();

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ChronicleSystem : BaseSystem
+public partial class ChronicleSystem : BaseSystem
 {
     public static ChronicleSystem Instance { get; private set; }
     

@@ -8,7 +8,7 @@ namespace Game.Scripts.UI
     /// <summary>
     /// 装备洗练界面
     /// </summary>
-    public class EquipmentReforgingUI : Control
+    public partial class EquipmentReforgingUI : Control
     {
         private Control _panel;
         private VBoxContainer _mainContainer;

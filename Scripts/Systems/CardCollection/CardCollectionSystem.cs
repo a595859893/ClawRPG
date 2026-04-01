@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CardCollectionSystem : BaseSystem
+public partial class CardCollectionSystem : BaseSystem
 {
     private CardCollectionData _data;
     private CardCollectionDatabase _database;

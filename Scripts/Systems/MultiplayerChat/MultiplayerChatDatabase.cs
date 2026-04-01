@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class MultiplayerChatDatabase : BaseSystem
+public partial class MultiplayerChatDatabase : BaseSystem
 {
     // Emote definitions
     public class EmoteDefinition

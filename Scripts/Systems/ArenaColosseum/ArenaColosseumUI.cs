@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 角斗场UI界面
     /// </summary>
-    public class ArenaColosseumUI : Control
+    public partial class ArenaColosseumUI : Control
     {
         private Control _mainPanel;
         private VBoxContainer _colosseumList;

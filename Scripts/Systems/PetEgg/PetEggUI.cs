@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetEggUI : Control
+public partial class PetEggUI : Control
 {
     private VBoxContainer mainContainer;
     private HBoxContainer eggListContainer;

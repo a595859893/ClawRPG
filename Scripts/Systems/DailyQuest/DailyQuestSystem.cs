@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DailyQuestSystem : BaseSystem
+public partial class DailyQuestSystem : BaseSystem
 {
 	public static DailyQuestSystem Instance { get; private set; }
 

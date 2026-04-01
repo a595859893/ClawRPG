@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Title UI - displays title collection, details and allows equipping titles
 /// </summary>
-public class TitleUI : Control
+public partial class TitleUI : Control
 {
     // UI Elements
     private Label _titleLabel;

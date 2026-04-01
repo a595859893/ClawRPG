@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class PlayerTalentSystem : BaseSystem
+public partial class PlayerTalentSystem : BaseSystem
 {
     private static PlayerTalentSystem _instance;
     public static PlayerTalentSystem Instance

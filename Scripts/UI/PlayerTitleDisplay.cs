@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI;
 /// 玩家头顶称号显示组件
 /// 显示玩家当前设置的称号
 /// </summary>
-public class PlayerTitleDisplay : Node2D
+public partial class PlayerTitleDisplay : Node2D
 {
     private Label _titleLabel;
     private Player _player;

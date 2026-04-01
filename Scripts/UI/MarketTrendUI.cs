@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class MarketTrendUI : Control
+public partial class MarketTrendUI : Control
 {
     private MarketTrendSystem _system;
     private VBoxContainer _mainContainer;

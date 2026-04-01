@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 敌人属性缩放系统，负责根据各种因素（楼层、玩家等级、击杀数、时间等）
 /// 动态计算敌人的属性缩放值，支持线性、指数、对数和 plateau 等多种增长模式。
 /// </summary>
-public class EnemyScalingSystem : BaseSystem
+public partial class EnemyScalingSystem : BaseSystem
 {
     // 单例
     private static EnemyScalingSystem _instance;

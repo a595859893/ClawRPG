@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DailyLoginBonusSystem : BaseSystem
+public partial class DailyLoginBonusSystem : BaseSystem
 {
     private DailyLoginBonusData _data;
     private DailyLoginBonusDatabase _database;

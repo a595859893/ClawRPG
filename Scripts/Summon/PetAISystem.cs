@@ -9,14 +9,14 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 宠物AI系统 - 智能召唤物行为控制
     /// </summary>
-    public class PetAISystem : BaseSystem
+    public partial class PetAISystem : BaseSystem
     {
         // 玩家宠物AI数据
         private PlayerPetAIData _playerData;
 
         // 信号事件
         public event Action<string, AIDecision> OnDecisionMade;
-        public event Action<string, PetAIState> OnStateChanged;
+        public event Action<string, ClawRPG.Systems.Pets.AI.PetAIState> OnStateChanged;
         public event Action<string, float> OnAdaptationChanged;
 
         //  Singleton
@@ -99,7 +99,7 @@ namespace ClawRPG.Scripts.Systems
                 aiInstance = new PetAIInstance
                 {
                     SummonId = summonId,
-                    State = PetAIState.Idle
+                    State = ClawRPG.Scripts.Data.ClawRPG.Systems.Pets.AI.PetAIState.Idle
                 };
                 _playerData.ActivePetAIs.Add(aiInstance);
             }
@@ -435,27 +435,27 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         private void UpdateState(PetAIInstance ai, AIDecisionType decisionType)
         {
-            PetAIState newState = ai.State;
+            ClawRPG.Systems.Pets.AI.ClawRPG.Systems.Pets.AI.PetAIState newState = ai.State;
 
             switch (decisionType)
             {
                 case AIDecisionType.Attack:
-                    newState = PetAIState.Engaging;
+                    newState = ClawRPG.Scripts.Data.ClawRPG.Systems.Pets.AI.PetAIState.Engaging;
                     break;
                 case AIDecisionType.Heal:
                 case AIDecisionType.Buff:
-                    newState = PetAIState.Supporting;
+                    newState = ClawRPG.Scripts.Data.ClawRPG.Systems.Pets.AI.PetAIState.Supporting;
                     break;
                 case AIDecisionType.Retreat:
-                    newState = PetAIState.Fleeing;
+                    newState = ClawRPG.Scripts.Data.ClawRPG.Systems.Pets.AI.PetAIState.Fleeing;
                     break;
                 case AIDecisionType.Follow:
                 case AIDecisionType.Explore:
-                    newState = PetAIState.Patrolling;
+                    newState = ClawRPG.Scripts.Data.ClawRPG.Systems.Pets.AI.PetAIState.Patrolling;
                     break;
                 case AIDecisionType.Wait:
                 case AIDecisionType.Defend:
-                    newState = PetAIState.Idle;
+                    newState = ClawRPG.Scripts.Data.ClawRPG.Systems.Pets.AI.PetAIState.Idle;
                     break;
             }
 

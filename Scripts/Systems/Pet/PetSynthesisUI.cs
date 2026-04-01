@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetSynthesisUI : Control
+public partial class PetSynthesisUI : Control
 {
     private static PetSynthesisUI _instance;
     public static PetSynthesisUI Instance

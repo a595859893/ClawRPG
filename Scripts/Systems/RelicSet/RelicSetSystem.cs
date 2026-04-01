@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 遗物套装系统 - 提供套装加成功能
     /// </summary>
-    public class RelicSetSystem : BaseSystem
+    public partial class RelicSetSystem : BaseSystem
     {
         private static RelicSetSystem _instance;
         public static RelicSetSystem Instance => _instance ??= new RelicSetSystem();

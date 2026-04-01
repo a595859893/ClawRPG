@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
 
-public class PrestigeUI : Control
+public partial class PrestigeUI : Control
 {
     private Control mainPanel;
     private VBoxContainer infoContainer;

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 宠物成就系统
 /// 管理宠物成就的解锁、进度追踪和奖励发放
 /// </summary>
-public class PetAchievementSystem : BaseSystem
+public partial class PetAchievementSystem : BaseSystem
 {
     private static PetAchievementSystem _instance;
     public static PetAchievementSystem Instance

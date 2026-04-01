@@ -7,7 +7,7 @@ using System;
 /// - <= dangerThreshold (默认0.15): 红色危险 + 脉动效果
 /// - 颜色平滑过渡
 /// </summary>
-public class ConfidenceFloorHealthBar : Control
+public partial class ConfidenceFloorHealthBar : Control
 {
     // 颜色定义
     private Color _healthyColor = new Color(0.2f, 0.8f, 0.2f);   // 绿色
@@ -37,7 +37,7 @@ public class ConfidenceFloorHealthBar : Control
     private Tween _tween;
 
     // 子组件
-    private TextureProgress _healthBar;
+    private TextureProgressBar _healthBar;
     private AnimationPlayer _pulsePlayer;
     private Label _rageLabel; // REQ-127: RAGE indicator
 

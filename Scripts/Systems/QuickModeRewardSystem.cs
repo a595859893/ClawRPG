@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 快速模式专属奖励系统
 /// 提供快速模式的专属奖励加成和成就追踪
 /// </summary>
-public class QuickModeRewardSystem : BaseSystem
+public partial class QuickModeRewardSystem : BaseSystem
 {
     public static QuickModeRewardSystem Instance { get; private set; }
 

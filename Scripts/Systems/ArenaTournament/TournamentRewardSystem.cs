@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 锦标赛奖励系统 - 负责奖励发放和玩家记录更新
     /// </summary>
-    public class TournamentRewardSystem : BaseSystem
+    public partial class TournamentRewardSystem : BaseSystem
     {
         private static TournamentRewardSystem _instance;
         public static TournamentRewardSystem Instance => _instance;

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.UI;
 
-public class CombatHUDEnhancementUI : Control
+public partial class CombatHUDEnhancementUI : Control
 {
 	private CombatHUDEnhancementSystem _combatSystem;
 	

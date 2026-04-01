@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// Game mode manager that provides quick mode switching and configuration access.
     /// Coordinates with GameModeConfig to manage game mode settings.
     /// </summary>
-    public class GameModeManager : BaseSystem
+    public partial class GameModeManager : BaseSystem
     {
         private static GameModeManager _instance;
         

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 随机挑战UI系统 - 管理挑战界面显示
 /// 包含挑战列表、详细信息、刷新功能等
 /// </summary>
-public class ProceduralChallengeUI : Control
+public partial class ProceduralChallengeUI : Control
 {
     private VBoxContainer _mainContainer;
     private VBoxContainer _challengeList;

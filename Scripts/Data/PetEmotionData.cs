@@ -33,8 +33,8 @@ namespace ClawRPG.Scripts.Data
 
         public string PetId { get; set; }
         public Dictionary<EmotionType, float> CurrentEmotions { get; set; } = new Dictionary<EmotionType, float>();
-        public EmotionType DominantEmotion { get; set; } = EmotionType.Neutral;
-        public EmotionIntensity CurrentIntensity { get; set; } = EmotionIntensity.Low;
+        public PetEmotionData.EmotionType DominantEmotion { get; set; } = EmotionType.Neutral;
+        public PetEmotionData.EmotionIntensity CurrentIntensity { get; set; } = EmotionIntensity.Low;
         public List<EmotionHistoryEntry> EmotionHistory { get; set; } = new List<EmotionHistoryEntry>();
         public int TotalEmotionChanges { get; set; }
         public DateTime LastEmotionChange { get; set; }
@@ -42,8 +42,8 @@ namespace ClawRPG.Scripts.Data
 
     public class EmotionHistoryEntry
     {
-        public EmotionType Emotion { get; set; }
-        public EmotionIntensity Intensity { get; set; }
+        public PetEmotionData.EmotionType Emotion { get; set; }
+        public PetEmotionData.EmotionIntensity Intensity { get; set; }
         public DateTime Timestamp { get; set; }
         public string Trigger { get; set; }
     }

@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI
     /// <summary>
     /// UI for managing pet traits.
     /// </summary>
-    public class PetTraitUI : Control
+    public partial class PetTraitUI : Control
     {
         private TabContainer _tabContainer;
         private VBoxContainer _overviewTab;

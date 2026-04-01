@@ -313,7 +313,7 @@ namespace ClawRPG.Scripts.UI {
         private void UpdateBossHealth()
         {
             // Get boss health from Boss script
-            var boss = _currentBoss as Scripts.Boss;
+            var boss = _currentBoss as Scripts.Characters.Boss;
             if (boss == null) return;
             
             float currentHealth = boss.CurrentHealth;
@@ -391,7 +391,7 @@ namespace ClawRPG.Scripts.UI {
         private float PulseTimer = 0f;
         private const float PulseInterval = 0.5f;
 
-        private void UpdateEnrageDisplay(Scripts.Boss boss, float delta)
+        private void UpdateEnrageDisplay(Scripts.Characters.Boss boss, float delta)
         {
             bool isEnraged = boss.IsEnraged();
             float enrageTimeRemaining = boss.GetEnrageTimeRemaining();
@@ -533,7 +533,7 @@ namespace ClawRPG.Scripts.UI {
         {
             _currentBoss = boss;
             
-            if (boss is Scripts.Boss bossScript)
+            if (boss is Scripts.Characters.Boss bossScript)
             {
                 _bossNameLabel.Text = string.IsNullOrEmpty(bossName) ? bossScript.BossName : bossName;
             }
@@ -564,7 +564,7 @@ namespace ClawRPG.Scripts.UI {
         /// </summary>
         private void SubscribeToBossEvents()
         {
-            if (_currentBoss is Scripts.Boss boss) {
+            if (_currentBoss is Scripts.Characters.Boss boss) {
                 boss.OnIntentSelected += OnBossIntentSelected;
             }
         }
@@ -574,7 +574,7 @@ namespace ClawRPG.Scripts.UI {
         /// </summary>
         private void UnsubscribeFromBossEvents()
         {
-            if (_currentBoss is Scripts.Boss boss) {
+            if (_currentBoss is Scripts.Characters.Boss boss) {
                 boss.OnIntentSelected -= OnBossIntentSelected;
             }
             _currentIntent = null;

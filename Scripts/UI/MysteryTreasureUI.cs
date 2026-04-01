@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MysteryTreasureUI : Control
+public partial class MysteryTreasureUI : Control
 {
     private static MysteryTreasureUI _instance;
     public static MysteryTreasureUI Instance => _instance;

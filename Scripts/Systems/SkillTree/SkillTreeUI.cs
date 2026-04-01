@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SkillTreeUI : Control
+public partial class SkillTreeUI : Control
 {
     private VBoxContainer mainContainer;
     private HBoxContainer headerContainer;

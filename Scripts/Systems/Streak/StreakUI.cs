@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class StreakUI : Control
+public partial class StreakUI : Control
 {
     private StreakSystem _streakSystem;
     private Label _titleLabel;

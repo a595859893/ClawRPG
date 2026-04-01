@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Game.Systems.Pets;
 
-public class PetEquipmentUI : Control
+public partial class PetEquipmentUI : Control
 {
     private PanelContainer _mainPanel;
     private VBoxContainer _mainVBox;

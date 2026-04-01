@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+using ClawRPG.Scripts.Combat;
+
 namespace ClawRPG.Scripts.Characters {
     /// <summary>
     /// Boss Abilities - handles ability execution

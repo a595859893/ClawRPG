@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Combat
     /// CombatLogFormatter - 战斗日志格式化器
     /// 负责格式化日志消息，提供不同的样式、颜色、图标
     /// </summary>
-    public class CombatLogFormatter : BaseSystem
+    public partial class CombatLogFormatter : BaseSystem
     {
         private static CombatLogFormatter _instance;
         public static CombatLogFormatter Instance => _instance;

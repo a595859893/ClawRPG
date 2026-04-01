@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildRankUI : Control
+public partial class GuildRankUI : Control
 {
 	private GuildRankSystem rankSystem;
 	private Label titleLabel;

@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
     /// Contract Bounty UI - 委托赏金系统界面
     /// </summary>
     
-    public class ContractBountyUI : Control
+    public partial class ContractBountyUI : Control
     {
         private ContractBountySystem _system = ContractBountySystem.Instance;
         

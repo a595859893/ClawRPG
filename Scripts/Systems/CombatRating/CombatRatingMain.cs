@@ -1,6 +1,6 @@
 using Godot;
 
-public class CombatRatingMain : BaseSystem
+public partial class CombatRatingMain : BaseSystem
 {
 	private CombatRatingSystem combatRatingSystem;
 	private CombatRatingUI combatRatingUI;

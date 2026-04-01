@@ -8,7 +8,7 @@ namespace ClawRPG.Systems
     /// 多人游戏大厅UI
     /// 房间列表、创建/加入房间、准备状态、游戏模式选择
     /// </summary>
-    public class MultiplayerLobbyUI : Control
+    public partial class MultiplayerLobbyUI : Control
     {
         public static MultiplayerLobbyUI Instance { get; private set; }
         

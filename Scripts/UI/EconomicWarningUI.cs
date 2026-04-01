@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class EconomicWarningUI : Control
+public partial class EconomicWarningUI : Control
 {
     private EconomicWarningSystem _system;
     private TabContainer _tabContainer;

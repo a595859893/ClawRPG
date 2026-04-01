@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 多人游戏 UI
 /// 连接服务器、创建/加入房间
 /// </summary>
-public class MultiplayerUI : Control
+public partial class MultiplayerUI : Control
 {
     // UI 元素
     private Button _connectButton;

@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
     /// <summary>
     /// 附魔系统核心类
     /// </summary>
-    public class EnchantmentSystem : BaseSystem
+    public partial class EnchantmentSystem : BaseSystem
     {
         // 单例
         private static EnchantmentSystem _instance;

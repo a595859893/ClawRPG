@@ -10,7 +10,7 @@ using System;
 /// - SkillModules.ApplyDamage: apply GetFatigueMultiplier() to damage
 /// - SkillComboSystem: call RecordComboUsage() after each combo execution
 /// </summary>
-public class ComboFatigueSystem : BaseSystem
+public partial class ComboFatigueSystem : BaseSystem
 {
     private static ComboFatigueSystem _instance;
     public static ComboFatigueSystem Instance

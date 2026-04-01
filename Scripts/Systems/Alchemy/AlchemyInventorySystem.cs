@@ -8,7 +8,7 @@ namespace ClawRPG.Systems.Alchemy
     /// 炼金材料库存管理系统
     /// 负责材料的存储、查询和管理
     /// </summary>
-    public class AlchemyInventorySystem : BaseSystem
+    public partial class AlchemyInventorySystem : BaseSystem
     {
         private Dictionary<int, AlchemyMaterial> _materials = new Dictionary<int, AlchemyMaterial>();
         private int _nextMaterialId = 1001;

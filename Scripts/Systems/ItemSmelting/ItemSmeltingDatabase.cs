@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ItemSmeltingDatabase : BaseSystem
+public partial class ItemSmeltingDatabase : BaseSystem
 {
     // Recipe configurations
     public Dictionary<string, SmeltingRecipe> Recipes = new Dictionary<string, SmeltingRecipe>();

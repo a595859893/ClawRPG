@@ -64,7 +64,7 @@ public class ClassData
 /// <summary>
     /// 职业系统单例 - 处理职业数据初始化、经验获取、等级提升和属性计算。
     /// </summary>
-    public class ClassSystem : BaseSystem
+    public partial class ClassSystem : BaseSystem
 {
     // 单例
     private static ClassSystem _instance;

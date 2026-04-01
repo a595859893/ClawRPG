@@ -7,7 +7,7 @@ namespace ClawRPG.UI;
 /// <summary>
 /// 宠物变异系统 UI
 /// </summary>
-public class PetMutationUI : Control
+public partial class PetMutationUI : Control
 {
     private Label _titleLabel;
     private Label _statsLabel;

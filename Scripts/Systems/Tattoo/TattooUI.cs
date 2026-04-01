@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TattooUI : Control
+public partial class TattooUI : Control
 {
     private TattooSystem _tattooSystem;
     private TattooDatabase _database;

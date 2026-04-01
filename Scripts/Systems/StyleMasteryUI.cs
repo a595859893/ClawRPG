@@ -5,7 +5,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class StyleMasteryUI : Control
+public partial class StyleMasteryUI : Control
 {
     private TabContainer tabContainer;
     private VBoxContainer overviewContainer;

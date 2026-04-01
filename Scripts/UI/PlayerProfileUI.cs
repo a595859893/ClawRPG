@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 玩家档案界面 - 显示玩家游戏统计和进度
 /// </summary>
-public class PlayerProfileUI : Control
+public partial class PlayerProfileUI : Control
 {
     private Label _titleLabel;
     private TabContainer _tabContainer;

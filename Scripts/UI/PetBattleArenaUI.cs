@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.Pets;
     using ArenaType = ClawRPG.Scripts.Systems.ArenaType;
 
-public class PetBattleArenaUI : Control
+public partial class PetBattleArenaUI : Control
 {
     private PetBattleArenaSystem _system;
     

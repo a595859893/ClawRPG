@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class PetEvolutionUI : Control
+public partial class PetEvolutionUI : Control
 {
     private Panel _mainPanel;
     private VBoxContainer _mainContainer;
@@ -275,7 +275,7 @@ public class PetEvolutionDetails : VBoxContainer
         AddChild(_chainLabel);
     }
 
-    public void UpdateDetails(EvolutionProgress progress, string petType)
+    public void UpdateDetails(PetEvolutionSystem.EvolutionProgress progress, string petType)
     {
         _currentFormLabel.Text = $"Current Form: {progress.CurrentForm}";
         _nextFormLabel.Text = progress.IsMaxEvolution 

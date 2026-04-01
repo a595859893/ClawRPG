@@ -14,7 +14,7 @@ namespace ClawRPG.Scripts.Systems
     /// - TournamentRewardSystem: 奖励发放
     /// - TournamentPersistenceSystem: 持久化
     /// </summary>
-    public class ArenaTournamentCoreSystem : BaseSystem
+    public partial class ArenaTournamentCoreSystem : BaseSystem
     {
         // 单例
         private static ArenaTournamentCoreSystem _instance;

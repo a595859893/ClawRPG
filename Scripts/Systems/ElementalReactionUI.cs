@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using static ElementalReactionData;
 
-public class ElementalReactionUI : Control
+public partial class ElementalReactionUI : Control
 {
     private PanelContainer _mainPanel;
     private VBoxContainer _content;

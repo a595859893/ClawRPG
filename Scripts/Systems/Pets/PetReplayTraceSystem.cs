@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// 职责：记录、存储、查询、回放宠物 AI 决策
     /// 数据来源：PetDecisionSystem.UpdateDecision / PetTargetingSystem.SelectSmartTarget / PetBehaviorTree.ExecuteBehavior
     /// </summary>
-    public class PetReplayTraceSystem : BaseSystem
+    public partial class PetReplayTraceSystem : BaseSystem
     {
         private static PetReplayTraceSystem _instance;
         public static PetReplayTraceSystem Instance => _instance ??= new PetReplayTraceSystem();

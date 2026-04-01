@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RandomNameUI : Control
+public partial class RandomNameUI : Control
 {
     private RandomNameSystem _system;
     private Label _titleLabel;

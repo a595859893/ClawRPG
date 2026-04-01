@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Combat
     /// <summary>
     /// Combat UI - Godot UI display for combat interface
     /// </summary>
-    public class CombatUI : Control
+    public partial class CombatUI : Control
     {
         private static CombatUI _instance;
         public static CombatUI Instance => _instance;

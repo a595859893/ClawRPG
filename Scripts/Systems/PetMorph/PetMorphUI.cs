@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetMorphUI : Control
+public partial class PetMorphUI : Control
 {
     private Control _mainContainer;
     private VBoxContainer _morphListContainer;

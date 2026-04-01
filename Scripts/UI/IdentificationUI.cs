@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class IdentificationUI : Control
+public partial class IdentificationUI : Control
 {
     private Label _titleLabel;
     private Label _statsLabel;

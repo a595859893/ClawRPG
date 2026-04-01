@@ -34,7 +34,7 @@ public enum GuildRankTier
 	Supreme = 10
 }
 
-public class GuildRankSystem : BaseSystem
+public partial class GuildRankSystem : BaseSystem
 {
 	private Dictionary<int, GuildRankData> memberRanks = new Dictionary<int, GuildRankData>();
 	private int currentSeason = 1;

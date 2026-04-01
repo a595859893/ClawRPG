@@ -251,14 +251,14 @@ namespace ClawRPG.Scripts.UI {
             }
         }
         
-        private Color GetItemTypeColor(ItemType type) {
+        private Color GetItemTypeColor(Item.ItemType type) {
             switch (type) {
-                case ItemType.Consumable: return new Color(1f, 0.3f, 0.3f);
-                case ItemType.Weapon: return new Color(1f, 0.8f, 0.2f);
-                case ItemType.Armor: return new Color(0.3f, 0.5f, 1f);
-                case ItemType.Accessory: return new Color(0.8f, 0.3f, 0.8f);
-                case ItemType.Material: return new Color(0.5f, 0.5f, 0.5f);
-                case ItemType.Quest: return new Color(1f, 1f, 0.2f);
+                case Item.ItemType.Consumable: return new Color(1f, 0.3f, 0.3f);
+                case Item.ItemType.Weapon: return new Color(1f, 0.8f, 0.2f);
+                case Item.ItemType.Armor: return new Color(0.3f, 0.5f, 1f);
+                case Item.ItemType.Accessory: return new Color(0.8f, 0.3f, 0.8f);
+                case Item.ItemType.Material: return new Color(0.5f, 0.5f, 0.5f);
+                case Item.ItemType.Quest: return new Color(1f, 1f, 0.2f);
                 default: return new Color(1f, 1f, 1f);
             }
         }

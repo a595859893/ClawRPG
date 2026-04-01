@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Boss Rush 系统 - 连续挑战 Boss 的模式
 /// 支持多难度选择和进度追踪
 /// </summary>
-public class BossRushSystem : BaseSystem
+public partial class BossRushSystem : BaseSystem
 {
     private BossRushData data;
     private BossRushState currentState = BossRushState.NotStarted;

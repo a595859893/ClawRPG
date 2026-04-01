@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.BossMechanics;
 
 namespace ClawRPG.UI {
-public class BossMechanicsUI : Control
+public partial class BossMechanicsUI : Control
 {
     private Label _titleLabel;
     private TabContainer _tabContainer;

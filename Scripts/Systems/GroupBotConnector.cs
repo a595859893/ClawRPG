@@ -8,7 +8,7 @@ namespace ClawRPG.Systems
 /// <summary>
 /// 群聊机器人连接器 - 负责与QQ/微信群聊机器人通信
 /// </summary>
-public class GroupBotConnector : BaseSystem
+public partial class GroupBotConnector : BaseSystem
 {
     public static GroupBotConnector Instance { get; private set; }
 

@@ -287,7 +287,7 @@ public class SeasonalEventDatabase
     }
 }
 
-public class SeasonalEventSystem : BaseSystem
+public partial class SeasonalEventSystem : BaseSystem
 {
     /// <summary>
     /// 获取系统单例实例。

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RoguelikeStatsUI : Control
+public partial class RoguelikeStatsUI : Control
 {
     private RoguelikeStatsSystem _system;
     private TabContainer _tabContainer;

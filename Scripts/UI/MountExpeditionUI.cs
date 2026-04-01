@@ -10,7 +10,7 @@ namespace ClawRPG.UI
     /// <summary>
     /// 坐骑远征界面
     /// </summary>
-    public class MountExpeditionUI : Control
+    public partial class MountExpeditionUI : Control
     {
         private Control _mainPanel;
         private TabContainer _tabContainer;

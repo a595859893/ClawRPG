@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ArtifactFusionUI : Control
+public partial class ArtifactFusionUI : Control
 {
     private TabContainer tabContainer;
     private VBoxContainer recipeContainer;
@@ -187,7 +187,7 @@ public class ArtifactFusionUI : Control
         }
     }
     
-    private Control CreateRecipeCard(FusionRecipe recipe)
+    private Control CreateRecipeCard(ArtifactFusionDatabase.FusionRecipe recipe)
     {
         var panel = new PanelContainer { MarginBottom = 10 };
         

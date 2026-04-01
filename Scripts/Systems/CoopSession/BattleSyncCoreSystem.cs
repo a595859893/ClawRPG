@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
     /// <summary>
     /// 战斗同步核心系统 - 信号定义、生命周期、会话管理、配置
     /// </summary>
-    public class BattleSyncCoreSystem : BaseSystem
+    public partial class BattleSyncCoreSystem : BaseSystem
     {
         // 单例
         public static BattleSyncCoreSystem Instance { get; private set; }

@@ -9,7 +9,7 @@ using static ElementalReactionData;
 /// <summary>
 /// 元素反应系统 - 管理元素之间的反应效果
 /// </summary>
-public class ElementalReactionSystem : BaseSystem
+public partial class ElementalReactionSystem : BaseSystem
 {
     private static ElementalReactionSystem _instance;
     public static ElementalReactionSystem Instance

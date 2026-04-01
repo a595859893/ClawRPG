@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 宠物回收系统 - UI显示
     /// </summary>
-    public class PetRecycleUI : Control
+    public partial class PetRecycleUI : Control
     {
         private PetRecycleSystem _system;
         

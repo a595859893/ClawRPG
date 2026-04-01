@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SeededRunUI : Control
+public partial class SeededRunUI : Control
 {
     private SeededRunSystem _system;
     

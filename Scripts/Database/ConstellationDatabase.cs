@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Framework;
 
-public class ConstellationDatabase : BaseSystem
+public partial class ConstellationDatabase : BaseSystem
 {
     // All constellation configurations
     private Dictionary<string, ConstellationSystem.Constellation> _constellations = new Dictionary<string, ConstellationSystem.Constellation>();

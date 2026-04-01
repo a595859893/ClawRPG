@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class MultiplayerChatMain : BaseSystem
+public partial class MultiplayerChatMain : BaseSystem
 {
     private MultiplayerChatSystem _chatSystem;
     private MultiplayerChatData _chatData;

@@ -7,7 +7,7 @@ using System;
 /// </summary>
 namespace ClawRPG.Scripts.UI.BossRush
 {
-    public class BossRushUIRushPanelControls : Control
+    public partial class BossRushUIRushPanelControls : Control
     {
         private BossRushSystem _bossRushSystem;
         

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CombatRatingUI : Control
+public partial class CombatRatingUI : Control
 {
 	private CombatRatingSystem combatRatingSystem;
 	

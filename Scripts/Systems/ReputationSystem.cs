@@ -67,7 +67,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 声望系统 - 管理玩家与阵营的声望关系
     /// </summary>
-    public class ReputationSystem : BaseSystem
+    public partial class ReputationSystem : BaseSystem
     {
         private static ReputationSystem _instance;
         public static ReputationSystem Instance

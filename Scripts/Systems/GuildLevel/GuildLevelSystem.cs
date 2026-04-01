@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildLevelSystem : BaseSystem
+public partial class GuildLevelSystem : BaseSystem
 {
     private static GuildLevelSystem _instance;
     public static GuildLevelSystem Instance

@@ -35,11 +35,11 @@ namespace ClawRPG.Scripts.Systems.Pets
         private float _lastAttackTime = 0f;
         
         // 状态机
-        private PetAIState _currentState = PetAIState.Idle;
+        private ClawRPG.Systems.Pets.AI.PetAIState _currentState = PetAIState.Idle;
         
         // 信号
         public delegate void PetAttackedEventHandler(Node2D enemy, int damage);
-        public delegate void PetStateChangedEventHandler(PetAIState newState);
+        public delegate void PetStateChangedEventHandler(ClawRPG.Systems.Pets.AI.PetAIState newState);
         
         public override void _Ready()
         {
@@ -389,7 +389,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// <summary>
         /// 改变状态
         /// </summary>
-        private void ChangeState(PetAIState newState)
+        private void ChangeState(ClawRPG.Systems.Pets.AI.PetAIState newState)
         {
             if (_currentState != newState)
             {
@@ -520,7 +520,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         
         public bool IsEnabled { get; set; } = true;
         public bool IsVisible { get; set; } = true;
-        public PetAIState CurrentState => _currentState;
+        public ClawRPG.Systems.Pets.AI.PetAIState CurrentState => _currentState;
         
         #endregion
         

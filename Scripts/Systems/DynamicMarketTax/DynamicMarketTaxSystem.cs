@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 动态市场税率系统 - 根据市场热度自动调整税率
 /// 基于 Game Economy Design 学习成果
 /// </summary>
-public class MarketTaxData : BaseSystem
+public partial class MarketTaxData : BaseSystem
 {
     // 基础税率配置
     public float BaseTaxRate { get; set; } = 5.0f;
@@ -88,7 +88,7 @@ public class TaxRecord
     public float MarketActivity { get; set; }
 }
 
-public class DynamicMarketTaxSystem : BaseSystem
+public partial class DynamicMarketTaxSystem : BaseSystem
 {
     private MarketTaxData _data;
     

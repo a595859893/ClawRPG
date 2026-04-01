@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Combo Skill Database - 连击技能配置数据库
 /// </summary>
-public class ComboSkillSystem : BaseSystem
+public partial class ComboSkillSystem : BaseSystem
 {
     // 单例
     private static ComboSkillSystem instance;

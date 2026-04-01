@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MilestoneUI : Control
+public partial class MilestoneUI : Control
 {
     private MilestoneSystem _system = MilestoneSystem.Instance;
     private MilestoneDatabase _database = MilestoneDatabase.Instance;

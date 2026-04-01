@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 元素试炼系统 - 管理元素试炼关卡
 /// </summary>
-public class ElementalTrialSystem : BaseSystem
+public partial class ElementalTrialSystem : BaseSystem
 {
     private static ElementalTrialSystem _instance;
     public static ElementalTrialSystem Instance

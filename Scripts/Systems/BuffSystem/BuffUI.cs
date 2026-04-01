@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BuffUI : Control
+public partial class BuffUI : Control
 {
 	private static BuffUI _instance;
 	public static BuffUI Instance

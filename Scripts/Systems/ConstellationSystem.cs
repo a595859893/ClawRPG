@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 星座数据 - 存储星座配置信息
 /// </summary>
-public class ConstellationSystem : BaseSystem
+public partial class ConstellationSystem : BaseSystem
 {
     // Constellation types
     public enum ConstellationType

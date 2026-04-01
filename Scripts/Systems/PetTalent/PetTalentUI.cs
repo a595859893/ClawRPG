@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetTalentUI : Control
+public partial class PetTalentUI : Control
 {
     private PetTalentSystem _talentSystem;
     private PetTalentDatabase _database;

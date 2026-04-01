@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 随机挑战系统 - 管理程序生成的挑战内容
 /// 包含挑战生成、进度追踪、奖励发放等
 /// </summary>
-public class ProceduralChallengeSystem : BaseSystem
+public partial class ProceduralChallengeSystem : BaseSystem
 {
     public static ProceduralChallengeSystem Instance { get; private set; }
 

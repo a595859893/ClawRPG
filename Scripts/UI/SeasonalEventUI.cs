@@ -3,7 +3,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SeasonalEventUI : Control
+public partial class SeasonalEventUI : Control
 {
     private PanelContainer _mainPanel;
     private VBoxContainer _eventList;

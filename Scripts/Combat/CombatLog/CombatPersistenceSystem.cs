@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Combat
     /// CombatPersistenceSystem - 战斗数据持久化系统
     /// 负责保存和加载战斗相关数据：统计、设置、历史记录
     /// </summary>
-    public class CombatPersistenceSystem : BaseSystem
+    public partial class CombatPersistenceSystem : BaseSystem
     {
         private static CombatPersistenceSystem _instance;
         public static CombatPersistenceSystem Instance => _instance;

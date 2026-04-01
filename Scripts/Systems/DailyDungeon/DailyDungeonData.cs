@@ -24,8 +24,8 @@ public class DailyDungeonData
 
     public string Id { get; set; }
     public string Name { get; set; }
-    public DungeonType Type { get; set; }
-    public DifficultyLevel Difficulty { get; set; }
+    public DailyDungeonData.DungeonType Type { get; set; }
+    public DailyDungeonData.DifficultyLevel Difficulty { get; set; }
     public int RecommendedLevel { get; set; }
     public int TotalFloors { get; set; }
     public int CurrentFloor { get; set; }
@@ -367,17 +367,17 @@ public class DailyDungeonDatabase
         return _dungeons.Find(d => d.Id == id);
     }
 
-    public static List<DailyDungeonData> GetDungeonsByType(DungeonType type)
+    public static List<DailyDungeonData> GetDungeonsByType(DailyDungeonData.DungeonType type)
     {
         return _dungeons.FindAll(d => d.Type == type);
     }
 
-    public static List<DailyDungeonData> GetDungeonsByDifficulty(Difficulty difficulty)
+    public static List<DailyDungeonData> GetDungeonsByDifficulty(DailyDungeonData.DifficultyLevel difficulty)
     {
-        return _dungeons.FindAll(d => d.Difficulty == difficulty);
+        return _dungeons.FindAll(d => d.DifficultyLevel == difficulty);
     }
 
-    public static string GetDungeonTypeName(DungeonType type)
+    public static string GetDungeonTypeName(DailyDungeonData.DungeonType type)
     {
         switch (type)
         {
@@ -416,7 +416,7 @@ public class DailyDungeonDatabase
         }
     }
 
-    public static Color GetDungeonTypeColor(DungeonType type)
+    public static Color GetDungeonTypeColor(DailyDungeonData.DungeonType type)
     {
         switch (type)
         {

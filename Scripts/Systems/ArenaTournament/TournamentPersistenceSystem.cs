@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 锦标赛持久化系统 - 负责所有数据的序列化和反序列化
     /// </summary>
-    public class TournamentPersistenceSystem : BaseSystem
+    public partial class TournamentPersistenceSystem : BaseSystem
     {
         private static TournamentPersistenceSystem _instance;
         public static TournamentPersistenceSystem Instance => _instance;

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ItemSmeltingData : BaseSystem
+public partial class ItemSmeltingData : BaseSystem
 {
     // Smelting recipes unlocked
     public HashSet<string> UnlockedRecipes = new HashSet<string>();

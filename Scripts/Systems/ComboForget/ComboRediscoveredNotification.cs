@@ -8,7 +8,7 @@ namespace Framework
     /// Combo 重新发现通知 — 比首次发现更简洁
     /// 显示 "COMBO REMEMBERED" 而不是完整的发现面板
     /// </summary>
-    public class ComboRediscoveredNotification : Control
+    public partial class ComboRediscoveredNotification : Control
     {
         private CanvasLayer _canvasLayer;
         private VBoxContainer _container;

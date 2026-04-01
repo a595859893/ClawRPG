@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 宠物回收系统 - 核心系统
     /// </summary>
-    public class PetRecycleSystem : BaseSystem
+    public partial class PetRecycleSystem : BaseSystem
     {
         private PetRecycleData _data;
         private PetRecycleDatabase _database;

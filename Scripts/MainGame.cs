@@ -20,7 +20,7 @@ namespace ClawRPG.Scripts
         
         // Managers
         private PlayerSpawnManager _playerSpawnManager;
-        private EnemySpawnManager _enemySpawnManager;
+        private ClawRPG.Scripts.Database.EnemySpawnManager _enemySpawnManager;
         
         public MainGame()
         {
@@ -92,7 +92,7 @@ namespace ClawRPG.Scripts
         /// <summary>
         /// Set enemy spawn manager
         /// </summary>
-        public void SetEnemySpawnManager(EnemySpawnManager manager)
+        public void SetEnemySpawnManager(ClawRPG.Scripts.Database.EnemySpawnManager manager)
         {
             _enemySpawnManager = manager;
         }

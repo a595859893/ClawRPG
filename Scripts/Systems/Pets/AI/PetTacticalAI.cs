@@ -53,7 +53,7 @@ namespace ClawRPG.Systems.Pets.AI
         // ===== 状态 =====
         
         private PetTacticalState _tacticalState;
-        private Pet _activePet;
+        private ClawRPG.Scripts.Systems.Pets.Pet _activePet;
         private CharacterBody2D _player;
         private Node2D _currentTarget;
         private List<Node2D> _nearbyEnemies = new List<Node2D>();
@@ -93,7 +93,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 初始化
         /// </summary>
-        public void Initialize(Pet pet, CharacterBody2D player)
+        public void Initialize(ClawRPG.Scripts.Systems.Pets.Pet pet, CharacterBody2D player)
         {
             _activePet = pet;
             _player = player;

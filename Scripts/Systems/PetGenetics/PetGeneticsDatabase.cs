@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetGeneticsDatabase : BaseSystem
+public partial class PetGeneticsDatabase : BaseSystem
 {
     // Gene templates by type
     public Dictionary<string, List<GeneTemplate>> GeneTemplates = new Dictionary<string, List<GeneTemplate>>();

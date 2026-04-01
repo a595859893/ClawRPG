@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TradeRouteUI : Control
+public partial class TradeRouteUI : Control
 {
     private TabContainer _tabContainer;
     private Label _goldLabel;

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildDiplomacySystem : BaseSystem
+public partial class GuildDiplomacySystem : BaseSystem
 {
     // 外交系统
     private GuildDiplomacyData diplomacyData;

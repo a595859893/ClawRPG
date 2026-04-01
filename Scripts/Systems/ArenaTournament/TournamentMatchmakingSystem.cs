@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 锦标赛匹配报名系统 - 负责玩家报名和锦标赛创建
     /// </summary>
-    public class TournamentMatchmakingSystem : BaseSystem
+    public partial class TournamentMatchmakingSystem : BaseSystem
     {
         private static TournamentMatchmakingSystem _instance;
         public static TournamentMatchmakingSystem Instance => _instance;

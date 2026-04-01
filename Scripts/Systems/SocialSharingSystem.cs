@@ -9,7 +9,7 @@ namespace ClawRPG.Systems
 /// 社交分享系统 - 协调层
 /// 整合截图、分享模板、群聊机器人功能
 /// </summary>
-public class SocialSharingSystem : BaseSystem
+public partial class SocialSharingSystem : BaseSystem
 {
     public static SocialSharingSystem Instance { get; private set; }
 

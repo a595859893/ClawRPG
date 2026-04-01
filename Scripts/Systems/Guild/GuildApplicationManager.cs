@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.Systems.Guild;
+using GameSystems;
 
 /// <summary>
 /// 公会申请管理器

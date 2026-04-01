@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
     /// 战斗同步系统 - 多人实时战斗同步主系统
     /// 整合 CoreSystem, Combat, Player, EventHandler 四个子模块
     /// </summary>
-    public class BattleSyncSystem : BaseSystem
+    public partial class BattleSyncSystem : BaseSystem
     {
         private static BattleSyncSystem _instance;
         public static BattleSyncSystem Instance { get; private set; }

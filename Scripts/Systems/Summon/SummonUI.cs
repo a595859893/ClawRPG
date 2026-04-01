@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SummonUI : Control
+public partial class SummonUI : Control
 {
 	private SummonSystem summonSystem;
 	private VBoxContainer mainContainer;

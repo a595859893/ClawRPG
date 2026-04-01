@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
     /// <summary>
     /// Choice event UI - displays choice events and handles user input
     /// </summary>
-    public class ChoiceEventUI : Control
+    public partial class ChoiceEventUI : Control
     {
         private PanelContainer _mainPanel;
         private VBoxContainer _mainVBox;

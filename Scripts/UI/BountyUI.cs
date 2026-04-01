@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI
     /// <summary>
     /// 赏金任务UI界面
     /// </summary>
-    public class BountyUI : Control
+    public partial class BountyUI : Control
     {
         private VBoxContainer _mainContainer;
         private HBoxContainer _headerContainer;

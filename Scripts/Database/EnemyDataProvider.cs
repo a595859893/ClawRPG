@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Database
     /// 敌人数据提供类 - 负责敌人数据的查询和检索
     /// 继承 BaseSystem 以获得生命周期管理支持
     /// </summary>
-    public class EnemyDataProvider : BaseSystem
+    public partial class EnemyDataProvider : BaseSystem
     {
         private Dictionary<string, EnemyType> _enemyTypes = new();
         

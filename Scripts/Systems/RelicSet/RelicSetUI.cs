@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 遗物套装UI界面
     /// </summary>
-    public class RelicSetUI : Control
+    public partial class RelicSetUI : Control
     {
         private Control _mainPanel;
         private VBoxContainer _mainVBox;

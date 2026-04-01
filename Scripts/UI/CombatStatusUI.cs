@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI
     /// <summary>
     /// Combat status UI - displays real-time combat statistics
     /// </summary>
-    public class CombatStatusUI : Control
+    public partial class CombatStatusUI : Control
     {
         private Control _mainPanel;
         private VBoxContainer _statsContainer;

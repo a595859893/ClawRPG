@@ -1,14 +1,14 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using WebSocketSharp;
+
 
 /// <summary>
 /// 网络客户端 - WebSocket 连接管理
 /// 支持指数退避重连 + jitter 防惊群
 /// 心跳保连 (Ping/Pong)
 /// </summary>
-public class NetworkClient : BaseSystem
+public partial class NetworkClient : BaseSystem
 {
     public static NetworkClient Instance { get; private set; }
 

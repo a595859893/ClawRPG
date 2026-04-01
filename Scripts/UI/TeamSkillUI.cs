@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 队伍技能UI
 /// 显示队伍技能快捷键、冷却、激活状态
 /// </summary>
-public class TeamSkillUI : Control
+public partial class TeamSkillUI : Control
 {
     private VBoxContainer _skillContainer;
     private Label _titleLabel;

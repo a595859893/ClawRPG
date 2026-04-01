@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ConstellationUI : Control
+public partial class ConstellationUI : Control
 {
     private ConstellationSystem _system;
     private ConstellationDatabase _database;

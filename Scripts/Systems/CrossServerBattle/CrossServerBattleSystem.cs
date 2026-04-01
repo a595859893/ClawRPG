@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class CrossServerBattleSystem : BaseSystem
+public partial class CrossServerBattleSystem : BaseSystem
 {
     private CrossServerBattleData _data = new CrossServerBattleData();
     private CrossServerBattleDatabase _database;

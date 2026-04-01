@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ClawRPG.Scripts.Systems.Pets.AI;
+using ClawRPG.Scripts.Systems.ComboReplay;
 
 namespace ClawRPG.Systems.Pets.AI
 {
@@ -283,7 +285,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 增量更新目标推断（新动作加入时微调）
         /// </summary>
-        private void UpdateGoalInferenceIncremental(PlayerActionRecord newRecord)
+        private void UpdateGoalInferenceIncremental(ClawRPG.Scripts.Systems.Pets.AI.PlayerActionRecord newRecord)
         {
             if (_currentGoalInference.Confidence < 0.4f)
                 return;  // 置信度太低，不增量更新

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 世界事件UI - 显示世界事件通知和详情
 /// </summary>
-public class WorldEventUI : Control
+public partial class WorldEventUI : Control
 {
     // UI Elements
     private Label _titleLabel;

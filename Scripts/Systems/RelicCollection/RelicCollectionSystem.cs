@@ -4,13 +4,14 @@
 
 using System;
 using ClawRPG.Systems.Relics;
+using RelicEffectType = ClawRPG.Systems.Relics.RelicEffectType;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace ClawRPG.Scripts.Systems
 {
-    public class RelicCollectionSystem : BaseSystem
+    public partial class RelicCollectionSystem : BaseSystem
     {
         // 玩家遗物收集数据
         private PlayerRelicCollection _playerCollection = new PlayerRelicCollection

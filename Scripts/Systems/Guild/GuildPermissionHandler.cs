@@ -1,5 +1,5 @@
 using System;
-using ClawRPG.Scripts.Systems.Guild;
+using GameSystems;
 
 /// <summary>
 /// 公会权限处理器

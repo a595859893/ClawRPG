@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public class DailyPuzzleSystem : BaseSystem
+public partial class DailyPuzzleSystem : BaseSystem
 {
     private DailyPuzzleData _data;
     private Random _random = new Random();

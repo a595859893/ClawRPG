@@ -7,7 +7,7 @@ namespace ClawRPG.UI {
     /// <summary>
     /// 按键绑定界面 - 允许玩家自定义快捷键
     /// </summary>
-    public class KeybindingUI : Control
+    public partial class KeybindingUI : Control
     {
         private VBoxContainer _mainContainer;
         private ScrollContainer _scrollContainer;

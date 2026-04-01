@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using ClawRPG.Core.Systems;
+using WorldEventType = ClawRPG.Core.Systems.WorldEventType;
 
 namespace ClawRPG.Core.Database
 {

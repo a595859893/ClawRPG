@@ -5,7 +5,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ElementalTrialUI : Control
+public partial class ElementalTrialUI : Control
 {
     private VBoxContainer _mainContainer;
     private HBoxContainer _headerContainer;

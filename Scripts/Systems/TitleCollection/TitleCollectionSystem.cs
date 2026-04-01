@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TitleCollectionSystem : BaseSystem
+public partial class TitleCollectionSystem : BaseSystem
 {
     private TitleCollectionData _data = new TitleCollectionData();
     

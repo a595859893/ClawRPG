@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Database
     /// 敌人Spawn管理类
     /// 负责管理敌人的生成、刷新和区域控制
     /// </summary>
-    public class EnemySpawnManager : BaseSystem
+    public partial class EnemySpawnManager : BaseSystem
     {
         private Dictionary<string, List<Node>> _activeEnemies;
         private Dictionary<string, SpawnZone> _spawnZones;

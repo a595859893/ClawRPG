@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems.PetRecycle {
     /// <summary>
     /// 宠物回收数据结构
     /// </summary>
-    public class PetRecycleData : BaseSystem
+    public partial class PetRecycleData : BaseSystem
     {
         // 已解锁的宠物类型
         public HashSet<string> UnlockedPetTypes { get; set; } = new HashSet<string>();

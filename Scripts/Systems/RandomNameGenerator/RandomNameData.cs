@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RandomNameData : BaseSystem
+public partial class RandomNameData : BaseSystem
 {
     // Name history for uniqueness tracking
     public List<string> GeneratedNames = new List<string>();

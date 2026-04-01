@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AlchemyLaboratoryUI : Control
+public partial class AlchemyLaboratoryUI : Control
 {
     private AlchemyLaboratorySystem system;
     

@@ -7,7 +7,7 @@ using MultiplayerEmoteSystem;
 /// 多人表情UI
 /// 显示表情轮盘和使用统计
 /// </summary>
-public class MultiplayerEmoteUI : Control
+public partial class MultiplayerEmoteUI : Control
 {
     public static MultiplayerEmoteUI Instance { get; private set; }
 

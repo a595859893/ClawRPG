@@ -6,7 +6,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// Core system for procedural name generation
     /// </summary>
-    public class ProceduralNameSystem : BaseSystem
+    public partial class ProceduralNameSystem : BaseSystem
     {
         private static ProceduralNameSystem _instance;
         public static ProceduralNameSystem Instance

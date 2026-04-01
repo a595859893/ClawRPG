@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Modules.MultiplayerVote;
+using VoteStatus = ClawRPG.Modules.MultiplayerVote.VoteStatus;
 
 namespace ClawRPG.Systems.MultiplayerVote
 {
@@ -49,7 +50,7 @@ namespace ClawRPG.Systems.MultiplayerVote
             if (vote == null)
                 return false;
             
-            return vote.Status == VoteStatus.Passed;
+            return vote.Status == Modules.MultiplayerVote.VoteStatus.Passed;
         }
         
         /// <summary>
@@ -58,7 +59,7 @@ namespace ClawRPG.Systems.MultiplayerVote
         public VoteStatus GetVoteStatus(string voteId)
         {
             var vote = _voteSystem.GetVote(voteId);
-            return vote != null ? vote.Status : VoteStatus.Cancelled;
+            return vote != null ? vote.Status : Modules.MultiplayerVote.VoteStatus.Cancelled;
         }
         
         /// <summary>

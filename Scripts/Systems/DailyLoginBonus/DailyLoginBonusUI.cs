@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DailyLoginBonusUI : Control
+public partial class DailyLoginBonusUI : Control
 {
     private DailyLoginBonusSystem _system;
     private Label _titleLabel;

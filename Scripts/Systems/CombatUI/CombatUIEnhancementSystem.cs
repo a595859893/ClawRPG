@@ -9,7 +9,7 @@ namespace ClawRPG.Systems;
     /// 动态血条、技能冷却动画、战斗状态指示器、连击计数器
     /// 应用 Advanced Shader Effects (trauma-based shake, visual feedback)
     /// </summary>
-    public class CombatUIEnhancementSystem : BaseSystem
+    public partial class CombatUIEnhancementSystem : BaseSystem
     {
         private static CombatUIEnhancementSystem _instance;
         public static CombatUIEnhancementSystem Instance => _instance;

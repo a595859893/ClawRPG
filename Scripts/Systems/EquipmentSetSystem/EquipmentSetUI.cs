@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class EquipmentSetUI : Control
+public partial class EquipmentSetUI : Control
 {
     // UI Components
     private Label titleLabel;

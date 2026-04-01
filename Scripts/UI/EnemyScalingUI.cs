@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class EnemyScalingUI : Control
+public partial class EnemyScalingUI : Control
 {
     private Label _titleLabel;
     private TabContainer _tabContainer;

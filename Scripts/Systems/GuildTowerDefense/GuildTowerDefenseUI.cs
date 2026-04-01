@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildTowerDefenseUI : Control
+public partial class GuildTowerDefenseUI : Control
 {
     private GuildTowerDefenseSystem _system;
     private Control _mainPanel;

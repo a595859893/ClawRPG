@@ -35,7 +35,7 @@ namespace ClawRPG.Scripts.Items
     /// <summary>
     /// Enhanced Inventory Manager with filtering, sorting and search
     /// </summary>
-    public class InventoryManager : BaseSystem
+    public partial class InventoryManager : BaseSystem
     {
         public static InventoryManager Instance { get; private set; }
         public Action InventoryUpdated;

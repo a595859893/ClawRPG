@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// </summary>
 namespace ClawRPG.Scripts.UI.BossRush
 {
-    public class BossRushUIHistoryPanel : Control
+    public partial class BossRushUIHistoryPanel : Control
     {
         private BossRushSystem _bossRushSystem;
         private VBoxContainer _historyContainer;

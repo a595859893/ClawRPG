@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SkillSynergyUI : Control
+public partial class SkillSynergyUI : Control
 {
     private Control _mainContainer;
     private VBoxContainer _synergyListContainer;

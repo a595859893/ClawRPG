@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems.Pets
     /// 宠物决策系统 - 决定何时行动以及进入什么状态
     /// 职责：状态机管理、战术决策、冷却计时
     /// </summary>
-    public class PetDecisionSystem : BaseSystem
+    public partial class PetDecisionSystem : BaseSystem
     {
         private static PetDecisionSystem _instance;
         public static PetDecisionSystem Instance => _instance ??= new PetDecisionSystem();

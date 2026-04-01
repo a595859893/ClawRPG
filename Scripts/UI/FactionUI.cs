@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class FactionUI : Control
+public partial class FactionUI : Control
 {
     // UI Elements
     private Label titleLabel;

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetBattleArenaSystem : BaseSystem
+public partial class PetBattleArenaSystem : BaseSystem
 {
     public static PetBattleArenaSystem Instance { get; private set; }
     

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetPhotoUI : Control
+public partial class PetPhotoUI : Control
 {
     private TabContainer _tabContainer;
     private OptionButton _locationSelector;

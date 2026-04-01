@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MilestoneMain : BaseSystem
+public partial class MilestoneMain : BaseSystem
 {
     public static MilestoneSystem MilestoneSystem { get; private set; }
     public static MilestoneUI MilestoneUI { get; private set; }

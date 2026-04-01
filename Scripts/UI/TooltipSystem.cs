@@ -216,27 +216,27 @@ namespace ClawRPG.Scripts.UI
             rarityLabel.AddThemeColorOverride("font_color", GetSkillTypeColor(currentSkill.SkillType));
         }
 
-        private Color GetRarityColor(ItemRarity rarity)
+        private Color GetRarityColor(ItemQuality rarity)
         {
             return rarity switch
             {
-                ItemRarity.Common => rarityCommon,
-                ItemRarity.Uncommon => rarityUncommon,
-                ItemRarity.Rare => rarityRare,
-                ItemRarity.Epic => rarityEpic,
-                ItemRarity.Legendary => rarityLegendary,
+                ItemQuality.Common => rarityCommon,
+                ItemQuality.Uncommon => rarityUncommon,
+                ItemQuality.Rare => rarityRare,
+                ItemQuality.Epic => rarityEpic,
+                ItemQuality.Legendary => rarityLegendary,
                 _ => textColor
             };
         }
 
-        private Color GetSkillTypeColor(SkillType type)
+        private Color GetSkillTypeColor(Skill.SkillType type)
         {
             return type switch
             {
-                SkillType.Attack => new Color(1f, 0.3f, 0.3f, 1f),
-                SkillType.Heal => new Color(0.3f, 1f, 0.3f, 1f),
-                SkillType.Buff => new Color(0.3f, 0.7f, 1f, 1f),
-                SkillType.Debuff => new Color(0.7f, 0.3f, 0.7f, 1f),
+                Skill.SkillType.Attack => new Color(1f, 0.3f, 0.3f, 1f),
+                Skill.SkillType.Heal => new Color(0.3f, 1f, 0.3f, 1f),
+                Skill.SkillType.Buff => new Color(0.3f, 0.7f, 1f, 1f),
+                Skill.SkillType.Debuff => new Color(0.7f, 0.3f, 0.7f, 1f),
                 _ => textColor
             };
         }

@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class PetLifeCycleUI : Control
+public partial class PetLifeCycleUI : Control
 {
     private PetLifeCycleSystem _system;
     private TabContainer _tabContainer;

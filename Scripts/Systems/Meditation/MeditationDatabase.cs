@@ -7,7 +7,7 @@ namespace ClawRPG.Systems.Meditation
     /// <summary>
     /// Meditation database configuration
     /// </summary>
-    public class MeditationDatabase : BaseSystem
+    public partial class MeditationDatabase : BaseSystem
     {
         public static MeditationDatabase Instance { get; private set; }
         

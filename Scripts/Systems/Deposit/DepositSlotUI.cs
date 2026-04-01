@@ -5,7 +5,7 @@ using System;
 /// UI panel showing current deposit slot levels and intensities.
 /// Attached to a CanvasLayer in the game UI.
 /// </summary>
-public class DepositSlotUI : Control
+public partial class DepositSlotUI : Control
 {
     private HBoxContainer _slotsContainer;
     private Label _titleLabel;
@@ -14,7 +14,7 @@ public class DepositSlotUI : Control
     // Deposit slot UI elements (one per DepositType)
     private Control[] _slotNodes = new Control[5]; // 5 deposit types
     private Label[] _slotLabels = new Label[5];
-    private TextureProgress[] _slotBars = new TextureProgress[5];
+    private TextureProgressBar[] _slotBars = new TextureProgressBar[5];
 
     public override void _Ready()
     {
@@ -86,7 +86,7 @@ public class DepositSlotUI : Control
         _slotLabels[index] = nameLabel;
 
         // Progress bar
-        var bar = new TextureProgress();
+        var bar = new TextureProgressBar();
         bar.CustomMinimumSize = new Vector2(70, 10);
         bar.MaxValue = 100;
         bar.Value = 0;

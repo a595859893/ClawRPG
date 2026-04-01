@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 动态市场税率系统 UI
 /// </summary>
-public class DynamicMarketTaxUI : Control
+public partial class DynamicMarketTaxUI : Control
 {
     private DynamicMarketTaxSystem _taxSystem;
     private Label _titleLabel;

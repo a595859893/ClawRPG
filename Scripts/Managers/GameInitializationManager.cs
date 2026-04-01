@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Managers
     /// <summary>
     /// 游戏初始化管理器 - 负责游戏启动时的各项系统初始化
     /// </summary>
-    public class GameInitializationManager : BaseSystem
+    public partial class GameInitializationManager : BaseSystem
     {
         public static GameInitializationManager Instance { get; private set; }
         
@@ -138,7 +138,7 @@ namespace ClawRPG.Scripts.Managers
             }
         }
         
-        private void LoadAllSystemsData(SaveData data)
+        private void LoadAllSystemsData(SaveDataManager.SaveData data)
         {
             // Load statistics
             var statsData = new Dictionary<string, object>
@@ -219,9 +219,9 @@ namespace ClawRPG.Scripts.Managers
             }
         }
         
-        private SaveData CreateSaveData()
+        private SaveDataManager.SaveData CreateSaveData()
         {
-            var data = new SaveData();
+            var data = new SaveDataManager.SaveData();
             // Collect data from all systems
             // This would be implemented based on the SaveData structure
             return data;

@@ -134,7 +134,7 @@ public class PetPhotoDatabase
     }
 }
 
-public class PetPhotoSystem : BaseSystem
+public partial class PetPhotoSystem : BaseSystem
 {
     private static PetPhotoSystem _instance;
     public static PetPhotoSystem Instance

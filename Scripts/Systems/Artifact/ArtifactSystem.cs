@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ClawRPG.Systems.Artifact
 {
-    public class ArtifactSystem : BaseSystem
+    public partial class ArtifactSystem : BaseSystem
     {
         private PlayerArtifactData _playerData;
         private ArtifactStatistics _statistics;

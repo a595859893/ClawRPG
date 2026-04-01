@@ -2,10 +2,11 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ClawRPG.Scripts.Items;
 
 namespace GameSystems
 {
-    public class PetExpeditionSystem : BaseSystem
+    public partial class PetExpeditionSystem : BaseSystem
     {
         private static PetExpeditionSystem _instance;
         public static PetExpeditionSystem Instance

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class EquipmentDurabilitySystem : BaseSystem
+public partial class EquipmentDurabilitySystem : BaseSystem
 {
     public static EquipmentDurabilitySystem Instance { get; private set; }
 

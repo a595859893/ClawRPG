@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
     /// <summary>
     /// 事件卡池系统 — 抽卡、效果应用、战斗集成
     /// </summary>
-    public class EventCardPoolSystem : BaseSystem
+    public partial class EventCardPoolSystem : BaseSystem
     {
         public static EventCardPoolSystem Instance { get; private set; }
 

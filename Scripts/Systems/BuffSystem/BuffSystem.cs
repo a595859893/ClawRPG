@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Framework;
 
-public class BuffSystem : BaseSystem
+public partial class BuffSystem : BaseSystem
 {
 	private static BuffSystem _instance;
 	public static BuffSystem Instance

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildLevelUI : Control
+public partial class GuildLevelUI : Control
 {
     private Control _mainContainer;
     private Label _levelLabel;

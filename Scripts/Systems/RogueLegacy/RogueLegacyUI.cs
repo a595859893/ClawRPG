@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class RogueLegacyUI : Control
+public partial class RogueLegacyUI : Control
 {
     private RogueLegacySystem _system;
     private RogueLegacyDatabase _database;

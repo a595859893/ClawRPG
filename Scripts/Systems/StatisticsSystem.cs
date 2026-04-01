@@ -215,7 +215,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Statistics Manager - singleton to track player statistics
     /// </summary>
-    public class StatisticsSystem : BaseSystem
+    public partial class StatisticsSystem : BaseSystem
     {
         private static StatisticsSystem _instance;
         public static StatisticsSystem Instance

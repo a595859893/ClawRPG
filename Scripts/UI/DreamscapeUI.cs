@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DreamscapeUI : Control
+public partial class DreamscapeUI : Control
 {
     private static DreamscapeUI _instance;
     public static DreamscapeUI Instance => _instance;

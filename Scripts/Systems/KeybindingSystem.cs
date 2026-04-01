@@ -6,7 +6,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// 按键绑定系统 - 管理游戏快捷键配置
     /// </summary>
-    public class KeybindingSystem : BaseSystem
+    public partial class KeybindingSystem : BaseSystem
     {
         public static KeybindingSystem Instance { get; private set; }
 

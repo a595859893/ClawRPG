@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CardCollectionDatabase : BaseSystem
+public partial class CardCollectionDatabase : BaseSystem
 {
     // All card definitions
     public Dictionary<string, CardDefinition> Cards = new Dictionary<string, CardDefinition>();

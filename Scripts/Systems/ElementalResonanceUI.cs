@@ -5,7 +5,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ElementalResonanceUI : Control
+public partial class ElementalResonanceUI : Control
 {
     private Control container;
     private Label titleLabel;

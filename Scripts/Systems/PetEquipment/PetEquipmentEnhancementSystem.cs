@@ -4,7 +4,7 @@ using System.Linq;
 using Godot;
 using Game.Systems.Pets;
 
-public class PetEquipmentEnhancementSystem : BaseSystem
+public partial class PetEquipmentEnhancementSystem : BaseSystem
 {
     public static PetEquipmentEnhancementSystem Instance { get; private set; }
 

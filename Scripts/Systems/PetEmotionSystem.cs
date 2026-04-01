@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Pet Emotion System - manages pet emotional states and behaviors
     /// </summary>
-    public class PetEmotionSystem : BaseSystem
+    public partial class PetEmotionSystem : BaseSystem
     {
         public static PetEmotionSystem Instance { get; private set; }
 

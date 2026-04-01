@@ -59,7 +59,7 @@ public enum TitleRarity
 /// <summary>
 /// TitleSystem - 玩家称号系统，管理称号的解锁、条件检查和装备
 /// </summary>
-public class TitleSystem : BaseSystem
+public partial class TitleSystem : BaseSystem
 {
     // Singleton
     private static TitleSystem _instance;

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ProceduralStoryUI : Control
+public partial class ProceduralStoryUI : Control
 {
     private ProceduralStorySystem _system;
     private ProceduralStoryDatabase _database;

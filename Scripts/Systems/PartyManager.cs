@@ -6,7 +6,7 @@ using ClawRPG.Scripts.Systems;
 /// <summary>
 /// 队伍管理器 - 负责组队、离队、邀请等核心逻辑
 /// </summary>
-public class PartyManager : BaseSystem
+public partial class PartyManager : BaseSystem
 {
     public static PartyManager Instance { get; private set; }
 

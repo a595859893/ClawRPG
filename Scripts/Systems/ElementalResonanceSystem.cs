@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 元素共鸣系统 - 管理元素共鸣加成
 /// </summary>
-public class ElementalResonanceSystem : BaseSystem
+public partial class ElementalResonanceSystem : BaseSystem
 {
     public static ElementalResonanceSystem Instance { get; private set; }
 

@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class RogueLegacySystem : BaseSystem
+public partial class RogueLegacySystem : BaseSystem
 {
     private RogueLegacyData _data;
     private RogueLegacyDatabase _database;

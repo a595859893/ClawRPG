@@ -6,7 +6,7 @@ using ClawRPG.Scripts.UI.BossRush;
 /// Boss Rush UI - Rush Panel Component
 /// Handles the main rush gameplay UI (difficulty selection, controls, rewards display)
 /// </summary>
-public class BossRushUIRushPanel : Control
+public partial class BossRushUIRushPanel : Control
 {
     private BossRushSystem _bossRushSystem;
     

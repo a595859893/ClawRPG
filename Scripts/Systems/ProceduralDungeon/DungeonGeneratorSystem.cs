@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
     /// <summary>
     /// 地下城生成系统 - 负责地图整体生成流程（入口点）
     /// </summary>
-    public class DungeonGeneratorSystem : BaseSystem
+    public partial class DungeonGeneratorSystem : BaseSystem
     {
         private static DungeonGeneratorSystem _instance;
         public static DungeonGeneratorSystem Instance => _instance;

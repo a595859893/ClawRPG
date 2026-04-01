@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+using ClawRPG.Scripts.Mounts;
+
 namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 坐骑战斗UI - 显示坐骑技能和战斗状态

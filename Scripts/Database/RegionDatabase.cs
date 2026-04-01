@@ -37,7 +37,7 @@ namespace ClawRPG.Scripts.Database {
     /// Database managing all game regions/zones
     /// </summary>
     
-    public class RegionDatabase : BaseSystem
+    public partial class RegionDatabase : BaseSystem
     {
         public static RegionDatabase Instance { get; private set; }
 

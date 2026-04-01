@@ -2,11 +2,13 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+using ClawRPG.Scripts.Crafting;
+
 namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Crafting UI - displays crafting interface
     /// </summary>
-    public class CraftingUI : Control
+    public partial class CraftingUI : Control
     {
         // UI Elements
         private VBoxContainer _mainContainer;

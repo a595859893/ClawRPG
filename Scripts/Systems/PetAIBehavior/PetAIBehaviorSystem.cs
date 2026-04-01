@@ -294,7 +294,7 @@ namespace ClawRPG.Scripts.Systems
             return null;
         }
 
-        public PetAIState GetCurrentState(string petId)
+        public ClawRPG.Scripts.Data.PetAIState GetCurrentState(string petId)
         {
             if (_activePetAI.TryGetValue(petId, out var aiData))
             {

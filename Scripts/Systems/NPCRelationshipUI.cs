@@ -6,7 +6,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// NPC关系UI - 显示和管理玩家与NPC的关系
     /// </summary>
-    public class NPCRelationshipUI : Control
+    public partial class NPCRelationshipUI : Control
     {
         private Label _titleLabel;
         private VBoxContainer _npcListContainer;

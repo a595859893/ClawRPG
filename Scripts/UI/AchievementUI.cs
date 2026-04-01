@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AchievementUI : Control
+public partial class AchievementUI : Control
 {
     private VBoxContainer _mainContainer;
     private HBoxContainer _headerContainer;

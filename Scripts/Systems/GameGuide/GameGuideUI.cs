@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class GameGuideUI : Control
+public partial class GameGuideUI : Control
 {
     private VBoxContainer _mainContainer;
     private HBoxContainer _categoryList;

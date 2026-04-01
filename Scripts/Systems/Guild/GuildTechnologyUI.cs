@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 
-public class GuildTechnologyUI : Control
+public partial class GuildTechnologyUI : Control
 {
     private VBoxContainer mainContainer;
     private HBoxContainer headerContainer;

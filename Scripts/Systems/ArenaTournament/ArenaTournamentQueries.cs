@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 锦标赛查询系统 - 提供各种查询接口
     /// </summary>
-    public class ArenaTournamentQueries : BaseSystem
+    public partial class ArenaTournamentQueries : BaseSystem
     {
         // 单例
         private static ArenaTournamentQueries _instance;

@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Characters
     /// <summary>
     /// Base class for all character entities (player, enemy, boss).
     /// </summary>
-    public class Character : Node2D
+    public partial class Character : Node2D
     {
         public float CurrentHealth { get; set; }
         public float MaxHealth { get; set; }

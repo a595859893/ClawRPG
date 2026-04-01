@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ArenaTournamentUI : Control
+public partial class ArenaTournamentUI : Control
 {
     private Button _closeButton;
     private TabContainer _tabContainer;

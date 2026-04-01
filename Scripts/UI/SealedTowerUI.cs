@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SealedTowerUI : Control
+public partial class SealedTowerUI : Control
 {
     private Label _titleLabel;
     private Label _floorLabel;

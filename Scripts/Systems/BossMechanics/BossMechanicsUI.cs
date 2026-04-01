@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BossMechanicsUI : Control
+public partial class BossMechanicsUI : Control
 {
     private BossMechanicsSystem _bossSystem;
     

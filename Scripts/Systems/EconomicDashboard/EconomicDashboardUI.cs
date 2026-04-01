@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class EconomicDashboardUI : Control
+public partial class EconomicDashboardUI : Control
 {
     private EconomicDashboardSystem system;
     private Label titleLabel;

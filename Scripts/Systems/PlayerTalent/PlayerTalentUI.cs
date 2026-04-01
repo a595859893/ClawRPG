@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class PlayerTalentUI : Control
+public partial class PlayerTalentUI : Control
 {
     private Control _mainContainer;
     private VBoxContainer _treePanelContainer;

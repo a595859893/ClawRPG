@@ -2,7 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Database;
 
-public class RuneSystem : BaseSystem
+public partial class RuneSystem : BaseSystem
 {
     private static RuneSystem _instance;
     public static RuneSystem Instance

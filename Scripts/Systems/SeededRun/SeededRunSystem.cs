@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 种子跑系统 - 管理种子跑模式的数据和统计
 /// </summary>
-public class SeededRunSystem : BaseSystem
+public partial class SeededRunSystem : BaseSystem
 {
     private static SeededRunSystem _instance;
     public static SeededRunSystem Instance

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RoguelikeStatsSystem : BaseSystem
+public partial class RoguelikeStatsSystem : BaseSystem
 {
     private RoguelikeStatsData _data;
     private int _currentRunId = 0;

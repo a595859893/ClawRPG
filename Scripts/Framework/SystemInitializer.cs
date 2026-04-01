@@ -9,7 +9,7 @@ using System.Collections.Generic;
 /// 系统初始化器 - 负责管理所有游戏系统的初始化
 /// 减少 Main.cs 中的初始化代码
 /// </summary>
-public class SystemInitializer : BaseSystem
+public partial class SystemInitializer : BaseSystem
 {
     /// <summary>
     /// 初始化所有系统

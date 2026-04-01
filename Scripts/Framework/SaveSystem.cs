@@ -10,7 +10,7 @@ using System.Reflection;
 /// <summary>
 /// 统一存档系统 - 自动发现并序列化所有实现了 ISaveable 的系统
 /// </summary>
-public class SaveSystem : BaseSystem
+public partial class SaveSystem : BaseSystem
 {
     /// <summary>
     /// 单例

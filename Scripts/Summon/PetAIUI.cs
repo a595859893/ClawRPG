@@ -380,7 +380,7 @@ namespace ClawRPG.Scripts.UI
             }
         }
 
-        private string GetStateName(PetAIState state)
+        private string GetStateName(ClawRPG.Scripts.Data.PetAIState state)
         {
             switch (state)
             {

@@ -9,7 +9,7 @@ namespace ClawRPG.Systems
 /// <summary>
 /// 分享模板管理器 - 负责生成分享文本和模板
 /// </summary>
-public class ShareTemplateManager : BaseSystem
+public partial class ShareTemplateManager : BaseSystem
 {
     public static ShareTemplateManager Instance { get; private set; }
 

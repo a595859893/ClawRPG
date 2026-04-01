@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class MythicPlusDungeonUI : Control
+public partial class MythicPlusDungeonUI : Control
 {
     private static MythicPlusDungeonUI _instance;
     public static MythicPlusDungeonUI Instance => _instance;

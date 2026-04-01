@@ -103,7 +103,7 @@ namespace ClawRPG.Systems.Relics
                 return;
             }
 
-            var root = json.Data.AsGodotDictionary();
+            var root = json.Data.AsDictionary();
             
             // 解析圣物列表
             if (root.ContainsKey("relics"))
@@ -111,7 +111,7 @@ namespace ClawRPG.Systems.Relics
                 var relicsArray = root["relics"].AsGodotArray();
                 foreach (var item in relicsArray)
                 {
-                    var relicDict = item.AsGodotDictionary();
+                    var relicDict = item.AsDictionary();
                     var relic = ParseRelic(relicDict);
                     if (relic != null)
                     {
@@ -126,7 +126,7 @@ namespace ClawRPG.Systems.Relics
                 var setsArray = root["relicSets"].AsGodotArray();
                 foreach (var item in setsArray)
                 {
-                    var setDict = item.AsGodotDictionary();
+                    var setDict = item.AsDictionary();
                     var set = ParseRelicSet(setDict);
                     if (set != null)
                     {
@@ -138,7 +138,7 @@ namespace ClawRPG.Systems.Relics
             // 解析生成配置
             if (root.ContainsKey("generationConfig"))
             {
-                _generationConfig = ParseGenerationConfig(root["generationConfig"].AsGodotDictionary());
+                _generationConfig = ParseGenerationConfig(root["generationConfig"].AsDictionary());
             }
             else
             {
@@ -160,7 +160,7 @@ namespace ClawRPG.Systems.Relics
         /// <summary>
         /// 解析单个圣物
         /// </summary>
-        private static Relic ParseRelic(GodotDictionary dict)
+        private static Relic ParseRelic(Dictionary dict)
         {
             try
             {
@@ -208,7 +208,7 @@ namespace ClawRPG.Systems.Relics
         /// <summary>
         /// 解析单个套装
         /// </summary>
-        private static RelicSet ParseRelicSet(GodotDictionary dict)
+        private static RelicSet ParseRelicSet(Dictionary dict)
         {
             try
             {
@@ -232,7 +232,7 @@ namespace ClawRPG.Systems.Relics
         /// <summary>
         /// 解析生成配置
         /// </summary>
-        private static RelicGenerationConfig ParseGenerationConfig(GodotDictionary dict)
+        private static RelicGenerationConfig ParseGenerationConfig(Dictionary dict)
         {
             try
             {

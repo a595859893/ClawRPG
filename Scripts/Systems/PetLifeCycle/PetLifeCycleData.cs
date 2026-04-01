@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ClawRPG.Systems.PetLifeCycle {
 // DUPLICATE CLASS REMOVED
-public class PetLifeCycleData : BaseSystem
+public partial class PetLifeCycleData : BaseSystem
 {
     // 宠物生命周期数据
     public Dictionary<int, PetLifeCycleEntry> PetLifeCycles = new Dictionary<int, PetLifeCycleEntry>();

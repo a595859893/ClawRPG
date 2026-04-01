@@ -5,7 +5,7 @@ using Godot;
 /// <summary>
 /// 坐骑战斗竞技场UI
 /// </summary>
-public class MountBattleArenaUI : Control
+public partial class MountBattleArenaUI : Control
 {
     private TabContainer _tabContainer;
     private VBoxContainer _arenaListTab;

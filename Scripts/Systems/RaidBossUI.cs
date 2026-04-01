@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 团本UI系统 - 管理团本界面显示
 /// 包含团队信息、Boss血量、计时器、参与玩家列表等
 /// </summary>
-public class RaidBossUI : Control
+public partial class RaidBossUI : Control
 {
     private Label titleLabel;
     private Label raidStatusLabel;

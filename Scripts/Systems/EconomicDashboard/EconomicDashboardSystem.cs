@@ -84,7 +84,7 @@ public class TransactionRecord
     }
 }
 
-public class EconomicDashboardSystem : BaseSystem
+public partial class EconomicDashboardSystem : BaseSystem
 {
     private EconomicDashboardData data = new EconomicDashboardData();
     private List<TransactionRecord> recentTransactions = new List<TransactionRecord>();

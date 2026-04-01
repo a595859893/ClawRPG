@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Boss模式系统 - 负责Boss攻击模式、决策逻辑、AI行为
 /// </summary>
-public class BossPatternSystem : BaseSystem
+public partial class BossPatternSystem : BaseSystem
 {
     public static BossPatternSystem Instance { get; private set; }
 

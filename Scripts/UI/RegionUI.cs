@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI
     /// Region UI - Shows current region and allows teleportation
     /// </summary>
     
-    public class RegionUI : Control
+    public partial class RegionUI : Control
     {
         [Export] public Color LockedColor { get; set; } = new Color(0.3f, 0.3f, 0.3f, 0.7f);
         [Export] public Color UnlockedColor { get; set; } = new Color(0.2f, 0.8f, 0.2f, 0.9f);

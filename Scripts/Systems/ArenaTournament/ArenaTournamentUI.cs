@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.UI
     /// <summary>
     /// 竞技场锦标赛 UI
     /// </summary>
-    public class ArenaTournamentUI : Control
+    public partial class ArenaTournamentUI : Control
     {
         // 主容器
         private VBoxContainer _mainContainer;

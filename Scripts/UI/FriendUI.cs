@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Godot.Collections;
 
-public class FriendUI : Control
+public partial class FriendUI : Control
 {
     private FriendSystem _friendSystem;
     

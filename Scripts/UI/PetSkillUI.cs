@@ -1,8 +1,6 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.Systems.Pets;
-    using PetsPet = ClawRPG.Scripts.Systems.Pets.Pet;
 
 namespace ClawRPG.Scripts.UI
 {
@@ -28,15 +26,15 @@ namespace ClawRPG.Scripts.UI
         // 宠物选择
         [Export] private OptionButton _petSelector;
         
-        private PetSkillSystem _skillSystem;
-        private PetManager _petManager;
-        private PetsPet _selectedPet;
-        private List<PetSkill> _displayedSkills = new List<PetSkill>();
+        private ClawRPG.Scripts.Systems.Pets.PetSkillSystem _skillSystem;
+        private ClawRPG.Scripts.Systems.Pets.PetManager _petManager;
+        private ClawRPG.Scripts.Systems.Pets.Pet _selectedPet;
+        private List<ClawRPG.Scripts.Systems.Pets.PetSkill> _displayedSkills = new List<ClawRPG.Scripts.Systems.Pets.PetSkill>();
         private bool _isVisible = false; 
 
         public override void _Ready()
         {
-            _skillSystem = PetSkillSystem.Instance;
+            _skillSystem = ClawRPG.Scripts.Systems.Pets.PetSkillSystem.Instance;
             _petManager = ClawRPG.Scripts.Systems.Pets.PetManager.Instance;
             
             // 连接信号
@@ -115,7 +113,7 @@ namespace ClawRPG.Scripts.UI
             UpdateSkillPointsDisplay();
         }
 
-        private void CreateSkillButton(PetSkill skill, bool isLearned)
+        private void CreateSkillButton(ClawRPG.Scripts.Systems.Pets.PetSkill skill, bool isLearned)
         {
             if (_skillListContainer == null) return;
             
@@ -144,7 +142,7 @@ namespace ClawRPG.Scripts.UI
             _skillListContainer.AddChild(button);
         }
 
-        private void OnSkillButtonPressed(PetSkill skill)
+        private void OnSkillButtonPressed(ClawRPG.Scripts.Systems.Pets.PetSkill skill)
         {
             if (_skillNameLabel != null)
                 _skillNameLabel.Text = skill.SkillName;
@@ -291,7 +289,7 @@ namespace ClawRPG.Scripts.UI
             };
         }
 
-        private string GetSkillEffectText(PetSkill skill)
+        private string GetSkillEffectText(ClawRPG.Scripts.Systems.Pets.PetSkill skill)
         {
             var effects = new List<string>();
             

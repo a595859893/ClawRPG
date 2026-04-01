@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// Guild Tournament UI - Display and manage guild tournaments
     /// </summary>
-    public class GuildTournamentUI : Control
+    public partial class GuildTournamentUI : Control
     {
         private static GuildTournamentUI _instance;
         public static GuildTournamentUI Instance

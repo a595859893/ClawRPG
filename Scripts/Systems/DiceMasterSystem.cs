@@ -6,7 +6,7 @@ using Framework;
 /// <summary>
 /// 骰子大师系统 - 骰子小游戏管理
 /// </summary>
-public class DiceMasterSystem : BaseSystem
+public partial class DiceMasterSystem : BaseSystem
 {
     public static DiceMasterSystem Instance { get; private set; }
     

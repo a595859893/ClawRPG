@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ClawRPG.Scripts.Systems.CoopSession;
 
 /// <summary>
 /// 合作收益分配系统

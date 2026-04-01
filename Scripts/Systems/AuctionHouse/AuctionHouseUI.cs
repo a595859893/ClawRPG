@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AuctionHouseUI : Control
+public partial class AuctionHouseUI : Control
 {
     private VBoxContainer _mainContainer;
     private HBoxContainer _categoryContainer;

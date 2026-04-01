@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
     /// <summary>
     /// 附魔系统UI界面
     /// </summary>
-    public class EnchantmentUI : Control
+    public partial class EnchantmentUI : Control
     {
         // UI组件
         private PanelContainer _mainPanel;

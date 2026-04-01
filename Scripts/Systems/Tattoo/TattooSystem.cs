@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 纹身系统 - 管理玩家的纹身数据、购买和装备
 /// </summary>
-public class TattooSystem : BaseSystem
+public partial class TattooSystem : BaseSystem
 {
     private static TattooSystem _instance;
     public static TattooSystem Instance

@@ -3,7 +3,7 @@ using Godot.Collections;
 using System;
 using System.Collections.Generic;
 
-public class MountEvolutionSystem : BaseSystem
+public partial class MountEvolutionSystem : BaseSystem
 {
     private static MountEvolutionSystem _instance;
     public static MountEvolutionSystem Instance => _instance ??= new MountEvolutionSystem();

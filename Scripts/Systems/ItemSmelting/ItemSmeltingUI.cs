@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ItemSmeltingUI : Control
+public partial class ItemSmeltingUI : Control
 {
     private ItemSmeltingSystem _system;
     private ItemSmeltingDatabase _database;

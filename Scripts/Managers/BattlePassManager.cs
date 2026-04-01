@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BattlePassManager : BaseSystem
+public partial class BattlePassManager : BaseSystem
 {
     public static BattlePassManager Instance { get; private set; }
     

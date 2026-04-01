@@ -7,7 +7,7 @@ namespace ClawRPG.Systems {
     /// 无障碍设置系统 - 辅助功能配置
     /// 包含：颜色盲模式、高对比度、UI缩放、文字大小、字幕系统等
     /// </summary>
-    public class AccessibilityManager : BaseSystem
+    public partial class AccessibilityManager : BaseSystem
     {
         public static AccessibilityManager Instance { get; private set; }
 

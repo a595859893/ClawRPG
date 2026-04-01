@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildWarUI : Control
+public partial class GuildWarUI : Control
 {
     private Label titleLabel;
     private Label statusLabel;

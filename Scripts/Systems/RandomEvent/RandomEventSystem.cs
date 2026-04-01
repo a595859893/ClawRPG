@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.RandomEvent;
+using EventRarity = ClawRPG.Scripts.Systems.RandomEvent.EventRarity;
 
 /// <summary>
 /// Core random event system that manages event generation and effects

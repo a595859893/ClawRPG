@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BattleStatisticsUI : Control
+public partial class BattleStatisticsUI : Control
 {
     private BattleStatisticsSystem _battleStats;
     private Control _mainPanel;

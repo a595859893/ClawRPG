@@ -10,7 +10,7 @@ namespace Game
     /// <summary>
     /// 装备套装UI
     /// </summary>
-    public class EquipmentSetUI : Control
+    public partial class EquipmentSetUI : Control
     {
         private VBoxContainer _mainContainer;
         private ScrollContainer _scrollContainer;

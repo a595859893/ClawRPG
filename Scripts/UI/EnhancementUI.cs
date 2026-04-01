@@ -2,6 +2,8 @@ using Godot;
 using Godot.Collections;
 using System;
 
+using ClawRPG.Scripts.Systems.Enhancement;
+
 namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 装备强化界面

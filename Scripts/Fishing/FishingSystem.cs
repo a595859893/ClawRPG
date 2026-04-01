@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Fishing
     /// <summary>
     /// 钓鱼系统核心逻辑
     /// </summary>
-    public class FishingSystem : BaseSystem
+    public partial class FishingSystem : BaseSystem
     {
         // 单例
         private static FishingSystem _instance;

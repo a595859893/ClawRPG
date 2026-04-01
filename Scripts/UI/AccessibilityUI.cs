@@ -8,7 +8,7 @@ namespace ClawRPG.UI {
     /// 无障碍设置界面 - Accessibility Settings UI
     /// Ctrl+Shift+A 键切换显示
     /// </summary>
-    public class AccessibilityUI : Control
+    public partial class AccessibilityUI : Control
     {
         private static AccessibilityUI _instance;
         public static AccessibilityUI Instance => _instance;

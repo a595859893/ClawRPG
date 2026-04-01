@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class EconomicWarningSystem : BaseSystem
+public partial class EconomicWarningSystem : BaseSystem
 {
     private EconomicWarningData _data;
     private EconomicWarningDatabase _database;

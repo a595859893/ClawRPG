@@ -12,7 +12,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
     /// 程序化地下城生成系统 - 协调者
     /// 委托给子系统：DungeonGeneratorSystem, RoomLayoutSystem, DungeonDifficultySystem
     /// </summary>
-    public class ProceduralDungeonSystem : BaseSystem
+    public partial class ProceduralDungeonSystem : BaseSystem
     {
         private static ProceduralDungeonSystem _instance;
         public static ProceduralDungeonSystem Instance => _instance;

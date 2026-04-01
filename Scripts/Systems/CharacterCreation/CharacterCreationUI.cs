@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CharacterCreationUI : Control
+public partial class CharacterCreationUI : Control
 {
     private CharacterCreationSystem _system;
     private CharacterCreationData _data;
@@ -298,7 +298,7 @@ public class CharacterCreationUI : Control
         return container;
     }
     
-    private DynamicFont CreateTitleFont()
+    private SystemFont CreateTitleFont()
     {
         var font = new DynamicFont();
         font.FontData = GD.Load<DynamicFontData>("res://fonts/NormalFont.ttf");
@@ -306,7 +306,7 @@ public class CharacterCreationUI : Control
         return font;
     }
     
-    private DynamicFont CreateHeaderFont()
+    private SystemFont CreateHeaderFont()
     {
         var font = new DynamicFont();
         font.FontData = GD.Load<DynamicFontData>("res://fonts/NormalFont.ttf");

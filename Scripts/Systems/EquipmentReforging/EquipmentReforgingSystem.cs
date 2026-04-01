@@ -7,7 +7,7 @@ namespace Game.Scripts.Systems.EquipmentReforging
     /// <summary>
     /// 装备洗练系统管理器
     /// </summary>
-    public class EquipmentReforgingSystem : BaseSystem
+    public partial class EquipmentReforgingSystem : BaseSystem
     {
         public static EquipmentReforgingSystem Instance { get; private set; }
 

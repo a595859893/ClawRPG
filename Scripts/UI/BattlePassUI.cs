@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BattlePassUI : Control
+public partial class BattlePassUI : Control
 {
     private Control mainPanel;
     private VBoxContainer seasonInfo;

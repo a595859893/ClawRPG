@@ -11,7 +11,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
     /// Combo 回放持久化系统（REQ-114-05）
     /// 职责：保存/加载回放到 user://replays/ 目录，命名格式 {seed}_{timestamp}.json
     /// </summary>
-    public class ComboReplayPersistence : BaseSystem
+    public partial class ComboReplayPersistence : BaseSystem
     {
         private static ComboReplayPersistence _instance;
         public static ComboReplayPersistence Instance => _instance ??= new ComboReplayPersistence();

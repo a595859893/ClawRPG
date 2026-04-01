@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class LuckUI : Control
+public partial class LuckUI : Control
 {
     private Label _luckValueLabel;
     private Label _baseLuckLabel;

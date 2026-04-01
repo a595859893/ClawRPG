@@ -4,7 +4,7 @@ using System;
 /// <summary>
 /// 网络质量UI - 显示连接状态和延迟
 /// </summary>
-public class NetworkQualityUI : Control
+public partial class NetworkQualityUI : Control
 {
     private Label _statusLabel;
     private Label _latencyLabel;

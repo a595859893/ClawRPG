@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MonsterTamingData : BaseSystem
+public partial class MonsterTamingData : BaseSystem
 {
     // Tamed Monsters
     public Dictionary<int, TamedMonster> TamedMonsters = new Dictionary<int, TamedMonster>();

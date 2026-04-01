@@ -11,7 +11,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving
     /// 子系统: 卡牌数据存储
     /// 负责存储和管理所有卡牌定义、路径定义、选择定义的数据
     /// </summary>
-    public class FateCardDatabase : BaseSystem
+    public partial class FateCardDatabase : BaseSystem
     {
 
         private static FateCardDatabase _instance;

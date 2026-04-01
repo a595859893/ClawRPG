@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CombatEffectOverlaySystem : BaseSystem
+public partial class CombatEffectOverlaySystem : BaseSystem
 {
     // Singleton instance
     private static CombatEffectOverlaySystem _instance;

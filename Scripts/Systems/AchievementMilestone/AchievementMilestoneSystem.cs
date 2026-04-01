@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems
     /// <summary>
     /// 成就里程碑系统 - 追踪玩家成就进度里程碑
     /// </summary>
-    public class AchievementMilestoneSystem : BaseSystem
+    public partial class AchievementMilestoneSystem : BaseSystem
     {
         private static AchievementMilestoneSystem _instance;
         public static AchievementMilestoneSystem Instance => _instance ??= new AchievementMilestoneSystem();

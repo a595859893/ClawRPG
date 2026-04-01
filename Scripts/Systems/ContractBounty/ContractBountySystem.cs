@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
     /// Contract Bounty System - 委托赏金核心系统
     /// </summary>
     
-    public class ContractBountySystem : BaseSystem
+    public partial class ContractBountySystem : BaseSystem
     {
         public static ContractBountySystem Instance { get; private set; }
         

@@ -6,7 +6,7 @@ using ClawRPG.Scripts.Systems;
 /// <summary>
 /// Boss阶段管理系统 - 负责Boss阶段管理、愤怒机制、阶段转换
 /// </summary>
-public class BossPhaseSystem : BaseSystem
+public partial class BossPhaseSystem : BaseSystem
 {
     public static BossPhaseSystem Instance { get; private set; }
 

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TreasureHuntManager : BaseSystem
+public partial class TreasureHuntManager : BaseSystem
 {
     public static TreasureHuntManager Instance { get; private set; }
     

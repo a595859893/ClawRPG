@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
     /// 战斗同步系统 - 事件处理模块
     /// 处理状态管理、同步处理、配置与存档
     /// </summary>
-    public class BattleSyncEventHandler : BaseSystem
+    public partial class BattleSyncEventHandler : BaseSystem
     {
         private static BattleSyncEventHandler _instance;
         public static BattleSyncEventHandler Instance => _instance ??= new BattleSyncEventHandler();
