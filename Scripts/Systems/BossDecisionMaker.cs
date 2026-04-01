@@ -113,21 +113,21 @@ namespace ClawRPG.Scripts.Systems {
         }
         
         /// <summary>
-        /// Apply the decision to the Boss
+        /// Apply the decision to the Boss.
+        /// Note: Intent is now emitted in BTScoreSelector.OnExecute() during the score phase (REQ-165).
+        /// ApplyDecision only handles the actual ability execution.
         /// </summary>
         private void ApplyDecision() {
             if (_context.SelectedAbility != null) {
-                // REQ-160: Build and emit intent data before the ability fires
-                var intentData = BuildIntentData(_context.SelectedAbility);
-                OnIntentSelected?.Invoke(intentData);
-
+                // REQ-165: Intent is emitted in OnExecute() score phase.
+                // Only execute the ability here — no duplicate intent emission.
                 _boss.TryUseAbility(_context.SelectedAbility);
                 _context.TimeSinceLastAbility = 0;
             }
 
             // Apply state change
             if (_context.DesiredState != BossAIState.Idle) {
-                _boss.ForceSetState(_context.DesiredState);
+                _boss.ForceSetAIState(_context.DesiredState);
             }
         }
 
@@ -152,8 +152,8 @@ namespace ClawRPG.Scripts.Systems {
                     }
                     // Classify based on ability name heuristics (covers all current abilities)
                     data.IntentType = ClassifyIntentFromAbility(ba);
-                    data.MinDamage = (int)(ba.DamageMultiplier * _boss.AttackPower);
-                    data.MaxDamage = (int)(ba.DamageMultiplier * _boss.AttackPower * 1.3f); // +30% variance
+                    data.MinDamage = (int)(ba.DamageMultiplier * _boss.AttackDamage);
+                    data.MaxDamage = (int)(ba.DamageMultiplier * _boss.AttackDamage * 1.3f); // +30% variance
                 } else {
                     data.AbilityName = ability.AbilityName ?? abilityId;
                     data.MinDamage = 0;

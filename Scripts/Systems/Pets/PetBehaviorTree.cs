@@ -133,8 +133,8 @@ namespace ClawRPG.Scripts.Systems.Pets
             
             // 获取玩家朝向
             int playerFacing = 1;
-            if (_player is CharacterBody2D cb && cb.Velocity.x != 0)
-                playerFacing = cb.Velocity.x > 0 ? 1 : -1;
+            if (_player is CharacterBody2D cb && cb.Velocity.X != 0)
+                playerFacing = cb.Velocity.X > 0 ? 1 : -1;
             
             // 侧翼位置：敌人侧后方
             Vector2 enemyDir = (enemyPos - playerPos).Normalized();
@@ -151,18 +151,18 @@ namespace ClawRPG.Scripts.Systems.Pets
         /// </summary>
         private void MaintainDistance(Node2D target, float delta, bool retreat)
         {
-            float currentDist = GlobalPosition.DistanceTo(target.GlobalPosition);
+            float currentDist = _activePet?.GlobalPosition.DistanceTo(target.GlobalPosition);
             float idealDist = 150f; // 谨慎型保持150f距离
             
             Vector2 direction;
             if (retreat && currentDist < idealDist)
-                direction = (GlobalPosition - target.GlobalPosition).Normalized();
+                direction = (_activePet?.GlobalPosition - target.GlobalPosition).Normalized();
             else if (currentDist > idealDist + 20f)
-                direction = (target.GlobalPosition - GlobalPosition).Normalized();
+                direction = (target._activePet?.GlobalPosition - _activePet?.GlobalPosition).Normalized();
             else
                 return; // 距离合适
             
-            GlobalPosition += direction * _followSpeed * delta;
+            _activePet?.GlobalPosition += direction * _followSpeed * delta;
             
             if (_petSprite != null)
                 _petSprite.FlipH = direction.X < 0;
@@ -179,7 +179,7 @@ namespace ClawRPG.Scripts.Systems.Pets
             
             if (distance > 15f)
             {
-                GlobalPosition += direction * speed * delta;
+                _activePet?.GlobalPosition += direction * speed * delta;
                 
                 if (_petSprite != null)
                     _petSprite.FlipH = direction.X < 0;
@@ -193,7 +193,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         {
             if (enemy == null) return;
             
-            var direction = (enemy.GlobalPosition - GlobalPosition).Normalized();
+            var direction = (enemy._activePet?.GlobalPosition - _activePet?.GlobalPosition).Normalized();
             if (_petSprite != null)
                 _petSprite.FlipH = direction.X < 0;
             
@@ -212,7 +212,7 @@ namespace ClawRPG.Scripts.Systems.Pets
                 enemyChar.CallDeferred("TakeDamage", finalDamage);
                 
                 // 击退
-                var knockbackDir = (enemy.GlobalPosition - GlobalPosition).Normalized();
+                var knockbackDir = (enemy._activePet?.GlobalPosition - _activePet?.GlobalPosition).Normalized();
                 enemyChar.Velocity = knockbackDir * 120f;
                 
                 // 经验获取
@@ -230,7 +230,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         private void ShowAttackEffect(Vector2 targetPos, bool isCrit)
         {
             var effect = new Sprite2D();
-            effect.Position = targetPos - GlobalPosition;
+            effect.Position = targetPos - _activePet?.GlobalPosition;
             
             var tex = CreateAttackTexture(isCrit);
             effect.Texture = tex;
@@ -248,7 +248,8 @@ namespace ClawRPG.Scripts.Systems.Pets
 
         private Texture2D CreateAttackTexture(bool isCrit)
         {
-            var image = new Image(16, 16, Image.Format.Rgba8);
+            using var image = new Image();
+            image.Create(16, 16, false, Image.Format.Rgba8);
             Color color = isCrit ? new Color(1f, 0.8f, 0f, 1f) : new Color(1f, 1f, 0f, 0.8f);
             image.Fill(color);
             return ImageTexture.CreateFromImage(image);
