@@ -43,6 +43,11 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 启用云同步
         /// </summary>
+        /// <param name="provider">存储 provider 类型: "local"（默认），扩展时填 "steam"、"google" 等</param>
+        /// <remarks>
+        /// Provider 扩展: 实现 <see cref="ICloudStorageProvider"/> 接口，
+        /// 在 EnableCloudSync 中添加对应分支即可支持新 provider。
+        /// </remarks>
         public void EnableCloudSync(string provider = "local")
         {
             _cloudProvider = provider;
@@ -54,8 +59,8 @@ namespace ClawRPG.Scripts.Systems
                 _storageProvider = new LocalCloudStorageProvider();
                 AddChild(_storageProvider);
             }
-            // TODO: 支持其他 provider (steam, google, etc.)
-            
+            // Provider 扩展说明: 要支持更多 provider（如 steam, google），请实现 ICloudStorageProvider
+            // 接口并在此添加分支: else if (provider == "steam") { _storageProvider = new SteamCloudStorageProvider(); }
             GD.Print("[CloudSaveSystem] Cloud sync enabled with provider: " + provider);
         }
 
