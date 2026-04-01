@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 教程UI - 显示教程提示和高亮
     /// </summary>
-    public class TutorialUI : Control {
+    public partial class TutorialUI : Control {
         private static TutorialUI _instance;
         public static TutorialUI Instance {
             get {

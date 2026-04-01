@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
     /// 子系统: 编织引擎
     /// 负责核心编织逻辑、卡牌生成、路径计算
     /// </summary>
-    public class FateWeavingEngine : BaseSystem {
+    public partial class FateWeavingEngine : BaseSystem {
 
         private static FateWeavingEngine _instance;
         public static new FateWeavingEngine Instance {

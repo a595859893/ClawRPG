@@ -52,7 +52,7 @@ namespace ClawRPG.Scripts.Skills.Optimizer {
     /// <summary>
     /// Skill tree optimizer system
     /// </summary>
-    public class SkillTreeOptimizer : BaseSystem {
+    public partial class SkillTreeOptimizer : BaseSystem {
         public static SkillTreeOptimizer Instance { get; private set; }
 
         private Dictionary<string, SkillTreePreset> _presets;

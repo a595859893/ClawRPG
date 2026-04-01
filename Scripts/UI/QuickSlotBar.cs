@@ -128,7 +128,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Individual quick slot item display
     /// </summary>
-    public class QuickSlotItem : Control {
+    public partial class QuickSlotItem : Control {
         private int _slotIndex;
         private Panel _slotPanel;
         private Label _keyLabel;

@@ -5,7 +5,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 装备强化特效系统
     /// </summary>
-    public class EnhancementEffect : Control {
+    public partial class EnhancementEffect : Control {
         // 特效节点
         private Control _effectContainer;
         private ColorRect _successOverlay;

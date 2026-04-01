@@ -15,7 +15,7 @@ public class PetInventoryItem {
     public DateTime AcquiredAt { get; set; }
 }
 
-public class PetInventoryData : BaseSystem {
+public partial class PetInventoryData : BaseSystem {
     public Dictionary<string, List<PetInventoryItem>> PetInventories { get; set; }
     public int TotalSlots { get; set; }
     public Dictionary<string, int> GoldByPet { get; set; }

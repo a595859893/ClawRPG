@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Drag and drop helper for inventory items to quick slots
     /// </summary>
-    public class DragDropHelper : Control {
+    public partial class DragDropHelper : Control {
         public static DragDropHelper Instance { get; private set; }
         
         private Control _dragPreview;

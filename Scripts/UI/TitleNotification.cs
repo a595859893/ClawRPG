@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 称号解锁通知弹窗
     /// </summary>
-    public class TitleNotification : Control {
+    public partial class TitleNotification : Control {
         private static TitleNotification _instance;
         public static TitleNotification Instance {
             get {

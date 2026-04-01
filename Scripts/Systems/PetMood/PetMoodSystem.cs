@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Scripts.Systems.PetMood {
-    public class PetMoodSystem : BaseSystem {
+    public partial class PetMoodSystem : BaseSystem {
         private PetMoodData _data = new PetMoodData();
         private PetMoodDatabase _database = PetMoodDatabase.Instance;
         private Random _random = new Random();

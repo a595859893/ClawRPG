@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 装备外观 UI - 允许玩家自定义装备外观
     /// </summary>
-    public class EquipmentVisualsUI : Control {
+    public partial class EquipmentVisualsUI : Control {
         private Control _mainPanel;
         private Control _weaponPanel;
         private Control _armorPanel;

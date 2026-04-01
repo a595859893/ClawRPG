@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     /// 宝石镶嵌系统管理器
     /// </summary>
     
-    public class GemSystem : BaseSystem {
+    public partial class GemSystem : BaseSystem {
         private static GemSystem _instance;
         public static GemSystem Instance => _instance ??= GetNode<GemSystem>("/root/GemSystem");
 

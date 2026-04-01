@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 宠物互动 UI
     /// </summary>
-    public class PetInteractionUI : Control {
+    public partial class PetInteractionUI : Control {
         private PetInteractionSystem _system = PetInteractionSystem.Instance;
         
         // UI 组件

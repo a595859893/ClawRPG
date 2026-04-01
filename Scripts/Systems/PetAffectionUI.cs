@@ -6,7 +6,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// Pet affection UI - displays pet relationship status
     /// </summary>
-    public class PetAffectionUI : Control {
+    public partial class PetAffectionUI : Control {
         private PetAffectionSystem _affectionSystem;
         private PetSystem _petSystem;
         

@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
     /// Secret Boss System - 隐藏Boss核心系统
     /// 管理隐藏Boss的出现条件检测、生成和战斗
     /// </summary>
-    public class SecretBossSystem : BaseSystem {
+    public partial class SecretBossSystem : BaseSystem {
         // 单例
         private static SecretBossSystem _instance;
         public static SecretBossSystem Instance => _instance;

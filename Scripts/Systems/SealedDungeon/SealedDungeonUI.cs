@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Systems.SealedDungeon {
-    public class SealedDungeonUI : Control {
+    public partial class SealedDungeonUI : Control {
         private Control _mainContainer;
         private Control _dungeonListPanel;
         private Control _dungeonDetailPanel;

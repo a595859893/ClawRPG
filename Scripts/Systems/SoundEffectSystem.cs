@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Sound Effect System - Manages game sound effects with procedural audio
     /// </summary>
-    public class SoundEffectSystem : BaseSystem {
+    public partial class SoundEffectSystem : BaseSystem {
         private static SoundEffectSystem _instance;
         public static SoundEffectSystem Instance => _instance;
         

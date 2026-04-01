@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Skill Tree Optimizer UI
     /// </summary>
-    public class SkillTreeOptimizerUI : Control {
+    public partial class SkillTreeOptimizerUI : Control {
         private VBoxContainer _mainContainer;
         private HBoxContainer _buttonContainer;
         private VBoxContainer _presetContainer;

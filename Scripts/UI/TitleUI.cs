@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 称号系统 UI
     /// </summary>
-    public class TitleUI : Control {
+    public partial class TitleUI : Control {
         private Control container;
         private VBoxContainer titleListContainer;
         private Label currentTitleLabel;

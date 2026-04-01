@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 宠物故事界面
     /// </summary>
-    public class PetStoryUI : Control {
+    public partial class PetStoryUI : Control {
         private static PetStoryUI Instance;
         
         // UI Components

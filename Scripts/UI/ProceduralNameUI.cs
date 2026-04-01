@@ -6,7 +6,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// UI for procedural name generation system
     /// </summary>
-    public class ProceduralNameUI : Control {
+    public partial class ProceduralNameUI : Control {
         private ProceduralNameSystem _system;
         private ProceduralNameDatabase _database;
         

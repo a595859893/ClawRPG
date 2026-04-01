@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 坐骑界面 - O键打开
     /// </summary>
-    public class MountUI : Control {
+    public partial class MountUI : Control {
         private PanelContainer _mainPanel;
         private VBoxContainer _mainVBox;
         private Label _titleLabel;

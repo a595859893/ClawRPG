@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetInventoryDatabase : BaseSystem {
+public partial class PetInventoryDatabase : BaseSystem {
     public Dictionary<string, Dictionary<string, object>> ItemTemplates { get; set; }
     public Dictionary<string, List<string>> CategoryItems { get; set; }
     public Dictionary<string, string> RarityColors { get; set; }

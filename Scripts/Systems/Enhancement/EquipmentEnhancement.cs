@@ -51,7 +51,7 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         }
     }
     
-    public class EnhancementSystem : BaseSystem {
+    public partial class EnhancementSystem : BaseSystem {
         public static EnhancementSystem Instance { get; private set; }
         
         // 强化配置

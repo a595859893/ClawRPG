@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 装备强化界面
     /// </summary>
-    public class EnhancementUI : Control {
+    public partial class EnhancementUI : Control {
         private Control _mainPanel;
         private VBoxContainer _mainContainer;
         private Label _titleLabel;

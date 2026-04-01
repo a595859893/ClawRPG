@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Connection Recovery UI - Displays network connection status
     /// </summary>
-    public class ConnectionRecoveryUI : Control {
+    public partial class ConnectionRecoveryUI : Control {
         private ConnectionRecoverySystem _system;
         private Label _statusLabel;
         private Label _pingLabel;

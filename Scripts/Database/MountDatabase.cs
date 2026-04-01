@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Mounts {
     /// <summary>
     /// 坐骑数据库
     /// </summary>
-    public class MountDatabase : BaseSystem {
+    public partial class MountDatabase : BaseSystem {
         public static MountDatabase Instance { get; private set; }
 
         private Dictionary<string, Mount> _mounts = new Dictionary<string, Mount>();

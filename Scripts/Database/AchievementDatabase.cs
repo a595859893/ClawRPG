@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Database
     /// <summary>
     /// Achievement database - stores all achievement templates
     /// </summary>
-    public class AchievementDatabase : BaseSystem, IDatabase
+    public partial class AchievementDatabase : BaseSystem, IDatabase
     {
         private Dictionary<string, Achievement> _achievements;
 

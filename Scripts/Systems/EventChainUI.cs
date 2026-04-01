@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Event Chain UI - 事件连锁界面
     /// </summary>
-    public class EventChainUI : Control {
+    public partial class EventChainUI : Control {
         private static EventChainUI Instance { get; set; }
 
         private bool isVisible = false;

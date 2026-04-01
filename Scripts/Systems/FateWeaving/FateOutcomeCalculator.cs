@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
     /// 子系统: 结果计算器
     /// 负责结果计算、奖励/惩罚计算
     /// </summary>
-    public class FateOutcomeCalculator : BaseSystem {
+    public partial class FateOutcomeCalculator : BaseSystem {
 
         private static FateOutcomeCalculator _instance;
         public static new FateOutcomeCalculator Instance {

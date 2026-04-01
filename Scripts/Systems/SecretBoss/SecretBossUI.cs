@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
     /// <summary>
     /// Secret Boss UI - 隐藏Boss系统UI显示
     /// </summary>
-    public class SecretBossUI : Control {
+    public partial class SecretBossUI : Control {
         // UI元素
         private Label _titleLabel;
         private TabContainer _tabContainer;

@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
     /// <summary>
     /// Configuration database for procedural weapon generation
     /// </summary>
-    public class ProceduralWeaponDatabase : BaseSystem {
+    public partial class ProceduralWeaponDatabase : BaseSystem {
         
         // Weapon types available
         public Dictionary<string, WeaponTypeConfig> WeaponTypes { get; set; } = new Dictionary<string, WeaponTypeConfig>();

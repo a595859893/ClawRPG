@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Mounts {
     /// <summary>
     /// 坐骑管理器 - 管理玩家拥有的坐骑
     /// </summary>
-    public class MountManager : BaseSystem {
+    public partial class MountManager : BaseSystem {
         public static MountManager Instance { get; private set; }
 
         private Dictionary<string, MountInstance> _ownedMounts = new Dictionary<string, MountInstance>();

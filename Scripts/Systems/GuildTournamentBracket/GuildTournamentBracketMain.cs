@@ -4,7 +4,7 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
     /// <summary>
     /// 公会锦标赛赛程系统主入口
     /// </summary>
-    public class GuildTournamentBracketMain : BaseSystem {
+    public partial class GuildTournamentBracketMain : BaseSystem {
         private GuildTournamentBracketSystem _bracketSystem;
         private GuildTournamentBracketUI _bracketUI;
         

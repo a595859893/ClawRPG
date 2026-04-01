@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     /// <summary>
     /// 宝石合成界面
     /// </summary>
-    public class GemFusionUI : Control {
+    public partial class GemFusionUI : Control {
         private Control _mainContainer;
         private VBoxContainer _recipeList;
         private Label _goldLabel;

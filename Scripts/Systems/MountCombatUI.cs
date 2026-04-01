@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 坐骑战斗UI - 显示坐骑技能和战斗状态
     /// </summary>
-    public class MountCombatUI : Control {
+    public partial class MountCombatUI : Control {
         public static MountCombatUI Instance { get; private set; }
 
         private PanelContainer _mainPanel;

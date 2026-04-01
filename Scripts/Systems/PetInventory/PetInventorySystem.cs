@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetInventorySystem : BaseSystem {
+public partial class PetInventorySystem : BaseSystem {
     private PetInventoryData _data;
     private PetInventoryDatabase _database;
     

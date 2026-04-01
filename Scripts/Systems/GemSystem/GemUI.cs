@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     /// 宝石镶嵌界面 - UI界面和交互
     /// </summary>
     
-    public class GemUI : Control {
+    public partial class GemUI : Control {
         // 界面引用
         private Control _mainPanel;
         private VBoxContainer _gemListContainer;

@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.UI {
     /// Enemy Tactical Info UI - displays enemy AI perception and decisions
     /// Based on Advanced Game UI/UX Design Patterns
     /// </summary>
-    public class EnemyTacticalUI : Control {
+    public partial class EnemyTacticalUI : Control {
         // UI Components
         private Label _titleLabel;
         private VBoxContainer _enemyList;

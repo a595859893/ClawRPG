@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Mounts {
     /// <summary>
     /// 坐骑战斗系统 - 管理坐骑战斗技能和战斗状态
     /// </summary>
-    public class MountCombatSystem : BaseSystem {
+    public partial class MountCombatSystem : BaseSystem {
         public static MountCombatSystem Instance { get; private set; }
 
         private MountCombatDatabase _database;

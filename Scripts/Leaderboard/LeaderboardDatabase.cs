@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Leaderboard {
     /// <summary>
     /// 排行榜配置数据库
     /// </summary>
-    public class LeaderboardDatabase : BaseSystem {
+    public partial class LeaderboardDatabase : BaseSystem {
         // 排行榜配置
         public Dictionary<LeaderboardType, LeaderboardConfig> Configs = new Dictionary<LeaderboardType, LeaderboardConfig>();
         

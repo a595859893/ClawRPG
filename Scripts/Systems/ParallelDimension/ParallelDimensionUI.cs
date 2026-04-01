@@ -5,7 +5,7 @@ using ClawRPG.Scripts.Systems.ParallelDimension;
 
 namespace ClawRPG.Scripts.Systems.ParallelDimension {
     
-    public class ParallelDimensionUI : Control {
+    public partial class ParallelDimensionUI : Control {
         
         private static ParallelDimensionUI _instance;
         public static ParallelDimensionUI Instance => _instance;

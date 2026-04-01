@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Leaderboard {
     /// <summary>
     /// 排行榜UI系统
     /// </summary>
-    public class LeaderboardUI : Control {
+    public partial class LeaderboardUI : Control {
         // UI组件
         private TabContainer _tabContainer;
         private OptionButton _leaderboardTypeSelector;

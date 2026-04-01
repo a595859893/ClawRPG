@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildWarLeagueSystem : BaseSystem {
+public partial class GuildWarLeagueSystem : BaseSystem {
     
     private GuildWarLeagueData _data;
     private GuildWarLeagueDatabase _database;

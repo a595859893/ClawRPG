@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// 声望界面 - 显示玩家与各阵营的声望关系
     /// </summary>
-    public class ReputationUI : Control {
+    public partial class ReputationUI : Control {
         private VBoxContainer _mainContainer;
         private VBoxContainer _factionList;
         private Label _titleLabel;

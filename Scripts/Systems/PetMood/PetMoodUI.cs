@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.PetMood;
 
-public class PetMoodUI : Control {
+public partial class PetMoodUI : Control {
     private PetMoodSystem _moodSystem;
     private Control _mainPanel;
     private Label _titleLabel;

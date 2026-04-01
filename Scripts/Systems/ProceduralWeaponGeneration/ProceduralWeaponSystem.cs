@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
     /// <summary>
     /// Core procedural weapon generation system
     /// </summary>
-    public class ProceduralWeaponSystem : BaseSystem {
+    public partial class ProceduralWeaponSystem : BaseSystem {
         
         private ProceduralWeaponData _data;
         private ProceduralWeaponDatabase _database;

@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// Day/Night Cycle UI - Displays current time and phase information
     /// </summary>
-    public class DayNightCycleUI : Control {
+    public partial class DayNightCycleUI : Control {
         private DayNightCycleSystem _dayNightSystem;
         
         // UI Elements

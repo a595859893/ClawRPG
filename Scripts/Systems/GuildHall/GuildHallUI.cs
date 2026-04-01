@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Systems.GuildHall {
-    public class GuildHallUI : Control {
+    public partial class GuildHallUI : Control {
         private GuildHallSystem _system;
         private TabContainer _tabContainer;
         

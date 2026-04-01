@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetFusionUI : Control {
+public partial class PetFusionUI : Control {
     private PetFusionSystem _system;
     private Control _mainContainer;
     private Label _titleLabel;

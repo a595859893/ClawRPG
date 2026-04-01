@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Music Collection UI - Display and manage player's music collection
     /// </summary>
-    public class MusicCollectionUI : Control {
+    public partial class MusicCollectionUI : Control {
         private static MusicCollectionUI _instance;
         public static MusicCollectionUI Instance => _instance;
         

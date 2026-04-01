@@ -6,7 +6,7 @@ namespace ClawRPG.Systems.UI {
     /// <summary>
     /// Fate Relic UI - displays and manages player's relic collection
     /// </summary>
-    public class FateRelicUI : Control {
+    public partial class FateRelicUI : Control {
         private FateRelicSystem _relicSystem;
         
         // UI Elements

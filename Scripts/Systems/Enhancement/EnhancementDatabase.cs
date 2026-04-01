@@ -24,7 +24,7 @@ namespace ClawRPG.Scripts.Systems.Enhancement {
         }
     }
     
-    public class EnhancementDatabase : BaseSystem {
+    public partial class EnhancementDatabase : BaseSystem {
         public static EnhancementDatabase Instance { get; private set; }
         
         private Dictionary<string, EnhancementStoneData> _stones = new();

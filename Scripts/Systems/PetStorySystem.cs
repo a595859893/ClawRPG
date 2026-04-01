@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems {
     /// <summary>
     /// 宠物故事系统管理器
     /// </summary>
-    public class PetStorySystem : BaseSystem {
+    public partial class PetStorySystem : BaseSystem {
         public static PetStorySystem Instance { get; private set; }
 public delegate void StoryUnlocked(int petId, PetStory story);
 public delegate void StoryRead(int petId, int storyId);

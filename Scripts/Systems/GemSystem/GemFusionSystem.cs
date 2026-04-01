@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     /// <summary>
     /// 宝石合成系统管理器
     /// </summary>
-    public class GemFusionSystem : BaseSystem {
+    public partial class GemFusionSystem : BaseSystem {
         public static GemFusionSystem Instance { get; private set; }
         
         // 信号

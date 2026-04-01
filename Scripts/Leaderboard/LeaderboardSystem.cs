@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Leaderboard {
     /// <summary>
     /// 排行榜核心系统
     /// </summary>
-    public class LeaderboardSystem : BaseSystem {
+    public partial class LeaderboardSystem : BaseSystem {
         private static LeaderboardSystem _instance;
         public static LeaderboardSystem Instance => _instance;
 

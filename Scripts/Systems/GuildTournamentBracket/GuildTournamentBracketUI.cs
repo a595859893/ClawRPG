@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
     /// <summary>
     /// 公会锦标赛赛程 UI
     /// </summary>
-    public class GuildTournamentBracketUI : Control {
+    public partial class GuildTournamentBracketUI : Control {
         // UI 组件
         private Label _titleLabel;
         private TabContainer _tabContainer;

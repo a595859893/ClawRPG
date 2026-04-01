@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Daily Challenge UI - displays and manages daily challenges
     /// </summary>
-    public class DailyChallengeUI : Control {
+    public partial class DailyChallengeUI : Control {
         [Export] private NodePath challengeListPath;
         [Export] private NodePath progressBarPath;
         [Export] private NodePath completedCountLabelPath;

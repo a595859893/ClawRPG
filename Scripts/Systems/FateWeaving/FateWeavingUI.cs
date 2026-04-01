@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.FateWeaving;
 
-public class FateWeavingUI : Control {
+public partial class FateWeavingUI : Control {
     private FateWeavingSystem _system;
     private FateWeavingDatabase _database;
     

@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
      * GuildQuestBoardUI - 公会任务布告栏界面
      * 显示任务列表，接受任务，查看进度
      */
-    public class GuildQuestBoardUI : Control {
+    public partial class GuildQuestBoardUI : Control {
         // 单例
         private static GuildQuestBoardUI _instance;
         public static GuildQuestBoardUI Instance => _instance;

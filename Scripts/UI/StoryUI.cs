@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.UI {
-    public class StoryUI : Control {
+    public partial class StoryUI : Control {
         private VBoxContainer mainContainer;
         private VBoxContainer chapterList;
         private Label titleLabel;

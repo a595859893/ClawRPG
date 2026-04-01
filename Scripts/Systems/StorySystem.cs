@@ -298,7 +298,7 @@ namespace ClawRPG.Scripts.Systems {
         }
     }
 
-    public class StoryManager : BaseSystem {
+    public partial class StoryManager : BaseSystem {
         public static StoryManager Instance { get; private set; }
 public delegate void ChapterUnlocked(StoryChapter chapter);
 public delegate void ChapterCompleted(StoryChapter chapter);

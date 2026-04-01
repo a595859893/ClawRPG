@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildWarLeagueUI : Control {
+public partial class GuildWarLeagueUI : Control {
     
     private GuildWarLeagueSystem _system;
     private TabContainer _tabContainer;

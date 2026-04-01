@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Systems.GuildHall {
-    public class GuildHallSystem : BaseSystem {
+    public partial class GuildHallSystem : BaseSystem {
         private GuildHallData _data;
         private GuildHallDatabase _database;
         

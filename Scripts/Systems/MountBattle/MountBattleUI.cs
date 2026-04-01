@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
     /// 坐骑战斗UI - Mount Battle UI
     /// 显示坐骑战斗界面
     /// </summary>
-    public class MountBattleUI : Control {
+    public partial class MountBattleUI : Control {
         private MountBattleSystem _battleSystem;
         private bool _isVisible = false;
         
