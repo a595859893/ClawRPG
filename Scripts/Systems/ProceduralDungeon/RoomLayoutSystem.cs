@@ -86,7 +86,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         }
 
         /// <summary>
-        /// 选择房间类型
+        /// 选择房间类型 — 受房间记忆系统影响
         /// </summary>
         public RoomType SelectRoomType(DungeonTypeConfig config)
         {
@@ -109,7 +109,16 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
             // 过滤允许的类型
             var availableWeights = weights.Where(w => allowedTypes.Contains(w.Key)).ToDictionary(w => w.Key, w => w.Value);
 
+            // 应用房间记忆调整（降低高熟悉度类型的概率）
+            var memorySystem = RoomMemorySystem.Instance;
+            if (memorySystem != null)
+            {
+                availableWeights = memorySystem.GetAdjustedWeights(availableWeights);
+            }
+
             int totalWeight = availableWeights.Values.Sum();
+            if (totalWeight <= 0) return RoomType.Combat;
+
             int roll = _random.Next(totalWeight);
 
             int current = 0;
