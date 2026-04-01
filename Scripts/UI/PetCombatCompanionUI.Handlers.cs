@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Pets.AI;
 using ClawRPG.Scripts.Systems.PetMimicry;
+using ClawRPG.Systems.Pets.AI;
 
 namespace ClawRPG.Scripts.UI
 {

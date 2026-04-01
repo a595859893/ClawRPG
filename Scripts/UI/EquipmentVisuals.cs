@@ -342,7 +342,7 @@ namespace ClawRPG.Scripts.UI {
 
         #region BaseSystem Persistence
 
-        public override Dictionary<string, object> ExportSaveData()
+        public Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, Variant>();
 
@@ -362,7 +362,7 @@ namespace ClawRPG.Scripts.UI {
             return data;
         }
 
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
 

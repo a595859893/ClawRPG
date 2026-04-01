@@ -365,7 +365,7 @@ namespace ClawRPG.Scripts.UI
         /// <summary>
         /// 导出保存数据
         /// </summary>
-        public override Dictionary<string, object> ExportSaveData()
+        public Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, object>();
             
@@ -386,7 +386,7 @@ namespace ClawRPG.Scripts.UI
         /// <summary>
         /// 导入保存数据
         /// </summary>
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null || !data.Contains("visibleUIs")) return;
             

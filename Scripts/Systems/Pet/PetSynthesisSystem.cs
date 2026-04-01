@@ -203,7 +203,7 @@ public class PetSynthesisSystem : BaseSystem
         return resultRarity;
     }
     
-    private PetSynthesisData.SynthesisType GetRandomPetSynthesisData.SynthesisType(object pet1, object pet2)
+    private PetSynthesisData.SynthesisType GetRandomSynthesisType(object pet1, object pet2)
     {
         var random = new Random();
         var types = Enum.GetValues(typeof(PetSynthesisData.SynthesisType));

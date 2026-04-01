@@ -55,8 +55,6 @@ namespace ClawRPG.Scripts.UI {
         private VBoxContainer _statsContainer;
         private Tween _pulseTween;
         
-        // Display helper
-        private CombatStatsPanelDisplay _display;
         
         public override void _Ready()
         {

@@ -9,6 +9,7 @@ public class SkillTreeDatabase : DatabaseBase
 {
     private static SkillTreeDatabase _instance;
     public static new SkillTreeDatabase StaticInstance => _instance ??= new SkillTreeDatabase();
+    public override object Instance => StaticInstance;
 
     public Dictionary<string, SkillTreeNode> AllNodes { get; private set; }
     public Dictionary<string, SkillTreeCategory> Categories { get; private set; }

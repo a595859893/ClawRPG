@@ -409,7 +409,7 @@ namespace ClawRPG.Scripts.UI
             }
         }
 
-        public override Dictionary<string, object> ExportSaveData()
+        public Dictionary<string, object> ExportSaveData()
         {
             return new Dictionary
             {
@@ -419,7 +419,7 @@ namespace ClawRPG.Scripts.UI
             };
         }
 
-        public override void ImportSaveData(Dictionary<string, object> data)
+        public void ImportSaveData(Dictionary<string, object> data)
         {
             base.ImportSaveData(data);
             if (data.Contains("CurrentPage"))

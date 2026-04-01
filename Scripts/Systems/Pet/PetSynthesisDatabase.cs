@@ -420,5 +420,5 @@ public class PetSynthesisRecipe
     public int RequiredLevel { get; set; }
     public int GoldCost { get; set; }
     public float SuccessRate { get; set; }
-    public PetSynthesisData.SynthesisType PetSynthesisData.SynthesisType { get; set; }
+    public PetSynthesisData.SynthesisType SynthesisType { get; set; }
 }

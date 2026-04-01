@@ -29,7 +29,7 @@ namespace ClawRPG.Systems {
         private string _selectedRarity = "";
         private string _selectedStyle = "";
         
-        public ProcedualNameUI() {
+        public ProceduralNameUI() {
             _system = new ProceduralNameSystem();
             _database = new ProceduralNameDatabase();
         }

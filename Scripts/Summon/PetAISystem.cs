@@ -616,7 +616,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导出存档数据
         /// </summary>
-        public PlayerPetAIData ExportSaveData()
+        public PlayerPetAIData ExportAIData()
         {
             return _playerData;
         }
@@ -624,7 +624,7 @@ namespace ClawRPG.Scripts.Systems
         /// <summary>
         /// 导入存档数据
         /// </summary>
-        public void ImportSaveData(PlayerPetAIData data)
+        public void ImportAIData(PlayerPetAIData data)
         {
             if (data != null)
             {

@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Items;
+using ClawRPG.Scripts.Skills;
+using ClawRPG.Scripts.Systems.Pets;
 
 namespace ClawRPG.Scripts.UI
 {

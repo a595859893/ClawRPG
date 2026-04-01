@@ -33,7 +33,7 @@ public class PlayerTalentData
         public List<string> Requires { get; set; }  // 前置天赋
     }
     
-    public class PlayerTalentData
+    public class PlayerTalentSaveData
     {
         public Dictionary<TalentTree, int> UnlockedTrees { get; set; } = new Dictionary<TalentTree, int>();
         public Dictionary<TalentTree, int> TreePoints { get; set; } = new Dictionary<TalentTree, int>();  // 已分配点数

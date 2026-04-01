@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.Pets;
 
 public class PetBattleArenaUI : Control
 {

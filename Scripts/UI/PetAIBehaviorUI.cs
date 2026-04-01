@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Database;
 using ClawRPG.Scripts.Data;
+using ClawRPG.Systems.Pets.AI;
 
 namespace ClawRPG.Scripts.UI
 {

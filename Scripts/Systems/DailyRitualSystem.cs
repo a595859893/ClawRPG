@@ -360,53 +360,6 @@ public class DailyRitualSystem : BaseSystem
         SaveSystem.Save("daily_ritual", data);
     }
 
-    #region Data Persistence
-
-    /// <summary>
-    /// 导出保存数据 - 实现 BaseSystem 接口
-    /// </summary>
-    public override Dictionary<string, object> ExportSaveData()
-    {
-        return new Dictionary
-        {
-            { "total_rituals", TotalRitualsPerformed },
-            { "total_gold_spent", TotalGoldSpent },
-            { "total_reputation", TotalReputationGained },
-            { "last_reset_time", _lastResetTime },
-            { "daily_rituals_remaining", _dailyRitualsRemaining },
-            { "unlocked_rituals", UnlockedRitualIds },
-            { "current_ritual", CurrentRitualId },
-            { "ritual_progress", RitualProgress }
-        };
-    }
-
-    /// <summary>
-    /// 导入保存数据 - 实现 BaseSystem 接口
-    /// </summary>
-    public override void ImportSaveData(Dictionary<string, object> data)
-    {
-        if (data == null) return;
-
-        if (data.ContainsKey("total_rituals"))
-            TotalRitualsPerformed = Convert.ToInt32(data["total_rituals"]);
-        if (data.ContainsKey("total_gold_spent"))
-            TotalGoldSpent = Convert.ToInt32(data["total_gold_spent"]);
-        if (data.ContainsKey("total_reputation"))
-            TotalReputationGained = Convert.ToInt32(data["total_reputation"]);
-        if (data.ContainsKey("last_reset_time"))
-            _lastResetTime = Convert.ToInt64(data["last_reset_time"]);
-        if (data.ContainsKey("daily_rituals_remaining"))
-            _dailyRitualsRemaining = Convert.ToInt32(data["daily_rituals_remaining"]);
-        if (data.ContainsKey("unlocked_rituals"))
-            UnlockedRitualIds = new List<string>((Array)data["unlocked_rituals"]);
-        if (data.ContainsKey("current_ritual"))
-            CurrentRitualId = data["current_ritual"].ToString();
-        if (data.ContainsKey("ritual_progress"))
-            RitualProgress = Convert.ToSingle(data["ritual_progress"]);
-    }
-
-    #endregion
-
     private void LoadData()
     {
         var data = SaveSystem.Load("daily_ritual");
