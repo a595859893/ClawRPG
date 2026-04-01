@@ -61,7 +61,7 @@ namespace ClawRPG.Scripts.Systems.Pets
             // 主面板
             _mainPanel = new PanelContainer
             {
-                AnchorPreset = ControlPreset.Center,
+                AnchorsPreset = LayoutPreset.Center,
                 GrowDirection = GrowDirection.Both,
                 CustomMinimumSize = new Vector2(600, 500)
             };

@@ -43,7 +43,7 @@ namespace ClawRPG.Scripts.Leaderboard {
         private void SetupUI() {
             // 主容器
             var mainContainer = new VBoxContainer();
-            mainContainer.SetAnchorAndMargin(AnchorPreset.FullRect, 0f);
+            mainContainer.SetAnchorAndMargin(AnchorsPreset.FullRect, 0f);
             mainContainer.AddThemeConstantOverride("separation", 10);
             AddChild(mainContainer);
 
@@ -117,7 +117,7 @@ namespace ClawRPG.Scripts.Leaderboard {
 
             // 设置滚动容器的子节点为列表
             scrollContainer.AddChild(_leaderboardList);
-            scrollContainer.SetAnchorAndMargin(AnchorPreset.FullRect, 0f);
+            scrollContainer.SetAnchorAndMargin(AnchorsPreset.FullRect, 0f);
             scrollContainer.MarginTop = 120f;
             scrollContainer.MarginBottom = -40f;
         }

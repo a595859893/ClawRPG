@@ -25,7 +25,7 @@ public partial class ComboFailureUI : Control
     public override void _Ready()
     {
         Name = "ComboFailureUI";
-        AnchorsPreset = Control.AnchorPreset.FullRect;
+        AnchorsPreset = Control.AnchorsPreset.FullRect;
         ZIndex = 100;
 
         _BuildUI();
@@ -36,7 +36,7 @@ public partial class ComboFailureUI : Control
         // Semi-transparent dark vignette at bottom of screen
         var vignette = new PanelContainer();
         vignette.Name = "Vignette";
-        vignette.AnchorsPreset = Control.AnchorPreset.BottomWide;
+        vignette.AnchorsPreset = Control.AnchorsPreset.BottomWide;
         vignette.OffsetLeft = 0;
         vignette.OffsetRight = 0;
         vignette.OffsetTop = -120;

@@ -58,7 +58,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
         private void SetupUI() {
             // 主容器
             _mainContainer = new VBoxContainer();
-            _mainContainer.SetAnchorPreset(ControlPreset.FullRect);
+            _mainContainer.SetAnchorPreset(LayoutPreset.FullRect);
             _mainContainer.AddThemeConstantOverride("separation", 10);
             AddChild(_mainContainer);
             
@@ -113,7 +113,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
             _questGrid.Columns = 1;
             _questGrid.AddThemeConstantOverride("h_separation", 10);
             _questGrid.AddThemeConstantOverride("v_separation", 10);
-            _questGrid.SetAnchorPreset(ControlPreset.FullRect);
+            _questGrid.SetAnchorPreset(LayoutPreset.FullRect);
             _questGrid.AddThemeConstantOverride("margin_left", 10);
             _questGrid.AddThemeConstantOverride("margin_top", 10);
             _questGrid.AddThemeConstantOverride("margin_right", 10);
@@ -130,7 +130,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
             _myQuestGrid.Columns = 1;
             _myQuestGrid.AddThemeConstantOverride("h_separation", 10);
             _myQuestGrid.AddThemeConstantOverride("v_separation", 10);
-            _myQuestGrid.SetAnchorPreset(ControlPreset.FullRect);
+            _myQuestGrid.SetAnchorPreset(LayoutPreset.FullRect);
             _myQuestGrid.AddThemeConstantOverride("margin_left", 10);
             _myQuestGrid.AddThemeConstantOverride("margin_top", 10);
             _myQuestGrid.AddThemeConstantOverride("margin_right", 10);
@@ -147,7 +147,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
             _dailyQuestGrid.Columns = 1;
             _dailyQuestGrid.AddThemeConstantOverride("h_separation", 10);
             _dailyQuestGrid.AddThemeConstantOverride("v_separation", 10);
-            _dailyQuestGrid.SetAnchorPreset(ControlPreset.FullRect);
+            _dailyQuestGrid.SetAnchorPreset(LayoutPreset.FullRect);
             _dailyQuestGrid.AddThemeConstantOverride("margin_left", 10);
             _dailyQuestGrid.AddThemeConstantOverride("margin_top", 10);
             _dailyQuestGrid.AddThemeConstantOverride("margin_right", 10);
@@ -207,12 +207,12 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
         
         private void CreateDetailPanel() {
             _detailPanel = new Panel();
-            _detailPanel.SetAnchorPreset(ControlPreset.FullRect);
+            _detailPanel.SetAnchorPreset(LayoutPreset.FullRect);
             _detailPanel.Visible = false;
             _mainContainer.AddChild(_detailPanel);
             
             var detailContainer = new VBoxContainer();
-            detailContainer.SetAnchorPreset(ControlPreset.FullRect);
+            detailContainer.SetAnchorPreset(LayoutPreset.FullRect);
             detailContainer.AddThemeConstantOverride("separation", 15);
             detailContainer.AddThemeConstantOverride("margin_left", 20);
             detailContainer.AddThemeConstantOverride("margin_top", 20);

@@ -32,13 +32,13 @@ public partial class DailyRitualUI : Control
     {
         // Main container
         _mainContainer = new VBoxContainer();
-        _mainContainer.SetAnchorAndMargin(AnchorPreset.CenterCenter, 0.5f);
+        _mainContainer.SetAnchorAndMargin(AnchorsPreset.CenterCenter, 0.5f);
         _mainContainer.CustomMinimumSize = new Vector2(700, 500);
         AddChild(_mainContainer);
 
         // Background panel
         var panel = new Panel();
-        panel.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
+        panel.SetAnchorAndMargin(AnchorsPreset.FullRect, 0);
         panel.Modulate = new Color(1, 1, 1, 0.95f);
         _mainContainer.AddChild(panel);
 

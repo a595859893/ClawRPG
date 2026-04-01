@@ -34,7 +34,7 @@ namespace ClawRPG.Scripts.UI
         {
             // 主容器
             _mainContainer = new VBoxContainer();
-            _mainContainer.SetAnchorPreset(ControlPreset.FullRect);
+            _mainContainer.SetAnchorPreset(LayoutPreset.FullRect);
             _mainContainer.AddThemeConstantOverride("separation", 10);
             AddChild(_mainContainer);
             

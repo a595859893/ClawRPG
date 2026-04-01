@@ -26,14 +26,14 @@ public partial class ElementalResonanceUI : Control
         // Background panel
         ColorRect bg = new ColorRect();
         bg.Color = new Color(0.1f, 0.1f, 0.15f, 0.95f);
-        bg.SetAnchorPreset(ControlPreset.Center);
+        bg.SetAnchorPreset(LayoutPreset.Center);
         bg.CustomMinimumSize = new Vector2(600, 500);
         AddChild(bg);
 
         // Title
         titleLabel = new Label();
         titleLabel.Text = "⚡ 元素共鸣系统 ⚡";
-        titleLabel.SetAnchorPreset(ControlPreset.TopWide);
+        titleLabel.SetAnchorPreset(LayoutPreset.TopWide);
         titleLabel.Align = Label.AlignEnum.Center;
         titleLabel.AddThemeFontSizeOverride("font_size", 24);
         titleLabel.Position = new Vector2(0, 20);
@@ -42,7 +42,7 @@ public partial class ElementalResonanceUI : Control
         // Info label
         infoLabel = new Label();
         infoLabel.Text = "当多个元素同时作用于敌人时触发共鸣效果";
-        infoLabel.SetAnchorPreset(ControlPreset.TopWide);
+        infoLabel.SetAnchorPreset(LayoutPreset.TopWide);
         infoLabel.Align = Label.AlignEnum.Center;
         infoLabel.AddThemeFontSizeOverride("font_size", 14);
         infoLabel.Modulate = new Color(0.7f, 0.7f, 0.7f);
@@ -51,7 +51,7 @@ public partial class ElementalResonanceUI : Control
 
         // Resonance container
         resonanceContainer = new VBoxContainer();
-        resonanceContainer.SetAnchorPreset(ControlPreset.FullRect);
+        resonanceContainer.SetAnchorPreset(LayoutPreset.FullRect);
         resonanceContainer.Position = new Vector2(20, 100);
         resonanceContainer.CustomMinimumSize = new Vector2(560, 340);
         bg.AddChild(resonanceContainer);
@@ -62,7 +62,7 @@ public partial class ElementalResonanceUI : Control
         // Close button
         closeButton = new Button();
         closeButton.Text = "关闭 (Esc)";
-        closeButton.SetAnchorPreset(ControlPreset.BottomWide);
+        closeButton.SetAnchorPreset(LayoutPreset.BottomWide);
         closeButton.Position = new Vector2(0, -50);
         closeButton.CustomMinimumSize = new Vector2(0, 40);
         closeButton.Pressed += () => ToggleUI();

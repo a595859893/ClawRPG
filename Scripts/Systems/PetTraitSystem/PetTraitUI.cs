@@ -38,12 +38,12 @@ namespace ClawRPG.Scripts.UI
         {
             // Main panel
             var panel = new PanelContainer();
-            panel.SetAnchor(AnchorPreset.FullRect);
+            panel.SetAnchor(AnchorsPreset.FullRect);
             panel.MouseFilter = Control.MouseFilterEnum.Stop;
             AddChild(panel);
             
             var mainVBox = new VBoxContainer();
-            mainVBox.SetAnchor(AnchorPreset.FullRect);
+            mainVBox.SetAnchor(AnchorsPreset.FullRect);
             panel.AddChild(mainVBox);
             
             // Header
@@ -155,7 +155,7 @@ namespace ClawRPG.Scripts.UI
             _traitsTab.AddChild(scroll);
             
             var traitsList = new VBoxContainer();
-            traitsList.SetAnchor(AnchorPreset.FullRect);
+            traitsList.SetAnchor(AnchorsPreset.FullRect);
             scroll.AddChild(traitsList);
             
             // Group by type

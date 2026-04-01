@@ -43,7 +43,7 @@ public partial class DungeonExpeditionUI : Control
     {
         // Main container
         _mainContainer = new VBoxContainer();
-        _mainContainer.SetAnchor(AnchorPreset.FullRect);
+        _mainContainer.SetAnchor(AnchorsPreset.FullRect);
         _mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(_mainContainer);
 

@@ -40,13 +40,13 @@ public partial class ProceduralChallengeUI : Control
     {
         // Main panel
         PanelContainer mainPanel = new PanelContainer();
-        mainPanel.SetAnchor(AnchorPreset.Center);
+        mainPanel.SetAnchor(AnchorsPreset.Center);
         mainPanel.SetOffset(-300, -250, 300, 250);
         mainPanel.Modulate = new Color(1, 1, 1, 0.95f);
         AddChild(mainPanel);
 
         _mainContainer = new VBoxContainer();
-        _mainContainer.SetAnchor(AnchorPreset.FullRect);
+        _mainContainer.SetAnchor(AnchorsPreset.FullRect);
         mainPanel.AddChild(_mainContainer);
 
         // Title
@@ -65,12 +65,12 @@ public partial class ProceduralChallengeUI : Control
 
         // Scroll container for challenges
         ScrollContainer scrollContainer = new ScrollContainer();
-        scrollContainer.SetAnchor(AnchorPreset.FullRect);
+        scrollContainer.SetAnchor(AnchorsPreset.FullRect);
         scrollContainer.SetOffset(new Vector2(0, 80), new Vector2(0, -50));
         _mainContainer.AddChild(scrollContainer);
 
         _challengeList = new VBoxContainer();
-        _challengeList.SetAnchor(AnchorPreset.FullRect);
+        _challengeList.SetAnchor(AnchorsPreset.FullRect);
         scrollContainer.AddChild(_challengeList);
 
         // Refresh button

@@ -40,7 +40,7 @@ public partial class RogueLegacyUI : Control
     {
         // 主容器
         _mainContainer = new VBoxContainer();
-        _mainContainer.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
+        _mainContainer.SetAnchorAndMargin(AnchorsPreset.FullRect, 0);
         _mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(_mainContainer);
         
@@ -83,7 +83,7 @@ public partial class RogueLegacyUI : Control
         _tabContainer.AddChild(scroll);
         
         var container = new VBoxContainer();
-        container.SetAnchorAndMargin(AnchorPreset.FullRect, 10);
+        container.SetAnchorAndMargin(AnchorsPreset.FullRect, 10);
         container.AddThemeConstantOverride("separation", 8);
         scroll.AddChild(container);
         
@@ -119,7 +119,7 @@ public partial class RogueLegacyUI : Control
         _tabContainer.AddChild(scroll);
         
         _upgradesContainer = new VBoxContainer();
-        _upgradesContainer.SetAnchorAndMargin(AnchorPreset.FullRect, 10);
+        _upgradesContainer.SetAnchorAndMargin(AnchorsPreset.FullRect, 10);
         _upgradesContainer.AddThemeConstantOverride("separation", 10);
         scroll.AddChild(_upgradesContainer);
         
@@ -194,7 +194,7 @@ public partial class RogueLegacyUI : Control
     {
         var container = new VBoxContainer();
         container.Name = "Current Run";
-        container.SetAnchorAndMargin(AnchorPreset.FullRect, 10);
+        container.SetAnchorAndMargin(AnchorsPreset.FullRect, 10);
         container.AddThemeConstantOverride("separation", 10);
         _tabContainer.AddChild(container);
         
@@ -284,7 +284,7 @@ public partial class RogueLegacyUI : Control
         _tabContainer.AddChild(scroll);
         
         _historyContainer = new VBoxContainer();
-        _historyContainer.SetAnchorAndMargin(AnchorPreset.FullRect, 10);
+        _historyContainer.SetAnchorAndMargin(AnchorsPreset.FullRect, 10);
         _historyContainer.AddThemeConstantOverride("separation", 10);
         scroll.AddChild(_historyContainer);
     }

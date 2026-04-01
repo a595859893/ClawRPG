@@ -25,7 +25,7 @@ namespace ClawRPG.Scripts.Items {
         public int Id { get; set; }
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
-        public ItemType Type { get; set; }
+        public Item.ItemType Type { get; set; }
         public ItemQuality Quality { get; set; } = ItemQuality.Common;
         public int Value { get; set; }
         public int MaxStack { get; set; } = 99;
@@ -33,7 +33,7 @@ namespace ClawRPG.Scripts.Items {
         public int Level { get; set; } = 1;  // 物品等级
         public List<EnchantmentData> Enchantments { get; set; }  // 附魔列表
         
-        public enum ItemType { 
+        public enum Item.ItemType { 
             Weapon, Armor, Accessory, 
             Consumable, Material, QuestItem 
         }
@@ -384,7 +384,7 @@ namespace ClawRPG.Scripts.Items {
             return new List<Item>(_items.Values);
         }
         
-        public List<Item> GetItemsByType(Item.ItemType type)
+        public List<Item> GetItemsByType(Item.Item.ItemType type)
         {
             var result = new List<Item>();
             foreach (var item in _items.Values)

@@ -44,7 +44,7 @@ public partial class ComboIntentDisplay : Control
     private void _SetupUI()
     {
         Name = "ComboIntentDisplay";
-        AnchorsPreset = AnchorPreset.Custom;
+        AnchorsPreset = AnchorsPreset.Custom;
         CustomMinimumSize = new Vector2(180, 60);
 
         // Position: bottom-right of screen, above other combo UI

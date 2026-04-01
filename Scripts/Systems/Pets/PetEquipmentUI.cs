@@ -76,7 +76,7 @@ public partial class PetEquipmentUI : Control
         AddChild(_mainPanel);
         
         _mainVBox = new VBoxContainer();
-        _mainVBox.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
+        _mainVBox.SetAnchorAndMargin(AnchorsPreset.FullRect, 0);
         _mainVBox.MarginLeft = 20;
         _mainVBox.MarginTop = 20;
         _mainVBox.MarginRight = 20;
@@ -111,7 +111,7 @@ public partial class PetEquipmentUI : Control
         
         // 主内容区域
         _contentArea = new HBoxContainer();
-        _contentArea.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
+        _contentArea.SetAnchorAndMargin(AnchorsPreset.FullRect, 0);
         _contentArea.MarginTop = 10;
         _contentArea.MarginRight = 10;
         _contentArea.MarginBottom = 10;
@@ -136,7 +136,7 @@ public partial class PetEquipmentUI : Control
         
         // 中间：装备列表
         _equipmentContainer = new VBoxContainer();
-        _equipmentContainer.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
+        _equipmentContainer.SetAnchorAndMargin(AnchorsPreset.FullRect, 0);
         _equipmentContainer.CustomMinimumWidth = 400;
         _contentArea.AddChild(_equipmentContainer);
         
@@ -158,7 +158,7 @@ public partial class PetEquipmentUI : Control
         
         // 标签页
         _equipmentTabs = new TabContainer();
-        _equipmentTabs.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
+        _equipmentTabs.SetAnchorAndMargin(AnchorsPreset.FullRect, 0);
         _equipmentTabs.SizeFlagsVertical = SizeFlags.ExpandFill;
         _equipmentContainer.AddChild(_equipmentTabs);
         
@@ -168,7 +168,7 @@ public partial class PetEquipmentUI : Control
         _equipmentTabs.AddChild(shopTab);
         
         _shopScroll = new ScrollContainer();
-        _shopScroll.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
+        _shopScroll.SetAnchorAndMargin(AnchorsPreset.FullRect, 0);
         shopTab.AddChild(_shopScroll);
         
         _shopList = new VBoxContainer();
@@ -180,7 +180,7 @@ public partial class PetEquipmentUI : Control
         _equipmentTabs.AddChild(inventoryTab);
         
         _inventoryScroll = new ScrollContainer();
-        _inventoryScroll.SetAnchorAndMargin(AnchorPreset.FullRect, 0);
+        _inventoryScroll.SetAnchorAndMargin(AnchorsPreset.FullRect, 0);
         inventoryTab.AddChild(_inventoryScroll);
         
         _inventoryList = new VBoxContainer();

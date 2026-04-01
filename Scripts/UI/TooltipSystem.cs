@@ -213,7 +213,7 @@ namespace ClawRPG.Scripts.UI
             statsLabel.Text = stats;
 
             rarityLabel.Text = currentSkill.SkillType.ToString().ToUpper();
-            rarityLabel.AddThemeColorOverride("font_color", GetSkillTypeColor(currentSkill.SkillType));
+            rarityLabel.AddThemeColorOverride("font_color", GetSkillTypeColor(currentSkill.Skill.SkillType));
         }
 
         private Color GetRarityColor(ItemQuality rarity)
@@ -229,7 +229,7 @@ namespace ClawRPG.Scripts.UI
             };
         }
 
-        private Color GetSkillTypeColor(Skill.SkillType type)
+        private Color GetSkillTypeColor(Skill.Skill.SkillType type)
         {
             return type switch
             {

@@ -32,7 +32,7 @@ public partial class ChronicleUI : Control
     {
         // Main panel
         var panel = new PanelContainer();
-        panel.SetAnchorPreset(ControlPreset.FullRect);
+        panel.SetAnchorPreset(LayoutPreset.FullRect);
         AddChild(panel);
         
         var panelStyle = new StyleBoxFlat();
@@ -46,7 +46,7 @@ public partial class ChronicleUI : Control
         panel.AddThemeStyleboxOverride("panel", panelStyle);
         
         mainContainer = new VBoxContainer();
-        mainContainer.SetAnchorPreset(ControlPreset.FullRect);
+        mainContainer.SetAnchorPreset(LayoutPreset.FullRect);
         mainContainer.AddThemeConstantOverride("separation", 15);
         panel.AddChild(mainContainer);
         
@@ -111,7 +111,7 @@ public partial class ChronicleUI : Control
         
         // Tab container
         tabContainer = new TabContainer();
-        tabContainer.SetAnchorPreset(ControlPreset.FullRect);
+        tabContainer.SetAnchorPreset(LayoutPreset.FullRect);
         tabContainer.CustomMinimumSize = new Vector2(0, 400);
         mainContainer.AddChild(tabContainer);
         

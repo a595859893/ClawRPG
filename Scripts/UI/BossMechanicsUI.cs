@@ -56,7 +56,7 @@ public partial class BossMechanicsUI : Control
     {
         // Main container
         var mainContainer = new VBoxContainer();
-        mainContainer.SetAnchor(AnchorPreset.FullRect);
+        mainContainer.SetAnchor(AnchorsPreset.FullRect);
         mainContainer.Margin = new Color32(20, 20, 20, 20);
         AddChild(mainContainer);
         

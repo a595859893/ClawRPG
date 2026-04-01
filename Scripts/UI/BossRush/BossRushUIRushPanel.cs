@@ -31,7 +31,7 @@ public partial class BossRushUIRushPanel : Control
     
     public void Setup(Control parent, Vector2 position, Vector2 size)
     {
-        SetAnchor(AnchorPreset.FullRect);
+        SetAnchor(AnchorsPreset.FullRect);
         Position = position;
         Size = size;
         parent.AddChild(this);

@@ -43,7 +43,7 @@ namespace ClawRPG.Scripts.UI
         {
             // Main container
             _mainContainer = new VBoxContainer();
-            _mainContainer.SetAnchorPreset(ControlPreset.CenterCenter);
+            _mainContainer.SetAnchorPreset(LayoutPreset.CenterCenter);
             _mainContainer.CustomMinimumSize = new Vector2(500, 450);
             AddChild(_mainContainer);
 
@@ -126,7 +126,7 @@ namespace ClawRPG.Scripts.UI
 
             // Background
             var bgPanel = new PanelContainer();
-            bgPanel.SetAnchorPreset(ControlPreset.FullRect);
+            bgPanel.SetAnchorPreset(LayoutPreset.FullRect);
             bgPanel.ZIndex = -1;
             MoveChild(bgPanel, 0);
         }

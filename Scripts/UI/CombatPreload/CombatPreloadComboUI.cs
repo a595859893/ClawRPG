@@ -54,7 +54,7 @@ public partial class CombatPreloadComboUI : Control
     {
         // 主面板
         _mainPanel = new PanelContainer();
-        _mainPanel.SetAnchor(AnchorPreset.FullRect);
+        _mainPanel.SetAnchor(AnchorsPreset.FullRect);
         AddChild(_mainPanel);
         
         // 使用主题样式
@@ -68,7 +68,7 @@ public partial class CombatPreloadComboUI : Control
         
         // 主容器
         var mainVBox = new VBoxContainer();
-        mainVBox.SetAnchor(AnchorPreset.FullRect);
+        mainVBox.SetAnchor(AnchorsPreset.FullRect);
         mainVBox.AddThemeConstantOverride("separation", 15);
         _mainPanel.AddChild(mainVBox);
         
@@ -128,7 +128,7 @@ public partial class CombatPreloadComboUI : Control
         mainVBox.AddChild(_comboScroll);
         
         _comboListContainer = new VBoxContainer();
-        _comboListContainer.SetAnchor(AnchorPreset.FullRect);
+        _comboListContainer.SetAnchor(AnchorsPreset.FullRect);
         _comboListContainer.AddThemeConstantOverride("separation", 10);
         _comboScroll.AddChild(_comboListContainer);
         

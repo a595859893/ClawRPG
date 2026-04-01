@@ -24,7 +24,7 @@ namespace ClawRPG.Scripts.UI.BossRush
         
         public void Setup(Control parent, Vector2 position, Vector2 size)
         {
-            SetAnchor(AnchorPreset.FullRect);
+            SetAnchor(AnchorsPreset.FullRect);
             Position = position;
             Size = size;
             Visible = false;

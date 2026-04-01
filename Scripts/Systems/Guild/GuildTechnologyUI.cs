@@ -45,7 +45,7 @@ public partial class GuildTechnologyUI : Control
     {
         // 主容器
         mainContainer = new VBoxContainer();
-        mainContainer.SetAnchor(AnchorPreset.FullRect);
+        mainContainer.SetAnchor(AnchorsPreset.FullRect);
         mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(mainContainer);
 
@@ -120,7 +120,7 @@ public partial class GuildTechnologyUI : Control
     private void SetupDetailPanel()
     {
         VBoxContainer container = new VBoxContainer();
-        container.SetAnchor(AnchorPreset.FullRect);
+        container.SetAnchor(AnchorsPreset.FullRect);
         container.AddThemeConstantOverride("separation", 10);
         container.AddThemeConstantOverride("margin_left", 20);
         container.AddThemeConstantOverride("margin_top", 10);

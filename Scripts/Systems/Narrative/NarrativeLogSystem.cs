@@ -14,7 +14,7 @@ namespace ClawRPG.Systems.Narrative
     /// - 碎片数据跨游戏局次持久化
     /// - 预写叙事，不依赖 LLM 生成
     /// </summary>
-    public class NarrativeLogSystem : BaseSystem
+    public partial class NarrativeLogSystem : BaseSystem
     {
         public static NarrativeLogSystem Instance { get; private set; }
 
@@ -500,19 +500,9 @@ namespace ClawRPG.Systems.Narrative
             }
         }
 
-        public override void ImportSaveDataRaw(Dictionary<string, object> data)
-        {
-            ImportSaveData(data);
-        }
-
         private void _OnFragmentCollected(string fragmentId, string roomType)
         {
             SaveIfReady();
-        }
-
-        public override string[] _GetDependencies()
-        {
-            return new string[] { };
         }
     }
 }

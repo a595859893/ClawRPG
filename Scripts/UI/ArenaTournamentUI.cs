@@ -16,7 +16,7 @@ public partial class ArenaTournamentUI : Control
     
     public override void _Ready()
     {
-        SetAnchor(AnchorPreset.FullRect);
+        SetAnchor(AnchorsPreset.FullRect);
         Modulate = new Color(1, 1, 1, 0);
         
         CreateUI();
@@ -32,7 +32,7 @@ public partial class ArenaTournamentUI : Control
         // Background panel
         var bgPanel = new PanelContainer
         {
-            SetAnchor(AnchorPreset.FullRect,
+            SetAnchor(AnchorsPreset.FullRect,
                 new Vector2(0.1f, 0.1f),
                 new Vector2(0.9f, 0.9f))
         };
@@ -42,7 +42,7 @@ public partial class ArenaTournamentUI : Control
         // Main VBox
         var mainVBox = new VBoxContainer
         {
-            SetAnchor(AnchorPreset.FullRect,
+            SetAnchor(AnchorsPreset.FullRect,
                 new Vector2(0.05f, 0.05f),
                 new Vector2(0.95f, 0.95f))
         };
@@ -85,7 +85,7 @@ public partial class ArenaTournamentUI : Control
         
         var scroll1 = new ScrollContainer
         {
-            SetAnchor(AnchorPreset.FullRect,
+            SetAnchor(AnchorsPreset.FullRect,
                 new Vector2(0.05f, 0.05f),
                 new Vector2(0.95f, 0.95f))
         };
@@ -104,7 +104,7 @@ public partial class ArenaTournamentUI : Control
         
         var scroll2 = new ScrollContainer
         {
-            SetAnchor(AnchorPreset.FullRect,
+            SetAnchor(AnchorsPreset.FullRect,
                 new Vector2(0.05f, 0.05f),
                 new Vector2(0.95f, 0.95f))
         };
@@ -123,7 +123,7 @@ public partial class ArenaTournamentUI : Control
         
         var scroll3 = new ScrollContainer
         {
-            SetAnchor(AnchorPreset.FullRect,
+            SetAnchor(AnchorsPreset.FullRect,
                 new Vector2(0.05f, 0.05f),
                 new Vector2(0.95f, 0.95f))
         };

@@ -33,7 +33,7 @@ public partial class MountWeatherBonusUI : Control
         // 主容器
         var mainPanel = new PanelContainer
         {
-            AnchorPreset = ControlPreset.CenterRight,
+            AnchorsPreset = LayoutPreset.CenterRight,
             OffsetRight = -50,
             OffsetTop = 50,
             OffsetBottom = -50,

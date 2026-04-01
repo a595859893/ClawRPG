@@ -30,12 +30,12 @@ public partial class TradeRouteUI : Control
     private void SetupUI()
     {
         var bg = new Panel();
-        bg.SetAnchor(AnchorPreset.FullRect);
+        bg.SetAnchor(AnchorsPreset.FullRect);
         bg.Modulate = new Color(0, 0, 0, 0.85f);
         AddChild(bg);
 
         var mainContainer = new VBoxContainer();
-        mainContainer.SetAnchor(AnchorPreset.FullRect);
+        mainContainer.SetAnchor(AnchorsPreset.FullRect);
         mainContainer.AddThemeConstantOverride("separation", 20);
         AddChild(mainContainer);
 
@@ -121,7 +121,7 @@ public partial class TradeRouteUI : Control
     private void SetupRoutesTab(Control parent)
     {
         var scroll = new ScrollContainer();
-        scroll.SetAnchor(AnchorPreset.FullRect);
+        scroll.SetAnchor(AnchorsPreset.FullRect);
         scroll.AddThemeConstantOverride("h_separation", 10);
         parent.AddChild(scroll);
 
@@ -135,7 +135,7 @@ public partial class TradeRouteUI : Control
     private void SetupMarketTab(Control parent)
     {
         var scroll = new ScrollContainer();
-        scroll.SetAnchor(AnchorPreset.FullRect);
+        scroll.SetAnchor(AnchorsPreset.FullRect);
         parent.AddChild(scroll);
 
         _marketContainer = new VBoxContainer();
@@ -148,7 +148,7 @@ public partial class TradeRouteUI : Control
     private void SetupHistoryTab(Control parent)
     {
         var scroll = new ScrollContainer();
-        scroll.SetAnchor(AnchorPreset.FullRect);
+        scroll.SetAnchor(AnchorsPreset.FullRect);
         parent.AddChild(scroll);
 
         _historyContainer = new VBoxContainer();

@@ -61,7 +61,7 @@ public partial class EconomicDashboardUI : Control
     {
         // 主容器
         var mainContainer = new VBoxContainer();
-        mainContainer.SetAnchor(AnchorPreset.FullRect);
+        mainContainer.SetAnchor(AnchorsPreset.FullRect);
         mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(mainContainer);
         
@@ -95,7 +95,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(overviewTab);
         
         var overviewContainer = new VBoxContainer();
-        overviewContainer.SetAnchor(AnchorPreset.FullRect);
+        overviewContainer.SetAnchor(AnchorsPreset.FullRect);
         overviewContainer.AddThemeConstantOverride("separation", 15);
         overviewTab.AddChild(overviewContainer);
         
@@ -154,7 +154,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(earningsTab);
         
         earningsContainer = new VBoxContainer();
-        earningsContainer.SetAnchor(AnchorPreset.FullRect);
+        earningsContainer.SetAnchor(AnchorsPreset.FullRect);
         earningsContainer.AddThemeConstantOverride("separation", 10);
         earningsTab.AddChild(earningsContainer);
         
@@ -170,7 +170,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(expensesTab);
         
         expensesContainer = new VBoxContainer();
-        expensesContainer.SetAnchor(AnchorPreset.FullRect);
+        expensesContainer.SetAnchor(AnchorsPreset.FullRect);
         expensesContainer.AddThemeConstantOverride("separation", 10);
         expensesTab.AddChild(expensesContainer);
         
@@ -186,7 +186,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(transactionsTab);
         
         transactionsContainer = new VBoxContainer();
-        transactionsContainer.SetAnchor(AnchorPreset.FullRect);
+        transactionsContainer.SetAnchor(AnchorsPreset.FullRect);
         transactionsContainer.AddThemeConstantOverride("separation", 5);
         transactionsTab.AddChild(transactionsContainer);
         
@@ -196,7 +196,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(itemsTab);
         
         var itemsContainer = new VBoxContainer();
-        itemsContainer.SetAnchor(AnchorPreset.FullRect);
+        itemsContainer.SetAnchor(AnchorsPreset.FullRect);
         itemsContainer.AddThemeConstantOverride("separation", 15);
         itemsTab.AddChild(itemsContainer);
         

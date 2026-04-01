@@ -28,13 +28,13 @@ public partial class PetEvolutionUI : Control
     public override void _Ready()
     {
         _mainPanel = new Panel();
-        _mainPanel.SetAnchorsPreset(ControlPreset.Center);
+        _mainPanel.SetAnchorsPreset(LayoutPreset.Center);
         _mainPanel.CustomMinimumSize = new Vector2(800, 600);
         AddChild(_mainPanel);
         _mainPanel.Visible = false;
 
         _mainContainer = new VBoxContainer();
-        _mainContainer.SetAnchorsPreset(ControlPreset.FullRect);
+        _mainContainer.SetAnchorsPreset(LayoutPreset.FullRect);
         _mainContainer.AddThemeConstantOverride("separation", 10);
         _mainPanel.AddChild(_mainContainer);
 

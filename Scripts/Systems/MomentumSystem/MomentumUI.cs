@@ -35,7 +35,7 @@ public partial class MomentumUI : Control
     {
         // Main Panel
         _mainPanel = new PanelContainer();
-        _mainPanel.AnchorPreset = ControlPreset.TopRight;
+        _mainPanel.AnchorsPreset = LayoutPreset.TopRight;
         _mainPanel.OffsetLeft = -320;
         _mainPanel.OffsetTop = 60;
         _mainPanel.OffsetRight = -20;

@@ -35,7 +35,7 @@ namespace ClawRPG.Scripts.Systems
             var panel = new PanelContainer
             {
                 Name = "MainPanel",
-                AnchorPreset = ControlPreset.Center,
+                AnchorsPreset = LayoutPreset.Center,
                 OffsetLeft = -400,
                 OffsetRight = 400,
                 OffsetTop = -300,

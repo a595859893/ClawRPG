@@ -44,7 +44,7 @@ public partial class PetTalentUI : Control
     {
         // Main container
         var mainContainer = new VBoxContainer();
-        mainContainer.SetAnchorAndMargin(AnchorPreset.FullRect, MarginPreset.FullRect);
+        mainContainer.SetAnchorAndMargin(AnchorsPreset.FullRect, MarginPreset.FullRect);
         mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(mainContainer);
         

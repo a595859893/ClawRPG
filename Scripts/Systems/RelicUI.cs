@@ -36,13 +36,13 @@ public partial class RelicUI : Control
     {
         // 背景面板
         var bg = new Panel();
-        bg.SetAnchorsPreset(ControlPreset.FullRect);
+        bg.SetAnchorsPreset(LayoutPreset.FullRect);
         bg.Modulate = new Color(1, 1, 1, 0.95f);
         AddChild(bg);
         
         // 主容器
         _mainContainer = new VBoxContainer();
-        _mainContainer.SetAnchorsPreset(ControlPreset.FullRect);
+        _mainContainer.SetAnchorsPreset(LayoutPreset.FullRect);
         _mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(_mainContainer);
         
@@ -97,7 +97,7 @@ public partial class RelicUI : Control
         
         // 内容区域
         _contentContainer = new HBoxContainer();
-        _contentContainer.SetAnchorsPreset(ControlPreset.FullRect);
+        _contentContainer.SetAnchorsPreset(LayoutPreset.FullRect);
         _contentContainer.AddThemeConstantOverride("separation", 20);
         _mainContainer.AddChild(_contentContainer);
         
@@ -107,7 +107,7 @@ public partial class RelicUI : Control
         _contentContainer.AddChild(listPanel);
         
         var listScroll = new ScrollContainer();
-        listScroll.SetAnchorsPreset(ControlPreset.FullRect);
+        listScroll.SetAnchorsPreset(LayoutPreset.FullRect);
         listScroll.AddThemeConstantOverride("h_separation", 5);
         listScroll.AddThemeConstantOverride("v_separation", 5);
         listPanel.AddChild(listScroll);

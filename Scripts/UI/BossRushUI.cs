@@ -34,19 +34,19 @@ public partial class BossRushUI : Control
     {
         // Main container
         mainContainer = new Control();
-        mainContainer.SetAnchor(AnchorPreset.FullRect);
+        mainContainer.SetAnchor(AnchorsPreset.FullRect);
         AddChild(mainContainer);
         
         // Background
         var bg = new ColorRect();
         bg.Color = new Color(0, 0, 0, 0.8f);
-        bg.SetAnchor(AnchorPreset.FullRect);
+        bg.SetAnchor(AnchorsPreset.FullRect);
         mainContainer.AddChild(bg);
         
         // Title
         titleLabel = new Label();
         titleLabel.Text = "⚔️ Boss Rush ⚔️";
-        titleLabel.SetAnchor(AnchorPreset.TopWide);
+        titleLabel.SetAnchor(AnchorsPreset.TopWide);
         titleLabel.AddThemeFontSizeOverride("font_size", 32);
         titleLabel.Position = new Vector2(0, 20);
         mainContainer.AddChild(titleLabel);
@@ -61,7 +61,7 @@ public partial class BossRushUI : Control
     private void SetupTabButtons()
     {
         var tabContainer = new HBoxContainer();
-        tabContainer.SetAnchor(AnchorPreset.TopWide);
+        tabContainer.SetAnchor(AnchorsPreset.TopWide);
         tabContainer.Position = new Vector2(20, 70);
         tabContainer.Size = new Vector2(760, 40);
         mainContainer.AddChild(tabContainer);
