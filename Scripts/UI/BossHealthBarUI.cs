@@ -32,6 +32,11 @@ namespace ClawRPG.Scripts.UI {
         private Label _intentDamageLabel;
         private BossIntentData _currentIntent;
         
+        // REQ-158: Attack history heatmap components
+        private HBoxContainer _historyContainer;
+        private string _historyInstanceId = "";
+        private const int HeatmapIconCount = 20;
+        
         // State
         private Node2D _currentBoss;
         private bool _isVisible = false; 
@@ -177,6 +182,15 @@ namespace ClawRPG.Scripts.UI {
             _intentDamageLabel.AddThemeFontSizeOverride("font_size", 12);
             _intentDamageLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.6f));
             _intentContainer.AddChild(_intentDamageLabel);
+
+            // REQ-158: Attack history heatmap row — positioned below intent, shows last 20 attacks
+            _historyContainer = new HBoxContainer();
+            _historyContainer.Alignment = BoxContainer.AlignmentMode.Center;
+            _historyContainer.HorizontalAlignment = HorizontalAlignment.Center;
+            _historyContainer.Visible = false;
+            _historyContainer.CustomMinimumSize = new Vector2(360, 22);
+            _historyContainer.SizeFlagsHorizontal = (int)Control.SizeFlags.ShrinkCenter;
+            vbox.AddChild(_historyContainer);
 
             // Health bar
             _healthBar = new ProgressBar();
@@ -550,6 +564,10 @@ namespace ClawRPG.Scripts.UI {
             UnsubscribeFromBossEvents(); // clean up any previous subscription
             SubscribeToBossEvents();
 
+            // REQ-158: Subscribe to attack history signal and track current battle instance
+            BossPatternSystem.BossAttackInitiated += OnAttackInitiated;
+            _historyInstanceId = BossPatternSystem.Instance?.CurrentBattle?.InstanceId ?? "";
+
             // Show
             Visible = true;
             _isVisible = true;
@@ -557,6 +575,7 @@ namespace ClawRPG.Scripts.UI {
 
             // Update immediately
             UpdateBossHealth();
+            UpdateHistoryDisplay();
         }
 
         /// <summary>
@@ -643,11 +662,117 @@ namespace ClawRPG.Scripts.UI {
         }
 
         /// <summary>
+        /// REQ-158: Handler for BossAttackInitiated signal — updates heatmap when boss attacks
+        /// </summary>
+        private void OnAttackInitiated(string instanceId, BossSkillType skillType, string abilityName, int damage)
+        {
+            if (instanceId != _historyInstanceId || string.IsNullOrEmpty(_historyInstanceId))
+                return;
+
+            UpdateHistoryDisplay();
+        }
+
+        /// <summary>
+        /// REQ-158: Update the attack history heatmap display
+        /// </summary>
+        private void UpdateHistoryDisplay()
+        {
+            if (_historyContainer == null || string.IsNullOrEmpty(_historyInstanceId))
+                return;
+
+            // Clear existing icons
+            _historyContainer.QueueFreeChildren();
+
+            var history = BossAttackHistory.GetHistory(_historyInstanceId, HeatmapIconCount);
+            if (history.Count == 0)
+            {
+                _historyContainer.Visible = false;
+                return;
+            }
+
+            _historyContainer.Visible = true;
+
+            for (int i = 0; i < history.Count; i++)
+            {
+                var record = history[i];
+                var icon = GetAttackTypeIcon(record.AttackType);
+                var color = GetAttackTypeColor(record.AttackType);
+
+                // Older attacks are more transparent
+                float alpha = 1.0f - (float)(history.Count - 1 - i) * 0.06f;
+                alpha = Mathf.Max(alpha, 0.2f);
+
+                var label = new Label();
+                label.Text = icon;
+                label.HorizontalAlignment = HorizontalAlignment.Center;
+                label.AddThemeFontSizeOverride("font_size", 13);
+                label.Modulate = new Color(color.R, color.G, color.B, alpha);
+                label.TooltipText = $"#{i + 1}: {record.AbilityName} ({(record.Damage > 0 ? record.Damage + " dmg" : "non-damage")})";
+                _historyContainer.AddChild(label);
+            }
+        }
+
+        /// <summary>
+        /// REQ-158: Get emoji icon for BossSkillType
+        /// </summary>
+        private string GetAttackTypeIcon(BossSkillType type)
+        {
+            return type switch
+            {
+                BossSkillType.MeleeAttack => "⚔️",
+                BossSkillType.RangedAttack => "🏹",
+                BossSkillType.Projectile => "🔵",
+                BossSkillType.AreaOfEffect => "💥",
+                BossSkillType.Summon => "👹",
+                BossSkillType.Heal => "💚",
+                BossSkillType.Shield => "🛡️",
+                BossSkillType.Debuff => "☠️",
+                BossSkillType.Teleport => "🏃",
+                BossSkillType.Stun => "⚡",
+                BossSkillType.Knockback => "💨",
+                BossSkillType.Charge => "🚀",
+                BossSkillType.SpinAttack => "🌀",
+                BossSkillType.LaserBeam => "⚡",
+                BossSkillType.Enrage => "🔥",
+                _ => "❓"
+            };
+        }
+
+        /// <summary>
+        /// REQ-158: Get color for BossSkillType (matches BossIntentData classification)
+        /// </summary>
+        private Color GetAttackTypeColor(BossSkillType type)
+        {
+            return type switch
+            {
+                BossSkillType.MeleeAttack or BossSkillType.RangedAttack
+                or BossSkillType.Projectile or BossSkillType.Charge
+                or BossSkillType.SpinAttack or BossSkillType.LaserBeam
+                or BossSkillType.Knockback or BossSkillType.Stun
+                or BossSkillType.AreaOfEffect => _intentDamage,
+
+                BossSkillType.Heal or BossSkillType.Shield => _intentBuff,
+
+                BossSkillType.Debuff => _intentDebuff,
+
+                BossSkillType.Teleport => _intentDefend,
+
+                BossSkillType.Summon or BossSkillType.Enrage => _intentSpecial,
+
+                _ => Colors.White
+            };
+        }
+
+        /// <summary>
         /// Hide boss health bar
         /// </summary>
         public void HideBossHealth()
         {
             UnsubscribeFromBossEvents();
+            BossPatternSystem.BossAttackInitiated -= OnAttackInitiated;
+            _historyInstanceId = "";
+            _historyContainer?.QueueFreeChildren();
+            _historyContainer.Visible = false;
             _currentBoss = null;
             StartFadeOut();
         }

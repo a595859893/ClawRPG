@@ -135,6 +135,10 @@ public partial class BossAbilitySystem : BaseSystem
         // 发出技能开始信号
         BossSkillInitiated?.Invoke(battle.InstanceId, skill.Id, skill.Name);
 
+        // REQ-158: 记录技能攻击到历史（供热力图使用）
+        BossAttackHistory.RecordAttack(battle.InstanceId, skill.SkillType, skill.Name, (int)skill.Damage, Time.GetTicksMsec() / 1000f);
+        BossPatternSystem.BossAttackInitiated?.Invoke(battle.InstanceId, skill.SkillType, skill.Name, (int)skill.Damage);
+
         // 执行技能效果
         switch (skill.SkillType)
         {

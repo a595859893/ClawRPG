@@ -11,7 +11,8 @@ public partial class BossPatternSystem : BaseSystem
 
     // 信号 - 模式相关
     public static Action<string, AttackPattern, AttackPattern> BossPatternChanged;
-    public static Action<string, Vector3> BossAttackInitiated;
+    // REQ-158: BossAttackInitiated 扩展，包含攻击类型、技能名、伤害值
+    public static Action<string, BossSkillType, string, int> BossAttackInitiated;
     public static Action<string, string, string> BossTargetChanged;
 
     private Random _random = new Random();
@@ -23,6 +24,15 @@ public partial class BossPatternSystem : BaseSystem
     public override void _Ready()
     {
         Instance = this;
+        // REQ-158: 战斗结束时清理攻击历史
+        BossMechanicsSystem.BossDefeated += OnBossDefeated;
+    }
+
+    private void OnBossDefeated(string bossConfigId, string bossName, bool isFirstBlood, System.Collections.Generic.List<string> rewards)
+    {
+        if (_currentBattle != null) {
+            BossAttackHistory.EndBattle(_currentBattle.InstanceId);
+        }
     }
 
     /// <summary>
@@ -42,6 +52,8 @@ public partial class BossPatternSystem : BaseSystem
         _currentBattle = battle;
         battle.CurrentPattern = battle.Config.DefaultPattern;
         battle.TimeSinceLastAttack = 0;
+        // REQ-158: 开始追踪这场战斗的攻击历史
+        BossAttackHistory.BeginBattle(battle.InstanceId, Time.GetTicksMsec() / 1000f);
     }
 
     /// <summary>
@@ -264,8 +276,9 @@ public partial class BossPatternSystem : BaseSystem
         // 更新目标位置（这里为0，实际由定位系统更新）
         battle.LastTargetPosition = Vector3.Zero;
         
-        // 发出攻击信号
-        BossAttackInitiated?.Invoke(battle.InstanceId, battle.LastTargetPosition);
+        // REQ-158: 记录攻击历史并发出扩展信号
+        BossAttackHistory.RecordAttack(battle.InstanceId, BossSkillType.MeleeAttack, "Basic Attack", (int)damage, Time.GetTicksMsec() / 1000f);
+        BossAttackInitiated?.Invoke(battle.InstanceId, BossSkillType.MeleeAttack, "Basic Attack", (int)damage);
     }
 
     /// <summary>
