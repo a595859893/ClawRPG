@@ -1,15 +1,18 @@
 using Godot;
 using System;
+using ClawRPG.Scripts.Framework;
 
 namespace ClawRPG.Scripts.UI
 {
     /// <summary>
     /// MiniMapUI - 小地图管理
     /// 处理小地图的显示、玩家位置标记、NPC/敌人标记等功能
+    /// REQ-101: Alt+Drag to move, Alt+Scroll to resize, Alt+DoubleClick to reset
     /// </summary>
     public partial class MiniMapUI : BaseUI
     {
         public static new MiniMapUI Instance { get; protected set; }
+        private const string ELEMENT_ID = "MiniMapUI";
 
         // 场景引用
         private Main _main;
@@ -40,6 +43,47 @@ namespace ClawRPG.Scripts.UI
             base._Ready();
             Instance = this;
             LoadNodes();
+
+            // REQ-101: Register with HUD layout manager
+            RegisterForDrag();
+        }
+
+        private void RegisterForDrag()
+        {
+            if (HUDLayoutManager.Instance != null)
+            {
+                HUDLayoutManager.Instance.RegisterHUD(ELEMENT_ID, this);
+            }
+        }
+
+        public override void _GuiInput(InputEvent @event)
+        {
+            if (@event is InputEventMouseButton mb)
+            {
+                // Double-click to reset position (Alt held)
+                if (mb.ButtonIndex == MouseButton.Left && mb.DoubleClick && Input.IsKeyPressed(Key.Alt))
+                {
+                    HUDLayoutManager.Instance?.OnElementDoubleClicked(ELEMENT_ID);
+                    AcceptEvent();
+                    return;
+                }
+
+                // Start drag
+                if (mb.ButtonIndex == MouseButton.Left && mb.Pressed && Input.IsKeyPressed(Key.Alt))
+                {
+                    var started = HUDLayoutManager.Instance?.TryStartDrag(this, ELEMENT_ID, mb.GlobalPosition) ?? false;
+                    if (started) AcceptEvent();
+                }
+            }
+
+            // Update drag position while dragging
+            if (@event is InputEventMouseMotion mm && Input.IsKeyPressed(Key.Alt))
+            {
+                HUDLayoutManager.Instance?.UpdateDragPosition(mm.GlobalPosition);
+            }
+
+            // Let base handle other events
+            base._GuiInput(@event);
         }
 
         private void LoadNodes()

@@ -1,12 +1,15 @@
 using Godot;
 using System;
+using ClawRPG.Scripts.Framework;
 using ClawRPG.Scripts.Items;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
     /// Quick slot bar UI - displays 9 quick access slots at the bottom of the screen
+    /// REQ-101: Alt+Drag to move, Alt+Scroll to resize, Alt+DoubleClick to reset
     /// </summary>
-    public class QuickSlotBar : Control {
+    public partial class QuickSlotBar : Control {
+        private const string ELEMENT_ID = "QuickSlotBar";
         private HBoxContainer _slotContainer;
         private Label _titleLabel;
         private QuickSlotItem[] _slotItems = new QuickSlotItem[QuickSlotSystem.SlotCount];
@@ -52,6 +55,44 @@ namespace ClawRPG.Scripts.UI {
             // Connect to inventory updates to auto-refresh
             if (InventoryManager.Instance != null) {
                 InventoryManager.Instance.OnInventoryUpdated += OnInventoryUpdated;
+            }
+
+            // REQ-101: Register with HUD layout manager
+            RegisterForDrag();
+        }
+
+        private void RegisterForDrag()
+        {
+            if (HUDLayoutManager.Instance != null)
+            {
+                HUDLayoutManager.Instance.RegisterHUD(ELEMENT_ID, this);
+            }
+        }
+
+        public override void _GuiInput(InputEvent @event)
+        {
+            if (@event is InputEventMouseButton mb)
+            {
+                // Double-click to reset position (Alt held)
+                if (mb.ButtonIndex == MouseButton.Left && mb.DoubleClick && Input.IsKeyPressed(Key.Alt))
+                {
+                    HUDLayoutManager.Instance?.OnElementDoubleClicked(ELEMENT_ID);
+                    AcceptEvent();
+                    return;
+                }
+
+                // Start drag
+                if (mb.ButtonIndex == MouseButton.Left && mb.Pressed && Input.IsKeyPressed(Key.Alt))
+                {
+                    var started = HUDLayoutManager.Instance?.TryStartDrag(this, ELEMENT_ID, mb.GlobalPosition) ?? false;
+                    if (started) AcceptEvent();
+                }
+            }
+
+            // Update drag position while dragging
+            if (@event is InputEventMouseMotion mm && Input.IsKeyPressed(Key.Alt))
+            {
+                HUDLayoutManager.Instance?.UpdateDragPosition(mm.GlobalPosition);
             }
         }
         
