@@ -33,7 +33,7 @@ namespace ClawRPG.Scripts.Items {
         public int Level { get; set; } = 1;  // 物品等级
         public List<EnchantmentData> Enchantments { get; set; }  // 附魔列表
         
-        public enum Item.ItemType { 
+        public enum ItemType { 
             Weapon, Armor, Accessory, 
             Consumable, Material, QuestItem 
         }
@@ -384,7 +384,7 @@ namespace ClawRPG.Scripts.Items {
             return new List<Item>(_items.Values);
         }
         
-        public List<Item> GetItemsByType(Item.Item.ItemType type)
+        public List<Item> GetItemsByType(Item.ItemType type)
         {
             var result = new List<Item>();
             foreach (var item in _items.Values)

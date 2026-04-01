@@ -14,7 +14,7 @@ namespace ClawRPG.Core.UI
     /// </summary>
     public class WorldEventUI
     {
-        private WorldEventSystem _worldEventSystem;
+        private ClawRPG.Core.Systems.WorldEventSystem _worldEventSystem;
         private bool _isVisible;
         private int _selectedTab; // 0: Active, 1: History, 2: Stats
         
@@ -22,7 +22,7 @@ namespace ClawRPG.Core.UI
         private int _windowWidth = 800;
         private int _windowHeight = 600;
         
-        public WorldEventUI(WorldEventSystem worldEventSystem)
+        public WorldEventUI(ClawRPG.Core.Systems.WorldEventSystem worldEventSystem)
         {
             _worldEventSystem = worldEventSystem;
             _isVisible = false;

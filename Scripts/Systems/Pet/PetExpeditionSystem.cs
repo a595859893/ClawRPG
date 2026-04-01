@@ -34,13 +34,13 @@ namespace GameSystems
         
         private Random _random = new Random();
         private PetManager _petManager;
-        private InventoryManager _inventoryManager;
+        private ClawRPG.Scripts.Items.InventoryManager _inventoryManager;
         
         public override void _Ready()
         {
             _instance = this;
             _petManager = GetNode<PetManager>("/root/Main/PetManager");
-            _inventoryManager = GetNode<InventoryManager>("/root/Main/InventoryManager");
+            _inventoryManager = GetNode<ClawRPG.Scripts.Items.InventoryManager>("/root/Main/InventoryManager");
             
             // 设置进程更新
             SetProcess(true);
@@ -57,7 +57,7 @@ namespace GameSystems
         {
             _instance = this;
             _petManager = GetNode<PetManager>("/root/Main/PetManager");
-            _inventoryManager = GetNode<InventoryManager>("/root/Main/InventoryManager");
+            _inventoryManager = GetNode<ClawRPG.Scripts.Items.InventoryManager>("/root/Main/InventoryManager");
             SetProcess(true);
             
             // Load saved data
