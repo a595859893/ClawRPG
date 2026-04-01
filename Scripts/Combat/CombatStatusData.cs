@@ -106,6 +106,9 @@ namespace ClawRPG.Scripts.Combat
             public int BestCombo;
             public float HighestDPS;
             public DateTime SessionStart;
+            
+            // REQ-173: Personal best tracking across sessions
+            public Dictionary<string, float> PersonalBests = new Dictionary<string, float>();
 
             public SessionStats()
             {

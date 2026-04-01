@@ -31,6 +31,12 @@ namespace ClawRPG.Scripts.Combat
         public static event Action OnComboChanged;
         public static event Action<CombatStatusData.CombatEvent> OnCombatEvent;
         
+        // REQ-173: Combo milestone signals (10x, 25x, 50x)
+        public static event Action<int> OnComboMilestone;
+        
+        // REQ-173: Personal best signals
+        public static event Action<string, float, float> OnPersonalBestBroken; // (statName, newValue, previousValue)
+        
         // Combat timeout (seconds)
         private const float COMBAT_TIMEOUT = 5.0f;
         private float _combatTimer;
@@ -185,6 +191,13 @@ namespace ClawRPG.Scripts.Combat
                     $"造成 {damage:F0} 伤害");
             }
 
+            // REQ-173: Check DPS personal best
+            float currentDPS = GetCurrentDPS();
+            if (currentDPS > _sessionStats.HighestDPS) {
+                _sessionStats.HighestDPS = currentDPS;
+                CheckPersonalBest("HighestDPS", currentDPS);
+            }
+
             OnStatsUpdated?.Invoke();
         }
 
@@ -284,7 +297,8 @@ namespace ClawRPG.Scripts.Combat
         }
 
         /// <summary>
-        /// Increment combo counter
+        /// Increment combo counter.
+        /// REQ-173: Emits combo milestone events at 10x, 25x, 50x.
         /// </summary>
         public void IncrementCombo()
         {
@@ -296,7 +310,32 @@ namespace ClawRPG.Scripts.Combat
             if (_currentCombat.CurrentCombo > _currentCombat.MaxCombo)
                 _currentCombat.MaxCombo = _currentCombat.CurrentCombo;
             
+            // REQ-173: Combo milestone celebrations
+            CheckComboMilestone(_currentCombat.CurrentCombo);
+            
+            // REQ-173: Track personal best combo
+            CheckPersonalBest("MaxCombo", _currentCombat.MaxCombo);
+            
             OnComboChanged?.Invoke();
+        }
+        
+        private void CheckComboMilestone(int combo) {
+            // REQ-173: Milestone events at specific combo counts
+            if (combo == 10 || combo == 25 || combo == 50 || combo == 100) {
+                OnComboMilestone?.Invoke(combo);
+            }
+        }
+        
+        private void CheckPersonalBest(string statName, float value) {
+            // REQ-173: Check if a new personal best was set
+            float prevBest = 0f;
+            bool hasPrev = _sessionStats.PersonalBests.TryGetValue(statName, out prevBest);
+            if (!hasPrev || value > prevBest) {
+                _sessionStats.PersonalBests[statName] = value;
+                if (hasPrev) {
+                    OnPersonalBestBroken?.Invoke(statName, value, prevBest);
+                }
+            }
         }
 
         /// <summary>

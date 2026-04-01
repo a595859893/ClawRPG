@@ -179,6 +179,10 @@ namespace ClawRPG.Scripts.UI
             CombatStatusSystem.OnComboChanged += UpdateCombo;
             CombatStatusSystem.OnCombatEvent += AddCombatEvent;
             CombatStatusSystem.OnCombatEnded += OnCombatEnded;
+            // REQ-173: Combo milestone celebrations
+            CombatStatusSystem.OnComboMilestone += OnComboMilestone;
+            // REQ-173: Personal best notifications
+            CombatStatusSystem.OnPersonalBestBroken += OnPersonalBestBroken;
         }
 
         public override void _Input(InputEvent e)
@@ -273,14 +277,58 @@ namespace ClawRPG.Scripts.UI
             var status = CombatStatusSystem.Instance.GetCurrentCombatStatus();
             _comboLabel.Text = $"连击: {status.CurrentCombo}x";
             
-            // Combo milestone effects
-            if (status.CurrentCombo > 0 && status.CurrentCombo % 10 == 0)
-            {
-                // Pulse effect on milestone
+            // REQ-173: Specific milestone celebration effects
+            if (status.CurrentCombo == 10 || status.CurrentCombo == 25 || 
+                status.CurrentCombo == 50 || status.CurrentCombo == 100) {
+                // Large pulse effect for major milestones
                 var tween = CreateTween();
-                tween.TweenProperty(_comboLabel, "scale", new Vector2(1.3f, 1.3f), 0.1f);
-                tween.TweenProperty(_comboLabel, "scale", new Vector2(1f, 1f), 0.1f);
+                tween.TweenProperty(_comboLabel, "scale", new Vector2(1.8f, 1.8f), 0.15f);
+                tween.TweenProperty(_comboLabel, "scale", new Vector2(1f, 1f), 0.25f);
+                
+                // Color flash
+                var origColor = _comboLabel.GetThemeColor("font_color");
+                _comboLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.3f, 1f));
+                tween.TweenCallback(Callable.From(() => {
+                    _comboLabel.AddThemeColorOverride("font_color", origColor);
+                }));
             }
+        }
+        
+        /// <summary>
+        /// REQ-173: Combo milestone celebration — called at specific combo values (10x, 25x, 50x).
+        /// </summary>
+        private void OnComboMilestone(int combo) {
+            // Big screen flash effect for milestones
+            var flash = new ColorRect();
+            flash.Color = new Color(1f, 0.9f, 0.5f, 0.15f);
+            flash.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+            AddChild(flash);
+            
+            var tween = CreateTween();
+            tween.TweenProperty(flash, "color:a", 0f, 0.4f);
+            tween.TweenCallback(Callable.From(() => flash.QueueFree()));
+            
+            GD.Print($"[CombatStatusUI] Combo milestone: {combo}x!");
+        }
+        
+        /// <summary>
+        /// REQ-173: Personal best broken notification.
+        /// </summary>
+        private void OnPersonalBestBroken(string statName, float newValue, float previousValue) {
+            // Create a floating "NEW RECORD!" notification
+            var notification = new Label();
+            notification.Text = $"新纪录! {statName}: {newValue:F0}";
+            notification.GlobalPosition = new Vector2(200, 100);
+            notification.AddThemeFontSizeOverride("font_size", 24);
+            notification.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0.2f, 1f));
+            GetTree().Root.AddChild(notification);
+            
+            var tween = CreateTween();
+            tween.TweenProperty(notification, "position:y", notification.Position.Y - 80, 1.5f);
+            tween.TweenProperty(notification, "modulate:a", 0f, 0.5f);
+            tween.TweenCallback(Callable.From(() => notification.QueueFree()));
+            
+            GD.Print($"[CombatStatusUI] Personal best broken: {statName} = {newValue:F0} (prev: {previousValue:F0})");
         }
 
         private void AddCombatEvent(CombatStatusData.CombatEvent combatEvent)
@@ -326,7 +374,7 @@ namespace ClawRPG.Scripts.UI
             var scroll = _eventsContainer.GetParent() as ScrollContainer;
             if (scroll != null)
             {
-                scroll.ScrollVertical = scroll.GetVScrollBar().MaxValue;
+                scroll.ScrollVertical = (int)scroll.GetVScrollBar().MaxValue;
             }
             
             // Show panel when event occurs
@@ -354,6 +402,9 @@ namespace ClawRPG.Scripts.UI
             CombatStatusSystem.OnComboChanged -= UpdateCombo;
             CombatStatusSystem.OnCombatEvent -= AddCombatEvent;
             CombatStatusSystem.OnCombatEnded -= OnCombatEnded;
+            // REQ-173
+            CombatStatusSystem.OnComboMilestone -= OnComboMilestone;
+            CombatStatusSystem.OnPersonalBestBroken -= OnPersonalBestBroken;
         }
     }
 }
