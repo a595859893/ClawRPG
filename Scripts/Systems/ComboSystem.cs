@@ -16,7 +16,7 @@ public partial class ComboSystem : BaseSystem
     /// <summary>
     /// 单例实例
     /// </summary>
-    public static ComboSystem Instance { get; private set; }
+    public new static ComboSystem Instance { get; private set; }
     
     // Combo database
     private Dictionary<string, ComboData> _combos = new Dictionary<string, ComboData>();
@@ -421,7 +421,7 @@ public partial class ComboSystem : BaseSystem
                     // REQ-168: Emit ComboFailed signal if there was active progress before timeout
                     if (progress.currentStep > 0)
                     {
-                        ComboFailed?.Emit(progress.comboId);
+                        ComboFailed?.Invoke(progress.comboId);
                     }
                     progress.currentStep = 0;
                     progress.isActive = false;
@@ -487,7 +487,7 @@ public partial class ComboSystem : BaseSystem
                 // REQ-171: Wrong skill during active combo — emit ComboFailed for visual feedback
                 if (expectedStep > 0 && combo.comboType != ComboData.ComboType.Chaos)
                 {
-                    ComboFailed?.Emit(progress.comboId);
+                    ComboFailed?.Invoke(progress.comboId);
                 }
             }
         }

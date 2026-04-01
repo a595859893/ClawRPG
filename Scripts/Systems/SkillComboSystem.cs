@@ -10,7 +10,7 @@ public partial class SkillComboSystem : BaseSystem
     /// <summary>
     /// 获取系统单例实例。
     /// </summary>
-    public static SkillComboSystem Instance { get; private set; }
+    public new static SkillComboSystem Instance { get; private set; }
     
     // Active combo tracking
     private Dictionary<string, ActiveCombo> _activeCombos;
@@ -32,13 +32,13 @@ public partial class SkillComboSystem : BaseSystem
     
     // Signals (Godot 4 compatible)
     [Signal]
-    public delegate void ComboStartedDelegate(string comboId);
+    public delegate void ComboStartedEventHandler(string comboId);
     [Signal]
-    public delegate void ComboCompletedDelegate(string comboId, int chainCount);
+    public delegate void ComboCompletedEventHandler(string comboId, int chainCount);
     [Signal]
-    public delegate void ComboBonusAppliedDelegate(string comboId, float bonus);
+    public delegate void ComboBonusAppliedEventHandler(string comboId, float bonus);
     [Signal]
-    public delegate void ComboFailedDelegate(string comboId);
+    public delegate void ComboFailedEventHandler(string comboId);
     
     public override void _Ready()
     {
