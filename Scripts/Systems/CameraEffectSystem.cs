@@ -47,24 +47,6 @@ namespace ClawRPG.Scripts.UI {
         /// </summary>
         protected override string SystemName => "CameraEffect";
         
-        public override void _Ready() {
-            Instance = this;
-            currentTargetFOV = defaultFOV;
-            
-            // 尝试自动获取相机
-            if (playerCamera == null) {
-                var player = GetTree().GetFirstNodeInGroup("Player");
-                if (player != null) {
-                    playerCamera = player.GetNode<Camera3D>("Camera3D");
-                }
-            }
-            
-            if (playerCamera != null) {
-                originalCameraOffset = playerCamera.Position;
-                playerCamera.Fov = defaultFOV;
-            }
-        }
-        
         public override void _Process(double delta) {
             float dt = (float)delta;
             

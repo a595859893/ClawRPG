@@ -14,7 +14,7 @@ public class PlayerTalentSystem : BaseSystem
         }
     }
     
-    public PlayerTalentData.PlayerTalentData PlayerData { get; private set; }
+    public PlayerTalentData.PlayerTalentSaveData PlayerData { get; private set; }
     
     // 天赋点数获取事件
     public Action<int> OnPointsChanged;
@@ -37,7 +37,7 @@ public class PlayerTalentSystem : BaseSystem
     
     public PlayerTalentSystem()
     {
-        PlayerData = new PlayerTalentData.PlayerTalentData();
+        PlayerData = new PlayerTalentData.PlayerTalentSaveData();
         InitializeDefaults();
     }
     

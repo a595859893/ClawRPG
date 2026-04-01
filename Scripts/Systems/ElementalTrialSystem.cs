@@ -402,7 +402,7 @@ public class PlayerTrialProgress
         }
     }
 
-    public override Dictionary<string, object> ExportSaveData()
+    public Dictionary<string, object> ExportSaveData()
     {
         return new Dictionary
         {
@@ -411,7 +411,7 @@ public class PlayerTrialProgress
         };
     }
 
-    public override void ImportSaveData(Dictionary<string, object> data)
+    public void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
 

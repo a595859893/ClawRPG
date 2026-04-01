@@ -16,8 +16,6 @@ public class BossMechanicsDatabase : IDatabase
         }
     }
 
-    object IDatabase.Instance => Instance;
-
     // Instance fields
     private Dictionary<string, BossConfig> _bossConfigs;
     private Dictionary<string, BossPhaseConfig> _phaseConfigs;

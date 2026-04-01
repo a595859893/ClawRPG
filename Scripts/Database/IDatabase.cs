@@ -6,11 +6,6 @@ namespace ClawRPG.Scripts.Database
     public interface IDatabase
     {
         /// <summary>
-        /// 获取数据库单例实例
-        /// </summary>
-        object Instance { get; }
-
-        /// <summary>
         /// 初始化数据库，加载配置数据
         /// </summary>
         void Initialize();

@@ -25,7 +25,7 @@ namespace ClawRPG.Scripts.Database
             _achievements = new Dictionary<string, Achievement>();
         }
 
-        public void IDatabase.Initialize()
+        void IDatabase.Initialize()
         {
             Initialize();
         }

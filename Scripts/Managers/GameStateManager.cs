@@ -14,7 +14,7 @@ namespace ClawRPG.Scripts.Managers
         /// <summary>
         /// 优先级（数值越小越先初始化）
         /// </summary>
-        public override int Priority => 10;
+        public int Priority => 10;
         
         // Game states
         public enum GameState

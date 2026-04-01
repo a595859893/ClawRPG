@@ -27,7 +27,7 @@ namespace ClawRPG.Core.Systems.GuildWar
         // Weekly war schedule
         private List<WarScheduleConfig> _weeklySchedule;
 
-        public override object Instance => _instance ??= new GuildWarDatabase();
+        public object Instance => _instance ??= new GuildWarDatabase();
 
         public override void Initialize()
         {

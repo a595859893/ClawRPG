@@ -133,6 +133,6 @@ public class LifeExtensionItem
         DaysExtended = daysExtended;
     }
 
-        public override Dictionary<string, object> ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary<string, object> data) { }
+        public Dictionary<string, object> ExportSaveData() => new();
+        public void ImportSaveData(Dictionary<string, object> data) { }
 }

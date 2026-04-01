@@ -243,7 +243,7 @@ public delegate void CounterAttackReadyEventHandler();
         /// <summary>
         /// Attempt to perform a counter attack
         /// </summary>
-        public bool TryCounterAttack(Characters.Player player, Characters.Enemy target)
+        public bool TryCounterAttack(Player player, Characters.Enemy target)
         {
             if (!IsCounterAttacking || !CanCounter)
             {

@@ -443,49 +443,6 @@ namespace ClawRPG.Scripts.UI
             Instance = null;
         }
 
-        public override void _Input(InputEvent evt)
-        {
-            // REQ-102: F key toggles rarity filter cycling
-            if (Visible && evt is InputEventKey key && key.Pressed && key.Keycode == Key.F)
-            {
-                CycleRarityFilter();
-            }
-        }
-
-        private int _rarityFilterIndex = -1;  // -1 = no filter
-
-        private void CycleRarityFilter()
-        {
-            if (_filterSystem == null) return;
-
-            string[] rarityOrder = { "Common", "Uncommon", "Rare", "Epic", "Legendary" };
-            _rarityFilterIndex++;
-
-            if (_rarityFilterIndex >= rarityOrder.Length)
-            {
-                // Turn off filter
-                _rarityFilterIndex = -1;
-                _filterSystem.UseCustomRules();
-                _filterSystem.ClearCustomRules();
-                GD.Print("[InventoryUI] Rarity filter cleared");
-            }
-            else
-            {
-                string rarity = rarityOrder[_rarityFilterIndex];
-                _filterSystem.UseCustomRules();
-                _filterSystem.ClearCustomRules();
-                _filterSystem.ToggleCustomRule(FilterDimension.Rarity, rarity, rarity, true);
-                GD.Print($"[InventoryUI] Rarity filter set to: {rarity}");
-            }
-        }
-
-        /// <summary>
-        /// Reloads inventory from player and re-applies filter.
-        /// </summary>
-        public void RefreshInventory()
-        {
-            LoadInventoryData();
-        }
     }
 
     /// <summary>

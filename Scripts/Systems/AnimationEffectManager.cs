@@ -10,7 +10,7 @@ public partial class AnimationEffectManager : BaseSystem
     public static AnimationEffectManager Instance { get; private set; }
     
     // 动画状态
-    private enum AnimationState { Idle, Attacking, Dodging, Casting, Hit }
+    public enum AnimationState { Idle, Attacking, Dodging, Casting, Hit }
     private AnimationState _currentState = AnimationState.Idle;
     
     // 攻击动画序列

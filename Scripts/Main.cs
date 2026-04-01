@@ -27,7 +27,7 @@ namespace ClawRPG.Scripts
         public static bool IsPaused => GameStateManager.IsPaused;
         public static int CurrentDay => GameStateManager.Instance?.GetCurrentDay() ?? 1;
 
-        public void SetGameState(Main.GameState state)
+        public void SetGameState(GameStateManager.GameState state)
         {
             var gsm = GetNodeOrNull<GameStateManager>("GameStateManager");
             if (gsm == null)
@@ -38,15 +38,15 @@ namespace ClawRPG.Scripts
             gsm?.SetState(state);
         }
 
-        public Main.GameState GetGameState()
+        public GameStateManager.GameState GetGameState()
         {
             var gsm = GetNodeOrNull<GameStateManager>("GameStateManager");
             if (gsm == null)
             {
                 GD.PrintErr("GetGameState: GameStateManager node not found!");
-                return Main.GameState.Playing;
+                return GameStateManager.GameState.Playing;
             }
-            return gsm?.GetState() ?? Main.GameState.Playing;
+            return gsm?.GetState() ?? GameStateManager.GameState.Playing;
         }
 
         public Player GetPlayer()

@@ -13,11 +13,6 @@ namespace ClawRPG.Scripts.Database
         private const string KEY_SAVE_VERSION = "_saveVersion";
 
         /// <summary>
-        /// 子类实例的静态引用
-        /// </summary>
-        public abstract object Instance { get; }
-
-        /// <summary>
         /// 初始化数据库
         /// </summary>
         public abstract void Initialize();

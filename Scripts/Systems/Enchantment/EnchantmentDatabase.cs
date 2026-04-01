@@ -12,7 +12,6 @@ namespace ClawRPG.Scripts.Systems.Enchantment
     {
         private static EnchantmentDatabase _instance;
         public static EnchantmentDatabase Instance => _instance ??= new EnchantmentDatabase();
-        public override object Instance => Instance;
 
         // 附魔记录缓存
         private Dictionary<string, EnchantmentRecord> _enchantments;

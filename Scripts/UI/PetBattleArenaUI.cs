@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.Pets;
+    using ArenaType = ClawRPG.Scripts.Systems.ArenaType;
 
 public class PetBattleArenaUI : Control
 {
@@ -44,7 +45,7 @@ public class PetBattleArenaUI : Control
     
     // Selected arena
     private int _selectedArenaIndex = 0;
-    private PetBattleArenaSystem.ArenaType _selectedArena = PetBattleArenaSystem.ArenaType.TrainingGround;
+    private ArenaType _selectedArena = ArenaType.TrainingGround;
     
     // Pet selection
     private OptionButton _petSelector;
@@ -386,7 +387,7 @@ public class PetBattleArenaUI : Control
     private void OnArenaSelected(int arenaIndex)
     {
         _selectedArenaIndex = arenaIndex;
-        _selectedArena = (PetBattleArenaSystem.ArenaType)arenaIndex;
+        _selectedArena = (ArenaType)arenaIndex;
         RefreshArenaList();
     }
     

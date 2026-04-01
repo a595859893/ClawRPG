@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using TamingMethod = ClawRPG.Scripts.Systems.TamingMethod;
 
 public partial class MonsterTamingUI
 {
@@ -9,7 +10,7 @@ public partial class MonsterTamingUI
         UpdateInfoPanel(monster);
     }
     
-    private void OnTameMethodPressed(MonsterTamingSystem.TamingMethod method)
+    private void OnTameMethodPressed(TamingMethod method)
     {
         if (_selectedMonster == null || _selectedMonster.IsTamed) return;
         

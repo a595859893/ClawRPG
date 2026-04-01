@@ -76,7 +76,7 @@ public partial class GodotRunner : BaseSystem
     /// <param name="frames">运行帧数，-1 表示不限制</param>
     /// <param name="quitAfter">多少秒后退出 (超时保护)</param>
     /// <returns>运行是否成功</returns>
-    public async bool RunHeadless(string scenePath = "", int frames = -1, int quitAfter = 60)
+    public async Task<bool> RunHeadless(string scenePath = "", int frames = -1, int quitAfter = 60)
     {
         var args = BuildHeadlessArgs(scenePath, frames);
         return await RunAsync(args, quitAfter);
@@ -85,7 +85,7 @@ public partial class GodotRunner : BaseSystem
     /// <summary>
     /// 运行脚本 (--script 模式)
     /// </summary>
-    public async bool RunScript(string scriptPath, string scenePath = "", int quitAfter = 60)
+    public async Task<bool> RunScript(string scriptPath, string scenePath = "", int quitAfter = 60)
     {
         var args = $"--headless --script {scriptPath}";
         if (!string.IsNullOrEmpty(scenePath))
@@ -96,7 +96,7 @@ public partial class GodotRunner : BaseSystem
     /// <summary>
     /// 截图并保存到文件
     /// </summary>
-    public async bool CaptureScreenshot(string outputPath, string scenePath = "", int quitAfter = 10)
+    public async Task<bool> CaptureScreenshot(string outputPath, string scenePath = "", int quitAfter = 10)
     {
         var args = $"--headless --rendering{GetRenderingArgs()} --quit-after 2";
         if (!string.IsNullOrEmpty(scenePath))

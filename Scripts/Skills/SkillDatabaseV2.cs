@@ -20,7 +20,7 @@ namespace ClawRPG.Scripts.Systems {
             Initialize();
         }
 
-        public void Initialize()
+        public override void Initialize()
         {
             // ===== OFFENSIVE SKILL TREE =====
             // Lightning Arrow - Thunder element

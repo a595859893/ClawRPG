@@ -169,6 +169,6 @@ public class GeneTemplate
         SpecialEffect = effect;
     }
 
-        public override Dictionary<string, object> ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary<string, object> data) { }
+        public Dictionary<string, object> ExportSaveData() => new();
+        public void ImportSaveData(Dictionary<string, object> data) { }
 }

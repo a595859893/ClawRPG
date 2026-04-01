@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Combat
     /// <summary>
     /// Combat status data structures
     /// </summary>
-    public class CombatStatusData
+    public partial class CombatStatusData
     {
         // Combat event types
         public enum CombatEventType
@@ -36,7 +36,7 @@ namespace ClawRPG.Scripts.Combat
         }
 
         // Damage breakdown by type
-        public class DamageBreakdown
+        public partial class DamageBreakdown
         {
             public float PhysicalDamage;
             public float MagicDamage;
@@ -47,12 +47,24 @@ namespace ClawRPG.Scripts.Combat
             public float HolyDamage;
             public float PoisonDamage;
             
-            public float Total => PhysicalDamage + MagicDamage + FireDamage + IceDamage + 
+            public float Total => PhysicalDamage + MagicDamage + FireDamage + IceDamage +
                                  LightningDamage + DarkDamage + HolyDamage + PoisonDamage;
-        }
 
-        // Player combat status
-        public class PlayerCombatStatus
+        public enum DamageType
+        {
+            Physical,
+            Magic,
+            Fire,
+            Ice,
+            Lightning,
+            Dark,
+            Holy,
+            Poison
+        }
+    }
+
+    // Player combat status
+    public class PlayerCombatStatus
         {
             public float TotalDamageDealt;
             public float TotalDamageTaken;

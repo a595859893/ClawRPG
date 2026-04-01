@@ -49,16 +49,16 @@ namespace ClawRPG.Systems.MultiplayerVote
             if (vote == null)
                 return false;
             
-            return vote.Status == VoteResults.VoteStatus.Passed;
+            return vote.Status == VoteStatus.Passed;
         }
         
         /// <summary>
         /// 获取投票状态
         /// </summary>
-        public VoteResults.VoteStatus GetVoteStatus(string voteId)
+        public VoteStatus GetVoteStatus(string voteId)
         {
             var vote = _voteSystem.GetVote(voteId);
-            return vote != null ? vote.Status : VoteResults.VoteStatus.Cancelled;
+            return vote != null ? vote.Status : VoteStatus.Cancelled;
         }
         
         /// <summary>

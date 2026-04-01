@@ -1,6 +1,5 @@
-// Truly missing type stubs — 36 types not defined anywhere in the codebase
-// These are minimal definitions to unblock compilation
-// Each stub should be replaced with proper implementation
+// Missing type stubs — unblock compilation only
+// Replace with proper implementations when available
 
 namespace ClawRPG.Scripts.Systems
 {
@@ -37,6 +36,20 @@ namespace ClawRPG.Scripts.Systems
 
     // ── Monster Taming ─────────────────────────────────────────────
     public class TameableMonster { }
+    public enum TamingMethod { Normal, Advanced, Special }
+    public enum MonsterRarity { Common, Uncommon, Rare, Epic, Legendary }
+
+    // ── Pet Battle ────────────────────────────────────────────────
+    public enum ArenaType { Normal, Ranked, Tournament }
+
+    // ── Pet (type already exists in Pets namespace; enum stubs here) ──
+    public enum PetRarityEnum { Common, Uncommon, Rare, Epic, Legendary }
+
+    // ── Multiplayer Vote ──────────────────────────────────────────
+    public enum VoteStatus { Pending, Accepted, Rejected, Expired }
+
+    // ── Combat ──────────────────────────────────────────────────
+    public class Player { }
 
     // ── Signal types ───────────────────────────────────────────────
     public class SignalPurchaseCompleted { }
@@ -60,20 +73,18 @@ namespace ClawRPG.Scripts.Systems
 
     // ── Misc ──────────────────────────────────────────────────────
     public class GetRandomPetSynthesisData { }
+
+    // ── Title System ───────────────────────────────────────────────
+    public class Title { }
+    public enum TitleType { Combat, Exploration, Social, Special }
 }
 
 namespace ClawRPG.Scripts.UI
 {
-    // Godot UI element stubs
     public class ComboBox : Godot.Control { }
 }
 
-namespace Godot
+namespace ClawRPG.Scripts
 {
-    // Type alias for Godot dictionary (must be before class declarations)
-    using GodotDictionary = Godot.Collections.Dictionary;
-
-    // Godot types that may not be resolving correctly
-    public class DynamicFont : Resource { }
-    public class TextureProgress : Control { }
+    public class Boss { }
 }

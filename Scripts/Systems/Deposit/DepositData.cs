@@ -151,7 +151,7 @@ public delegate void DepositLevelChanged(DepositType type, int newLevel);
 
     // ── Save System ────────────────────────────────────────────────────────
 
-    public override Dictionary<string, object> ExportSaveData()
+    public Dictionary<string, object> ExportSaveData()
     {
         var data = new Dictionary<string, object>();
         var slotsList = new Godot.Collections.Array();
@@ -171,7 +171,7 @@ public delegate void DepositLevelChanged(DepositType type, int newLevel);
         return data;
     }
 
-    public override void ImportSaveData(Dictionary<string, object> data)
+    public void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null || !data.Contains("depositSlots")) return;
 

@@ -44,8 +44,8 @@ public class SkillTreeResetData
         LastResetTime = DateTime.MinValue;
     }
 
-    public override Dictionary<string, object> ExportSaveData() => new();
-    public override void ImportSaveData(Dictionary<string, object> data) { }
+    public Dictionary<string, object> ExportSaveData() => new();
+    public void ImportSaveData(Dictionary<string, object> data) { }
 
 }
 
@@ -386,9 +386,9 @@ public partial class SkillTreeResetSystem : BaseSystem
 
     #region Persistence
 
-    public override Dictionary<string, object> ExportSaveData() => new Dictionary<string, object>();
+    public Dictionary<string, object> ExportSaveData() => new Dictionary<string, object>();
 
-    public override void ImportSaveData(Dictionary<string, object> data) { }
+    public void ImportSaveData(Dictionary<string, object> data) { }
 
     #endregion
 }

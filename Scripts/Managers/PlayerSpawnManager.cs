@@ -14,7 +14,7 @@ namespace ClawRPG.Scripts.Managers
         /// <summary>
         /// 优先级（数值越小越先初始化）
         /// </summary>
-        public override int Priority => 20;
+        public int Priority => 20;
         
         // Player reference
         private Player _player;

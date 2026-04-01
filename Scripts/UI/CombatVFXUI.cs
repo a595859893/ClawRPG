@@ -340,7 +340,7 @@ namespace ClawRPG.Scripts.UI {
             }
         }
         
-        public override void _VisibleToggled(bool visibleNode) {
+        public void OnVisibleToggled(bool visibleNode) {
             isVisible = visibleNode;
         }
         

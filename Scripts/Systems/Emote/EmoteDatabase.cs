@@ -13,7 +13,7 @@ namespace ClawRPG.Systems.Emote
 
         private Dictionary<string, Emote> _emotes;
 
-        public void Initialize()
+        public override void Initialize()
         {
             _emotes = new Dictionary<string, Emote>();
 

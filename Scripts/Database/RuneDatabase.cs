@@ -20,7 +20,7 @@ namespace ClawRPG.Scripts.Database
         /// </summary>
         public static RuneDatabase Singleton { get; private set; }
 
-        public override object Instance => Instance;
+        public object Instance => Instance;
 
         public RuneDatabase()
         {

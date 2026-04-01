@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+    using Title = ClawRPG.Scripts.Systems.Title;
+    using TitleType = ClawRPG.Scripts.Systems.TitleType;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
@@ -23,7 +25,7 @@ namespace ClawRPG.Scripts.UI {
         private Button specialButton;
         
         // 当前筛选类型
-        private TitleSystem.TitleType? currentFilter = null;
+        private TitleType? currentFilter = null;
         
         // 预设颜色
         private Color commonColor = new Color(0.7f, 0.7f, 0.7f);
@@ -106,19 +108,19 @@ namespace ClawRPG.Scripts.UI {
             allButton.Pressed += () => SetFilter(null);
             
             levelButton = CreateFilterButton("等级", filterContainer);
-            levelButton.Pressed += () => SetFilter(TitleSystem.TitleType.Level);
+            levelButton.Pressed += () => SetFilter(TitleType.Level);
             
             combatButton = CreateFilterButton("战斗", filterContainer);
-            combatButton.Pressed += () => SetFilter(TitleSystem.TitleType.Combat);
+            combatButton.Pressed += () => SetFilter(TitleType.Combat);
             
             questButton = CreateFilterButton("任务", filterContainer);
-            questButton.Pressed += () => SetFilter(TitleSystem.TitleType.Quest);
+            questButton.Pressed += () => SetFilter(TitleType.Quest);
             
             collectionButton = CreateFilterButton("收集", filterContainer);
-            collectionButton.Pressed += () => SetFilter(TitleSystem.TitleType.Collection);
+            collectionButton.Pressed += () => SetFilter(TitleType.Collection);
             
             specialButton = CreateFilterButton("特殊", filterContainer);
-            specialButton.Pressed += () => SetFilter(TitleSystem.TitleType.Special);
+            specialButton.Pressed += () => SetFilter(TitleType.Special);
             
             // 称号列表容器 (使用 ScrollContainer)
             ScrollContainer scrollContainer = new ScrollContainer();
@@ -144,16 +146,16 @@ namespace ClawRPG.Scripts.UI {
             return button;
         }
         
-        private void SetFilter(TitleSystem.TitleType? type) {
+        private void SetFilter(TitleType? type) {
             currentFilter = type;
             
             // 更新按钮状态
             allButton.Modulate = type == null ? Colors.Yellow : Colors.White;
-            levelButton.Modulate = type == TitleSystem.TitleType.Level ? Colors.Yellow : Colors.White;
-            combatButton.Modulate = type == TitleSystem.TitleType.Combat ? Colors.Yellow : Colors.White;
-            questButton.Modulate = type == TitleSystem.TitleType.Quest ? Colors.Yellow : Colors.White;
-            collectionButton.Modulate = type == TitleSystem.TitleType.Collection ? Colors.Yellow : Colors.White;
-            specialButton.Modulate = type == TitleSystem.TitleType.Special ? Colors.Yellow : Colors.White;
+            levelButton.Modulate = type == TitleType.Level ? Colors.Yellow : Colors.White;
+            combatButton.Modulate = type == TitleType.Combat ? Colors.Yellow : Colors.White;
+            questButton.Modulate = type == TitleType.Quest ? Colors.Yellow : Colors.White;
+            collectionButton.Modulate = type == TitleType.Collection ? Colors.Yellow : Colors.White;
+            specialButton.Modulate = type == TitleType.Special ? Colors.Yellow : Colors.White;
             
             PopulateTitleList();
         }
@@ -185,7 +187,7 @@ namespace ClawRPG.Scripts.UI {
             }
             
             // 筛选并显示称号
-            List<TitleSystem.Title> filteredTitles = new List<TitleSystem.Title>();
+            List<Title> filteredTitles = new List<Title>();
             if (currentFilter.HasValue) {
                 filteredTitles = titleSystem.GetTitlesByType(currentFilter.Value);
             } else {
@@ -198,7 +200,7 @@ namespace ClawRPG.Scripts.UI {
             }
         }
         
-        private Control CreateTitleItem(TitleSystem.Title title) {
+        private Control CreateTitleItem(Title title) {
             var titleSystem = TitleSystem.Instance;
             
             // 称号项目容器

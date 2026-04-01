@@ -465,21 +465,14 @@ namespace ClawRPG.Scripts.Combat
     }
 }
 
-// Damage type enum extension
-public partial class CombatStatusData
+namespace ClawRPG.Scripts.Combat
 {
-    public partial class DamageBreakdown
+    // Damage type enum extension
+    public partial class CombatStatusData
     {
-        public enum DamageType
+        public partial class DamageBreakdown
         {
-            Physical,
-            Magic,
-            Fire,
-            Ice,
-            Lightning,
-            Dark,
-            Holy,
-            Poison
+            // DamageType enum moved to CombatStatusData.cs
         }
     }
 }

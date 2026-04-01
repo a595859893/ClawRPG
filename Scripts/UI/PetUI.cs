@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using Godot.Collections;
 using ClawRPG.Scripts.Systems.Pets;
+    using PetsPet = ClawRPG.Scripts.Systems.Pets.Pet;
+    using PetsPetType = ClawRPG.Scripts.Systems.Pets.PetType;
+    using PetsPetRarity = ClawRPG.Scripts.Systems.Pets.PetRarity;
 using PetSystem = ClawRPG.Scripts.Systems.Pets.PetManager;
 
 namespace ClawRPG.Scripts.UI
@@ -39,7 +42,7 @@ namespace ClawRPG.Scripts.UI
         [Export] private Button _releaseButton;
         
         private PetSystem _petManager;
-        private Pet _selectedPet;
+        private PetsPet _selectedPet;
         private Array<Button> _petButtons = new Array<Button>();
         private bool _isVisible = false; 
 
@@ -144,13 +147,13 @@ namespace ClawRPG.Scripts.UI
             }
         }
 
-        private void OnPetButtonPressed(Pet pet)
+        private void OnPetButtonPressed(PetsPet pet)
         {
             _selectedPet = pet;
             UpdatePetDetails(pet);
         }
 
-        private void UpdatePetDetails(Pet pet)
+        private void UpdatePetDetails(PetsPet pet)
         {
             if (pet == null) return;
 
@@ -217,7 +220,7 @@ namespace ClawRPG.Scripts.UI
             }
 
             // 更新按钮状态
-            bool isActive = _petManager.ActivePet == pet;
+            bool isActive = _petManager.ActivePet == (PetsPet)pet;
             if (_activateButton != null)
             {
                 _activateButton.Text = isActive ? "已激活" : "激活";
@@ -229,7 +232,7 @@ namespace ClawRPG.Scripts.UI
         {
             if (_selectedPet != null)
             {
-                _petManager.SetActivePet(_selectedPet);
+                _petManager.SetActivePet((PetsPet)_selectedPet);
                 RefreshPetList();
             }
         }
@@ -238,56 +241,56 @@ namespace ClawRPG.Scripts.UI
         {
             if (_selectedPet != null && _selectedPet != _petManager.ActivePet)
             {
-                _petManager.RemovePet(_selectedPet);
+                _petManager.RemovePet((PetsPet)_selectedPet);
                 _selectedPet = null;
                 RefreshPetList();
             }
         }
 
-        private void OnPetListChanged(Pet pet)
+        private void OnPetListChanged(PetsPet pet)
         {
             RefreshPetList();
         }
 
-        private void OnActivePetChanged(Pet pet)
+        private void OnActivePetChanged(PetsPet pet)
         {
             RefreshPetList();
         }
 
-        private Color GetRarityColor(PetSystem.PetRarity rarity)
+        private Color GetRarityColor(PetRarity rarity)
         {
             return rarity switch
             {
-                PetSystem.PetRarity.Common => Colors.White,
-                PetSystem.PetRarity.Uncommon => Colors.Green,
-                PetSystem.PetRarity.Rare => Colors.Blue,
-                PetSystem.PetRarity.Epic => new Color(0.6f, 0.2f, 0.8f), // 紫色
-                PetSystem.PetRarity.Legendary => new Color(1f, 0.5f, 0f), // 橙色
+                PetRarity.Common => Colors.White,
+                PetRarity.Uncommon => Colors.Green,
+                PetRarity.Rare => Colors.Blue,
+                PetRarity.Epic => new Color(0.6f, 0.2f, 0.8f), // 紫色
+                PetRarity.Legendary => new Color(1f, 0.5f, 0f), // 橙色
                 _ => Colors.White
             };
         }
 
-        private string GetRarityName(PetSystem.PetRarity rarity)
+        private string GetRarityName(PetRarity rarity)
         {
             return rarity switch
             {
-                PetSystem.PetRarity.Common => "普通",
-                PetSystem.PetRarity.Uncommon => "优秀",
-                PetSystem.PetRarity.Rare => "稀有",
-                PetSystem.PetRarity.Epic => "史诗",
-                PetSystem.PetRarity.Legendary => "传说",
+                PetRarity.Common => "普通",
+                PetRarity.Uncommon => "优秀",
+                PetRarity.Rare => "稀有",
+                PetRarity.Epic => "史诗",
+                PetRarity.Legendary => "传说",
                 _ => "未知"
             };
         }
 
-        private string GetPetTypeName(PetSystem.PetType type)
+        private string GetPetTypeName(PetType type)
         {
             return type switch
             {
-                PetSystem.PetType.Companion => "伙伴",
-                PetSystem.PetType.Collector => "收藏家",
-                PetSystem.PetType.Guardian => "守护者",
-                PetSystem.PetType.Explorer => "探险家",
+                PetType.Companion => "伙伴",
+                PetType.Collector => "收藏家",
+                PetType.Guardian => "守护者",
+                PetType.Explorer => "探险家",
                 _ => "未知"
             };
         }

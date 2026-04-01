@@ -362,14 +362,14 @@ public class MountEvolutionSystem : BaseSystem
     /// <summary>
     /// 存档数据
     /// </summary>
-    public System.Collections.Generic.Dictionary<string, System.Collections.Generic.System.Collections.Generic.Dictionary<string, object>> SaveData()
+    public System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, object>> SaveData()
     {
-        var data = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.System.Collections.Generic.Dictionary<string, object>>();
+        var data = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, object>>();
         
         foreach (var kvp in _playerEvolutions)
         {
             var evolution = kvp.Value;
-            data[kvp.Key] = new System.Collections.Generic.System.Collections.Generic.Dictionary<string, object>
+            data[kvp.Key] = new System.Collections.Generic.Dictionary<string, object>
             {
                 { "currentStage", (int)evolution.CurrentStage },
                 { "evolvedType", (int)evolution.EvolvedType },
@@ -385,7 +385,7 @@ public class MountEvolutionSystem : BaseSystem
     /// <summary>
     /// 加载存档数据
     /// </summary>
-    public void LoadData(System.Collections.Generic.Dictionary<string, System.Collections.Generic.System.Collections.Generic.Dictionary<string, object>> data)
+    public void LoadData(System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, object>> data)
     {
         if (data == null) return;
         

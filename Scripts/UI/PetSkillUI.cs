@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.Pets;
+    using PetsPet = ClawRPG.Scripts.Systems.Pets.Pet;
 
 namespace ClawRPG.Scripts.UI
 {
@@ -29,7 +30,7 @@ namespace ClawRPG.Scripts.UI
         
         private PetSkillSystem _skillSystem;
         private PetManager _petManager;
-        private Pet _selectedPet;
+        private PetsPet _selectedPet;
         private List<PetSkill> _displayedSkills = new List<PetSkill>();
         private bool _isVisible = false; 
 

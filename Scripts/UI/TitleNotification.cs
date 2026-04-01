@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+    using Title = ClawRPG.Scripts.Systems.Title;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
@@ -19,7 +20,7 @@ namespace ClawRPG.Scripts.UI {
         }
         
         // 通知队列
-        private Queue<TitleSystem.Title> _notificationQueue = new();
+        private Queue<Title> _notificationQueue = new();
         private bool _isShowing = false; 
         private const int MaxVisible = 3;
         
@@ -42,7 +43,7 @@ namespace ClawRPG.Scripts.UI {
         /// <summary>
         /// 显示称号解锁通知
         /// </summary>
-        public void ShowTitleNotification(TitleSystem.Title title) {
+        public void ShowTitleNotification(Title title) {
             _notificationQueue.Enqueue(title);
             ProcessQueue();
         }
@@ -58,7 +59,7 @@ namespace ClawRPG.Scripts.UI {
             CreateNotificationPopup(title);
         }
         
-        private void CreateNotificationPopup(TitleSystem.Title title) {
+        private void CreateNotificationPopup(Title title) {
             var titleSystem = TitleSystem.Instance;
             
             // 创建通知面板

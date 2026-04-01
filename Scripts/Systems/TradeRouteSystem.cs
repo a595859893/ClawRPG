@@ -355,7 +355,7 @@ public partial class TradeRouteSystem : BaseSystem
     }
 
     // Save/Load
-    public override Dictionary<string, object> ExportSaveData()
+    public Dictionary<string, object> ExportSaveData()
     {
         var saveData = new Dictionary<string, object>();
         
@@ -383,7 +383,7 @@ public partial class TradeRouteSystem : BaseSystem
         return saveData;
     }
 
-    protected override void ImportSaveData(Dictionary saveData)
+    protected void ImportSaveData(Dictionary saveData)
     {
         if (saveData == null) return;
 

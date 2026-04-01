@@ -1,17 +1,10 @@
 using Godot;
 using Godot.Collections;
 using System;
+using MonsterRarity = ClawRPG.Scripts.Systems.MonsterRarity;
 
 public partial class MonsterTamingUI
 {
-    public override void _Ready()
-    {
-        Instance = this;
-        SetupUI();
-        SetupInput();
-        Hide();
-    }
-    
     private void SetupUI()
     {
         // Main Panel
@@ -420,15 +413,15 @@ public partial class MonsterTamingUI
         return card;
     }
     
-    private Color GetRarityColor(MonsterTamingSystem.MonsterRarity rarity)
+    private Color GetRarityColor(MonsterRarity rarity)
     {
         switch (rarity)
         {
-            case MonsterTamingSystem.MonsterRarity.Common: return new Color(0.7f, 0.7f, 0.7f);
-            case MonsterTamingSystem.MonsterRarity.Uncommon: return new Color(0.3f, 0.8f, 0.3f);
-            case MonsterTamingSystem.MonsterRarity.Rare: return new Color(0.3f, 0.5f, 0.9f);
-            case MonsterTamingSystem.MonsterRarity.Epic: return new Color(0.6f, 0.3f, 0.8f);
-            case MonsterTamingSystem.MonsterRarity.Legendary: return new Color(1f, 0.6f, 0.1f);
+            case MonsterRarity.Common: return new Color(0.7f, 0.7f, 0.7f);
+            case MonsterRarity.Uncommon: return new Color(0.3f, 0.8f, 0.3f);
+            case MonsterRarity.Rare: return new Color(0.3f, 0.5f, 0.9f);
+            case MonsterRarity.Epic: return new Color(0.6f, 0.3f, 0.8f);
+            case MonsterRarity.Legendary: return new Color(1f, 0.6f, 0.1f);
             default: return new Color(0.7f, 0.7f, 0.7f);
         }
     }
