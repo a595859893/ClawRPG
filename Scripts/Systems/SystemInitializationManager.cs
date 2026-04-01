@@ -126,7 +126,7 @@ namespace ClawRPG.Scripts.Systems
             RegisterSystemInGroup("combat", typeof(SkillComboSystem));
             RegisterSystemInGroup("combat", typeof(ComboFatigueData));
             RegisterSystemInGroup("combat", typeof(ComboFatigueSystem));
-            RegisterSystemInGroup("combat", typeof(ComboForgetSystem)); // REQ-154: Combo 遗忘再发现机制
+            RegisterSystemInGroup("combat", typeof(Framework.ComboForgetSystem)); // REQ-154: Combo 遗忘再发现机制
             RegisterSystemInGroup("combat", typeof(ComboEchoTrailSystem));
             RegisterSystemInGroup("combat", typeof(ComboReplayRecorder)); // REQ-114-02
             RegisterSystemInGroup("combat", typeof(ComboReplayPersistence)); // REQ-114-05

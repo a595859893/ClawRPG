@@ -7,7 +7,7 @@ namespace Framework
     /// Combo 遗忘系统 - Godot Node 单例
     /// 订阅 GameOver 事件，在每局游戏结束时推进遗忘逻辑
     /// </summary>
-    public class ComboForgetSystem : Node
+    public partial class ComboForgetSystem : Node
     {
         public static ComboForgetSystem Instance { get; private set; }
         

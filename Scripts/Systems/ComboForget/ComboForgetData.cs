@@ -255,14 +255,14 @@ namespace Framework
         
         // ========== 存档 ==========
         
-        public Dictionary ExportSaveData()
+        public Godot.Collections.Dictionary ExportSaveData()
         {
-            var data = new Dictionary<string, object>();
+            var data = new Godot.Collections.Dictionary();
             
-            var entries = new List<Dictionary>();
+            var entries = new Godot.Collections.Array();
             foreach (var kvp in _comboStates)
             {
-                var e = new Dictionary
+                var e = new Godot.Collections.Dictionary
                 {
                     ["comboId"] = kvp.Key,
                     ["gamesSinceLastUse"] = kvp.Value.gamesSinceLastUse,
@@ -277,19 +277,19 @@ namespace Framework
             return data;
         }
         
-        public void ImportSaveData(Dictionary data)
+        public void ImportSaveData(Godot.Collections.Dictionary data)
         {
             _comboStates.Clear();
             if (data == null || !data.ContainsKey("entries")) return;
             
-            var entries = (List<object>)data["entries"];
-            foreach (Dictionary entryData in entries)
+            var entries = (Godot.Collections.Array)data["entries"];
+            foreach (Godot.Collections.Dictionary entryData in entries)
             {
                 var entry = new ComboForgetEntry
                 {
                     comboId = (string)entryData["comboId"],
-                    gamesSinceLastUse = (int)entryData["gamesSinceLastUse"],
-                    totalUseCount = (int)entryData["totalUseCount"],
+                    gamesSinceLastUse = (int)(long)entryData["gamesSinceLastUse"],
+                    totalUseCount = (int)(long)entryData["totalUseCount"],
                     isLocked = (bool)entryData["isLocked"],
                     isDormant = (bool)entryData["isDormant"],
                     wasEverDiscovered = (bool)entryData["wasEverDiscovered"]
