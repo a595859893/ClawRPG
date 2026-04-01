@@ -32,6 +32,11 @@ namespace ClawRPG.UI {
         private OptionButton _categoryOption;
         private string _currentCategory = "all";
 
+        // 导入/导出
+        private Button _exportButton;
+        private Button _importButton;
+        private OptionButton _presetOption;
+
         private Dictionary<string, List<string>> _categories = new Dictionary<string, List<string>>
         {
             { "all", new List<string>() },
@@ -127,6 +132,49 @@ namespace ClawRPG.UI {
             };
             _resetButton.Pressed += OnResetPressed;
             categoryContainer.AddChild(_resetButton);
+
+            // 导入/导出/预设容器
+            var syncContainer = new HBoxContainer
+            {
+                Alignment = BoxContainer.AlignMode.Center,
+                CustomMinimumSize = new Vector2(0, 40)
+            };
+            _mainContainer.AddChild(syncContainer);
+
+            var presetLabel = new Label { Text = "预设: " };
+            syncContainer.AddChild(presetLabel);
+
+            _presetOption = new OptionButton
+            {
+                CustomMinimumSize = new Vector2(150, 30)
+            };
+            _presetOption.AddItem("当前配置", 0);
+            _presetOption.AddItem("默认风格", 1);
+            _presetOption.AddItem("MOBA风格", 2);
+            _presetOption.AddItem("ARPG风格", 3);
+            _presetOption.AddItem("射击风格", 4);
+            _presetOption.AddItem("简约风格", 5);
+            _presetOption.Selected = 0;
+            _presetOption.ItemSelected += OnPresetSelected;
+            syncContainer.AddChild(_presetOption);
+
+            // 导出按钮
+            _exportButton = new Button
+            {
+                Text = "导出配置",
+                CustomMinimumSize = new Vector2(120, 30)
+            };
+            _exportButton.Pressed += OnExportPressed;
+            syncContainer.AddChild(_exportButton);
+
+            // 导入按钮
+            _importButton = new Button
+            {
+                Text = "导入配置",
+                CustomMinimumSize = new Vector2(120, 30)
+            };
+            _importButton.Pressed += OnImportPressed;
+            syncContainer.AddChild(_importButton);
 
             // 滚动容器
             _scrollContainer = new ScrollContainer
@@ -294,6 +342,111 @@ namespace ClawRPG.UI {
             HideKeybindingUI();
         }
 
+        private void OnPresetSelected(int index)
+        {
+            string[] presets = { "current", "default", "moba", "arpg", "shooter", "minimal" };
+            if (index == 0) return; // "当前配置" 不做操作
+
+            var category = presets[index];
+            var confirmDialog = new AcceptDialog
+            {
+                WindowTitle = "应用预设",
+                DialogText = $"确定要应用「{(string)_presetOption.GetItemText(index)}」预设吗？这将覆盖当前所有按键绑定。"
+            };
+            int presetIdx = index;
+            confirmDialog.Ok += () => {
+                if (KeybindingSystem.Instance.ApplyPreset(presets[presetIdx]))
+                {
+                    ShowNotification($"已应用「{_presetOption.GetItemText(presetIdx)}」");
+                }
+            };
+            AddChild(confirmDialog);
+            confirmDialog.PopupCentered();
+            _presetOption.Selected = 0;
+        }
+
+        private void OnExportPressed()
+        {
+            var json = KeybindingSystem.Instance.ExportToJson("My Keybinding Config");
+            var dialog = new AcceptDialog
+            {
+                WindowTitle = "导出按键配置",
+                DialogText = "复制以下 JSON 内容保存：\n\n" + json.Substring(0, Mathf.Min(json.Length, 500))
+            };
+            // 添加复制按钮（通过 SelectionDialog 更好，这里用 PopupDialog 代替）
+            var popup = new PopupDialog
+            {
+                Exclusive = false
+            };
+            AddChild(popup);
+
+            var label = new Label { Text = json, AutowrapMode = TextServer.AutowrapMode.Word };
+            popup.AddChild(label);
+            popup.PopupCentered(new Vector2(600, 400));
+
+            // 同时显示标准的确认对话框
+            var notifyDialog = new AcceptDialog
+            {
+                WindowTitle = "配置已复制",
+                DialogText = $"配置 JSON 共 {json.Length} 字符。\n完整内容已在弹出窗口显示。\n手动复制后关闭弹窗。"
+            };
+            AddChild(notifyDialog);
+            notifyDialog.PopupCentered();
+        }
+
+        private void OnImportPressed()
+        {
+            var dialog = new ConfirmationDialog
+            {
+                WindowTitle = "导入按键配置",
+                DialogText = "请在下方输入导入的 JSON 配置：",
+                InitialPosition = Control.WindowInitialPosition.Center
+            };
+            var input = new TextEdit
+            {
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+                SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+                CustomMinimumSize = new Vector2(500, 200)
+            };
+
+            var vbox = new VBoxContainer();
+            vbox.AddChild(new Label { Text = "粘贴 JSON 配置：" });
+            vbox.AddChild(input);
+            dialog.AddChild(vbox);
+
+            dialog.Confirmed += () => {
+                var json = input.Text;
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    ShowNotification("错误：输入为空");
+                    return;
+                }
+                if (KeybindingSystem.Instance.ImportFromJson(json))
+                {
+                    ShowNotification("配置导入成功！");
+                    PopulateKeybindings();
+                }
+                else
+                {
+                    ShowNotification("错误：配置格式无效");
+                }
+            };
+
+            AddChild(dialog);
+            dialog.PopupCentered(new Vector2(600, 350));
+        }
+
+        private void ShowNotification(string message)
+        {
+            var notify = new AcceptDialog
+            {
+                WindowTitle = "提示",
+                DialogText = message
+            };
+            AddChild(notify);
+            notify.PopupCentered();
+        }
+
         private void OnKeybindingChanged(string actionName, Key oldKey, Key newKey)
         {
             // REQ-058-11: Invoke new event
@@ -303,7 +456,7 @@ namespace ClawRPG.UI {
                 item.UpdateKey(newKey);
             }
         }
-        
+
         private void OnKeybindingsReset()
         {
             // REQ-058-11: Invoke new event

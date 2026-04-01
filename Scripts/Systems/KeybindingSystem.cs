@@ -313,6 +313,124 @@ public delegate void KeybindingsReset();
                 }
             }
         }
+
+        /// <summary>
+        /// 导出为可分享的 JSON 字符串
+        /// </summary>
+        public string ExportToJson(string profileName = "My Config")
+        {
+            var profile = new KeybindingProfile(profileName, "custom");
+            foreach (var kvp in _keybindings)
+            {
+                profile.Keybindings[kvp.Key] = ((int)kvp.Value.Key).ToString();
+            }
+            return profile.ToJson();
+        }
+
+        /// <summary>
+        /// 从 JSON 字符串导入按键配置
+        /// </summary>
+        public bool ImportFromJson(string json, bool showErrors = true)
+        {
+            var profile = KeybindingProfile.FromJson(json);
+            if (profile == null || !profile.Validate())
+            {
+                if (showErrors) GD.PrintErr("[KeybindingSystem] Invalid profile JSON");
+                return false;
+            }
+
+            int applied = 0;
+            int errors = 0;
+            foreach (var kvp in profile.Keybindings)
+            {
+                if (!_keybindings.ContainsKey(kvp.Key))
+                {
+                    errors++;
+                    continue;
+                }
+
+                if (int.TryParse(kvp.Value, out int keyCode))
+                {
+                    _keybindings[kvp.Key].Key = (Key)keyCode;
+                    applied++;
+                }
+                else
+                {
+                    errors++;
+                }
+            }
+
+            if (errors > 0 && showErrors)
+            {
+                GD.PrintErr($"[KeybindingSystem] Import: {errors} bindings could not be applied");
+            }
+
+            EmitSignal(nameof(KeybindingsReset));
+            return applied > 0;
+        }
+
+        /// <summary>
+        /// 应用预设方案
+        /// </summary>
+        public bool ApplyPreset(string category)
+        {
+            KeybindingProfile preset = null;
+            switch (category.ToLower())
+            {
+                case "moba": preset = KeybindingPresets.MobaStyle(); break;
+                case "arpg": preset = KeybindingPresets.ArpgStyle(); break;
+                case "shooter": preset = KeybindingPresets.ShooterStyle(); break;
+                case "minimal": preset = KeybindingPresets.MinimalStyle(); break;
+                case "default": preset = KeybindingPresets.DefaultStyle(); break;
+                default: return false;
+            }
+
+            if (preset.Keybindings.Count == 0)
+            {
+                ResetAllKeybindings();
+                return true;
+            }
+
+            int applied = 0;
+            foreach (var kvp in preset.Keybindings)
+            {
+                if (_keybindings.ContainsKey(kvp.Key) && int.TryParse(kvp.Value, out int keyCode))
+                {
+                    _keybindings[kvp.Key].Key = (Key)keyCode;
+                    applied++;
+                }
+            }
+
+            EmitSignal(nameof(KeybindingsReset));
+            return applied > 0;
+        }
+
+        /// <summary>
+        /// 同步到云端（挂载 CloudSaveSystem）
+        /// </summary>
+        public void SyncToCloud()
+        {
+            if (CloudSaveSystem.Instance != null)
+            {
+                var json = ExportToJson("Cloud Backup");
+                CloudSaveSystem.Instance.SyncSlotToCloud("keybindings", json);
+            }
+        }
+
+        /// <summary>
+        /// 从云端恢复
+        /// </summary>
+        public void RestoreFromCloud()
+        {
+            if (CloudSaveSystem.Instance != null)
+            {
+                var json = CloudSaveSystem.Instance.SyncSlotFromCloud("keybindings");
+                if (!string.IsNullOrEmpty(json))
+                {
+                    ImportFromJson(json);
+                }
+            }
+        }
     }
 
     /// <summary>
