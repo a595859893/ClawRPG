@@ -87,6 +87,9 @@ namespace ClawRPG.Systems
         public List<string> Effects = new List<string>();
         public bool IsUpgraded = false;
         
+        // REQ-166: Conditional card effects
+        public List<CardCondition> Conditions = new List<CardCondition>();
+        
         public string GetDisplayText()
         {
             var text = $"{Name}\n";

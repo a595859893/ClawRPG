@@ -119,12 +119,17 @@ namespace ClawRPG.Systems
         
         /// <summary>
         /// 应用卡牌效果
+        /// REQ-166: Evaluates conditional card effects before applying.
         /// </summary>
         private void ApplyCardEffects(CardData card, string targetId)
         {
-            int finalDamage = card.Damage + _strength;
+            // REQ-166: Evaluate conditions to get effect multiplier
+            float conditionMultiplier = CardConditionEvaluator.Instance.EvaluateConditions(card.Conditions);
             
-            GD.Print($"Playing card: {card.Name}, Damage: {finalDamage}, Block: {card.Block}");
+            int finalDamage = (int)((card.Damage + _strength) * conditionMultiplier);
+            int finalBlock = (int)(card.Block * conditionMultiplier);
+            
+            GD.Print($"Playing card: {card.Name}, Damage: {finalDamage} (x{conditionMultiplier:F1}), Block: {finalBlock}");
             
             if (card.Damage > 0)
             {
@@ -134,7 +139,7 @@ namespace ClawRPG.Systems
             
             if (card.Block > 0)
             {
-                _block += card.Block;
+                _block += finalBlock;
             }
             
             if (card.Draw > 0)
