@@ -75,6 +75,15 @@ public partial class ComboGhostSystem : BaseSystem
         GD.Print("[ComboGhostSystem] Initialized");
     }
 
+    public override void _ExitTree()
+    {
+        // Unsubscribe from all signals to prevent leaks
+        SkillComboSystem.ComboFailed -= OnComboFailed;
+        CombatStatusSystem.OnCombatStarted -= OnCombatStarted;
+        OnTeachingHintRequested -= _OnTeachingHintRequested;
+        base._ExitTree();
+    }
+
     /// <summary>
     /// REQ-174: Record an abandoned combo and roll for ghost in next combat.
     /// AbandonmentType: Timeout=80%, WrongSkill=60%, ManualCancel=40%, Died=30%
