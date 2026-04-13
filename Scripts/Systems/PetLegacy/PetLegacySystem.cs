@@ -45,7 +45,7 @@ namespace ClawRPG.Systems.PetLegacy
             var petCompanion = GetNodeOrNull<Godot.Node>("/root/PetCombatCompanion");
             if (petCompanion != null && petCompanion.HasSignal("PetDied"))
             {
-                petCompanion.Connect("PetDied", Callable.From<Godot.Dictionary>(OnPetDiedHandler));
+                petCompanion.Connect("PetDied", Callable.From<Godot.Collections.Dictionary>(OnPetDiedHandler));
             }
 
             // 订阅战斗开始信号，用于激活标记增益
@@ -59,7 +59,7 @@ namespace ClawRPG.Systems.PetLegacy
         /// <summary>
         /// 处理宠物死亡事件
         /// </summary>
-        private void OnPetDiedHandler(Godot.Dictionary petData)
+        private void OnPetDiedHandler(Godot.Collections.Dictionary petData)
         {
             int petId = petData.ContainsKey("pet_id") ? Convert.ToInt32(petData["pet_id"]) : 0;
             string petName = petData.ContainsKey("pet_name") ? petData["pet_name"].ToString() : "Unknown";

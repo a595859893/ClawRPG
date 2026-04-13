@@ -508,9 +508,9 @@ namespace ClawRPG.Systems.PetMemorial
             _entrancePanel.Visible = true;
         }
 
-        public override void _GuiInput(InputEvent @event)
+        public override void _Input(InputEvent @event)
         {
-            base._GuiInput(@event);
+            base._Input(@event);
 
             // ESC 关闭详情面板
             if (@event is InputEventKey key && key.Pressed && key.Keycode == Key.Escape)
