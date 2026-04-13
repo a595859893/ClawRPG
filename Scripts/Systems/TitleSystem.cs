@@ -1,13 +1,15 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
+using ClawRPG.Scripts.Systems.PrestigeShop;
 
 namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
     /// 称号系统 - 管理玩家称号的解锁、装备和展示
     /// </summary>
-    public class TitleData : Resource
+    public partial class TitleData : Resource
     {
     public string TitleId { get; set; }
     public string TitleName { get; set; }
@@ -41,7 +43,8 @@ public enum TitleCategory
     Social,      // 社交相关
     Economy,     // 经济相关
     Special,     // 特殊成就
-    Seasonal     // 季节活动
+    Seasonal,    // 季节活动
+    Prestige     // 声望称号 (PrestigeShop)
 }
 
 public enum TitleRarity
@@ -90,11 +93,11 @@ public partial class TitleSystem : BaseSystem
     
     // Signals (Godot 4 compatible)
     [Signal]
-    public delegate void TitleUnlockedDelegate(string playerId, TitleData data);
+    public delegate void TitleUnlockedEventHandler(string playerId, TitleData data);
     [Signal]
-    public delegate void TitleEquippedDelegate(string playerId);
+    public delegate void TitleEquippedEventHandler(string playerId);
     [Signal]
-    public delegate void TitleProgressUpdatedDelegate(string playerId, int current, int total);
+    public delegate void TitleProgressUpdatedEventHandler(string playerId, int current, int total);
 
     public override void _Ready()
     {
@@ -304,7 +307,7 @@ public partial class TitleSystem : BaseSystem
         }
 
         // Update progress
-        TitleProgressUpdated?.Call(titleId, currentValue, title.RequiredValue);
+        EmitSignal(SignalName.TitleProgressUpdated, titleId, currentValue, title.RequiredValue);
 
         // Check if requirement is met
         return currentValue >= title.RequiredValue;
@@ -331,7 +334,7 @@ public partial class TitleSystem : BaseSystem
         _totalTitlesUnlocked++;
 
         GD.Print($"[TitleSystem] Title unlocked: {title.TitleName}");
-        TitleUnlocked?.Call(titleId, title);
+        EmitSignal(SignalName.TitleUnlocked, titleId, title);
     }
 
     // Equip a title
@@ -350,7 +353,7 @@ public partial class TitleSystem : BaseSystem
 
         _equippedTitle = titleId;
         GD.Print($"[TitleSystem] Title equipped: {_titleDatabase[titleId].TitleName}");
-        TitleEquipped?.Call(titleId);
+        EmitSignal(SignalName.TitleEquipped, titleId);
     }
 
     // Unequip current title
@@ -529,6 +532,132 @@ public partial class TitleSystem : BaseSystem
             _equippedTitle = titleId;
         }
     }
+
+    // ===== Title UI Compatibility Layer =====
+
+    /// <summary>
+    /// Lightweight Title wrapper used by TitleUI.
+    /// Maps TitleData fields to the names TitleUI expects.
+    /// </summary>
+    public class Title
+    {
+        public string Id => _data.TitleId;
+        public string Name => _data.TitleName;
+        public string Description => _data.Description;
+        public TitleCategory Category => _data.Category;
+        public TitleRarity Rarity => _data.Rarity;
+        public bool IsUnlocked => _data.IsUnlocked;
+        private readonly TitleData _data;
+        public Title(TitleData data) { _data = data; }
+    }
+
+    // Missing methods called by TitleUI
+
+    /// <summary>
+    /// Get all titles of a given category (maps to TitleUI's GetTitlesByType).
+    /// </summary>
+    public List<TitleData> GetTitlesByType(TitleCategory category) => GetTitlesByCategory(category);
+
+    /// <summary>
+    /// Get the currently equipped title's name (TitleUI compatibility).
+    /// </summary>
+    public string GetCurrentTitleName() => GetEquippedTitleName();
+
+    /// <summary>
+    /// Get the color for the currently equipped title (TitleUI compatibility).
+    /// </summary>
+    public Color GetCurrentTitleColor()
+    {
+        if (string.IsNullOrEmpty(_equippedTitle) || !_titleDatabase.TryGetValue(_equippedTitle, out var td))
+            return new Color(0.7f, 0.7f, 0.7f);
+        return GetRarityColor(td.Rarity);
+    }
+
+    /// <summary>
+    /// Get color for a given rarity.
+    /// </summary>
+    public Color GetRarityColor(TitleRarity rarity)
+    {
+        return rarity switch
+        {
+            TitleRarity.Common => new Color(0.7f, 0.7f, 0.7f),
+            TitleRarity.Uncommon => new Color(0.2f, 0.8f, 0.2f),
+            TitleRarity.Rare => new Color(0.2f, 0.5f, 1.0f),
+            TitleRarity.Epic => new Color(0.6f, 0.3f, 0.9f),
+            TitleRarity.Legendary => new Color(1.0f, 0.6f, 0.0f),
+            _ => new Color(0.7f, 0.7f, 0.7f)
+        };
+    }
+
+    /// <summary>
+    /// Current equipped title ID (TitleUI compatibility).
+    /// </summary>
+    public string CurrentTitleId => _equippedTitle;
+
+    /// <summary>
+    /// Set the current title by ID (TitleUI compatibility).
+    /// </summary>
+    public void SetCurrentTitle(string titleId) => EquipTitle(titleId);
+
+    // ===== Prestige Shop Integration =====
+
+    /// <summary>
+    /// Register a prestige shop title into TitleSystem and auto-unlock it.
+    /// Called by PrestigeShopSystem when a title item is unlocked.
+    /// </summary>
+    public void RegisterPrestigeTitle(string titleId, string displayName, string description, TitleRarity rarity)
+    {
+        if (_titleDatabase.ContainsKey(titleId))
+        {
+            // Already registered — just unlock if not already
+            if (!IsTitleUnlocked(titleId))
+                UnlockTitle(titleId);
+            return;
+        }
+
+        var title = new TitleData
+        {
+            TitleId = titleId,
+            TitleName = displayName,
+            Description = description,
+            Category = TitleCategory.Prestige,
+            Rarity = rarity,
+            RequiredValue = 0,
+            IsUnlocked = true,
+            UnlockTime = DateTime.Now
+        };
+        _titleDatabase[titleId] = title;
+        _unlockedTitles.Add(titleId);
+        _totalTitlesUnlocked++;
+
+        GD.Print($"[TitleSystem] Registered and unlocked prestige title: {displayName}");
+        EmitSignal(SignalName.TitleUnlocked, titleId, title);
+    }
+
+    /// <summary>
+    /// Register all prestige shop titles that are already unlocked in PrestigeShop.
+    /// Call this once at game startup after PrestigeShopSystem has loaded its save data.
+    /// </summary>
+    public void SyncPrestigeTitlesFromShop()
+    {
+        var shop = PrestigeShopSystem.Instance;
+        if (shop == null) return;
+
+        foreach (var item in PrestigeShopDatabase.AllItems)
+        {
+            if (item.Category != ShopCategory.Title) continue;
+            if (!shop.IsUnlocked(item.ItemId)) continue;
+
+            var rarity = item.UnlockType == UnlockType.AutoTier
+                ? TitleRarity.Legendary
+                : TitleRarity.Epic;
+
+            if (!_titleDatabase.ContainsKey(item.ItemId))
+                RegisterPrestigeTitle(item.ItemId, item.DisplayName, item.Description, rarity);
+            else if (!IsTitleUnlocked(item.ItemId))
+                UnlockTitle(item.ItemId);
+        }
+    }
     
     // ===== 持久化 =====
     public override Dictionary<string, object> ExportSaveData()
@@ -581,4 +710,71 @@ public partial class TitleSystem : BaseSystem
             _totalTitlesUnlocked = Convert.ToInt32(data["total_titles_unlocked"]);
     }
 }
+}
+
+    // ===== REQ-200: Title Progress Tracking =====
+
+    /// <summary>
+    /// Progress data for a single title (REQ-200).
+    /// </summary>
+    public class TitleProgressData
+    {
+        public string TitleId;
+        public int CurrentValue;
+        public int RequiredValue;
+        public float Progress => RequiredValue > 0 ? Mathf.Clamp((float)CurrentValue / RequiredValue, 0f, 1f) : 0f;
+        public bool IsUnlocked;
+        public TitleProgressData() { }
+        public TitleProgressData(string id, int current, int required, bool unlocked)
+        {
+            TitleId = id;
+            CurrentValue = current;
+            RequiredValue = required;
+            IsUnlocked = unlocked;
+        }
+    }
+
+    // Internal progress tracking (separate from TitleData to avoid breaking existing save format)
+    private Dictionary<string, TitleProgressData> _titleProgress = new Dictionary<string, TitleProgressData>();
+
+    /// <summary>
+    /// Update progress for a title. Called by external stat systems (e.g. CombatSystem, AchievementSystem).
+    /// REQ-200-01: progress query API — this method serves as the primary update entry point.
+    /// </summary>
+    /// <param name="titleId">Title ID</param>
+    /// <param name="currentValue">Current progress value</param>
+    public void SetTitleProgress(string titleId, int currentValue)
+    {
+        if (!_titleDatabase.TryGetValue(titleId, out var title)) return;
+        var prog = new TitleProgressData(titleId, currentValue, title.RequiredValue, title.IsUnlocked);
+        _titleProgress[titleId] = prog;
+        EmitSignal(SignalName.TitleProgressUpdated, titleId, currentValue, title.RequiredValue);
+    }
+
+    /// <summary>
+    /// Get progress for a single title (0.0~1.0). Returns 0 if not tracked.
+    /// REQ-200-01: progress query API — this is GetTitleProgress(titleId) mentioned in REQ-200.
+    /// </summary>
+    public float GetTitleProgress(string titleId)
+    {
+        if (_titleProgress.TryGetValue(titleId, out var prog)) return prog.Progress;
+        return 0f;
+    }
+
+    /// <summary>
+    /// Get all title progress records.
+    /// REQ-200-01: progress query API — this is GetAllTitleProgress() mentioned in REQ-200.
+    /// </summary>
+    public List<TitleProgressData> GetAllTitleProgress()
+    {
+        var result = new List<TitleProgressData>();
+        foreach (var title in _titleDatabase.Values)
+        {
+            if (_titleProgress.TryGetValue(title.TitleId, out var prog))
+                result.Add(prog);
+            else
+                result.Add(new TitleProgressData(title.TitleId, 0, title.RequiredValue, title.IsUnlocked));
+        }
+        return result;
+    }
 }
