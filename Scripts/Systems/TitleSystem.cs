@@ -712,6 +712,9 @@ public partial class TitleSystem : BaseSystem
 }
 }
 
+namespace ClawRPG.Scripts.Systems
+{
+
     // ===== REQ-200: Title Progress Tracking =====
 
     /// <summary>
