@@ -9,7 +9,7 @@ using System;
 /// 提供统一的显示/隐藏/刷新接口
 /// 支持单例模式 (通过 Instance 属性访问)
 /// </summary>
-public abstract class BaseUI : Control
+public abstract partial class BaseUI : Control
 {
     /// <summary>
     /// 单例实例 (子类需要实现)

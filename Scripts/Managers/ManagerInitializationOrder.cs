@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Managers
     /// <summary>
     /// 管理器初始化顺序管理器 - 负责管理所有 Manager 的初始化顺序
     /// </summary>
-    public class ManagerInitializationOrder : ManagerBase
+    public partial class ManagerInitializationOrder : ManagerBase
     {
         public static ManagerInitializationOrder Instance { get; private set; }
         

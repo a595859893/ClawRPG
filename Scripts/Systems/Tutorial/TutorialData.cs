@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TutorialData : Resource
+public partial class TutorialData : Resource
 {
     public Dictionary<string, bool> CompletedTutorials { get; set; } = new Dictionary<string, bool>();
     public List<string> InProgressTutorials { get; set; } = new List<string>();

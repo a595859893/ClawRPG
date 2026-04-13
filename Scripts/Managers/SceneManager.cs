@@ -7,7 +7,7 @@ using ClawRPG.Scripts.Managers;
 /// 场景管理器 - 负责游戏场景的加载、切换和过渡
 /// 使用 EventBusManager 进行事件通信，减少系统耦合
 /// </summary>
-public class SceneManager : ManagerBase
+public partial class SceneManager : ManagerBase
 {
     public static SceneManager Instance { get; private set; }
     
@@ -71,7 +71,7 @@ public class SceneManager : ManagerBase
         var root = GetTree().CurrentScene;
         if (root != null)
         {
-            CurrentScenePath = root.Filename;
+            CurrentScenePath = root.SceneFilePath;
         }
         
         NotifyInitialized();
@@ -99,7 +99,7 @@ public class SceneManager : ManagerBase
         IsLoading = true;
         
         // 使用 Godot 的场景切换
-        var error = GetTree().ChangeScene(scenePath);
+        var error = GetTree().ChangeSceneToFile(scenePath);
         if (error != Error.Ok)
         {
             GD.PrintErr($"[SceneManager] Failed to change scene: {error}");
@@ -124,27 +124,16 @@ public class SceneManager : ManagerBase
         TargetScenePath = scenePath;
         IsLoading = true;
         
-        // 异步加载场景
-        var loadTask = ResourceLoader.LoadThreadedRequest(scenePath);
-        
-        while (ResourceLoader.LoadThreadGetStatus(loadTask) == ResourceLoader.ThreadLoadStatus.InProgress)
+        // 同步加载场景 (Godot 4 简化实现)
+        var scene = ResourceLoader.Load(scenePath) as PackedScene;
+        if (scene != null)
         {
-            LoadingProgress = ResourceLoader.LoadThreadGetProgress(loadTask);
-            OnLoadingProgress?.Invoke(LoadingProgress);
-            await ToSignal(GetTree().CreateTimer(0.1f), "timeout");
-        }
-        
-        if (ResourceLoader.LoadThreadGetStatus(loadTask) == ResourceLoader.ThreadLoadStatus.Loaded)
-        {
-            var scene = ResourceLoader.LoadThreadGet(loadTask) as PackedScene;
-            if (scene != null)
-            {
-                GetTree().CurrentScene?.QueueFree();
-                _currentScene = scene;
-                _currentScene.Instance();
-                GetTree().CurrentScene = _currentScene.Instance();
-                CurrentScenePath = scenePath;
-            }
+            GetTree().CurrentScene?.QueueFree();
+            _currentScene = scene;
+            _currentScene.Instantiate();
+            GetTree().CurrentScene = _currentScene.Instantiate();
+            CurrentScenePath = scenePath;
+            LoadingProgress = 1.0f;
         }
         
         _OnSceneLoaded();
@@ -161,7 +150,7 @@ public class SceneManager : ManagerBase
         GetTree().CurrentScene?.QueueFree();
         
         _currentScene = scene;
-        var instance = scene.Instance();
+        var instance = scene.Instantiate();
         GetTree().CurrentScene = instance as Node;
         CurrentScenePath = scene.ResourcePath;
         
@@ -221,7 +210,7 @@ public class SceneManager : ManagerBase
     /// </summary>
     public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary
+        return new Dictionary<string, object>
         {
             { "currentScenePath", CurrentScenePath }
         };
@@ -234,7 +223,7 @@ public class SceneManager : ManagerBase
     {
         if (data == null) return;
         
-        if (data.Contains("currentScenePath"))
+        if (data.ContainsKey("currentScenePath"))
             CurrentScenePath = data["currentScenePath"].ToString();
     }
 }

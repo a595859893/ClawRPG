@@ -13,7 +13,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
     /// 3. 在等级变化时发射信号，通知 PetMimicrySkillSystem 刷新
     /// 4. 支持存档持久化
     /// </summary>
-    public class MimicryLevelTracker : Node
+    public partial class MimicryLevelTracker : Node
     {
         public static MimicryLevelTracker Instance { get; private set; }
 

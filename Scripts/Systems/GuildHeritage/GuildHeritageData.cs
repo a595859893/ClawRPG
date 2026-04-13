@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildHeritageData : GodotObject
+public partial class GuildHeritageData : GodotObject
 {
     // Heritage Records - tracks what has been passed down
     public Dictionary<int, HeritageRecord> HeritageRecords { get; set; } = new Dictionary<int, HeritageRecord>();
@@ -38,7 +38,7 @@ public class GuildHeritageData : GodotObject
     }
 }
 
-public class HeritageRecord : GodotObject
+public partial class HeritageRecord : GodotObject
 {
     public int RecordId { get; set; }
     public int FromPlayerId { get; set; }
@@ -58,7 +58,7 @@ public class HeritageRecord : GodotObject
     }
 }
 
-public class HeritageTransfer : GodotObject
+public partial class HeritageTransfer : GodotObject
 {
     public int TransferId { get; set; }
     public int FromPlayerId { get; set; }

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TattooData : Resource
+public partial class TattooData : Resource
 {
     [Export] public Dictionary<string, bool> UnlockedTattoos = new Dictionary<string, bool>();
     [Export] public Dictionary<string, string> AppliedTattoos = new Dictionary<string, string>(); // slot -> tattoo_id

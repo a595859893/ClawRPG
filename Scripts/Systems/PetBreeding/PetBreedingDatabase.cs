@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetBreedingDatabase : Resource
+public partial class PetBreedingDatabase : Resource
 {
     [Export] public Dictionary<string, PetBreedConfig> BreedConfigs = new Dictionary<string, PetBreedConfig>();
 

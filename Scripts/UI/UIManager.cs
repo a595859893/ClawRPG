@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.UI
     /// <summary>
     /// UI 管理器 - 负责所有游戏 UI 的创建、显示和隐藏
     /// </summary>
-    public class UIManager : ManagerBase
+    public partial class UIManager : ManagerBase
     {
         public static UIManager Instance { get; private set; }
         

@@ -286,7 +286,7 @@ namespace ClawRPG.Scripts.Systems
         
         public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Godot.Dictionary();
+            var data = new Godot.Collections.Dictionary();
             
             // 保存已装备的遗物ID列表
             var equippedRelics = new Godot.Array();
@@ -305,7 +305,7 @@ namespace ClawRPG.Scripts.Systems
             data["unlocked_sets"] = unlockedSets;
             
             // 保存套装完成次数
-            var setCompletionCounts = new Godot.Dictionary();
+            var setCompletionCounts = new Godot.Collections.Dictionary();
             foreach (var kvp in _data.SetCompletionCounts)
             {
                 setCompletionCounts[kvp.Key] = kvp.Value;
@@ -349,7 +349,7 @@ namespace ClawRPG.Scripts.Systems
             if (data.Contains("set_completion_counts"))
             {
                 _data.SetCompletionCounts.Clear();
-                var setCompletionCounts = (Godot.Dictionary)data["set_completion_counts"];
+                var setCompletionCounts = (Godot.Collections.Dictionary)data["set_completion_counts"];
                 foreach (string setId in setCompletionCounts.Keys)
                 {
                     _data.SetCompletionCounts[setId] = (int)setCompletionCounts[setId];

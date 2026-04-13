@@ -13,7 +13,7 @@ namespace ClawRPG.UI
         /// <summary>
         /// Currently selected region
         /// </summary>
-        private object _selectedRegion;
+        private TreasureHuntManager.HuntRegion _selectedRegion;
 
         /// <summary>
         /// UI Elements
@@ -83,10 +83,10 @@ namespace ClawRPG.UI
             _regionList.Clear();
 
             var regions = TreasureHuntManager.Instance.GetRegions();
+            _regionList.Clear();
             foreach (var region in regions)
             {
                 _regionList.AddItem($"{region.name} (Lv.{region.requiredLevel})");
-                _regionList.SetItemMetadata(_regionList.ItemCount - 1, region);
             }
 
             UpdateTreasurePreview();
@@ -102,17 +102,10 @@ namespace ClawRPG.UI
                 return;
             }
 
-            var itemData = _regionList.GetItemMetadata((int)index);
-            if (itemData == null)
-            {
-                return;
-            }
-
-            _selectedRegion = itemData as TreasureHuntManager.HuntRegion;
-            if (_selectedRegion == null)
-            {
-                return;
-            }
+            var regions = TreasureHuntManager.Instance.GetRegions();
+            if (index < 0 || index >= regions.Count) return;
+            _selectedRegion = regions[(int)index];
+            if (_selectedRegion == null) return;
 
             // Update info panel
             if (_infoPanel != null)

@@ -31,11 +31,11 @@ public partial class DailyQuestSystem : BaseSystem
 	private int _arenaWinCount;
 
 	[Signal]
-	public delegate void QuestUpdatedDelegate();
+	public delegate void QuestUpdatedDelegateEventHandlerEventHandler();
 	[Signal]
-	public delegate void QuestCompletedDelegate();
+	public delegate void QuestCompletedDelegateEventHandlerEventHandler();
 	[Signal]
-	public delegate void QuestClaimedDelegate();
+	public delegate void QuestClaimedDelegateEventHandlerEventHandler();
 
 	public DailyQuestSystem()
 	{

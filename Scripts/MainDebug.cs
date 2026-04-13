@@ -117,7 +117,7 @@ public partial class MainDebug : Node
     {
         if (_currentLogLevel <= LogLevel.Warning)
         {
-            GD.PrintWarn("[WARN] " + message);
+            GD.PushWarning("[WARN] " + message);
             AddToCache("WARN", message.ToString());
         }
     }

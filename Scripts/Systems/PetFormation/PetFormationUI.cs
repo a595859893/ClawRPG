@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Systems.PetFormation;
 
 /// <summary>
 /// Pet Tactical Formation UI — displays three formation zone panels (REQ-176).

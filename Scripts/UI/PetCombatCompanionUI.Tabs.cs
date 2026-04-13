@@ -478,5 +478,45 @@ namespace ClawRPG.Scripts.UI
             _performanceSampleLabel.Modulate = new Color(0.6f, 0.6f, 0.6f);
             _performanceTab.AddChild(_performanceSampleLabel);
         }
+
+        // REQ-178: Social Memory Tab ────────────────────────────────────────
+        private void SetupSocialMemoryTab()
+        {
+            // 创建社交记忆面板作为一页 tab
+            var socialTab = new VBoxContainer { Name = "SocialMemory" };
+            _tabContainer.AddChild(socialTab);
+
+            // 标题栏
+            var header = new HBoxContainer();
+            socialTab.AddChild(header);
+
+            var title = new Label
+            {
+                Text = "🐾 社交记忆",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            title.AddThemeFontSizeOverride("font_size", 18);
+            header.AddChild(title);
+
+            header.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
+
+            var refreshBtn = new Button { Text = "刷新" };
+            refreshBtn.Pressed += () => {
+                if (_socialMemoryPanel != null)
+                    _socialMemoryPanel.RefreshDisplay();
+            };
+            header.AddChild(refreshBtn);
+
+            // 分隔线
+            var sep = new HSeparator();
+            socialTab.AddChild(sep);
+
+            // PetSocialMemoryPanel 实例
+            _socialMemoryPanel = new PetSocialMemoryPanel
+            {
+                SizeFlagsVertical = Control.SizeFlags.ExpandFill
+            };
+            socialTab.AddChild(_socialMemoryPanel);
+        }
     }
 }

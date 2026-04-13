@@ -8,8 +8,8 @@ public class PlayerEventData
 {
     public Player Player { get; set; }
     public Vector3 Position { get; set; }
-    public int Health { get; set; }
-    public int MaxHealth { get; set; }
+    public float Health { get; set; }
+    public float MaxHealth { get; set; }
     public float HealthPercentage => MaxHealth > 0 ? (float)Health / MaxHealth : 0f;
     
     public PlayerEventData() { }
@@ -19,8 +19,8 @@ public class PlayerEventData
         Player = player;
         if (player != null)
         {
-            Position = player.GlobalPosition;
-            Health = player.Health;
+            Position = new Vector3(player.GlobalPosition.X, player.GlobalPosition.Y, 0);
+            Health = player.CurrentHealth;
             MaxHealth = player.MaxHealth;
         }
     }
@@ -73,7 +73,7 @@ public class PlayerHealthChangedEventData
     public Player Player { get; set; }
     public int OldHealth { get; set; }
     public int NewHealth { get; set; }
-    public int MaxHealth { get; set; }
+    public float MaxHealth { get; set; }
     public int Delta => NewHealth - OldHealth;
     public float OldPercentage => MaxHealth > 0 ? (float)OldHealth / MaxHealth : 0f;
     public float NewPercentage => MaxHealth > 0 ? (float)NewHealth / MaxHealth : 0f;

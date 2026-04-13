@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class TitleCollectionData : Resource
+public partial class TitleCollectionData : Resource
 {
     // Title categories
     public enum TitleCategory { Combat, Exploration, Crafting, Social, Achievement, Seasonal, Special, Hidden }

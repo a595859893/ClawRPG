@@ -319,23 +319,23 @@ namespace ClawRPG.Scripts.Systems.Pets
         
         public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Godot.Dictionary();
+            var data = new Godot.Collections.Dictionary();
             
             // 保存全局技能点
             data["global_skill_points"] = _globalSkillPoints;
             
             // 保存每个宠物的技能数据
-            var petsData = new Godot.Dictionary();
+            var petsData = new Godot.Collections.Dictionary();
             foreach (var kvp in _playerPetSkills)
             {
-                var petData = new Godot.Dictionary();
+                var petData = new Godot.Collections.Dictionary();
                 petData["available_skill_points"] = kvp.Value.AvailableSkillPoints;
                 
                 // 保存已学习的技能
-                var skillsData = new Godot.Dictionary();
+                var skillsData = new Godot.Collections.Dictionary();
                 foreach (var skillKvp in kvp.Value.LearnedSkills)
                 {
-                    var skillInstance = new Godot.Dictionary();
+                    var skillInstance = new Godot.Collections.Dictionary();
                     skillInstance["level"] = skillKvp.Value;
                     
                     if (kvp.Value.SkillInstances.TryGetValue(skillKvp.Key, out var instance))
@@ -365,10 +365,10 @@ namespace ClawRPG.Scripts.Systems.Pets
             _playerPetSkills.Clear();
             if (data.Contains("pets"))
             {
-                var petsData = (Godot.Dictionary)data["pets"];
+                var petsData = (Godot.Collections.Dictionary)data["pets"];
                 foreach (string petId in petsData.Keys)
                 {
-                    var petData = (Godot.Dictionary)petsData[petId];
+                    var petData = (Godot.Collections.Dictionary)petsData[petId];
                     var petSkillData = new PetSkillData();
                     
                     if (petData.Contains("available_skill_points"))
@@ -376,10 +376,10 @@ namespace ClawRPG.Scripts.Systems.Pets
                     
                     if (petData.Contains("skills"))
                     {
-                        var skillsData = (Godot.Dictionary)petData["skills"];
+                        var skillsData = (Godot.Collections.Dictionary)petData["skills"];
                         foreach (string skillId in skillsData.Keys)
                         {
-                            var skillInstance = (Godot.Dictionary)skillsData[skillId];
+                            var skillInstance = (Godot.Collections.Dictionary)skillsData[skillId];
                             var level = (int)skillInstance["level"];
                             petSkillData.LearnedSkills[skillId] = level;
                             

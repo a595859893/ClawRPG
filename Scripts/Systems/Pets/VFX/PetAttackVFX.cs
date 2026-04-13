@@ -218,7 +218,7 @@ namespace ClawRPG.Scripts.Systems.Pets.VFX {
             ShowClawMark(edge);
         }
 
-        private class ClawMark : Control {
+        private partial class ClawMark : Control {
             public PetAttackVFX.ScreenEdge Edge { get; set; }
 
             public ClawMark() {

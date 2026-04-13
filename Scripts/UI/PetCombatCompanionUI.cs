@@ -5,6 +5,7 @@ using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Pets.AI;
 using ClawRPG.Scripts.Systems.PetMimicry;
+using ClawRPG.Systems.PetFormation;
 
 namespace ClawRPG.Scripts.UI
 {
@@ -29,6 +30,16 @@ namespace ClawRPG.Scripts.UI
         private Label _roleLabel;
         private Label _statsLabel;
         private Label _learningLabel;
+
+        // ── Formation UI (REQ-176-04) ────────────────────────────────────
+        private CheckButton _btnFormation;
+        private PetFormationUI _formationUI;
+
+        // REQ-178: Social Memory Panel
+        private PetSocialMemoryPanel _socialMemoryPanel;
+
+        // REQ-179: Combo Fatigue Panel
+        private ComboFatiguePanel _fatiguePanel;
 
         // Tactical tab controls
         private Label _tacticalModeLabel;
@@ -176,6 +187,13 @@ namespace ClawRPG.Scripts.UI
             _comboLabel.AddThemeFontSizeOverride("font_size", 18);
             overviewTab.AddChild(_comboLabel);
 
+            // REQ-179: Combo Fatigue Panel - show fatigue stars in overview
+            _fatiguePanel = new ComboFatiguePanel
+            {
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+            };
+            overviewTab.AddChild(_fatiguePanel);
+
             _roleLabel = new Label { Text = "当前角色: Attacker" };
             _roleLabel.AddThemeFontSizeOverride("font_size", 16);
             overviewTab.AddChild(_roleLabel);
@@ -222,6 +240,37 @@ namespace ClawRPG.Scripts.UI
             SetupPersonalityTab();
             SetupObserverTab();
             SetupPerformanceTab();
+            // REQ-178: Social Memory tab
+            SetupSocialMemoryTab();
+
+            // ── REQ-176-04: Formation Toggle Button ────────────────────────
+            var formationHBox = new HBoxContainer();
+            vbox.AddChild(formationHBox);
+
+            _btnFormation = new CheckButton
+            {
+                Text = "🐾 战术阵型",
+                ButtonPressed = false,
+                tooltip_text = "显示/隐藏战术阵型设置"
+            };
+            _btnFormation.Toggled += OnFormationToggled;
+            formationHBox.AddChild(_btnFormation);
+
+            // Instantiate PetFormationUI as a floating overlay
+            _formationUI = new PetFormationUI
+            {
+                Name = "PetFormationUI_Overlay"
+            };
+            // Position it centered at top of screen
+            _formationUI.Position = new Vector2I(0, 60);
+            _formationUI.AnchorLeft = 0.5f;
+            _formationUI.AnchorRight = 0.5f;
+            _formationUI.OffsetLeft = -200;
+            _formationUI.OffsetRight = 200;
+            AddChild(_formationUI);
+            // Start hidden
+            _formationUI.Modulate = new Color(1f, 1f, 1f, 0f);
+            _formationUI.Hide();
         }
 
         private void ConnectSignals()
@@ -233,6 +282,22 @@ namespace ClawRPG.Scripts.UI
                 _companionSystem.SyncLevelChanged += OnSyncLevelChanged;
                 _companionSystem.ComboExecuted += OnComboExecuted;
                 _companionSystem.LearningUpdated += OnLearningUpdated;
+            }
+        }
+
+        // ── REQ-176-04: Formation Toggle ──────────────────────────────────
+
+        private void OnFormationToggled(bool buttonPressed)
+        {
+            if (_formationUI == null) return;
+
+            if (buttonPressed)
+            {
+                _formationUI.ShowFormationUI();
+            }
+            else
+            {
+                _formationUI.HideFormationUI();
             }
         }
 
@@ -261,6 +326,11 @@ namespace ClawRPG.Scripts.UI
             else
             {
                 _selectedPetId = _petSelector.GetItemText((int)index);
+            }
+            // REQ-179: Update fatigue panel for selected pet
+            if (_fatiguePanel != null)
+            {
+                _fatiguePanel.SetPetId(_selectedPetId);
             }
             RefreshUI();
         }

@@ -229,21 +229,21 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             var saveSystem = GetNode("/root/SaveSystem") as ClawRPG.Scripts.Systems.SaveSystem;
             if (saveSystem != null) {
                 // Save fate weaving data
-                var saveData = new Godot.Dictionary();
+                var saveData = new Godot.Collections.Dictionary();
                 // Serialization would go here
             }
         }
 
         public Dictionary<string, object> GetSaveData() {
-            var saveData = new Godot.Dictionary();
+            var saveData = new Godot.Collections.Dictionary();
             
-            var pathAffinity = new Godot.Dictionary();
+            var pathAffinity = new Godot.Collections.Dictionary();
             foreach (var kvp in Data.PathAffinity) {
                 pathAffinity[kvp.Key.ToString()] = kvp.Value;
             }
             saveData["path_affinity"] = pathAffinity;
             
-            var playerStats = new Godot.Dictionary();
+            var playerStats = new Godot.Collections.Dictionary();
             foreach (var kvp in Data.PlayerStats) {
                 playerStats[kvp.Key] = kvp.Value;
             }
@@ -254,7 +254,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             saveData["weave_level"] = Data.WeaveLevel;
             saveData["total_weaves"] = Data.TotalWeaves;
             
-            var choiceTypeCount = new Godot.Dictionary();
+            var choiceTypeCount = new Godot.Collections.Dictionary();
             foreach (var kvp in Data.ChoiceTypeCount) {
                 choiceTypeCount[kvp.Key] = kvp.Value;
             }
@@ -267,7 +267,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             if (saveData == null) return;
             
             if (saveData.Contains("path_affinity")) {
-                var pathAffinity = saveData["path_affinity"] as Godot.Dictionary;
+                var pathAffinity = saveData["path_affinity"] as Godot.Collections.Dictionary;
                 foreach (var key in pathAffinity.Keys) {
                     if (Enum.TryParse<FatePathType>(key.ToString(), out var pathType)) {
                         Data.PathAffinity[pathType] = Convert.ToSingle(pathAffinity[key]);
@@ -276,7 +276,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             }
             
             if (saveData.Contains("player_stats")) {
-                var playerStats = saveData["player_stats"] as Godot.Dictionary;
+                var playerStats = saveData["player_stats"] as Godot.Collections.Dictionary;
                 foreach (var key in playerStats.Keys) {
                     Data.PlayerStats[key.ToString()] = Convert.ToSingle(playerStats[key]);
                 }
@@ -305,7 +305,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             }
             
             if (saveData.Contains("choice_type_count")) {
-                var choiceTypeCount = saveData["choice_type_count"] as Godot.Dictionary;
+                var choiceTypeCount = saveData["choice_type_count"] as Godot.Collections.Dictionary;
                 Data.ChoiceTypeCount.Clear();
                 foreach (var key in choiceTypeCount.Keys) {
                     Data.ChoiceTypeCount[key.ToString()] = Convert.ToInt32(choiceTypeCount[key]);

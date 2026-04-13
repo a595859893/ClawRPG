@@ -236,13 +236,13 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
             if (saveSystem == null) return;
 
             var data = saveSystem.LoadGame();
-            if (data == null) data = new Godot.Dictionary();
+            if (data == null) data = new Godot.Collections.Dictionary();
 
             // Save pet interactions
             var interactionsArray = new Godot.Array();
             foreach (var kvp in _data.petInteractions)
             {
-                var petData = new Godot.Dictionary();
+                var petData = new Godot.Collections.Dictionary();
                 petData["pet_id"] = kvp.Key;
                 petData["pet_name"] = kvp.Value.petName;
                 petData["total_interactions"] = kvp.Value.totalInteractions;
@@ -258,7 +258,7 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
                 var recentHistory = kvp.Value.history.TakeLast(30).ToList();
                 foreach (var entry in recentHistory)
                 {
-                    var historyData = new Godot.Dictionary();
+                    var historyData = new Godot.Collections.Dictionary();
                     historyData["type"] = (int)entry.type;
                     historyData["result"] = (int)entry.result;
                     historyData["happiness"] = entry.happinessGained;
@@ -281,7 +281,7 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
             var typeCountArray = new Godot.Array();
             foreach (var kvp in _data.interactionTypeCount)
             {
-                var typeData = new Godot.Dictionary();
+                var typeData = new Godot.Collections.Dictionary();
                 typeData["type"] = (int)kvp.Key;
                 typeData["count"] = kvp.Value;
                 typeCountArray.Add(typeData);
@@ -308,7 +308,7 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
             if (data.Contains("pet_interactions"))
             {
                 var interactionsArray = (Godot.Array)data["pet_interactions"];
-                foreach (Godot.Dictionary petData in interactionsArray)
+                foreach (Godot.Collections.Dictionary petData in interactionsArray)
                 {
                     var petId = (string)petData["pet_id"];
                     var record = new PetInteractionRecord
@@ -329,7 +329,7 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
                     if (petData.Contains("history"))
                     {
                         var historyArray = (Godot.Array)petData["history"];
-                        foreach (Godot.Dictionary historyData in historyArray)
+                        foreach (Godot.Collections.Dictionary historyData in historyArray)
                         {
                             var entry = new InteractionHistory
                             {
@@ -359,7 +359,7 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
             if (data.Contains("pet_interaction_type_counts"))
             {
                 var typeCountArray = (Godot.Array)data["pet_interaction_type_counts"];
-                foreach (Godot.Dictionary typeData in typeCountArray)
+                foreach (Godot.Collections.Dictionary typeData in typeCountArray)
                 {
                     var type = (InteractionType)(int)typeData["type"];
                     var count = (int)typeData["count"];

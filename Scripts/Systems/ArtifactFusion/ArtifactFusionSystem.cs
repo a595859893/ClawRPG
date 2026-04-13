@@ -56,7 +56,7 @@ public partial class ArtifactFusionSystem : BaseSystem
             Artifact1 = recipe.Artifact1,
             Artifact2 = recipe.Artifact2,
             GoldSpent = recipe.GoldCost,
-            Timestamp = OS.GetUnixTime()
+            Timestamp = (float)Time.GetUnixTimeFromSystem()
         };
         
         // 计算融合结果

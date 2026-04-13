@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
     /// Combo 回放 UI 集成（REQ-114-04）
     /// 职责：战斗结束后显示"查看回放"按钮，点击后打开回放列表，选择后进入回放播放
     /// </summary>
-    public class ComboReplayIntegration : Node
+    public partial class ComboReplayIntegration : Node
     {
         private static ComboReplayIntegration _instance;
         public static ComboReplayIntegration Instance => _instance ??= new ComboReplayIntegration();

@@ -157,7 +157,7 @@ public partial class PetPhotoSystem : BaseSystem
 
     public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Godot.Dictionary();
+        var data = new Godot.Collections.Dictionary();
         
         // 保存已解锁的位置
         var unlockedLocations = new Godot.Array();
@@ -171,7 +171,7 @@ public partial class PetPhotoSystem : BaseSystem
         var photosArray = new Godot.Array();
         foreach (var photo in _data.AllPhotos)
         {
-            var photoData = new Godot.Dictionary();
+            var photoData = new Godot.Collections.Dictionary();
             photoData["photo_id"] = photo.PhotoId;
             photoData["pet_id"] = photo.PetId;
             photoData["pet_name"] = photo.PetName;
@@ -189,7 +189,7 @@ public partial class PetPhotoSystem : BaseSystem
         var albumsArray = new Godot.Array();
         foreach (var album in _data.Albums)
         {
-            var albumData = new Godot.Dictionary();
+            var albumData = new Godot.Collections.Dictionary();
             albumData["album_name"] = album.AlbumName;
             var photoIdsArray = new Godot.Array();
             foreach (string photoId in album.PhotoIds)
@@ -203,7 +203,7 @@ public partial class PetPhotoSystem : BaseSystem
         data["albums"] = albumsArray;
         
         // 保存统计数据
-        var stats = new Godot.Dictionary();
+        var stats = new Godot.Collections.Dictionary();
         stats["total_photos"] = _data.TotalPhotos;
         stats["favorite_photos"] = _data.FavoritePhotos;
         stats["total_albums"] = _data.TotalAlbums;
@@ -234,7 +234,7 @@ public partial class PetPhotoSystem : BaseSystem
         {
             _data.AllPhotos.Clear();
             var photosArray = (Godot.Array)data["all_photos"];
-            foreach (Godot.Dictionary photoData in photosArray)
+            foreach (Godot.Collections.Dictionary photoData in photosArray)
             {
                 var photo = new PetPhotoData.PhotoEntry
                 {
@@ -257,7 +257,7 @@ public partial class PetPhotoSystem : BaseSystem
         {
             _data.Albums.Clear();
             var albumsArray = (Godot.Array)data["albums"];
-            foreach (Godot.Dictionary albumData in albumsArray)
+            foreach (Godot.Collections.Dictionary albumData in albumsArray)
             {
                 var album = new PetPhotoData.PhotoAlbum
                 {
@@ -276,7 +276,7 @@ public partial class PetPhotoSystem : BaseSystem
         // 加载统计数据
         if (data.Contains("stats"))
         {
-            var stats = (Godot.Dictionary)data["stats"];
+            var stats = (Godot.Collections.Dictionary)data["stats"];
             _data.TotalPhotos = (int)stats["total_photos"];
             _data.FavoritePhotos = (int)stats["favorite_photos"];
             _data.TotalAlbums = (int)stats["total_albums"];
@@ -506,7 +506,7 @@ public partial class PetPhotoSystem : BaseSystem
         {
             var photosArray = (Godot.Array)data["pet_photo_photos"];
             _data.AllPhotos.Clear();
-            foreach (Godot.Dictionary photoData in photosArray)
+            foreach (Godot.Collections.Dictionary photoData in photosArray)
             {
                 var photo = new PetPhotoData.PhotoEntry
                 {
@@ -534,7 +534,7 @@ public partial class PetPhotoSystem : BaseSystem
         {
             var albumsArray = (Godot.Array)data["pet_photo_albums"];
             _data.Albums.Clear();
-            foreach (Godot.Dictionary albumData in albumsArray)
+            foreach (Godot.Collections.Dictionary albumData in albumsArray)
             {
                 var album = new PetPhotoData.PhotoAlbum
                 {
@@ -553,7 +553,7 @@ public partial class PetPhotoSystem : BaseSystem
         // 加载统计数据
         if (data.Contains("pet_photo_stats"))
         {
-            var stats = (Godot.Dictionary)data["pet_photo_stats"];
+            var stats = (Godot.Collections.Dictionary)data["pet_photo_stats"];
             _data.TotalPhotos = (int)stats["total_photos"];
             _data.FavoritePhotos = (int)stats["favorite_photos"];
             _data.TotalAlbums = (int)stats["total_albums"];
@@ -570,7 +570,7 @@ public partial class PetPhotoSystem : BaseSystem
         if (saveSystem == null) return;
 
         var data = saveSystem.LoadGame();
-        if (data == null) data = new Godot.Dictionary();
+        if (data == null) data = new Godot.Collections.Dictionary();
 
         // 保存已解锁地点
         var locationsArray = new Godot.Array();
@@ -584,7 +584,7 @@ public partial class PetPhotoSystem : BaseSystem
         var photosArray = new Godot.Array();
         foreach (var photo in _data.AllPhotos)
         {
-            var photoData = new Godot.Dictionary();
+            var photoData = new Godot.Collections.Dictionary();
             photoData["photo_id"] = photo.PhotoId;
             photoData["pet_id"] = photo.PetId;
             photoData["pet_name"] = photo.PetName;
@@ -602,7 +602,7 @@ public partial class PetPhotoSystem : BaseSystem
         var albumsArray = new Godot.Array();
         foreach (var album in _data.Albums)
         {
-            var albumData = new Godot.Dictionary();
+            var albumData = new Godot.Collections.Dictionary();
             albumData["album_name"] = album.AlbumName;
             albumData["created_at"] = album.CreatedAt.ToString("o");
             var photoIdsArray = new Godot.Array();
@@ -616,7 +616,7 @@ public partial class PetPhotoSystem : BaseSystem
         data["pet_photo_albums"] = albumsArray;
 
         // 保存统计数据
-        var stats = new Godot.Dictionary();
+        var stats = new Godot.Collections.Dictionary();
         stats["total_photos"] = _data.TotalPhotos;
         stats["favorite_photos"] = _data.FavoritePhotos;
         stats["total_albums"] = _data.TotalAlbums;

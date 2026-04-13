@@ -22,13 +22,13 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
         
         // Signals (Godot 4 compatible)
         [Signal]
-        public delegate void EventStartedDelegate(ChoiceEventType type, string eventId);
+        public delegate void EventStartedDelegateEventHandlerEventHandler(ChoiceEventType type, string eventId);
         [Signal]
-        public delegate void EventEndedDelegate(ChoiceEventType type, string eventId);
+        public delegate void EventEndedDelegateEventHandlerEventHandler(ChoiceEventType type, string eventId);
         [Signal]
-        public delegate void OptionSelectedDelegate(ChoiceOption option);
+        public delegate void OptionSelectedDelegateEventHandlerEventHandler(ChoiceOption option);
         [Signal]
-        public delegate void RewardGrantedDelegate(int gold, int exp, List<string> items);
+        public delegate void RewardGrantedDelegateEventHandlerEventHandler(int gold, int exp, List<string> items);
         
         public ChoiceEventSystem()
         {

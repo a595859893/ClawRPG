@@ -1,6 +1,10 @@
 using Godot;
+using ClawRPG.Systems.AuctionHouse;
+using AuctionItem = ClawRPG.Systems.AuctionHouse.AuctionItem;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Systems.AuctionHouse;
+using AuctionItem = ClawRPG.Systems.AuctionHouse.AuctionItem;
 
 public partial class AuctionHouseSystem : BaseSystem
 {
@@ -36,9 +40,9 @@ public partial class AuctionHouseSystem : BaseSystem
             return new Dictionary<string, object> { { "success", false }, { "message", "无效的挂售时长" } };
         }
         
-        long currentTime = OS.GetSystemTimeMsecs();
+        long currentTime = (long)(Time.GetUnixTimeFromSystem() * 1000);
         
-        var listing = new AuctionItem
+        var listing = new ClawRPG.Systems.AuctionHouse.AuctionItem
         {
             ItemId = itemId,
             ItemName = itemName,
@@ -84,7 +88,7 @@ public partial class AuctionHouseSystem : BaseSystem
             return new Dictionary<string, object> { { "success", false }, { "message", "不能购买自己的物品" } };
         }
         
-        if (OS.GetSystemTimeMsecs() > listing.ExpireTime)
+        if ((long)(Time.GetUnixTimeFromSystem() * 1000) > listing.ExpireTime)
         {
             _data.ActiveListings.Remove(listingId);
             return new Dictionary<string, object> { { "success", false }, { "message", "该物品已过期" } };
@@ -95,7 +99,7 @@ public partial class AuctionHouseSystem : BaseSystem
         
         _data.ActiveListings.Remove(listingId);
         _data.TotalSales++;
-        _data.LastUpdate = OS.GetSystemTimeMsecs();
+        _data.LastUpdate = (long)(Time.GetUnixTimeFromSystem() * 1000);
         
         if (!_data.PurchaseHistory.ContainsKey(buyerId))
         {
@@ -131,7 +135,7 @@ public partial class AuctionHouseSystem : BaseSystem
         }
         
         _data.ActiveListings.Remove(listingId);
-        _data.LastUpdate = OS.GetSystemTimeMsecs();
+        _data.LastUpdate = (long)(Time.GetUnixTimeFromSystem() * 1000);
         
         SaveAuctionData();
         
@@ -145,7 +149,7 @@ public partial class AuctionHouseSystem : BaseSystem
     public List<AuctionItem> GetListings(string category = "", string rarity = "", string searchTerm = "", int maxResults = 50)
     {
         var results = new List<AuctionItem>();
-        long currentTime = OS.GetSystemTimeMsecs();
+        long currentTime = (long)(Time.GetUnixTimeFromSystem() * 1000);
         
         foreach (var kvp in _data.ActiveListings)
         {
@@ -224,7 +228,7 @@ public partial class AuctionHouseSystem : BaseSystem
         foreach (var kvp in _data.ActiveListings)
         {
             var listing = kvp.Value;
-            if (OS.GetSystemTimeMsecs() <= listing.ExpireTime)
+            if ((long)(Time.GetUnixTimeFromSystem() * 1000) <= listing.ExpireTime)
             {
                 if (categories.ContainsKey(listing.Category))
                 {
@@ -247,7 +251,7 @@ public partial class AuctionHouseSystem : BaseSystem
         foreach (var kvp in _data.ActiveListings)
         {
             var listing = kvp.Value;
-            if (OS.GetSystemTimeMsecs() <= listing.ExpireTime)
+            if ((long)(Time.GetUnixTimeFromSystem() * 1000) <= listing.ExpireTime)
             {
                 if (rarities.ContainsKey(listing.Rarity))
                 {
@@ -266,7 +270,7 @@ public partial class AuctionHouseSystem : BaseSystem
     public Dictionary<string, object> GetStatistics()
     {
         int activeCount = 0;
-        long currentTime = OS.GetSystemTimeMsecs();
+        long currentTime = (long)(Time.GetUnixTimeFromSystem() * 1000);
         
         foreach (var kvp in _data.ActiveListings)
         {
@@ -287,7 +291,7 @@ public partial class AuctionHouseSystem : BaseSystem
     
     public void CleanExpiredListings()
     {
-        long currentTime = OS.GetSystemTimeMsecs();
+        long currentTime = (long)(Time.GetUnixTimeFromSystem() * 1000);
         var expiredIds = new List<int>();
         
         foreach (var kvp in _data.ActiveListings)
@@ -382,7 +386,7 @@ public partial class AuctionHouseSystem : BaseSystem
             var listings = data["listings"] as List<Dictionary<string, object>>;
             foreach (var listingData in listings)
             {
-                var listing = new AuctionItem
+                var listing = new ClawRPG.Systems.AuctionHouse.AuctionItem
                 {
                     ItemId = listingData["itemId"].ToString(),
                     ItemName = listingData["itemName"].ToString(),

@@ -35,11 +35,11 @@ namespace ClawRPG.Systems.Narrative
 
         /// <summary>Signal: 新碎片被收集</summary>
         [Signal]
-        public delegate void FragmentCollectedDelegate(string fragmentId, string roomType);
+        public delegate void FragmentCollectedDelegateEventHandlerEventHandler(string fragmentId, string roomType);
 
         /// <summary>Signal: 玩家进入一个已分配碎片的房间</summary>
         [Signal]
-        public delegate void RoomFragmentDiscoveredDelegate(string roomId, string fragmentId);
+        public delegate void RoomFragmentDiscoveredDelegateEventHandlerEventHandler(string roomId, string fragmentId);
 
         public override void _Ready()
         {
@@ -377,7 +377,7 @@ namespace ClawRPG.Systems.Narrative
             if (fragment != null)
             {
                 _currentRunAssignedFragments[roomId] = fragment.FragmentId;
-                EmitSignal(nameof(RoomFragmentDiscoveredDelegate), roomId, fragment.FragmentId);
+                EmitSignal(nameof(RoomFragmentDiscoveredDelegateEventHandlerEventHandler), roomId, fragment.FragmentId);
             }
             return fragment;
         }
@@ -394,7 +394,7 @@ namespace ClawRPG.Systems.Narrative
             var fragment = _fragments.FirstOrDefault(f => f.FragmentId == fragmentId);
             if (fragment != null)
             {
-                EmitSignal(nameof(FragmentCollectedDelegate), fragmentId, fragment.RoomType);
+                EmitSignal(nameof(FragmentCollectedDelegateEventHandlerEventHandler), fragmentId, fragment.RoomType);
             }
         }
 

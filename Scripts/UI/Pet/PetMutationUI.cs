@@ -346,7 +346,7 @@ public partial class PetMutationUI : Control
 /// <summary>
 /// 变异树形视图
 /// </summary>
-public class PetMutationTree : VBoxContainer
+public partial class PetMutationTree : VBoxContainer
 {
     private Tree _tree;
     
@@ -388,7 +388,7 @@ public class PetMutationTree : VBoxContainer
 /// <summary>
 /// 变异详情面板
 /// </summary>
-public class PetMutationDetails : PanelContainer
+public partial class PetMutationDetails : PanelContainer
 {
     private VBoxContainer _content;
     private Label _bonusesLabel;

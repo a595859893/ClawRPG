@@ -16,7 +16,7 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
         private Label _countLabel;
         private ScrollContainer _scrollContainer;
         private PanelContainer _emptyState;
-        private Dictionary<string, Control> _entryNodes = new Dictionary<string, Control>();
+        private System.Collections.Generic.Dictionary<string, Control> _entryNodes = new System.Collections.Generic.Dictionary<string, Control>();
 
         // 稀有度颜色
         private readonly Color CommonColor   = new Color(0.7f, 0.7f, 0.7f);

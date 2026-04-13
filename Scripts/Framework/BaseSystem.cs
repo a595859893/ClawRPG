@@ -10,7 +10,7 @@ using System.Collections.Generic;
 /// 提供统一的生命周期管理和数据持久化接口
 /// 支持单例模式 (通过 Instance 属性访问)
 /// </summary>
-public abstract class BaseSystem : Node
+public abstract partial class BaseSystem : Node
 {
     /// <summary>
     /// 单例实例 (子类需要实现)

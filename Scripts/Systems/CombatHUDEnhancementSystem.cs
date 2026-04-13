@@ -87,11 +87,11 @@ public partial class CombatHUDEnhancementSystem : BaseSystem
 	
 	// Signals (Godot 4 compatible)
 	[Signal]
-	public delegate void CombatEndedDelegate(CombatHUDEnhancementData.CombatRating rating);
+	public delegate void CombatEndedDelegateEventHandlerEventHandler(CombatHUDEnhancementData.CombatRating rating);
 	[Signal]
-	public delegate void ComboChangedDelegate(int combo);
+	public delegate void ComboChangedDelegateEventHandlerEventHandler(int combo);
 	[Signal]
-	public delegate void MilestoneReachedDelegate(string milestone);
+	public delegate void MilestoneReachedDelegateEventHandlerEventHandler(string milestone);
 	
 	public override void _Ready()
 	{

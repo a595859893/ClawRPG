@@ -15,7 +15,7 @@ using ClawRPG.Scripts.Systems.Pets;
 /// 3. 将行为映射为 PlayerBehaviorType 并记录到 PetMimicryData
 /// 4. 支持行为印记跨游戏持久化
 /// </summary>
-public class PetBehaviorLogger : Node
+public partial class PetBehaviorLogger : Node
 {
     // ── Singleton ──────────────────────────────────────────────────────────
     public static PetBehaviorLogger Instance { get; private set; }

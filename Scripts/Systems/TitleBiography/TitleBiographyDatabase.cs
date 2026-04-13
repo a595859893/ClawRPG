@@ -19,7 +19,7 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
         /// dataField: 填充 bioTemplate 所需的玩家数据字段名（对应 StyleMasterySystem / CombatStatusSystem 等的API）
         /// milestoneTemplate: 未解锁时的里程碑提示
         /// </summary>
-        private class BiographyTemplate
+        public class BiographyTemplate
         {
             public string TitleId { get; set; }
             public string BioTemplate { get; set; }

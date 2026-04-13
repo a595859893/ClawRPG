@@ -20,19 +20,19 @@ public partial class PetMorphSystem : BaseSystem
     
     // 信号系统 (Godot 4 compatible)
     [Signal]
-    public delegate void MorphUnlockedDelegate(string petId, string morphId);
+    public delegate void MorphUnlockedDelegateEventHandlerEventHandler(string petId, string morphId);
     [Signal]
-    public delegate void MorphActivatedDelegate(string petId, string morphId);
+    public delegate void MorphActivatedDelegateEventHandlerEventHandler(string petId, string morphId);
     [Signal]
-    public delegate void MorphDeactivatedDelegate(string petId);
+    public delegate void MorphDeactivatedDelegateEventHandlerEventHandler(string petId);
     [Signal]
-    public delegate void MorphTransformedDelegate(string petId, string morphId);
+    public delegate void MorphTransformedDelegateEventHandlerEventHandler(string petId, string morphId);
     [Signal]
-    public delegate void TransformationStartedDelegate(string petId, string morphId);
+    public delegate void TransformationStartedDelegateEventHandlerEventHandler(string petId, string morphId);
     [Signal]
-    public delegate void TransformationCompletedDelegate(string petId, string morphId);
+    public delegate void TransformationCompletedDelegateEventHandlerEventHandler(string petId, string morphId);
     [Signal]
-    public delegate void TransformationFailedDelegate(string petId, string morphId);
+    public delegate void TransformationFailedDelegateEventHandlerEventHandler(string petId, string morphId);
     
     /// <summary>
     /// 初始化系统

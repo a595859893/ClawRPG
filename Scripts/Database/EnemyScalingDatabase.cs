@@ -57,8 +57,8 @@ public class EnemyScalingDatabase
         {
             EnemyType = "Slime",
             HealthScaling = new EnemyScalingData.ScalingParameters { BaseValue = 50, GrowthRate = 5, MaxValue = 500, Type = EnemyScalingData.ScalingType.Linear },
-            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 5, GrowthRate = 0.8, MaxValue = 50, Type = EnemyScalingData.ScalingType.Linear },
-            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 0, GrowthRate = 0.2, MaxValue = 20, Type = EnemyScalingData.ScalingType.Linear },
+            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 5, GrowthRate = 0.8F, MaxValue = 50, Type = EnemyScalingData.ScalingType.Linear },
+            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 0, GrowthRate = 0.2F, MaxValue = 20, Type = EnemyScalingData.ScalingType.Linear },
             SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 50, GrowthRate = 1, MaxValue = 100, Type = EnemyScalingData.ScalingType.Plateau },
             ExperienceMultiplier = 1.0f,
             DropRateMultiplier = 1.0f,
@@ -69,9 +69,9 @@ public class EnemyScalingDatabase
         {
             EnemyType = "Goblin",
             HealthScaling = new EnemyScalingData.ScalingParameters { BaseValue = 80, GrowthRate = 10, MaxValue = 800, Type = EnemyScalingData.ScalingType.Linear },
-            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 10, GrowthRate = 1.5, MaxValue = 100, Type = EnemyScalingData.ScalingType.Linear },
-            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 2, GrowthRate = 0.5, MaxValue = 40, Type = EnemyScalingData.ScalingType.Linear },
-            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 60, GrowthRate = 1.5, MaxValue = 120, Type = EnemyScalingData.ScalingType.Plateau },
+            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 10, GrowthRate = 1.5F, MaxValue = 100, Type = EnemyScalingData.ScalingType.Linear },
+            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 2, GrowthRate = 0.5F, MaxValue = 40, Type = EnemyScalingData.ScalingType.Linear },
+            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 60, GrowthRate = 1.5F, MaxValue = 120, Type = EnemyScalingData.ScalingType.Plateau },
             ExperienceMultiplier = 1.2f,
             DropRateMultiplier = 1.2f,
         };
@@ -81,9 +81,9 @@ public class EnemyScalingDatabase
         {
             EnemyType = "Skeleton",
             HealthScaling = new EnemyScalingData.ScalingParameters { BaseValue = 100, GrowthRate = 12, MaxValue = 1000, Type = EnemyScalingData.ScalingType.Linear },
-            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 12, GrowthRate = 1.8, MaxValue = 120, Type = EnemyScalingData.ScalingType.Linear },
+            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 12, GrowthRate = 1.8F, MaxValue = 120, Type = EnemyScalingData.ScalingType.Linear },
             DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 5, GrowthRate = 1, MaxValue = 80, Type = EnemyScalingData.ScalingType.Plateau },
-            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 45, GrowthRate = 0.8, MaxValue = 90, Type = EnemyScalingData.ScalingType.Linear },
+            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 45, GrowthRate = 0.8F, MaxValue = 90, Type = EnemyScalingData.ScalingType.Linear },
             ExperienceMultiplier = 1.3f,
             DropRateMultiplier = 1.3f,
         };
@@ -93,8 +93,8 @@ public class EnemyScalingDatabase
         {
             EnemyType = "Elemental",
             HealthScaling = new EnemyScalingData.ScalingParameters { BaseValue = 120, GrowthRate = 18, MaxValue = 1500, Type = EnemyScalingData.ScalingType.Exponential },
-            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 15, GrowthRate = 2.5, MaxValue = 200, Type = EnemyScalingData.ScalingType.Exponential },
-            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 3, GrowthRate = 0.8, MaxValue = 60, Type = EnemyScalingData.ScalingType.Linear },
+            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 15, GrowthRate = 2.5F, MaxValue = 200, Type = EnemyScalingData.ScalingType.Exponential },
+            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 3, GrowthRate = 0.8F, MaxValue = 60, Type = EnemyScalingData.ScalingType.Linear },
             SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 70, GrowthRate = 2, MaxValue = 150, Type = EnemyScalingData.ScalingType.Plateau },
             ExperienceMultiplier = 1.5f,
             DropRateMultiplier = 1.5f,
@@ -118,8 +118,8 @@ public class EnemyScalingDatabase
             EnemyType = "Demon",
             HealthScaling = new EnemyScalingData.ScalingParameters { BaseValue = 200, GrowthRate = 25, MaxValue = 2000, Type = EnemyScalingData.ScalingType.Exponential },
             AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 25, GrowthRate = 4, MaxValue = 250, Type = EnemyScalingData.ScalingType.Exponential },
-            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 8, GrowthRate = 1.5, MaxValue = 100, Type = EnemyScalingData.ScalingType.Linear },
-            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 65, GrowthRate = 1.5, MaxValue = 130, Type = EnemyScalingData.ScalingType.Plateau },
+            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 8, GrowthRate = 1.5F, MaxValue = 100, Type = EnemyScalingData.ScalingType.Linear },
+            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 65, GrowthRate = 1.5F, MaxValue = 130, Type = EnemyScalingData.ScalingType.Plateau },
             ExperienceMultiplier = 1.8f,
             DropRateMultiplier = 1.8f,
         };
@@ -130,8 +130,8 @@ public class EnemyScalingDatabase
             EnemyType = "Mechanical",
             HealthScaling = new EnemyScalingData.ScalingParameters { BaseValue = 150, GrowthRate = 20, MaxValue = 1800, Type = EnemyScalingData.ScalingType.Exponential },
             AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 18, GrowthRate = 3, MaxValue = 200, Type = EnemyScalingData.ScalingType.Linear },
-            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 15, GrowthRate = 2.5, MaxValue = 180, Type = EnemyScalingData.ScalingType.Plateau },
-            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 35, GrowthRate = 0.5, MaxValue = 70, Type = EnemyScalingData.ScalingType.Linear },
+            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 15, GrowthRate = 2.5F, MaxValue = 180, Type = EnemyScalingData.ScalingType.Plateau },
+            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 35, GrowthRate = 0.5F, MaxValue = 70, Type = EnemyScalingData.ScalingType.Linear },
             ExperienceMultiplier = 1.4f,
             DropRateMultiplier = 1.2f,
         };
@@ -142,8 +142,8 @@ public class EnemyScalingDatabase
             EnemyType = "Undead",
             HealthScaling = new EnemyScalingData.ScalingParameters { BaseValue = 90, GrowthRate = 12, MaxValue = 900, Type = EnemyScalingData.ScalingType.Linear },
             AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 14, GrowthRate = 2, MaxValue = 140, Type = EnemyScalingData.ScalingType.Linear },
-            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 4, GrowthRate = 0.8, MaxValue = 50, Type = EnemyScalingData.ScalingType.Logarithmic },
-            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 50, GrowthRate = 1.2, MaxValue = 110, Type = EnemyScalingData.ScalingType.Linear },
+            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 4, GrowthRate = 0.8F, MaxValue = 50, Type = EnemyScalingData.ScalingType.Logarithmic },
+            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 50, GrowthRate = 1.2F, MaxValue = 110, Type = EnemyScalingData.ScalingType.Linear },
             ExperienceMultiplier = 1.25f,
             DropRateMultiplier = 1.4f,
         };
@@ -153,9 +153,9 @@ public class EnemyScalingDatabase
         {
             EnemyType = "Beast",
             HealthScaling = new EnemyScalingData.ScalingParameters { BaseValue = 110, GrowthRate = 15, MaxValue = 1200, Type = EnemyScalingData.ScalingType.Exponential },
-            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 16, GrowthRate = 2.2, MaxValue = 160, Type = EnemyScalingData.ScalingType.Linear },
-            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 3, GrowthRate = 0.6, MaxValue = 45, Type = EnemyScalingData.ScalingType.Linear },
-            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 80, GrowthRate = 2.5, MaxValue = 180, Type = EnemyScalingData.ScalingType.Plateau },
+            AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 16, GrowthRate = 2.2F, MaxValue = 160, Type = EnemyScalingData.ScalingType.Linear },
+            DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 3, GrowthRate = 0.6F, MaxValue = 45, Type = EnemyScalingData.ScalingType.Linear },
+            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 80, GrowthRate = 2.5F, MaxValue = 180, Type = EnemyScalingData.ScalingType.Plateau },
             ExperienceMultiplier = 1.35f,
             DropRateMultiplier = 1.25f,
         };
@@ -167,7 +167,7 @@ public class EnemyScalingDatabase
             HealthScaling = new EnemyScalingData.ScalingParameters { BaseValue = 1000, GrowthRate = 100, MaxValue = 10000, Type = EnemyScalingData.ScalingType.Exponential },
             AttackScaling = new EnemyScalingData.ScalingParameters { BaseValue = 50, GrowthRate = 8, MaxValue = 500, Type = EnemyScalingData.ScalingType.Exponential },
             DefenseScaling = new EnemyScalingData.ScalingParameters { BaseValue = 20, GrowthRate = 3, MaxValue = 200, Type = EnemyScalingData.ScalingType.Linear },
-            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 30, GrowthRate = 0.5, MaxValue = 80, Type = EnemyScalingData.ScalingType.Linear },
+            SpeedScaling = new EnemyScalingData.ScalingParameters { BaseValue = 30, GrowthRate = 0.5F, MaxValue = 80, Type = EnemyScalingData.ScalingType.Linear },
             ExperienceMultiplier = 3.0f,
             DropRateMultiplier = 3.0f,
         };

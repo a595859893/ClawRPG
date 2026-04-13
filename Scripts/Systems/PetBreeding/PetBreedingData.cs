@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetBreedingData : Resource
+public partial class PetBreedingData : Resource
 {
     [Export] public Dictionary<string, bool> UnlockedBreeds = new Dictionary<string, bool>();
     [Export] public List<PetBreedingRecord> BreedingHistory = new List<PetBreedingRecord>();

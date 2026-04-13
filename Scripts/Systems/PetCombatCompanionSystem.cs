@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
 using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Data;
 
@@ -18,22 +19,22 @@ namespace ClawRPG.Scripts.Systems
         
         // Signals for UI and game integration (Godot 4 compatible)
         [Signal]
-        public delegate void ComboChainChangedDelegate(string petId, int chain);
+        public delegate void ComboChainChangedDelegateEventHandlerEventHandler(string petId, int chain);
         [Signal]
-        public delegate void RoleChangedDelegate(string petId, string role);
+        public delegate void RoleChangedDelegateEventHandlerEventHandler(string petId, string role);
         [Signal]
-        public delegate void SyncLevelChangedDelegate(string petId, float syncLevel);
+        public delegate void SyncLevelChangedDelegateEventHandlerEventHandler(string petId, float syncLevel);
         [Signal]
-        public delegate void ComboExecutedDelegate(string petId, ComboType comboType, float syncLevel);
+        public delegate void ComboExecutedDelegateEventHandlerEventHandler(string petId, ComboType comboType, float syncLevel);
         [Signal]
-        public delegate void LearningUpdatedDelegate(string petId, string learning);
+        public delegate void LearningUpdatedDelegateEventHandlerEventHandler(string petId, string learning);
         [Signal]
-        public delegate void PositionRecommendationDelegate(string petId, Vector2 position);
+        public delegate void PositionRecommendationDelegateEventHandlerEventHandler(string petId, Vector2 position);
         /// <summary>
         /// 宠物协同攻击触发（REQ-136）：玩家combo触发后，宠物根据syncLevel概率发动协战
         /// </summary>
         [Signal]
-        public delegate void SynergyAttackTriggeredDelegate(string petId, string attackType, float syncLevel);
+        public delegate void SynergyAttackTriggeredDelegateEventHandlerEventHandler(string petId, string attackType, float syncLevel);
 
         public override void _Ready()
         {
@@ -190,6 +191,26 @@ namespace ClawRPG.Scripts.Systems
             {
                 ExecuteCombo(petId, state.ComboChain);
                 SynergyAttackTriggered?.Emit(petId, attackType, state.SyncLevel);
+            }
+
+            // REQ-189: Record skill usage for departure profile card
+            try
+            {
+                ClawRPG.Systems.PetDeparture.PetDepartureSystem.Instance?.RecordSkillUsed(petId, attackType);
+            }
+            catch (Exception)
+            {
+                // Silently ignore if PetDepartureSystem is not available
+            }
+
+            // REQ-190: Record first skill of each battle for memory guidance
+            try
+            {
+                ClawRPG.Systems.PetBattleMemory.PetBattleMemorySystem.Instance?.RecordPlayerSkillUse(petId, attackType, "");
+            }
+            catch (Exception)
+            {
+                // Silently ignore if PetBattleMemorySystem is not available
             }
         }
 
@@ -597,7 +618,26 @@ namespace ClawRPG.Scripts.Systems
                 learnedSkillsData.Add(skill);
             }
             data["learned_skills"] = learnedSkillsData;
-            
+
+            // 保存讣告数据 (REQ-191)
+            var obituaryDataList = new List<Dictionary<string, object>>();
+            foreach (var kvp in _companionData.ObituaryData)
+            {
+                obituaryDataList.Add(new Dictionary<string, object>
+                {
+                    ["pet_id"] = kvp.Key,
+                    ["total_battles"] = kvp.Value.TotalBattles,
+                    ["most_used_combo"] = kvp.Value.MostUsedCombo ?? "",
+                    ["most_used_combo_count"] = kvp.Value.MostUsedComboCount,
+                    ["total_enemies_killed"] = kvp.Value.TotalEnemiesKilled,
+                    ["total_battle_time_seconds"] = kvp.Value.TotalBattleTimeSeconds,
+                    ["peak_streak"] = kvp.Value.PeakStreak,
+                    ["first_battle_timestamp"] = kvp.Value.FirstBattleTimestamp,
+                    ["last_battle_timestamp"] = kvp.Value.LastBattleTimestamp
+                });
+            }
+            data["obituary_data"] = obituaryDataList;
+
             return data;
         }
         
@@ -633,6 +673,95 @@ namespace ClawRPG.Scripts.Systems
                     _companionData.LearnedSkills.Add(skill);
                 }
             }
+
+            // 恢复讣告数据 (REQ-191)
+            if (data.ContainsKey("obituary_data"))
+            {
+                try
+                {
+                    var obituaryList = (Godot.Collections.Array)data["obituary_data"];
+                    _companionData.ObituaryData.Clear();
+                    foreach (var item in obituaryList)
+                    {
+                        var dict = (Dictionary<string, object>)item;
+                        string petId = dict.GetValueOrDefault("pet_id", "").ToString();
+                        if (!string.IsNullOrEmpty(petId))
+                        {
+                            var obituary = new PetObituaryData
+                            {
+                                TotalBattles = Convert.ToInt32(dict.GetValueOrDefault("total_battles", 0)),
+                                MostUsedCombo = dict.GetValueOrDefault("most_used_combo", "").ToString(),
+                                MostUsedComboCount = Convert.ToInt32(dict.GetValueOrDefault("most_used_combo_count", 0)),
+                                TotalEnemiesKilled = Convert.ToInt32(dict.GetValueOrDefault("total_enemies_killed", 0)),
+                                TotalBattleTimeSeconds = Convert.ToDouble(dict.GetValueOrDefault("total_battle_time_seconds", 0.0)),
+                                PeakStreak = Convert.ToInt32(dict.GetValueOrDefault("peak_streak", 0)),
+                                FirstBattleTimestamp = Convert.ToInt64(dict.GetValueOrDefault("first_battle_timestamp", 0L)),
+                                LastBattleTimestamp = Convert.ToInt64(dict.GetValueOrDefault("last_battle_timestamp", 0L))
+                            };
+                            _companionData.ObituaryData[petId] = obituary;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    GD.PrintErr($"[PetCombatCompanion] Failed to restore obituary data: {ex.Message}");
+                }
+            }
         }
+
+        #region Obituary System Integration (REQ-191)
+
+        /// <summary>
+        /// 战斗开始时由 PetObituarySystem 调用（通过 CombatManager.CombatStarted 信号）
+        /// </summary>
+        public void OnBattleStarted()
+        {
+            string activeId = _companionData.ActivePetId;
+            if (string.IsNullOrEmpty(activeId)) return;
+
+            EnsureObituaryData(activeId);
+            _companionData.ObituaryData[activeId].OnBattleStarted();
+        }
+
+        /// <summary>
+        /// 战斗结束时由 PetObituarySystem 调用（通过 CombatManager.CombatEnded 信号）
+        /// </summary>
+        public void OnBattleEnded(string firstCombo)
+        {
+            string activeId = _companionData.ActivePetId;
+            if (string.IsNullOrEmpty(activeId)) return;
+
+            EnsureObituaryData(activeId);
+            _companionData.ObituaryData[activeId].OnBattleEnded(firstCombo);
+
+            // 同步 TotalEnemiesDefeated 到讣告数据
+            _companionData.ObituaryData[activeId].TotalEnemiesKilled = _companionData.TotalEnemiesDefeated;
+
+            // 同步 PeakStreak
+            if (_companionData.MaxComboCount > _companionData.ObituaryData[activeId].PeakStreak)
+            {
+                _companionData.ObituaryData[activeId].PeakStreak = _companionData.MaxComboCount;
+            }
+        }
+
+        /// <summary>
+        /// 获取宠物讣告数据（供 PetObituarySystem 使用）
+        /// </summary>
+        public PetObituaryData GetObituaryData(string petId)
+        {
+            if (string.IsNullOrEmpty(petId)) return null;
+            EnsureObituaryData(petId);
+            return _companionData.ObituaryData[petId];
+        }
+
+        private void EnsureObituaryData(string petId)
+        {
+            if (!_companionData.ObituaryData.ContainsKey(petId))
+            {
+                _companionData.ObituaryData[petId] = new PetObituaryData();
+            }
+        }
+
+        #endregion
     }
 }

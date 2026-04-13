@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
      * GuildQuestBoardData - 公会任务布告栏数据
      * 存储公会发布的任务和玩家接受的任务
      */
-    public class GuildQuestBoardData : Resource {
+    public partial class GuildQuestBoardData : Resource {
         // 任务ID -> 任务数据
         public Dictionary<int, QuestBoardQuest> availableQuests = new Dictionary<int, QuestBoardQuest>();
         

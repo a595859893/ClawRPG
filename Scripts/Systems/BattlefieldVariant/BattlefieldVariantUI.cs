@@ -5,7 +5,7 @@ using System;
 /// 战场变体 UI（REQ-115-05）
 /// 战斗开始时显示变体名称+图标+效果描述，战斗中实时显示效果触发
 /// </summary>
-public class BattlefieldVariantUI : CanvasLayer
+public partial class BattlefieldVariantUI : CanvasLayer
 {
     // 变体提示面板
     private PanelContainer _variantPanel;
@@ -28,7 +28,7 @@ public class BattlefieldVariantUI : CanvasLayer
 
         SetupUI();
         SubscribeToSignals();
-        HideVariantPanel();
+        Hide(); // HideVariantPanel renamed to Hide in Godot 4
     }
 
     private static BattlefieldVariantUI _instance;
@@ -156,7 +156,7 @@ public class BattlefieldVariantUI : CanvasLayer
 
     private void OnVariantExited(BattlefieldVariantType variant)
     {
-        HideVariantPanel();
+        Hide(); // HideVariantPanel renamed to Hide in Godot 4
         _effectLabel.Hide();
     }
 

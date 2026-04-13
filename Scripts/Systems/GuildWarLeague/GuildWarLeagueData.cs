@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildWarLeagueData : Resource {
+public partial class GuildWarLeagueData : Resource {
     [Export] public int CurrentSeason { get; set; } = 1;
     [Export] public int SeasonStartTimestamp { get; set; }
     [Export] public int SeasonDurationDays { get; set; } = 30;
@@ -55,7 +55,7 @@ public class GuildWarLeagueStatistics {
     public int HighestPoints { get; set; } = 0;
 }
 
-public class GuildWarLeagueDatabase : Resource {
+public partial class GuildWarLeagueDatabase : Resource {
     [Export] public Dictionary<string, DivisionConfig> Divisions { get; set; } = new Dictionary<string, DivisionConfig>();
     [Export] public Dictionary<string, SeasonReward> SeasonRewards { get; set; } = new Dictionary<string, SeasonReward>();
     [Export] public Dictionary<string, MatchConfig> MatchTypes { get; set; } = new Dictionary<string, MatchConfig>();

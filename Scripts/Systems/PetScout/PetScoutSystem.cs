@@ -31,16 +31,16 @@ namespace ClawRPG.Scripts.Systems.PetScout
         // 信号 (Godot 4 compatible)
         /// <summary>发现盲区敌人时触发 (enemyId, position, alertType)</summary>
         [Signal]
-        public delegate void EnemyDetectedInBlindSpotDelegate(string enemyId, Vector2 position, ScoutAlertType alertType);
+        public delegate void EnemyDetectedInBlindSpotDelegateEventHandlerEventHandler(string enemyId, Vector2 position, ScoutAlertType alertType);
         /// <summary>侦察模式切换时触发 (enabled)</summary>
         [Signal]
-        public delegate void ScoutModeChangedDelegate(bool enabled);
+        public delegate void ScoutModeChangedDelegateEventHandlerEventHandler(bool enabled);
         /// <summary>宠物发光强度变化 (intensity 0-1)</summary>
         [Signal]
-        public delegate void GlowIntensityChangedDelegate(float intensity);
+        public delegate void GlowIntensityChangedDelegateEventHandlerEventHandler(float intensity);
         /// <summary>触发警报音效时触发</summary>
         [Signal]
-        public delegate void PlayedAlertSoundDelegate();
+        public delegate void PlayedAlertSoundDelegateEventHandlerEventHandler();
 
         // 当前发光强度
         private float _currentGlowIntensity = 0f;

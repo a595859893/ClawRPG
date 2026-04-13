@@ -46,17 +46,17 @@ public partial class AuctionHouseUI : Control
     private void SetupUI()
     {
         var bg = new TextureRect();
-        bg.Texture = GD.Load<Texture>("res://assets/ui/panel_bg.png");
+        bg.Texture = GD.Load<Texture2D>("res://assets/ui/panel_bg.png");
         bg.Modulate = new Color(1, 1, 1, 0.9f);
         bg.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(bg);
         
         _mainContainer = new VBoxContainer();
         _mainContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        _mainContainer.MarginLeft = 50;
-        _mainContainer.MarginTop = 50;
-        _mainContainer.MarginRight = -50;
-        _mainContainer.MarginBottom = -50;
+        _mainContainer.OffsetLeft = 50;
+        _mainContainer.OffsetTop = 50;
+        _mainContainer.OffsetRight = -50;
+        _mainContainer.OffsetBottom = -50;
         _mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(_mainContainer);
         

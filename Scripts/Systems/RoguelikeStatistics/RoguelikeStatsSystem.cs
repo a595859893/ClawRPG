@@ -274,7 +274,7 @@ public partial class RoguelikeStatsSystem : BaseSystem
     
     public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Godot.Dictionary();
+        var data = new Godot.Collections.Dictionary();
         
         // 保存总统计数据
         data["total_runs"] = _data.TotalRuns;
@@ -302,7 +302,7 @@ public partial class RoguelikeStatsSystem : BaseSystem
         data["most_used_build_count"] = _data.MostUsedBuildCount;
         
         // 保存死亡原因统计
-        var deathCauses = new Godot.Dictionary();
+        var deathCauses = new Godot.Collections.Dictionary();
         foreach (var kvp in _data.DeathCauses)
         {
             deathCauses[kvp.Key] = kvp.Value;
@@ -315,7 +315,7 @@ public partial class RoguelikeStatsSystem : BaseSystem
         for (int i = start; i < _data.RunHistory.Count; i++)
         {
             var record = _data.RunHistory[i];
-            var recordData = new Godot.Dictionary();
+            var recordData = new Godot.Collections.Dictionary();
             recordData["run_id"] = record.RunId;
             recordData["victory"] = record.Victory;
             recordData["floor_reached"] = record.FloorReached;
@@ -369,7 +369,7 @@ public partial class RoguelikeStatsSystem : BaseSystem
         if (data.Contains("death_causes"))
         {
             _data.DeathCauses.Clear();
-            var deathCauses = (Godot.Dictionary)data["death_causes"];
+            var deathCauses = (Godot.Collections.Dictionary)data["death_causes"];
             foreach (string cause in deathCauses.Keys)
             {
                 _data.DeathCauses[cause] = (int)deathCauses[cause];
@@ -383,7 +383,7 @@ public partial class RoguelikeStatsSystem : BaseSystem
             var runHistory = (Godot.Array)data["run_history"];
             foreach (var recordData in runHistory)
             {
-                var rd = (Godot.Dictionary)recordData;
+                var rd = (Godot.Collections.Dictionary)recordData;
                 var record = new RoguelikeRunRecord
                 {
                     RunId = (int)rd["run_id"],

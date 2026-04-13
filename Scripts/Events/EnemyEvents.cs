@@ -20,11 +20,11 @@ public class EnemyEventData
         Enemy = enemy;
         if (enemy != null)
         {
-            Position = enemy.GlobalPosition;
+            Position = new Vector3(enemy.GlobalPosition.X, enemy.GlobalPosition.Y, 0);
             // 尝试获取敌人类型和生命值
             if (enemy.HasMethod("GetEnemyType"))
             {
-                EnemyType = enemy.Call("GetEnemyType") as string ?? "default";
+                EnemyType = (string)enemy.Call("GetEnemyType");
             }
         }
     }
@@ -53,7 +53,7 @@ public class EnemyDiedEventData
         
         if (enemy != null && enemy.HasMethod("GetEnemyType"))
         {
-            EnemyType = enemy.Call("GetEnemyType") as string ?? "default";
+            EnemyType = (string)enemy.Call("GetEnemyType");
         }
     }
 }
@@ -102,7 +102,7 @@ public class EnemySpawnedEventData
         
         if (enemy != null && enemy.HasMethod("GetEnemyType"))
         {
-            EnemyType = enemy.Call("GetEnemyType") as string ?? "default";
+            EnemyType = (string)enemy.Call("GetEnemyType");
         }
     }
 }

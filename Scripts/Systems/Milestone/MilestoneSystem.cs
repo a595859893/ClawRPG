@@ -30,13 +30,13 @@ public partial class MilestoneSystem : BaseSystem
         // Load milestone data
         if (data.Contains("milestones"))
         {
-            var milestoneData = (Godot.Dictionary)data["milestones"];
+            var milestoneData = (Godot.Collections.Dictionary)data["milestones"];
             
             // Load milestone entries
             if (milestoneData.Contains("entries"))
             {
                 var entriesArray = (Godot.Array)milestoneData["entries"];
-                foreach (Godot.Dictionary entryDict in entriesArray)
+                foreach (Godot.Collections.Dictionary entryDict in entriesArray)
                 {
                     var entry = new MilestoneData.MilestoneEntry
                     {
@@ -68,7 +68,7 @@ public partial class MilestoneSystem : BaseSystem
             // Load category progress
             if (milestoneData.Contains("category_progress"))
             {
-                var catProgressDict = (Godot.Dictionary)milestoneData["category_progress"];
+                var catProgressDict = (Godot.Collections.Dictionary)milestoneData["category_progress"];
                 foreach (var key in catProgressDict.Keys)
                 {
                     _data.CategoryProgress[(string)key] = (int)catProgressDict[key];
@@ -78,7 +78,7 @@ public partial class MilestoneSystem : BaseSystem
             // Load statistics
             if (milestoneData.Contains("statistics"))
             {
-                var statsDict = (Godot.Dictionary)milestoneData["statistics"];
+                var statsDict = (Godot.Collections.Dictionary)milestoneData["statistics"];
                 _data.Statistics.TotalMilestones = statsDict.Contains("total_milestones") ? (int)statsDict["total_milestones"] : 0;
                 _data.Statistics.UnlockedMilestones = statsDict.Contains("unlocked_milestones") ? (int)statsDict["unlocked_milestones"] : 0;
                 _data.Statistics.BronzeMilestones = statsDict.Contains("bronze_milestones") ? (int)statsDict["bronze_milestones"] : 0;
@@ -100,17 +100,17 @@ public partial class MilestoneSystem : BaseSystem
         if (saveSystem == null) return;
 
         var data = saveSystem.LoadGame();
-        if (data == null) data = new Godot.Dictionary();
+        if (data == null) data = new Godot.Collections.Dictionary();
 
         // Save milestone data
-        var milestoneData = new Godot.Dictionary();
+        var milestoneData = new Godot.Collections.Dictionary();
         
         // Save milestone entries
         var entriesArray = new Godot.Array();
         foreach (var kvp in _data.Milestones)
         {
             var entry = kvp.Value;
-            var entryDict = new Godot.Dictionary();
+            var entryDict = new Godot.Collections.Dictionary();
             entryDict["id"] = entry.Id;
             entryDict["name"] = entry.Name;
             entryDict["description"] = entry.Description;
@@ -131,13 +131,13 @@ public partial class MilestoneSystem : BaseSystem
         milestoneData["entries"] = entriesArray;
         
         // Save category progress
-        var catProgressDict = new Godot.Dictionary();
+        var catProgressDict = new Godot.Collections.Dictionary();
         foreach (var kvp in _data.CategoryProgress)
             catProgressDict[kvp.Key] = kvp.Value;
         milestoneData["category_progress"] = catProgressDict;
         
         // Save statistics
-        var statsDict = new Godot.Dictionary();
+        var statsDict = new Godot.Collections.Dictionary();
         statsDict["total_milestones"] = _data.Statistics.TotalMilestones;
         statsDict["unlocked_milestones"] = _data.Statistics.UnlockedMilestones;
         statsDict["bronze_milestones"] = _data.Statistics.BronzeMilestones;

@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
+using GameSaveSystem = ClawRPG.Scripts.Systems.SaveSystem;
 using ClawRPG.Systems;
 using SaveData = ClawRPG.Scripts.Systems.SaveDataManager.SaveData;
 using ClawRPG.Scripts.Managers;
@@ -52,7 +53,7 @@ public partial class MainSaveLoad : Node
     /// </summary>
     public void LoadGameData()
     {
-        var saveSystem = SaveSystem.Instance;
+        var saveSystem = GameSaveSystem.Instance;
         if (saveSystem != null && saveSystem.HasSave(0))
         {
             GD.Print("Found save file, loading...");
@@ -100,7 +101,7 @@ public partial class MainSaveLoad : Node
             ["HighestCombo"] = data.HighestCombo,
             ["AchievementsUnlocked"] = data.AchievementsUnlocked
         };
-        StatisticsManager.Instance.LoadStatistics(statsData);
+        StatisticsManager.Instance.ImportSaveData(statsData);
         GD.Print("Statistics loaded successfully!");
     }
     
@@ -112,7 +113,9 @@ public partial class MainSaveLoad : Node
         var skillComboSystem = SkillComboSystem.Instance;
         if (skillComboSystem != null && data.ComboData != null)
         {
-            skillComboSystem.ImportSaveData(new Dictionary(data.ComboData));
+            var comboDict = new System.Collections.Generic.Dictionary<string, object>();
+            foreach (var kvp in data.ComboData) comboDict[kvp.Key.ToString()] = kvp.Value;
+            skillComboSystem.ImportSaveData(comboDict);
             GD.Print("Combo data loaded successfully!");
         }
     }
@@ -124,7 +127,13 @@ public partial class MainSaveLoad : Node
     {
         if (Framework.ComboForgetData.Instance != null && data.ComboForgetData != null)
         {
-            Framework.ComboForgetData.Instance.ImportSaveData(new Dictionary(data.ComboForgetData));
+            var cfDict = new Godot.Collections.Dictionary();
+            foreach (var key in data.ComboForgetData.Keys)
+            {
+                object val = data.ComboForgetData[key];
+                cfDict[key] = val;
+            }
+            Framework.ComboForgetData.Instance.ImportSaveData(cfDict);
             GD.Print("Combo forget data loaded successfully!");
         }
     }
@@ -134,7 +143,7 @@ public partial class MainSaveLoad : Node
     /// </summary>
     private void LoadKeybindingData(SaveData data)
     {
-        var keybindingSystem = GetNodeOrNull<Systems.KeybindingSystem>("KeybindingSystem");
+        var keybindingSystem = GetNodeOrNull<ClawRPG.Systems.KeybindingSystem>("KeybindingSystem");
         if (keybindingSystem != null && data.KeybindingData != null)
         {
             keybindingSystem.Deserialize(data.KeybindingData);
@@ -163,7 +172,7 @@ public partial class MainSaveLoad : Node
         var styleMasterySystem = GetNodeOrNull<StyleMasterySystem>("StyleMasterySystem");
         if (styleMasterySystem != null && data.StyleMasteryData != null)
         {
-            styleMasterySystem.ImportSaveData(new Dictionary(data.StyleMasteryData));
+            styleMasterySystem.ImportSaveData(data.StyleMasteryData);
             GD.Print("Style mastery data loaded successfully!");
         }
     }
@@ -175,10 +184,10 @@ public partial class MainSaveLoad : Node
     {
         GD.Print("Loading game from slot: " + saveSlot);
         
-        var saveSystem = SaveSystem.Instance;
+        var saveSystem = GameSaveSystem.Instance;
         if (saveSystem == null)
         {
-            GD.PrintErr("[MainSaveLoad] SaveSystem.Instance is null — SaveSystem node not found in scene tree");
+            GD.PrintErr("[MainSaveLoad] GameSaveSystem.Instance is null — SaveSystem node not found in scene tree");
             return;
         }
         var saveData = saveSystem.LoadGame(saveSlot);
@@ -202,7 +211,7 @@ public partial class MainSaveLoad : Node
         var player = GetNodeOrNull<Player>("../Player");
         if (player != null && saveData.PlayerData != null)
         {
-            player.LoadPlayerData(saveData.PlayerData);
+            player.LoadPlayerData((Dictionary<string, object>)saveData.PlayerData);
         }
     }
     
@@ -237,7 +246,7 @@ public partial class MainSaveLoad : Node
             ["HighestCombo"] = saveData.HighestCombo,
             ["AchievementsUnlocked"] = saveData.AchievementsUnlocked
         };
-        StatisticsManager.Instance.LoadStatistics(statsData);
+        StatisticsManager.Instance.ImportSaveData(statsData);
     }
     
     /// <summary>
@@ -251,7 +260,7 @@ public partial class MainSaveLoad : Node
             {
                 if (QuickSlotSystem.Instance != null && i < 9)
                 {
-                    QuickSlotSystem.Instance.SetSlot(i, saveData.QuickSlotItemIds[i], saveData.QuickSlotQuantities[i]);
+                    QuickSlotSystem.Instance.AddToQuickSlot(saveData.QuickSlotItemIds[i], saveData.QuickSlotQuantities[i], i);
                 }
             }
         }

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using ClawRPG.Scripts.UI;
 
 public partial class ArenaTournamentMain : BaseSystem
 {
@@ -28,10 +29,9 @@ public partial class ArenaTournamentMain : BaseSystem
         if (event_ is InputEventKey keyEvent && keyEvent.Pressed)
         {
             // Ctrl+Shift+A: 切换竞技场锦标赛 UI
-            if (keyEvent.Ctrl && keyEvent.Shift && keyEvent.Keycode == Key.A)
+            if (keyEvent.CtrlPressed && keyEvent.ShiftPressed && keyEvent.Keycode == Key.A)
             {
                 _ui.Toggle();
-                GetTree().SetInputAsHandled();
             }
         }
     }
@@ -52,9 +52,9 @@ public partial class ArenaTournamentMain : BaseSystem
     public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
-        if (data.Contains("system") && _system != null)
+        if (data.ContainsKey("system") && _system != null)
         {
-            _system.ImportSaveData((Dictionary)data["system"]);
+            _system.ImportSaveData((Dictionary<string, object>)data["system"]);
         }
     }
 }

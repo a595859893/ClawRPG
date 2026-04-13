@@ -284,7 +284,7 @@ public partial class PetBreedingSystem : BaseSystem
         // Load stats
         if (data.Contains("pet_breeding_stats"))
         {
-            var stats = (Godot.Dictionary)data["pet_breeding_stats"];
+            var stats = (Godot.Collections.Dictionary)data["pet_breeding_stats"];
             _data.TotalBreeds = (int)stats.Get("total_breeds", 0);
             _data.SuccessfulBreeds = (int)stats.Get("successful_breeds", 0);
             _data.LegendaryBreeds = (int)stats.Get("legendary_breeds", 0);
@@ -293,7 +293,7 @@ public partial class PetBreedingSystem : BaseSystem
         // Load offspring stats
         if (data.Contains("pet_breeding_offspring"))
         {
-            var offspringData = (Godot.Dictionary)data["pet_breeding_offspring"];
+            var offspringData = (Godot.Collections.Dictionary)data["pet_breeding_offspring"];
             foreach (string key in offspringData.Keys)
             {
                 _data.OffspringStats[key] = (int)offspringData[key];
@@ -307,7 +307,7 @@ public partial class PetBreedingSystem : BaseSystem
         if (saveSystem == null) return;
 
         var data = saveSystem.LoadGame();
-        if (data == null) data = new Godot.Dictionary();
+        if (data == null) data = new Godot.Collections.Dictionary();
 
         // Save unlocked breeds
         var unlockedArray = new Godot.Array();
@@ -322,7 +322,7 @@ public partial class PetBreedingSystem : BaseSystem
         var recentHistory = _data.BreedingHistory.TakeLast(50).ToList();
         foreach (var record in recentHistory)
         {
-            var historyData = new Godot.Dictionary();
+            var historyData = new Godot.Collections.Dictionary();
             historyData["parent1"] = record.Parent1Id;
             historyData["parent2"] = record.Parent2Id;
             historyData["offspring_id"] = record.OffspringId;
@@ -335,14 +335,14 @@ public partial class PetBreedingSystem : BaseSystem
         data["pet_breeding_history"] = historyArray;
 
         // Save stats
-        var stats = new Godot.Dictionary();
+        var stats = new Godot.Collections.Dictionary();
         stats["total_breeds"] = _data.TotalBreeds;
         stats["successful_breeds"] = _data.SuccessfulBreeds;
         stats["legendary_breeds"] = _data.LegendaryBreeds;
         data["pet_breeding_stats"] = stats;
 
         // Save offspring stats
-        var offspringData = new Godot.Dictionary();
+        var offspringData = new Godot.Collections.Dictionary();
         foreach (var kvp in _data.OffspringStats)
         {
             offspringData[kvp.Key] = kvp.Value;

@@ -21,7 +21,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
     /// - 30% < ImprintStrength <= 50%: 混合状态，原始颜色占主导
     /// - ImprintStrength <= 30%: 基本回到原始外观
     /// </summary>
-    public class PetMemoryDecayVisualizer : Node
+    public partial class PetMemoryDecayVisualizer : Node
     {
         public static PetMemoryDecayVisualizer Instance { get; private set; }
 

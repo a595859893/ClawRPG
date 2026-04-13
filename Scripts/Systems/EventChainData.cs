@@ -7,7 +7,7 @@ namespace ClawRPG.Scripts.Systems {
     /// Event Chain System - 连接随机事件形成故事序列
     /// 应用 PCG 学习成果
     /// </summary>
-    public class EventChainData : Resource {
+    public partial class EventChainData : Resource {
         [Export] public string chainId = "";
         [Export] public string chainName = "";
         [Export] public string description = "";

@@ -88,5 +88,5 @@ namespace ClawRPG.Scripts.Systems
 
 namespace ClawRPG.Scripts.UI
 {
-    public class ComboBox : Godot.Control { }
+    public partial class ComboBox : Godot.Control { }
 }

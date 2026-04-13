@@ -18,7 +18,7 @@ public enum BattlefieldVariantType
 /// <summary>
 /// 战场变体配置数据（Resources/.tres 文件）
 /// </summary>
-public class BattlefieldVariantConfig : Resource
+public partial class BattlefieldVariantConfig : Resource
 {
     [Export] public BattlefieldVariantType VariantType = BattlefieldVariantType.None;
     [Export] public string DisplayName = "";

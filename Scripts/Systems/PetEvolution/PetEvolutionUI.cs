@@ -228,7 +228,7 @@ public partial class PetEvolutionUI : Control
     }
 }
 
-public class PetEvolutionList : ItemList
+public partial class PetEvolutionList : ItemList
 {
     public PetEvolutionList()
     {
@@ -236,7 +236,7 @@ public class PetEvolutionList : ItemList
     }
 }
 
-public class PetEvolutionDetails : VBoxContainer
+public partial class PetEvolutionDetails : VBoxContainer
 {
     private Label _currentFormLabel;
     private Label _nextFormLabel;

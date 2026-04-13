@@ -488,7 +488,7 @@ namespace ClawRPG.UI {
     /// <summary>
     /// 单个按键绑定项
     /// </summary>
-    public class KeybindingItem : HBoxContainer
+    public partial class KeybindingItem : HBoxContainer
     {
         public string ActionName { get; }
 

@@ -25,7 +25,7 @@ namespace ClawRPG.Systems.Meditation
         /// <summary>
         /// Aggregated signals from all meditation subsystems
         /// </summary>
-        public class MeditationUISignals : GodotObject
+        public partial class MeditationUISignals : GodotObject
         {
             public delegate void MeditationStartedHandler(string playerId, MeditationType type);
             public delegate void MeditationCompletedHandler(string playerId, MeditationType type, List<string> benefits);

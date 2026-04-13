@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class RandomQuestData : Resource
+public partial class RandomQuestData : Resource
 {
     [Export] public List<ActiveQuest> ActiveQuests { get; set; } = new List<ActiveQuest>();
     [Export] public List<string> CompletedQuestIds { get; set; } = new List<string>();

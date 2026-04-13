@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
     /// <summary>
     /// 事件卡抽卡UI — 战斗前展示卡牌，接受或重抽
     /// </summary>
-    public class EventCardDrawUI : CanvasLayer
+    public partial class EventCardDrawUI : CanvasLayer
     {
         // ========== 控件引用 ==========
         private PanelContainer _cardPanel;

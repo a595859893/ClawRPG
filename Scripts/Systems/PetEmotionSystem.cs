@@ -335,13 +335,13 @@ namespace ClawRPG.Scripts.Systems
             if (saveSystem == null) return;
 
             var data = saveSystem.LoadGame();
-            if (data == null) data = new Godot.Dictionary();
+            if (data == null) data = new Godot.Collections.Dictionary();
 
             // Save pet emotions
             var emotionsArray = new Godot.Array();
             foreach (var kvp in _petEmotions)
             {
-                var emotionData = new Godot.Dictionary();
+                var emotionData = new Godot.Collections.Dictionary();
                 emotionData["pet_id"] = kvp.Key;
                 emotionData["dominant_emotion"] = (int)kvp.Value.DominantEmotion;
                 emotionData["intensity"] = (int)kvp.Value.CurrentIntensity;
@@ -350,7 +350,7 @@ namespace ClawRPG.Scripts.Systems
                     emotionData["last_change"] = kvp.Value.LastEmotionChange.ToString("o");
                 
                 // Save emotion values
-                var emotionValues = new Godot.Dictionary();
+                var emotionValues = new Godot.Collections.Dictionary();
                 foreach (var emotionKvp in kvp.Value.CurrentEmotions)
                 {
                     emotionValues[(int)emotionKvp.Key] = emotionKvp.Value;
@@ -362,7 +362,7 @@ namespace ClawRPG.Scripts.Systems
             data["pet_emotions"] = emotionsArray;
 
             // Save stats
-            var stats = new Godot.Dictionary();
+            var stats = new Godot.Collections.Dictionary();
             stats["total_changes"] = TotalEmotionChanges;
             stats["dominant_counts"] = DominantEmotionCounts;
             data["pet_emotion_stats"] = stats;
@@ -402,7 +402,7 @@ namespace ClawRPG.Scripts.Systems
                     // Load emotion values
                     if (emotionData.Contains("emotion_values"))
                     {
-                        var emotionValues = (Godot.Dictionary)emotionData["emotion_values"];
+                        var emotionValues = (Godot.Collections.Dictionary)emotionData["emotion_values"];
                         foreach (var key in emotionValues.Keys)
                         {
                             petData.CurrentEmotions[(Data.PetEmotionData.EmotionType)(int)key] = (float)emotionValues[key];
@@ -416,7 +416,7 @@ namespace ClawRPG.Scripts.Systems
             // Load stats
             if (data.Contains("pet_emotion_stats"))
             {
-                var stats = (Godot.Dictionary)data["pet_emotion_stats"];
+                var stats = (Godot.Collections.Dictionary)data["pet_emotion_stats"];
                 TotalEmotionChanges = (int)stats.Get("total_changes", 0);
                 DominantEmotionCounts = (int)stats.Get("dominant_counts", 0);
             }

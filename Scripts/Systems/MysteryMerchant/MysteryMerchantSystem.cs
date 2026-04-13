@@ -24,13 +24,13 @@ namespace ClawRPG.Scripts.Systems
         
         // Godot 4 signals
         [Signal]
-        public delegate void MerchantSpawned(MysteryMerchant merchant);
+        public delegate void MerchantSpawnedEventHandlerEventHandler(MysteryMerchant merchant);
         [Signal]
-        public delegate void MerchantExpired(MysteryMerchant merchant);
+        public delegate void MerchantExpiredEventHandlerEventHandler(MysteryMerchant merchant);
         [Signal]
-        public delegate void ItemPurchased(string itemId, int quantity, int price);
+        public delegate void ItemPurchasedEventHandlerEventHandler(string itemId, int quantity, int price);
         [Signal]
-        public delegate void MerchantRefreshed(MysteryMerchant merchant);
+        public delegate void MerchantRefreshedEventHandlerEventHandler(MysteryMerchant merchant);
         
         public override void _Ready()
         {
@@ -117,7 +117,7 @@ namespace ClawRPG.Scripts.Systems
             GenerateMerchantItems(merchant, itemCount, config);
             
             _activeMerchants.Add(merchant);
-            EmitSignal(nameof(MerchantSpawned), merchant);
+            EmitSignal(nameof(MerchantSpawnedEventHandlerEventHandler), merchant);
         }
         
         // 生成商品
@@ -217,7 +217,7 @@ namespace ClawRPG.Scripts.Systems
         {
             merchant.IsActive = false;
             _activeMerchants.Remove(merchant);
-            EmitSignal(nameof(MerchantExpired), merchant);
+            EmitSignal(nameof(MerchantExpiredEventHandlerEventHandler), merchant);
         }
         
         // 购买商品
@@ -274,7 +274,7 @@ namespace ClawRPG.Scripts.Systems
             }
             
             SavePlayerData();
-            EmitSignal(nameof(ItemPurchased), item.ItemId, 1, item.Price);
+            EmitSignal(nameof(ItemPurchasedEventHandlerEventHandler), item.ItemId, 1, item.Price);
             
             return true;
         }
@@ -303,7 +303,7 @@ namespace ClawRPG.Scripts.Systems
                 GenerateMerchantItems(merchant, itemCount, config);
             }
             
-            EmitSignal(nameof(MerchantRefreshed), merchant);
+            EmitSignal(nameof(MerchantRefreshedEventHandlerEventHandler), merchant);
             return true;
         }
         

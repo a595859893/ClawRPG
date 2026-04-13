@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
     /// <summary>
     /// 事件卡池运行时数据（单例，每局游戏一份）
     /// </summary>
-    public class EventCardPoolData : Node
+    public partial class EventCardPoolData : Node
     {
         private static EventCardPoolData _instance;
         public static EventCardPoolData Instance => _instance;

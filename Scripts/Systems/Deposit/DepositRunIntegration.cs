@@ -8,7 +8,7 @@ using ClawRPG.Scripts.Systems;
 /// - On new run: generates deposit cards and injects them into starting hand
 /// - On game over: applies decay to deposit slots
 /// </summary>
-public class DepositRunIntegration : Node
+public partial class DepositRunIntegration : Node
 {
     public static DepositRunIntegration Instance { get; private set; }
 

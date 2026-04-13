@@ -34,10 +34,10 @@ public partial class SkillTreeSystem : BaseSystem
 
     public override Dictionary<string, object> ExportSaveData()
     {
-        var data = new Godot.Dictionary();
+        var data = new Godot.Collections.Dictionary();
         
         // 保存已解锁的节点
-        var unlockedNodes = new Godot.Dictionary();
+        var unlockedNodes = new Godot.Collections.Dictionary();
         foreach (var kvp in PlayerData.UnlockedNodes)
         {
             unlockedNodes[kvp.Key] = kvp.Value;
@@ -45,7 +45,7 @@ public partial class SkillTreeSystem : BaseSystem
         data["unlocked_nodes"] = unlockedNodes;
         
         // 保存每个分类的技能点花费
-        var skillPointsSpent = new Godot.Dictionary();
+        var skillPointsSpent = new Godot.Collections.Dictionary();
         foreach (var kvp in PlayerData.SkillPointsSpent)
         {
             skillPointsSpent[kvp.Key] = kvp.Value;
@@ -67,7 +67,7 @@ public partial class SkillTreeSystem : BaseSystem
         if (data.Contains("unlocked_nodes"))
         {
             PlayerData.UnlockedNodes.Clear();
-            var unlockedNodes = (Godot.Dictionary)data["unlocked_nodes"];
+            var unlockedNodes = (Godot.Collections.Dictionary)data["unlocked_nodes"];
             foreach (string key in unlockedNodes.Keys)
             {
                 PlayerData.UnlockedNodes[key] = (int)unlockedNodes[key];
@@ -78,7 +78,7 @@ public partial class SkillTreeSystem : BaseSystem
         if (data.Contains("skill_points_spent"))
         {
             PlayerData.SkillPointsSpent.Clear();
-            var skillPointsSpent = (Godot.Dictionary)data["skill_points_spent"];
+            var skillPointsSpent = (Godot.Collections.Dictionary)data["skill_points_spent"];
             foreach (string key in skillPointsSpent.Keys)
             {
                 PlayerData.SkillPointsSpent[key] = (int)skillPointsSpent[key];

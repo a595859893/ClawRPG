@@ -7,7 +7,7 @@ using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 /// <summary>
 /// 保存/加载管理器 - 负责游戏数据的持久化
 /// </summary>
-public class SaveLoadManager : ManagerBase
+public partial class SaveLoadManager : ManagerBase
 {
     public static SaveLoadManager Instance { get; private set; }
     
@@ -145,7 +145,7 @@ public class SaveLoadManager : ManagerBase
             saveData["gameVersion"] = "1.0.0";
             
             // 调用 SaveSystem 保存
-            bool success = _saveSystem.SaveGame(slot, saveData);
+            bool success = _saveSystem.SaveGame();
             
             if (success)
             {
@@ -182,7 +182,7 @@ public class SaveLoadManager : ManagerBase
             return false;
         }
         
-        if (!_saveSystem.HasSave(slot))
+        if (!_saveSystem.HasSave())
         {
             GD.PrintErr($"[SaveLoadManager] No save found in slot {slot}");
             return false;
@@ -192,13 +192,10 @@ public class SaveLoadManager : ManagerBase
         
         try
         {
-            var saveData = _saveSystem.LoadGame(slot);
+            var success = _saveSystem.LoadGame();
             
-            if (saveData != null)
+            if (success)
             {
-                // 应用数据到游戏系统
-                ApplySaveData(saveData);
-                
                 CurrentSaveSlot = slot;
                 LastLoadTime = DateTime.Now;
                 
@@ -220,18 +217,18 @@ public class SaveLoadManager : ManagerBase
     /// <summary>
     /// 收集所有游戏数据
     /// </summary>
-    private Dictionary CollectSaveData()
+    private Godot.Collections.Dictionary CollectSaveData()
     {
-        var allData = new Dictionary<string, object>();
+        var allData = new Godot.Collections.Dictionary();
         
         // 从 GameManager 获取所有系统数据
         var gameManager = GetNode("/root/Main");
         if (gameManager != null && gameManager.HasMethod("ExportAllData"))
         {
-            var systemData = gameManager.Call("ExportAllData") as Dictionary;
-            foreach (DictionaryEntry entry in systemData)
+            var systemData = (Godot.Collections.Dictionary)gameManager.Call("ExportAllData");
+            foreach (var key in systemData.Keys)
             {
-                allData[entry.Key] = entry.Value;
+                allData[key] = systemData[key];
             }
         }
         
@@ -241,7 +238,7 @@ public class SaveLoadManager : ManagerBase
     /// <summary>
     /// 应用保存数据到游戏系统
     /// </summary>
-    private void ApplySaveData(Dictionary saveData)
+    private void ApplySaveData(Godot.Collections.Dictionary saveData)
     {
         var gameManager = GetNode("/root/Main");
         if (gameManager != null && gameManager.HasMethod("ImportAllData"))
@@ -255,7 +252,7 @@ public class SaveLoadManager : ManagerBase
     /// </summary>
     public bool HasSave(int slot)
     {
-        return _saveSystem?.HasSave(slot) ?? false;
+        return _saveSystem?.HasSave() ?? false;
     }
     
     /// <summary>
@@ -263,9 +260,9 @@ public class SaveLoadManager : ManagerBase
     /// </summary>
     public Dictionary GetSaveInfo(int slot)
     {
-        if (!_saveSystem.HasSave(slot)) return null;
+        if (!_saveSystem.HasSave()) return null;
         
-        var saveData = _saveSystem.LoadGame(slot);
+        var saveData = _saveSystem.LoadGame();
         if (saveData == null) return null;
         
         return new Dictionary

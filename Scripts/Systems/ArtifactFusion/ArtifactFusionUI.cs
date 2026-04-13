@@ -44,12 +44,12 @@ public partial class ArtifactFusionUI : Control
         {
             AnchorRight = 1f,
             AnchorBottom = 1f,
-            MarginLeft = 200,
-            MarginTop = 100,
-            MarginRight = -200,
-            MarginBottom = -100
+            OffsetLeft = 200,
+            OffsetTop = 100,
+            OffsetRight = -200,
+            OffsetBottom = -100
         };
-        add_child(mainPanel);
+        AddChild(mainPanel);
         
         var mainVBox = new VBoxContainer();
         mainPanel.AddChild(mainVBox);
@@ -61,7 +61,7 @@ public partial class ArtifactFusionUI : Control
         var titleLabel = new Label
         {
             Text = "Artifact Fusion System",
-            Align = Label.AlignEnum.Center,
+            HorizontalAlignment = HorizontalAlignment.Center,
             SizeFlagsHorizontal = SizeFlags.Expand
         };
         titleBar.AddChild(titleLabel);
@@ -83,7 +83,7 @@ public partial class ArtifactFusionUI : Control
         
         // 配方标签页
         recipesTab = new Control();
-        recipesTab.SetAnchor(Control.LayoutPreset.FullRect);
+        recipesTab.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
         tabContainer.AddChild(recipesTab);
         tabContainer.SetTabTitle(0, "Recipes");
         
@@ -91,10 +91,10 @@ public partial class ArtifactFusionUI : Control
         {
             AnchorRight = 1f,
             AnchorBottom = 1f,
-            MarginLeft = 10,
-            MarginTop = 10,
-            MarginRight = -10,
-            MarginBottom = -10
+            OffsetLeft = 10,
+            OffsetTop = 10,
+            OffsetRight = -10,
+            OffsetBottom = -10
         };
         recipesTab.AddChild(recipesScroll);
         
@@ -104,7 +104,7 @@ public partial class ArtifactFusionUI : Control
         
         // 历史标签页
         historyTab = new Control();
-        historyTab.SetAnchor(Control.LayoutPreset.FullRect);
+        historyTab.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
         tabContainer.AddChild(historyTab);
         tabContainer.SetTabTitle(1, "History");
         
@@ -112,10 +112,10 @@ public partial class ArtifactFusionUI : Control
         {
             AnchorRight = 1f,
             AnchorBottom = 1f,
-            MarginLeft = 10,
-            MarginTop = 10,
-            MarginRight = -10,
-            MarginBottom = -10
+            OffsetLeft = 10,
+            OffsetTop = 10,
+            OffsetRight = -10,
+            OffsetBottom = -10
         };
         historyTab.AddChild(historyScroll);
         
@@ -125,7 +125,7 @@ public partial class ArtifactFusionUI : Control
         
         // 统计标签页
         statsTab = new Control();
-        statsTab.SetAnchor(Control.LayoutPreset.FullRect);
+        statsTab.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
         tabContainer.AddChild(statsTab);
         tabContainer.SetTabTitle(2, "Statistics");
         
@@ -133,10 +133,10 @@ public partial class ArtifactFusionUI : Control
         {
             AnchorRight = 1f,
             AnchorBottom = 1f,
-            MarginLeft = 20,
-            MarginTop = 20,
-            MarginRight = -20,
-            MarginBottom = -20
+            OffsetLeft = 20,
+            OffsetTop = 20,
+            OffsetRight = -20,
+            OffsetBottom = -20
         };
         statsTab.AddChild(statsVBox);
         
@@ -158,7 +158,7 @@ public partial class ArtifactFusionUI : Control
         var resetButton = new Button
         {
             Text = "Reset Statistics",
-            MarginTop = 30
+            OffsetTop = 30
         };
         resetButton.Pressed += OnResetPressed;
         statsVBox.AddChild(resetButton);
@@ -189,7 +189,7 @@ public partial class ArtifactFusionUI : Control
     
     private Control CreateRecipeCard(ArtifactFusionDatabase.FusionRecipe recipe)
     {
-        var panel = new PanelContainer { MarginBottom = 10 };
+        var panel = new PanelContainer { OffsetBottom = 10 };
         
         var vbox = new VBoxContainer();
         panel.AddChild(vbox);
@@ -226,7 +226,7 @@ public partial class ArtifactFusionUI : Control
         var fuseButton = new Button
         {
             Text = "Fuse",
-            MarginTop = 5
+            OffsetTop = 5
         };
         var recipeCopy = recipe;
         fuseButton.Pressed += () => OnFuseButtonPressed(recipeCopy.Id);
@@ -259,7 +259,7 @@ public partial class ArtifactFusionUI : Control
     
     private Control CreateHistoryCard(FusionRecord record)
     {
-        var panel = new PanelContainer { MarginBottom = 5 };
+        var panel = new PanelContainer { OffsetBottom = 5 };
         
         var hbox = new HBoxContainer();
         panel.AddChild(hbox);
@@ -269,7 +269,7 @@ public partial class ArtifactFusionUI : Control
             Text = record.Success ? "✓" : "✗",
             Modulate = record.Success ? new Color(0.2f, 0.8f, 0.2f) : new Color(0.8f, 0.2f, 0.2f),
             SizeFlagsHorizontal = SizeFlags.ShrinkStart,
-            MarginRight = 10
+            OffsetRight = 10
         };
         hbox.AddChild(statusIcon);
         

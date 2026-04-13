@@ -5,7 +5,7 @@ using System;
 /// 所有管理器的基础类
 /// 提供统一的生命周期管理和通用接口
 /// </summary>
-public abstract class ManagerBase : BaseSystem
+public abstract partial class ManagerBase : BaseSystem
 {
     /// <summary>
     /// 管理器是否已准备好

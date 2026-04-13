@@ -27,6 +27,9 @@ namespace ClawRPG.Scripts.Data
         public int TotalDamageDealt { get; set; }
         public int TotalEnemiesDefeated { get; set; }
         public List<string> LearnedSkills { get; set; } = new List<string>();
+
+        // Pet obituary data (REQ-191): keyed by petId
+        public Dictionary<string, PetObituaryData> ObituaryData { get; set; } = new Dictionary<string, PetObituaryData>();
     }
 
     public class PetCompanionState
@@ -81,5 +84,93 @@ namespace ClawRPG.Scripts.Data
         Counter,
         Support,
         Ultimate
+    }
+
+    /// <summary>
+    /// 宠物讣告数据 — 记录宠物一生，供死亡时生成叙事讣告（REQ-191）
+    /// </summary>
+    public class PetObituaryData
+    {
+        // 参战统计
+        public int TotalBattles { get; set; }           // 总参战场次
+        public string MostUsedCombo { get; set; }        // 最常用的 combo 起手（如 "heavy→slash"）
+        public int MostUsedComboCount { get; set; }     // 该 combo 使用次数
+        public int TotalEnemiesKilled { get; set; }      // 总击杀数（复用现有数据）
+        public double TotalBattleTimeSeconds { get; set; } // 累计战斗时长（秒）
+        public int PeakStreak { get; set; }              // 最佳连胜记录
+        public long FirstBattleTimestamp { get; set; }   // 第一次参战时间戳
+        public long LastBattleTimestamp { get; set; }    // 最后一次参战时间戳
+
+        // 本次战斗内实时数据（不持久化）
+        public string CurrentBattleFirstCombo { get; set; } // 本场战斗第一个 combo 起手
+        public double CurrentBattleStartTime { get; set; } // 本场战斗开始时间
+
+        /// <summary>
+        /// 战斗开始时调用，重置本次战斗数据
+        /// </summary>
+        public void OnBattleStarted()
+        {
+            CurrentBattleFirstCombo = "";
+            CurrentBattleStartTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        }
+
+        /// <summary>
+        /// 战斗结束时调用，结算本次战斗数据
+        /// </summary>
+        public void OnBattleEnded(string firstCombo)
+        {
+            if (string.IsNullOrEmpty(firstCombo))
+                firstCombo = "basic_attack";
+
+            // 记录第一个 combo
+            if (string.IsNullOrEmpty(CurrentBattleFirstCombo))
+                CurrentBattleFirstCombo = firstCombo;
+
+            TotalBattles++;
+
+            // 更新最常用 combo
+            if (!string.IsNullOrEmpty(CurrentBattleFirstCombo))
+            {
+                if (CurrentBattleFirstCombo == MostUsedCombo)
+                {
+                    MostUsedComboCount++;
+                }
+                else if (MostUsedComboCount == 0 || 
+                         CurrentBattleFirstCombo != MostUsedCombo)
+                {
+                    // 第一次记录，或者被新的 combo 超过
+                    if (string.IsNullOrEmpty(MostUsedCombo) || 
+                        (CurrentBattleFirstCombo != MostUsedCombo && 
+                         GetComboFrequency(CurrentBattleFirstCombo) > GetComboFrequency(MostUsedCombo)))
+                    {
+                        MostUsedCombo = CurrentBattleFirstCombo;
+                        MostUsedComboCount = 1;
+                    }
+                }
+            }
+
+            // 更新时长
+            if (CurrentBattleStartTime > 0)
+            {
+                double elapsed = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - CurrentBattleStartTime;
+                TotalBattleTimeSeconds += elapsed;
+            }
+
+            // 更新时间戳
+            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            if (FirstBattleTimestamp == 0)
+                FirstBattleTimestamp = now;
+            LastBattleTimestamp = now;
+
+            // 重置本次战斗数据
+            CurrentBattleFirstCombo = "";
+            CurrentBattleStartTime = 0;
+        }
+
+        private int GetComboFrequency(string combo)
+        {
+            // 估算频率（实际使用 MostUsedComboCount）
+            return MostUsedCombo == combo ? MostUsedComboCount : 0;
+        }
     }
 }

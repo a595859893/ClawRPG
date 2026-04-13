@@ -326,7 +326,7 @@ public partial class PetInventoryUI : Control {
 }
 
 // Item Grid Control
-public class ItemGrid : GridContainer {
+public partial class ItemGrid : GridContainer {
     private List<PetInventoryItem> _allItems = new List<PetInventoryItem>();
     private List<PetInventoryItem> _filteredItems = new List<PetInventoryItem>();
     private string _searchFilter = "";
@@ -431,7 +431,7 @@ public class ItemGrid : GridContainer {
 }
 
 // Item Detail Panel
-public class ItemDetailPanel : VBoxContainer {
+public partial class ItemDetailPanel : VBoxContainer {
     private PetInventoryItem _currentItem;
     private PetInventoryDatabase _database;
     

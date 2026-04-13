@@ -323,7 +323,7 @@ namespace ClawRPG.Systems.GuildHall {
         }
         
         private static T JsonValueToType<T>(object value) {
-            if (value is Godot.Dictionary dict) {
+            if (value is Godot.Collections.Dictionary dict) {
                 var type = typeof(T);
                 var obj = Activator.CreateInstance<T>();
                 return obj;

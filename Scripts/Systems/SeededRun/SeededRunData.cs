@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SeededRunData : Resource
+public partial class SeededRunData : Resource
 {
     [Export] public int TotalSeededRuns { get; set; } = 0;
     [Export] public Dictionary<string, SeededRunRecord> SeedHistory { get; set; } = new Dictionary<string, SeededRunRecord>();

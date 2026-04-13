@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems.Testing
     /// <summary>
     /// 测试运行器 - 支持控制台输出、JSON 导出、CI 集成（退出码）
     /// </summary>
-    public class TestRunner : Node
+    public partial class TestRunner : Node
     {
         private const string VERSION = "1.0.0";
 

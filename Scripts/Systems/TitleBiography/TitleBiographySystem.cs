@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Framework;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.Scripts.Systems.TitleBiography
 {
@@ -61,7 +62,7 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
         /// <summary>
         /// TitleSystem.TitleUnlocked 信号的回调
         /// </summary>
-        private void OnTitleUnlocked(string playerId, TitleSystem.TitleData titleData)
+        private void OnTitleUnlocked(string playerId, TitleData titleData)
         {
             if (titleData == null) return;
             GenerateAndStoreBiography(titleData);
@@ -88,7 +89,7 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
         /// <summary>
         /// 生成并存储指定称号的传记
         /// </summary>
-        public void GenerateAndStoreBiography(TitleSystem.TitleData titleData)
+        public void GenerateAndStoreBiography(TitleData titleData)
         {
             if (titleData == null || string.IsNullOrEmpty(titleData.TitleId)) return;
             if (_biographies.ContainsKey(titleData.TitleId)) return; // 已有传记，不重复生成

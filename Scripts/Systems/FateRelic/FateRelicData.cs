@@ -6,7 +6,7 @@ namespace ClawRPG.Systems {
     /// <summary>
     /// Fate Relic data structures for roguelike-style relic collection
     /// </summary>
-    public class FateRelicRarity : GodotObject {
+    public partial class FateRelicRarity : GodotObject {
         public string Name { get; set; }
         public string Color { get; set; }
         public float DropRate { get; set; }
@@ -20,7 +20,7 @@ namespace ClawRPG.Systems {
         public static FateRelicRarity[] All = new[] { Common, Uncommon, Rare, Epic, Legendary };
     }
     
-    public class FateRelicType : GodotObject {
+    public partial class FateRelicType : GodotObject {
         public string Name { get; set; }
         
         public static FateRelicType Combat = new FateRelicType { Name = "Combat" };
@@ -32,13 +32,13 @@ namespace ClawRPG.Systems {
         public static FateRelicType[] All = new[] { Combat, Defense, Utility, Economic, Special };
     }
     
-    public class FateRelicEffect : GodotObject {
+    public partial class FateRelicEffect : GodotObject {
         public string Stat { get; set; }
         public float Value { get; set; }
         public string Description { get; set; }
     }
     
-    public class FateRelic : GodotObject {
+    public partial class FateRelic : GodotObject {
         public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -57,7 +57,7 @@ namespace ClawRPG.Systems {
         }
     }
     
-    public class PlayerFateRelicData : GodotObject {
+    public partial class PlayerFateRelicData : GodotObject {
         public List<string> OwnedRelicIds { get; set; }
         public Dictionary<string, bool> EquippedRelics { get; set; }
         public Dictionary<string, int> RelicStacks { get; set; }

@@ -8,7 +8,7 @@ using Godot;
 /// 提供统一的生命周期管理和数据持久化接口
 /// 支持单例模式 (通过 Instance 属性访问)
 /// </summary>
-public abstract class BaseSystem2D : Node2D
+public abstract partial class BaseSystem2D : Node2D
 {
     /// <summary>
     /// 单例实例 (子类需要实现)

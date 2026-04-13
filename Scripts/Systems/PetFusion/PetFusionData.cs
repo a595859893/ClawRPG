@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetFusionData : Resource {
+public partial class PetFusionData : Resource {
     // 宠物融合数据
     public Dictionary<int, PetFusionRecord> FusionHistory { get; set; } = new Dictionary<int, PetFusionRecord>();
     public int TotalFusions { get; set; } = 0;

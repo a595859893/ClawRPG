@@ -21,15 +21,15 @@ public partial class ElementalTrialSystem : BaseSystem
     }
 
     [Signal]
-    public delegate void TrialStartedDelegate(string trialId, int wave, int timeRemaining);
+    public delegate void TrialStartedDelegateEventHandlerEventHandler(string trialId, int wave, int timeRemaining);
     [Signal]
-    public delegate void TrialCompletedDelegate(string trialId, int wave, int timeRemaining);
+    public delegate void TrialCompletedDelegateEventHandlerEventHandler(string trialId, int wave, int timeRemaining);
     [Signal]
-    public delegate void TrialFailedDelegate(string trialId, int wave, string reason);
+    public delegate void TrialFailedDelegateEventHandlerEventHandler(string trialId, int wave, string reason);
     [Signal]
-    public delegate void WaveCompletedDelegate(int currentWave, int totalWaves);
+    public delegate void WaveCompletedDelegateEventHandlerEventHandler(int currentWave, int totalWaves);
     [Signal]
-    public delegate void TrialUnlockedDelegate(string trialId);
+    public delegate void TrialUnlockedDelegateEventHandlerEventHandler(string trialId);
 
     private ElementalTrialDatabase _database;
     private Dictionary<string, PlayerTrialProgress> _playerProgress;
@@ -100,7 +100,7 @@ public partial class ElementalTrialSystem : BaseSystem
         // Spawn first wave enemies
         SpawnWave(trial);
 
-        EmitSignal(nameof(TrialStartedDelegate), trialId, _currentWave, (int)_timeRemaining);
+        EmitSignal(nameof(TrialStartedDelegateEventHandlerEventHandler), trialId, _currentWave, (int)_timeRemaining);
         
         if (_trialTimer != null)
         {
@@ -122,7 +122,7 @@ public partial class ElementalTrialSystem : BaseSystem
         var trial = _database.GetTrial(_currentTrialId);
         if (trial == null) return;
 
-        EmitSignal(nameof(WaveCompletedDelegate), _currentWave, trial.WaveCount);
+        EmitSignal(nameof(WaveCompletedDelegateEventHandlerEventHandler), _currentWave, trial.WaveCount);
         
         if (_currentWave >= trial.WaveCount)
         {
@@ -192,7 +192,7 @@ public partial class ElementalTrialSystem : BaseSystem
         trial.IsCompleted = true;
         trial.BestWave = _currentWave;
 
-        EmitSignal(nameof(TrialCompletedDelegate), _currentTrialId, _currentWave, (int)_timeRemaining);
+        EmitSignal(nameof(TrialCompletedDelegateEventHandlerEventHandler), _currentTrialId, _currentWave, (int)_timeRemaining);
         _currentTrialId = "";
     }
 
@@ -221,7 +221,7 @@ public partial class ElementalTrialSystem : BaseSystem
             }
         }
 
-        EmitSignal(nameof(TrialFailedDelegate), failedTrialId, _currentWave, reason);
+        EmitSignal(nameof(TrialFailedDelegateEventHandlerEventHandler), failedTrialId, _currentWave, reason);
         _currentTrialId = "";
     }
 
@@ -236,7 +236,7 @@ public partial class ElementalTrialSystem : BaseSystem
             if (!nextTrial.IsUnlocked)
             {
                 nextTrial.IsUnlocked = true;
-                EmitSignal(nameof(TrialUnlockedDelegate), nextTrial.TrialId);
+                EmitSignal(nameof(TrialUnlockedDelegateEventHandlerEventHandler), nextTrial.TrialId);
             }
         }
     }
@@ -297,7 +297,7 @@ public partial class ElementalTrialSystem : BaseSystem
         var trial = _database.GetTrial(trialId);
         if (trial != null)
         {
-            EmitSignal(nameof(TrialUnlockedDelegate), trialId);
+            EmitSignal(nameof(TrialUnlockedDelegateEventHandlerEventHandler), trialId);
         }
     }
 

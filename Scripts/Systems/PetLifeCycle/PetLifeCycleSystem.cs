@@ -249,13 +249,13 @@ public partial class PetLifeCycleSystem : BaseSystem
         if (saveSystem == null) return;
 
         var data = saveSystem.LoadGame();
-        if (data == null) data = new Godot.Dictionary();
+        if (data == null) data = new Godot.Collections.Dictionary();
 
         // 保存宠物生命周期数据
         var petCyclesArray = new Godot.Array();
         foreach (var kvp in _data.PetLifeCycles)
         {
-            var petData = new Godot.Dictionary();
+            var petData = new Godot.Collections.Dictionary();
             petData["pet_id"] = kvp.Key;
             petData["pet_name"] = kvp.Value.PetName;
             petData["current_age"] = kvp.Value.CurrentAge;
@@ -269,7 +269,7 @@ public partial class PetLifeCycleSystem : BaseSystem
         data["pet_life_cycle_pets"] = petCyclesArray;
 
         // 保存统计数据
-        var stats = new Godot.Dictionary();
+        var stats = new Godot.Collections.Dictionary();
         stats["total_life_cycles"] = _data.TotalLifeCycles;
         stats["total_deaths"] = _data.TotalDeaths;
         stats["total_life_extensions"] = _data.TotalLifeExtensions;
@@ -281,7 +281,7 @@ public partial class PetLifeCycleSystem : BaseSystem
         var recentHistory = _data.History.TakeLast(50).ToList();
         foreach (var record in recentHistory)
         {
-            var historyData = new Godot.Dictionary();
+            var historyData = new Godot.Collections.Dictionary();
             historyData["pet_id"] = record.PetId;
             historyData["pet_name"] = record.PetName;
             historyData["age_at_death"] = record.AgeAtDeath;
@@ -309,7 +309,7 @@ public partial class PetLifeCycleSystem : BaseSystem
         if (data.Contains("pet_life_cycle_pets"))
         {
             var petCyclesArray = (Godot.Array)data["pet_life_cycle_pets"];
-            foreach (Godot.Dictionary petData in petCyclesArray)
+            foreach (Godot.Collections.Dictionary petData in petCyclesArray)
             {
                 var entry = new PetLifeCycleEntry
                 {
@@ -329,7 +329,7 @@ public partial class PetLifeCycleSystem : BaseSystem
         // 加载统计数据
         if (data.Contains("pet_life_cycle_stats"))
         {
-            var stats = (Godot.Dictionary)data["pet_life_cycle_stats"];
+            var stats = (Godot.Collections.Dictionary)data["pet_life_cycle_stats"];
             _data.TotalLifeCycles = (int)stats["total_life_cycles"];
             _data.TotalDeaths = (int)stats["total_deaths"];
             _data.TotalLifeExtensions = (int)stats["total_life_extensions"];
@@ -340,7 +340,7 @@ public partial class PetLifeCycleSystem : BaseSystem
         if (data.Contains("pet_life_cycle_history"))
         {
             var historyArray = (Godot.Array)data["pet_life_cycle_history"];
-            foreach (Godot.Dictionary historyData in historyArray)
+            foreach (Godot.Collections.Dictionary historyData in historyArray)
             {
                 var record = new LifeCycleHistoryEntry
                 {

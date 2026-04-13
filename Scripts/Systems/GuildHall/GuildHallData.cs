@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Systems.GuildHall {
-    public class GuildHallData : Godot.Resource {
+    public partial class GuildHallData : Godot.Resource {
         [Export] public int GuildId { get; set; }
         [Export] public string GuildName { get; set; }
         [Export] public int HallLevel { get; set; }

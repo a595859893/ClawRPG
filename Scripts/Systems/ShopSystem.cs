@@ -1,8 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
 
-namespace GameSystems
+namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
     /// 商店物品数据结构
@@ -68,10 +69,13 @@ namespace GameSystems
         // 商店刷新时间
         private Dictionary<string, DateTime> _lastRefresh = new Dictionary<string, DateTime>();
 
-        // 信号
-        public static readonly SignalPurchaseCompleted PurchaseCompleted;
-        public static readonly SignalShopRefreshed ShopRefreshed;
-        public static readonly SignalItemSold ItemSold;
+        // Signals
+        [Signal]
+        public delegate void PurchaseCompleted(string shopId, string itemId, int quantity);
+        [Signal]
+        public delegate void ShopRefreshed(string shopId);
+        [Signal]
+        public delegate void ItemSold(string shopId, string itemId, int quantity);
 
         public override void _Ready()
         {

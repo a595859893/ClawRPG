@@ -12,36 +12,15 @@ using System;
 /// </summary>
 public partial class ComboFatigueSystem : BaseSystem
 {
-    private static ComboFatigueSystem _instance;
-    public static ComboFatigueSystem Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = new ComboFatigueSystem();
-            }
-            return _instance;
-        }
-    }
-    
     private ComboFatigueData _data;
-    
+
     // Signal emitted when a combo's adaptation level changes
-public delegate void AdaptationChanged(string comboId, float adaptationLevel, float damageMultiplier);
-    
+    public delegate void AdaptationChanged(string comboId, float adaptationLevel, float damageMultiplier);
+
     // Signal emitted when a new combo is used (for UI feedback)
-public delegate void ComboSwitched(string newComboId, string previousComboId);
-    
-    public override void _Ready()
-    {
-        _data = GetNode<ComboFatigueData>("/root/ComboFatigueData");
-        if (_data == null)
-        {
-            GD.PrintErr("ComboFatigueData not found!");
-        }
-    }
-    
+    public delegate void ComboSwitched(string newComboId, string previousComboId);
+
+
     /// <summary>
     /// Record that the player used a combo skill.
     /// Call this after a combo skill successfully deals damage / is executed.

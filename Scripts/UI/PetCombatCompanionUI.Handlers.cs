@@ -5,6 +5,7 @@ using ClawRPG.Scripts.Systems.Pets;
 using ClawRPG.Scripts.Systems.Pets.AI;
 using ClawRPG.Scripts.Systems.PetMimicry;
 using ClawRPG.Systems.Pets.AI;
+using ClawRPG.Systems.PetFormation;
 
 namespace ClawRPG.Scripts.UI
 {
@@ -773,6 +774,20 @@ namespace ClawRPG.Scripts.UI
                 {
                     tacticalAI.OnTacticalModeChanged -= OnPetTacticalModeChanged;
                     tacticalAI.OnTacticalDecision -= OnTacticalDecision;
+                }
+
+                // REQ-176-04: Validate formation when UI exits (combat starting)
+                var formationSystem = PetFormationSystem.Instance;
+                if (formationSystem != null)
+                {
+                    formationSystem.ValidateFormationForCombat();
+                }
+
+                // Hide formation UI on exit
+                if (_formationUI != null)
+                {
+                    _formationUI.HideFormationUI();
+                    _btnFormation.SetPressedNoSignal(false);
                 }
             }
         }

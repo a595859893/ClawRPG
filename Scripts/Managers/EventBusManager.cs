@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// 事件总线管理器 - 统一的游戏事件分发系统
 /// 减少系统间的直接依赖
 /// </summary>
-public class EventBusManager : ManagerBase
+public partial class EventBusManager : ManagerBase
 {
     public static EventBusManager Instance { get; private set; }
     

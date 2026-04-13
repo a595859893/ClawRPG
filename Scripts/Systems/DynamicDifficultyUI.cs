@@ -339,7 +339,7 @@ public partial class DynamicDifficultyUI : Control
     #endregion
 
     // 难度按钮容器类
-    private class ButtonContainer : HBoxContainer
+    private partial class ButtonContainer : HBoxContainer
     {
         private List<Button> _buttons = new List<Button>();
         private DynamicDifficultyData.DifficultyLevel _currentLevel;

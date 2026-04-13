@@ -210,6 +210,14 @@ namespace ClawRPG.Scripts.Items {
         {
             return new List<EquipmentSet>(_sets.Values);
         }
+        public List<EquipmentSet> GetSetsByType(Game.EquipmentSetData.SetType type)
+        {
+            var result = new List<EquipmentSet>();
+            foreach (var set in _sets.Values)
+                if (set.SetType == type) result.Add(set);
+            return result;
+        }
+
         
         public int GetSetCount()
         {

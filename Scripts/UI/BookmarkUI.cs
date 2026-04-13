@@ -37,7 +37,7 @@ namespace ClawRPG.Scripts.UI {
         private BookmarkCategory? _currentFilter = null;
         
         // Signal for when player wants to travel to a bookmark
-        [Signal] public delegate void OnTravelToBookmark(Bookmark bookmark);
+        [Signal] public delegate void OnTravelToBookmarkEventHandlerEventHandler(Bookmark bookmark);
         
         public override void _Ready() {
             SetupUI();
@@ -277,7 +277,7 @@ namespace ClawRPG.Scripts.UI {
                 Text = "传送",
                 CustomMinimumSize = new Vector2(60, 30)
             };
-            travelButton.Pressed += () => OnTravelToBookmarkPressed(bookmark);
+            travelButton.Pressed += () => OnTravelToBookmarkEventHandlerEventHandlerPressed(bookmark);
             container.AddChild(travelButton);
             
             // Delete button
@@ -350,9 +350,9 @@ namespace ClawRPG.Scripts.UI {
             }
         }
         
-        private void OnTravelToBookmarkPressed(Bookmark bookmark) {
+        private void OnTravelToBookmarkEventHandlerEventHandlerPressed(Bookmark bookmark) {
             GD.Print($"[BookmarkUI] Traveling to bookmark: {bookmark.Name}");
-            OnTravelToBookmark?.Invoke(bookmark);
+            OnTravelToBookmarkEventHandlerEventHandler?.Invoke(bookmark);
             
             // Hide UI after traveling
             if (_isVisible) {

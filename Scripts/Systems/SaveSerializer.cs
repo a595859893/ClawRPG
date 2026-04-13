@@ -6,6 +6,7 @@ using ClawRPG.Scripts.Mounts;
 using ClawRPG.Scripts.UI;
 using ClawRPG.Systems.Emote;
 using ClawRPG.Scripts.Systems.Enchantment;
+using ClawRPG.Systems.Enchantment;
 using ClawRPG.Systems;
 
 namespace ClawRPG.Scripts.Systems

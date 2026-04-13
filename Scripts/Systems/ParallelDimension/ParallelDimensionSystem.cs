@@ -25,17 +25,17 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
         private DateTime _dimensionStartTime;
         
         [Signal]
-        public delegate void DimensionEnteredDelegate();
+        public delegate void DimensionEnteredDelegateEventHandlerEventHandler();
         [Signal]
-        public delegate void DimensionLeftDelegate();
+        public delegate void DimensionLeftDelegateEventHandlerEventHandler();
         [Signal]
-        public delegate void FloorCompletedDelegate();
+        public delegate void FloorCompletedDelegateEventHandlerEventHandler();
         [Signal]
-        public delegate void DimensionCompletedDelegate();
+        public delegate void DimensionCompletedDelegateEventHandlerEventHandler();
         [Signal]
-        public delegate void DimensionMasteredDelegate();
+        public delegate void DimensionMasteredDelegateEventHandlerEventHandler();
         [Signal]
-        public delegate void ScoreUpdatedDelegate();
+        public delegate void ScoreUpdatedDelegateEventHandlerEventHandler();
         
         public override void _Ready() {
             _instance = this;
@@ -114,7 +114,7 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
             
             ScoreUpdated.Call();
             
-            EmitSignal(nameof(ScoreUpdatedDelegate));
+            EmitSignal(nameof(ScoreUpdatedDelegateEventHandlerEventHandler));
         }
         
         public void CompleteFloor() {

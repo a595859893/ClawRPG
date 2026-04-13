@@ -199,6 +199,44 @@ public class PetSocialMemoryDatabase
         }
     }
 
+    /// <summary>
+    /// 获取指定宠物最近一次共同战斗的时间（跨所有同伴）
+    /// 用于 REQ-178 社交记忆可视化
+    /// </summary>
+    /// <returns>最近战斗时间，若无记录返回 null</returns>
+    public DateTime? GetLastBattleTimeForPet(int petId)
+    {
+        DateTime? latest = null;
+        foreach (var kvp in _memoryRecords)
+        {
+            var record = kvp.Value;
+            if (record.PetIdA == petId || record.PetIdB == petId)
+            {
+                if (DateTime.TryParse(record.LastBattleTime, out var battleTime))
+                {
+                    if (latest == null || battleTime > latest.Value)
+                        latest = battleTime;
+                }
+            }
+        }
+        return latest;
+    }
+
+    /// <summary>
+    /// 获取指定宠物所有社交记忆记录
+    /// </summary>
+    public System.Collections.Generic.List<PetSocialMemoryRecord> GetMemoriesForPet(int petId)
+    {
+        var result = new System.Collections.Generic.List<PetSocialMemoryRecord>();
+        foreach (var kvp in _memoryRecords)
+        {
+            var record = kvp.Value;
+            if (record.PetIdA == petId || record.PetIdB == petId)
+                result.Add(record);
+        }
+        return result;
+    }
+
     private static string MakeKey(int petId1, int petId2)
     {
         int a = Math.Min(petId1, petId2);

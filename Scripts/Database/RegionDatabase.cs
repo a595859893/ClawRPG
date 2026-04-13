@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Database {
     /// Represents a game region/zone with its properties
     /// </summary>
     
-    public class RegionType : Resource
+    public partial class RegionType : Resource
     {
         [Export] public string RegionId { get; set; } = "";
         [Export] public string RegionName { get; set; } = "";

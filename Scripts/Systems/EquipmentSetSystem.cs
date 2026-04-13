@@ -445,6 +445,25 @@ public partial class EquipmentSetSystem : BaseSystem
             }
         }
     }
+
+
+    public int GetSetPieceCount(int setId)
+    {
+        return EquippedPieces.GetValueOrDefault(setId.ToString(), 0);
+    }
+
+    // Statistics class for UI
+    public class Statistics
+    {
+        public int CompletedSets { get; set; }
+        public int TotalSets { get; set; }
+    }
+
+    public Statistics GetStatistics()
+    {
+        return new Statistics { CompletedSets = 0, TotalSets = 0 };
+    }
+
 }
 
 // Equipment Set data class

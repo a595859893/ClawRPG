@@ -1,9 +1,10 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.Systems.Enchantment;
+using ClawRPG.Systems.Enchantment;
 using ClawRPG.Scripts.Items;
-using EnchantmentData = ClawRPG.Scripts.Systems.Enchantment.EnchantmentRecord;
+using EnchantmentData = ClawRPG.Systems.Enchantment.EnchantmentRecord;
+using EnchantmentAttr = ClawRPG.Systems.Enchantment.EnchantmentAttribute;
 
 public partial class EnchantmentUI : Control
 {
@@ -438,23 +439,23 @@ public partial class EnchantmentUI : Control
         }
     }
 
-    private string GetAttributeName(EnchantmentAttribute attribute)
+    private string GetAttributeName(EnchantmentAttr attribute)
     {
         return attribute switch
         {
-            EnchantmentAttribute.Damage => "伤害",
-            EnchantmentAttribute.Defense => "防御",
-            EnchantmentAttribute.Health => "生命",
-            EnchantmentAttribute.Mana => "法力",
-            EnchantmentAttribute.CriticalRate => "暴击率",
-            EnchantmentAttribute.CriticalDamage => "暴击伤害",
-            EnchantmentAttribute.AttackSpeed => "攻击速度",
-            EnchantmentAttribute.MoveSpeed => "移动速度",
-            EnchantmentAttribute.FireResistance => "火抗",
-            EnchantmentAttribute.IceResistance => "冰抗",
-            EnchantmentAttribute.LightningResistance => "雷抗",
-            EnchantmentAttribute.PoisonResistance => "毒抗",
-            EnchantmentAttribute.AllAttributes => "全属性",
+            EnchantmentAttr.Damage => "伤害",
+            EnchantmentAttr.Defense => "防御",
+            EnchantmentAttr.Health => "生命",
+            EnchantmentAttr.Mana => "法力",
+            EnchantmentAttr.CriticalRate => "暴击率",
+            EnchantmentAttr.CriticalDamage => "暴击伤害",
+            EnchantmentAttr.AttackSpeed => "攻击速度",
+            EnchantmentAttr.MoveSpeed => "移动速度",
+            EnchantmentAttr.FireResistance => "火抗",
+            EnchantmentAttr.IceResistance => "冰抗",
+            EnchantmentAttr.LightningResistance => "雷抗",
+            EnchantmentAttr.PoisonResistance => "毒抗",
+            EnchantmentAttr.AllAttributes => "全属性",
             _ => attribute.ToString()
         };
     }

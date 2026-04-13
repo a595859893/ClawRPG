@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Roguelike Deposit System — persistent cross-run data.
 /// Tracks deposit slots that accumulate from player actions and convert into deposit cards.
 /// </summary>
-public class DepositData : Node
+public partial class DepositData : Node
 {
     // ── Deposit Types ──────────────────────────────────────────────────────
     public enum DepositType

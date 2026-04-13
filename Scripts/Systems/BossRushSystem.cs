@@ -30,7 +30,7 @@ public partial class BossRushSystem : BaseSystem
         
         if (savedData.Contains("BossRushData"))
         {
-            var dict = (Godot.Dictionary)savedData["BossRushData"];
+            var dict = (Godot.Collections.Dictionary)savedData["BossRushData"];
             data = new BossRushData();
             
             if (dict.Contains("CurrentStage")) data.CurrentStage = Convert.ToInt32(dict["CurrentStage"]);
@@ -62,7 +62,7 @@ public partial class BossRushSystem : BaseSystem
     
     public override Dictionary<string, object> ExportSaveData()
     {
-        var dict = new Godot.Dictionary();
+        var dict = new Godot.Collections.Dictionary();
         dict["CurrentStage"] = data.CurrentStage;
         dict["CurrentBossIndex"] = data.CurrentBossIndex;
         dict["IsInRush"] = data.IsInRush;
@@ -343,7 +343,7 @@ public partial class BossRushSystem : BaseSystem
     
     public Dictionary GetStatistics()
     {
-        var stats = new Godot.Dictionary();
+        var stats = new Godot.Collections.Dictionary();
         stats["total_attempts"] = data.TotalRushAttempts;
         stats["total_victories"] = data.TotalVictories;
         stats["total_bosses"] = data.TotalBossesDefeated;

@@ -330,14 +330,14 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             if (saveSystem == null) return;
 
             var data = saveSystem.LoadGame();
-            if (data == null) data = new Godot.Dictionary();
+            if (data == null) data = new Godot.Collections.Dictionary();
 
             // Save generation history (limit to last 50)
             var historyArray = new Godot.Array();
             var recentHistory = _data.GenerationHistory.TakeLast(50).ToList();
             foreach (var record in recentHistory)
             {
-                var recordData = new Godot.Dictionary();
+                var recordData = new Godot.Collections.Dictionary();
                 recordData["weapon_name"] = record.WeaponName;
                 recordData["weapon_type"] = record.WeaponType;
                 recordData["rarity"] = record.Rarity;
@@ -394,7 +394,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             data["procedural_weapon_unlocked_suffixes"] = unlockedSuffixesArray;
 
             // Save rarity distribution
-            var rarityDistDict = new Godot.Dictionary();
+            var rarityDistDict = new Godot.Collections.Dictionary();
             foreach (var kvp in _data.RarityGenerationCount)
             {
                 rarityDistDict[kvp.Key] = kvp.Value;
@@ -419,7 +419,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             if (data.Contains("procedural_weapon_history")) {
                 var historyArray = (Godot.Array)data["procedural_weapon_history"];
                 _data.GenerationHistory.Clear();
-                foreach (Godot.Dictionary recordData in historyArray)
+                foreach (Godot.Collections.Dictionary recordData in historyArray)
                 {
                     var record = new WeaponGenerationRecord();
                     record.WeaponName = recordData.Contains("weapon_name") ? (string)recordData["weapon_name"] : "";
@@ -495,7 +495,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
 
             // Load rarity distribution
             if (data.Contains("procedural_weapon_rarity_dist")) {
-                var rarityDistDict = (Godot.Dictionary)data["procedural_weapon_rarity_dist"];
+                var rarityDistDict = (Godot.Collections.Dictionary)data["procedural_weapon_rarity_dist"];
                 foreach (var key in rarityDistDict.Keys)
                 {
                     _data.RarityGenerationCount[(string)key] = (int)rarityDistDict[key];

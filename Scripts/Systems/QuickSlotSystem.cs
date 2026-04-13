@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
 using ClawRPG.Scripts.UI;
 using ClawRPG.Scripts.Items;
 
@@ -39,6 +40,7 @@ public partial class QuickSlotSystem : BaseSystem
     
     // 8 quick slots (1-8 keys)
     private QuickSlotData[] _slots = new QuickSlotData[8];
+    private int _selectedSlot = 0;
     
     // Signals
 public delegate void SlotUpdated(int slotIndex, QuickSlotData data);

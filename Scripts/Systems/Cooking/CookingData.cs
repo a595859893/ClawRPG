@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CookingRecipe : Resource
+public partial class CookingRecipe : Resource
 {
     [Export] public string recipeId;
     [Export] public string recipeName;
@@ -18,7 +18,7 @@ public class CookingRecipe : Resource
     [Export] public int requiredCookingLevel;
 }
 
-public class StatBonus : Resource
+public partial class StatBonus : Resource
 {
     [Export] public string statName;
     [Export] public float bonusValue;

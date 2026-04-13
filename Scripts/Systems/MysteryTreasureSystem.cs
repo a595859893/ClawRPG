@@ -32,15 +32,15 @@ public partial class MysteryTreasureSystem : BaseSystem
 
     // 信号定义 (Godot 4 兼容)
     [Signal]
-    public delegate void TreasureFoundDelegate(string treasureId, Vector2 position);
+    public delegate void TreasureFoundDelegateEventHandlerEventHandler(string treasureId, Vector2 position);
     [Signal]
-    public delegate void TreasureOpenedDelegate(string treasureId, Dictionary<string, int> rewards);
+    public delegate void TreasureOpenedDelegateEventHandlerEventHandler(string treasureId, Dictionary<string, int> rewards);
     [Signal]
-    public delegate void TreasureDiscoveredDelegate(string treasureId);
+    public delegate void TreasureDiscoveredDelegateEventHandlerEventHandler(string treasureId);
     [Signal]
-    public delegate void GoldEarnedDelegate(int amount);
+    public delegate void GoldEarnedDelegateEventHandlerEventHandler(int amount);
     [Signal]
-    public delegate void ExpEarnedDelegate(int amount);
+    public delegate void ExpEarnedDelegateEventHandlerEventHandler(int amount);
 
     public override void _Ready()
     {
@@ -102,7 +102,7 @@ public partial class MysteryTreasureSystem : BaseSystem
         _activeTreasures.Add(instance);
         
         // 发送信号
-        EmitSignal(nameof(TreasureFoundDelegate), treasure.TreasureId, spawnPos);
+        EmitSignal(nameof(TreasureFoundDelegateEventHandlerEventHandler), treasure.TreasureId, spawnPos);
     }
 
     // 获取随机生成位置
@@ -186,7 +186,7 @@ public partial class MysteryTreasureSystem : BaseSystem
         UpdatePlayerData(treasure, rewards);
         
         // 发送信号
-        EmitSignal(nameof(TreasureOpenedDelegate), treasure.TreasureId, rewards);
+        EmitSignal(nameof(TreasureOpenedDelegateEventHandlerEventHandler), treasure.TreasureId, rewards);
         
         // 移除已打开的宝藏
         _activeTreasures.Remove(instance);
@@ -204,7 +204,7 @@ public partial class MysteryTreasureSystem : BaseSystem
             var treasure = _database.GetTreasureById(instance.TreasureId);
             if (treasure != null)
             {
-                EmitSignal(nameof(TreasureDiscoveredDelegate), treasure.TreasureId);
+                EmitSignal(nameof(TreasureDiscoveredDelegateEventHandlerEventHandler), treasure.TreasureId);
             }
         }
     }
@@ -283,7 +283,7 @@ public partial class MysteryTreasureSystem : BaseSystem
         };
         
         _activeTreasures.Add(instance);
-        EmitSignal(nameof(TreasureFoundDelegate), treasureId, spawnPos);
+        EmitSignal(nameof(TreasureFoundDelegateEventHandlerEventHandler), treasureId, spawnPos);
     }
 
     // 强制生成随机宝藏

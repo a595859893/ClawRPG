@@ -4,6 +4,7 @@ using Godot;
 /// </summary>
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
 
 public partial class StyleMasterySystem : BaseSystem
 {

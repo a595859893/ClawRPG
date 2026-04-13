@@ -24,7 +24,7 @@ public partial class DailyLoginBonusSystem : BaseSystem
             var gameData = saveSystem.LoadGame();
             if (gameData.Contains("dailyLoginBonus"))
             {
-                var bonusData = (Godot.Dictionary)gameData["dailyLoginBonus"];
+                var bonusData = (Godot.Collections.Dictionary)gameData["dailyLoginBonus"];
                 _data = new DailyLoginBonusData();
                 
                 if (bonusData.Contains("currentStreak"))
@@ -49,7 +49,7 @@ public partial class DailyLoginBonusSystem : BaseSystem
                 // 解析最后登录日期
                 if (bonusData.Contains("lastLoginDate"))
                 {
-                    var lastLogin = (Godot.Dictionary)bonusData["lastLoginDate"];
+                    var lastLogin = (Godot.Collections.Dictionary)bonusData["lastLoginDate"];
                     _data.LastLoginDate = new Dictionary<string, object>
                     {
                         { "year", lastLogin.Contains("year") ? Convert.ToInt32(lastLogin["year"]) : 0 },
@@ -88,7 +88,7 @@ public partial class DailyLoginBonusSystem : BaseSystem
         {
             var gameData = saveSystem.LoadGame();
             
-            var bonusData = new Godot.Dictionary
+            var bonusData = new Godot.Collections.Dictionary
             {
                 { "currentStreak", _data.CurrentStreak },
                 { "bestStreak", _data.BestStreak },
@@ -99,7 +99,7 @@ public partial class DailyLoginBonusSystem : BaseSystem
                 { "totalExpReceived", _data.TotalExpReceived },
                 { "totalDiamondsReceived", _data.TotalDiamondsReceived },
                 { "claimedBonusCount", _data.ClaimedBonusCount },
-                { "lastLoginDate", new Godot.Dictionary
+                { "lastLoginDate", new Godot.Collections.Dictionary
                     {
                         { "year", _data.LastLoginDate["year"] },
                         { "month", _data.LastLoginDate["month"] },

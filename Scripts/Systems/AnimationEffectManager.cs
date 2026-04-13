@@ -138,7 +138,7 @@ public partial class AnimationEffectManager : BaseSystem
         _isPlayingAttackAnimation = true;
         
         // 播放攻击音效
-        SoundEffectSystem.Instance?.PlayAttackSound();
+        SoundEffectSystem.Instance?.PlayDamage();
     }
     
     /// <summary>

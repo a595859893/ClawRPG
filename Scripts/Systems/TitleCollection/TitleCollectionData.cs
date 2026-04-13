@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ClawRPG.Systems.TitleCollection {
-public class TitleCollectionData : Resource
+public partial class TitleCollectionData : Resource
 {
     private Godot.Collections.Dictionary _data = new Godot.Collections.Dictionary();
     

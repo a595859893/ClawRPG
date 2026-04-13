@@ -49,7 +49,7 @@ namespace ClawRPG.Scripts.Systems
             // Load trait levels
             if (data.Contains("pet_trait_levels"))
             {
-                var levelsData = (Godot.Dictionary)data["pet_trait_levels"];
+                var levelsData = (Godot.Collections.Dictionary)data["pet_trait_levels"];
                 foreach (string key in levelsData.Keys)
                 {
                     _data.TraitLevels[key] = (int)levelsData[key];
@@ -70,7 +70,7 @@ namespace ClawRPG.Scripts.Systems
             // Load stats
             if (data.Contains("pet_trait_stats"))
             {
-                var stats = (Godot.Dictionary)data["pet_trait_stats"];
+                var stats = (Godot.Collections.Dictionary)data["pet_trait_stats"];
                 _totalTraitsUnlocked = (int)stats.Get("unlocked", 0);
                 _totalTraitsActivated = (int)stats.Get("activated", 0);
             }
@@ -82,7 +82,7 @@ namespace ClawRPG.Scripts.Systems
             if (saveSystem == null) return;
 
             var data = saveSystem.LoadGame();
-            if (data == null) data = new Godot.Dictionary();
+            if (data == null) data = new Godot.Collections.Dictionary();
 
             // Save unlocked traits
             var unlockedArray = new Godot.Array();
@@ -93,7 +93,7 @@ namespace ClawRPG.Scripts.Systems
             data["pet_trait_unlocked"] = unlockedArray;
 
             // Save trait levels
-            var levelsData = new Godot.Dictionary();
+            var levelsData = new Godot.Collections.Dictionary();
             foreach (var kvp in _data.TraitLevels)
             {
                 levelsData[kvp.Key] = kvp.Value;
@@ -109,7 +109,7 @@ namespace ClawRPG.Scripts.Systems
             data["pet_trait_active"] = activeArray;
 
             // Save stats
-            var stats = new Godot.Dictionary();
+            var stats = new Godot.Collections.Dictionary();
             stats["unlocked"] = _totalTraitsUnlocked;
             stats["activated"] = _totalTraitsActivated;
             data["pet_trait_stats"] = stats;

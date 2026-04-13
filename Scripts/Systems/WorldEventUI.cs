@@ -289,7 +289,7 @@ public partial class WorldEventUI : Control
     }
 
     // Event card class
-    private class EventCard : Control
+    private partial class EventCard : Control
     {
         private WorldEvent _event;
 

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems;
     using Title = ClawRPG.Scripts.Systems.Title;
-    using TitleType = ClawRPG.Scripts.Systems.TitleType;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
@@ -25,7 +24,7 @@ namespace ClawRPG.Scripts.UI {
         private Button specialButton;
         
         // 当前筛选类型
-        private TitleType? currentFilter = null;
+        private TitleCategory? currentFilter = null;
         
         // 预设颜色
         private Color commonColor = new Color(0.7f, 0.7f, 0.7f);
@@ -108,19 +107,19 @@ namespace ClawRPG.Scripts.UI {
             allButton.Pressed += () => SetFilter(null);
             
             levelButton = CreateFilterButton("等级", filterContainer);
-            levelButton.Pressed += () => SetFilter(TitleType.Level);
+            levelButton.Pressed += () => SetFilter(TitleCategory.Combat);
             
             combatButton = CreateFilterButton("战斗", filterContainer);
-            combatButton.Pressed += () => SetFilter(TitleType.Combat);
+            combatButton.Pressed += () => SetFilter(TitleCategory.Combat);
             
             questButton = CreateFilterButton("任务", filterContainer);
-            questButton.Pressed += () => SetFilter(TitleType.Quest);
+            questButton.Pressed += () => SetFilter(TitleCategory.Exploration);
             
             collectionButton = CreateFilterButton("收集", filterContainer);
-            collectionButton.Pressed += () => SetFilter(TitleType.Collection);
+            collectionButton.Pressed += () => SetFilter(TitleCategory.Collection);
             
             specialButton = CreateFilterButton("特殊", filterContainer);
-            specialButton.Pressed += () => SetFilter(TitleType.Special);
+            specialButton.Pressed += () => SetFilter(TitleCategory.Special);
             
             // 称号列表容器 (使用 ScrollContainer)
             ScrollContainer scrollContainer = new ScrollContainer();
@@ -146,16 +145,16 @@ namespace ClawRPG.Scripts.UI {
             return button;
         }
         
-        private void SetFilter(TitleType? type) {
+        private void SetFilter(TitleCategory? type) {
             currentFilter = type;
             
             // 更新按钮状态
             allButton.Modulate = type == null ? Colors.Yellow : Colors.White;
-            levelButton.Modulate = type == TitleType.Level ? Colors.Yellow : Colors.White;
-            combatButton.Modulate = type == TitleType.Combat ? Colors.Yellow : Colors.White;
-            questButton.Modulate = type == TitleType.Quest ? Colors.Yellow : Colors.White;
-            collectionButton.Modulate = type == TitleType.Collection ? Colors.Yellow : Colors.White;
-            specialButton.Modulate = type == TitleType.Special ? Colors.Yellow : Colors.White;
+            levelButton.Modulate = type == TitleCategory.Combat ? Colors.Yellow : Colors.White;
+            combatButton.Modulate = type == TitleCategory.Combat ? Colors.Yellow : Colors.White;
+            questButton.Modulate = type == TitleCategory.Exploration ? Colors.Yellow : Colors.White;
+            collectionButton.Modulate = type == TitleCategory.Collection ? Colors.Yellow : Colors.White;
+            specialButton.Modulate = type == TitleCategory.Special ? Colors.Yellow : Colors.White;
             
             PopulateTitleList();
         }
@@ -167,7 +166,8 @@ namespace ClawRPG.Scripts.UI {
             }
             
             var titleSystem = TitleSystem.Instance;
-            var allTitles = titleSystem.GetAllTitles();
+            var allTitleData = titleSystem.GetAllTitles();
+            var allTitles = allTitleData.ConvertAll(t => new Title(t));
             var unlockedTitles = titleSystem.GetUnlockedTitles();
             
             int totalCount = allTitles.Count;
@@ -177,7 +177,7 @@ namespace ClawRPG.Scripts.UI {
             titleCountLabel.Text = $"已解锁: {unlockedCount}/{totalCount}";
             
             // 更新当前称号显示
-            string currentTitleName = titleSystem.GetCurrentTitleName();
+            string currentTitleName = titleSystem.GetEquippedTitleName();
             if (!string.IsNullOrEmpty(currentTitleName)) {
                 currentTitleLabel.Text = currentTitleName;
                 currentTitleLabel.Modulate = titleSystem.GetCurrentTitleColor();
@@ -189,9 +189,10 @@ namespace ClawRPG.Scripts.UI {
             // 筛选并显示称号
             List<Title> filteredTitles = new List<Title>();
             if (currentFilter.HasValue) {
-                filteredTitles = titleSystem.GetTitlesByType(currentFilter.Value);
+                var raw = titleSystem.GetTitlesByType(currentFilter.Value);
+                filteredTitles = raw.ConvertAll(t => new Title(t));
             } else {
-                filteredTitles = allTitles;
+                filteredTitles = allTitles.ConvertAll(t => new Title(t));
             }
             
             foreach (var title in filteredTitles) {

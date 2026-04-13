@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Game;
+using ClawRPG.Scripts.Items;
 using SetType = Game.EquipmentSetData.SetType;
 using SetRarity = Game.EquipmentSetData.SetRarity;
 
@@ -49,7 +50,7 @@ namespace Game
         {
             // 主容器
             _mainContainer = new VBoxContainer();
-            _mainContainer.SetAnchorsPreset(Control.AnchorsPreset.FullRect);
+            _mainContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             _mainContainer.AddThemeConstantOverride("separation", 10);
             AddChild(_mainContainer);
 
@@ -76,8 +77,8 @@ namespace Game
 
             // 滚动容器
             _scrollContainer = new ScrollContainer();
-            _scrollContainer.SetHExpand(true);
-            _scrollContainer.SetVExpand(true);
+            _scrollContainer.SizeFlagsHorizontal = Control.SizeFlags.Expand;
+            _scrollContainer.SizeFlagsVertical = Control.SizeFlags.Expand;
             _mainContainer.AddChild(_scrollContainer);
 
             // 网格容器
@@ -106,12 +107,12 @@ namespace Game
         private void _CreateDetailPanel()
         {
             _detailPanel = new Panel();
-            _detailPanel.SetAnchorsPreset(Control.AnchorsPreset.FullRect);
+            _detailPanel.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             _detailPanel.Visible = false; 
             AddChild(_detailPanel);
 
             var detailContainer = new VBoxContainer();
-            detailContainer.SetAnchorsPreset(Control.AnchorsPreset.FullRect);
+            detailContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             detailContainer.AddThemeConstantOverride("separation", 10);
             detailContainer.AddThemeConstantOverride("margin_left", 20);
             detailContainer.AddThemeConstantOverride("margin_top", 20);
@@ -122,12 +123,12 @@ namespace Game
             // 关闭按钮
             var closeBtn = new Button();
             closeBtn.Text = "关闭";
-            closeBtn.Align = Button.AlignMode.Center;
+            // closeBtn.TextAlignment = HorizontalAlignment.Center; // Godot 4 removed this property
             closeBtn.Pressed += () => _detailPanel.Visible = false; 
             
             var headerContainer = new HBoxContainer();
             headerContainer.AddChild(closeBtn);
-            headerContainer.AddChild(new Control() { HExpand = true }); // Spacer
+            headerContainer.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand }); // Spacer
             detailContainer.AddChild(headerContainer);
 
             // 套装名称
@@ -185,7 +186,7 @@ namespace Game
             }
 
             var db = EquipmentSetDatabase.Instance;
-            List<EquipmentSet> sets;
+            List<ClawRPG.Scripts.Items.EquipmentSet> sets;
 
             if (_currentFilter.HasValue)
             {
@@ -207,7 +208,7 @@ namespace Game
             }
         }
 
-        private Control _CreateSetPanel(EquipmentSet set)
+        private Control _CreateSetPanel(ClawRPG.Scripts.Items.EquipmentSet set)
         {
             var panel = new PanelContainer();
             panel.CustomMinimumSize = new Vector2(350, 120);
@@ -218,11 +219,11 @@ namespace Game
 
             // 名称和稀有度
             var nameLabel = new Label();
-            nameLabel.Text = set.Name;
+            nameLabel.Text = set.SetName;
             nameLabel.AddThemeFontSizeOverride("font_size", 18);
             
             // 稀有度颜色
-            Color rarityColor = _GetRarityColor(set.Rarity);
+            Color rarityColor = new Color(1f, 1f, 1f); // Rarity removed
             nameLabel.Modulate = rarityColor;
             container.AddChild(nameLabel);
 
@@ -235,7 +236,7 @@ namespace Game
 
             // 进度
             int owned = EquipmentSetSystem.Instance.GetSetPieceCount(set.SetId);
-            int total = set.Items.Count;
+            int total = set.EquipmentIds.Count;
             var progressLabel = new Label();
             progressLabel.Text = $"已收集: {owned}/{total} 件";
             
@@ -266,21 +267,20 @@ namespace Game
             return panel;
         }
 
-        private void _ShowSetDetail(EquipmentSet set)
+        private void _ShowSetDetail(ClawRPG.Scripts.Items.EquipmentSet set)
         {
             _selectedSet = set;
             _detailPanel.Visible = true;
 
-            _detailName.Text = set.Name;
-            _detailName.Modulate = _GetRarityColor(set.Rarity);
+            _detailName.Text = set.SetName;
+            // Rarity removed
 
-            _detailRarity.Text = "稀有度: " + _GetRarityName(set.Rarity);
-            _detailRarity.Modulate = _GetRarityColor(set.Rarity);
+            // Rarity and description removed
 
-            _detailDescription.Text = set.Description;
+            _detailDescription.Visible = false;
 
             int owned = EquipmentSetSystem.Instance.GetSetPieceCount(set.SetId);
-            int total = set.Items.Count;
+            int total = set.EquipmentIds.Count;
             _detailProgress.Text = $"收集进度: {owned}/{total}";
 
             // 物品列表
@@ -317,16 +317,16 @@ namespace Game
             foreach (var bonus in set.Bonuses)
             {
                 var bonusLabel = new Label();
-                bool isActive = owned >= bonus.PieceCount;
+                bool isActive = owned >= bonus.RequiredPieceCount;
                 
                 if (isActive)
                 {
-                    bonusLabel.Text = $"✓ {bonus.PieceCount}件: {bonus.Description}";
+                    bonusLabel.Text = $"✓ {bonus.RequiredPieceCount}件: {bonus.Description}";
                     bonusLabel.Modulate = new Color(0.2f, 0.8f, 0.2f);
                 }
                 else
                 {
-                    bonusLabel.Text = $"✗ {bonus.PieceCount}件: {bonus.Description}";
+                    bonusLabel.Text = $"✗ {bonus.RequiredPieceCount}件: {bonus.Description}";
                     bonusLabel.Modulate = new Color(0.5f, 0.5f, 0.5f);
                 }
                 

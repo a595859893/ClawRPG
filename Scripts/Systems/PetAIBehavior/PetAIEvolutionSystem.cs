@@ -17,13 +17,13 @@ namespace ClawRPG.Scripts.Systems
         
         // Signals (Godot 4 compatible)
         [Signal]
-        public delegate void EvolutionUnlockedDelegate(string petId, PetAIEvolutionType type);
+        public delegate void EvolutionUnlockedDelegateEventHandlerEventHandler(string petId, PetAIEvolutionType type);
         [Signal]
-        public delegate void ProgressUpdatedDelegate(string petId, float progress);
+        public delegate void ProgressUpdatedDelegateEventHandlerEventHandler(string petId, float progress);
         [Signal]
-        public delegate void BonusActivatedDelegate(string petId, PetAIEvolutionType type, float bonus);
+        public delegate void BonusActivatedDelegateEventHandlerEventHandler(string petId, PetAIEvolutionType type, float bonus);
         [Signal]
-        public delegate void ComboUpdatedDelegate(string petId, int combo);
+        public delegate void ComboUpdatedDelegateEventHandlerEventHandler(string petId, int combo);
 
         public override void _Ready()
         {

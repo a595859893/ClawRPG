@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
 
 /// <summary>
 /// 宠物友谊系统 - 管理宠物之间的友谊关系和互动

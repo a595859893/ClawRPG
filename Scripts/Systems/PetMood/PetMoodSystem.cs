@@ -15,11 +15,11 @@ namespace ClawRPG.Scripts.Systems.PetMood {
         
         // 信号 (Godot 4 compatible)
         [Signal]
-        public delegate void PetMoodChangedDelegate(string petId, PetMoodType mood);
+        public delegate void PetMoodChangedDelegateEventHandlerEventHandler(string petId, PetMoodType mood);
         [Signal]
-        public delegate void MoodEffectTriggeredDelegate(string petId, PetMoodEffect effect);
+        public delegate void MoodEffectTriggeredDelegateEventHandlerEventHandler(string petId, PetMoodEffect effect);
         [Signal]
-        public delegate void MoodDecayAppliedDelegate(string petId);
+        public delegate void MoodDecayAppliedDelegateEventHandlerEventHandler(string petId);
         
         // 持久化
         private const string SAVE_KEY = "pet_mood_system";

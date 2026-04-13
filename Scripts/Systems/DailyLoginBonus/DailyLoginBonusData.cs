@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class DailyLoginBonusData : Resource
+public partial class DailyLoginBonusData : Resource
 {
     // 登录记录
     public Dictionary<string, object> LastLoginDate { get; set; } = new Dictionary<string, object>

@@ -70,7 +70,7 @@ public class BattleRecord
 public partial class BattleStatisticsSystem : BaseSystem
 {
     private BattleStatsData _stats = new BattleStatsData();
-    private bool _battleActive = false;
+    private bool         _battleActive = false;
     private DateTime _battleStartTime;
     private int _currentBattleDamageDealt = 0;
     private int _currentBattleDamageTaken = 0;
@@ -91,7 +91,7 @@ public partial class BattleStatisticsSystem : BaseSystem
     
     protected override void Initialize()
     {
-        LoadData();
+
     }
 
     public override void _Ready()
@@ -179,8 +179,7 @@ public partial class BattleStatisticsSystem : BaseSystem
             _stats.RecentBattles.RemoveAt(_stats.RecentBattles.Count - 1);
         }
         
-        _battleActive = false;
-        SaveData();
+                _battleActive = false;
     }
     
     /// <summary>
@@ -431,6 +430,5 @@ public partial class BattleStatisticsSystem : BaseSystem
     public void ResetStats()
     {
         _stats = new BattleStatsData();
-        SaveData();
     }
 }

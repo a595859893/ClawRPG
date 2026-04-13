@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class PetEggData : Resource
+public partial class PetEggData : Resource
 {
     [Export] public string eggId = "";
     [Export] public string eggName = "";

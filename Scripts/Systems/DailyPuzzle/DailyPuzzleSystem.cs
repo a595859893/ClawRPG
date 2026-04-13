@@ -219,7 +219,7 @@ public partial class DailyPuzzleSystem : BaseSystem
         foreach (var kvp in _data.SolvedPuzzles)
         {
             var record = kvp.Value;
-            var puzzleRecord = new Godot.Dictionary();
+            var puzzleRecord = new Godot.Collections.Dictionary();
             puzzleRecord["puzzle_id"] = record.PuzzleId;
             puzzleRecord["solved_date"] = record.SolvedDate.ToString("o");
             puzzleRecord["time_taken"] = record.TimeTakenSeconds;
@@ -280,7 +280,7 @@ public partial class DailyPuzzleSystem : BaseSystem
         if (data.Contains("solved_puzzles"))
         {
             var solvedArray = (Godot.Array)data["solved_puzzles"];
-            foreach (Godot.Dictionary puzzleRecord in solvedArray)
+            foreach (Godot.Collections.Dictionary puzzleRecord in solvedArray)
             {
                 var record = new PuzzleRecord
                 {

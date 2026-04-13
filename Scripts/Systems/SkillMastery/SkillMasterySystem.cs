@@ -38,13 +38,13 @@ namespace ClawRPG.Scripts.Systems
 
         public override Dictionary<string, object> ExportSaveData()
         {
-            var data = new Godot.Dictionary();
+            var data = new Godot.Collections.Dictionary();
             
             // 保存技能熟练度数据
-            var skillsData = new Godot.Dictionary();
+            var skillsData = new Godot.Collections.Dictionary();
             foreach (var kvp in _playerData.Skills)
             {
-                var skillData = new Godot.Dictionary();
+                var skillData = new Godot.Collections.Dictionary();
                 skillData["current_points"] = kvp.Value.CurrentPoints;
                 skillData["total_points"] = kvp.Value.TotalPoints;
                 skillData["tier"] = kvp.Value.CurrentTier;
@@ -75,10 +75,10 @@ namespace ClawRPG.Scripts.Systems
             if (data.Contains("skills"))
             {
                 _playerData.Skills.Clear();
-                var skillsData = (Godot.Dictionary)data["skills"];
+                var skillsData = (Godot.Collections.Dictionary)data["skills"];
                 foreach (string skillId in skillsData.Keys)
                 {
-                    var skillData = (Godot.Dictionary)skillsData[skillId];
+                    var skillData = (Godot.Collections.Dictionary)skillsData[skillId];
                     var masteryData = new SkillMasteryData.SkillMasteryEntry
                     {
                         CurrentPoints = (int)skillData["current_points"],

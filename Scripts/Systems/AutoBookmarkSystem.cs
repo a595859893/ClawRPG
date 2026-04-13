@@ -11,7 +11,7 @@ namespace ClawRPG.Scripts.Systems {
         public static AutoBookmarkSystem Instance { get; private set; }
         
         // Signals
-        [Signal] public delegate void OnAutoBookmarkAdded(Bookmark bookmark, string trigger);
+        [Signal] public delegate void OnAutoBookmarkAddedEventHandlerEventHandler(Bookmark bookmark, string trigger);
         
         // Settings
         [Export] public bool AutoBookmarkBoss = true;
@@ -72,7 +72,7 @@ namespace ClawRPG.Scripts.Systems {
                 );
                 
                 if (added) {
-                    OnAutoBookmarkAdded?.Invoke(
+                    OnAutoBookmarkAddedEventHandlerEventHandler?.Invoke(
                         bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1],
                         "boss_defeat"
                     );
@@ -106,7 +106,7 @@ namespace ClawRPG.Scripts.Systems {
                 );
                 
                 if (added) {
-                    OnAutoBookmarkAdded?.Invoke(
+                    OnAutoBookmarkAddedEventHandlerEventHandler?.Invoke(
                         bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1],
                         "shop_discovered"
                     );
@@ -140,7 +140,7 @@ namespace ClawRPG.Scripts.Systems {
                 );
                 
                 if (added) {
-                    OnAutoBookmarkAdded?.Invoke(
+                    OnAutoBookmarkAddedEventHandlerEventHandler?.Invoke(
                         bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1],
                         "quest_updated"
                     );
@@ -174,7 +174,7 @@ namespace ClawRPG.Scripts.Systems {
                 );
                 
                 if (added) {
-                    OnAutoBookmarkAdded?.Invoke(
+                    OnAutoBookmarkAddedEventHandlerEventHandler?.Invoke(
                         bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1],
                         "waypoint_discovered"
                     );

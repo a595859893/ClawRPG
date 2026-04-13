@@ -7,7 +7,7 @@ using ClawRPG.Scripts.Managers;
 /// Tracks player actions during a run and records them as deposit events.
 /// Subscribes to combat/game events and maps them to deposit types.
 /// </summary>
-public class DepositTracker : Node
+public partial class DepositTracker : Node
 {
     // ── Singleton ──────────────────────────────────────────────────────────
     public static DepositTracker Instance { get; private set; }

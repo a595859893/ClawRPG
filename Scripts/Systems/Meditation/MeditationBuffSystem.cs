@@ -18,7 +18,7 @@ namespace ClawRPG.Systems.Meditation
         // Signals
         public MeditationSignals Signals;
 
-        public class MeditationSignals : GodotObject
+        public partial class MeditationSignals : GodotObject
         {
             public delegate void BuffAppliedHandler(string playerId, MeditationType type, string statAffected, float value);
             public delegate void BuffExpiredHandler(string playerId, MeditationType type);

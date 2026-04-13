@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Framework;
 
 /// <summary>
 /// 技能Combo系统。管理技能连击的检测、触发和奖励计算。
@@ -199,7 +200,10 @@ public partial class SkillComboSystem : BaseSystem
         activeCombo.CurrentStep = activeCombo.TriggeredSkills.Count;
         activeCombo.TimeRemaining = combo.TimeWindow;
         activeCombo.IsActive = true;
-        
+
+        // Emit progress updated so intent display can show expected next skill
+        ComboProgressUpdated?.Invoke(comboId, activeCombo.CurrentStep, activeCombo.TimeRemaining);
+
         // Check if combo is complete
         if (activeCombo.CurrentStreak >= combo.Bonus.RequiredComboCount)
         {
@@ -256,16 +260,18 @@ public partial class SkillComboSystem : BaseSystem
     /// </summary>
     public void ApplyComboBonus(ComboBonus bonus)
     {
+        if (bonus == null) return;
+        
         float currentTime = Time.GetTicksMsec() / 1000f;
         
-        // Apply damage multiplier
+        // Apply damage multiplier (accumulate, not replace)
         if (bonus.DamageMultiplier > 1f)
         {
-            _currentDamageMultiplier = Math.Max(_currentDamageMultiplier, bonus.DamageMultiplier);
+            _currentDamageMultiplier += bonus.DamageMultiplier - 1f; // accumulate the bonus portion
         }
         
-        // Apply cooldown reduction (simplified)
-        _currentCooldownReduction = Math.Max(_currentCooldownReduction, bonus.CooldownReduction);
+        // Apply cooldown reduction (accumulate)
+        _currentCooldownReduction += bonus.CooldownReduction;
         
         // Set bonus expiration
         _bonusEndTime = currentTime + bonus.Duration;

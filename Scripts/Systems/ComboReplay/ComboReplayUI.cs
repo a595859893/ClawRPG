@@ -10,7 +10,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
     /// Combo 回放 UI（REQ-114-03 + REQ-114-04）
     /// 显示回放时间线、操作记录列表、播放控制
     /// </summary>
-    public class ComboReplayUI : BaseUI
+    public partial class ComboReplayUI : BaseUI
     {
         public static ComboReplayUI Instance { get; private set; }
 

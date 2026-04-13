@@ -90,9 +90,9 @@ namespace ClawRPG.Scripts.Systems {
         public static BookmarkSystem Instance { get; private set; }
         
         // Signals for bookmark events
-        [Signal] public delegate void OnBookmarkAdded(Bookmark bookmark);
-        [Signal] public delegate void OnBookmarkRemoved(int bookmarkId);
-        [Signal] public delegate void OnBookmarkUpdated(Bookmark bookmark);
+        [Signal] public delegate void OnBookmarkAddedEventHandlerEventHandler(Bookmark bookmark);
+        [Signal] public delegate void OnBookmarkRemovedEventHandlerEventHandler(int bookmarkId);
+        [Signal] public delegate void OnBookmarkUpdatedEventHandlerEventHandler(Bookmark bookmark);
         
         // Player's bookmarks
         public List<Bookmark> PlayerBookmarks { get; private set; } = new();
@@ -121,7 +121,7 @@ namespace ClawRPG.Scripts.Systems {
             };
             
             PlayerBookmarks.Add(bookmark);
-            OnBookmarkAdded?.Invoke(bookmark);
+            OnBookmarkAddedEventHandlerEventHandler?.Invoke(bookmark);
             
             GD.Print($"[BookmarkSystem] Added bookmark: {name} at {position}");
             return true;
@@ -134,7 +134,7 @@ namespace ClawRPG.Scripts.Systems {
             var bookmark = PlayerBookmarks.Find(b => b.Id == bookmarkId);
             if (bookmark != null) {
                 PlayerBookmarks.Remove(bookmark);
-                OnBookmarkRemoved?.Invoke(bookmarkId);
+                OnBookmarkRemovedEventHandlerEventHandler?.Invoke(bookmarkId);
                 GD.Print($"[BookmarkSystem] Removed bookmark: {bookmark.Name}");
                 return true;
             }
@@ -149,7 +149,7 @@ namespace ClawRPG.Scripts.Systems {
             if (bookmark != null) {
                 if (!string.IsNullOrEmpty(newName)) bookmark.Name = newName;
                 if (newNote != null) bookmark.Note = newNote;
-                OnBookmarkUpdated?.Invoke(bookmark);
+                OnBookmarkUpdatedEventHandlerEventHandler?.Invoke(bookmark);
                 return true;
             }
             return false;

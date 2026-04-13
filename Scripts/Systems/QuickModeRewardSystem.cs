@@ -276,7 +276,7 @@ public partial class QuickModeRewardSystem : BaseSystem
         var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
         if (saveSystem == null) return;
 
-        var data = new Godot.Dictionary
+        var data = new Godot.Collections.Dictionary
         {
             ["quick_mode_wins"] = _quickModeWins,
             ["quick_mode_plays"] = _quickModePlays,

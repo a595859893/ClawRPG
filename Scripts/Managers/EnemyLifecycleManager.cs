@@ -8,7 +8,7 @@ using ClawRPG.Scripts.Characters;
 /// 敌人生命周期管理器 - 负责敌人的生成、AI 更新、死亡和状态管理
 /// 使用 EventBusManager 进行事件通信，减少系统耦合
 /// </summary>
-public class EnemyLifecycleManager : ManagerBase
+public partial class EnemyLifecycleManager : ManagerBase
 {
     public static EnemyLifecycleManager Instance { get; private set; }
     
@@ -88,7 +88,7 @@ public class EnemyLifecycleManager : ManagerBase
         var main = GetNode("/root/Main");
         if (main != null && main.HasMethod("GetEnemyScene"))
         {
-            _enemyScene = main.Call("GetEnemyScene") as PackedScene;
+            _enemyScene = main.Call("GetEnemyScene").Obj as PackedScene;
         }
         
         if (_enemyScene == null)
@@ -104,7 +104,7 @@ public class EnemyLifecycleManager : ManagerBase
     {
         if (ActiveEnemies.Count >= MaxEnemies)
         {
-            GD.PrintWarn("[EnemyLifecycleManager] Max enemies reached!");
+            GD.PushWarning("[EnemyLifecycleManager] Max enemies reached!");
             return null;
         }
         
@@ -115,7 +115,7 @@ public class EnemyLifecycleManager : ManagerBase
         }
         
         // 实例化敌人
-        var enemy = _enemyScene.Instance() as Enemy;
+        var enemy = (Enemy)_enemyScene.Instantiate();
         if (enemy == null)
         {
             GD.PrintErr("[EnemyLifecycleManager] Failed to instantiate enemy!");
@@ -124,7 +124,7 @@ public class EnemyLifecycleManager : ManagerBase
         
         // 设置位置
         var spawnPos = position ?? GetRandomSpawnPoint();
-        enemy.GlobalPosition = spawnPos;
+        enemy.GlobalPosition = new Vector2(spawnPos.X, spawnPos.Y);
         
         // 添加到场景
         GetTree().CurrentScene?.AddChild(enemy);
@@ -211,7 +211,7 @@ public class EnemyLifecycleManager : ManagerBase
     private Vector3 GetRandomSpawnPoint()
     {
         if (_spawnPoints.Count == 0) return Vector3.Zero;
-        return _spawnPoints[GD.Randi() % _spawnPoints.Count];
+        return _spawnPoints[(int)(GD.Randi() % (uint)_spawnPoints.Count)];
     }
     
     /// <summary>
@@ -245,7 +245,7 @@ public class EnemyLifecycleManager : ManagerBase
         {
             if (!IsInstanceValid(enemy)) continue;
             
-            var dist = fromPosition.DistanceTo(enemy.GlobalPosition);
+            var dist = fromPosition.DistanceTo(new Vector3(enemy.GlobalPosition.X, enemy.GlobalPosition.Y, 0));
             if (dist < nearestDist)
             {
                 nearestDist = dist;
@@ -267,7 +267,7 @@ public class EnemyLifecycleManager : ManagerBase
         {
             if (!IsInstanceValid(enemy)) continue;
             
-            if (position.DistanceTo(enemy.GlobalPosition) <= range)
+            if (position.DistanceTo(new Vector3(enemy.GlobalPosition.X, enemy.GlobalPosition.Y, 0)) <= range)
             {
                 enemies.Add(enemy);
             }

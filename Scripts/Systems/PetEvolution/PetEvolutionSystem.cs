@@ -321,13 +321,13 @@ public partial class PetEvolutionSystem : BaseSystem
         if (saveSystem == null) return;
 
         var data = saveSystem.LoadGame();
-        if (data == null) data = new Godot.Dictionary();
+        if (data == null) data = new Godot.Collections.Dictionary();
 
         // Save evolved pets
         var evolvedPetsArray = new Godot.Array();
         foreach (var kvp in _data.EvolvedPets)
         {
-            var petData = new Godot.Dictionary();
+            var petData = new Godot.Collections.Dictionary();
             petData["pet_id"] = kvp.Key;
             petData["current_form"] = kvp.Value.CurrentForm;
             petData["target_form"] = kvp.Value.TargetForm;
@@ -345,7 +345,7 @@ public partial class PetEvolutionSystem : BaseSystem
         var recentHistory = _data.EvolutionHistory.TakeLast(50).ToList();
         foreach (var entry in recentHistory)
         {
-            var historyData = new Godot.Dictionary();
+            var historyData = new Godot.Collections.Dictionary();
             historyData["pet_id"] = entry.PetId;
             historyData["original_form"] = entry.OriginalForm;
             historyData["new_form"] = entry.NewForm;
@@ -357,7 +357,7 @@ public partial class PetEvolutionSystem : BaseSystem
         data["pet_evolution_history"] = historyArray;
 
         // Save stats
-        var stats = new Godot.Dictionary();
+        var stats = new Godot.Collections.Dictionary();
         stats["total_evolutions"] = _data.TotalEvolutions;
         stats["legendary_evolutions"] = _data.LegendaryEvolutions;
         stats["epic_evolutions"] = _data.EpicEvolutions;
@@ -420,7 +420,7 @@ public partial class PetEvolutionSystem : BaseSystem
         // Load stats
         if (data.Contains("pet_evolution_stats"))
         {
-            var stats = (Godot.Dictionary)data["pet_evolution_stats"];
+            var stats = (Godot.Collections.Dictionary)data["pet_evolution_stats"];
             _data.TotalEvolutions = (int)stats.Get("total_evolutions", 0);
             _data.LegendaryEvolutions = (int)stats.Get("legendary_evolutions", 0);
             _data.EpicEvolutions = (int)stats.Get("epic_evolutions", 0);

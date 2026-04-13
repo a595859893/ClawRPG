@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems
     /// 系统初始化管理器 - 负责游戏启动时所有系统的初始化
     /// 管理器的初始化顺序通过 Priority 属性控制
     /// </summary>
-    public class SystemInitializationManager : ManagerBase
+    public partial class SystemInitializationManager : ManagerBase
     {
         public static SystemInitializationManager Instance { get; private set; }
         

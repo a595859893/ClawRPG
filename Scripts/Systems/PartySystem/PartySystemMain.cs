@@ -33,35 +33,35 @@ public partial class PartySystem : BaseSystem
     private PartyPersistenceManager _partyPersistence;
 
     [Signal]
-    public delegate void PartyCreatedDelegate();
+    public delegate void PartyCreatedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void PartyDisbandedDelegate();
+    public delegate void PartyDisbandedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void PlayerJoinedPartyDelegate();
+    public delegate void PlayerJoinedPartyDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void PlayerLeftPartyDelegate();
+    public delegate void PlayerLeftPartyDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void PlayerKickedDelegate();
+    public delegate void PlayerKickedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void InviteSentDelegate();
+    public delegate void InviteSentDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void InviteAcceptedDelegate();
+    public delegate void InviteAcceptedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void InviteDeclinedDelegate();
+    public delegate void InviteDeclinedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void LeaderChangedDelegate();
+    public delegate void LeaderChangedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void RoleChangedDelegate();
+    public delegate void RoleChangedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void StateChangedDelegate();
+    public delegate void StateChangedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void FriendAddedDelegate();
+    public delegate void FriendAddedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void FriendRemovedDelegate();
+    public delegate void FriendRemovedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void PlayerBlockedDelegate();
+    public delegate void PlayerBlockedDelegateEventHandlerEventHandler();
     [Signal]
-    public delegate void PlayerUnblockedDelegate();
+    public delegate void PlayerUnblockedDelegateEventHandlerEventHandler();
 
     public void Initialize()
     {

@@ -94,7 +94,7 @@ public abstract class Singleton<T> where T : class
 ///     }
 /// }
 /// </summary>
-public abstract class SingletonNode<T> : Godot.Node where T : Godot.Node
+public abstract partial class SingletonNode<T> : Godot.Node where T : Godot.Node
 {
     private static T _instance;
     private static readonly object _lock = new object();
@@ -152,7 +152,7 @@ public abstract class SingletonNode<T> : Godot.Node where T : Godot.Node
 /// <summary>
 /// UI 单例基类 - 适用于继承自 Godot Control 的 UI 类
 /// </summary>
-public abstract class SingletonUI<T> : Godot.Control where T : Godot.Control
+public abstract partial class SingletonUI<T> : Godot.Control where T : Godot.Control
 {
     private static T _instance;
     private static readonly object _lock = new object();

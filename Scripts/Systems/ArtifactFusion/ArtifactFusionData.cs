@@ -55,15 +55,15 @@ public class ArtifactFusionData
         
         if (data.ContainsKey("unlocked_recipes"))
         {
-            UnlockedRecipes = new List<string>((List<object>)data["unlocked_recipes"]);
+            UnlockedRecipes = ((List<object>)data["unlocked_recipes"]).Cast<string>().ToList();
         }
         
-        TotalFusions = data.GetValueOrDefault("total_fusions", 0);
-        SuccessfulFusions = data.GetValueOrDefault("successful_fusions", 0);
-        LegendaryFusions = data.GetValueOrDefault("legendary_fusions", 0);
-        TotalGoldSpent = data.GetValueOrDefault("total_gold_spent", 0);
-        SelectedArtifact1 = data.GetValueOrDefault("selected_artifact1", "");
-        SelectedArtifact2 = data.GetValueOrDefault("selected_artifact2", "");
+        TotalFusions = Convert.ToInt32(data.GetValueOrDefault("total_fusions", 0) ?? 0);
+        SuccessfulFusions = Convert.ToInt32(data.GetValueOrDefault("successful_fusions", 0) ?? 0);
+        LegendaryFusions = Convert.ToInt32(data.GetValueOrDefault("legendary_fusions", 0) ?? 0);
+        TotalGoldSpent = Convert.ToInt32(data.GetValueOrDefault("total_gold_spent", 0) ?? 0);
+        SelectedArtifact1 = (string)(data.GetValueOrDefault("selected_artifact1", "") ?? "");
+        SelectedArtifact2 = (string)(data.GetValueOrDefault("selected_artifact2", "") ?? "");
     }
     
     /// <summary>
@@ -113,12 +113,12 @@ public class ArtifactFusionData
             }
         }
         
-        TotalFusions = data.GetValueOrDefault("total_fusions", 0);
-        SuccessfulFusions = data.GetValueOrDefault("successful_fusions", 0);
-        LegendaryFusions = data.GetValueOrDefault("legendary_fusions", 0);
-        TotalGoldSpent = data.GetValueOrDefault("total_gold_spent", 0);
-        SelectedArtifact1 = data.GetValueOrDefault("selected_artifact1", "");
-        SelectedArtifact2 = data.GetValueOrDefault("selected_artifact2", "");
+        TotalFusions = Convert.ToInt32(data.GetValueOrDefault("total_fusions", 0) ?? 0);
+        SuccessfulFusions = Convert.ToInt32(data.GetValueOrDefault("successful_fusions", 0) ?? 0);
+        LegendaryFusions = Convert.ToInt32(data.GetValueOrDefault("legendary_fusions", 0) ?? 0);
+        TotalGoldSpent = Convert.ToInt32(data.GetValueOrDefault("total_gold_spent", 0) ?? 0);
+        SelectedArtifact1 = (string)(data.GetValueOrDefault("selected_artifact1", "") ?? "");
+        SelectedArtifact2 = (string)(data.GetValueOrDefault("selected_artifact2", "") ?? "");
     }
 }
 
@@ -146,12 +146,12 @@ public class FusionRecord
     
     public void Load(Dictionary<string, object> data)
     {
-        Artifact1 = data.GetValueOrDefault("artifact1", "");
-        Artifact2 = data.GetValueOrDefault("artifact2", "");
-        ResultArtifact = data.GetValueOrDefault("result_artifact", "");
-        Success = data.GetValueOrDefault("success", false);
-        GoldSpent = data.GetValueOrDefault("gold_spent", 0);
-        Timestamp = data.GetValueOrDefault("timestamp", 0f);
+        Artifact1 = (string)(data.GetValueOrDefault("artifact1", "") ?? "");
+        Artifact2 = (string)(data.GetValueOrDefault("artifact2", "") ?? "");
+        ResultArtifact = (string)(data.GetValueOrDefault("result_artifact", "") ?? "");
+        Success = (bool)(data.GetValueOrDefault("success", false) ?? false);
+        GoldSpent = Convert.ToInt32(data.GetValueOrDefault("gold_spent", 0) ?? 0);
+        Timestamp = Convert.ToSingle(data.GetValueOrDefault("timestamp", 0f) ?? 0f);
     }
 }
 

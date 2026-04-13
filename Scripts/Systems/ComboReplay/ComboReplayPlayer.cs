@@ -8,7 +8,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
     /// Combo 回放播放器（REQ-114-03）
     /// 职责：从头读取 replay，模拟时间轴推进，以只读模式重放玩家操作
     /// </summary>
-    public class ComboReplayPlayer : Node
+    public partial class ComboReplayPlayer : Node
     {
         private static ComboReplayPlayer _instance;
         public static ComboReplayPlayer Instance => _instance ??= new ComboReplayPlayer();

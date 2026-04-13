@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class GuildHeritageDatabase : GodotObject
+public partial class GuildHeritageDatabase : GodotObject
 {
     private static GuildHeritageDatabase _instance;
     public static GuildHeritageDatabase Instance => _instance ??= new GuildHeritageDatabase();
@@ -158,7 +158,7 @@ public class GuildHeritageDatabase : GodotObject
     }
 }
 
-public class TransferTypeConfig : GodotObject
+public partial class TransferTypeConfig : GodotObject
 {
     public string TypeId { get; set; }
     public string DisplayName { get; set; }

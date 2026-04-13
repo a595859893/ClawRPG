@@ -29,7 +29,7 @@ namespace ClawRPG.Scripts.Systems.Pets.VFX
         /// 配合动画触发信号 — 参数：(攻击宠物ID, 配合宠物ID, 友谊等级, 动画名称)
         /// </summary>
         [Signal]
-        public delegate void SynergyAnimTriggeredDelegate(int attackerId, int buddyId, int friendshipLevel, string animName);
+        public delegate void SynergyAnimTriggeredDelegateEventHandlerEventHandler(int attackerId, int buddyId, int friendshipLevel, string animName);
 
         public override void _Ready()
         {

@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class RuneData : Godot.Resource
+public partial class RuneData : Godot.Resource
 {
     [Export]
     public Dictionary<string, int> UnlockedRunes = new Dictionary<string, int>();

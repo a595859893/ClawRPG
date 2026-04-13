@@ -9,7 +9,7 @@ namespace ClawRPG.Systems.CombatUI
     /// Provides dynamic health bars, skill cooldown animations, combat state indicators, combo counters
     /// 应用 Advanced Shader Effects 学习的视觉增强技术
     /// </summary>
-    public class CombatUIEnhancementData : Resource
+    public partial class CombatUIEnhancementData : Resource
     {
         [Export] public bool Enabled { get; set; } = true;
         
@@ -46,7 +46,7 @@ namespace ClawRPG.Systems.CombatUI
         [Export] public float TotalDamageMitigated { get; set; } = 0f;
     }
     
-    public class CombatStateData : Resource
+    public partial class CombatStateData : Resource
     {
         public enum CombatState
         {
@@ -68,7 +68,7 @@ namespace ClawRPG.Systems.CombatUI
         public bool IsDodging { get; set; } = false;
     }
     
-    public class SkillCooldownData : Resource
+    public partial class SkillCooldownData : Resource
     {
         public string SkillId { get; set; } = "";
         public string SkillName { get; set; } = "";
@@ -79,7 +79,7 @@ namespace ClawRPG.Systems.CombatUI
         public float GetCooldownPercent() => MaxCooldown > 0 ? CurrentCooldown / MaxCooldown : 0f;
     }
     
-    public class StatusEffectData : Resource
+    public partial class StatusEffectData : Resource
     {
         public enum EffectType
         {

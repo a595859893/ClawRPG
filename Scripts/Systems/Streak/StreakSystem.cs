@@ -68,7 +68,7 @@ public partial class StreakSystem : BaseSystem
         if (saveSystem == null) return;
 
         var data = saveSystem.LoadGame();
-        if (data == null) data = new Godot.Dictionary();
+        if (data == null) data = new Godot.Collections.Dictionary();
 
         // Save streak data
         data["streak_login"] = _data.LoginStreak;

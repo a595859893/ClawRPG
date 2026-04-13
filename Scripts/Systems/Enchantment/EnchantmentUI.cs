@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using ClawRPG.Scripts.Systems.Enchantment;
+using ClawRPG.Systems.Enchantment;
 
 namespace ClawRPG.Scripts.Systems.Enchantment
 {

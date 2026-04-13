@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Generates deposit cards from active deposit slots at the start of a new run.
 /// Reads deposit levels and converts them into playable deposit cards.
 /// </summary>
-public class DepositCardGenerator : Node
+public partial class DepositCardGenerator : Node
 {
     public static DepositCardGenerator Instance { get; private set; }
 

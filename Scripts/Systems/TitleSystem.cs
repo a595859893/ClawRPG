@@ -710,162 +710,158 @@ public partial class TitleSystem : BaseSystem
         if (data.ContainsKey("total_titles_unlocked"))
             _totalTitlesUnlocked = Convert.ToInt32(data["total_titles_unlocked"]);
     }
-}
-}
 
-    // ===== REQ-200: Title Progress Tracking =====
-
-    /// <summary>
-    /// Progress data for a single title (REQ-200).
-    /// </summary>
-    public class TitleProgressData
-    {
-        public string TitleId;
-        public int CurrentValue;
-        public int RequiredValue;
-        public float Progress => RequiredValue > 0 ? Mathf.Clamp((float)CurrentValue / RequiredValue, 0f, 1f) : 0f;
-        public bool IsUnlocked;
-        public TitleProgressData() { }
-        public TitleProgressData(string id, int current, int required, bool unlocked)
+        /// <summary>
+        /// Progress data for a single title (REQ-200).
+        /// </summary>
+        public class TitleProgressData
         {
-            TitleId = id;
-            CurrentValue = current;
-            RequiredValue = required;
-            IsUnlocked = unlocked;
-        }
-    }
-
-    // Internal progress tracking (separate from TitleData to avoid breaking existing save format)
-    private Dictionary<string, TitleProgressData> _titleProgress = new Dictionary<string, TitleProgressData>();
-
-    /// <summary>
-    /// Update progress for a title. Called by external stat systems (e.g. CombatSystem, AchievementSystem).
-    /// REQ-200-01: progress query API — this method serves as the primary update entry point.
-    /// </summary>
-    /// <param name="titleId">Title ID</param>
-    /// <param name="currentValue">Current progress value</param>
-    public void SetTitleProgress(string titleId, int currentValue)
-    {
-        if (!_titleDatabase.TryGetValue(titleId, out var title)) return;
-        var prog = new TitleProgressData(titleId, currentValue, title.RequiredValue, title.IsUnlocked);
-        _titleProgress[titleId] = prog;
-        EmitSignal(SignalName.TitleProgressUpdated, titleId, currentValue, title.RequiredValue);
-    }
-
-    /// <summary>
-    /// Get progress for a single title (0.0~1.0). Returns 0 if not tracked.
-    /// REQ-200-01: progress query API — this is GetTitleProgress(titleId) mentioned in REQ-200.
-    /// </summary>
-    public float GetTitleProgress(string titleId)
-    {
-        if (_titleProgress.TryGetValue(titleId, out var prog)) return prog.Progress;
-        return 0f;
-    }
-
-    /// <summary>
-    /// Get all title progress records.
-    /// REQ-200-01: progress query API — this is GetAllTitleProgress() mentioned in REQ-200.
-    /// </summary>
-    public List<TitleProgressData> GetAllTitleProgress()
-    {
-        var result = new List<TitleProgressData>();
-        foreach (var title in _titleDatabase.Values)
-        {
-            if (_titleProgress.TryGetValue(title.TitleId, out var prog))
-                result.Add(prog);
-            else
-                result.Add(new TitleProgressData(title.TitleId, 0, title.RequiredValue, title.IsUnlocked));
-        }
-        return result;
-    }
-
-
-    /// <summary>
-    /// Get recommended titles (progress >= 80%, not yet unlocked), sorted by progress descending.
-    /// REQ-200-03: core recommendation engine.
-    /// </summary>
-    public List<TitleRecommendationData> GetRecommendedTitles(float minProgress = 0.8f, int maxCount = 5)
-    {
-        var result = new List<TitleRecommendationData>();
-        foreach (var titleData in _titleDatabase.Values)
-        {
-            if (titleData.IsUnlocked) continue;
-            float progress = GetTitleProgress(titleData.TitleId);
-            if (progress < minProgress) continue;
-
-            int current = 0;
-            int required = titleData.RequiredValue;
-            if (_titleProgress.TryGetValue(titleData.TitleId, out var prog))
+            public string TitleId;
+            public int CurrentValue;
+            public int RequiredValue;
+            public float Progress => RequiredValue > 0 ? Mathf.Clamp((float)CurrentValue / RequiredValue, 0f, 1f) : 0f;
+            public bool IsUnlocked;
+            public TitleProgressData() { }
+            public TitleProgressData(string id, int current, int required, bool unlocked)
             {
-                current = prog.CurrentValue;
-                required = prog.RequiredValue;
+                TitleId = id;
+                CurrentValue = current;
+                RequiredValue = required;
+                IsUnlocked = unlocked;
+            }
+        }
+
+        // Internal progress tracking (separate from TitleData to avoid breaking existing save format)
+        private Dictionary<string, TitleProgressData> _titleProgress = new Dictionary<string, TitleProgressData>();
+
+        /// <summary>
+        /// Update progress for a title. Called by external stat systems (e.g. CombatSystem, AchievementSystem).
+        /// REQ-200-01: progress query API — this method serves as the primary update entry point.
+        /// </summary>
+        /// <param name="titleId">Title ID</param>
+        /// <param name="currentValue">Current progress value</param>
+        public void SetTitleProgress(string titleId, int currentValue)
+        {
+            if (!_titleDatabase.TryGetValue(titleId, out var title)) return;
+            var prog = new TitleProgressData(titleId, currentValue, title.RequiredValue, title.IsUnlocked);
+            _titleProgress[titleId] = prog;
+            EmitSignal(SignalName.TitleProgressUpdated, titleId, currentValue, title.RequiredValue);
+        }
+
+        /// <summary>
+        /// Get progress for a single title (0.0~1.0). Returns 0 if not tracked.
+        /// REQ-200-01: progress query API — this is GetTitleProgress(titleId) mentioned in REQ-200.
+        /// </summary>
+        public float GetTitleProgress(string titleId)
+        {
+            if (_titleProgress.TryGetValue(titleId, out var prog)) return prog.Progress;
+            return 0f;
+        }
+
+        /// <summary>
+        /// Get all title progress records.
+        /// REQ-200-01: progress query API — this is GetAllTitleProgress() mentioned in REQ-200.
+        /// </summary>
+        public List<TitleProgressData> GetAllTitleProgress()
+        {
+            var result = new List<TitleProgressData>();
+            foreach (var title in _titleDatabase.Values)
+            {
+                if (_titleProgress.TryGetValue(title.TitleId, out var prog))
+                    result.Add(prog);
+                else
+                    result.Add(new TitleProgressData(title.TitleId, 0, title.RequiredValue, title.IsUnlocked));
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// Get recommended titles (progress >= 80%, not yet unlocked), sorted by progress descending.
+        /// REQ-200-03: core recommendation engine.
+        /// </summary>
+        public List<TitleRecommendationData> GetRecommendedTitles(float minProgress = 0.8f, int maxCount = 5)
+        {
+            var result = new List<TitleRecommendationData>();
+            foreach (var titleData in _titleDatabase.Values)
+            {
+                if (titleData.IsUnlocked) continue;
+                float progress = GetTitleProgress(titleData.TitleId);
+                if (progress < minProgress) continue;
+
+                int current = 0;
+                int required = titleData.RequiredValue;
+                if (_titleProgress.TryGetValue(titleData.TitleId, out var prog))
+                {
+                    current = prog.CurrentValue;
+                    required = prog.RequiredValue;
+                }
+
+                int remaining = Mathf.Max(0, required - current);
+                string unitLabel = _InferUnitLabel(titleData.Description, titleData.Category);
+
+                result.Add(new TitleRecommendationData(
+                    titleData.TitleId,
+                    titleData.TitleName,
+                    titleData.Description,
+                    progress,
+                    remaining,
+                    current,
+                    required,
+                    unitLabel,
+                    (int)titleData.Rarity,
+                    (int)titleData.Category,
+                    false
+                ));
             }
 
-            int remaining = Mathf.Max(0, required - current);
-            string unitLabel = _InferUnitLabel(titleData.Description, titleData.Category);
-
-            result.Add(new TitleRecommendationData(
-                titleData.TitleId,
-                titleData.TitleName,
-                titleData.Description,
-                progress,
-                remaining,
-                current,
-                required,
-                unitLabel,
-                (int)titleData.Rarity,
-                (int)titleData.Category,
-                false
-            ));
+            result.Sort((a, b) => b.Progress.CompareTo(a.Progress));
+            if (result.Count > maxCount) result.RemoveRange(maxCount, result.Count - maxCount);
+            return result;
         }
 
-        result.Sort((a, b) => b.Progress.CompareTo(a.Progress));
-        if (result.Count > maxCount) result.RemoveRange(maxCount, result.Count - maxCount);
-        return result;
-    }
-
-    /// <summary>
-    /// Get the highest progress among all locked titles (for "最高进度: XX%" fallback display).
-    /// </summary>
-    public float GetHighestLockedProgress()
-    {
-        float highest = 0f;
-        foreach (var titleData in _titleDatabase.Values)
+        /// <summary>
+        /// Get the highest progress among all locked titles (for "最高进度: XX%" fallback display).
+        /// </summary>
+        public float GetHighestLockedProgress()
         {
-            if (titleData.IsUnlocked) continue;
-            float progress = GetTitleProgress(titleData.TitleId);
-            if (progress > highest) highest = progress;
+            float highest = 0f;
+            foreach (var titleData in _titleDatabase.Values)
+            {
+                if (titleData.IsUnlocked) continue;
+                float progress = GetTitleProgress(titleData.TitleId);
+                if (progress > highest) highest = progress;
+            }
+            return highest;
         }
-        return highest;
-    }
 
-    private string _InferUnitLabel(string description, TitleCategory category)
-    {
-        if (string.IsNullOrEmpty(description)) return _CategoryDefaultUnit(category);
-        string desc = description.ToLower();
-        if (desc.Contains("enemy") || desc.Contains("怪物") || desc.Contains("敌人")) return "敌人";
-        if (desc.Contains("boss")) return "Boss";
-        if (desc.Contains("gold") || desc.Contains("金币")) return "金币";
-        if (desc.Contains("level") || desc.Contains("等级")) return "级";
-        if (desc.Contains("damage")) return "伤害";
-        if (desc.Contains("combo")) return "连击";
-        if (desc.Contains("pet") || desc.Contains("宠物")) return "宠物";
-        if (desc.Contains("run") || desc.Contains("局")) return "局";
-        if (desc.Contains("kill")) return "击杀";
-        return _CategoryDefaultUnit(category);
-    }
-
-    private string _CategoryDefaultUnit(TitleCategory category)
-    {
-        switch (category)
+        private string _InferUnitLabel(string description, TitleCategory category)
         {
-            case TitleCategory.Combat: return "次";
-            case TitleCategory.Economy: return "金币";
-            case TitleCategory.Social: return "次";
-            case TitleCategory.Exploration: return "处";
-            case TitleCategory.Special: return "次";
-            default: return "次";
+            if (string.IsNullOrEmpty(description)) return _CategoryDefaultUnit(category);
+            string desc = description.ToLower();
+            if (desc.Contains("enemy") || desc.Contains("怪物") || desc.Contains("敌人")) return "敌人";
+            if (desc.Contains("boss")) return "Boss";
+            if (desc.Contains("gold") || desc.Contains("金币")) return "金币";
+            if (desc.Contains("level") || desc.Contains("等级")) return "级";
+            if (desc.Contains("damage")) return "伤害";
+            if (desc.Contains("combo")) return "连击";
+            if (desc.Contains("pet") || desc.Contains("宠物")) return "宠物";
+            if (desc.Contains("run") || desc.Contains("局")) return "局";
+            if (desc.Contains("kill")) return "击杀";
+            return _CategoryDefaultUnit(category);
+        }
+
+        private string _CategoryDefaultUnit(TitleCategory category)
+        {
+            switch (category)
+            {
+                case TitleCategory.Combat: return "次";
+                case TitleCategory.Economy: return "金币";
+                case TitleCategory.Social: return "次";
+                case TitleCategory.Exploration: return "处";
+                case TitleCategory.Special: return "次";
+                default: return "次";
+            }
         }
     }
-
 }

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class StreakData : Resource
+public partial class StreakData : Resource
 {
     [Export] public int LoginStreak { get; set; } = 0;
     [Export] public int BattleStreak { get; set; } = 0;

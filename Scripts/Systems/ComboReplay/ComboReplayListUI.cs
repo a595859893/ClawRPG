@@ -9,7 +9,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
     /// Combo 回放列表 UI（REQ-114-04）
     /// 显示本地保存的回放列表，点击播放
     /// </summary>
-    public class ComboReplayListUI : BaseUI
+    public partial class ComboReplayListUI : BaseUI
     {
         public static ComboReplayListUI Instance { get; private set; }
 

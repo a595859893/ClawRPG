@@ -6,7 +6,7 @@ using ClawRPG.Scripts.Managers;
 /// 玩家生命周期管理器 - 负责玩家的生成、死亡、重生和状态管理
 /// 使用 EventBusManager 进行事件通信，减少系统耦合
 /// </summary>
-public class PlayerLifecycleManager : ManagerBase
+public partial class PlayerLifecycleManager : ManagerBase
 {
     public static PlayerLifecycleManager Instance { get; private set; }
     
@@ -93,7 +93,7 @@ public class PlayerLifecycleManager : ManagerBase
         var main = GetNode("/root/Main");
         if (main != null && main.HasMethod("GetPlayerScene"))
         {
-            _playerScene = main.Call("GetPlayerScene") as PackedScene;
+            _playerScene = main.Call("GetPlayerScene").Obj as PackedScene;
         }
         
         // 如果没有，尝试默认路径
@@ -121,7 +121,7 @@ public class PlayerLifecycleManager : ManagerBase
         }
         
         // 实例化玩家
-        var player = _playerScene.Instance() as Player;
+        var player = (Player)_playerScene.Instantiate();
         if (player == null)
         {
             GD.PrintErr("[PlayerLifecycleManager] Failed to instantiate player!");
@@ -130,7 +130,7 @@ public class PlayerLifecycleManager : ManagerBase
         
         // 设置位置
         var spawnPos = position ?? RespawnPoint;
-        player.GlobalPosition = spawnPos;
+        player.GlobalPosition = new Vector2(spawnPos.X, spawnPos.Y);
         
         // 添加到场景
         var root = GetTree().Root;
@@ -266,12 +266,12 @@ public class PlayerLifecycleManager : ManagerBase
     /// </summary>
     public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary
+        return new Dictionary<string, object>
         {
             { "deathCount", DeathCount },
-            { "respawnPointX", RespawnPoint.x },
-            { "respawnPointY", RespawnPoint.y },
-            { "respawnPointZ", RespawnPoint.z },
+            { "respawnPointX", RespawnPoint.X },
+            { "respawnPointY", RespawnPoint.Y },
+            { "respawnPointZ", RespawnPoint.Z },
             { "respawnDelay", RespawnDelay }
         };
     }

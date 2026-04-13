@@ -159,6 +159,25 @@ public partial class GameManager : BaseSystem
         }
     }
     
+
+    /// <summary>
+    /// 添加金币
+    /// </summary>
+    public void AddGold(int amount)
+    {
+        var player = Player.Instance;
+        if (player != null)
+            player.Gold += amount;
+    }
+
+    /// <summary>
+    /// 添加经验
+    /// </summary>
+    public void AddExp(int amount)
+    {
+        GD.Print($"[GameManager] Player gained {amount} experience");
+    }
+
     /// <summary>
     /// 重置所有系统
     /// </summary>

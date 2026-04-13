@@ -267,7 +267,7 @@ public partial class QuickSlotUI : Control
 }
 
 // Helper class for slot items
-public class QuickSlotItem : VBoxContainer
+public partial class QuickSlotItem : VBoxContainer
 {
     public int SlotIndex { get; set; }
     public Label KeyLabel { get; set; }

@@ -197,7 +197,8 @@ public partial class AlchemyLaboratoryUI : Control
 
     public static void Toggle()
     {
-        var existingUI = Engine.GetMainLoop().GetRoot().GetNode<AlchemyLaboratoryUI>("AlchemyLaboratoryUI");
+        var tree = Engine.GetMainLoop() as SceneTree;
+        var existingUI = tree?.Root?.GetNode<AlchemyLaboratoryUI>("AlchemyLaboratoryUI");
         if (existingUI != null)
         {
             existingUI.QueueFree();
@@ -206,7 +207,7 @@ public partial class AlchemyLaboratoryUI : Control
         {
             var ui = new AlchemyLaboratoryUI();
             ui.Name = "AlchemyLaboratoryUI";
-            Engine.GetMainLoop().GetRoot().AddChild(ui);
+            tree?.Root?.AddChild(ui);
         }
     }
 }

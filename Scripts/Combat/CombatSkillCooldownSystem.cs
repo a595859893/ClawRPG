@@ -15,10 +15,10 @@ public partial class CombatSkillCooldownSystem : BaseSystem
 	private CombatSkillCooldownData.PlayerSkillCooldownData _playerCooldownData;
 	
 	// 信号系统
-public delegate void CooldownStarted(string skillId, string skillName, float cooldownTime);
-public delegate void CooldownUpdated(string skillId, float remainingTime);
-public delegate void CooldownReady(string skillId, string skillName);
-public delegate void SkillUsed(string skillId, string skillName);
+public static Action<string, string, float> CooldownStarted;
+public static Action<string, float> CooldownUpdated;
+public static Action<string, string> CooldownReady;
+public static Action<string, string> SkillUsed;
 	
 	public override void _Ready()
 	{
@@ -31,6 +31,15 @@ public delegate void SkillUsed(string skillId, string skillName);
 	protected override void Initialize()
 	{
 		GD.Print("[CombatSkillCooldownSystem] Initialized");
+	}
+
+	/// <summary>
+	/// Loads cooldown data from save. Stub implementation.
+	/// </summary>
+	private void LoadData()
+	{
+		// No-op: cooldown data is created in-memory in _Ready()
+		// TODO: implement save/load persistence
 	}
 	
 	/// <summary>
@@ -108,7 +117,7 @@ public delegate void SkillUsed(string skillId, string skillName);
 		{
 			if (kvp.Value.CurrentCooldown > 0)
 			{
-				kvp.Value.CurrentCooldown -= delta;
+				kvp.Value.CurrentCooldown -= (float)delta;
 				if (kvp.Value.CurrentCooldown <= 0)
 				{
 					kvp.Value.CurrentCooldown = 0;

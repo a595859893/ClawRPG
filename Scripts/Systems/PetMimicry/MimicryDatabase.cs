@@ -212,7 +212,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
     /// 2. 提供技能查询接口
     /// 3. 生成技能实例
     /// </summary>
-    public class MimicryDatabase : Node
+    public partial class MimicryDatabase : Node
     {
         public static MimicryDatabase Instance { get; private set; }
 

@@ -5,7 +5,7 @@ using System;
 /// 战斗节拍感知 UI（REQ-131-04）
 /// 战斗内显示当前节奏等级图标：Calm / Normal / Intense / Frenzied
 /// </summary>
-public class CombatRhythmUI : CanvasLayer
+public partial class CombatRhythmUI : CanvasLayer
 {
     private static CombatRhythmUI _instance;
     public static CombatRhythmUI Instance => _instance;

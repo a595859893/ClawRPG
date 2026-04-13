@@ -19,11 +19,11 @@ namespace ClawRPG.Systems
         
         // Godot 4 compatible signal system
         [Signal]
-        public delegate void ExpeditionStarted();
+        public delegate void ExpeditionStartedEventHandlerEventHandler();
         [Signal]
-        public delegate void ExpeditionCompleted();
+        public delegate void ExpeditionCompletedEventHandlerEventHandler();
         [Signal]
-        public delegate void ExpeditionFailed();
+        public delegate void ExpeditionFailedEventHandlerEventHandler();
         
         public override void _Ready()
         {
@@ -87,7 +87,7 @@ namespace ClawRPG.Systems
                     }
                 }
                 
-                ExpeditionCompleted?.Invoke();
+                ExpeditionCompletedEventHandlerEventHandler?.Invoke();
             }
             else
             {
@@ -95,7 +95,7 @@ namespace ClawRPG.Systems
                 result.GoldReward = zone.MinGoldReward / 5;
                 result.ExpReward = zone.MinExpReward / 5;
                 
-                ExpeditionFailed?.Invoke();
+                ExpeditionFailedEventHandlerEventHandler?.Invoke();
             }
             
             // 更新统计
@@ -206,7 +206,7 @@ namespace ClawRPG.Systems
             };
             
             _playerData.ActiveExpeditions.Add(expedition);
-            ExpeditionStarted?.Invoke();
+            ExpeditionStartedEventHandlerEventHandler?.Invoke();
             
             GD.Print($"[MountExpedition] Started expedition: {zone.Name} for {mountId}");
             return true;

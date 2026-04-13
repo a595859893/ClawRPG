@@ -6,7 +6,7 @@ namespace ClawRPG.Scripts.Mounts {
     /// <summary>
     /// 坐骑数据类
     /// </summary>
-    public class Mount : Resource {
+    public partial class Mount : Resource {
         [Export] public string MountId { get; set; }
         [Export] public string Name { get; set; }
         [Export] public string Description { get; set; }

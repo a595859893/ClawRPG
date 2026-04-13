@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class WeeklyChallengeData : Resource
+public partial class WeeklyChallengeData : Resource
 {
     public int WeekNumber { get; set; }
     public int Year { get; set; }

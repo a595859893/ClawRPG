@@ -44,7 +44,7 @@ public class ComboConfigFile
 /// <summary>
 /// 连击数据资源 - 定义一个连击的完整配置
 /// </summary>
-public class ComboData : Resource
+public partial class ComboData : Resource
 {
     /// <summary>
     /// 连击ID
