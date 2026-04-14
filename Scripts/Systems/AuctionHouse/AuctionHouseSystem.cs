@@ -3,8 +3,6 @@ using ClawRPG.Systems.AuctionHouse;
 using AuctionItem = ClawRPG.Systems.AuctionHouse.AuctionItem;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Systems.AuctionHouse;
-using AuctionItem = ClawRPG.Systems.AuctionHouse.AuctionItem;
 
 public partial class AuctionHouseSystem : BaseSystem
 {
@@ -20,6 +18,8 @@ public partial class AuctionHouseSystem : BaseSystem
         
         AddToGroup("save");
         AddToGroup("auction_house");
+        
+        LoadAuctionData();
         
         GD.Print("AuctionHouseSystem: 拍卖行系统已初始化");
     }
@@ -211,10 +211,14 @@ public partial class AuctionHouseSystem : BaseSystem
     {
         var results = new List<AuctionItem>();
         
-        if (_data.PurchaseHistory.ContainsKey(playerId))
+        if (_data.PurchaseHistory.TryGetValue(playerId, out var listingIds))
         {
-            foreach (var listingId in _data.PurchaseHistory[playerId])
+            foreach (var listingId in listingIds)
             {
+                if (_data.ActiveListings.TryGetValue(listingId, out var listing))
+                {
+                    results.Add(listing);
+                }
             }
         }
         
@@ -317,10 +321,19 @@ public partial class AuctionHouseSystem : BaseSystem
     
     private void SaveAuctionData()
     {
-        var saveSystem = GetTree().GetFirstNodeInGroup("save_system");
-        if (saveSystem != null)
+        try
         {
-            // 保存数据
+            var saveData = GetSaveData();
+            var file = new Godot.File();
+            if (file.Open("user://auction_house_save.dat", Godot.File.ModeFlags.Write) == Error.Ok)
+            {
+                file.StoreString(JSON.Print(saveData));
+                file.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr($"[AuctionHouseSystem] SaveAuctionData failed: {ex.Message}");
         }
     }
     
@@ -421,6 +434,47 @@ public partial class AuctionHouseSystem : BaseSystem
             _data.NextListingId = Convert.ToInt32(data["nextListingId"]);
         }
         
+        if (data.ContainsKey("purchases"))
+        {
+            var purchases = data["purchases"] as List<Dictionary<string, object>>;
+            foreach (var purchaseData in purchases)
+            {
+                int playerId = Convert.ToInt32(purchaseData["playerId"]);
+                var listingIds = purchaseData["listingIds"] as List<object>;
+                var ids = new List<int>();
+                foreach (var lid in listingIds)
+                {
+                    ids.Add(Convert.ToInt32(lid));
+                }
+                _data.PurchaseHistory[playerId] = ids;
+            }
+        }
+        
         GD.Print("AuctionHouseSystem: 拍卖行数据已加载");
+    }
+
+    private void LoadAuctionData()
+    {
+        try
+        {
+            var file = new Godot.File();
+            if (file.FileExists("user://auction_house_save.dat"))
+            {
+                if (file.Open("user://auction_house_save.dat", Godot.File.ModeFlags.Read) == Error.Ok)
+                {
+                    var json = file.GetAsText();
+                    file.Close();
+                    var result = JSON.Parse(json);
+                    if (result.Error == Error.Ok && result.Result is Dictionary dict)
+                    {
+                        LoadSaveData(dict);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr($"[AuctionHouseSystem] LoadAuctionData failed: {ex.Message}");
+        }
     }
 }
