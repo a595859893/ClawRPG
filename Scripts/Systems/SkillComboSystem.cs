@@ -86,6 +86,56 @@ public partial class SkillComboSystem : BaseSystem
 
         // REQ-114-02: 通知回放录制器记录技能使用
         ClawRPG.Scripts.Systems.ComboReplay.ComboReplayRecorder.Instance?.RecordSkillUse(skillId);
+
+        // REQ-204: 检查是否按错技能，如果是则对所有 active combo 发射 ComboFailed
+        CheckWrongSkill(skillId);
+    }
+
+    /// <summary>
+    /// REQ-204: 检查是否按错技能并发射 ComboFailed 信号。
+    /// 当玩家在有 active combo 的情况下按了一个不属于任何 active combo 预期序列的技能时触发。
+    /// Chaos combo 类型排除（chaos 的"错"是设计的一部分）。
+    /// </summary>
+    private void CheckWrongSkill(string skillId)
+    {
+        if (_activeCombos.Count == 0) return;
+
+        bool matchedAnyCombo = false;
+
+        foreach (var kvp in _activeCombos)
+        {
+            if (kvp.Value.IsComplete) continue;
+
+            var combo = SkillComboDatabase.Instance.GetCombo(kvp.Key);
+            if (combo == null) continue;
+
+            // Skip Chaos combos - any skill from pool is valid, never "wrong"
+            if (combo.OldComboType == ComboData.ComboType.Chaos) continue;
+
+            // Get the expected next skill for this active combo
+            if (combo.SkillIds == null || combo.SkillIds.Count == 0) continue;
+            if (kvp.Value.CurrentStep >= combo.SkillIds.Count) continue;
+
+            string expectedSkill = combo.SkillIds[kvp.Value.CurrentStep];
+            if (skillId == expectedSkill)
+            {
+                // This skill matches at least one active combo's expected next — not wrong
+                matchedAnyCombo = true;
+                break;
+            }
+        }
+
+        if (!matchedAnyCombo)
+        {
+            // No active combo expected this skill — it's wrong; emit ComboFailed for all active combos
+            foreach (var kvp in _activeCombos)
+            {
+                if (!kvp.Value.IsComplete)
+                {
+                    ComboFailed.Emit(kvp.Key);
+                }
+            }
+        }
     }
 
     /// <summary>
