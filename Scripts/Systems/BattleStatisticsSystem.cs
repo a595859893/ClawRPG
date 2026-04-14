@@ -393,13 +393,60 @@ public partial class BattleStatisticsSystem : BaseSystem
     
     public override Dictionary<string, object> ExportSaveData()
     {
-        return _stats.ToDictionary();
+        var dict = new Dictionary<string, object>();
+        dict["TotalBattles"] = _stats.TotalBattles;
+        dict["TotalVictories"] = _stats.TotalVictories;
+        dict["TotalDefeats"] = _stats.TotalDefeats;
+        dict["TotalBattleTime"] = _stats.TotalBattleTime;
+        dict["TotalDamageDealt"] = _stats.TotalDamageDealt;
+        dict["TotalDamageTaken"] = _stats.TotalDamageTaken;
+        dict["TotalCriticalDamage"] = _stats.TotalCriticalDamage;
+        dict["TotalHealing"] = _stats.TotalHealing;
+        dict["TotalEnemiesKilled"] = _stats.TotalEnemiesKilled;
+        dict["TotalBossesKilled"] = _stats.TotalBossesKilled;
+        dict["TotalEliteKilled"] = _stats.TotalEliteKilled;
+        dict["TotalSkillsUsed"] = _stats.TotalSkillsUsed;
+        dict["TotalSkillsHit"] = _stats.TotalSkillsHit;
+        dict["TotalSkillsMissed"] = _stats.TotalSkillsMissed;
+        dict["FireDamage"] = _stats.FireDamage;
+        dict["IceDamage"] = _stats.IceDamage;
+        dict["LightningDamage"] = _stats.LightningDamage;
+        dict["DarkDamage"] = _stats.DarkDamage;
+        dict["HolyDamage"] = _stats.HolyDamage;
+        dict["PhysicalDamage"] = _stats.PhysicalDamage;
+        dict["SessionBattles"] = _stats.SessionBattles;
+        dict["SessionVictories"] = _stats.SessionVictories;
+        dict["SessionStart"] = _stats.SessionStart.ToOADate();
+
+        // EnemyKillsByType: Dictionary<string, int>
+        var killsDict = new Dictionary<string, object>();
+        foreach (var kvp in _stats.EnemyKillsByType)
+            killsDict[kvp.Key] = kvp.Value;
+        dict["EnemyKillsByType"] = killsDict;
+
+        // RecentBattles: List<BattleRecord>
+        var recentList = new List<object>();
+        foreach (var record in _stats.RecentBattles)
+        {
+            var recordDict = new Dictionary<string, object>();
+            recordDict["Timestamp"] = record.Timestamp.ToOADate();
+            recordDict["Victory"] = record.Victory;
+            recordDict["DamageDealt"] = record.DamageDealt;
+            recordDict["DamageTaken"] = record.DamageTaken;
+            recordDict["EnemiesKilled"] = record.EnemiesKilled;
+            recordDict["Duration"] = record.Duration;
+            recordDict["BattleType"] = record.BattleType ?? "";
+            recentList.Add(recordDict);
+        }
+        dict["RecentBattles"] = recentList;
+
+        return dict;
     }
-    
+
     public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
-        
+
         if (data.Contains("TotalBattles")) _stats.TotalBattles = Convert.ToInt32(data["TotalBattles"]);
         if (data.Contains("TotalVictories")) _stats.TotalVictories = Convert.ToInt32(data["TotalVictories"]);
         if (data.Contains("TotalDefeats")) _stats.TotalDefeats = Convert.ToInt32(data["TotalDefeats"]);
@@ -422,6 +469,43 @@ public partial class BattleStatisticsSystem : BaseSystem
         if (data.Contains("PhysicalDamage")) _stats.PhysicalDamage = Convert.ToInt32(data["PhysicalDamage"]);
         if (data.Contains("SessionBattles")) _stats.SessionBattles = Convert.ToInt32(data["SessionBattles"]);
         if (data.Contains("SessionVictories")) _stats.SessionVictories = Convert.ToInt32(data["SessionVictories"]);
+        if (data.Contains("SessionStart")) _stats.SessionStart = DateTime.FromOADate(Convert.ToDouble(data["SessionStart"]));
+
+        // EnemyKillsByType: Dictionary<string, int>
+        if (data.Contains("EnemyKillsByType") && data["EnemyKillsByType"] is Dictionary<string, object> killsData)
+        {
+            _stats.EnemyKillsByType.Clear();
+            foreach (var kvp in killsData)
+                _stats.EnemyKillsByType[kvp.Key] = Convert.ToInt32(kvp.Value);
+        }
+
+        // RecentBattles: List<BattleRecord>
+        if (data.Contains("RecentBattles") && data["RecentBattles"] is List<object> battlesData)
+        {
+            _stats.RecentBattles.Clear();
+            foreach (var item in battlesData)
+            {
+                if (item is Dictionary<string, object> recordDict)
+                {
+                    var record = new BattleRecord();
+                    if (recordDict.Contains("Timestamp"))
+                        record.Timestamp = DateTime.FromOADate(Convert.ToDouble(recordDict["Timestamp"]));
+                    if (recordDict.Contains("Victory"))
+                        record.Victory = Convert.ToBoolean(recordDict["Victory"]);
+                    if (recordDict.Contains("DamageDealt"))
+                        record.DamageDealt = Convert.ToInt32(recordDict["DamageDealt"]);
+                    if (recordDict.Contains("DamageTaken"))
+                        record.DamageTaken = Convert.ToInt32(recordDict["DamageTaken"]);
+                    if (recordDict.Contains("EnemiesKilled"))
+                        record.EnemiesKilled = Convert.ToInt32(recordDict["EnemiesKilled"]);
+                    if (recordDict.Contains("Duration"))
+                        record.Duration = (float)Convert.ToDouble(recordDict["Duration"]);
+                    if (recordDict.Contains("BattleType"))
+                        record.BattleType = recordDict["BattleType"]?.ToString() ?? "";
+                    _stats.RecentBattles.Add(record);
+                }
+            }
+        }
     }
     
     /// <summary>
