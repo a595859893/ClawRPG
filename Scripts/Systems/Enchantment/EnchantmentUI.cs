@@ -114,12 +114,6 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             tierOptions.ItemSelected += OnTierSelected;
             filterBar.AddChild(tierOptions);
             
-            // 专注力显示
-            var focusLabel = new Label();
-            focusLabel.Name = "FocusLabel";
-            focusLabel.Text = "专注力: 0";
-            _contentBox.AddChild(focusLabel);
-            
             // 标签页容器
             _tabContainer = new TabContainer();
             _tabContainer.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlagsFlags.ExpandFill);
@@ -221,9 +215,7 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             // 连接到附魔系统信号
             if (EnchantmentSystem.Instance != null)
             {
-                EnchantmentSystem.Instance.EnchantmentCompleted += OnEnchantmentCompleted;
-                EnchantmentSystem.Instance.EnchantmentSuccess += OnEnchantmentSuccess;
-                EnchantmentSystem.Instance.FocusPointsChanged += RefreshFocusPoints;
+                EnchantmentSystem.Instance.EnchantmentResult += OnEnchantmentResult;
             }
         }
         
@@ -383,16 +375,11 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         }
         
         /// <summary>
-        /// 刷新专注力显示
+        /// 刷新专注力显示（已移除：FocusPoints不在新API中）
         /// </summary>
         private void RefreshFocusPoints()
         {
-            var focusLabel = _contentBox.FindChild("FocusLabel", true, false) as Label;
-            if (focusLabel != null)
-            {
-                int focusPoints = EnchantmentSystem.Instance.GetFocusPoints(_playerId);
-                focusLabel.Text = $"专注力: {focusPoints}";
-            }
+            // FocusPoints 已从新 API 移除，此方法保留但无操作
         }
         
         /// <summary>
@@ -411,33 +398,34 @@ namespace ClawRPG.Scripts.Systems.Enchantment
                 child.QueueFree();
             }
             
-            var stats = EnchantmentSystem.Instance.GetStatistics(_playerId);
+            // 新 API：使用 GetInventory 获取库存信息
+            var inventory = EnchantmentSystem.Instance.GetInventory();
+            int totalOwned = 0;
+            foreach (var kvp in inventory)
+                totalOwned += kvp.Value;
             
             var totalLabel = new Label();
-            totalLabel.Text = $"总附魔次数: {stats.TotalAttempts}";
+            totalLabel.Text = $"持有附魔卷轴: {totalOwned}";
             statsBox.AddChild(totalLabel);
             
-            var successLabel = new Label();
-            successLabel.Text = $"成功次数: {stats.TotalSuccesses}";
-            statsBox.AddChild(successLabel);
-            
-            var failLabel = new Label();
-            failLabel.Text = $"失败次数: {stats.TotalFailures}";
-            statsBox.AddChild(failLabel);
-            
-            var rateLabel = new Label();
-            rateLabel.Text = $"总成功率: {stats.GetOverallSuccessRate():F1}%";
-            statsBox.AddChild(rateLabel);
-            
-            var expenseLabel = new Label();
-            expenseLabel.Text = $"总花费: {stats.TotalExpenses} 金币";
-            statsBox.AddChild(expenseLabel);
-            
-            // 已解锁附魔
-            var unlocked = EnchantmentSystem.Instance.GetUnlockedEnchantments(_playerId);
             var unlockedLabel = new Label();
-            unlockedLabel.Text = $"\n已解锁附魔: {unlocked.Count} / {EnchantmentDatabase.Instance.GetTotalCount()}";
+            unlockedLabel.Text = $"\n已解锁类型: {inventory.Count} / {EnchantmentDatabase.Instance.GetTotalCount()}";
             statsBox.AddChild(unlockedLabel);
+            
+            // 显示各卷轴库存
+            var inventoryTitle = new Label();
+            inventoryTitle.Text = "\n卷轴库存:";
+            inventoryTitle.AddThemeFontSizeOverride("font_size", 14);
+            statsBox.AddChild(inventoryTitle);
+            
+            foreach (var kvp in inventory)
+            {
+                var record = EnchantmentDatabase.Instance.GetEnchantment(kvp.Key);
+                string name = record != null ? record.Name : kvp.Key;
+                var itemLabel = new Label();
+                itemLabel.Text = $"  {name}: {kvp.Value}个";
+                statsBox.AddChild(itemLabel);
+            }
         }
         
         /// <summary>
@@ -455,38 +443,35 @@ namespace ClawRPG.Scripts.Systems.Enchantment
         {
             if (string.IsNullOrEmpty(_selectedEnchantmentId)) return;
             
-            // 假设装备ID为 "current_weapon"（实际需要选择装备）
-            string equipmentId = "current_weapon";
-            
-            var session = EnchantmentSystem.Instance.StartEnchantment(_playerId, equipmentId, _selectedEnchantmentId);
-            
-            if (session != null)
+            // 获取玩家等级（如果存在PlayerSystem则获取真实等级，否则使用默认值1）
+            int playerLevel = 1;
+            var player = GetTree().CurrentScene?.FindChild("Player", true, false) as Godot.Node;
+            if (player != null)
             {
-                // 自动执行附魔判定
-                bool success = EnchantmentSystem.Instance.PerformEnchantment(session.SessionId);
-                
-                // 显示结果
-                string resultText = success ? "附魔成功!" : "附魔失败!";
-                GD.Print($"EnchantmentUI: {resultText}");
+                var levelProp = player.Get("Level");
+                if (levelProp != null) playerLevel = (int)levelProp;
             }
+            
+            // 使用默认装备槽位0（武器），新API使用int而非string
+            int equipmentSlot = 0;
+            
+            bool success = EnchantmentSystem.Instance.Enchant(_selectedEnchantmentId, playerLevel, equipmentSlot);
+            
+            // 显示结果（信号 EnchantmentResult 也会触发 OnEnchantmentResult）
+            string resultText = success ? "附魔成功!" : "附魔失败!";
+            GD.Print($"EnchantmentUI: {resultText}");
+            
+            // 刷新列表（信号会在适当时机触发，这里主动刷新确保UI同步）
+            RefreshEnchantmentList();
         }
         
         /// <summary>
-        /// 附魔完成回调
+        /// 附魔结果回调（新API：EnchantmentResult信号）
         /// </summary>
-        private void OnEnchantmentCompleted()
+        private void OnEnchantmentResult(bool success, string message)
         {
             RefreshEnchantmentList();
-            RefreshFocusPoints();
-        }
-        
-        /// <summary>
-        /// 附魔成功回调
-        /// </summary>
-        private void OnEnchantmentSuccess()
-        {
-            // 可以显示成功特效或消息
-            GD.Print("EnchantmentUI: Enchantment successful!");
+            GD.Print($"EnchantmentUI: {message}");
         }
         
         /// <summary>
