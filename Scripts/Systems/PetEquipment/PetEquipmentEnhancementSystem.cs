@@ -341,6 +341,6 @@ public delegate void EnhancementDataLoaded();
         SaveSystem.SaveGame();
     }
 
-        public override Dictionary<string, object> ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary<string, object> data) { }
+        public override Dictionary<string, object> ExportSaveData() => GetSaveData();
+        public override void ImportSaveData(Dictionary<string, object> data) => LoadSaveData(data);
 }

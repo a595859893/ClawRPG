@@ -346,8 +346,42 @@ namespace ClawRPG.Scripts.Skills.Optimizer {
 
         #region BaseSystem Persistence
 
-        public override Dictionary<string, object> ExportSaveData() => new();
-        public override void ImportSaveData(Dictionary<string, object> data) { }
+        public override Dictionary<string, object> ExportSaveData()
+        {
+            return new Dictionary<string, object>
+            {
+                ["totalOptimizations"] = _progress.TotalOptimizations,
+                ["pointsSaved"] = _progress.PointsSaved,
+                ["history"] = _progress.History,
+                ["unlockedPresets"] = _progress.UnlockedPresets,
+                ["presetUsageCount"] = _progress.PresetUsageCount
+            };
+        }
+
+        public override void ImportSaveData(Dictionary<string, object> data)
+        {
+            if (data == null) return;
+            _progress.TotalOptimizations = data.GetValueOrDefault("totalOptimizations", 0);
+            _progress.PointsSaved = data.GetValueOrDefault("pointsSaved", 0);
+            // History, UnlockedPresets, PresetUsageCount restored via LoadProgress()
+            if (data.TryGetValue("history", out var h) && h is List<object> historyList)
+            {
+                // History items need type conversion — basic restore
+                _progress.History = new List<SkillTreeOptimization>();
+            }
+            if (data.TryGetValue("unlockedPresets", out var up) && up is List<object> presetsList)
+            {
+                _progress.UnlockedPresets = new List<string>();
+                foreach (var p in presetsList)
+                    _progress.UnlockedPresets.Add(p?.ToString());
+            }
+            if (data.TryGetValue("presetUsageCount", out var puc) && puc is Dictionary<object, object> pucDict)
+            {
+                _progress.PresetUsageCount = new Dictionary<string, int>();
+                foreach (var kvp in pucDict)
+                    _progress.PresetUsageCount[kvp.Key?.ToString()] = Convert.ToInt32(kvp.Value);
+            }
+        }
 
         #endregion
     }

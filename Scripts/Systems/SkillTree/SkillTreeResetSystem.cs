@@ -44,8 +44,34 @@ public class SkillTreeResetData
         LastResetTime = DateTime.MinValue;
     }
 
-    public Dictionary<string, object> ExportSaveData() => new();
-    public void ImportSaveData(Dictionary<string, object> data) { }
+    public Dictionary<string, object> ExportSaveData()
+    {
+        return new Dictionary<string, object>
+        {
+            ["totalResets"] = TotalResets,
+            ["freeResetsRemaining"] = FreeResetsRemaining,
+            ["totalPointsRecovered"] = TotalPointsRecovered,
+            ["totalGoldSpent"] = TotalGoldSpent,
+            ["maxPointsInSingleReset"] = MaxPointsInSingleReset,
+            ["lastResetTime"] = LastResetTime.ToString("o"),
+            ["resetHistory"] = ResetHistory,
+            ["skillPointsSpentAtReset"] = SkillPointsSpentAtReset
+        };
+    }
+
+    public void ImportSaveData(Dictionary<string, object> data)
+    {
+        if (data == null) return;
+        TotalResets = data.GetValueOrDefault("totalResets", 0);
+        FreeResetsRemaining = data.GetValueOrDefault("freeResetsRemaining", 1);
+        TotalPointsRecovered = data.GetValueOrDefault("totalPointsRecovered", 0);
+        TotalGoldSpent = data.GetValueOrDefault("totalGoldSpent", 0);
+        MaxPointsInSingleReset = data.GetValueOrDefault("maxPointsInSingleReset", 0);
+        var lastResetStr = data.GetValueOrDefault("lastResetTime", "").ToString();
+        if (!string.IsNullOrEmpty(lastResetStr) && DateTime.TryParse(lastResetStr, out var dt))
+            LastResetTime = dt;
+        // ResetHistory and SkillPointsSpentAtReset handled by caller
+    }
 
 }
 
