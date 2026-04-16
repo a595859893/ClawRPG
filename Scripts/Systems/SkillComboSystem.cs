@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ClawRPG.Scripts.Framework;
 
 /// <summary>
@@ -30,6 +31,9 @@ public partial class SkillComboSystem : BaseSystem
     // Last completed combo ID for fatigue system integration (REQ-120)
     private string _lastCompletedComboId = "";
     public string LastCompletedComboId => _lastCompletedComboId;
+
+    // Re-entrancy guard for CheckWrongSkill to prevent nested calls
+    private bool _isCheckingWrongSkill = false;
     
     // Signals (Godot 4 compatible)
     [Signal]
@@ -99,24 +103,28 @@ public partial class SkillComboSystem : BaseSystem
     private void CheckWrongSkill(string skillId)
     {
         if (_activeCombos.Count == 0) return;
+        if (_isCheckingWrongSkill) return;
+        _isCheckingWrongSkill = true;
 
         bool matchedAnyCombo = false;
+        // Snapshot keys to avoid InvalidOperationException if a signal handler modifies _activeCombos
+        var activeComboKeys = _activeCombos.Keys.ToList();
 
-        foreach (var kvp in _activeCombos)
+        foreach (var key in activeComboKeys)
         {
-            if (kvp.Value.IsComplete) continue;
+            if (!_activeCombos.TryGetValue(key, out var combo) || combo.IsComplete) continue;
 
-            var combo = SkillComboDatabase.Instance.GetCombo(kvp.Key);
-            if (combo == null) continue;
+            var skillCombo = SkillComboDatabase.Instance.GetCombo(key);
+            if (skillCombo == null) continue;
 
             // Skip Chaos combos - any skill from pool is valid, never "wrong"
-            if (combo.OldComboType == ComboData.ComboType.Chaos) continue;
+            if (skillCombo.OldComboType == ComboData.ComboType.Chaos) continue;
 
             // Get the expected next skill for this active combo
-            if (combo.SkillIds == null || combo.SkillIds.Count == 0) continue;
-            if (kvp.Value.CurrentStep >= combo.SkillIds.Count) continue;
+            if (skillCombo.SkillIds == null || skillCombo.SkillIds.Count == 0) continue;
+            if (combo.CurrentStep >= skillCombo.SkillIds.Count) continue;
 
-            string expectedSkill = combo.SkillIds[kvp.Value.CurrentStep];
+            string expectedSkill = skillCombo.SkillIds[combo.CurrentStep];
             if (skillId == expectedSkill)
             {
                 // This skill matches at least one active combo's expected next — not wrong
@@ -128,14 +136,16 @@ public partial class SkillComboSystem : BaseSystem
         if (!matchedAnyCombo)
         {
             // No active combo expected this skill — it's wrong; emit ComboFailed for all active combos
-            foreach (var kvp in _activeCombos)
+            foreach (var key in activeComboKeys)
             {
-                if (!kvp.Value.IsComplete)
+                if (_activeCombos.TryGetValue(key, out var combo) && !combo.IsComplete)
                 {
-                    ComboFailed.Emit(kvp.Key);
+                    ComboFailed.Emit(key);
                 }
             }
         }
+
+        _isCheckingWrongSkill = false;
     }
 
     /// <summary>
