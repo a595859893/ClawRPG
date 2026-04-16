@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Framework;
+using ClawRPG.Scripts.UI;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>
@@ -28,6 +29,10 @@ namespace ClawRPG.Scripts.UI {
         
         // Player Reference
         private Player _player;
+
+        // REQ-210-05: Title Recommendation UI
+        private TitleRecommendationUI _titleRecommendationUI;
+        private bool _titleUIVisible = false;
         
         public override void _Ready()
         {
@@ -41,6 +46,11 @@ namespace ClawRPG.Scripts.UI {
 
             // REQ-101: Register with HUD layout manager
             RegisterForDrag();
+
+            // REQ-210-05: Instantiate Title Recommendation UI
+            _titleRecommendationUI = new TitleRecommendationUI();
+            AddChild(_titleRecommendationUI);
+            _titleRecommendationUI.HidePanel();
         }
 
         public override void _Process(double delta)
@@ -84,6 +94,26 @@ namespace ClawRPG.Scripts.UI {
             {
                 HUDLayoutManager.Instance?.UpdateDragPosition(mm.GlobalPosition);
             }
+        }
+
+        public override void _Input(InputEvent @event)
+        {
+            // REQ-210-05: Toggle Title Recommendation UI with 'T' key
+            if (@event is InputEventKey key && key.Pressed && key.Keycode == Key.T)
+            {
+                ToggleTitleRecommendationUI();
+                AcceptEvent();
+            }
+        }
+
+        private void ToggleTitleRecommendationUI()
+        {
+            if (_titleRecommendationUI == null) return;
+            _titleUIVisible = !_titleUIVisible;
+            if (_titleUIVisible)
+                _titleRecommendationUI.ShowPanel();
+            else
+                _titleRecommendationUI.HidePanel();
         }
         
         private void SetupUI()
