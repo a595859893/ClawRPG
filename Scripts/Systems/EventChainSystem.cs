@@ -304,6 +304,19 @@ namespace ClawRPG.Scripts.Systems {
             if (chain == null) return;
 
             var activeChain = activeChains[chainId];
+
+            // 已完成的链不能再推进
+            if (activeChain.isCompleted) {
+                GD.Print($"[EventChain] AdvanceChain({chainId}): chain already completed, ignoring");
+                return;
+            }
+
+            // 已失败的链不能再推进（需要 RetryChain）
+            if (activeChain.isFailed) {
+                GD.Print($"[EventChain] AdvanceChain({chainId}): chain already failed, use RetryChain to restart");
+                return;
+            }
+
             activeChain.currentStage++;
             activeChain.progress = (float)activeChain.currentStage / activeChain.totalStages;
 
@@ -318,9 +331,9 @@ namespace ClawRPG.Scripts.Systems {
             // 检查是否完成
             if (activeChain.currentStage >= activeChain.totalStages) {
                 CompleteChain(chainId);
+            } else {
+                GD.Print($"[EventChain] Advanced: {chain.chainName} - Stage {activeChain.currentStage}/{activeChain.totalStages}");
             }
-
-            GD.Print($"[EventChain] Advanced: {chain.chainName} - Stage {activeChain.currentStage}/{activeChain.totalStages}");
         }
 
         /// <summary>
@@ -380,20 +393,31 @@ namespace ClawRPG.Scripts.Systems {
         }
 
         /// <summary>
-        /// 重试失败的事件链（仅限同一 run 内可重试一次）
+        /// 重试失败的事件链（同一 run 内可重试一次）
         /// </summary>
         public bool RetryChain(string chainId) {
             if (!chains.ContainsKey(chainId)) return false;
             if (!failedChainIds.Contains(chainId)) return false;  // 不是失败状态
 
-            // 从失败列表移除，允许重新开始
-            failedChainIds.Remove(chainId);
+            // 从 activeChains 移除（如果还在里面），防止幽灵状态
+            if (activeChains.ContainsKey(chainId)) {
+                activeChains.Remove(chainId);
+            }
 
             // 重新触发该链的 requiredEvents 检查
             var chain = chains[chainId];
             if (chain.requiredEvents.Count > 0) {
                 // 模拟触发第一个 required event 来尝试重新开始
-                return TryStartChain(chain.requiredEvents[0], 1.0f, chainId);
+                bool started = TryStartChain(chain.requiredEvents[0], 1.0f, chainId);
+                if (started) {
+                    // 成功启动：从失败列表移除由 TryStartChain 处理
+                    return true;
+                } else {
+                    // 启动失败：恢复到失败状态
+                    failedChainIds.Add(chainId);
+                    GD.Print($"[EventChain] RetryChain({chainId}): failed to restart, keeping in failed list");
+                    return false;
+                }
             }
             return false;
         }
