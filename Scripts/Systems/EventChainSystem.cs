@@ -209,33 +209,55 @@ namespace ClawRPG.Scripts.Systems {
             return new List<EventChainData>(chains.Values);
         }
 
-        public EventChainData GetRandomChain(float luckModifier = 1.0f) {
-            List<EventChainData> available = new List<EventChainData>();
+        public EventChainData GetRandomChain(EventChainCategory? category = null, float luckModifier = 1.0f) {
+            List<EventChainData> candidates = new List<EventChainData>();
             foreach (var chain in chains.Values) {
+                // Filter by category if specified
+                if (category.HasValue && chain.category != category.Value) {
+                    continue;
+                }
+                // Skip chains that are already completed, active, or permanently failed
+                if (completedChainIds.Contains(chain.chainId)) continue;
+                if (activeChains.ContainsKey(chain.chainId)) continue;
                 float adjustedProb = chain.triggerProbability * luckModifier;
                 if (GD.Randf() < adjustedProb) {
-                    available.Add(chain);
+                    candidates.Add(chain);
                 }
             }
-            if (available.Count == 0) return null;
-            return available[GD.Randi() % available.Count];
+            if (candidates.Count == 0) return null;
+            return candidates[GD.Randi() % candidates.Count];
         }
 
         // ========== 运行时方法 ==========
         /// <summary>
         /// 尝试开始一个新的事件链
         /// </summary>
-        public bool TryStartChain(string eventId, float luckModifier = 1.0f) {
+        /// <param name="eventId">触发的事件 ID</param>
+        /// <param name="luckModifier">运气修正因子</param>
+        /// <param name="chainIdOverride">指定 chainId 直接启动（绕过随机概率，用于 RetryChain）</param>
+        public bool TryStartChain(string eventId, float luckModifier = 1.0f, string chainIdOverride = null) {
             if (EventChainSystem.Instance == null) return false;
+
+            // 直接启动指定 chain（来自 RetryChain）
+            if (!string.IsNullOrEmpty(chainIdOverride)) {
+                var targetChain = EventChainSystem.Instance.GetChain(chainIdOverride);
+                if (targetChain != null && !completedChainIds.Contains(chainIdOverride) && !activeChains.ContainsKey(chainIdOverride)) {
+                    StartChain(targetChain);
+                    return true;
+                }
+                return false;
+            }
 
             // 检查是否有可以触发的连锁
             var allChains = EventChainSystem.Instance.GetAllChains();
             foreach (var chain in allChains) {
                 // 检查是否需要特定事件触发
                 if (chain.requiredEvents.Contains(eventId)) {
-                    // 检查是否已经完成过
+                    // 检查是否已经完成或激活
                     if (completedChainIds.Contains(chain.chainId)) continue;
-                    
+                    if (activeChains.ContainsKey(chain.chainId)) continue;
+                    if (failedChainIds.Contains(chain.chainId)) continue;  // 失败状态需通过 RetryChain 显式重试
+
                     // 随机触发检查
                     float adjustedProb = chain.triggerProbability * luckModifier;
                     if (GD.Randf() < adjustedProb) {
@@ -245,9 +267,9 @@ namespace ClawRPG.Scripts.Systems {
                 }
             }
 
-            // 尝试随机开始一个连锁
-            var randomChain = EventChainSystem.Instance.GetRandomChain(luckModifier);
-            if (randomChain != null && !completedChainIds.Contains(randomChain.chainId)) {
+            // 尝试随机开始一个连锁（排除已失败的）
+            var randomChain = EventChainSystem.Instance.GetRandomChain(null, luckModifier);
+            if (randomChain != null) {
                 StartChain(randomChain);
                 return true;
             }
@@ -285,9 +307,12 @@ namespace ClawRPG.Scripts.Systems {
             activeChain.currentStage++;
             activeChain.progress = (float)activeChain.currentStage / activeChain.totalStages;
 
-            // 检查是否跟随事件
-            if (chain.followUpEvents.Contains(nextEventId)) {
-                // 正常推进
+            // 检查是否跟随事件 — 必须匹配 followUpEvents 列表才能正常推进
+            if (!chain.followUpEvents.Contains(nextEventId)) {
+                // 事件不匹配链的预期，触发失败
+                FailChain(chainId);
+                GD.Print($"[EventChain] Chain {chain.chainName} failed: unexpected event '{nextEventId}'");
+                return;
             }
 
             // 检查是否完成
@@ -352,6 +377,32 @@ namespace ClawRPG.Scripts.Systems {
             totalChainsFailed++;
 
             GD.Print($"[EventChain] Failed: {chain?.chainName ?? chainId}");
+        }
+
+        /// <summary>
+        /// 重试失败的事件链（仅限同一 run 内可重试一次）
+        /// </summary>
+        public bool RetryChain(string chainId) {
+            if (!chains.ContainsKey(chainId)) return false;
+            if (!failedChainIds.Contains(chainId)) return false;  // 不是失败状态
+
+            // 从失败列表移除，允许重新开始
+            failedChainIds.Remove(chainId);
+
+            // 重新触发该链的 requiredEvents 检查
+            var chain = chains[chainId];
+            if (chain.requiredEvents.Count > 0) {
+                // 模拟触发第一个 required event 来尝试重新开始
+                return TryStartChain(chain.requiredEvents[0], 1.0f, chainId);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 检查是否可以重试特定事件链
+        /// </summary>
+        public bool CanRetryChain(string chainId) {
+            return failedChainIds.Contains(chainId);
         }
 
         /// <summary>
