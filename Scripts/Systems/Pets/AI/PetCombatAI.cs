@@ -16,6 +16,7 @@ namespace ClawRPG.Scripts.Systems.Pets
         private PetAIDecision _decisionSystem;
         private PetBehaviorTree _behaviorTree;
         private PetSkillSelector _skillSelector;
+        private ClawRPG.Systems.Pets.AI.PetTacticalAI _tacticalAI;
         
         // 宠物战斗属性
         private Pet _activePet;
@@ -50,6 +51,10 @@ namespace ClawRPG.Scripts.Systems.Pets
             _decisionSystem = new PetAIDecision();
             _behaviorTree = new PetBehaviorTree();
             _skillSelector = new PetSkillSelector();
+            _tacticalAI = ClawRPG.Systems.Pets.AI.PetTacticalAI.Instance;
+
+            // 订阅 EventBus 事件（REQ-112-05: 事件驱动集成）
+            TrySubscribeToEventBus();
         }
         
         protected override string SystemName => "PetCombatAI";
@@ -74,6 +79,9 @@ namespace ClawRPG.Scripts.Systems.Pets
             {
                 _decisionSystem.DeterminePersonalityFromPetType(pet.Type);
             }
+
+            // 初始化战术AI（REQ-112-05: 事件驱动集成）
+            TryInitTacticalAI();
         }
 
         /// <summary>
@@ -90,6 +98,9 @@ namespace ClawRPG.Scripts.Systems.Pets
         public void SetPlayer(CharacterBody2D player)
         {
             _player = player;
+
+            // 初始化战术AI（REQ-112-05: 事件驱动集成）
+            TryInitTacticalAI();
         }
         
         /// <summary>
@@ -102,6 +113,10 @@ namespace ClawRPG.Scripts.Systems.Pets
             
             float deltaF = (float)delta;
             
+            // 更新战术AI（REQ-112: PetTacticalAI由PetCombatAI驱动）
+            if (_tacticalAI != null)
+                _tacticalAI._Process(delta);
+
             // 更新状态机
             UpdateStateMachine(deltaF);
             
@@ -523,6 +538,50 @@ namespace ClawRPG.Scripts.Systems.Pets
         public ClawRPG.Systems.Pets.AI.PetAIState CurrentState => _currentState;
         
         #endregion
+
+        // ===== PetTacticalAI 集成 (REQ-112) =====
+
+        /// <summary>
+        /// 初始化 PetTacticalAI（安全检查，防止在 pet/player 未就绪时调用）
+        /// </summary>
+        private void TryInitTacticalAI()
+        {
+            if (_tacticalAI == null || _activePet == null || _player == null)
+                return;
+            _tacticalAI.Initialize(_activePet, _player);
+        }
+
+        /// <summary>
+        /// 订阅 EventBusManager 事件（REQ-112-05: 事件驱动集成）
+        /// </summary>
+        private void TrySubscribeToEventBus()
+        {
+            var eventBus = EventBusManager.Instance;
+            if (eventBus == null)
+            {
+                GD.Warn("[PetCombatAI] EventBusManager not available");
+                return;
+            }
+
+            eventBus.Subscribe(EventBusManager.Events.CombatStarted, OnCombatStarted);
+            eventBus.Subscribe(EventBusManager.Events.CombatEnded, OnCombatEnded);
+            GD.Print("[PetCombatAI] Subscribed to EventBus (CombatStarted, CombatEnded)");
+        }
+
+        private void OnCombatStarted()
+        {
+            GD.Print("[PetCombatAI] Combat started via event bus");
+            TryInitTacticalAI();
+        }
+
+        private void OnCombatEnded()
+        {
+            GD.Print("[PetCombatAI] Combat ended via event bus");
+            // 重置战术AI到 Follow 模式
+            if (_tacticalAI != null)
+                _tacticalAI.SetTacticalMode(ClawRPG.Systems.Pets.AI.PetTacticalAI.PetTacticalMode.Follow);
+        }
+
         
         public override Dictionary<string, object> ExportSaveData()
         {
