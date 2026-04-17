@@ -18,15 +18,15 @@ namespace ClawRPG.Scripts.Systems
         
         // Signals (Godot 4 compatible)
         [Signal]
-        public delegate void BehaviorChangedDelegateEventHandlerEventHandler(string petId);
+        public delegate void BehaviorChanged(string petId);
         [Signal]
-        public delegate void StateChangedDelegateEventHandlerEventHandler(string petId, string newState);
+        public delegate void StateChanged(string petId, string newState);
         [Signal]
-        public delegate void TargetSelectedDelegateEventHandlerEventHandler(string petId, string targetId);
+        public delegate void TargetSelected(string petId, string targetId);
         [Signal]
-        public delegate void DamageAvoidedDelegateEventHandlerEventHandler(string petId, float damage);
+        public delegate void DamageAvoided(string petId, float damage);
         [Signal]
-        public delegate void PositionUpdatedDelegateEventHandlerEventHandler(string petId, Vector2 position);
+        public delegate void PositionUpdated(string petId, Vector2 position);
 
         public override void _Ready()
         {
