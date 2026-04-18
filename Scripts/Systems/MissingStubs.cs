@@ -7,7 +7,6 @@ namespace ClawRPG.Scripts.Systems
     public class PetSystem { }
     public class PetData { }
     public class PetBreedingResult { }
-    public class PetAIContext { }
     public class PetLifeCycleEntry { }
     public class LifeStage { }
     public class LifeCycleHistoryEntry { }

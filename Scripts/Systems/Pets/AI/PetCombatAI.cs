@@ -78,6 +78,8 @@ namespace ClawRPG.Scripts.Systems.Pets
             if (pet != null)
             {
                 _decisionSystem.DeterminePersonalityFromPetType(pet.Type);
+                // 初始化运行时HP（REQ-206: 从实际宠物数据获取，而非硬编码）
+                InitRuntimeHp(100);
             }
 
             // 初始化战术AI（REQ-112-05: 事件驱动集成）
@@ -141,13 +143,14 @@ namespace ClawRPG.Scripts.Systems.Pets
             bool playerInCombat = nearbyEnemies.Count > 0;
             
             // 创建上下文
+            float petHpPercent = GetCurrentHealthPercent();
             var context = new PetBehaviorTree.PetAIContext
             {
                 PlayerPosition = playerPos,
                 PetPosition = petPos,
                 NearbyEnemies = nearbyEnemies,
                 DistanceToPlayer = distToPlayer,
-                PetHealthPercent = 1.0f,  // 简化
+                PetHealthPercent = petHpPercent,
                 PlayerInCombat = playerInCombat,
                 CurrentState = _currentState
             };
@@ -155,7 +158,7 @@ namespace ClawRPG.Scripts.Systems.Pets
             // 使用决策系统
             var decision = _decisionSystem.MakeDecision(_currentState, playerPos, petPos, 
                                                        nearbyEnemies, distToPlayer, 
-                                                       1.0f, playerInCombat);
+                                                       petHpPercent, playerInCombat);
             
             // 转换决策到状态
             if (decision.Confidence > 0.5f)
@@ -326,7 +329,7 @@ namespace ClawRPG.Scripts.Systems.Pets
             var skill = _skillSelector.SelectBestSkill(new PetBehaviorTree.PetAIContext
             {
                 PlayerInCombat = true,
-                PetHealthPercent = 1.0f
+                PetHealthPercent = GetCurrentHealthPercent()
             });
             
             if (skill != null)

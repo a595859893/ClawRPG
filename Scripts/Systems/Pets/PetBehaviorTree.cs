@@ -476,5 +476,19 @@ namespace ClawRPG.Scripts.Systems.Pets
             if (data.Contains("holyProtectionTimer"))
                 _holyProtectionTimer = Convert.ToSingle(data["holyProtectionTimer"]);
         }
+
+        /// <summary>
+        /// 宠物AI决策上下文 - 传递战斗信息给决策系统
+        /// </summary>
+        public class PetAIContext
+        {
+            public Vector2 PlayerPosition { get; set; }
+            public Vector2 PetPosition { get; set; }
+            public List<Node2D> NearbyEnemies { get; set; }
+            public float DistanceToPlayer { get; set; }
+            public float PetHealthPercent { get; set; }
+            public bool PlayerInCombat { get; set; }
+            public ClawRPG.Systems.Pets.AI.PetAIState CurrentState { get; set; }
+        }
     }
 }

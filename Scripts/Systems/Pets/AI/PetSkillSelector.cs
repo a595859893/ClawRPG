@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Systems.Pets;
 
 namespace ClawRPG.Systems.Pets.AI
 {
@@ -142,7 +142,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 选择最佳技能
         /// </summary>
-        public PetSkill SelectBestSkill(PetAIContext context)
+        public PetSkill SelectBestSkill(PetBehaviorTree.PetAIContext context)
         {
             var evaluations = EvaluateAllSkills(context);
             
@@ -157,7 +157,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 评估所有技能
         /// </summary>
-        public List<SkillEvaluation> EvaluateAllSkills(PetAIContext context)
+        public List<SkillEvaluation> EvaluateAllSkills(PetBehaviorTree.PetAIContext context)
         {
             var evaluations = new List<SkillEvaluation>();
             float currentTime = OS.GetUnixTimeFromSystem();
@@ -181,7 +181,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 评估单个技能
         /// </summary>
-        private SkillEvaluation EvaluateSkill(PetSkill skill, PetAIContext context)
+        private SkillEvaluation EvaluateSkill(PetSkill skill, PetBehaviorTree.PetAIContext context)
         {
             var evaluation = new SkillEvaluation
             {
@@ -210,7 +210,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 评估攻击技能
         /// </summary>
-        private SkillEvaluation EvaluateAttackSkill(PetSkill skill, PetAIContext context, SkillEvaluation evaluation)
+        private SkillEvaluation EvaluateAttackSkill(PetSkill skill, PetBehaviorTree.PetAIContext context, SkillEvaluation evaluation)
         {
             // 有敌人时才使用攻击技能
             if (context.NearbyEnemies.Count > 0)
@@ -245,7 +245,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 评估治疗技能
         /// </summary>
-        private SkillEvaluation EvaluateHealSkill(PetSkill skill, PetAIContext context, SkillEvaluation evaluation)
+        private SkillEvaluation EvaluateHealSkill(PetSkill skill, PetBehaviorTree.PetAIContext context, SkillEvaluation evaluation)
         {
             // 血量低时使用治疗
             if (context.PetHealthPercent < 0.5f)
@@ -265,7 +265,7 @@ namespace ClawRPG.Systems.Pets.AI
         /// <summary>
         /// 评估增益技能
         /// </summary>
-        private SkillEvaluation EvaluateBuffSkill(PetSkill skill, PetAIContext context, SkillEvaluation evaluation)
+        private SkillEvaluation EvaluateBuffSkill(PetSkill skill, PetBehaviorTree.PetAIContext context, SkillEvaluation evaluation)
         {
             // 玩家在战斗时使用增益
             if (context.PlayerInCombat)
