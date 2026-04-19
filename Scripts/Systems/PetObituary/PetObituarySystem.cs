@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using ClawRPG.Scripts.Systems.Ripple;
 
 namespace ClawRPG.Systems.PetObituary
 {
@@ -77,6 +78,9 @@ namespace ClawRPG.Systems.PetObituary
             string petColor = petData.ContainsKey("pet_color") ? petData["pet_color"].ToString() : "#FFFFFF";
             int friendshipLevel = petData.ContainsKey("friendship") ? Convert.ToInt32(petData["friendship"]) : 0;
             string battleId = petData.ContainsKey("battle_id") ? petData["battle_id"].ToString() : "";
+
+            // REQ-210-06: 涟漪集成 — 宠物牺牲
+            RippleIntegration.AddRipple(RippleType.Sacrifice, 1);
 
             GenerateAndRecordObituary(petId, petName, petColor, friendshipLevel, battleId);
         }

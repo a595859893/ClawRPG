@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ClawRPG.Scripts.Framework;
+using ClawRPG.Scripts.Systems.Ripple;
 
 /// <summary>
 /// 技能Combo系统。管理技能连击的检测、触发和奖励计算。
@@ -141,6 +142,8 @@ public partial class SkillComboSystem : BaseSystem
                 if (_activeCombos.TryGetValue(key, out var combo) && !combo.IsComplete)
                 {
                     ComboFailed.Emit(key);
+                    // REQ-210-06: 涟漪集成 — combo 失败
+                    RippleIntegration.AddRipple(RippleType.Loss, 1);
                 }
             }
         }
@@ -353,6 +356,8 @@ public partial class SkillComboSystem : BaseSystem
                 if (!kvp.Value.IsComplete && kvp.Value.CurrentStreak > 0)
                 {
                     ComboFailed.Emit(kvp.Key);
+                    // REQ-210-06: 涟漪集成 — combo 超时失败
+                    RippleIntegration.AddRipple(RippleType.Loss, 1);
                 }
                 expiredCombos.Add(kvp.Key);
             }

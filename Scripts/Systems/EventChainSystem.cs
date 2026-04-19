@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.Ripple;
 
 namespace ClawRPG.Scripts.Systems {
     /// <summary>
@@ -28,6 +29,9 @@ namespace ClawRPG.Scripts.Systems {
         private List<string> completedChainIds = new List<string>();
         private List<string> failedChainIds = new List<string>();
         private Dictionary<string, int> chainCompletionCount = new Dictionary<string, int>();
+
+        // 运行时状态持久化：当前链进度（REQ-210-04）
+        private Dictionary<string, int> activeChainProgress = new Dictionary<string, int>();
         
         // 统计
         private int totalChainsStarted = 0;
@@ -221,6 +225,8 @@ namespace ClawRPG.Scripts.Systems {
 
         public EventChainData GetRandomChain(EventChainCategory? category = null, float luckModifier = 1.0f) {
             List<EventChainData> candidates = new List<EventChainData>();
+            float highestWeight = 0f;
+
             foreach (var chain in chains.Values) {
                 // Filter by category if specified
                 if (category.HasValue && chain.category != category.Value) {
@@ -229,13 +235,74 @@ namespace ClawRPG.Scripts.Systems {
                 // Skip chains that are already completed, active, or permanently failed
                 if (completedChainIds.Contains(chain.chainId)) continue;
                 if (activeChains.ContainsKey(chain.chainId)) continue;
-                float adjustedProb = chain.triggerProbability * luckModifier;
+
+                // REQ-210-03: 涟漪加权计算
+                // chain.triggerProbability × (1.0 + Σ relevant_ripple_points / threshold)
+                float rippleMultiplier = 1.0f;
+                if (RippleSystem.Instance != null) {
+                    rippleMultiplier += GetChainRippleWeight(chain);
+                }
+
+                float adjustedProb = chain.triggerProbability * luckModifier * rippleMultiplier;
+                adjustedProb = Mathf.Clamp(adjustedProb, 0f, 1f);  // 最多100%触发
+
                 if (GD.Randf() < adjustedProb) {
                     candidates.Add(chain);
                 }
             }
             if (candidates.Count == 0) return null;
             return candidates[GD.Randi() % candidates.Count];
+        }
+
+        /// <summary>
+        /// REQ-210-03: 获取事件链的涟漪加权值
+        /// </summary>
+        private float GetChainRippleWeight(EventChainData chain) {
+            float totalWeight = 0f;
+            int count = 0;
+
+            // 根据链的类别映射到涟漪类型
+            switch (chain.category) {
+                case EventChainCategory.Combat:
+                    // 战斗类链 → Loss / Desperation / Triumph
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Loss);
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Desperation);
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Triumph);
+                    count = 3;
+                    break;
+                case EventChainCategory.Adventure:
+                    // 冒险类链 → Abandon
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Abandon);
+                    count = 1;
+                    break;
+                case EventChainCategory.Tragedy:
+                    // 悲剧类链 → Sacrifice / Desperation
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Sacrifice);
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Desperation);
+                    count = 2;
+                    break;
+                case EventChainCategory.Mystery:
+                case EventChainCategory.Legend:
+                    // 神秘/传奇类链 → Forget / Triumph
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Forget);
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Triumph);
+                    count = 2;
+                    break;
+                case EventChainCategory.Romance:
+                    // 浪漫类链 → Triumph
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Triumph);
+                    count = 1;
+                    break;
+                case EventChainCategory.Comedy:
+                    // 喜剧类链 → Loss
+                    totalWeight += RippleSystem.Instance.GetRippleWeight(RippleType.Loss);
+                    count = 1;
+                    break;
+            }
+
+            // 归一化到 [0, 1] 范围，加权系数上限为 0.5（触发概率最多提升50%）
+            float avgWeight = count > 0 ? totalWeight / count : 0f;
+            return avgWeight * 0.5f;
         }
 
         // ========== 运行时方法 ==========
@@ -332,6 +399,9 @@ namespace ClawRPG.Scripts.Systems {
 
             activeChain.currentStage++;
             activeChain.progress = (float)activeChain.currentStage / activeChain.totalStages;
+
+            // REQ-210-04: 同步当前链进度
+            activeChainProgress[chainId] = activeChain.currentStage;
 
             // 检查是否跟随事件 — 必须匹配 followUpEvents 列表才能正常推进
             if (!chain.followUpEvents.Contains(nextEventId)) {
@@ -526,7 +596,9 @@ namespace ClawRPG.Scripts.Systems {
                 { "total_chains_completed", totalChainsCompleted },
                 { "total_chains_failed", totalChainsFailed },
                 { "total_gold_earned", totalGoldEarned },
-                { "total_exp_earned", totalExpEarned }
+                { "total_exp_earned", totalExpEarned },
+                // REQ-210-04: 活跃链进度持久化
+                { "active_chain_progress", activeChainProgress }
             };
         }
 
@@ -557,6 +629,16 @@ namespace ClawRPG.Scripts.Systems {
             if (data.ContainsKey("total_exp_earned")) {
                 totalExpEarned = (int)data["total_exp_earned"];
             }
+            // REQ-210-04: 活跃链进度恢复
+            if (data.ContainsKey("active_chain_progress")) {
+                activeChainProgress = new Dictionary<string, int>((Dictionary<string, int>)data["active_chain_progress"]);
+                // 恢复活跃链的 currentStage
+                foreach (var kvp in activeChainProgress) {
+                    if (activeChains.ContainsKey(kvp.Key)) {
+                        activeChains[kvp.Key].currentStage = kvp.Value;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -564,7 +646,13 @@ namespace ClawRPG.Scripts.Systems {
         /// </summary>
         public override Dictionary<string, object> ExportSaveData()
         {
-            return SaveData();
+            var data = SaveData();
+            // REQ-210-04: 导出时同步 activeChainProgress
+            activeChainProgress.Clear();
+            foreach (var kvp in activeChains) {
+                activeChainProgress[kvp.Key] = kvp.Value.currentStage;
+            }
+            return data;
         }
 
         /// <summary>
