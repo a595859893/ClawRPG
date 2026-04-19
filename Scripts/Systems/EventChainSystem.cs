@@ -10,6 +10,16 @@ namespace ClawRPG.Scripts.Systems {
     public partial class EventChainSystem : BaseSystem {
         public static EventChainSystem Instance { get; private set; }
 
+        // ========== 信号定义 ==========
+        [Signal]
+        public delegate void ChainCompletedEventHandler(string chainName, int goldBonus, int expBonus);
+        
+        [Signal]
+        public delegate void ChainStartedEventHandler(string chainId, string chainName);
+        
+        [Signal]
+        public delegate void ChainAdvancedEventHandler(string chainId, string chainName, int currentStage, int totalStages);
+
         // ========== 配置数据 ==========
         private Dictionary<string, EventChainData> chains = new Dictionary<string, EventChainData>();
 
@@ -291,6 +301,9 @@ namespace ClawRPG.Scripts.Systems {
             activeChains[chain.chainId] = activeChain;
             totalChainsStarted++;
             
+            // 发出启动信号
+            EmitSignal("ChainStarted", chain.chainId, chain.chainName);
+            
             GD.Print($"[EventChain] Started: {chain.chainName} - {activeChain.totalStages} stages");
         }
 
@@ -332,6 +345,8 @@ namespace ClawRPG.Scripts.Systems {
             if (activeChain.currentStage >= activeChain.totalStages) {
                 CompleteChain(chainId);
             } else {
+                // 发出推进信号
+                EmitSignal("ChainAdvanced", chainId, chain.chainName, activeChain.currentStage, activeChain.totalStages);
                 GD.Print($"[EventChain] Advanced: {chain.chainName} - Stage {activeChain.currentStage}/{activeChain.totalStages}");
             }
         }
@@ -356,16 +371,21 @@ namespace ClawRPG.Scripts.Systems {
                 totalGoldEarned += chain.reward.goldBonus;
                 totalExpEarned += chain.reward.expBonus;
                 
-                // 这里可以调用经济系统添加金币和经验
-                // PlayerStats.AddGold(chain.reward.goldBonus);
-                // PlayerStats.AddExp(chain.reward.expBonus);
+                // 发放金币和经验
+                if (GameManager.Instance != null) {
+                    GameManager.Instance.AddGold(chain.reward.goldBonus);
+                    GameManager.Instance.AddExp(chain.reward.expBonus);
+                }
                 
-                // 掉落奖励物品
-                foreach (var item in chain.reward.bonusItems) {
-                    GD.Print($"[EventChain] Reward: {item}");
-                    // AddItemToInventory(item);
+                // 发放奖励物品（string ID → 需要 ItemDatabase 解析为 int ID）
+                foreach (var itemId in chain.reward.bonusItems) {
+                    GD.Print($"[EventChain] Reward item: {itemId}");
+                    // Item bonus: full integration pending ItemDatabase string→int lookup
                 }
             }
+
+            // 发出完成信号（UI通知用）
+            EmitSignal("ChainCompleted", chain.chainName, chain.reward?.goldBonus ?? 0, chain.reward?.expBonus ?? 0);
 
             // 更新统计
             if (!chainCompletionCount.ContainsKey(chainId)) {
