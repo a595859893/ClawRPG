@@ -7,6 +7,8 @@ public class AuctionHouseData
 {
     public Dictionary<int, AuctionItem> ActiveListings = new Dictionary<int, AuctionItem>();
     public Dictionary<int, List<int>> PurchaseHistory = new Dictionary<int, List<int>>();
+    // PurchasedItems: playerId -> list of AuctionItem copies (preserved after original listing is removed)
+    public Dictionary<int, List<AuctionItem>> PurchasedItems = new Dictionary<int, List<AuctionItem>>();
     public int TotalListings { get; set; }
     public int TotalSales { get; set; }
     public long LastUpdate { get; set; }
@@ -45,11 +47,42 @@ public class AuctionHouseData
                 { "listingIds", kvp.Value }
             });
         }
-        
+
+        var purchasedItems = new List<Dictionary<string, object>>();
+        foreach (var kvp in PurchasedItems)
+        {
+            var items = new List<Dictionary<string, object>>();
+            foreach (var item in kvp.Value)
+            {
+                items.Add(new Dictionary<string, object>
+                {
+                    { "itemId", item.ItemId },
+                    { "itemName", item.ItemName },
+                    { "itemDescription", item.ItemDescription },
+                    { "quantity", item.Quantity },
+                    { "pricePerUnit", item.PricePerUnit },
+                    { "sellerName", item.SellerName },
+                    { "sellerId", item.SellerId },
+                    { "listingTime", item.ListingTime },
+                    { "expireTime", item.ExpireTime },
+                    { "rarity", item.Rarity },
+                    { "category", item.Category },
+                    { "purchasePrice", item.PurchasePrice },
+                    { "purchaseTime", item.PurchaseTime }
+                });
+            }
+            purchasedItems.Add(new Dictionary<string, object>
+            {
+                { "playerId", kvp.Key },
+                { "items", items }
+            });
+        }
+
         return new Dictionary<string, object>
         {
             { "activeListings", listings },
             { "purchaseHistory", purchases },
+            { "purchasedItems", purchasedItems },
             { "totalListings", TotalListings },
             { "totalSales", TotalSales },
             { "nextListingId", NextListingId }
@@ -98,6 +131,38 @@ public class AuctionHouseData
                     ids.Add(Convert.ToInt32(id));
                 }
                 PurchaseHistory[playerId] = ids;
+            }
+        }
+        
+        if (data.ContainsKey("purchasedItems"))
+        {
+            var purchasedItems = data["purchasedItems"] as List<Dictionary<string, object>>;
+            foreach (var playerData in purchasedItems)
+            {
+                int playerId = Convert.ToInt32(playerData["playerId"]);
+                var itemsList = playerData["items"] as List<Dictionary<string, object>>;
+                var items = new List<AuctionItem>();
+                foreach (var itemData in itemsList)
+                {
+                    var item = new AuctionItem
+                    {
+                        ItemId = itemData["itemId"].ToString(),
+                        ItemName = itemData["itemName"].ToString(),
+                        ItemDescription = itemData["itemDescription"].ToString(),
+                        Quantity = Convert.ToInt32(itemData["quantity"]),
+                        PricePerUnit = Convert.ToInt32(itemData["pricePerUnit"]),
+                        SellerName = itemData["sellerName"].ToString(),
+                        SellerId = Convert.ToInt32(itemData["sellerId"]),
+                        ListingTime = Convert.ToInt64(itemData["listingTime"]),
+                        ExpireTime = Convert.ToInt64(itemData["expireTime"]),
+                        Rarity = itemData["rarity"].ToString(),
+                        Category = itemData["category"].ToString(),
+                        CurrentBid = Convert.ToInt32(itemData["purchasePrice"]),
+                        EndTime = Convert.ToInt64(itemData["purchaseTime"])
+                    };
+                    items.Add(item);
+                }
+                PurchasedItems[playerId] = items;
             }
         }
         

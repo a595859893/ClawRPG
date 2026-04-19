@@ -23,6 +23,7 @@ namespace UI
         private Button _closeButton;
         private Button _myListingsButton;
         private Button _myBidsButton;
+        private Button _myPurchasesButton;
         private Button _allListingsButton;
         
         // 筛选按钮
@@ -119,6 +120,11 @@ namespace UI
             _myBidsButton.Text = "💰 我的竞拍";
             _myBidsButton.Pressed += () => SwitchTab("my_bids");
             tabContainer.AddChild(_myBidsButton);
+
+            _myPurchasesButton = new Button();
+            _myPurchasesButton.Text = "📦 我的购买";
+            _myPurchasesButton.Pressed += () => SwitchTab("my_purchases");
+            tabContainer.AddChild(_myPurchasesButton);
 
             // 搜索和筛选
             var searchContainer = new HBoxContainer();
@@ -308,33 +314,37 @@ namespace UI
             switch (_currentTab)
             {
                 case "my_listings":
-                    auctions = AuctionHouseSystem.Instance.GetPlayerListings();
+                    auctions = AuctionHouseSystem.Instance.GetMyListings(1);
                     break;
                 case "my_bids":
-                    auctions = AuctionHouseSystem.Instance.GetPlayerBids();
+                    auctions = new List<AuctionItem>(); // Bidding system not yet implemented
+                    break;
+                case "my_purchases":
+                    auctions = AuctionHouseSystem.Instance.GetMyPurchases(1);
                     break;
                 default:
-                    auctions = AuctionHouseSystem.Instance.GetFilteredListings();
+                    auctions = AuctionHouseSystem.Instance.GetListings();
                     break;
             }
 
             // 添加列表项
+            bool isPurchaseHistory = (_currentTab == "my_purchases");
             foreach (var auction in auctions)
             {
-                var item = CreateAuctionItemRow(auction);
+                var item = CreateAuctionItemRow(auction, isPurchaseHistory);
                 _auctionListContainer.AddChild(item);
             }
 
             if (auctions.Count == 0)
             {
                 var emptyLabel = new Label();
-                emptyLabel.Text = "暂无拍卖物品";
+                emptyLabel.Text = _currentTab == "my_purchases" ? "暂无购买记录" : "暂无拍卖物品";
                 emptyLabel.Alignment = Label.AlignmentMode.Center;
                 _auctionListContainer.AddChild(emptyLabel);
             }
         }
 
-        private Control CreateAuctionItemRow(AuctionItem auction)
+        private Control CreateAuctionItemRow(AuctionItem auction, bool isPurchaseHistory = false)
         {
             var container = new HBoxContainer();
             container.CustomMinimumSize = new Vector2(0, 50);
@@ -349,14 +359,25 @@ namespace UI
             nameLabel.SizeFlagsHorizontal = Control.SizeFlags.Expand;
             container.AddChild(nameLabel);
 
-            // 当前价格
+            // 当前价格 (listing: PricePerUnit, purchase: PurchasePrice)
             var priceLabel = new Label();
-            priceLabel.Text = $"💰 {auction.CurrentBid}";
+            int displayPrice = isPurchaseHistory ? auction.PurchasePrice : auction.PricePerUnit * auction.Quantity;
+            priceLabel.Text = $"💰 {displayPrice}";
             container.AddChild(priceLabel);
 
-            // 时间
+            // 时间 (listing: time remaining, purchase: purchase time)
             var timeLabel = new Label();
-            timeLabel.Text = AuctionHouseSystem.Instance.FormatTimeRemaining(auction.EndTime);
+            if (isPurchaseHistory)
+            {
+                long now = (long)(OS.GetUnixTime() * 1000);
+                long diff = now - auction.PurchaseTime;
+                int days = (int)(diff / 86400000);
+                timeLabel.Text = days > 0 ? $"{days}天前" : "今天";
+            }
+            else
+            {
+                timeLabel.Text = AuctionHouseSystem.Instance.FormatTimeRemaining(auction.ExpireTime);
+            }
             container.AddChild(timeLabel);
 
             // 点击事件
@@ -379,7 +400,7 @@ namespace UI
             _currentBidLabel.Text = $"当前出价: {auction.CurrentBid} 💰";
             _buyNowLabel.Text = $"一口价: {auction.BuyNowPrice} 💰";
             _sellerLabel.Text = $"卖家: {auction.SellerName}";
-            _timeRemainingLabel.Text = $"剩余时间: {AuctionHouseSystem.Instance.FormatTimeRemaining(auction.EndTime)}";
+            _timeRemainingLabel.Text = $"剩余时间: {AuctionHouseSystem.Instance.FormatTimeRemaining(auction.ExpireTime)}";
 
             _bidButton.Disabled = false; 
             _buyNowButton.Disabled = false; 
@@ -390,10 +411,10 @@ namespace UI
             var stats = AuctionHouseSystem.Instance.GetPlayerAuctionStats();
             if (stats != null)
             {
-                _totalSalesLabel.Text = $"出售次数: {stats.TotalSales}";
-                _totalPurchasesLabel.Text = $"购买次数: {stats.TotalPurchases}";
-                _totalEarnedLabel.Text = $"总收入: {stats.TotalEarned} 💰";
-                _totalSpentLabel.Text = $"总支出: {stats.TotalSpent} 💰";
+                _totalSalesLabel.Text = $"出售次数: {stats["TotalSales"]}";
+                _totalPurchasesLabel.Text = $"购买次数: {stats["TotalPurchases"]}";
+                _totalEarnedLabel.Text = $"总收入: {stats["TotalEarned"]} 💰";
+                _totalSpentLabel.Text = $"总支出: {stats["TotalSpent"]} 💰";
             }
         }
 

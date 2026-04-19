@@ -106,7 +106,31 @@ public partial class AuctionHouseSystem : BaseSystem
             _data.PurchaseHistory[buyerId] = new List<int>();
         }
         _data.PurchaseHistory[buyerId].Add(listingId);
-        
+
+        // Store a copy in PurchasedItems so GetMyPurchases() still works after listing is removed
+        if (!_data.PurchasedItems.ContainsKey(buyerId))
+        {
+            _data.PurchasedItems[buyerId] = new List<AuctionItem>();
+        }
+        // Create a copy with purchase metadata
+        var purchasedItem = new AuctionItem
+        {
+            ItemId = listing.ItemId,
+            ItemName = listing.ItemName,
+            ItemDescription = listing.ItemDescription,
+            Quantity = listing.Quantity,
+            PricePerUnit = listing.PricePerUnit,
+            SellerName = listing.SellerName,
+            SellerId = listing.SellerId,
+            ListingTime = listing.ListingTime,
+            ExpireTime = listing.ExpireTime,
+            Rarity = listing.Rarity,
+            Category = listing.Category,
+            PurchasePrice = totalCost,
+            PurchaseTime = (long)(Time.GetUnixTimeFromSystem() * 1000)
+        };
+        _data.PurchasedItems[buyerId].Add(purchasedItem);
+
         SaveAuctionData();
         
         return new Dictionary<string, object> 
@@ -146,6 +170,62 @@ public partial class AuctionHouseSystem : BaseSystem
         };
     }
     
+    // Placeholder: gold is managed by EconomySystem, not AuctionHouseSystem
+    public int GetPlayerGold() => 0;
+
+    public bool PlaceBid(int listingId, int amount)
+    {
+        // Bidding system not yet fully implemented
+        GD.Print($"AuctionHouseSystem: PlaceBid called for listing {listingId} with amount {amount} (not implemented)");
+        return false;
+    }
+
+    public bool BuyNow(int listingId)
+    {
+        // BuyNow requires player context; stub for compilation
+        GD.Print($"AuctionHouseSystem: BuyNow called for listing {listingId} (not implemented)");
+        return false;
+    }
+
+    public string FormatTimeRemaining(long timestamp)
+    {
+        long now = (long)(Time.GetUnixTimeFromSystem() * 1000);
+        long diff = timestamp - now;
+        if (diff <= 0) return "已结束";
+        int hours = (int)(diff / 3600000);
+        int minutes = (int)((diff % 3600000) / 60000);
+        if (hours > 24)
+            return $"{(hours / 24)}天 {hours % 24}小时";
+        return $"{hours}小时 {minutes}分钟";
+    }
+
+    // Search and filter state (stubs for UI calls)
+    private string _searchTerm = "";
+    private int _rarityFilter = -1;
+
+    public void SetSearchTerm(string term) { _searchTerm = term; }
+    public void SetRarityFilter(int rarity) { _rarityFilter = rarity; }
+
+    public Dictionary<string, object> GetPlayerAuctionStats()
+    {
+        // Compute stats from purchased items
+        int totalPurchases = 0;
+        int totalSpent = 0;
+        if (_data.PurchasedItems.TryGetValue(1, out var purchases))
+        {
+            totalPurchases = purchases.Count;
+            foreach (var p in purchases)
+                totalSpent += p.PurchasePrice;
+        }
+        return new Dictionary<string, object>
+        {
+            { "TotalSales", _data.TotalSales },
+            { "TotalPurchases", totalPurchases },
+            { "TotalEarned", 0 },
+            { "TotalSpent", totalSpent }
+        };
+    }
+
     public List<AuctionItem> GetListings(string category = "", string rarity = "", string searchTerm = "", int maxResults = 50)
     {
         var results = new List<AuctionItem>();
@@ -209,20 +289,11 @@ public partial class AuctionHouseSystem : BaseSystem
     
     public List<AuctionItem> GetMyPurchases(int playerId)
     {
-        var results = new List<AuctionItem>();
-        
-        if (_data.PurchaseHistory.TryGetValue(playerId, out var listingIds))
+        if (_data.PurchasedItems.TryGetValue(playerId, out var purchases))
         {
-            foreach (var listingId in listingIds)
-            {
-                if (_data.ActiveListings.TryGetValue(listingId, out var listing))
-                {
-                    results.Add(listing);
-                }
-            }
+            return new List<AuctionItem>(purchases);
         }
-        
-        return results;
+        return new List<AuctionItem>();
     }
     
     public Dictionary<string, int> GetCategories()
@@ -369,11 +440,42 @@ public partial class AuctionHouseSystem : BaseSystem
                 { "listingIds", kvp.Value }
             });
         }
-        
+
+        var purchasedItems = new List<Dictionary<string, object>>();
+        foreach (var kvp in _data.PurchasedItems)
+        {
+            var items = new List<Dictionary<string, object>>();
+            foreach (var item in kvp.Value)
+            {
+                items.Add(new Dictionary<string, object>
+                {
+                    { "itemId", item.ItemId },
+                    { "itemName", item.ItemName },
+                    { "itemDescription", item.ItemDescription },
+                    { "quantity", item.Quantity },
+                    { "pricePerUnit", item.PricePerUnit },
+                    { "sellerName", item.SellerName },
+                    { "sellerId", item.SellerId },
+                    { "listingTime", item.ListingTime },
+                    { "expireTime", item.ExpireTime },
+                    { "rarity", item.Rarity },
+                    { "category", item.Category },
+                    { "purchasePrice", item.PurchasePrice },
+                    { "purchaseTime", item.PurchaseTime }
+                });
+            }
+            purchasedItems.Add(new Dictionary<string, object>
+            {
+                { "playerId", kvp.Key },
+                { "items", items }
+            });
+        }
+
         return new Dictionary<string, object>
         {
             { "listings", listings },
             { "purchases", purchases },
+            { "purchasedItems", purchasedItems },
             { "totalListings", _data.TotalListings },
             { "totalSales", _data.TotalSales },
             { "nextListingId", _data.NextListingId }
@@ -449,7 +551,39 @@ public partial class AuctionHouseSystem : BaseSystem
                 _data.PurchaseHistory[playerId] = ids;
             }
         }
-        
+
+        if (data.ContainsKey("purchasedItems"))
+        {
+            var purchasedItems = data["purchasedItems"] as List<Dictionary<string, object>>;
+            foreach (var playerData in purchasedItems)
+            {
+                int playerId = Convert.ToInt32(playerData["playerId"]);
+                var itemsList = playerData["items"] as List<Dictionary<string, object>>;
+                var items = new List<AuctionItem>();
+                foreach (var itemData in itemsList)
+                {
+                    var item = new AuctionItem
+                    {
+                        ItemId = itemData["itemId"].ToString(),
+                        ItemName = itemData["itemName"].ToString(),
+                        ItemDescription = itemData["itemDescription"].ToString(),
+                        Quantity = Convert.ToInt32(itemData["quantity"]),
+                        PricePerUnit = Convert.ToInt32(itemData["pricePerUnit"]),
+                        SellerName = itemData["sellerName"].ToString(),
+                        SellerId = Convert.ToInt32(itemData["sellerId"]),
+                        ListingTime = Convert.ToInt64(itemData["listingTime"]),
+                        ExpireTime = Convert.ToInt64(itemData["expireTime"]),
+                        Rarity = itemData["rarity"].ToString(),
+                        Category = itemData["category"].ToString(),
+                        PurchasePrice = Convert.ToInt32(itemData["purchasePrice"]),
+                        PurchaseTime = Convert.ToInt64(itemData["purchaseTime"])
+                    };
+                    items.Add(item);
+                }
+                _data.PurchasedItems[playerId] = items;
+            }
+        }
+
         GD.Print("AuctionHouseSystem: 拍卖行数据已加载");
     }
 

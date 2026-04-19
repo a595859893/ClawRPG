@@ -16,5 +16,11 @@ public class AuctionItem
     public long ExpireTime { get; set; }
     public string Rarity { get; set; }
     public string Category { get; set; }
+    // UI helper fields (not persisted)
+    public int CurrentBid { get; set; }
+    public int BuyNowPrice { get; set; }
+    // Purchase metadata (populated when item is bought)
+    public int PurchasePrice { get; set; }
+    public long PurchaseTime { get; set; }
 }
 }
