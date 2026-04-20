@@ -652,6 +652,7 @@ namespace ClawRPG.Scripts.Systems {
             foreach (var kvp in activeChains) {
                 activeChainProgress[kvp.Key] = kvp.Value.currentStage;
             }
+            data["active_chain_progress"] = activeChainProgress;
             return data;
         }
 
