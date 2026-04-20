@@ -35,7 +35,7 @@ namespace ClawRPG.Scripts.Systems.WeaponResonance
         [Signal]
         public delegate void ResonanceChangedDelegateEventHandlerEventHandler(string weaponType, bool isActive);
         [Signal]
-        public delegate void ResonanceEffectUpdatedDelegateEventHandlerEventHandler(string weaponType, ResonanceEffect effect);
+        public delegate void ResonanceEffectUpdatedDelegateEventHandlerEventHandler(string weaponType, string effectName);
 
         // 共鸣特效节点引用（运行时动态创建）
         private Label _resonanceLabel;
@@ -106,7 +106,7 @@ namespace ClawRPG.Scripts.Systems.WeaponResonance
                     ResonanceActivated.Emit(mainType);
                     ResonanceChanged.Emit(mainType, true);
                     if (effect != null)
-                        ResonanceEffectUpdated.Emit(mainType, effect);
+                        ResonanceEffectUpdated.Emit(mainType, effect?.Name ?? "");
 
                     ShowResonanceLabel(mainType, effect);
                     GD.Print($"[WeaponResonance] 共鸣激活: {mainType} - {effect?.Name}");

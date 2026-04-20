@@ -19,7 +19,7 @@ public partial class FriendSystem : BaseSystem
     private Array<string> _blockedPlayers = new Array<string>();
     
     // 聊天记录
-    private System.Collections.Generic.Dictionary<string, Array<ChatMessage>> _chatHistory = new System.Collections.Generic.Dictionary<string, Array<ChatMessage>>();
+    private System.Collections.Generic.Dictionary<string, Godot.Collections.Array> _chatHistory = new System.Collections.Generic.Dictionary<string, Godot.Collections.Array>();
 
     // 信号
     public delegate void FriendListUpdated();
@@ -136,12 +136,19 @@ public partial class FriendSystem : BaseSystem
     }
 
     // 获取好友列表
-    public Array<FriendData> GetFriends()
+    public Godot.Collections.Array GetFriends()
     {
-        var friends = new Array<FriendData>();
+        var friends = new Godot.Collections.Array();
         foreach (var friend in _friends.Values)
         {
-            friends.Add(friend);
+            friends.Add(new Godot.Collections.Dictionary
+            {
+                { "playerName", friend.playerName },
+                { "addedTime", friend.addedTime },
+                { "isOnline", friend.isOnline },
+                { "lastSeen", friend.lastSeen },
+                { "friendshipLevel", friend.friendshipLevel }
+            });
         }
         return friends;
     }
@@ -158,13 +165,13 @@ public partial class FriendSystem : BaseSystem
     }
 
     // 获取聊天记录
-    public Array<ChatMessage> GetChatHistory(string friendName)
+    public Godot.Collections.Array GetChatHistory(string friendName)
     {
         if (_chatHistory.ContainsKey(friendName))
         {
             return _chatHistory[friendName];
         }
-        return new Array<ChatMessage>();
+        return new Godot.Collections.Array();
     }
 
     // 获取好友数量
@@ -228,9 +235,16 @@ public partial class FriendSystem : BaseSystem
     {
         if (!_chatHistory.ContainsKey(friendName))
         {
-            _chatHistory[friendName] = new Array<ChatMessage>();
+            _chatHistory[friendName] = new Godot.Collections.Array();
         }
-        _chatHistory[friendName].Add(message);
+        _chatHistory[friendName].Add(new Godot.Collections.Dictionary
+        {
+            { "fromPlayer", message.fromPlayer },
+            { "toPlayer", message.toPlayer },
+            { "message", message.message },
+            { "timestamp", message.timestamp },
+            { "isRead", message.isRead }
+        });
     }
 
     private string GetPlayerName()

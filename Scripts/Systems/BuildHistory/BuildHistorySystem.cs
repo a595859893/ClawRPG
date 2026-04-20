@@ -28,13 +28,13 @@ namespace ClawRPG.Systems.BuildHistory
 
         // Signals
         [Signal]
-        public delegate void HistoryEntryCreatedDelegateEventHandler(BuildHistoryEntry entry);
+        public delegate void HistoryEntryCreatedDelegateEventHandler(string entryRunIndex);
 
         [Signal]
-        public delegate void HighlightRecordedDelegateEventHandler(HighlightMoment moment);
+        public delegate void HighlightRecordedDelegateEventHandler(string momentTimestamp);
 
         [Signal]
-        public delegate void LowlightRecordedDelegateEventHandler(LowlightMoment moment);
+        public delegate void LowlightRecordedDelegateEventHandler(string momentTimestamp);
 
         public override void _Ready()
         {
@@ -294,7 +294,7 @@ namespace ClawRPG.Systems.BuildHistory
                 return;
 
             _currentEntry.HighlightMoments.Add(moment);
-            OnHighlightRecorded?.Invoke(moment);
+            OnHighlightRecorded?.Invoke(moment.Timestamp.ToString());
             GD.Print($"[BuildHistory] 高光时刻: {moment.Type} - {moment.NarrativeText}");
         }
 
@@ -316,7 +316,7 @@ namespace ClawRPG.Systems.BuildHistory
             }
 
             _currentEntry.LowlightMoments.Add(moment);
-            OnLowlightRecorded?.Invoke(moment);
+            OnLowlightRecorded?.Invoke(moment.Timestamp.ToString());
             GD.Print($"[BuildHistory] 低谷时刻: {moment.Type} - {moment.NarrativeText}");
         }
 
@@ -388,7 +388,7 @@ namespace ClawRPG.Systems.BuildHistory
             while (_historyEntries.Count > 20)
                 _historyEntries.RemoveAt(0);
 
-            OnHistoryEntryCreated?.Invoke(entry);
+            OnHistoryEntryCreated?.Invoke(entry.RunIndex.ToString());
             GD.Print($"[BuildHistory] Run #{entry.RunIndex} 记录已提交 (高光:{entry.HighlightMoments.Count}, 低谷:{entry.LowlightMoments.Count})");
         }
 

@@ -24,13 +24,13 @@ namespace ClawRPG.Scripts.Systems
         
         // Godot 4 signals
         [Signal]
-        public delegate void MerchantSpawnedEventHandlerEventHandler(MysteryMerchant merchant);
+        public delegate void MerchantSpawnedEventHandlerEventHandler(string merchantId);
         [Signal]
-        public delegate void MerchantExpiredEventHandlerEventHandler(MysteryMerchant merchant);
+        public delegate void MerchantExpiredEventHandlerEventHandler(string merchantId);
         [Signal]
         public delegate void ItemPurchasedEventHandlerEventHandler(string itemId, int quantity, int price);
         [Signal]
-        public delegate void MerchantRefreshedEventHandlerEventHandler(MysteryMerchant merchant);
+        public delegate void MerchantRefreshedEventHandlerEventHandler(string merchantId);
         
         public override void _Ready()
         {
@@ -117,7 +117,7 @@ namespace ClawRPG.Scripts.Systems
             GenerateMerchantItems(merchant, itemCount, config);
             
             _activeMerchants.Add(merchant);
-            EmitSignal(nameof(MerchantSpawnedEventHandlerEventHandler), merchant);
+            EmitSignal(nameof(MerchantSpawnedEventHandlerEventHandler), merchant.MerchantId);
         }
         
         // 生成商品
@@ -217,7 +217,7 @@ namespace ClawRPG.Scripts.Systems
         {
             merchant.IsActive = false;
             _activeMerchants.Remove(merchant);
-            EmitSignal(nameof(MerchantExpiredEventHandlerEventHandler), merchant);
+            EmitSignal(nameof(MerchantExpiredEventHandlerEventHandler), merchant.MerchantId);
         }
         
         // 购买商品
@@ -303,7 +303,7 @@ namespace ClawRPG.Scripts.Systems
                 GenerateMerchantItems(merchant, itemCount, config);
             }
             
-            EmitSignal(nameof(MerchantRefreshedEventHandlerEventHandler), merchant);
+            EmitSignal(nameof(MerchantRefreshedEventHandlerEventHandler), merchant.MerchantId);
             return true;
         }
         

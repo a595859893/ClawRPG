@@ -151,12 +151,12 @@ public class PetSocialMemoryDatabase
     /// <summary>
     /// 导出存档数据
     /// </summary>
-    public System.Collections.Generic.Dictionary<string, object> ExportSaveData()
+    public Godot.Collections.Dictionary<string, Godot.Variant> ExportSaveData()
     {
         var records = new Godot.Collections.Array();
         foreach (var kvp in _memoryRecords)
         {
-            var d = new Godot.Collections.Dictionary<string, object>
+            var d = new Godot.Collections.Dictionary<string, Godot.Variant>
             {
                 { "key", kvp.Key },
                 { "pet_id_a", kvp.Value.PetIdA },
@@ -169,7 +169,7 @@ public class PetSocialMemoryDatabase
             records.Add(d);
         }
 
-        return new System.Collections.Generic.Dictionary<string, object>
+        return new Godot.Collections.Dictionary<string, Godot.Variant>
         {
             { "records", records }
         };
@@ -178,13 +178,13 @@ public class PetSocialMemoryDatabase
     /// <summary>
     /// 导入存档数据
     /// </summary>
-    public void ImportSaveData(System.Collections.Generic.Dictionary<string, object> data)
+    public void ImportSaveData(Godot.Collections.Dictionary<string, Godot.Variant> data)
     {
         _memoryRecords.Clear();
         if (data == null || !data.ContainsKey("records")) return;
 
         var records = (Godot.Collections.Array)data["records"];
-        foreach (Godot.Collections.Dictionary<string, object> rd in records)
+        foreach (Godot.Collections.Dictionary<string, Godot.Variant> rd in records)
         {
             var record = new PetSocialMemoryRecord
             {

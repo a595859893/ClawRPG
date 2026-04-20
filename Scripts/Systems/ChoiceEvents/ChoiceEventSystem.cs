@@ -26,9 +26,9 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
         [Signal]
         public delegate void EventEndedDelegateEventHandlerEventHandler(ChoiceEventType type, string eventId);
         [Signal]
-        public delegate void OptionSelectedDelegateEventHandlerEventHandler(ChoiceOption option);
+        public delegate void OptionSelectedDelegateEventHandlerEventHandler(string optionId);
         [Signal]
-        public delegate void RewardGrantedDelegateEventHandlerEventHandler(int gold, int exp, List<string> items);
+        public delegate void RewardGrantedDelegateEventHandlerEventHandler(int gold, int exp, string itemsJson);
         
         public ChoiceEventSystem()
         {
@@ -169,7 +169,7 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
             var eventTitle = selectedOption.Name;
             
             EventEnded?.Invoke(eventType, selectedOption.Name);
-            OptionSelected?.Invoke(selectedOption);
+            OptionSelected?.Invoke(selectedOption.Id);
             
             GD.Print($"Option selected: {selectedOption.Name}");
             
@@ -217,7 +217,7 @@ namespace ClawRPG.Scripts.Systems.ChoiceEvents
                 GD.Print($"Applied permanent bonuses: Atk+{option.AttackBonus} Def+{option.DefenseBonus}");
             }
             
-            RewardGranted?.Invoke(option.GoldReward, option.ExpReward, option.ItemRewards);
+            RewardGranted?.Invoke(option.GoldReward, option.ExpReward, Json.Stringify(option.ItemRewards));
         }
         
         /// <summary>

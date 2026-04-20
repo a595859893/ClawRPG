@@ -317,7 +317,7 @@ public partial class MonsterTamingUI
         }
     }
     
-    private void UpdateMonsterGrid(GridContainer grid, Array<TameableMonster> monsters, bool isWild)
+    private void UpdateMonsterGrid(GridContainer grid, Godot.Collections.Array monsters, bool isWild)
     {
         // Clear existing
         foreach (var child in grid.GetChildren())

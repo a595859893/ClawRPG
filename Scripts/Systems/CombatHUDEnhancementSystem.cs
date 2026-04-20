@@ -87,7 +87,7 @@ public partial class CombatHUDEnhancementSystem : BaseSystem
 	
 	// Signals (Godot 4 compatible)
 	[Signal]
-	public delegate void CombatEndedDelegateEventHandlerEventHandler(CombatHUDEnhancementData.CombatRating rating);
+	public delegate void CombatEndedDelegateEventHandlerEventHandler(string ratingGrade);
 	[Signal]
 	public delegate void ComboChangedDelegateEventHandlerEventHandler(int combo);
 	[Signal]
@@ -125,7 +125,7 @@ public partial class CombatHUDEnhancementSystem : BaseSystem
 		_currentSession.PlayerStats.MaxCombo = Math.Max(_currentSession.PlayerStats.MaxCombo, _currentCombo);
 		
 		var rating = CalculateCombatRating();
-		CombatEnded.Emit(rating);
+		CombatEnded.Emit(rating.Grade);
 	}
 	
 	public void RecordDamageDealt(int damage, bool isCritical, string enemyId, string enemyName)

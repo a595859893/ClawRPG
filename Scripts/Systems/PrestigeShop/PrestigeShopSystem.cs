@@ -21,10 +21,10 @@ namespace ClawRPG.Scripts.Systems.PrestigeShop
 
         // Signal definitions
         [Signal]
-        public delegate void ItemUnlockedEventHandler(string itemId, ShopItem item);
+        public delegate void ItemUnlockedEventHandler(string itemId, string itemId2);
 
         [Signal]
-        public delegate void ItemPurchasedEventHandler(string itemId, ShopItem item, int cost);
+        public delegate void ItemPurchasedEventHandler(string itemId, string itemId2, int cost);
 
         [Signal]
         public delegate void TierAutoUnlockedEventHandler(string itemId, int tierLevel, string tierName);
@@ -116,7 +116,7 @@ namespace ClawRPG.Scripts.Systems.PrestigeShop
             state.Unlocked = true;
             state.Purchased = false; // Auto-unlock
             state.PurchasedAtTier = tierLevel;
-            EmitSignal(SignalName.ItemUnlocked, item.ItemId, item);
+            EmitSignal(SignalName.ItemUnlocked, item.ItemId, item.ItemId);
             GD.Print($"[PrestigeShop] Auto-unlocked '{item.ItemId}' at tier {tierLevel} ({item.TierName})");
 
             // Integrate with TitleSystem for Title category items
@@ -195,7 +195,7 @@ namespace ClawRPG.Scripts.Systems.PrestigeShop
             state.Purchased = true;
             state.PurchasedAtTier = _prestigeSystem.PrestigeLevel;
 
-            EmitSignal(SignalName.ItemPurchased, itemId, item, item.Cost);
+            EmitSignal(SignalName.ItemPurchased, itemId, item.ItemId, item.Cost);
 
             // Integrate with TitleSystem for Title category items
             if (item.Category == ShopCategory.Title)

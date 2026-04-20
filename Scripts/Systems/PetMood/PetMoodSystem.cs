@@ -17,7 +17,7 @@ namespace ClawRPG.Scripts.Systems.PetMood {
         [Signal]
         public delegate void PetMoodChangedDelegateEventHandlerEventHandler(string petId, PetMoodType mood);
         [Signal]
-        public delegate void MoodEffectTriggeredDelegateEventHandlerEventHandler(string petId, PetMoodEffect effect);
+        public delegate void MoodEffectTriggeredDelegateEventHandlerEventHandler(string petId, string effectId);
         [Signal]
         public delegate void MoodDecayAppliedDelegateEventHandlerEventHandler(string petId);
         
@@ -155,7 +155,7 @@ namespace ClawRPG.Scripts.Systems.PetMood {
             var effects = _database.GetEffectsForMood(mood);
             
             foreach (var effect in effects) {
-                MoodEffectTriggered.Emit(petId, effect);
+                MoodEffectTriggered.Emit(petId, effect.EffectId);
             }
         }
 

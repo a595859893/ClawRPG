@@ -32,7 +32,7 @@ public partial class LinearSync : BaseSystem
     // ── Signals ──────────────────────────────────────────────────────────────
 
     [Signal]
-    public delegate void SyncCompletedEventHandler(SyncStats stats);
+    public delegate void SyncCompletedEventHandler(string lastError);
 
     [Signal]
     public delegate void SyncProgressEventHandler(int current, int total, string currentReq);
@@ -120,7 +120,7 @@ public partial class LinearSync : BaseSystem
         if (processed >= total)
         {
             LastSyncStats.TotalProcessed = total;
-            EmitSignal(SyncCompletedSignal, LastSyncStats);
+            EmitSignal(SyncCompletedSignal, LastSyncStats.LastError);
             onComplete?.Invoke(LastSyncStats);
             return;
         }

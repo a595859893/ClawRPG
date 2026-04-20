@@ -11,7 +11,7 @@ namespace ClawRPG.Scripts.Systems {
         public static AutoBookmarkSystem Instance { get; private set; }
         
         // Signals
-        [Signal] public delegate void OnAutoBookmarkAddedEventHandlerEventHandler(Bookmark bookmark, string trigger);
+        [Signal] public delegate void OnAutoBookmarkAddedEventHandlerEventHandler(string bookmarkId, string trigger);
         
         // Settings
         [Export] public bool AutoBookmarkBoss = true;
@@ -73,7 +73,7 @@ namespace ClawRPG.Scripts.Systems {
                 
                 if (added) {
                     OnAutoBookmarkAddedEventHandlerEventHandler?.Invoke(
-                        bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1],
+                        bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1].Id.ToString(),
                         "boss_defeat"
                     );
                     GD.Print($"[AutoBookmarkSystem] Added boss bookmark: {bossName}");
@@ -107,7 +107,7 @@ namespace ClawRPG.Scripts.Systems {
                 
                 if (added) {
                     OnAutoBookmarkAddedEventHandlerEventHandler?.Invoke(
-                        bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1],
+                        bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1].Id.ToString(),
                         "shop_discovered"
                     );
                     GD.Print($"[AutoBookmarkSystem] Added shop bookmark: {shopName}");
@@ -141,7 +141,7 @@ namespace ClawRPG.Scripts.Systems {
                 
                 if (added) {
                     OnAutoBookmarkAddedEventHandlerEventHandler?.Invoke(
-                        bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1],
+                        bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1].Id.ToString(),
                         "quest_updated"
                     );
                     GD.Print($"[AutoBookmarkSystem] Added quest bookmark: {questName}");
@@ -175,7 +175,7 @@ namespace ClawRPG.Scripts.Systems {
                 
                 if (added) {
                     OnAutoBookmarkAddedEventHandlerEventHandler?.Invoke(
-                        bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1],
+                        bookmarkSystem.PlayerBookmarks[bookmarkSystem.PlayerBookmarks.Count - 1].Id.ToString(),
                         "waypoint_discovered"
                     );
                     GD.Print($"[AutoBookmarkSystem] Added waypoint bookmark: {waypointName}");

@@ -34,7 +34,7 @@ public partial class MysteryTreasureSystem : BaseSystem
     [Signal]
     public delegate void TreasureFoundDelegateEventHandlerEventHandler(string treasureId, Vector2 position);
     [Signal]
-    public delegate void TreasureOpenedDelegateEventHandlerEventHandler(string treasureId, Dictionary<string, int> rewards);
+    public delegate void TreasureOpenedDelegateEventHandlerEventHandler(string treasureId, string rewardsJson);
     [Signal]
     public delegate void TreasureDiscoveredDelegateEventHandlerEventHandler(string treasureId);
     [Signal]
@@ -186,7 +186,7 @@ public partial class MysteryTreasureSystem : BaseSystem
         UpdatePlayerData(treasure, rewards);
         
         // 发送信号
-        EmitSignal(nameof(TreasureOpenedDelegateEventHandlerEventHandler), treasure.TreasureId, rewards);
+        EmitSignal(nameof(TreasureOpenedDelegateEventHandlerEventHandler), treasure.TreasureId, Json.Stringify(rewards));
         
         // 移除已打开的宝藏
         _activeTreasures.Remove(instance);

@@ -20,7 +20,7 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
 
         // Signals
         [Signal]
-        public delegate void BiographyUnlockedEventHandler(string titleId, TitleBiographyData biography);
+        public delegate void BiographyUnlockedEventHandler(string titleId, string biographyTitleId);
         [Signal]
         public delegate void BiographyPanelRequestedEventHandler();
 
@@ -110,7 +110,7 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
             _biographies[titleData.TitleId] = bioData;
 
             GD.Print($"[TitleBiographySystem] Biography generated for: {titleData.TitleName}");
-            EmitSignal(SignalName.BiographyUnlocked, titleData.TitleId, bioData);
+            EmitSignal(SignalName.BiographyUnlocked, titleData.TitleId, bioData.TitleId);
         }
 
         /// <summary>

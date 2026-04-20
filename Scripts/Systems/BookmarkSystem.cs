@@ -90,9 +90,9 @@ namespace ClawRPG.Scripts.Systems {
         public static BookmarkSystem Instance { get; private set; }
         
         // Signals for bookmark events
-        [Signal] public delegate void OnBookmarkAddedEventHandlerEventHandler(Bookmark bookmark);
+        [Signal] public delegate void OnBookmarkAddedEventHandlerEventHandler(string bookmarkId);
         [Signal] public delegate void OnBookmarkRemovedEventHandlerEventHandler(int bookmarkId);
-        [Signal] public delegate void OnBookmarkUpdatedEventHandlerEventHandler(Bookmark bookmark);
+        [Signal] public delegate void OnBookmarkUpdatedEventHandlerEventHandler(string bookmarkId);
         
         // Player's bookmarks
         public List<Bookmark> PlayerBookmarks { get; private set; } = new();
@@ -121,7 +121,7 @@ namespace ClawRPG.Scripts.Systems {
             };
             
             PlayerBookmarks.Add(bookmark);
-            OnBookmarkAddedEventHandlerEventHandler?.Invoke(bookmark);
+            OnBookmarkAddedEventHandlerEventHandler?.Invoke(bookmark.Id.ToString());
             
             GD.Print($"[BookmarkSystem] Added bookmark: {name} at {position}");
             return true;
@@ -149,7 +149,7 @@ namespace ClawRPG.Scripts.Systems {
             if (bookmark != null) {
                 if (!string.IsNullOrEmpty(newName)) bookmark.Name = newName;
                 if (newNote != null) bookmark.Note = newNote;
-                OnBookmarkUpdatedEventHandlerEventHandler?.Invoke(bookmark);
+                OnBookmarkUpdatedEventHandlerEventHandler?.Invoke(bookmark.Id.ToString());
                 return true;
             }
             return false;
