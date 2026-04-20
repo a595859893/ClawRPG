@@ -1,6 +1,5 @@
 using Godot;
 using ClawRPG.Systems.AuctionHouse;
-using AuctionItem = ClawRPG.Systems.AuctionHouse.AuctionItem;
 using System;
 using System.Collections.Generic;
 

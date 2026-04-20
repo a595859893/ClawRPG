@@ -71,11 +71,11 @@ namespace ClawRPG.Scripts.Systems
 
         // Signals
         [Signal]
-        public delegate void PurchaseCompleted(string shopId, string itemId, int quantity);
+        public delegate void PurchaseCompletedEventHandler(string shopId, string itemId, int quantity);
         [Signal]
-        public delegate void ShopRefreshed(string shopId);
+        public delegate void ShopRefreshedEventHandler(string shopId);
         [Signal]
-        public delegate void ItemSold(string shopId, string itemId, int quantity);
+        public delegate void ItemSoldEventHandler(string shopId, string itemId, int quantity);
 
         public override void _Ready()
         {

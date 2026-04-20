@@ -19,22 +19,22 @@ namespace ClawRPG.Scripts.Systems
         
         // Signals for UI and game integration (Godot 4 compatible)
         [Signal]
-        public delegate void ComboChainChanged(string petId, int chain);
+        public delegate void ComboChainChangedEventHandler(string petId, int chain);
         [Signal]
-        public delegate void RoleChanged(string petId, string role);
+        public delegate void RoleChangedEventHandler(string petId, string role);
         [Signal]
-        public delegate void SyncLevelChanged(string petId, float syncLevel);
+        public delegate void SyncLevelChangedEventHandler(string petId, float syncLevel);
         [Signal]
-        public delegate void ComboExecuted(string petId, ComboType comboType, float syncLevel);
+        public delegate void ComboExecutedEventHandler(string petId, ComboType comboType, float syncLevel);
         [Signal]
-        public delegate void LearningUpdated(string petId, string learning);
+        public delegate void LearningUpdatedEventHandler(string petId, string learning);
         [Signal]
-        public delegate void PositionRecommendation(string petId, Vector2 position);
+        public delegate void PositionRecommendationEventHandler(string petId, Vector2 position);
         /// <summary>
         /// 宠物协同攻击触发（REQ-136）：玩家combo触发后，宠物根据syncLevel概率发动协战
         /// </summary>
         [Signal]
-        public delegate void SynergyAttackTriggered(string petId, string attackType, float syncLevel);
+        public delegate void SynergyAttackTriggeredEventHandler(string petId, string attackType, float syncLevel);
 
         public override void _Ready()
         {
