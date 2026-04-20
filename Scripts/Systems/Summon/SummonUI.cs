@@ -171,14 +171,14 @@ public partial class SummonUI : Control
 		// Name
 		var nameLabel = new Label();
 		nameLabel.Text = summon.Name;
-		nameLabel.Align = Label.AlignEnum.Center;
+		nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		nameLabel.AddThemeFontSizeOverride("font_size", 16);
 		vbox.AddChild(nameLabel);
 		
 		// Type and Rarity
 		var typeLabel = new Label();
 		typeLabel.Text = $"{summon.Type} | {summon.Rarity}";
-		typeLabel.Align = Label.AlignEnum.Center;
+		typeLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		typeLabel.AddThemeFontSizeOverride("font_size", 12);
 		vbox.AddChild(typeLabel);
 		
@@ -193,7 +193,7 @@ public partial class SummonUI : Control
 		var isUnlocked = summonSystem.IsSummonUnlocked(summon.SummonId);
 		var statusLabel = new Label();
 		statusLabel.Text = isUnlocked ? "已解锁" : "未解锁";
-		statusLabel.Align = Label.AlignEnum.Center;
+		statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		statusLabel.Modulate = isUnlocked ? new Color(0, 1, 0) : new Color(1, 0, 0);
 		vbox.AddChild(statusLabel);
 		

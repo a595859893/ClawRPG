@@ -74,7 +74,7 @@ namespace ClawRPG.Scripts.UI {
             _titleLabel.AddThemeFontSizeOverride("font_size", 24);
             header.AddChild(_titleLabel);
             
-            header.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlagsExpand });
+            header.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
             
             _skillPointsLabel = new Label();
             _skillPointsLabel.Text = "技能点: 0";

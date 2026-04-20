@@ -88,7 +88,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
             
             // 标签页容器
             _tabContainer = new TabContainer();
-            _tabContainer.SetVSizeFlags(Control.SizeFlags.Expand);
+            _tabContainer.SizeFlagsVertical = Control.SizeFlags.Expand;
             _mainContainer.AddChild(_tabContainer);
             
             // 创建标签页
@@ -168,7 +168,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
             
             // 统计内容
             var statsScroll = new ScrollContainer();
-            statsScroll.SetVSizeFlags(Control.SizeFlags.Expand);
+            statsScroll.SizeFlagsVertical = Control.SizeFlags.Expand;
             statsContainer.AddChild(statsScroll);
             
             var statsGrid = new GridContainer();

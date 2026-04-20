@@ -533,9 +533,9 @@ namespace ClawRPG.Systems.BuildHistory
 
         #region Events
 
-        public event Action<BuildHistoryEntry> OnHistoryEntryCreated;
-        public event Action<HighlightMoment> OnHighlightRecorded;
-        public event Action<LowlightMoment> OnLowlightRecorded;
+        public event Action<string> OnHistoryEntryCreated;
+        public event Action<string> OnHighlightRecorded;
+        public event Action<string> OnLowlightRecorded;
 
         #endregion
     }

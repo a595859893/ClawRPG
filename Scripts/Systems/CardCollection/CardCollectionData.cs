@@ -53,7 +53,7 @@ public class CardCollectionData
         data["owned_cards"] = new Dictionary(OwnedCards);
         
         // 喜欢的卡牌
-        data["favorite_cards"] = new Array(FavoriteCards);
+        data["favorite_cards"] = new Godot.Collections.Array(FavoriteCards);
         
         // 统计数据
         data["total_unique_cards"] = TotalUniqueCards;
@@ -64,7 +64,7 @@ public class CardCollectionData
         data["packs_opened"] = PacksOpened;
         
         // 获取历史
-        var historyList = new Array();
+        var historyList = new Godot.Collections.Array();
         foreach (var record in ObtainHistory)
         {
             var recordDict = new Dictionary
@@ -82,7 +82,7 @@ public class CardCollectionData
         data["unlocked_categories"] = new Dictionary(UnlockedCategories);
         
         // 可用于组卡的卡牌
-        data["deck_buildable_cards"] = new Array(DeckBuildableCards);
+        data["deck_buildable_cards"] = new Godot.Collections.Array(DeckBuildableCards);
         
         return data;
     }

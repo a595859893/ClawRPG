@@ -62,7 +62,7 @@ namespace ClawRPG.Scripts.UI {
             // 标题
             _titleLabel = new Label();
             _titleLabel.Text = "🐴 坐 骑 系 统 🐴";
-            _titleLabel.Align = Label.AlignEnum.Center;
+            _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _titleLabel.AddThemeFontSizeOverride("font_size", 24);
             _titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.5f, 1f));
             _mainVBox.AddChild(_titleLabel);
@@ -106,7 +106,7 @@ namespace ClawRPG.Scripts.UI {
 
             _detailsLabel = new Label();
             _detailsLabel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-            _detailsLabel.Align = Label.AlignEnum.Center;
+            _detailsLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _detailsLabel.Text = "选择一个坐骑查看详情";
             _detailsLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f, 1f));
             detailsVBox.AddChild(_detailsLabel);
@@ -114,7 +114,7 @@ namespace ClawRPG.Scripts.UI {
             // 无坐骑提示
             _noMountsLabel = new Label();
             _noMountsLabel.Text = "暂无坐骑\n\n可以通过商店购买或在\n探索中发现新的坐骑！";
-            _noMountsLabel.Align = Label.AlignEnum.Center;
+            _noMountsLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _noMountsLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f, 1f));
             _noMountsLabel.Visible = false; 
             detailsVBox.AddChild(_noMountsLabel);

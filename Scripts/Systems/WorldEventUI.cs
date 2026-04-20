@@ -49,8 +49,8 @@ public partial class WorldEventUI : Control
         _titleLabel.Text = "⚔️ 世界事件";
         _titleLabel.RectPosition = new Vector2(0, 10);
         _titleLabel.SetAnchorsPreset(Control.AnchorsPreset.TopWide);
-        _titleLabel.Align = Label.AlignEnum.Center;
-        _titleLabel.AddColorOverride("font_color", new Color(1f, 0.9f, 0.7f, 1f));
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        _titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.7f, 1f));
         _titleLabel.RectMinSize = new Vector2(0, 40);
         background.AddChild(_titleLabel);
 
@@ -76,7 +76,7 @@ public partial class WorldEventUI : Control
         _activeEventsLabel = new Label();
         _activeEventsLabel.Text = "当前进行中的世界事件:";
         _activeEventsLabel.RectPosition = new Vector2(10, 10);
-        _activeEventsLabel.AddColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
+        _activeEventsLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
         activeTab.AddChild(_activeEventsLabel);
 
         _eventListContainer = new VBoxContainer();
@@ -87,8 +87,8 @@ public partial class WorldEventUI : Control
         _noEventsLabel = new Label();
         _noEventsLabel.Text = "暂无进行中的事件\n\n世界事件将随机触发\n请留意游戏公告!";
         _noEventsLabel.RectPosition = new Vector2(10, 100);
-        _noEventsLabel.Align = Label.AlignEnum.Center;
-        _noEventsLabel.AddColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f, 1f));
+        _noEventsLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        _noEventsLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f, 1f));
         activeTab.AddChild(_noEventsLabel);
 
         // History tab
@@ -99,7 +99,7 @@ public partial class WorldEventUI : Control
         Label historyTitle = new Label();
         historyTitle.Text = "事件历史记录:";
         historyTitle.RectPosition = new Vector2(10, 10);
-        historyTitle.AddColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
+        historyTitle.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
         historyTab.AddChild(historyTitle);
 
         _historyContainer = new VBoxContainer();
@@ -114,7 +114,7 @@ public partial class WorldEventUI : Control
 
         _statsLabel = new Label();
         _statsLabel.RectPosition = new Vector2(20, 20);
-        _statsLabel.AddColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
+        _statsLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
         statsTab.AddChild(_statsLabel);
 
         // Hint label
@@ -122,8 +122,8 @@ public partial class WorldEventUI : Control
         hintLabel.Text = "按 E 键切换显示";
         hintLabel.RectPosition = new Vector2(0, 555);
         hintLabel.SetAnchorsPreset(Control.AnchorsPreset.BottomWide);
-        hintLabel.Align = Label.AlignEnum.Center;
-        hintLabel.AddColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f, 1f));
+        hintLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        hintLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f, 1f));
         background.AddChild(hintLabel);
     }
 
@@ -221,7 +221,7 @@ public partial class WorldEventUI : Control
             {
                 Label historyItem = new Label();
                 historyItem.Text = $"• {evt.name}";
-                historyItem.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f, 1f));
+                historyItem.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f, 1f));
                 _historyContainer.AddChild(historyItem);
             }
         }
@@ -343,7 +343,7 @@ public partial class WorldEventUI : Control
             Label nameLabel = new Label();
             nameLabel.Text = $"⚡ {_event.name}";
             nameLabel.RectPosition = new Vector2(15, 10);
-            nameLabel.AddColorOverride("font_color", typeColor);
+            nameLabel.AddThemeColorOverride("font_color", typeColor);
             nameLabel.RectMinSize = new Vector2(0, 30);
             bg.AddChild(nameLabel);
 
@@ -370,14 +370,14 @@ public partial class WorldEventUI : Control
 
             statusLabel.Text = statusText;
             statusLabel.RectPosition = new Vector2(600, 10);
-            statusLabel.AddColorOverride("font_color", statusColor);
+            statusLabel.AddThemeColorOverride("font_color", statusColor);
             bg.AddChild(statusLabel);
 
             // Description
             Label descLabel = new Label();
             descLabel.Text = _event.description;
             descLabel.RectPosition = new Vector2(15, 45);
-            descLabel.AddColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
+            descLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1f));
             descLabel.RectMinSize = new Vector2(0, 40);
             bg.AddChild(descLabel);
 
@@ -387,7 +387,7 @@ public partial class WorldEventUI : Control
             int seconds = _event.timeRemaining % 60;
             timeLabel.Text = $"⏱️ 剩余时间: {minutes}:{seconds:D2}";
             timeLabel.RectPosition = new Vector2(15, 90);
-            timeLabel.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f, 1f));
+            timeLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f, 1f));
             bg.AddChild(timeLabel);
 
             // Rewards
@@ -400,7 +400,7 @@ public partial class WorldEventUI : Control
             Label rewardLabel = new Label();
             rewardLabel.Text = rewardText;
             rewardLabel.RectPosition = new Vector2(250, 90);
-            rewardLabel.AddColorOverride("font_color", new Color(1f, 0.9f, 0.5f, 1f));
+            rewardLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.5f, 1f));
             bg.AddChild(rewardLabel);
 
             // Participate button
@@ -421,7 +421,7 @@ public partial class WorldEventUI : Control
             Label partLabel = new Label();
             partLabel.Text = $"👥 参与人数: {_event.participantCount}";
             partLabel.RectPosition = new Vector2(15, 115);
-            partLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f, 1f));
+            partLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f, 1f));
             bg.AddChild(partLabel);
         }
 

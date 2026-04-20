@@ -40,7 +40,7 @@ public partial class LuckUI : Control
         // 标题
         var title = new Label();
         title.Text = "🎲 运气系统";
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.AddFontOverride("font", GD.Load<DynamicFont>("res://fonts/title_font.tres"));
         mainContainer.AddChild(title);
         
@@ -132,7 +132,7 @@ public partial class LuckUI : Control
         // 快捷键
         var shortcutLabel = new Label();
         shortcutLabel.Text = "快捷键: L 切换显示";
-        shortcutLabel.Align = Label.AlignEnum.Center;
+        shortcutLabel.HorizontalAlignment = HorizontalAlignment.Center;
         mainContainer.AddChild(shortcutLabel);
     }
     

@@ -462,7 +462,7 @@ public partial class RandomEventSystem : BaseSystem
         data["total_exp_from_events"] = _stats.totalExpFromEvents;
         
         // 活跃效果
-        var activeEffects = new Array();
+        var activeEffects = new Godot.Collections.Array();
         foreach (var effect in _stats.activeEffects)
         {
             activeEffects.Add(effect);

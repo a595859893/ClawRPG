@@ -50,8 +50,8 @@ public partial class DynamicMarketTaxUI : Control
         // 标题
         _titleLabel = new Label();
         _titleLabel.Text = "  📊 动态市场税率系统  ";
-        _titleLabel.Align = Label.AlignEnum.Center;
-        _titleLabel.AddColorOverride("font_color", new Color(1, 0.84f, 0));
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        _titleLabel.AddThemeColorOverride("font_color", new Color(1, 0.84f, 0));
         _mainContainer.AddChild(_titleLabel);
         
         // 分隔线
@@ -60,19 +60,19 @@ public partial class DynamicMarketTaxUI : Control
         // 税率显示
         _taxRateLabel = new Label();
         _taxRateLabel.Text = "当前税率: 5.0%";
-        _taxRateLabel.Align = Label.AlignEnum.Center;
+        _taxRateLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _mainContainer.AddChild(_taxRateLabel);
         
         // 市场热度
         _marketActivityLabel = new Label();
         _marketActivityLabel.Text = "市场热度: 50%";
-        _marketActivityLabel.Align = Label.AlignEnum.Center;
+        _marketActivityLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _mainContainer.AddChild(_marketActivityLabel);
         
         // 市场趋势
         _marketTrendLabel = new Label();
         _marketTrendLabel.Text = "市场趋势: Stable";
-        _marketTrendLabel.Align = Label.AlignEnum.Center;
+        _marketTrendLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _mainContainer.AddChild(_marketTrendLabel);
         
         // 分隔线
@@ -81,7 +81,7 @@ public partial class DynamicMarketTaxUI : Control
         // 统计信息
         _statisticsLabel = new Label();
         _statisticsLabel.Text = "统计信息:\n总交易: 0\n总税收: 0\n总交易额: 0\n平均交易额: 0\n峰值交易额: 0";
-        _statisticsLabel.Align = Label.AlignEnum.Center;
+        _statisticsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _mainContainer.AddChild(_statisticsLabel);
         
         // 分隔线
@@ -183,7 +183,7 @@ public partial class DynamicMarketTaxUI : Control
         float activity = (float)stats["marketActivity"];
         string activityColor = activity > 70 ? "#FF6B6B" : (activity < 30 ? "#4ECDC4" : "#FFFFFF");
         _marketActivityLabel.Text = $"市场热度: {activity:F1}%";
-        _marketActivityLabel.AddColorOverride("font_color", new Color(activityColor));
+        _marketActivityLabel.AddThemeColorOverride("font_color", new Color(activityColor));
         
         string trend = (string)stats["marketTrend"];
         string trendEmoji = trend == "Rising" ? "📈" : (trend == "Falling" ? "📉" : "➡️");

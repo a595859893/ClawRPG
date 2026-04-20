@@ -63,12 +63,12 @@ public partial class BossMechanicsUI : Control
         // 标题
         _titleLabel = new Label();
         _titleLabel.Text = "=== Boss 战斗系统 ===";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         mainVBox.AddChild(_titleLabel);
 
         // 标签页容器
         _tabContainer = new TabContainer();
-        _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+        _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         mainVBox.AddChild(_tabContainer);
 
         // 创建标签页
@@ -79,7 +79,7 @@ public partial class BossMechanicsUI : Control
         // 底部说明
         var hintLabel = new Label();
         hintLabel.Text = "[↑/↓] 选择 | [1-3] 切换标签页 | [Enter] 开始战斗 | [ESC] 关闭";
-        hintLabel.Align = Label.AlignEnum.Center;
+        hintLabel.HorizontalAlignment = HorizontalAlignment.Center;
         mainVBox.AddChild(hintLabel);
     }
 
@@ -100,7 +100,7 @@ public partial class BossMechanicsUI : Control
         vbox.AddChild(listLabel);
 
         _bossList = new ItemList();
-        _bossList.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+        _bossList.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _bossList.ItemSelected += OnBossListItemSelected;
         vbox.AddChild(_bossList);
 
@@ -130,7 +130,7 @@ public partial class BossMechanicsUI : Control
         // Boss血条
         _bossNameLabel = new Label();
         _bossNameLabel.Text = "等待挑战...";
-        _bossNameLabel.Align = Label.AlignEnum.Center;
+        _bossNameLabel.HorizontalAlignment = HorizontalAlignment.Center;
         vbox.AddChild(_bossNameLabel);
 
         _bossHealthBar = new ConfidenceFloorHealthBar();
@@ -167,7 +167,7 @@ public partial class BossMechanicsUI : Control
         vbox.AddChild(skillLabel);
 
         _skillList = new VBoxContainer();
-        _skillList.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+        _skillList.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         vbox.AddChild(_skillList);
 
         // 战斗统计
@@ -203,7 +203,7 @@ public partial class BossMechanicsUI : Control
         vbox.AddChild(historyLabel);
 
         _historyList = new ItemList();
-        _historyList.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+        _historyList.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         vbox.AddChild(_historyList);
     }
 
@@ -252,7 +252,7 @@ public partial class BossMechanicsUI : Control
         }
     }
 
-    private void OnBossListItemSelected(int index)
+    private void OnBossListItemSelected(long index)
     {
         var bosses = _bossSystem.GetAllBossConfigs();
         int i = 0;

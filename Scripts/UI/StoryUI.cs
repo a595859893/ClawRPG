@@ -65,7 +65,7 @@ namespace ClawRPG.Scripts.UI {
                 Align = Label.AlignEnum.Center,
                 SelfModulate = new Color(1f, 0.9f, 0.5f, 1f)
             };
-            titleLabel.AddColorOverride("font_color", new Color(1f, 0.9f, 0.5f, 1f));
+            titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.5f, 1f));
             panel.AddChild(titleLabel);
             
             // Close button
@@ -87,7 +87,7 @@ namespace ClawRPG.Scripts.UI {
                 AnchorRight = 0.95f,
                 Align = Label.AlignEnum.Center
             };
-            currentChapterLabel.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.9f, 1f));
+            currentChapterLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.9f, 1f));
             panel.AddChild(currentChapterLabel);
             
             // Chapter list scroll container
@@ -163,14 +163,14 @@ namespace ClawRPG.Scripts.UI {
                 Text = $"第{chapter.ChapterId}章",
                 SelfModulate = chapter.IsCompleted ? completedColor : (chapter.IsUnlocked ? unlockedColor : lockedColor)
             };
-            chapterNum.AddColorOverride("font_color", chapter.IsCompleted ? completedColor : (chapter.IsUnlocked ? unlockedColor : lockedColor));
+            chapterNum.AddThemeColorOverride("font_color", chapter.IsCompleted ? completedColor : (chapter.IsUnlocked ? unlockedColor : lockedColor));
             header.AddChild(chapterNum);
             
             var title = new Label {
                 Text = $" {chapter.Title}",
                 SelfModulate = chapter.IsCompleted ? completedColor : (chapter.IsUnlocked ? Colors.White : lockedColor)
             };
-            title.AddColorOverride("font_color", chapter.IsCompleted ? completedColor : (chapter.IsUnlocked ? Colors.White : lockedColor));
+            title.AddThemeColorOverride("font_color", chapter.IsCompleted ? completedColor : (chapter.IsUnlocked ? Colors.White : lockedColor));
             header.AddChild(title);
             
             var statusLabel = new Label {
@@ -178,7 +178,7 @@ namespace ClawRPG.Scripts.UI {
                 Align = Label.AlignEnum.Right,
                 SizeFlagsHorizontal = SizeFlags.Expand
             };
-            statusLabel.AddColorOverride("font_color", chapter.IsCompleted ? completedColor : (isCurrent ? inProgressColor : lockedColor));
+            statusLabel.AddThemeColorOverride("font_color", chapter.IsCompleted ? completedColor : (isCurrent ? inProgressColor : lockedColor));
             header.AddChild(statusLabel);
             
             // Description
@@ -186,7 +186,7 @@ namespace ClawRPG.Scripts.UI {
                 Text = chapter.Description,
                 SelfModulate = new Color(0.7f, 0.7f, 0.8f, 1f)
             };
-            desc.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.8f, 1f));
+            desc.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.8f, 1f));
             desc.Autowrap = true;
             vbox.AddChild(desc);
             
@@ -196,7 +196,7 @@ namespace ClawRPG.Scripts.UI {
                     Text = "目标:",
                     SelfModulate = new Color(0.6f, 0.6f, 0.7f, 1f)
                 };
-                objHeader.AddColorOverride("font_color", new Color(0.6f, 0.6f, 0.7f, 1f));
+                objHeader.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.7f, 1f));
                 vbox.AddChild(objHeader);
                 
                 foreach (var obj in chapter.Objectives) {
@@ -209,7 +209,7 @@ namespace ClawRPG.Scripts.UI {
                         Text = objText,
                         SelfModulate = obj.CurrentCount >= obj.TargetCount ? completedColor : new Color(0.8f, 0.8f, 0.85f, 1f)
                     };
-                    objLabel.AddColorOverride("font_color", obj.CurrentCount >= obj.TargetCount ? completedColor : new Color(0.8f, 0.8f, 0.85f, 1f));
+                    objLabel.AddThemeColorOverride("font_color", obj.CurrentCount >= obj.TargetCount ? completedColor : new Color(0.8f, 0.8f, 0.85f, 1f));
                     vbox.AddChild(objLabel);
                 }
                 
@@ -234,7 +234,7 @@ namespace ClawRPG.Scripts.UI {
                         Text = rewardText,
                         SelfModulate = new Color(1f, 0.85f, 0.4f, 1f)
                     };
-                    rewardLabel.AddColorOverride("font_color", new Color(1f, 0.85f, 0.4f, 1f));
+                    rewardLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.4f, 1f));
                     vbox.AddChild(rewardLabel);
                 }
             }

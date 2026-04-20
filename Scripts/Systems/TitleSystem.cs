@@ -666,7 +666,7 @@ public partial class TitleSystem : BaseSystem
         var data = new Dictionary<string, object>();
         
         // 保存已解锁称号
-        data["unlocked_titles"] = new Array(_unlockedTitles);
+        data["unlocked_titles"] = new Godot.Collections.Array(_unlockedTitles);
         
         // 保存已装备称号
         data["equipped_title"] = _equippedTitle;

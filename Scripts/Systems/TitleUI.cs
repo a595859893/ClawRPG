@@ -238,7 +238,7 @@ public partial class TitleUI : Control
         PopulateTitleList();
     }
 
-    private void OnTitleSelected(int index)
+    private void OnTitleSelected(long index)
     {
         if (index < 0 || index >= _displayedTitles.Count) return;
 

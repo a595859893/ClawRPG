@@ -332,7 +332,7 @@ public partial class MountBattleArenaUI : Control
         RefreshArenaList();
     }
     
-    private void OnArenaSelected(int index)
+    private void OnArenaSelected(long index)
     {
         var arenas = MountBattleArenaSystem.Instance.GetAllArenas();
         

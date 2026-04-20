@@ -64,15 +64,15 @@ public partial class RandomNameUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "🎲 Random Name Generator";
-        _titleLabel.Align = Label.AlignEnum.Center;
-        _titleLabel.AddColorOverride("font_color", _titleColor);
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        _titleLabel.AddThemeColorOverride("font_color", _titleColor);
         _titleLabel.RectMinSize = new Vector2(0, 40);
         mainVBox.AddChild(_titleLabel);
         
         // Style selection
         var styleLabel = new Label();
         styleLabel.Text = "Name Style:";
-        styleLabel.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
+        styleLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
         mainVBox.AddChild(styleLabel);
         
         _styleOption = new OptionButton();
@@ -88,7 +88,7 @@ public partial class RandomNameUI : Control
         // Gender selection
         var genderLabel = new Label();
         genderLabel.Text = "Gender:";
-        genderLabel.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
+        genderLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
         mainVBox.AddChild(genderLabel);
         
         _genderOption = new OptionButton();
@@ -101,8 +101,8 @@ public partial class RandomNameUI : Control
         // Generated name display
         _nameLabel = new Label();
         _nameLabel.Text = "Press Generate to create a name";
-        _nameLabel.Align = Label.AlignEnum.Center;
-        _nameLabel.AddColorOverride("font_color", new Color(1f, 1f, 1f));
+        _nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        _nameLabel.AddThemeColorOverride("font_color", new Color(1f, 1f, 1f));
         _nameLabel.RectMinSize = new Vector2(0, 50);
         mainVBox.AddChild(_nameLabel);
         
@@ -130,19 +130,19 @@ public partial class RandomNameUI : Control
         // Stats
         var statsTitle = new Label();
         statsTitle.Text = "Statistics:";
-        statsTitle.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+        statsTitle.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
         mainVBox.AddChild(statsTitle);
         
         _statsLabel = new Label();
         _statsLabel.Text = "Total Generated: 0";
-        _statsLabel.AddColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+        _statsLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
         _statsLabel.RectMinSize = new Vector2(0, 60);
         mainVBox.AddChild(_statsLabel);
         
         // History
         var historyTitle = new Label();
         historyTitle.Text = "Recent Names:";
-        historyTitle.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+        historyTitle.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
         mainVBox.AddChild(historyTitle);
         
         _historyContainer = new VBoxContainer();
@@ -213,7 +213,7 @@ public partial class RandomNameUI : Control
         {
             var label = new Label();
             label.Text = "• " + name;
-            label.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+            label.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
             _historyContainer.AddChild(label);
         }
     }

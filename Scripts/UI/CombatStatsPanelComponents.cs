@@ -92,7 +92,7 @@ namespace ClawRPG.Scripts.UI {
             {
                 Text = label + ":",
                 HorizontalAlignment = HorizontalAlignment.Left,
-                SizeFlagsHorizontal = SizeFlags.Expand
+                SizeFlagsHorizontal = Control.SizeFlags.Expand
             };
             labelControl.AddThemeFontSizeOverride("font_size", 13);
             labelControl.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f, 1f));
@@ -102,7 +102,7 @@ namespace ClawRPG.Scripts.UI {
             {
                 Text = value,
                 HorizontalAlignment = HorizontalAlignment.Right,
-                SizeFlagsHorizontal = SizeFlags.ShrinkEnd
+                SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd
             };
             valueControl.AddThemeFontSizeOverride("font_size", 14);
             valueControl.AddThemeColorOverride("font_color", valueColor);

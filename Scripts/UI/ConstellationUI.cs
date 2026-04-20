@@ -59,7 +59,7 @@ public partial class ConstellationUI : Control
         // Title
         var titleLabel = new Label();
         titleLabel.Text = "✦ Constellation System ✦";
-        titleLabel.Align = Label.AlignEnum.Center;
+        titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainVBox.AddChild(titleLabel);
         
@@ -137,7 +137,7 @@ public partial class ConstellationUI : Control
         var visualLabel = new Label();
         visualLabel.Text = GetConstellationSymbol(constellation.Type);
         visualLabel.AddThemeFontSizeOverride("font_size", 40);
-        visualLabel.Align = Label.AlignEnum.Center;
+        visualLabel.HorizontalAlignment = HorizontalAlignment.Center;
         visualLabel.Valign = Label.VAlign.Center;
         visualPanel.AddChild(visualLabel);
         
@@ -186,7 +186,7 @@ public partial class ConstellationUI : Control
             
             var levelLabel = new Label();
             levelLabel.Text = $"Lvl {constellation.RequiredLevel}+";
-            levelLabel.Align = Label.AlignEnum.Center;
+            levelLabel.HorizontalAlignment = HorizontalAlignment.Center;
             actionPanel.AddChild(levelLabel);
         }
         else
@@ -202,7 +202,7 @@ public partial class ConstellationUI : Control
             
             var progressLabel = new Label();
             progressLabel.Text = $"Stars: {progress?.ActivatedStars ?? 0}/{constellation.Stars}";
-            progressLabel.Align = Label.AlignEnum.Center;
+            progressLabel.HorizontalAlignment = HorizontalAlignment.Center;
             actionPanel.AddChild(progressLabel);
         }
         
@@ -221,7 +221,7 @@ public partial class ConstellationUI : Control
         {
             var emptyLabel = new Label();
             emptyLabel.Text = "No constellations unlocked yet.";
-            emptyLabel.Align = Label.AlignEnum.Center;
+            emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _activeList.AddChild(emptyLabel);
             return;
         }
@@ -248,7 +248,7 @@ public partial class ConstellationUI : Control
         var nameLabel = new Label();
         nameLabel.Text = $"✦ {constellation.Name} - {progress.ActivatedStars}/{progress.TotalStars} Stars";
         nameLabel.AddThemeFontSizeOverride("font_size", 20);
-        nameLabel.Align = Label.AlignEnum.Center;
+        nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
         cardContainer.AddChild(nameLabel);
         
         // Progress bar
@@ -264,7 +264,7 @@ public partial class ConstellationUI : Control
         float activationRatio = (float)progress.ActivatedStars / progress.TotalStars;
         statsLabel.Text = $"Active Bonuses: ATK +{constellation.AttackBonus * activationRatio:P0} | DEF +{constellation.DefenseBonus * activationRatio:P0} | HP +{constellation.HealthBonus * activationRatio:P0}";
         statsLabel.AddThemeFontSizeOverride("font_size", 14);
-        statsLabel.Align = Label.AlignEnum.Center;
+        statsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         cardContainer.AddChild(statsLabel);
         
         var elementColor = GetElementColor(constellation.Type);
@@ -284,7 +284,7 @@ public partial class ConstellationUI : Control
                          $"Fragments Collected: {stats["fragments_collected"]}\n" +
                          $"Current Fragments: {stats["current_fragments"]}";
         statsLabel.AddThemeFontSizeOverride("font_size", 18);
-        statsLabel.Align = Label.AlignEnum.Center;
+        statsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _statisticsPanel.AddChild(statsLabel);
         
         // Total bonuses
@@ -300,7 +300,7 @@ public partial class ConstellationUI : Control
                            $"Gold Bonus: +{bonuses["gold"]:P1}\n" +
                            $"EXP Bonus: +{bonuses["exp"]:P1}";
         bonusesLabel.AddThemeFontSizeOverride("font_size", 16);
-        bonusesLabel.Align = Label.AlignEnum.Center;
+        bonusesLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _statisticsPanel.AddChild(bonusesLabel);
     }
     

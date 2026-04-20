@@ -54,7 +54,7 @@ public partial class CombatPreloadComboUI : Control
     {
         // 主面板
         _mainPanel = new PanelContainer();
-        _mainPanel.SetAnchor(AnchorsPreset.FullRect);
+        _mainPanel.SetAnchorsPreset(FullRect);
         AddChild(_mainPanel);
         
         // 使用主题样式
@@ -68,7 +68,7 @@ public partial class CombatPreloadComboUI : Control
         
         // 主容器
         var mainVBox = new VBoxContainer();
-        mainVBox.SetAnchor(AnchorsPreset.FullRect);
+        mainVBox.SetAnchorsPreset(FullRect);
         mainVBox.AddThemeConstantOverride("separation", 15);
         _mainPanel.AddChild(mainVBox);
         
@@ -82,7 +82,7 @@ public partial class CombatPreloadComboUI : Control
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         headerBox.AddChild(_titleLabel);
         
-        headerBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
+        headerBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
         
         _comboLevelLabel = new Label();
         _comboLevelLabel.Text = "Combo等级: 1";
@@ -128,7 +128,7 @@ public partial class CombatPreloadComboUI : Control
         mainVBox.AddChild(_comboScroll);
         
         _comboListContainer = new VBoxContainer();
-        _comboListContainer.SetAnchor(AnchorsPreset.FullRect);
+        _comboListContainer.SetAnchorsPreset(FullRect);
         _comboListContainer.AddThemeConstantOverride("separation", 10);
         _comboScroll.AddChild(_comboListContainer);
         
@@ -137,7 +137,7 @@ public partial class CombatPreloadComboUI : Control
         buttonBox.AddThemeConstantOverride("separation", 15);
         mainVBox.AddChild(buttonBox);
         
-        buttonBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
+        buttonBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
         
         _cancelButton = new Button();
         _cancelButton.Text = "取消";
@@ -359,7 +359,7 @@ public partial class CombatPreloadComboUI : Control
         rarityLabel.AddThemeColorOverride("font_color", _GetRarityColor(combo.Rarity) * new Color(0.8f, 0.8f, 0.8f));
         headerBox.AddChild(rarityLabel);
         
-        headerBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
+        headerBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
         
         var damageLabel = new Label();
         // REQ-128: 显示有效伤害倍率（已应用疲劳惩罚），与基础倍率不同时标注
@@ -433,7 +433,7 @@ public partial class CombatPreloadComboUI : Control
         descLabel.Text = combo.Description;
         descLabel.AddThemeFontSizeOverride("font_size", 12);
         descLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.7f));
-        descLabel.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+        descLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         footerBox.AddChild(descLabel);
         
         var rewardLabel = new Label();
@@ -475,7 +475,7 @@ public partial class CombatPreloadComboUI : Control
         }
         
         var btnContainer = new HBoxContainer();
-        btnContainer.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
+        btnContainer.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
         btnContainer.AddChild(selectBtn);
         cardVBox.AddChild(btnContainer);
         

@@ -171,7 +171,7 @@ namespace ClawRPG.Scripts.UI
             {
                 var emptyLabel = new Label();
                 emptyLabel.Text = "暂无赏金任务";
-                emptyLabel.Align = Label.AlignEnum.Center;
+                emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 emptyLabel.AddThemeFontSizeOverride("font_size", 18);
                 _bountyListContainer.AddChild(emptyLabel);
             }

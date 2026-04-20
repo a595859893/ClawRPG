@@ -308,7 +308,7 @@ public partial class MountEvolutionUI : Control
 		_statisticsLabel.Text = statsText;
 	}
 	
-	private void OnEvolutionItemSelected(int index)
+	private void OnEvolutionItemSelected(long index)
 	{
 		// Show details for selected evolution
 	}

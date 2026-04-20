@@ -386,7 +386,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
                 var data = new Dictionary<string, object>();
                 
                 // 导出玩家状态
-                var playerStatesList = new Array();
+                var playerStatesList = new Godot.Collections.Array();
                 foreach (var kvp in _playerStates)
                 {
                     var state = kvp.Value;

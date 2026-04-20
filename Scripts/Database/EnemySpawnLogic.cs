@@ -319,7 +319,7 @@ namespace ClawRPG.Scripts.Database
             var data = new Dictionary<string, object>();
             
             // Export enemy instances
-            var instancesArray = new Array();
+            var instancesArray = new Godot.Collections.Array();
             foreach (var instance in _enemyInstances.Values)
             {
                 instancesArray.Add(JsonSerializer.Serialize(instance));

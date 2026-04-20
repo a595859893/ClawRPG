@@ -71,8 +71,8 @@ public partial class TitleCollectionUI : Control
         
         // Tab Container
         _tabContainer = new TabContainer();
-        _tabContainer.SetVerticalExpandFlags(Control.VExpandFlags.ExpandGrow);
-        _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandGrow;
+        _tabContainer;
+        _tabContainer.SizeFlagsVertical = Control.SizeFlags.Expand;
         mainVBox.AddChild(_tabContainer);
         
         // 创建标签页
@@ -168,8 +168,8 @@ public partial class TitleCollectionUI : Control
         
         // 标题列表
         _titleScroll = new ScrollContainer();
-        _titleScroll.SetVerticalExpandFlags(Control.VExpandFlags.ExpandGrow);
-        _titleScroll.SizeFlagsVertical = Control.SizeFlags.ExpandGrow;
+        _titleScroll;
+        _titleScroll.SizeFlagsVertical = Control.SizeFlags.Expand;
         tab.AddChild(_titleScroll);
         
         _titleListContainer = new VBoxContainer();

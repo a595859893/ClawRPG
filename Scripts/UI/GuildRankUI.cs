@@ -58,14 +58,14 @@ public partial class GuildRankUI : Control
 		// Title
 		titleLabel = new Label();
 		titleLabel.Text = "🏆 Guild Rank System";
-		titleLabel.Align = Label.AlignEnum.Center;
+		titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		titleLabel.AddThemeFontSizeOverride("font_size", 28);
 		mainContainer.AddChild(titleLabel);
 		
 		// Season info
 		seasonLabel = new Label();
 		seasonLabel.Text = "Season 1";
-		seasonLabel.Align = Label.AlignEnum.Center;
+		seasonLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		seasonLabel.AddThemeFontSizeOverride("font_size", 16);
 		mainContainer.AddChild(seasonLabel);
 		
@@ -125,7 +125,7 @@ public partial class GuildRankUI : Control
 		var header = new Label();
 		header.Text = "🏅 Top Players";
 		header.AddThemeFontSizeOverride("font_size", 20);
-		header.Align = Label.AlignEnum.Center;
+		header.HorizontalAlignment = HorizontalAlignment.Center;
 		listContainer.AddChild(header);
 		
 		// Sample data for display
@@ -190,20 +190,20 @@ public partial class GuildRankUI : Control
 		var header = new Label();
 		header.Text = "📊 Your Rank";
 		header.AddThemeFontSizeOverride("font_size", 20);
-		header.Align = Label.AlignEnum.Center;
+		header.HorizontalAlignment = HorizontalAlignment.Center;
 		myRankContainer.AddChild(header);
 		
 		// Current rank display
 		currentRankLabel = new Label();
 		currentRankLabel.Text = "🥉 Bronze";
-		currentRankLabel.Align = Label.AlignEnum.Center;
+		currentRankLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		currentRankLabel.AddThemeFontSizeOverride("font_size", 32);
 		myRankContainer.AddChild(currentRankLabel);
 		
 		// Points
 		pointsLabel = new Label();
 		pointsLabel.Text = "Points: 100";
-		pointsLabel.Align = Label.AlignEnum.Center;
+		pointsLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		pointsLabel.AddThemeFontSizeOverride("font_size", 18);
 		myRankContainer.AddChild(pointsLabel);
 		
@@ -216,7 +216,7 @@ public partial class GuildRankUI : Control
 		
 		var progressLabel = new Label();
 		progressLabel.Text = "Next Tier: Silver (100/250)";
-		progressLabel.Align = Label.AlignEnum.Center;
+		progressLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		myRankContainer.AddChild(progressLabel);
 		
 		// Stats
@@ -245,24 +245,24 @@ public partial class GuildRankUI : Control
 		var header = new Label();
 		header.Text = "📅 Season Statistics";
 		header.AddThemeFontSizeOverride("font_size", 20);
-		header.Align = Label.AlignEnum.Center;
+		header.HorizontalAlignment = HorizontalAlignment.Center;
 		seasonContainer.AddChild(header);
 		
 		var stats = rankSystem.GetSeasonStats();
 		
 		var seasonInfo = new Label();
 		seasonInfo.Text = $"Season: {stats["season"]}\nStarted: {stats["startDate"]}";
-		seasonInfo.Align = Label.AlignEnum.Center;
+		seasonInfo.HorizontalAlignment = HorizontalAlignment.Center;
 		seasonContainer.AddChild(seasonInfo);
 		
 		var totalInfo = new Label();
 		totalInfo.Text = $"Total Matches: {(int)stats["totalWins"] + (int)stats["totalLosses"]}\nWins: {stats["totalWins"]} | Losses: {stats["totalLosses"]}";
-		totalInfo.Align = Label.AlignEnum.Center;
+		totalInfo.HorizontalAlignment = HorizontalAlignment.Center;
 		seasonContainer.AddChild(totalInfo);
 		
 		var winRateLabel = new Label();
 		winRateLabel.Text = $"Win Rate: {stats["winRate"]:F1}%";
-		winRateLabel.Align = Label.AlignEnum.Center;
+		winRateLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		winRateLabel.AddThemeFontSizeOverride("font_size", 24);
 		seasonContainer.AddChild(winRateLabel);
 		

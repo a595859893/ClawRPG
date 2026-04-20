@@ -406,7 +406,7 @@ public partial class EquipmentSetSystem : BaseSystem
         var data = new Dictionary<string, object>();
         
         // 保存已解锁套装
-        data["unlocked_sets"] = new Array(UnlockedSets);
+        data["unlocked_sets"] = new Godot.Collections.Array(UnlockedSets);
         
         // 保存已装备部件
         var equippedData = new Dictionary<string, object>();

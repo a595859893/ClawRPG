@@ -268,7 +268,7 @@ public partial class ArtifactFusionUI : Control
         {
             Text = record.Success ? "✓" : "✗",
             Modulate = record.Success ? new Color(0.2f, 0.8f, 0.2f) : new Color(0.8f, 0.2f, 0.2f),
-            SizeFlagsHorizontal = SizeFlags.ShrinkStart,
+            SizeFlagsHorizontal = SizeFlags.ShrinkEnd,
             OffsetRight = 10
         };
         hbox.AddChild(statusIcon);

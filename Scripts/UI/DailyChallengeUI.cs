@@ -91,7 +91,7 @@ namespace ClawRPG.Scripts.UI {
             // Description
             var descLabel = new Label();
             descLabel.Text = challenge.Description;
-            descLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+            descLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
             
             // Progress bar
             var progress = new ProgressBar();
@@ -104,7 +104,7 @@ namespace ClawRPG.Scripts.UI {
             var progressText = new Label();
             string progressStr = challenge.IsCompleted ? "已完成!" : $"{challenge.CurrentProgress}/{challenge.TargetCount}";
             progressText.Text = progressStr;
-            progressText.Align = Label.AlignEnum.Center;
+            progressText.HorizontalAlignment = HorizontalAlignment.Center;
             
             // Rewards
             var rewardLabel = new Label();
@@ -113,7 +113,7 @@ namespace ClawRPG.Scripts.UI {
                 rewards += " 物品x" + challenge.ItemRewardIds.Count;
             }
             rewardLabel.Text = rewards;
-            rewardLabel.AddColorOverride("font_color", new Color(1f, 0.9f, 0.5f));
+            rewardLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.5f));
             
             // Add to container
             container.AddChild(nameLabel);
@@ -124,7 +124,7 @@ namespace ClawRPG.Scripts.UI {
             
             // Style based on completion
             if (challenge.IsCompleted) {
-                nameLabel.AddColorOverride("font_color", new Color(0.5f, 1f, 0.5f));
+                nameLabel.AddThemeColorOverride("font_color", new Color(0.5f, 1f, 0.5f));
             }
             
             return container;

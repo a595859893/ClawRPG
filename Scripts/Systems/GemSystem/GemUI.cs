@@ -455,7 +455,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
             return container;
         }
         
-        private void OnEquipmentSelected(int index) {
+        private void OnEquipmentSelected(long index) {
             var metadata = _equipmentList.GetItemMetadata(index) as Dictionary;
             if (metadata != null) {
                 _selectedEquipmentId = metadata["id"].ToString();

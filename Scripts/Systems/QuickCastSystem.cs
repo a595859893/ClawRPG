@@ -511,7 +511,7 @@ public partial class QuickCastSystem : BaseSystem
     {
         var data = new Dictionary<string, object>();
         
-        var slots = new Array();
+        var slots = new Godot.Collections.Array();
         foreach (var slot in _quickSlots)
         {
             var slotData = new Dictionary

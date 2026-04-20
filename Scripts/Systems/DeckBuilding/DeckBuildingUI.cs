@@ -232,7 +232,7 @@ namespace ClawRPG.Systems
             var costLabel = new Label();
             costLabel.Text = $"⚡ {card.Cost}";
             costLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            costLabel.AddThemeColorOverride("font_color", new Color(1, 0.8, 0.2));
+            costLabel.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0.2f));
             vbox.AddChild(costLabel);
             
             var descLabel = new Label();

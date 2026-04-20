@@ -32,7 +32,7 @@ namespace ClawRPG.Systems
         public void ShuffleDeckIntoDrawPile()
         {
             _drawPile.Clear();
-            _drawPile.AddRange(_data.CurrentDeck);
+            _drawPile.AddRange(_data.CurrentDeck.Cast<string>());
             _discardPile.Clear();
             _hand.Clear();
             ShuffleDrawPile();
@@ -267,7 +267,7 @@ namespace ClawRPG.Systems
         /// <summary>
         /// 获取套牌
         /// </summary>
-        public List<string> GetCurrentDeck() => _data.CurrentDeck;
+        public List<string> GetCurrentDeck() => new List<string>(_data.CurrentDeck.Cast<string>());
         
         /// <summary>
         /// 获取数据库
@@ -280,7 +280,7 @@ namespace ClawRPG.Systems
             var data = new Dictionary<string, object>();
             
             // 保存当前套牌
-            data["current_deck"] = new Array(_data.CurrentDeck);
+            data["current_deck"] = new Godot.Collections.Array(_data.CurrentDeck);
             
             // 保存统计数据
             data["total_cards_played"] = _data.TotalCardsPlayed;

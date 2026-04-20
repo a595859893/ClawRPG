@@ -60,7 +60,7 @@ namespace ClawRPG.Scripts.UI {
             _titleLabel.SetAnchor(AnchorPresets.TopWide);
             _titleLabel.AddThemeFontSizeOverride("font_size", 32);
             _titleLabel.Position = new Vector2(0, 20);
-            _titleLabel.Align = Label.AlignEnum.Center;
+            _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _mainPanel.AddChild(_titleLabel);
 
             // 金币显示

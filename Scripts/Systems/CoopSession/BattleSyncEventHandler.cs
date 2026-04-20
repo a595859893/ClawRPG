@@ -371,7 +371,7 @@ public delegate void BattleActionReceivedEventHandler(BattleSyncData.BattleActio
                 var data = new Dictionary<string, object>();
                 data["current_session_id"] = _currentSessionId;
                 
-                var playerStatesList = new Array();
+                var playerStatesList = new Godot.Collections.Array();
                 foreach (var kvp in _playerStates)
                 {
                     var state = kvp.Value;

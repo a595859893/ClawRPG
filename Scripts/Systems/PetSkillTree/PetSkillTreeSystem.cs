@@ -235,7 +235,7 @@ namespace ClawRPG.Scripts.Systems
                 treeData["used_skill_points"] = kvp.Value.UsedSkillPoints;
                 
                 // 保存已解锁节点
-                var unlockedNodeIds = new Array();
+                var unlockedNodeIds = new Godot.Collections.Array();
                 foreach (var node in kvp.Value.UnlockedNodes)
                 {
                     unlockedNodeIds.Add(node.NodeId);

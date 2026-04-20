@@ -82,7 +82,7 @@ namespace ClawRPG.Scripts.UI
             var header = new HBoxContainer
             {
                 Name = "Header",
-                SizeFlagsHorizontal = SizeFlags.Fill
+                SizeFlagsHorizontal = Control.SizeFlags.Fill
             };
             header.CustomMinimumSize = new Vector2(0, 36);
             _mainPanel.AddChild(header);
@@ -90,7 +90,7 @@ namespace ClawRPG.Scripts.UI
             _titleLabel = new Label
             {
                 Text = "档案陈列室",
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
             _titleLabel.HorizontalAlignment = HorizontalAlignment.Left;
             _titleLabel.VerticalAlignment = VerticalAlignment.Center;
@@ -110,7 +110,7 @@ namespace ClawRPG.Scripts.UI
             {
                 Name = "Scroll",
                 HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
-                SizeFlagsVertical = SizeFlags.ExpandFill
+                SizeFlagsVertical = Control.SizeFlags.ExpandFill
             };
             _scroll.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             _scroll.OffsetLeft = 0;
@@ -124,7 +124,7 @@ namespace ClawRPG.Scripts.UI
                 Name = "RecordList",
                 CustomMinimumSize = new Vector2(0, 0)
             };
-            _recordList.SizeFlagsHorizontal = SizeFlags.Fill;
+            _recordList.SizeFlagsHorizontal = Control.SizeFlags.Fill;
             _scroll.AddChild(_recordList);
 
             // 空状态标签
@@ -173,7 +173,7 @@ namespace ClawRPG.Scripts.UI
             var container = new PanelContainer
             {
                 CustomMinimumSize = new Vector2(0, 80),
-                SizeFlagsHorizontal = SizeFlags.Fill
+                SizeFlagsHorizontal = Control.SizeFlags.Fill
             };
 
             // 卡片背景
@@ -217,13 +217,13 @@ namespace ClawRPG.Scripts.UI
             container.AddChild(vbox);
 
             // 第一行：宠物名 + 状态
-            var row1 = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            var row1 = new HBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
             vbox.AddChild(row1);
 
             var nameLabel = new Label
             {
                 Text = string.IsNullOrEmpty(rec.PetName) ? rec.PetId : rec.PetName,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
             nameLabel.HorizontalAlignment = HorizontalAlignment.Left;
             nameLabel.AddThemeColorOverride("font_color", new Color(0.95f, 0.9f, 1f, 1f));
@@ -232,7 +232,7 @@ namespace ClawRPG.Scripts.UI
             var statusLabel = new Label
             {
                 Text = statusText,
-                SizeFlagsHorizontal = SizeFlags.ShrinkEnd
+                SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd
             };
             statusLabel.HorizontalAlignment = HorizontalAlignment.Right;
             statusLabel.AddThemeColorOverride("font_color", borderColor);

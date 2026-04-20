@@ -159,7 +159,7 @@ public partial class MultiplayerChatData : BaseSystem
         data["messages_per_channel"] = messagesPerChannel;
         
         // 忽略列表
-        data["ignored_players"] = new Array(IgnoredPlayers);
+        data["ignored_players"] = new Godot.Collections.Array(IgnoredPlayers);
         
         // 频道设置
         var channelSettingsData = new Dictionary<string, object>();

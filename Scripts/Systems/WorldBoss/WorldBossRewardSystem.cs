@@ -223,7 +223,7 @@ namespace ClawRPG.Scripts.Systems
             var data = new Dictionary<string, object>();
             
             // 保存击杀历史
-            var history = new Array();
+            var history = new Godot.Collections.Array();
             foreach (var record in _killHistory)
             {
                 var recordDict = new Dictionary

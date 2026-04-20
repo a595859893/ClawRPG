@@ -144,7 +144,6 @@ namespace ClawRPG.Systems.BuildHistory
 
             // 历史列表（可滚动）
             var scroll = new ScrollContainer();
-            scroll.VerticalScrollBarEditingEnabled = true;
             scroll.CustomMinimumSize = new Vector2(0, 300);
             mainContainer.AddChild(scroll);
 
@@ -260,10 +259,10 @@ namespace ClawRPG.Systems.BuildHistory
             container.AddThemeStyleboxOverride("panel", styleBox);
 
             var innerVBox = new VBoxContainer();
-            innerVBox.MarginLeft = 12;
-            innerVBox.MarginTop = 8;
-            innerVBox.MarginRight = -12;
-            innerVBox.MarginBottom = -8;
+            innerVBox.AddThemeConstantOverride("margin_left", 12);
+            innerVBox.AddThemeConstantOverride("margin_top", 8);
+            innerVBox.AddThemeConstantOverride("margin_right", 12);
+            innerVBox.AddThemeConstantOverride("margin_bottom", 8);
             container.AddChild(innerVBox);
 
             // 标题行
@@ -287,8 +286,6 @@ namespace ClawRPG.Systems.BuildHistory
 
             // 分隔线
             var sep = new HSeparator();
-            sep.MarginTop = 4;
-            sep.MarginBottom = 4;
             innerVBox.AddChild(sep);
 
             // 根据过滤器显示内容
@@ -377,7 +374,7 @@ namespace ClawRPG.Systems.BuildHistory
             }
         }
 
-        private void OnHistoryEntryCreated(BuildHistoryEntry entry)
+        private void OnHistoryEntryCreated(string entry)
         {
             RefreshStats();
             RefreshHistoryList();

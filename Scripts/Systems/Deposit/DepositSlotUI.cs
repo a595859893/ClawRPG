@@ -81,7 +81,7 @@ public partial class DepositSlotUI : Control
         var nameLabel = new Label();
         nameLabel.Text = GetTypeName(type);
         nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
-        nameLabel.AddColorOverride("font_color", GetTypeColor(type));
+        nameLabel.AddThemeColorOverride("font_color", GetTypeColor(type));
         container.AddChild(nameLabel);
         _slotLabels[index] = nameLabel;
 
@@ -98,7 +98,7 @@ public partial class DepositSlotUI : Control
         var levelLabel = new Label();
         levelLabel.Text = "Lv0";
         levelLabel.HorizontalAlignment = HorizontalAlignment.Center;
-        levelLabel.AddColorOverride("font_color", GetTypeColor(type));
+        levelLabel.AddThemeColorOverride("font_color", GetTypeColor(type));
         levelLabel.Name = "LevelLabel";
         container.AddChild(levelLabel);
 
@@ -149,7 +149,7 @@ public partial class DepositSlotUI : Control
         {
             color.A = 0.3f;
         }
-        _slotLabels[idx].AddColorOverride("font_color", color);
+        _slotLabels[idx].AddThemeColorOverride("font_color", color);
     }
 
     private void RefreshAllSlots()

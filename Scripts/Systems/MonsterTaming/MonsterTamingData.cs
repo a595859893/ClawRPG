@@ -46,7 +46,7 @@ public partial class MonsterTamingData : BaseSystem
         var data = new Dictionary<string, object>();
 
         // 已捕获的怪物
-        var tamedMonstersList = new Array();
+        var tamedMonstersList = new Godot.Collections.Array();
         foreach (var monster in TamedMonsters)
         {
             var monsterDict = new Dictionary

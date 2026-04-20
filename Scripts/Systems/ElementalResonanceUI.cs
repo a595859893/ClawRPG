@@ -34,7 +34,7 @@ public partial class ElementalResonanceUI : Control
         titleLabel = new Label();
         titleLabel.Text = "⚡ 元素共鸣系统 ⚡";
         titleLabel.SetAnchorPreset(LayoutPreset.TopWide);
-        titleLabel.Align = Label.AlignEnum.Center;
+        titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         titleLabel.AddThemeFontSizeOverride("font_size", 24);
         titleLabel.Position = new Vector2(0, 20);
         bg.AddChild(titleLabel);
@@ -43,7 +43,7 @@ public partial class ElementalResonanceUI : Control
         infoLabel = new Label();
         infoLabel.Text = "当多个元素同时作用于敌人时触发共鸣效果";
         infoLabel.SetAnchorPreset(LayoutPreset.TopWide);
-        infoLabel.Align = Label.AlignEnum.Center;
+        infoLabel.HorizontalAlignment = HorizontalAlignment.Center;
         infoLabel.AddThemeFontSizeOverride("font_size", 14);
         infoLabel.Modulate = new Color(0.7f, 0.7f, 0.7f);
         infoLabel.Position = new Vector2(0, 60);

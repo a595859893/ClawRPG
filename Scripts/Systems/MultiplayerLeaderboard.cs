@@ -338,7 +338,7 @@ namespace ClawRPG.Scripts.Systems
             
             foreach (var kvp in _leaderboards)
             {
-                var entries = new Array();
+                var entries = new Godot.Collections.Array();
                 foreach (var entry in kvp.Value)
                 {
                     var entryData = new Dictionary

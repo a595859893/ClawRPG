@@ -60,7 +60,7 @@ namespace ClawRPG.Scripts.UI
             // Title
             _titleLabel = new Label();
             _titleLabel.Text = "🐾 Pet Emotion System";
-            _titleLabel.Align = Label.AlignEnum.Center;
+            _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _titleLabel.AddThemeFontSizeOverride("font_size", 24);
             mainVBox.AddChild(_titleLabel);
 
@@ -88,7 +88,7 @@ namespace ClawRPG.Scripts.UI
             var statsLabel = new Label();
             statsLabel.Text = "Emotion Statistics";
             statsLabel.AddThemeFontSizeOverride("font_size", 18);
-            statsLabel.Align = Label.AlignEnum.Center;
+            statsLabel.HorizontalAlignment = HorizontalAlignment.Center;
             statsTab.AddChild(statsLabel);
 
             var statsScroll = new ScrollContainer();
@@ -190,7 +190,7 @@ namespace ClawRPG.Scripts.UI
             {
                 var noPetsLabel = new Label();
                 noPetsLabel.Text = "No pets with emotions yet.\nInteract with pets to see their emotions!";
-                noPetsLabel.Align = Label.AlignEnum.Center;
+                noPetsLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 noPetsLabel.AddThemeFontSizeOverride("font_size", 16);
                 _petListContainer.AddChild(noPetsLabel);
                 return;

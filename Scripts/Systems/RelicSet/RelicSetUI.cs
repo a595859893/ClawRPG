@@ -56,7 +56,8 @@ namespace ClawRPG.Scripts.Systems
 
             // Tab 容器
             _tabContainer = new TabContainer();
-            _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Fill);
+            _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            _tabContainer.SizeFlagsVertical = Control.SizeFlags.Fill;
             _mainVBox.AddChild(_tabContainer);
 
             // 标签页1: 套装列表
@@ -91,12 +92,13 @@ namespace ClawRPG.Scripts.Systems
         private void SetupSetsListTab()
         {
             _setsScroll = new ScrollContainer();
-            _setsScroll.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Fill);
-            _setsScroll.SetSizeFlags(Control.SizeFlags.Fill, Control.SizeFlags.Vertical);
+            _setsScroll.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            _setsScroll.SizeFlagsVertical = Control.SizeFlags.Fill;
             _setsListPanel.AddChild(_setsScroll);
 
             var scrollVBox = new VBoxContainer();
-            scrollVBox.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Fill);
+            scrollVBox.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            scrollVBox.SizeFlagsVertical = Control.SizeFlags.Fill;
             _setsScroll.AddChild(scrollVBox);
 
             // 动态添加套装卡片
@@ -192,11 +194,13 @@ namespace ClawRPG.Scripts.Systems
         private void SetupBonusesTab()
         {
             var scroll = new ScrollContainer();
-            scroll.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Fill);
+            scroll.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            scroll.SizeFlagsVertical = Control.SizeFlags.Fill;
             _currentBonusesPanel.AddChild(scroll);
 
             var contentVBox = new VBoxContainer();
-            contentVBox.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Fill);
+            contentVBox.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            contentVBox.SizeFlagsVertical = Control.SizeFlags.Fill;
             scroll.AddChild(contentVBox);
 
             // 标题
@@ -264,11 +268,13 @@ namespace ClawRPG.Scripts.Systems
         private void SetupStatsTab()
         {
             var scroll = new ScrollContainer();
-            scroll.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Fill);
+            scroll.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            scroll.SizeFlagsVertical = Control.SizeFlags.Fill;
             _statsPanel.AddChild(scroll);
 
             var contentVBox = new VBoxContainer();
-            contentVBox.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Fill);
+            contentVBox.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            contentVBox.SizeFlagsVertical = Control.SizeFlags.Fill;
             scroll.AddChild(contentVBox);
 
             // 标题

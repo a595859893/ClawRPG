@@ -82,7 +82,7 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
                 Text = "",
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                SizeFlagsHorizontal = (int)Control.SizeFlags.ExpandFILL
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
             _categoryLabel.Set("custom_fonts/font", CreateDefaultFont(16));
             vbox.AddChild(_categoryLabel);

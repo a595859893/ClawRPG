@@ -189,7 +189,7 @@ namespace ClawRPG.Scripts.UI {
             _historyContainer.HorizontalAlignment = HorizontalAlignment.Center;
             _historyContainer.Visible = false;
             _historyContainer.CustomMinimumSize = new Vector2(360, 22);
-            _historyContainer.SizeFlagsHorizontal = (int)Control.SizeFlags.ShrinkCenter;
+            _historyContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
             vbox.AddChild(_historyContainer);
 
             // Health bar

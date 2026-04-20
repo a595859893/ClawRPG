@@ -61,7 +61,7 @@ public partial class BuffUI : Control
 		// 标题
 		_titleLabel = new Label();
 		_titleLabel.Text = "  状态效果";
-		_titleLabel.AddColorOverride("font_color", new Color(1f, 0.9f, 0.6f, 1f));
+		_titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.6f, 1f));
 		_titleLabel.AddFontOverride("font", GD.Load<Font>("res://Fonts/TitleFont.tres"));
 		mainVBox.AddChild(_titleLabel);
 		
@@ -87,7 +87,7 @@ public partial class BuffUI : Control
 		// 统计信息
 		_statsLabel = new Label();
 		_statsLabel.MarginTop = 10;
-		_statsLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.8f, 1f));
+		_statsLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.8f, 1f));
 		mainVBox.AddChild(_statsLabel);
 		
 		AddChild(_mainPanel);
@@ -124,8 +124,8 @@ public partial class BuffUI : Control
 		{
 			Label emptyLabel = new Label();
 			emptyLabel.Text = "  无状态效果";
-			emptyLabel.AddColorOverride("font_color", new Color(0.5f, 0.5f, 0.6f, 1f));
-			emptyLabel.Align = Label.AlignEnum.Left;
+			emptyLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.6f, 1f));
+			emptyLabel.HorizontalAlignment = HorizontalAlignment.Left;
 			_buffListContainer.AddChild(emptyLabel);
 		}
 		else
@@ -175,14 +175,14 @@ public partial class BuffUI : Control
 		
 		Label nameLabel = new Label();
 		nameLabel.Text = buff.Info.Name;
-		nameLabel.AddColorOverride("font_color", buff.Info.IsDebuff ? new Color(1f, 0.5f, 0.5f) : new Color(0.5f, 1f, 0.8f));
+		nameLabel.AddThemeColorOverride("font_color", buff.Info.IsDebuff ? new Color(1f, 0.5f, 0.5f) : new Color(0.5f, 1f, 0.8f));
 		nameRow.AddChild(nameLabel);
 		
 		if (buff.StackCount > 1)
 		{
 			Label stackLabel = new Label();
 			stackLabel.Text = $" x{buff.StackCount}";
-			stackLabel.AddColorOverride("font_color", new Color(1f, 0.8f, 0.2f, 1f));
+			stackLabel.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0.2f, 1f));
 			nameRow.AddChild(stackLabel);
 		}
 		

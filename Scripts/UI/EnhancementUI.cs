@@ -86,7 +86,7 @@ namespace ClawRPG.Scripts.UI {
             _titleLabel.AddThemeFontSizeOverride("font_size", 28);
             titleBar.AddChild(_titleLabel);
             
-            titleBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
+            titleBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
             
             _closeButton = new Button();
             _closeButton.Text = "X";
@@ -166,7 +166,7 @@ namespace ClawRPG.Scripts.UI {
             _materialsLabel.AutowrapMode = TextServer.AutowrapMode.Word;
             _detailPanel.AddChild(_materialsLabel);
             
-            _detailPanel.AddChild(new Control() { SizeFlagsVertical = Control.SizeFlagsExpandFill });
+            _detailPanel.AddChild(new Control() { SizeFlagsVertical = Control.SizeFlags.ExpandFill });
             
             // 强化按钮
             _enhanceButton = new Button();

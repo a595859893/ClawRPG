@@ -53,14 +53,14 @@ namespace ClawRPG.Core.Systems.GuildWar
         {
             var data = new Dictionary<string, object>();
             
-            var wars = new Array();
+            var wars = new Godot.Collections.Array();
             foreach (var war in _activeWars.Values)
             {
                 wars.Add(war.WarId);
             }
             data["active_wars"] = wars;
             
-            var playerProgress = new Array();
+            var playerProgress = new Godot.Collections.Array();
             foreach (var kvp in _playerProgress)
             {
                 var progress = new Dictionary { { "guild_id", kvp.Key } };

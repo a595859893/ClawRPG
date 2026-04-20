@@ -69,7 +69,8 @@ namespace ClawRPG.Scripts
             
             // 标签容器
             _tabContainer = new TabContainer();
-            _tabContainer.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlags.Fill);
+            _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            _tabContainer.SizeFlagsVertical = Control.SizeFlags.Fill;
             _mainContainer.AddChild(_tabContainer);
             
             // 成就标签页
@@ -88,7 +89,8 @@ namespace ClawRPG.Scripts
         private void SetupProgressHeader()
         {
             var headerContainer = new HBoxContainer();
-            headerContainer.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlags.Fill);
+            headerContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            headerContainer.SizeFlagsVertical = Control.SizeFlags.Fill;
             _mainContainer.AddChild(headerContainer);
             
             var titleLabel = new Label();
@@ -116,7 +118,8 @@ namespace ClawRPG.Scripts
             _tabContainer.AddChild(_achievementsTab);
             
             var hbox = new HBoxContainer();
-            hbox.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlags.Fill);
+            hbox.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            hbox.SizeFlagsVertical = Control.SizeFlags.Fill;
             _achievementsTab.AddChild(hbox);
             
             // 成就列表
@@ -141,7 +144,8 @@ namespace ClawRPG.Scripts
             _tabContainer.AddChild(_milestonesTab);
             
             var hbox = new HBoxContainer();
-            hbox.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlags.Fill);
+            hbox.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            hbox.SizeFlagsVertical = Control.SizeFlags.Fill;
             _milestonesTab.AddChild(hbox);
             
             // 里程碑列表
@@ -166,7 +170,8 @@ namespace ClawRPG.Scripts
             _tabContainer.AddChild(_statisticsTab);
             
             var scroll = new ScrollContainer();
-            scroll.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlags.Fill);
+            scroll.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            scroll.SizeFlagsVertical = Control.SizeFlags.Fill;
             _statisticsTab.AddChild(scroll);
             
             _statsLabel = new Label();
@@ -182,7 +187,8 @@ namespace ClawRPG.Scripts
             
             var centerContainer = new VBoxContainer();
             centerContainer.Alignment = BoxContainer.AlignmentMode.Center;
-            centerContainer.SetSizeFlags(Control.SizeFlags.Center, Control.SizeFlags.Fill);
+            centerContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
+            centerContainer.SizeFlagsVertical = Control.SizeFlags.Fill;
             _progressTab.AddChild(centerContainer);
             
             var overallLabel = new Label();
@@ -192,7 +198,7 @@ namespace ClawRPG.Scripts
             
             var bigProgress = new ProgressBar();
             bigProgress.CustomMinimumSize = new Vector2(400, 50);
-            bigProgress.SizeFlagsHorizontal = Control.SizeFlags.Center;
+            bigProgress.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
             centerContainer.AddChild(bigProgress);
             
             // 分类进度

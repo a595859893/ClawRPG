@@ -41,7 +41,7 @@ namespace ClawRPG.Scripts.Mounts {
         {
             var data = new Dictionary<string, object>();
             
-            var mounts = new Array();
+            var mounts = new Godot.Collections.Array();
             foreach (var kvp in _ownedMounts)
             {
                 mounts.Add(kvp.Key);

@@ -168,7 +168,7 @@ public partial class PartyUI
         // 标题
         var titleLabel = new Label();
         titleLabel.Text = "选择要邀请的玩家:";
-        titleLabel.Align = Label.AlignEnum.Center;
+        titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         vbox.AddChild(titleLabel);
         
         // 玩家列表（模拟数据，实际应从服务器获取）

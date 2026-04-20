@@ -86,7 +86,7 @@ namespace ClawRPG.Systems
             data["total_losses"] = TotalLosses;
             
             // 房间历史记录
-            data["room_history"] = new Array(RoomHistory);
+            data["room_history"] = new Godot.Collections.Array(RoomHistory);
             
             return data;
         }

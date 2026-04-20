@@ -100,7 +100,7 @@ namespace ClawRPG.Systems.PetObituary
             _headerBar.AddChild(_titleLabel);
 
             var spacer = new Control();
-            spacer.SizeFlagsHorizontal = Control.SizeFlagsExpand;
+            spacer.SizeFlagsHorizontal = Control.SizeFlags.Expand;
             _headerBar.AddChild(spacer);
 
             _closeButton = new Button

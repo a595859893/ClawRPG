@@ -521,7 +521,7 @@ public delegate void BuffListChanged();
 		data["buff_source_count"] = _playerBuffData.BuffSourceCount;
 		
 		// 保存活跃buff（只保存ID和剩余时间，buff信息从数据库读取）
-		var activeBuffsData = new Array();
+		var activeBuffsData = new Godot.Collections.Array();
 		foreach (var buff in _activeBuffs)
 		{
 			var buffData = new Dictionary<string, object>();

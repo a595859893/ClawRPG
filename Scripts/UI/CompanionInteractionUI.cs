@@ -53,7 +53,7 @@ namespace ClawRPG.Scripts.UI
             // 标题
             var titleLabel = new Label();
             titleLabel.Text = "🐾 伴侣互动系统";
-            titleLabel.Align = Label.AlignEnum.Center;
+            titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             titleLabel.AddThemeFontSizeOverride("font_size", 24);
             _mainContainer.AddChild(titleLabel);
 
@@ -116,14 +116,14 @@ namespace ClawRPG.Scripts.UI
             // 动作描述
             _actionDescription = new Label();
             _actionDescription.Text = "选择一个互动动作查看详情";
-            _actionDescription.Align = Label.AlignEnum.Center;
+            _actionDescription.HorizontalAlignment = HorizontalAlignment.Center;
             _actionDescription.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
             _mainContainer.AddChild(_actionDescription);
 
             // 动作信息
             _actionInfo = new Label();
             _actionInfo.Text = "";
-            _actionInfo.Align = Label.AlignEnum.Center;
+            _actionInfo.HorizontalAlignment = HorizontalAlignment.Center;
             _actionInfo.AddThemeFontSizeOverride("font_size", 14);
             _mainContainer.AddChild(_actionInfo);
 
@@ -137,7 +137,7 @@ namespace ClawRPG.Scripts.UI
 
             _progressLabel = new Label();
             _progressLabel.Text = "";
-            _progressLabel.Align = Label.AlignEnum.Center;
+            _progressLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _progressLabel.Visible = false; 
             _mainContainer.AddChild(_progressLabel);
 

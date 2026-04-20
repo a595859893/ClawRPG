@@ -116,7 +116,8 @@ namespace ClawRPG.Scripts.Systems.Enchantment
             
             // 标签页容器
             _tabContainer = new TabContainer();
-            _tabContainer.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlagsFlags.ExpandFill);
+            _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
             _contentBox.AddChild(_tabContainer);
             
             // 附魔列表页

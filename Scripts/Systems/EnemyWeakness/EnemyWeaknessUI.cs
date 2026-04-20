@@ -55,7 +55,7 @@ public partial class EnemyWeaknessUI : Control
         // 标题
         _titleLabel = Labelnew;
         _titleLabel.Text = "🎯 Enemy Weakness System";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainContainer.AddChild(_titleLabel);
 
@@ -79,7 +79,7 @@ public partial class EnemyWeaknessUI : Control
         // 关闭提示
         var hintLabel = Labelnew;
         hintLabel.Text = "Press ESC to close";
-        hintLabel.Align = Label.AlignEnum.Center;
+        hintLabel.HorizontalAlignment = HorizontalAlignment.Center;
         hintLabel.AddThemeFontSizeOverride("font_size", 14);
         mainContainer.AddChild(hintLabel);
     }
@@ -93,7 +93,7 @@ public partial class EnemyWeaknessUI : Control
         var title = Labelnew;
         title.Text = "📋 All Weakness Types";
         title.AddThemeFontSizeOverride("font_size", 18);
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         tab.AddChild(title);
 
         var scroll = ScrollContainernew;
@@ -124,7 +124,7 @@ public partial class EnemyWeaknessUI : Control
         var title = Labelnew;
         title.Text = "👹 Enemy Weakness Info";
         title.AddThemeFontSizeOverride("font_size", 18);
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         tab.AddChild(title);
 
         // 敌人选择
@@ -156,7 +156,7 @@ public partial class EnemyWeaknessUI : Control
         var title = Labelnew;
         title.Text = "📊 Weakness Statistics";
         title.AddThemeFontSizeOverride("font_size", 18);
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         tab.AddChild(title);
 
         _statisticsPanel = VBoxContainernew;

@@ -40,37 +40,37 @@ public partial class ProceduralChallengeUI : Control
     {
         // Main panel
         PanelContainer mainPanel = new PanelContainer();
-        mainPanel.SetAnchor(AnchorsPreset.Center);
+        mainPanel.SetAnchorsPreset(Center);
         mainPanel.SetOffset(-300, -250, 300, 250);
         mainPanel.Modulate = new Color(1, 1, 1, 0.95f);
         AddChild(mainPanel);
 
         _mainContainer = new VBoxContainer();
-        _mainContainer.SetAnchor(AnchorsPreset.FullRect);
+        _mainContainer.SetAnchorsPreset(FullRect);
         mainPanel.AddChild(_mainContainer);
 
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "⚔️ Procedural Challenges";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         _mainContainer.AddChild(_titleLabel);
 
         // Stats
         _statsLabel = new Label();
         _statsLabel.Text = "Total Completed: 0 | Gold Earned: 0 | Exp Earned: 0";
-        _statsLabel.Align = Label.AlignEnum.Center;
+        _statsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _statsLabel.AddThemeFontSizeOverride("font_size", 14);
         _mainContainer.AddChild(_statsLabel);
 
         // Scroll container for challenges
         ScrollContainer scrollContainer = new ScrollContainer();
-        scrollContainer.SetAnchor(AnchorsPreset.FullRect);
+        scrollContainer.SetAnchorsPreset(FullRect);
         scrollContainer.SetOffset(new Vector2(0, 80), new Vector2(0, -50));
         _mainContainer.AddChild(scrollContainer);
 
         _challengeList = new VBoxContainer();
-        _challengeList.SetAnchor(AnchorsPreset.FullRect);
+        _challengeList.SetAnchorsPreset(FullRect);
         scrollContainer.AddChild(_challengeList);
 
         // Refresh button
@@ -173,7 +173,7 @@ public partial class ProceduralChallengeUI : Control
         // Progress label
         Label progressLabel = new Label();
         progressLabel.Text = $"{challenge.CurrentProgress} / {challenge.TargetProgress}";
-        progressLabel.Align = Label.AlignEnum.Center;
+        progressLabel.HorizontalAlignment = HorizontalAlignment.Center;
         progressBar.AddChild(progressLabel);
 
         // Time remaining (if applicable)

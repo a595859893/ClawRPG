@@ -185,7 +185,7 @@ namespace ClawRPG.Scripts.Leaderboard {
             if (_currentEntries.Count == 0) {
                 var emptyLabel = new Label();
                 emptyLabel.Text = "No entries yet";
-                emptyLabel.Align = Label.AlignEnum.Center;
+                emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 _leaderboardList.AddChild(emptyLabel);
             }
         }
@@ -198,7 +198,7 @@ namespace ClawRPG.Scripts.Leaderboard {
             var rankLabel = new Label();
             rankLabel.Text = rank;
             rankLabel.CustomMinimumSize = new Vector2(60, 0);
-            rankLabel.Align = Label.AlignEnum.Center;
+            rankLabel.HorizontalAlignment = HorizontalAlignment.Center;
 
             if (!isHeader) {
                 if (rankNum == 1) rankLabel.AddThemeColorOverride("font_color", _goldColor);
@@ -217,14 +217,14 @@ namespace ClawRPG.Scripts.Leaderboard {
             var scoreLabel = new Label();
             scoreLabel.Text = score;
             scoreLabel.CustomMinimumSize = new Vector2(120, 0);
-            scoreLabel.Align = Label.AlignEnum.Right;
+            scoreLabel.HorizontalAlignment = HorizontalAlignment.Right;
             container.AddChild(scoreLabel);
 
             // 变化
             var changeLabel = new Label();
             changeLabel.Text = change;
             changeLabel.CustomMinimumSize = new Vector2(80, 0);
-            changeLabel.Align = Label.AlignEnum.Center;
+            changeLabel.HorizontalAlignment = HorizontalAlignment.Center;
             container.AddChild(changeLabel);
 
             return container;

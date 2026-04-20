@@ -22,7 +22,7 @@ public partial class PlayerTitleDisplay : Node2D
     {
         // 创建标签
         _titleLabel = new Label();
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.Valign = Label.VAlign.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 14);
         AddChild(_titleLabel);

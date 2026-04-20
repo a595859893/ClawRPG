@@ -418,7 +418,7 @@ namespace 悬疑RPG
                 { "last_login_date", playerData.LastLoginDate.ToString("yyyy-MM-dd HH:mm:ss") },
                 { "total_login_days", playerData.TotalLoginDays },
                 { "consecutive_login_days", playerData.ConsecutiveLoginDays },
-                { "claimed_days", new Array(playerData.ClaimedDays) },
+                { "claimed_days", new Godot.Collections.Array(playerData.ClaimedDays) },
                 { "last_claim_date", playerData.LastClaimDate.ToString("yyyy-MM-dd HH:mm:ss") }
             };
         }

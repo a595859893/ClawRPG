@@ -141,7 +141,7 @@ namespace ClawRPG.Scripts.Systems
             var data = new Dictionary<string, object>();
             
             // Export position configs
-            var positionsArray = new Array();
+            var positionsArray = new Godot.Collections.Array();
             foreach (var kvp in _positionConfigs)
             {
                 var entry = new Dictionary
@@ -154,7 +154,7 @@ namespace ClawRPG.Scripts.Systems
             data["positionConfigs"] = positionsArray;
             
             // Export member configs
-            var membersArray = new Array();
+            var membersArray = new Godot.Collections.Array();
             foreach (var kvp in _memberConfigs)
             {
                 var entry = new Dictionary

@@ -56,10 +56,10 @@ public partial class GuildLevelUI : Control
         Label title = new Label();
         title.Text = "🏰 Guild Level";
         title.SetAnchorsPreset(Control.AnchorsPreset.TopWide);
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.RectMinSize = new Vector2(0, 60);
         title.RectPosition = new Vector2(0, 10);
-        title.AddColorOverride("font_color", new Color(1f, 0.84f, 0f)); // Gold
+        title.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f)); // Gold
         title.AddFontOverride("font_size", 28);
         _mainContainer.AddChild(title);
         
@@ -75,10 +75,10 @@ public partial class GuildLevelUI : Control
         _levelLabel = new Label();
         _levelLabel.Text = "Level 1";
         _levelLabel.SetAnchorsPreset(Control.AnchorsPreset.TopWide);
-        _levelLabel.Align = Label.AlignEnum.Center;
+        _levelLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _levelLabel.RectMinSize = new Vector2(0, 50);
         _levelLabel.RectPosition = new Vector2(0, 60);
-        _levelLabel.AddColorOverride("font_color", new Color(1f, 0.84f, 0f));
+        _levelLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
         _levelLabel.AddFontOverride("font_size", 32);
         _mainContainer.AddChild(_levelLabel);
         
@@ -112,10 +112,10 @@ public partial class GuildLevelUI : Control
         _expLabel = new Label();
         _expLabel.Text = "0 / 1000 XP";
         _expLabel.SetAnchorsPreset(Control.AnchorsPreset.TopWide);
-        _expLabel.Align = Label.AlignEnum.Center;
+        _expLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _expLabel.RectMinSize = new Vector2(0, 30);
         _expLabel.RectPosition = new Vector2(0, 145);
-        _expLabel.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
+        _expLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
         _mainContainer.AddChild(_expLabel);
         
         // Stats container
@@ -127,13 +127,13 @@ public partial class GuildLevelUI : Control
         // Stats title
         Label statsTitle = new Label();
         statsTitle.Text = "📊 Guild Stats";
-        statsTitle.AddColorOverride("font_color", new Color(0.7f, 0.9f, 1f));
+        statsTitle.AddThemeColorOverride("font_color", new Color(0.7f, 0.9f, 1f));
         statsTitle.AddFontOverride("font_size", 18);
         statsContainer.AddChild(statsTitle);
         
         _statsLabel = new Label();
         _statsLabel.Text = "Loading...";
-        _statsLabel.AddColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f));
+        _statsLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f));
         _statsLabel.AddFontOverride("font_size", 14);
         statsContainer.AddChild(_statsLabel);
         
@@ -146,50 +146,50 @@ public partial class GuildLevelUI : Control
         // Bonuses title
         Label bonusesTitle = new Label();
         bonusesTitle.Text = "⚡ Active Bonuses";
-        bonusesTitle.AddColorOverride("font_color", new Color(0.7f, 1f, 0.7f));
+        bonusesTitle.AddThemeColorOverride("font_color", new Color(0.7f, 1f, 0.7f));
         bonusesTitle.AddFontOverride("font_size", 18);
         bonusesContainer.AddChild(bonusesTitle);
         
         _goldBonusLabel = new Label();
         _goldBonusLabel.Text = "Gold Bonus: +0%";
-        _goldBonusLabel.AddColorOverride("font_color", new Color(1f, 0.9f, 0.5f));
+        _goldBonusLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.5f));
         bonusesContainer.AddChild(_goldBonusLabel);
         
         _expBonusLabel = new Label();
         _expBonusLabel.Text = "EXP Bonus: +0%";
-        _expBonusLabel.AddColorOverride("font_color", new Color(0.5f, 1f, 0.5f));
+        _expBonusLabel.AddThemeColorOverride("font_color", new Color(0.5f, 1f, 0.5f));
         bonusesContainer.AddChild(_expBonusLabel);
         
         _warBonusLabel = new Label();
         _warBonusLabel.Text = "War Score: +0%";
-        _warBonusLabel.AddColorOverride("font_color", new Color(1f, 0.5f, 0.5f));
+        _warBonusLabel.AddThemeColorOverride("font_color", new Color(1f, 0.5f, 0.5f));
         bonusesContainer.AddChild(_warBonusLabel);
         
         _questDiscountLabel = new Label();
         _questDiscountLabel.Text = "Quest Discount: -0%";
-        _questDiscountLabel.AddColorOverride("font_color", new Color(0.5f, 0.8f, 1f));
+        _questDiscountLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.8f, 1f));
         bonusesContainer.AddChild(_questDiscountLabel);
         
         _techDiscountLabel = new Label();
         _techDiscountLabel.Text = "Tech Discount: -0%";
-        _techDiscountLabel.AddColorOverride("font_color", new Color(0.8f, 0.5f, 1f));
+        _techDiscountLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.5f, 1f));
         bonusesContainer.AddChild(_techDiscountLabel);
         
         _bankDiscountLabel = new Label();
         _bankDiscountLabel.Text = "Bank Fee: -0%";
-        _bankDiscountLabel.AddColorOverride("font_color", new Color(1f, 0.8f, 0.5f));
+        _bankDiscountLabel.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0.5f));
         bonusesContainer.AddChild(_bankDiscountLabel);
         
         _lootBonusLabel = new Label();
         _lootBonusLabel.Text = "Loot Bonus: +0%";
-        _lootBonusLabel.AddColorOverride("font_color", new Color(1f, 0.5f, 1f));
+        _lootBonusLabel.AddThemeColorOverride("font_color", new Color(1f, 0.5f, 1f));
         bonusesContainer.AddChild(_lootBonusLabel);
         
         // Perks section
         Label perksTitle = new Label();
         perksTitle.Text = "🎁 Unlocked Perks";
         perksTitle.RectPosition = new Vector2(30, 390);
-        perksTitle.AddColorOverride("font_color", new Color(0.9f, 0.9f, 0.5f));
+        perksTitle.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.5f));
         perksTitle.AddFontOverride("font_size", 18);
         _mainContainer.AddChild(perksTitle);
         
@@ -207,7 +207,7 @@ public partial class GuildLevelUI : Control
         _maxMembersLabel = new Label();
         _maxMembersLabel.Text = "Max Members: 10";
         _maxMembersLabel.RectPosition = new Vector2(450, 60);
-        _maxMembersLabel.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
+        _maxMembersLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
         _mainContainer.AddChild(_maxMembersLabel);
         
         // Update button
@@ -300,7 +300,7 @@ public partial class GuildLevelUI : Control
         {
             Label noPerks = new Label();
             noPerks.Text = "No perks unlocked yet. Level up to unlock!";
-            noPerks.AddColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+            noPerks.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
             _perksContainer.AddChild(noPerks);
         }
         else
@@ -312,7 +312,7 @@ public partial class GuildLevelUI : Control
                 {
                     Label perkLabel = new Label();
                     perkLabel.Text = $"✓ {perkInfo["name"]}: {perkInfo["description"]}";
-                    perkLabel.AddColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f));
+                    perkLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f));
                     _perksContainer.AddChild(perkLabel);
                 }
             }

@@ -21,7 +21,7 @@ public partial class RandomNameData : BaseSystem
         var data = new Dictionary<string, object>();
         
         // 生成的名字历史
-        data["generated_names"] = new Array(GeneratedNames);
+        data["generated_names"] = new Godot.Collections.Array(GeneratedNames);
         
         // 统计数据
         data["total_generated"] = TotalGenerated;

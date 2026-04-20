@@ -35,7 +35,7 @@ public partial class IdentificationUI : Control
         _titleLabel = new Label();
         _titleLabel.Text = "⚗️ 装备鉴定系统";
         _titleLabel.SetAnchorPreset(Control.LayoutPreset.TopWide);
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.Position = new Vector2(0, 10);
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         _bg.AddChild(_titleLabel);
@@ -45,7 +45,7 @@ public partial class IdentificationUI : Control
         _statsLabel.Text = "统计信息";
         _statsLabel.SetAnchorPreset(Control.LayoutPreset.TopWide);
         _statsLabel.Position = new Vector2(0, 50);
-        _statsLabel.Align = Label.AlignEnum.Center;
+        _statsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _statsLabel.AddThemeFontSizeOverride("font_size", 16);
         _bg.AddChild(_statsLabel);
         
@@ -87,7 +87,7 @@ public partial class IdentificationUI : Control
         _resultLabel.Text = "鉴定结果将显示在这里...";
         _resultLabel.Position = new Vector2(30, 290);
         _resultLabel.CustomMinimumSize = new Vector2(440, 100);
-        _resultLabel.Align = Label.AlignEnum.Center;
+        _resultLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _resultLabel.AddThemeFontSizeOverride("font_size", 14);
         _bg.AddChild(_resultLabel);
         

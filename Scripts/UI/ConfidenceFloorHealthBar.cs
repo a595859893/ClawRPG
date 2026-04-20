@@ -62,7 +62,7 @@ public partial class ConfidenceFloorHealthBar : Control
     {
         _rageLabel = new Label();
         _rageLabel.Text = "⚠ RAGE ⚠";
-        _rageLabel.Align = Label.AlignEnum.Center;
+        _rageLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _rageLabel.Modulate = new Color(1f, 0.3f, 0.3f);
         _rageLabel.Modulate.a = 0f; // 隐藏直到触发
         _rageLabel.SetAnchorsPreset(Control.LayoutPreset.Center);

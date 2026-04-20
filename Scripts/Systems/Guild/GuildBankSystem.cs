@@ -291,7 +291,7 @@ public partial class GuildBankSystem : BaseSystem {
         data["total_withdrawals"] = BankData.TotalWithdrawals;
         
         // 物品
-        var itemsArray = new Array();
+        var itemsArray = new Godot.Collections.Array();
         foreach (var item in BankData.Items)
         {
             itemsArray.Add(new Dictionary<string, object>
@@ -308,7 +308,7 @@ public partial class GuildBankSystem : BaseSystem {
         data["items"] = itemsArray;
         
         // 交易记录
-        var transactionsArray = new Array();
+        var transactionsArray = new Godot.Collections.Array();
         foreach (var transaction in BankData.Transactions)
         {
             transactionsArray.Add(new Dictionary<string, object>

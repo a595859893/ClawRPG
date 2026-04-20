@@ -445,7 +445,7 @@ namespace ClawRPG.Scripts.Skills {
             var data = new Dictionary<string, object>();
             
             // 技能解锁状态
-            var statesArray = new Array();
+            var statesArray = new Godot.Collections.Array();
             foreach (var playerKvp in _unlockStates)
             {
                 foreach (var skillKvp in playerKvp.Value)

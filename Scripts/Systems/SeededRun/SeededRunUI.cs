@@ -60,7 +60,7 @@ public partial class SeededRunUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "🎲 Seeded Run System";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainContainer.AddChild(_titleLabel);
         
@@ -106,14 +106,14 @@ public partial class SeededRunUI : Control
         // Current seed display
         _currentSeedLabel = new Label();
         _currentSeedLabel.Text = "Current Seed: None";
-        _currentSeedLabel.Align = Label.AlignEnum.Center;
+        _currentSeedLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _currentSeedLabel.AddThemeColorOverride("font_color", _primaryColor);
         startTab.AddChild(_currentSeedLabel);
         
         // Status
         _statusLabel = new Label();
         _statusLabel.Text = "Seeded Mode: Inactive";
-        _statusLabel.Align = Label.AlignEnum.Center;
+        _statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
         startTab.AddChild(_statusLabel);
         
         // Buttons
@@ -138,7 +138,7 @@ public partial class SeededRunUI : Control
         // Quick actions
         Label quickLabel = new Label();
         quickLabel.Text = "Quick Start:";
-        quickLabel.Align = Label.AlignEnum.Center;
+        quickLabel.HorizontalAlignment = HorizontalAlignment.Center;
         startTab.AddChild(quickLabel);
         
         HBoxContainer quickSection = new HBoxContainer();
@@ -166,7 +166,7 @@ public partial class SeededRunUI : Control
         
         Label presetTitle = new Label();
         presetTitle.Text = "Seed Presets";
-        presetTitle.Align = Label.AlignEnum.Center;
+        presetTitle.HorizontalAlignment = HorizontalAlignment.Center;
         presetTitle.AddThemeFontSizeOverride("font_size", 18);
         presetsTab.AddChild(presetTitle);
         
@@ -276,7 +276,7 @@ public partial class SeededRunUI : Control
     {
         Label labelWidget = new Label();
         labelWidget.Text = label;
-        labelWidget.Align = Label.AlignEnum.Right;
+        labelWidget.HorizontalAlignment = HorizontalAlignment.Right;
         parent.AddChild(labelWidget);
         
         Label valueWidget = new Label();
@@ -296,7 +296,7 @@ public partial class SeededRunUI : Control
         
         Label historyTitle = new Label();
         historyTitle.Text = "Seed History";
-        historyTitle.Align = Label.AlignEnum.Center;
+        historyTitle.HorizontalAlignment = HorizontalAlignment.Center;
         historyTitle.AddThemeFontSizeOverride("font_size", 18);
         historyTab.AddChild(historyTitle);
         
@@ -436,7 +436,7 @@ public partial class SeededRunUI : Control
         }
     }
     
-    private void OnSeedHistorySelected(int index)
+    private void OnSeedHistorySelected(long index)
     {
         var records = _system.GetAllSeedRecords();
         int i = 0;

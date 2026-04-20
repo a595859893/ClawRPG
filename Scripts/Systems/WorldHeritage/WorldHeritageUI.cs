@@ -86,7 +86,7 @@ namespace ClawRPG.Systems.WorldHeritage
             // 铭刻标签
             _inscriptionLabel = new Label();
             _inscriptionLabel.Name = "InscriptionLabel";
-            _inscriptionLabel.Align = Label.AlignEnum.Center;
+            _inscriptionLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _inscriptionLabel.Modulate = new Color(1, 0.85f, 0.4f, 0.7f); // 暖金色，半透明
             AddChild(_inscriptionLabel);
         }

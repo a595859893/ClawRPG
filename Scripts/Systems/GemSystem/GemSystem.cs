@@ -354,7 +354,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         private Dictionary SaveEquipmentSlots() {
             var data = new System.Collections.Generic.Dictionary<string, object>();
             foreach (var kvp in _playerGemData.EquipmentSlots) {
-                var slots = new Array();
+                var slots = new Godot.Collections.Array();
                 foreach (var slot in kvp.Value) {
                     var slotData = new Dictionary {
                         { "index", slot.SlotIndex },

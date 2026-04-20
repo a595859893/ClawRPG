@@ -53,19 +53,19 @@ public partial class PetFriendshipUI : Control
         titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainVBox.AddChild(titleLabel);
 
-        var hsplit = new HSplitContainer { SizeFlagsVertical = Control.SizeFlags.ExpandAndFill };
+        var hsplit = new HSplitContainer { SizeFlagsVertical = Control.SizeFlags.ExpandFill };
         mainVBox.AddChild(hsplit);
 
-        var leftPanel = new ScrollContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandAndFill, CustomMinimumSize = new Vector2(300, 0) };
+        var leftPanel = new ScrollContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(300, 0) };
         hsplit.AddChild(leftPanel);
 
-        petListContainer = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandAndFill };
+        petListContainer = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         leftPanel.AddChild(petListContainer);
 
-        var rightPanel = new ScrollContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandAndFill, CustomMinimumSize = new Vector2(400, 0) };
+        var rightPanel = new ScrollContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(400, 0) };
         hsplit.AddChild(rightPanel);
 
-        friendshipDetailsContainer = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandAndFill };
+        friendshipDetailsContainer = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         rightPanel.AddChild(friendshipDetailsContainer);
 
         var separator = new HSeparator();
@@ -98,7 +98,7 @@ public partial class PetFriendshipUI : Control
             {
                 Text = $"🐾 {pet.PetName} (ID: {pet.PetId})",
                 CustomMinimumSize = new Vector2(0, 50),
-                SizeFlagsHorizontal = Control.SizeFlags.ExpandAndFill
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
             petButton.Pressed += () => OnPetSelected(pet.PetId);
             petListContainer.AddChild(petButton);
@@ -162,7 +162,7 @@ public partial class PetFriendshipUI : Control
         headerLabel.AddThemeFontSizeOverride("font_size", 20);
         friendshipDetailsContainer.AddChild(headerLabel);
 
-        friendshipDetailsContainer.AddChild(new VBoxContainer { SizeFlagsVertical = Control.SizeFlags.ExpandAndFill });
+        friendshipDetailsContainer.AddChild(new VBoxContainer { SizeFlagsVertical = Control.SizeFlags.ExpandFill });
 
         if (selectedFriendId >= 0)
         {
@@ -194,14 +194,14 @@ public partial class PetFriendshipUI : Control
                     var skills = PetFriendshipDatabase.GetFriendshipSkills();
                     foreach (var skill in skills)
                     {
-                        var skillButton = new Button { Text = skill, SizeFlagsHorizontal = Control.SizeFlags.ExpandAndFill };
+                        var skillButton = new Button { Text = skill, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
                         int skillLevel = friendship.FriendshipLevel;
                         skillButton.Pressed += () => friendshipSystem.EquipSkill(selectedPetId, selectedFriendId, skill);
                         details.AddChild(skillButton);
                     }
                 }
 
-                var bondsButton = new Button { Text = "Toggle Bonds of War", SizeFlagsHorizontal = Control.SizeFlags.ExpandAndFill };
+                var bondsButton = new Button { Text = "Toggle Bonds of War", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
                 bondsButton.Pressed += () =>
                 {
                     friendshipSystem.SetBondsOfWar(selectedPetId, selectedFriendId, !friendship.IsBondsOfWar);
@@ -219,7 +219,7 @@ public partial class PetFriendshipUI : Control
             addFriendLabel.AddThemeFontSizeOverride("font_size", 16);
             friendshipDetailsContainer.AddChild(addFriendLabel);
 
-            var addButton = new Button { Text = "Select Two Pets to Connect", SizeFlagsHorizontal = Control.SizeFlags.ExpandAndFill };
+            var addButton = new Button { Text = "Select Two Pets to Connect", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
             addButton.Pressed += () => ShowFriendshipOptions(selectedPetId);
             friendshipDetailsContainer.AddChild(addButton);
         }
@@ -239,7 +239,7 @@ public partial class PetFriendshipUI : Control
                 var petButton = new Button
                 {
                     Text = $"Connect with {pet.PetName}",
-                    SizeFlagsHorizontal = Control.SizeFlags.ExpandAndFill
+                    SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
                 };
                 int targetPetId = pet.PetId;
                 petButton.Pressed += () =>

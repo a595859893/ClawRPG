@@ -265,7 +265,7 @@ public partial class TattooSystem : BaseSystem
         var data = new Dictionary<string, object>();
         
         // 序列化已解锁纹身
-        var unlockedTattoos = new Array();
+        var unlockedTattoos = new Godot.Collections.Array();
         foreach (var kvp in _data.UnlockedTattoos)
         {
             if (kvp.Value)

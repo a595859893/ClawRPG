@@ -49,7 +49,7 @@ public partial class FriendUI : Control
         
         var title = new Label();
         title.Text = "  好友系统";
-        title.AddColorOverride("font_color", new Color(1, 0.9, 0.5));
+        title.AddThemeColorOverride("font_color", new Color(1, 0.9, 0.5));
         titleBar.AddChild(title);
         
         titleBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
@@ -90,7 +90,7 @@ public partial class FriendUI : Control
         // 底部提示
         var hintLabel = new Label();
         hintLabel.Text = "  按 F 切换显示";
-        hintLabel.AddColorOverride("font_color", new Color(0.6, 0.6, 0.6));
+        hintLabel.AddThemeColorOverride("font_color", new Color(0.6, 0.6, 0.6));
         mainContainer.AddChild(hintLabel);
     }
 
@@ -292,7 +292,7 @@ public partial class FriendUI : Control
 
         var statusLabel = new Label();
         statusLabel.Text = friend.isOnline ? "在线" : "离线";
-        statusLabel.AddColorOverride("font_color", new Color(0.6, 0.6, 0.6));
+        statusLabel.AddThemeColorOverride("font_color", new Color(0.6, 0.6, 0.6));
         infoVbox.AddChild(statusLabel);
 
         // 好感度

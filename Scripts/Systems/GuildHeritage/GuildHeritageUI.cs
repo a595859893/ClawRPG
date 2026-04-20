@@ -52,20 +52,20 @@ public partial class GuildHeritageUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "🏛️ Guild Heritage System";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainContainer.AddChild(_titleLabel);
         
         // Heritage Points
         _heritagePointsLabel = new Label();
         _heritagePointsLabel.Text = "Heritage Points: 0";
-        _heritagePointsLabel.Align = Label.AlignEnum.Center;
+        _heritagePointsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         mainContainer.AddChild(_heritagePointsLabel);
         
         // Daily Limit
         _dailyLimitLabel = new Label();
         _dailyLimitLabel.Text = "Transfers Today: 0/3";
-        _dailyLimitLabel.Align = Label.AlignEnum.Center;
+        _dailyLimitLabel.HorizontalAlignment = HorizontalAlignment.Center;
         mainContainer.AddChild(_dailyLimitLabel);
         
         // Tab Container

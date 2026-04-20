@@ -52,7 +52,7 @@ public partial class SeededRunSystem : BaseSystem
         data["is_seeded_mode_active"] = _data.IsSeededModeActive;
         
         // 序列化种子历史
-        var seedHistory = new Array();
+        var seedHistory = new Godot.Collections.Array();
         if (_data.SeedHistory != null)
         {
             foreach (var kvp in _data.SeedHistory)

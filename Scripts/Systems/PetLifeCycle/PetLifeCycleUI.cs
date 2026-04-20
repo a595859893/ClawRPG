@@ -34,13 +34,14 @@ public partial class PetLifeCycleUI : Control
         // 标题
         var title = new Label();
         title.Text = "  🐾 宠物生命周期系统  🐾  ";
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.AddThemeFontSizeOverride("font_size", 24);
         mainVBox.AddChild(title);
         
         // Tab容器
         _tabContainer = new TabContainer();
-        _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Vertical);
+        _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+        _tabContainer.SizeFlagsVertical = Control.SizeFlags.Expand;
         mainVBox.AddChild(_tabContainer);
         
         // 创建标签页
@@ -72,7 +73,7 @@ public partial class PetLifeCycleUI : Control
         
         var title = new Label();
         title.Text = "宠物生命周期概览";
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.AddThemeFontSizeOverride("font_size", 20);
         _overviewTab.AddChild(title);
         
@@ -123,7 +124,7 @@ public partial class PetLifeCycleUI : Control
         
         var title = new Label();
         title.Text = "宠物生命周期状态";
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.AddThemeFontSizeOverride("font_size", 20);
         _petsTab.AddChild(title);
         
@@ -131,7 +132,8 @@ public partial class PetLifeCycleUI : Control
         
         // 宠物树形列表
         _petsTree = new Tree();
-        _petsTree.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Vertical);
+        _petsTree.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+        _petsTree.SizeFlagsVertical = Control.SizeFlags.Expand;
         _petsTree.HideRoot = true;
         _petsTab.AddChild(_petsTree);
         
@@ -150,7 +152,7 @@ public partial class PetLifeCycleUI : Control
         
         var title = new Label();
         title.Text = "宠物生命周期历史";
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.AddThemeFontSizeOverride("font_size", 20);
         _historyTab.AddChild(title);
         
@@ -169,7 +171,7 @@ public partial class PetLifeCycleUI : Control
         
         var title = new Label();
         title.Text = "详细统计数据";
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.AddThemeFontSizeOverride("font_size", 20);
         _statisticsTab.AddChild(title);
         

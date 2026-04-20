@@ -394,7 +394,7 @@ public partial class MythicPlusDungeonSystem : BaseSystem
         }
         
         // 跑图历史
-        var historyList = new Array();
+        var historyList = new Godot.Collections.Array();
         foreach (var run in _runHistory)
         {
             var runData = new Dictionary
@@ -415,7 +415,7 @@ public partial class MythicPlusDungeonSystem : BaseSystem
         data["run_history"] = historyList;
         
         // 排行榜
-        var leaderboardList = new Array();
+        var leaderboardList = new Godot.Collections.Array();
         foreach (var entry in _leaderboard)
         {
             var entryData = new Dictionary

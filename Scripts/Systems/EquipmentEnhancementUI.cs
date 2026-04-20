@@ -64,7 +64,7 @@ public partial class EquipmentEnhancementUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "⚒️ Equipment Enhancement";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         _mainContainer.AddChild(_titleLabel);
 
@@ -117,13 +117,13 @@ public partial class EquipmentEnhancementUI : Control
         // Result labels
         _resultLabel = new Label();
         _resultLabel.Text = "";
-        _resultLabel.Align = Label.AlignEnum.Center;
+        _resultLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _resultLabel.AddThemeFontSizeOverride("font_size", 20);
         _mainContainer.AddChild(_resultLabel);
 
         _detailLabel = new Label();
         _detailLabel.Text = "";
-        _detailLabel.Align = Label.AlignEnum.Center;
+        _detailLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _detailLabel.AddThemeFontSizeOverride("font_size", 14);
         _mainContainer.AddChild(_detailLabel);
 

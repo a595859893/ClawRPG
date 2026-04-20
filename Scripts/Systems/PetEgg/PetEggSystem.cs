@@ -340,7 +340,7 @@ public partial class PetEggSystem : BaseSystem
         var data = new Dictionary<string, object>();
 
         // 拥有的蛋
-        var eggsList = new Array();
+        var eggsList = new Godot.Collections.Array();
         foreach (var kvp in ownedEggs)
         {
             var eggDict = new Dictionary

@@ -176,7 +176,7 @@ public partial class DailyRitualUI : Control
         // Name
         var nameLabel = new Label();
         nameLabel.Text = ritual.Name;
-        nameLabel.Align = Label.AlignEnum.Center;
+        nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
         nameLabel.AddThemeFontSizeOverride("font_size", 16);
         cardContainer.AddChild(nameLabel);
 
@@ -184,14 +184,14 @@ public partial class DailyRitualUI : Control
         var tierLabel = new Label();
         tierLabel.Text = $"[{ritual.Tier}]";
         tierLabel.AddThemeColorOverride("font_color", tierColor);
-        tierLabel.Align = Label.AlignEnum.Center;
+        tierLabel.HorizontalAlignment = HorizontalAlignment.Center;
         tierLabel.AddThemeFontSizeOverride("font_size", 12);
         cardContainer.AddChild(tierLabel);
 
         // Description
         var descLabel = new Label();
         descLabel.Text = ritual.Description;
-        descLabel.Align = Label.AlignEnum.Center;
+        descLabel.HorizontalAlignment = HorizontalAlignment.Center;
         descLabel.AutowrapMode = TextServer.AutowrapMode.Word;
         descLabel.CustomMinimumSize = new Vector2(180, 40);
         cardContainer.AddChild(descLabel);
@@ -199,7 +199,7 @@ public partial class DailyRitualUI : Control
         // Cost and duration
         var infoLabel = new Label();
         infoLabel.Text = $"💰 {ritual.GoldCost} | ⏱️ {ritual.Duration / 60:F0}min";
-        infoLabel.Align = Label.AlignEnum.Center;
+        infoLabel.HorizontalAlignment = HorizontalAlignment.Center;
         infoLabel.AddThemeFontSizeOverride("font_size", 12);
         cardContainer.AddChild(infoLabel);
 
@@ -211,7 +211,7 @@ public partial class DailyRitualUI : Control
         }
         var bonusLabel = new Label();
         bonusLabel.Text = bonusText;
-        bonusLabel.Align = Label.AlignEnum.Center;
+        bonusLabel.HorizontalAlignment = HorizontalAlignment.Center;
         bonusLabel.AddThemeFontSizeOverride("font_size", 11);
         bonusLabel.Modulate = new Color(0.7f, 0.9f, 0.7f);
         cardContainer.AddChild(bonusLabel);
@@ -219,7 +219,7 @@ public partial class DailyRitualUI : Control
         // Reputation
         var repLabel = new Label();
         repLabel.Text = $"⭐ +{ritual.ReputationGain} Rep";
-        repLabel.Align = Label.AlignEnum.Center;
+        repLabel.HorizontalAlignment = HorizontalAlignment.Center;
         repLabel.AddThemeFontSizeOverride("font_size", 11);
         cardContainer.AddChild(repLabel);
 
@@ -241,7 +241,7 @@ public partial class DailyRitualUI : Control
         {
             var progressLabel = new Label();
             progressLabel.Text = $"🔮 In Progress...";
-            progressLabel.Align = Label.AlignEnum.Center;
+            progressLabel.HorizontalAlignment = HorizontalAlignment.Center;
             progressLabel.Modulate = new Color(0.3f, 0.8f, 1f);
             cardContainer.AddChild(progressLabel);
 

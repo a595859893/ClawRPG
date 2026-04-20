@@ -169,7 +169,7 @@ namespace ClawRPG.Scripts.Skills
         {
             var data = new Dictionary<string, object>();
             
-            var progressArray = new Array();
+            var progressArray = new Godot.Collections.Array();
             foreach (var playerKvp in _skillProgress)
             {
                 foreach (var skillKvp in playerKvp.Value)

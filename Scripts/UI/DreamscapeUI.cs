@@ -45,7 +45,7 @@ public partial class DreamscapeUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "Dreamscape System";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddFontOverride("font", GD.Load<DynamicFont>("res://Fonts/LargeFont.ttf"));
         _mainContainer.AddChild(_titleLabel);
         
@@ -67,25 +67,25 @@ public partial class DreamscapeUI : Control
         // Current layer info (shown when in dreamscape)
         _currentLayerLabel = new Label();
         _currentLayerLabel.Text = "";
-        _currentLayerLabel.Align = Label.AlignEnum.Center;
+        _currentLayerLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _currentLayerLabel.Visible = false;
         _mainContainer.AddChild(_currentLayerLabel);
         
         _timerLabel = new Label();
         _timerLabel.Text = "";
-        _timerLabel.Align = Label.AlignEnum.Center;
+        _timerLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _timerLabel.Visible = false;
         _mainContainer.AddChild(_timerLabel);
         
         _scoreLabel = new Label();
         _scoreLabel.Text = "";
-        _scoreLabel.Align = Label.AlignEnum.Center;
+        _scoreLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _scoreLabel.Visible = false;
         _mainContainer.AddChild(_scoreLabel);
         
         _ruleEffectLabel = new Label();
         _ruleEffectLabel.Text = "";
-        _ruleEffectLabel.Align = Label.AlignEnum.Center;
+        _ruleEffectLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _ruleEffectLabel.Visible = false;
         _mainContainer.AddChild(_ruleEffectLabel);
         
@@ -160,25 +160,25 @@ public partial class DreamscapeUI : Control
         
         var nameLabel = new Label();
         nameLabel.Text = ds.Name;
-        nameLabel.Align = Label.AlignEnum.Center;
+        nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
         nameLabel.AddFontOverride("font", GD.Load<DynamicFont>("res://Fonts/BoldFont.ttf"));
         vbox.AddChild(nameLabel);
         
         var typeLabel = new Label();
         typeLabel.Text = ds.Type.ToString();
-        typeLabel.Align = Label.AlignEnum.Center;
-        typeLabel.AddColorOverride("font_color", _GetTypeColor(ds.Type));
+        typeLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        typeLabel.AddThemeColorOverride("font_color", _GetTypeColor(ds.Type));
         vbox.AddChild(typeLabel);
         
         var layersInfo = new Label();
         layersInfo.Text = $"{ds.TotalLayers} Layers";
-        layersInfo.Align = Label.AlignEnum.Center;
+        layersInfo.HorizontalAlignment = HorizontalAlignment.Center;
         vbox.AddChild(layersInfo);
         
         var stateLabel = new Label();
         stateLabel.Text = ds.State.ToString();
-        stateLabel.Align = Label.AlignEnum.Center;
-        stateLabel.AddColorOverride("font_color", _GetStateColor(ds.State));
+        stateLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        stateLabel.AddThemeColorOverride("font_color", _GetStateColor(ds.State));
         vbox.AddChild(stateLabel);
         
         var selectButton = new Button();

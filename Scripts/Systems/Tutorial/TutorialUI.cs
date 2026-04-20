@@ -85,13 +85,13 @@ public partial class TutorialUI : Control
         currentTitle.Name = "CurrentTitle";
         currentTitle.Text = "当前教程";
         currentTitle.AddThemeFontSizeOverride("font_size", 18);
-        currentTitle.Align = Label.AlignEnum.Center;
+        currentTitle.HorizontalAlignment = HorizontalAlignment.Center;
         currentTab.AddChild(currentTitle);
 
         _stepLabel = new Label();
         _stepLabel.Name = "StepLabel";
         _stepLabel.Text = "步骤 0/0";
-        _stepLabel.Align = Label.AlignEnum.Center;
+        _stepLabel.HorizontalAlignment = HorizontalAlignment.Center;
         currentTab.AddChild(_stepLabel);
 
         _progressBar = new ProgressBar();
@@ -104,7 +104,7 @@ public partial class TutorialUI : Control
         _descriptionLabel = new Label();
         _descriptionLabel.Name = "Description";
         _descriptionLabel.Text = "暂无进行中的教程";
-        _descriptionLabel.Align = Label.AlignEnum.Center;
+        _descriptionLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _descriptionLabel.AutowrapMode = TextServer.AutowrapMode.Word;
         currentTab.AddChild(_descriptionLabel);
 
@@ -209,7 +209,7 @@ public partial class TutorialUI : Control
         titleLabel.Name = "StatsTitle";
         titleLabel.Text = "教程统计";
         titleLabel.AddThemeFontSizeOverride("font_size", 18);
-        titleLabel.Align = Label.AlignEnum.Center;
+        titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         statsTab.AddChild(titleLabel);
 
         var statsContainer = new GridContainer();
@@ -246,7 +246,7 @@ public partial class TutorialUI : Control
 
         var valueNode = new Label();
         valueNode.Text = value;
-        valueNode.Align = Label.AlignEnum.Right;
+        valueNode.HorizontalAlignment = HorizontalAlignment.Right;
         container.AddChild(valueNode);
     }
 

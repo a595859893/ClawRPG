@@ -381,7 +381,7 @@ public partial class EconomicWarningUI : Control
         grid.AddChild(labelNode);
         
         var valueNode = new Label { Text = value };
-        valueNode.Align = Label.AlignEnum.Right;
+        valueNode.HorizontalAlignment = HorizontalAlignment.Right;
         grid.AddChild(valueNode);
     }
 

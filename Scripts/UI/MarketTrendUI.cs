@@ -48,7 +48,7 @@ public partial class MarketTrendUI : Control
         
         Label title = new Label();
         title.Text = "📈 市场趋势分析";
-        title.AddColorOverride("font_color", new Color(1, 0.9, 0.5f));
+        title.AddThemeColorOverride("font_color", new Color(1, 0.9, 0.5f));
         title.Set("custom_fonts/font", CreateBoldFont(24));
         header.AddChild(title);
         
@@ -77,11 +77,11 @@ public partial class MarketTrendUI : Control
         
         Label sentimentTitle = new Label();
         sentimentTitle.Text = "市场情绪";
-        sentimentTitle.Align = Label.AlignEnum.Center;
+        sentimentTitle.HorizontalAlignment = HorizontalAlignment.Center;
         sentimentBox.AddChild(sentimentTitle);
         
         _sentimentLabel = new Label();
-        _sentimentLabel.Align = Label.AlignEnum.Center;
+        _sentimentLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _sentimentLabel.Set("custom_fonts/font", CreateBoldFont(20));
         sentimentBox.AddChild(_sentimentLabel);
         
@@ -91,11 +91,11 @@ public partial class MarketTrendUI : Control
         
         Label hotTitle = new Label();
         hotTitle.Text = "热门品类";
-        hotTitle.Align = Label.AlignEnum.Center;
+        hotTitle.HorizontalAlignment = HorizontalAlignment.Center;
         hotBox.AddChild(hotTitle);
         
         Label hotLabel = new Label();
-        hotLabel.Align = Label.AlignEnum.Center;
+        hotLabel.HorizontalAlignment = HorizontalAlignment.Center;
         hotBox.AddChild(hotLabel);
         
         // Investment Opportunities
@@ -104,11 +104,11 @@ public partial class MarketTrendUI : Control
         
         Label investTitle = new Label();
         investTitle.Text = "投资机会";
-        investTitle.Align = Label.AlignEnum.Center;
+        investTitle.HorizontalAlignment = HorizontalAlignment.Center;
         investBox.AddChild(investTitle);
         
         Label investLabel = new Label();
-        investLabel.Align = Label.AlignEnum.Center;
+        investLabel.HorizontalAlignment = HorizontalAlignment.Center;
         investBox.AddChild(investLabel);
         
         // Update overview
@@ -126,11 +126,11 @@ public partial class MarketTrendUI : Control
         sentiment.Text = sentimentText;
         
         if (sentimentValue > 20)
-            sentiment.AddColorOverride("font_color", _risingColor);
+            sentiment.AddThemeColorOverride("font_color", _risingColor);
         else if (sentimentValue < -20)
-            sentiment.AddColorOverride("font_color", _fallingColor);
+            sentiment.AddThemeColorOverride("font_color", _fallingColor);
         else
-            sentiment.AddColorOverride("font_color", _stableColor);
+            sentiment.AddThemeColorOverride("font_color", _stableColor);
         
         // Hot categories
         var hotCategories = _system.GetHotCategories(3);
@@ -237,7 +237,7 @@ public partial class MarketTrendUI : Control
             }
             
             dirLabel.Text = dirText;
-            dirLabel.AddColorOverride("font_color", dirColor);
+            dirLabel.AddThemeColorOverride("font_color", dirColor);
             dirLabel.RectMinSize = new Vector2(80, 0);
             trendRow.AddChild(dirLabel);
             
@@ -245,7 +245,7 @@ public partial class MarketTrendUI : Control
             Label changeLabel = new Label();
             string changeText = $"{trend.ChangePercent:+0.0;-0.0;0}%";
             changeLabel.Text = changeText;
-            changeLabel.AddColorOverride("font_color", trend.ChangePercent >= 0 ? _risingColor : _fallingColor);
+            changeLabel.AddThemeColorOverride("font_color", trend.ChangePercent >= 0 ? _risingColor : _fallingColor);
             changeLabel.RectMinSize = new Vector2(60, 0);
             trendRow.AddChild(changeLabel);
             
@@ -318,7 +318,7 @@ public partial class MarketTrendUI : Control
             }
             
             _trendLabel.Text = $"趋势: {dirText} ({trend.ChangePercent:+0.0;-0.0;0}%) | 强度: {trend.TrendStrength:F0}% | 波动率: {trend.Volatility:P0}";
-            _trendLabel.AddColorOverride("font_color", dirColor);
+            _trendLabel.AddThemeColorOverride("font_color", dirColor);
         }
         
         if (prediction != null)

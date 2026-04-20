@@ -32,7 +32,7 @@ public partial class PetPhotoUI : Control
         // Title
         Label title = new Label();
         title.Text = " 📸 Pet Photo Album";
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.AddThemeFontSizeOverride("font_size", 24);
         mainContainer.AddChild(title);
 
@@ -195,7 +195,7 @@ public partial class PetPhotoUI : Control
         {
             Label noDataLabel = new Label();
             noDataLabel.Text = "No photos yet! Take a photo with your pet.";
-            noDataLabel.Align = Label.AlignEnum.Center;
+            noDataLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _photoList.AddChild(noDataLabel);
             return;
         }

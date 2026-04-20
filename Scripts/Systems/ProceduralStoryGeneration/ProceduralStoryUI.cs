@@ -44,8 +44,8 @@ public partial class ProceduralStoryUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "Procedural Story System";
-        _titleLabel.Align = Label.AlignEnum.Center;
-        _titleLabel.AddColorOverride("font_color", _legendColor);
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        _titleLabel.AddThemeColorOverride("font_color", _legendColor);
         mainVBox.AddChild(_titleLabel);
         
         // Tab container
@@ -130,7 +130,7 @@ public partial class ProceduralStoryUI : Control
         {
             var noStoriesLabel = new Label();
             noStoriesLabel.Text = "No active stories. Start one!";
-            noStoriesLabel.AddColorOverride("font_color", Colors.Gray);
+            noStoriesLabel.AddThemeColorOverride("font_color", Colors.Gray);
             _activeStoriesContainer.AddChild(noStoriesLabel);
             return;
         }
@@ -159,7 +159,7 @@ public partial class ProceduralStoryUI : Control
         // Title
         var titleLabel = new Label();
         titleLabel.Text = story.StoryName;
-        titleLabel.AddColorOverride("font_color", _legendColor);
+        titleLabel.AddThemeColorOverride("font_color", _legendColor);
         titleLabel.FontSettings = new Label.LabelSettings
         {
             FontSize = 18
@@ -219,7 +219,7 @@ public partial class ProceduralStoryUI : Control
         // This would need to access the data from system
         var noHistoryLabel = new Label();
         noHistoryLabel.Text = "Story history will appear here.";
-        noHistoryLabel.AddColorOverride("font_color", Colors.Gray);
+        noHistoryLabel.AddThemeColorOverride("font_color", Colors.Gray);
         _historyContainer.AddChild(noHistoryLabel);
     }
     

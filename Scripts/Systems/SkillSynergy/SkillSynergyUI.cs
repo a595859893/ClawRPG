@@ -369,7 +369,7 @@ public partial class SkillSynergyUI : Control
         var valueNode = new Label();
         valueNode.Text = value;
         valueNode.AddThemeFontSizeOverride("font_size", 16);
-        valueNode.Align = Label.AlignEnum.Right;
+        valueNode.HorizontalAlignment = HorizontalAlignment.Right;
         grid.AddChild(valueNode);
     }
 

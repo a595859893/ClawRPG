@@ -118,7 +118,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
             _titleLabel.AddThemeFontSizeOverride("font_size", 18);
             _titleBar.AddChild(_titleLabel);
 
-            _titleBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
+            _titleBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
 
             _closeButton = new Button();
             _closeButton.Text = "✕";
@@ -132,25 +132,25 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
             _sceneLabel = new Label();
             _sceneLabel.Text = "场景: -";
             _sceneLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.8f));
-            _sceneLabel.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+            _sceneLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _infoBar.AddChild(_sceneLabel);
 
             _resultLabel = new Label();
             _resultLabel.Text = "结果: -";
             _resultLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.8f));
-            _resultLabel.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+            _resultLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _infoBar.AddChild(_resultLabel);
 
             _durationLabel = new Label();
             _durationLabel.Text = "时长: -";
             _durationLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.8f));
-            _durationLabel.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+            _durationLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _infoBar.AddChild(_durationLabel);
 
             _seedLabel = new Label();
             _seedLabel.Text = "Seed: -";
             _seedLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.6f));
-            _seedLabel.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+            _seedLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _infoBar.AddChild(_seedLabel);
 
             // 时间轴
@@ -167,7 +167,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
             _timelineSlider = new HSlider();
             _timelineSlider.MinValue = 0;
             _timelineSlider.Step = 0.1;
-            _timelineSlider.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+            _timelineSlider.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _timelineSlider.ValueChanged += OnSliderValueChanged;
             _timelineContainer.AddChild(_timelineSlider);
 
@@ -197,7 +197,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
             _fastForwardButton.Pressed += OnFastForwardPressed;
             _controlsBar.AddChild(_fastForwardButton);
 
-            _controlsBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
+            _controlsBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
 
             _speedLabel = new Label();
             _speedLabel.Text = "速度:";
@@ -212,11 +212,11 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
             // 历史记录区（操作列表）
             _historyScroll = new ScrollContainer();
             _historyScroll.CustomMinimumSize = new Vector2(0, 200);
-            _historyScroll.SizeFlagsVertical = Control.SizeFlagsExpandFill;
+            _historyScroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
             _mainVBox.AddChild(_historyScroll);
 
             _historyContainer = new VBoxContainer();
-            _historyContainer.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+            _historyContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _historyScroll.AddChild(_historyContainer);
 
             _noActionsLabel = new Label();
@@ -330,7 +330,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
 
             var detailLabel = new Label();
             detailLabel.Text = GetActionDetail(action);
-            detailLabel.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+            detailLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             detailLabel.AddThemeFontSizeOverride("font_size", 12);
             hbox.AddChild(detailLabel);
 

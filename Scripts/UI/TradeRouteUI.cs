@@ -30,12 +30,12 @@ public partial class TradeRouteUI : Control
     private void SetupUI()
     {
         var bg = new Panel();
-        bg.SetAnchor(AnchorsPreset.FullRect);
+        bg.SetAnchorsPreset(FullRect);
         bg.Modulate = new Color(0, 0, 0, 0.85f);
         AddChild(bg);
 
         var mainContainer = new VBoxContainer();
-        mainContainer.SetAnchor(AnchorsPreset.FullRect);
+        mainContainer.SetAnchorsPreset(FullRect);
         mainContainer.AddThemeConstantOverride("separation", 20);
         AddChild(mainContainer);
 
@@ -50,7 +50,7 @@ public partial class TradeRouteUI : Control
         header.AddChild(title);
 
         var spacer = new Control();
-        spacer.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+        spacer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         header.AddChild(spacer);
 
         _goldLabel = new Label();
@@ -75,7 +75,7 @@ public partial class TradeRouteUI : Control
 
         // Tab Container
         _tabContainer = new TabContainer();
-        _tabContainer.SizeFlagsVertical = Control.SizeFlagsExpandFill;
+        _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         mainContainer.AddChild(_tabContainer);
 
         // Routes Tab
@@ -107,7 +107,7 @@ public partial class TradeRouteUI : Control
         footer.AddChild(refreshBtn);
 
         var spacer2 = new Control();
-        spacer2.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+        spacer2.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         footer.AddChild(spacer2);
 
         var closeBtn = new Button();
@@ -121,7 +121,7 @@ public partial class TradeRouteUI : Control
     private void SetupRoutesTab(Control parent)
     {
         var scroll = new ScrollContainer();
-        scroll.SetAnchor(AnchorsPreset.FullRect);
+        scroll.SetAnchorsPreset(FullRect);
         scroll.AddThemeConstantOverride("h_separation", 10);
         parent.AddChild(scroll);
 
@@ -135,7 +135,7 @@ public partial class TradeRouteUI : Control
     private void SetupMarketTab(Control parent)
     {
         var scroll = new ScrollContainer();
-        scroll.SetAnchor(AnchorsPreset.FullRect);
+        scroll.SetAnchorsPreset(FullRect);
         parent.AddChild(scroll);
 
         _marketContainer = new VBoxContainer();
@@ -148,7 +148,7 @@ public partial class TradeRouteUI : Control
     private void SetupHistoryTab(Control parent)
     {
         var scroll = new ScrollContainer();
-        scroll.SetAnchor(AnchorsPreset.FullRect);
+        scroll.SetAnchorsPreset(FullRect);
         parent.AddChild(scroll);
 
         _historyContainer = new VBoxContainer();
@@ -225,7 +225,7 @@ public partial class TradeRouteUI : Control
 
         // Spacer
         var spacer = new Control();
-        spacer.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+        spacer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         hbox.AddChild(spacer);
 
         // Actions

@@ -345,10 +345,10 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
                 data["start_time"] = CurrentProgress.StartTime.ToString("o");
                 
                 // 已清理房间
-                data["cleared_rooms"] = new Array(CurrentProgress.ClearedRooms);
+                data["cleared_rooms"] = new Godot.Collections.Array(CurrentProgress.ClearedRooms);
                 
                 // 发现的秘密
-                data["discovered_secrets"] = new Array(CurrentProgress.DiscoveredSecrets);
+                data["discovered_secrets"] = new Godot.Collections.Array(CurrentProgress.DiscoveredSecrets);
             }
             
             return data;

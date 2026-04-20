@@ -53,7 +53,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             _titleLabel = new Label();
             _titleLabel.Text = "🔮 隐藏Boss系统";
             _titleLabel.RectPosition = new Vector2(20, 20);
-            _titleLabel.AddColorOverride("font_color", new Color(1f, 0.84f, 0f));
+            _titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
             AddChild(_titleLabel);
             
             // 标签容器
@@ -85,7 +85,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             _hintLabel = new Label();
             _hintLabel.Text = "按 B 键关闭 | 按 Tab 切换标签";
             _hintLabel.RectPosition = new Vector2(20, 550);
-            _hintLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+            _hintLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
             AddChild(_hintLabel);
             
             // 初始隐藏
@@ -176,7 +176,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             // Boss名称和图标
             var nameLabel = new Label();
             nameLabel.Text = $"{(boss.IsDiscovered ? "🔓" : "🔒")} {boss.BossName}";
-            nameLabel.AddColorOverride("font_color", GetRarityColor(boss.Rarity));
+            nameLabel.AddThemeColorOverride("font_color", GetRarityColor(boss.Rarity));
             titleBar.AddChild(nameLabel);
             
             titleBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
@@ -184,25 +184,25 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             // 稀有度标签
             var rarityLabel = new Label();
             rarityLabel.Text = $"[{boss.Rarity}]";
-            rarityLabel.AddColorOverride("font_color", GetRarityColor(boss.Rarity));
+            rarityLabel.AddThemeColorOverride("font_color", GetRarityColor(boss.Rarity));
             titleBar.AddChild(rarityLabel);
             
             // 类型标签
             var typeLabel = new Label();
             typeLabel.Text = $" {boss.Type}";
-            typeLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+            typeLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
             titleBar.AddChild(typeLabel);
             
             // 描述
             var descLabel = new Label();
             descLabel.Text = boss.Description;
-            descLabel.AddColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f));
+            descLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f));
             container.AddChild(descLabel);
             
             // 出现条件
             var conditionLabel = new Label();
             conditionLabel.Text = $"出现条件: {GetConditionText(boss.Condition)}";
-            conditionLabel.AddColorOverride("font_color", new Color(0.6f, 0.8f, 1f));
+            conditionLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.8f, 1f));
             container.AddChild(conditionLabel);
             
             // 状态
@@ -216,7 +216,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
                 status = "❓ 未知";
             }
             statusLabel.Text = status;
-            statusLabel.AddColorOverride("font_color", boss.IsDefeated ? new Color(0.3f, 1f, 0.3f) : new Color(0.8f, 0.8f, 0.8f));
+            statusLabel.AddThemeColorOverride("font_color", boss.IsDefeated ? new Color(0.3f, 1f, 0.3f) : new Color(0.8f, 0.8f, 0.8f));
             container.AddChild(statusLabel);
             
             // 分割线
@@ -238,7 +238,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             if (SecretBossSystem.Instance == null) {
                 var noDataLabel = new Label();
                 noDataLabel.Text = "系统未初始化";
-                noDataLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+                noDataLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
                 _activeBossContent.AddChild(noDataLabel);
                 return;
             }
@@ -248,7 +248,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             if (activeBosses.Count == 0) {
                 var noDataLabel = new Label();
                 noDataLabel.Text = "当前没有活跃的隐藏Boss";
-                noDataLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+                noDataLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
                 _activeBossContent.AddChild(noDataLabel);
                 return;
             }
@@ -271,14 +271,14 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             
             var nameLabel = new Label();
             nameLabel.Text = $"⚔ {boss.BossName} [{boss.Rarity}]";
-            nameLabel.AddColorOverride("font_color", GetRarityColor(boss.Rarity));
+            nameLabel.AddThemeColorOverride("font_color", GetRarityColor(boss.Rarity));
             container.AddChild(nameLabel);
             
             var infoLabel = new Label();
             float elapsed = OS.GetTicksMsec() / 1000f - spawnInfo.SpawnTime;
             float remaining = spawnInfo.Duration - elapsed;
             infoLabel.Text = $"剩余时间: {remaining:F1}秒 | 位置: {spawnInfo.Position}";
-            infoLabel.AddColorOverride("font_color", new Color(1f, 0.5f, 0.5f));
+            infoLabel.AddThemeColorOverride("font_color", new Color(1f, 0.5f, 0.5f));
             container.AddChild(infoLabel);
             
             var hSeparator = new HSeparator();
@@ -299,7 +299,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             if (SecretBossSystem.Instance == null) {
                 var noDataLabel = new Label();
                 noDataLabel.Text = "系统未初始化";
-                noDataLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+                noDataLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
                 _statisticsContent.AddChild(noDataLabel);
                 return;
             }
@@ -309,7 +309,7 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             // 标题
             var titleLabel = new Label();
             titleLabel.Text = "📊 隐藏Boss统计";
-            titleLabel.AddColorOverride("font_color", new Color(1f, 0.84f, 0f));
+            titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
             _statisticsContent.AddChild(titleLabel);
             
             AddStatRow("总计Boss数量", stats["TotalBosses"]);
@@ -328,12 +328,12 @@ namespace ClawRPG.Scripts.Systems.SecretBoss {
             
             var labelWidget = new Label();
             labelWidget.Text = $"{label}: ";
-            labelWidget.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
+            labelWidget.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
             row.AddChild(labelWidget);
             
             var valueWidget = new Label();
             valueWidget.Text = value.ToString();
-            valueWidget.AddColorOverride("font_color", new Color(1f, 0.84f, 0f));
+            valueWidget.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
             row.AddChild(valueWidget);
             
             _statisticsContent.AddChild(row);

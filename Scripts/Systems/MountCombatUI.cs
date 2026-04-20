@@ -78,15 +78,15 @@ namespace ClawRPG.Scripts.UI {
             // 坐骑名称标签
             _mountNameLabel = new Label();
             _mountNameLabel.Text = "坐骑战斗";
-            _mountNameLabel.Align = Label.AlignEnum.Center;
-            _mountNameLabel.AddColorOverride("font_color", new Color(0.9f, 0.8f, 0.4f, 1.0f));
+            _mountNameLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _mountNameLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.8f, 0.4f, 1.0f));
             mainVBox.AddChild(_mountNameLabel);
 
             // 战斗统计标签
             _combatStatsLabel = new Label();
             _combatStatsLabel.Text = "准备就绪";
-            _combatStatsLabel.Align = Label.AlignEnum.Center;
-            _combatStatsLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f, 1.0f));
+            _combatStatsLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _combatStatsLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f, 1.0f));
             _combatStatsLabel.RectMinHeight = 30;
             mainVBox.AddChild(_combatStatsLabel);
 
@@ -99,8 +99,8 @@ namespace ClawRPG.Scripts.UI {
             // 提示标签
             var hintLabel = new Label();
             hintLabel.Text = "点击技能按钮或按 1-9 释放技能";
-            hintLabel.Align = Label.AlignEnum.Center;
-            hintLabel.AddColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f, 1.0f));
+            hintLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            hintLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f, 1.0f));
             hintLabel.RectMinHeight = 20;
             mainVBox.AddChild(hintLabel);
         }
@@ -150,8 +150,8 @@ namespace ClawRPG.Scripts.UI {
                 // 技能名称
                 var skillLabel = new Label();
                 skillLabel.Text = skill.Name;
-                skillLabel.Align = Label.AlignEnum.Center;
-                skillLabel.AddColorOverride("font_color", Colors.White);
+                skillLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                skillLabel.AddThemeColorOverride("font_color", Colors.White);
                 skillLabel.RectMinSize = new Vector2(56, 20);
                 skillLabel.RectPosition = new Vector2(0, 18);
                 iconBg.AddChild(skillLabel);
@@ -159,8 +159,8 @@ namespace ClawRPG.Scripts.UI {
                 // 快捷键提示
                 var keyLabel = new Label();
                 keyLabel.Text = (i + 1).ToString();
-                keyLabel.Align = Label.AlignEnum.Center;
-                keyLabel.AddColorOverride("font_color", new Color(1f, 1f, 0.5f, 1f));
+                keyLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                keyLabel.AddThemeColorOverride("font_color", new Color(1f, 1f, 0.5f, 1f));
                 keyLabel.RectMinSize = new Vector2(56, 16);
                 keyLabel.RectPosition = new Vector2(0, 40);
                 iconBg.AddChild(keyLabel);
@@ -168,8 +168,8 @@ namespace ClawRPG.Scripts.UI {
                 // 冷却标签
                 var cooldownLabel = new Label();
                 cooldownLabel.Text = "";
-                cooldownLabel.Align = Label.AlignEnum.Center;
-                cooldownLabel.AddColorOverride("font_color", new Color(1f, 0.3f, 0.3f, 1f));
+                cooldownLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                cooldownLabel.AddThemeColorOverride("font_color", new Color(1f, 0.3f, 0.3f, 1f));
                 cooldownLabel.RectMinSize = new Vector2(56, 16);
                 cooldownLabel.RectPosition = new Vector2(0, 0);
                 iconBg.AddChild(cooldownLabel);

@@ -85,7 +85,8 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             
             // Tab container
             _tabContainer = new TabContainer();
-            _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlagsVertical.Fill);
+            _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            _tabContainer.SizeFlagsVertical = Control.SizeFlags.Fill;
             leftPanel.AddChild(_tabContainer);
             
             // Available tab
@@ -117,11 +118,12 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             
             var detailsLabel = new Label();
             detailsLabel.Text = "合同详情";
-            detailsLabel.Align = Label.AlignEnum.Center;
+            detailsLabel.HorizontalAlignment = HorizontalAlignment.Center;
             rightPanel.AddChild(detailsLabel);
             
             var detailsContainer = new ScrollContainer();
-            detailsContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlagsVertical.Fill);
+            detailsContainer.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            detailsContainer.SizeFlagsVertical = Control.SizeFlags.Fill;
             rightPanel.AddChild(detailsContainer);
             
             var detailsContent = new VBoxContainer();
@@ -170,7 +172,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             
             var valueNode = new Label();
             valueNode.Text = value;
-            valueNode.Align = Label.AlignEnum.Right;
+            valueNode.Align = Label.HorizontalAlignment.Right;
             row.AddChild(valueNode);
         }
         
@@ -204,7 +206,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             {
                 var emptyLabel = new Label();
                 emptyLabel.Text = "没有可用的合同";
-                emptyLabel.Align = Label.AlignEnum.Center;
+                emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 _availableTab.AddChild(emptyLabel);
             }
         }
@@ -225,7 +227,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             {
                 var emptyLabel = new Label();
                 emptyLabel.Text = "没有进行中的合同";
-                emptyLabel.Align = Label.AlignEnum.Center;
+                emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 _activeTab.AddChild(emptyLabel);
             }
         }
@@ -246,7 +248,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             {
                 var emptyLabel = new Label();
                 emptyLabel.Text = "没有已完成的合同";
-                emptyLabel.Align = Label.AlignEnum.Center;
+                emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 _completedTab.AddChild(emptyLabel);
             }
         }
@@ -351,7 +353,7 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
             // Title
             var title = new Label();
             title.Text = contract.title;
-            title.Align = Label.AlignEnum.Center;
+            title.Align = Label.HorizontalAlignment.Center;
             title.FontSize = 24;
             detailsContent.AddChild(title);
             
@@ -410,19 +412,19 @@ namespace ClawRPG.Scripts.Systems.ContractBounty
                 
                 var progressLabel = new Label();
                 progressLabel.Text = $"{contract.target.currentKills} / {contract.target.requiredKills}";
-                progressLabel.Align = Label.AlignEnum.Center;
+                progressLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 detailsContent.AddChild(progressLabel);
             }
         }
         
         // Signal handlers
-        private void _on_difficulty_selected(int index)
+        private void _on_difficulty_selected(long index)
         {
             _currentDifficultyFilter = index == 0 ? null : (ContractDifficulty)(index - 1);
             RefreshAvailableTab();
         }
         
-        private void _on_type_selected(int index)
+        private void _on_type_selected(long index)
         {
             _currentTypeFilter = index == 0 ? null : (ContractType)(index - 1);
             RefreshAvailableTab();

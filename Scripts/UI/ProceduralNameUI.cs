@@ -49,7 +49,7 @@ namespace ClawRPG.Systems {
             // Title
             _titleLabel = new Label();
             _titleLabel.Text = "Procedural Item Name Generator";
-            _titleLabel.Align = Label.AlignEnum.Center;
+            _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _titleLabel.AddThemeFontSizeOverride("font_size", 24);
             mainContainer.AddChild(_titleLabel);
             
@@ -146,7 +146,7 @@ namespace ClawRPG.Systems {
             // Result display
             _resultLabel = new Label();
             _resultLabel.Text = "Click Generate to create a name";
-            _resultLabel.Align = Label.AlignEnum.Center;
+            _resultLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _resultLabel.AddThemeFontSizeOverride("font_size", 20);
             _resultLabel.CustomMinimumSize = new Vector2(0, 60);
             generatorTab.AddChild(_resultLabel);

@@ -370,7 +370,7 @@ public partial class CombatRatingSystem : BaseSystem
 		exportData["session_stars"] = data.sessionStars;
 		
 		// 保存历史记录（限制最近50条）
-		var history = new Array();
+		var history = new Godot.Collections.Array();
 		int count = 0;
 		foreach (var record in data.ratingHistory)
 		{

@@ -108,7 +108,7 @@ namespace ClawRPG.Scripts.UI {
             _titleLabel.AddThemeFontSizeOverride("font_size", 28);
             header.AddChild(_titleLabel);
             
-            header.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlagsExpand });
+            header.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
             
             _closeButton = new Button();
             _closeButton.Text = "✕";
@@ -477,7 +477,7 @@ namespace ClawRPG.Scripts.UI {
             slider.MaxValue = max;
             slider.Step = 0.1f;
             slider.Value = defaultValue;
-            slider.SizeFlagsHorizontal = Control.SizeFlagsExpand;
+            slider.SizeFlagsHorizontal = Control.SizeFlags.Expand;
             slider.ValueChanged += (v) => {
                 onChange?.Invoke(v);
             };

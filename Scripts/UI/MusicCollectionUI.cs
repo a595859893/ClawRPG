@@ -89,13 +89,13 @@ namespace ClawRPG.Scripts.UI {
             _trackGrid.Columns = 4;
             _trackGrid.AddThemeConstantOverride("h_separation", 10);
             _trackGrid.AddThemeConstantOverride("v_separation", 10);
-            _trackGrid.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+            _trackGrid.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
             
             var scrollContainer = new ScrollContainer();
             scrollContainer.AddThemeConstantOverride("h_separation", 10);
             scrollContainer.AddThemeConstantOverride("v_separation", 10);
             scrollContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            scrollContainer.SizeFlagsVertical = Control.SizeFlags.ExpandAndFill;
+            scrollContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
             scrollContainer.AddChild(_trackGrid);
             _mainContainer.AddChild(scrollContainer);
             

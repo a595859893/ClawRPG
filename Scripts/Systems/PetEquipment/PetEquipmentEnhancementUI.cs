@@ -49,7 +49,7 @@ public partial class PetEquipmentEnhancementUI : Control
         Label title = new Label();
         title.Text = "🐾 Pet Equipment Enhancement";
         title.SetAnchorsPreset(Control.LayoutPreset.TopWide);
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.Position = new Vector2(0, 10);
         title.AddThemeFontSizeOverride("font_size", 24);
         _mainPanel.AddChild(title);
@@ -150,7 +150,7 @@ public partial class PetEquipmentEnhancementUI : Control
         _resultLabel.Text = "";
         _resultLabel.Position = new Vector2(290, 440);
         _resultLabel.Size = new Vector2(280, 40);
-        _resultLabel.Align = Label.AlignEnum.Center;
+        _resultLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _resultLabel.AddThemeFontSizeOverride("font_size", 16);
         _mainPanel.AddChild(_resultLabel);
 

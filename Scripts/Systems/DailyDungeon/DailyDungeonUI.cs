@@ -44,7 +44,7 @@ public partial class DailyDungeonUI : Control
     {
         // Main container
         _mainContainer = new VBoxContainer();
-        _mainContainer.SetAnchor(AnchorsPreset.Center);
+        _mainContainer.SetAnchorsPreset(Center);
         _mainContainer.SetAnchorPreset(AnchorsPreset.Center);
         _mainContainer.Position = new Vector2(-400, -300);
         _mainContainer.Size = new Vector2(800, 600);
@@ -156,12 +156,12 @@ public partial class DailyDungeonUI : Control
     {
         _combatUI = new Control();
         _combatUI.Visible = false; 
-        _combatUI.SetAnchor(AnchorsPreset.FullRect);
+        _combatUI.SetAnchorsPreset(FullRect);
         AddChild(_combatUI);
 
         // Background
         var combatBg = new PanelContainer();
-        combatBg.SetAnchor(AnchorsPreset.FullRect);
+        combatBg.SetAnchorsPreset(FullRect);
         
         var combatStyle = new StyleBoxFlat();
         combatStyle.BgColor = new Color(0.05f, 0.05f, 0.1f, 0.95f);
@@ -169,7 +169,7 @@ public partial class DailyDungeonUI : Control
         _combatUI.AddChild(combatBg);
 
         var combatContainer = new VBoxContainer();
-        combatContainer.SetAnchor(AnchorsPreset.Center);
+        combatContainer.SetAnchorsPreset(Center);
         combatContainer.SetAnchorPreset(AnchorsPreset.Center);
         combatContainer.Position = new Vector2(-200, -150);
         combatContainer.Size = new Vector2(400, 300);

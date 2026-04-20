@@ -26,7 +26,7 @@ public partial class SoulBondUI : Control
     {
         // Main container
         var mainContainer = new VBoxContainer();
-        mainContainer.SetAnchor(AnchorsPreset.FullRect);
+        mainContainer.SetAnchorsPreset(FullRect);
         mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(mainContainer);
 
@@ -38,7 +38,7 @@ public partial class SoulBondUI : Control
 
         // Tab container
         _tabContainer = new TabContainer();
-        _tabContainer.SetAnchor(AnchorsPreset.FullRect);
+        _tabContainer.SetAnchorsPreset(FullRect);
         _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         mainContainer.AddChild(_tabContainer);
 
@@ -48,7 +48,7 @@ public partial class SoulBondUI : Control
         _tabContainer.AddChild(bondsTab);
 
         _bondListContainer = new VBoxContainer();
-        _bondListContainer.SetAnchor(AnchorsPreset.FullRect);
+        _bondListContainer.SetAnchorsPreset(FullRect);
         _bondListContainer.AddThemeConstantOverride("separation", 10);
         bondsTab.AddChild(_bondListContainer);
 
@@ -58,7 +58,7 @@ public partial class SoulBondUI : Control
         _tabContainer.AddChild(historyTab);
 
         _historyContainer = new VBoxContainer();
-        _historyContainer.SetAnchor(AnchorsPreset.FullRect);
+        _historyContainer.SetAnchorsPreset(FullRect);
         _historyContainer.AddThemeConstantOverride("separation", 5);
         historyTab.AddChild(_historyContainer);
 
@@ -68,7 +68,7 @@ public partial class SoulBondUI : Control
         _tabContainer.AddChild(statsTab);
 
         _statsContainer = new VBoxContainer();
-        _statsContainer.SetAnchor(AnchorsPreset.FullRect);
+        _statsContainer.SetAnchorsPreset(FullRect);
         _statsContainer.AddThemeConstantOverride("separation", 10);
         statsTab.AddChild(_statsContainer);
 

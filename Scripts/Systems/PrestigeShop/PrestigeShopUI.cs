@@ -96,7 +96,7 @@ public partial class PrestigeShopUI : Control
 
         // === TAB CONTAINER ===
         _tabContainer = new TabContainer();
-        _tabContainer.SetHSizeFlags(Control.SizeFlags.ExpandFill);
+        _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         _tabContainer.SetCustomMinimumSize(new Vector2(0, PANEL_H - 140));
         _tabContainer.TabChanged += OnTabChanged;
         mainVBox.AddChild(_tabContainer);
@@ -110,7 +110,7 @@ public partial class PrestigeShopUI : Control
         for (int i = 0; i < _tabCategories.Length; i++)
         {
             var tabPanel = new Control();
-            tabPanel.SetHSizeFlags(Control.SizeFlags.ExpandFill | Control.SizeFlags.ShrinkBegin);
+            tabPanel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill | Control.SizeFlags.ShrinkBegin;
             _tabContainer.AddChild(tabPanel);
 
             var tabName = tabNames[i];
@@ -152,7 +152,7 @@ public partial class PrestigeShopUI : Control
 
         // Spacer
         var spacer1 = new Control();
-        spacer1.SetHSizeFlags(Control.SizeFlags.ExpandFill);
+        spacer1.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         header.AddChild(spacer1);
 
         // Tier badge
@@ -240,7 +240,7 @@ public partial class PrestigeShopUI : Control
         // Card panel
         var card = new Panel();
         card.SetCustomMinimumSize(new Vector2(0, ITEM_CARD_H));
-        card.SetHSizeFlags(Control.SizeFlags.ExpandFill);
+        card.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         card.AddThemeStyleboxOverride("panel", ItemCardStylebox(isUnlocked, isPurchased));
 
         var hbox = new HBoxContainer();
@@ -259,7 +259,7 @@ public partial class PrestigeShopUI : Control
 
         // Center: Name + Description + unlock info
         var infoVBox = new VBoxContainer();
-        infoVBox.SetHSizeFlags(Control.SizeFlags.ExpandFill);
+        infoVBox.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         infoVBox.AddThemeConstantOverride("separation", 4);
         hbox.AddChild(infoVBox);
 
@@ -304,7 +304,7 @@ public partial class PrestigeShopUI : Control
 
         // Right: Action button or status
         var actionContainer = new VBoxContainer();
-        actionContainer.SetHSizeFlags(Control.SizeFlags.ShrinkEnd);
+        actionContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
         actionContainer.VerticalAlignment = VerticalAlignment.Center;
         actionContainer.AddThemeConstantOverride("separation", 6);
         hbox.AddChild(actionContainer);

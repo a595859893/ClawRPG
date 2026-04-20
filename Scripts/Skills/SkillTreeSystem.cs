@@ -166,7 +166,7 @@ namespace ClawRPG.Scripts.Skills
         {
             var data = new Dictionary<string, object>();
             
-            var treesArray = new Array();
+            var treesArray = new Godot.Collections.Array();
             foreach (var playerKvp in _skillTrees)
             {
                 foreach (var treeKvp in playerKvp.Value)

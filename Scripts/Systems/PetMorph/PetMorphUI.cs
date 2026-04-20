@@ -47,7 +47,7 @@ public partial class PetMorphUI : Control
         _titleLabel = new Label();
         _titleLabel.Text = "宠物形态系统";
         _titleLabel.SetAnchorsPreset(Control.AnchorsPreset.TopWide);
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.Position = new Vector2(0, 10);
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         _mainContainer.AddChild(_titleLabel);

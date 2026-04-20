@@ -160,7 +160,7 @@ public partial class TattooUI : Control
             $"EVA: {bonuses["evasion"]}%";
     }
     
-    private void _on_tattoo_selected(int index)
+    private void _on_tattoo_selected(long index)
     {
         // Get tattoo ID from list
         var unlockedTattoos = _tattooSystem.GetUnlockedTattoos();
@@ -190,7 +190,7 @@ public partial class TattooUI : Control
         UpdateInfoLabel();
     }
     
-    private void _on_slot_selected(int index)
+    private void _on_slot_selected(long index)
     {
         var slots = _tattooSystem.GetAvailableSlots();
         if (index >= 0 && index < slots.Count)

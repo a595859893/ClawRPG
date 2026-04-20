@@ -47,13 +47,14 @@ public partial class RuneUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "⚔️ Rune System";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainVBox.AddChild(_titleLabel);
         
         // Tab container
         _tabContainer = new TabContainer();
-        _tabContainer.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlags.Fill);
+        _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            _tabContainer.SizeFlagsVertical = Control.SizeFlags.Fill;
         mainVBox.AddChild(_tabContainer);
         
         // Overview Tab
@@ -87,7 +88,8 @@ public partial class RuneUI : Control
     private void SetupOverviewTab()
     {
         var scroll = new ScrollContainer();
-        scroll.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlags.Fill);
+        scroll.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            scroll.SizeFlagsVertical = Control.SizeFlags.Fill;
         _overviewTab.AddChild(scroll);
         
         var content = new VBoxContainer();
@@ -152,7 +154,8 @@ public partial class RuneUI : Control
         
         // Rune grid
         var scroll = new ScrollContainer();
-        scroll.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlags.Fill);
+        scroll.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            scroll.SizeFlagsVertical = Control.SizeFlags.Fill;
         _runesTab.AddChild(scroll);
         
         _runesGrid = new GridContainer();
@@ -187,7 +190,8 @@ public partial class RuneUI : Control
     private void SetupStatisticsTab()
     {
         var scroll = new ScrollContainer();
-        scroll.SetSizeFlags(Control.SizeFlags.ExpandFill, Control.SizeFlags.Fill);
+        scroll.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            scroll.SizeFlagsVertical = Control.SizeFlags.Fill;
         _statisticsTab.AddChild(scroll);
         
         _statsLabel = new Label();
@@ -242,7 +246,7 @@ public partial class RuneUI : Control
             
             var slotLabel = new Label();
             slotLabel.Text = slot;
-            slotLabel.Align = Label.AlignEnum.Center;
+            slotLabel.HorizontalAlignment = HorizontalAlignment.Center;
             slotLabel.AddThemeFontSizeOverride("font_size", 12);
             slotVBox.AddChild(slotLabel);
             
@@ -254,14 +258,14 @@ public partial class RuneUI : Control
                 {
                     var runeLabel = new Label();
                     runeLabel.Text = rune.Name;
-                    runeLabel.Align = Label.AlignEnum.Center;
+                    runeLabel.HorizontalAlignment = HorizontalAlignment.Center;
                     runeLabel.AddThemeFontSizeOverride("font_size", 10);
                     slotVBox.AddChild(runeLabel);
                     
                     int level = RuneSystem.Instance.GetRuneLevel(runeId);
                     var levelLabel = new Label();
                     levelLabel.Text = $"Lv.{level}";
-                    levelLabel.Align = Label.AlignEnum.Center;
+                    levelLabel.HorizontalAlignment = HorizontalAlignment.Center;
                     slotVBox.AddChild(levelLabel);
                 }
             }
@@ -269,7 +273,7 @@ public partial class RuneUI : Control
             {
                 var emptyLabel = new Label();
                 emptyLabel.Text = "[Empty]";
-                emptyLabel.Align = Label.AlignEnum.Center;
+                emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 emptyLabel.AddThemeFontSizeOverride("font_size", 10);
                 slotVBox.AddChild(emptyLabel);
             }

@@ -612,7 +612,7 @@ namespace ClawRPG.Scripts.Systems
             data["total_enemies_defeated"] = _companionData.TotalEnemiesDefeated;
             
             // 保存学习技能
-            var learnedSkillsData = new Array();
+            var learnedSkillsData = new Godot.Collections.Array();
             foreach (var skill in _companionData.LearnedSkills)
             {
                 learnedSkillsData.Add(skill);

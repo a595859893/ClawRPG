@@ -51,7 +51,7 @@ public partial class DiceMasterUI : Control
         // Title
         titleLabel = new Label();
         titleLabel.Text = "🎲 Dice Master";
-        titleLabel.Align = Label.AlignEnum.Center;
+        titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainVBox.AddChild(titleLabel);
         
@@ -76,7 +76,7 @@ public partial class DiceMasterUI : Control
         // Result display
         resultLabel = new Label();
         resultLabel.Text = "Roll a dice!";
-        resultLabel.Align = Label.AlignEnum.Center;
+        resultLabel.HorizontalAlignment = HorizontalAlignment.Center;
         resultLabel.AddThemeFontSizeOverride("font_size", 32);
         mainVBox.AddChild(resultLabel);
         
@@ -105,19 +105,19 @@ public partial class DiceMasterUI : Control
         // Buff info
         buffLabel = new Label();
         buffLabel.Text = "No active buffs";
-        buffLabel.Align = Label.AlignEnum.Center;
+        buffLabel.HorizontalAlignment = HorizontalAlignment.Center;
         mainVBox.AddChild(buffLabel);
         
         // Stats
         statsLabel = new Label();
         statsLabel.Text = "Stats: Rolls: 0 | Wins: 0 | Best: 0";
-        statsLabel.Align = Label.AlignEnum.Center;
+        statsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         mainVBox.AddChild(statsLabel);
         
         // History
         historyLabel = new Label();
         historyLabel.Text = "History: ";
-        historyLabel.Align = Label.AlignEnum.Center;
+        historyLabel.HorizontalAlignment = HorizontalAlignment.Center;
         historyLabel.AddThemeFontSizeOverride("font_size", 12);
         mainVBox.AddChild(historyLabel);
         

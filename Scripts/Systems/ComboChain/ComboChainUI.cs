@@ -44,14 +44,14 @@ public partial class ComboChainUI : Control
         // 标题
         var titleLabel = new Label();
         titleLabel.Text = "⚔️ Combo Chain System ⚔️";
-        titleLabel.Align = Label.AlignEnum.Center;
+        titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainContainer.AddChild(titleLabel);
         
         // 连击数显示
         _chainCountLabel = new Label();
         _chainCountLabel.Text = "0";
-        _chainCountLabel.Align = Label.AlignEnum.Center;
+        _chainCountLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _chainCountLabel.AddThemeFontSizeOverride("font_size", 72);
         _chainCountLabel.AddThemeColorOverride("font_color", _normalColor);
         mainContainer.AddChild(_chainCountLabel);
@@ -59,7 +59,7 @@ public partial class ComboChainUI : Control
         // 连击等级
         _comboLevelLabel = new Label();
         _comboLevelLabel.Text = "Novice";
-        _comboLevelLabel.Align = Label.AlignEnum.Center;
+        _comboLevelLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _comboLevelLabel.AddThemeFontSizeOverride("font_size", 18);
         mainContainer.AddChild(_comboLevelLabel);
         
@@ -72,7 +72,7 @@ public partial class ComboChainUI : Control
         // 计时器标签
         _timerLabel = new Label();
         _timerLabel.Text = "Time: 0.0s";
-        _timerLabel.Align = Label.AlignEnum.Center;
+        _timerLabel.HorizontalAlignment = HorizontalAlignment.Center;
         mainContainer.AddChild(_timerLabel);
         
         // 计时器进度条

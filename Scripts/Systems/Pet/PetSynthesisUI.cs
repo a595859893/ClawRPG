@@ -71,7 +71,7 @@ public partial class PetSynthesisUI : Control
         var titleLabel = new Label();
         titleLabel.Text = "🐾 Pet Synthesis System";
         titleLabel.RectPosition = new Vector2(20, 10);
-        titleLabel.AddColorOverride("font_color", new Color(1f, 0.84f, 0f));
+        titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
         _mainPanel.AddChild(titleLabel);
         
         // Close button
@@ -150,13 +150,13 @@ public partial class PetSynthesisUI : Control
         // Result label
         _resultLabel = new Label();
         _resultLabel.Text = "";
-        _resultLabel.AddColorOverride("font_color", new Color(1f, 1f, 0f));
+        _resultLabel.AddThemeColorOverride("font_color", new Color(1f, 1f, 0f));
         container.AddChild(_resultLabel);
         
         // Help text
         var helpLabel = new Label();
         helpLabel.Text = "\nTips:\n- Combining pets may result in failure\n- Higher rarity = better stats\n- Some recipes require level prerequisites";
-        helpLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+        helpLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
         container.AddChild(helpLabel);
     }
     
@@ -195,7 +195,7 @@ public partial class PetSynthesisUI : Control
         // Title
         var title = new Label();
         title.Text = "📊 Synthesis Statistics";
-        title.AddColorOverride("font_color", new Color(1f, 0.84f, 0f));
+        title.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
         container.AddChild(title);
         
         _totalSynthesesLabel = new Label();
@@ -208,7 +208,7 @@ public partial class PetSynthesisUI : Control
         
         _legendarySynthesesLabel = new Label();
         _legendarySynthesesLabel.Text = "Legendary Results: 0";
-        _legendarySynthesesLabel.AddColorOverride("font_color", new Color(1f, 0.84f, 0f));
+        _legendarySynthesesLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
         container.AddChild(_legendarySynthesesLabel);
         
         _successRateStatLabel = new Label();
@@ -323,13 +323,13 @@ public partial class PetSynthesisUI : Control
         if (pet1Index <= 0 || pet2Index <= 0)
         {
             _resultLabel.Text = "⚠️ Please select both pets!";
-            _resultLabel.AddColorOverride("font_color", new Color(1f, 0.5f, 0.5f));
+            _resultLabel.AddThemeColorOverride("font_color", new Color(1f, 0.5f, 0.5f));
             return;
         }
         
         // Note: In actual implementation, we'd map these indices to pet IDs
         _resultLabel.Text = "🔮 Synthesizing...";
-        _resultLabel.AddColorOverride("font_color", new Color(0.5f, 0.8f, 1f));
+        _resultLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.8f, 1f));
         
         // Perform synthesis (placeholder)
         // PetSynthesisSystem.Instance.StartSynthesis(pet1Id, pet2Id);
@@ -338,7 +338,7 @@ public partial class PetSynthesisUI : Control
     private void _on_synthesis_started(int pet1Id, int pet2Id)
     {
         _resultLabel.Text = "🔮 Synthesizing...";
-        _resultLabel.AddColorOverride("font_color", new Color(0.5f, 0.8f, 1f));
+        _resultLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.8f, 1f));
     }
     
     private void _on_synthesis_completed(int resultPetId, string rarity)
@@ -348,16 +348,16 @@ public partial class PetSynthesisUI : Control
         switch (rarity)
         {
             case "Legendary":
-                _resultLabel.AddColorOverride("font_color", new Color(1f, 0.84f, 0f));
+                _resultLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
                 break;
             case "Epic":
-                _resultLabel.AddColorOverride("font_color", new Color(0.6f, 0.2f, 1f));
+                _resultLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.2f, 1f));
                 break;
             case "Rare":
-                _resultLabel.AddColorOverride("font_color", new Color(0.2f, 0.6f, 1f));
+                _resultLabel.AddThemeColorOverride("font_color", new Color(0.2f, 0.6f, 1f));
                 break;
             default:
-                _resultLabel.AddColorOverride("font_color", new Color(0.5f, 1f, 0.5f));
+                _resultLabel.AddThemeColorOverride("font_color", new Color(0.5f, 1f, 0.5f));
                 break;
         }
         
@@ -370,7 +370,7 @@ public partial class PetSynthesisUI : Control
     private void _on_synthesis_failed()
     {
         _resultLabel.Text = "💥 Synthesis Failed! Pets were lost.";
-        _resultLabel.AddColorOverride("font_color", new Color(1f, 0.3f, 0.3f));
+        _resultLabel.AddThemeColorOverride("font_color", new Color(1f, 0.3f, 0.3f));
         
         UpdateStatistics();
     }

@@ -412,7 +412,7 @@ public partial class TeamSystem : BaseSystem
             data["share_exp"] = _currentTeam.ShareExp;
             
             // 保存成员信息
-            var membersData = new Array();
+            var membersData = new Godot.Collections.Array();
             foreach (var member in _currentTeam.Members)
             {
                 var memberData = new Dictionary<string, object>();

@@ -7,8 +7,6 @@ public partial class GuildUI {
     private void OnCreateButtonPressed() {
         var popup = new AcceptDialog();
         popup.Title = "创建公会";
-        popup.SetAnchorsPreset(Control.LayoutPreset.Center);
-        popup.CustomMinimumSize = new Vector2(400, 200);
         GetTree().CurrentScene.AddChild(popup);
 
         var vbox = new VBoxContainer();
@@ -19,12 +17,13 @@ public partial class GuildUI {
         input.PlaceholderText = "输入公会名称...";
         vbox.AddChild(input);
 
-        popup.OkButtonPressed += () => {
-            if (GuildSystem.Instance.CreateGuild(input.Text)) {
+        popup.Confirmed += () => {
+            if (input.Text != "" && GuildSystem.Instance.CreateGuild(input.Text)) {
                 RefreshUI();
             }
+            popup.QueueFree();
         };
-        popup.CancelButtonPressed += () => popup.QueueFree();
+        popup.Canceled += () => popup.QueueFree();
         popup.PopupCentered();
     }
 
@@ -38,7 +37,7 @@ public partial class GuildUI {
     }
 
     private void OnLeaveButtonPressed() {
-        var confirm = new ConfirmDialog();
+        var confirm = new ConfirmationDialog();
         confirm.Title = "确认离开";
         confirm.DialogText = "确定要离开当前公会吗？";
         GetTree().CurrentScene.AddChild(confirm);
@@ -50,7 +49,7 @@ public partial class GuildUI {
     }
 
     private void OnDisbandButtonPressed() {
-        var confirm = new ConfirmDialog();
+        var confirm = new ConfirmationDialog();
         confirm.Title = "确认解散";
         confirm.DialogText = "确定要解散公会吗？此操作不可恢复！";
         GetTree().CurrentScene.AddChild(confirm);
@@ -79,20 +78,20 @@ public partial class GuildUI {
 
     // ===== 列表选择事件 =====
 
-    private void OnGuildSelected(int index) {
+    private void OnGuildSelected(long index) {
         if (index >= 0 && index < GuildSystem.Instance.AvailableGuilds.Count) {
-            selectedGuildId = GuildSystem.Instance.AvailableGuilds[index].GuildId;
+            selectedGuildId = GuildSystem.Instance.AvailableGuilds[(int)index].GuildId;
         }
     }
 
-    private void OnMemberSelected(int index) {
+    private void OnMemberSelected(long index) {
         if (GuildSystem.Instance.CurrentGuild != null &&
             index >= 0 && index < GuildSystem.Instance.CurrentGuild.Members.Count) {
-            selectedMemberId = GuildSystem.Instance.CurrentGuild.Members[index].PlayerId;
+            selectedMemberId = GuildSystem.Instance.CurrentGuild.Members[(int)index].PlayerId;
         }
     }
 
-    private void OnBuildingSelected(int index) {
+    private void OnBuildingSelected(long index) {
         if (GuildSystem.Instance.CurrentGuild != null) {
             int i = 0;
             foreach (var building in GuildSystem.Instance.CurrentGuild.Buildings.Values) {
@@ -105,7 +104,7 @@ public partial class GuildUI {
         }
     }
 
-    private void OnSkillSelected(int index) {
+    private void OnSkillSelected(long index) {
         if (GuildSystem.Instance.CurrentGuild != null) {
             int i = 0;
             foreach (var skill in GuildSystem.Instance.CurrentGuild.Skills.Values) {
@@ -118,7 +117,7 @@ public partial class GuildUI {
         }
     }
 
-    private void OnApplicationSelected(int index) {
+    private void OnApplicationSelected(long index) {
         // 注：单人模式选择申请（可选功能）
     }
 

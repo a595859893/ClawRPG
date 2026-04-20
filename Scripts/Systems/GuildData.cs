@@ -114,6 +114,9 @@ namespace GameSystems {
         public bool AllowInvite { get; set; } = true;
         public int RequiredLevel { get; set; } = 1;
         public int RequiredContribution { get; set; } = 0;
+
+        // 申请列表
+        public List<GuildApplication> Applications { get; set; } = new List<GuildApplication>();
     }
 
     // 公会申请

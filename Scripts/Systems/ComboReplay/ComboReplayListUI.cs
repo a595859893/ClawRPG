@@ -72,7 +72,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
             _titleLabel.AddThemeFontSizeOverride("font_size", 18);
             _titleBar.AddChild(_titleLabel);
 
-            _titleBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlagsExpandFill });
+            _titleBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
 
             _closeButton = new Button();
             _closeButton.Text = "✕";
@@ -82,11 +82,11 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
             // 列表区
             _listScroll = new ScrollContainer();
             _listScroll.CustomMinimumSize = new Vector2(0, 400);
-            _listScroll.SizeFlagsVertical = Control.SizeFlagsExpandFill;
+            _listScroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
             _mainVBox.AddChild(_listScroll);
 
             _listContainer = new VBoxContainer();
-            _listContainer.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+            _listContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _listScroll.AddChild(_listContainer);
 
             _emptyLabel = new Label();
@@ -166,7 +166,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
 
             // 中间信息
             var infoVBox = new VBoxContainer();
-            infoVBox.SizeFlagsHorizontal = Control.SizeFlagsExpandFill;
+            infoVBox.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             hbox.AddChild(infoVBox);
 
             var nameLabel = new Label();

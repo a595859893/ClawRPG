@@ -49,7 +49,7 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
             _titleLabel = new Label { Text = "🏆 荣誉墙", HorizontalAlignment = HorizontalAlignment.Left };
             headerContainer.AddChild(_titleLabel);
 
-            headerContainer.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFille });
+            headerContainer.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
             _countLabel = new Label { Text = "0 个传记", HorizontalAlignment = HorizontalAlignment.Right };
             _countLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f, 0.8f));
@@ -80,13 +80,13 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
             {
                 VerticalScrollMode = ScrollContainer.ScrollMode.Enabled,
                 HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
-                SizeFlagsVertical = SizeFlags.ExpandFille
+                SizeFlagsVertical = SizeFlags.ExpandFill
             };
             mainContainer.AddChild(_scrollContainer);
 
             _contentContainer = new VBoxContainer
             {
-                SizeFlagsHorizontal = SizeFlags.ExpandFille,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
                 CustomMinimumSize = new Vector2(440, 0)
             };
             _scrollContainer.AddChild(_contentContainer);
@@ -208,7 +208,7 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
             titleNameLabel.AddThemeFontSizeOverride("font_size", 15);
             titleRow.AddChild(titleNameLabel);
 
-            titleRow.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFille });
+            titleRow.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
             // 日期标签
             var dateLabel = new Label

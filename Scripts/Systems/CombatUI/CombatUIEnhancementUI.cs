@@ -63,7 +63,7 @@ namespace ClawRPG.Systems
             // Title
             _titleLabel = new Label();
             _titleLabel.Text = "⚔️ Combat UI Enhancement";
-            _titleLabel.Align = Label.AlignEnum.Center;
+            _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _mainContainer.AddChild(_titleLabel);
             
             // Enabled checkbox
@@ -109,7 +109,7 @@ namespace ClawRPG.Systems
             
             _comboLabel = new Label();
             _comboLabel.Text = "Combo: 0";
-            _comboLabel.AddColorOverride("font_color", new Color(1f, 0.8f, 0f));
+            _comboLabel.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0f));
             _mainContainer.AddChild(_comboLabel);
             
             // Separator
@@ -165,7 +165,7 @@ namespace ClawRPG.Systems
             // Close hint
             var closeHint = new Label();
             closeHint.Text = "Press ESC to close";
-            closeHint.AddColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+            closeHint.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
             _mainContainer.AddChild(closeHint);
             
             // Initial state
@@ -203,11 +203,11 @@ namespace ClawRPG.Systems
             
             // Combo color scaling
             if (combo > 10)
-                _comboLabel.AddColorOverride("font_color", new Color(1f, 0.3f, 0f));
+                _comboLabel.AddThemeColorOverride("font_color", new Color(1f, 0.3f, 0f));
             else if (combo > 5)
-                _comboLabel.AddColorOverride("font_color", new Color(1f, 0.6f, 0f));
+                _comboLabel.AddThemeColorOverride("font_color", new Color(1f, 0.6f, 0f));
             else
-                _comboLabel.AddColorOverride("font_color", new Color(1f, 0.8f, 0f));
+                _comboLabel.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0f));
             
             // Update skill cooldowns
             var cooldowns = _system.GetAllCooldowns();
@@ -253,8 +253,8 @@ namespace ClawRPG.Systems
                 
                 var effectLabel = new Label();
                 effectLabel.Text = effect.DisplayName;
-                effectLabel.Align = Label.AlignEnum.Center;
-                effectLabel.AddColorOverride("font_color", effect.EffectColor);
+                effectLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                effectLabel.AddThemeColorOverride("font_color", effect.EffectColor);
                 effectContainer.AddChild(effectLabel);
                 
                 var progressBar = new ProgressBar();

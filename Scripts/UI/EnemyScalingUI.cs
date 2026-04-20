@@ -46,7 +46,7 @@ public partial class EnemyScalingUI : Control
         // 标题
         _titleLabel = new Label();
         _titleLabel.Text = "⚔️ Enemy Scaling System";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         mainContainer.AddChild(_titleLabel);
 
@@ -231,7 +231,7 @@ public partial class EnemyScalingUI : Control
     {
         var label = new Label();
         label.Text = text;
-        label.Align = Label.AlignEnum.Right;
+        label.HorizontalAlignment = HorizontalAlignment.Right;
         return label;
     }
 

@@ -49,7 +49,7 @@ public partial class RandomQuestUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "  📜 Random Quest Generator  📜";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.Modulate = Colors.Gold;
         _titleLabel.AddThemeFontSizeOverride("font_size", 26);
         _mainContainer.AddChild(_titleLabel);
@@ -170,7 +170,7 @@ public partial class RandomQuestUI : Control
             Label noQuests = new Label();
             noQuests.Text = "No active quests.\nClick 'Generate New Quests' to get some!";
             noQuests.Modulate = Colors.Gray;
-            noQuests.Align = Label.AlignEnum.Center;
+            noQuests.HorizontalAlignment = HorizontalAlignment.Center;
             _activeQuestsContainer.AddChild(noQuests);
             return;
         }
@@ -282,7 +282,7 @@ public partial class RandomQuestUI : Control
             Label noCompleted = new Label();
             noCompleted.Text = "No completed quests yet.";
             noCompleted.Modulate = Colors.Gray;
-            noCompleted.Align = Label.AlignEnum.Center;
+            noCompleted.HorizontalAlignment = HorizontalAlignment.Center;
             _completedQuestsContainer.AddChild(noCompleted);
             return;
         }

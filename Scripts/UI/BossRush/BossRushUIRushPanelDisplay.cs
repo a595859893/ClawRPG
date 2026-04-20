@@ -37,7 +37,7 @@ namespace ClawRPG.Scripts.UI.BossRush
                 HorizontalAlignment = HorizontalAlignment.Center
             };
             _statusLabel.AddThemeFontSizeOverride("font_size", 24);
-            _statusLabel.SetAnchor(AnchorsPreset.TopWide);
+            _statusLabel.SetAnchorsPreset(TopWide);
             _statusLabel.Position = new Vector2(0, 20);
             parent.AddChild(_statusLabel);
             
@@ -47,7 +47,7 @@ namespace ClawRPG.Scripts.UI.BossRush
                 Text = "Stage: 1"
             };
             _stageLabel.AddThemeFontSizeOverride("font_size", 20);
-            _stageLabel.SetAnchor(AnchorsPreset.TopWide);
+            _stageLabel.SetAnchorsPreset(TopWide);
             _stageLabel.Position = new Vector2(0, 70);
             parent.AddChild(_stageLabel);
             
@@ -57,7 +57,7 @@ namespace ClawRPG.Scripts.UI.BossRush
                 Text = "Current Streak: 0 | Best Streak: 0"
             };
             _streakLabel.AddThemeFontSizeOverride("font_size", 18);
-            _streakLabel.SetAnchor(AnchorsPreset.TopWide);
+            _streakLabel.SetAnchorsPreset(TopWide);
             _streakLabel.Position = new Vector2(0, 110);
             parent.AddChild(_streakLabel);
             
@@ -74,7 +74,7 @@ namespace ClawRPG.Scripts.UI.BossRush
             {
                 Text = "Health:"
             };
-            healthTitle.SetAnchor(AnchorsPreset.TopWide);
+            healthTitle.SetAnchorsPreset(TopWide);
             healthTitle.Position = new Vector2(200, 160);
             parent.AddChild(healthTitle);
             
@@ -86,14 +86,14 @@ namespace ClawRPG.Scripts.UI.BossRush
                 Value = 100,
                 ShowPercentage = false
             };
-            _healthBar.SetAnchor(AnchorsPreset.TopWide);
+            _healthBar.SetAnchorsPreset(TopWide);
             parent.AddChild(_healthBar);
             
             _healthLabel = new Label
             {
                 Text = "100%"
             };
-            _healthLabel.SetAnchor(AnchorsPreset.TopWide);
+            _healthLabel.SetAnchorsPreset(TopWide);
             _healthLabel.Position = new Vector2(350, 165);
             parent.AddChild(_healthLabel);
         }

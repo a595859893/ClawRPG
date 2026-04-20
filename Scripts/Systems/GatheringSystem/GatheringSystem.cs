@@ -233,7 +233,7 @@ public partial class GatheringSystem : BaseSystem
         }
         
         // 工具数据
-        var toolsData = new Array();
+        var toolsData = new Godot.Collections.Array();
         foreach (var kvp in tools)
         {
             toolsData.Add(new System.Collections.Generic.System.Collections.Generic.Dictionary<string, object>

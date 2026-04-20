@@ -60,16 +60,16 @@ public partial class AchievementUI : Control
 
         _titleLabel = new Label();
         _titleLabel.Text = "🏆 Achievements";
-        _titleLabel.AddColorOverride("font_color", new Color(1, 0.84f, 0));
+        _titleLabel.AddThemeColorOverride("font_color", new Color(1, 0.84f, 0));
         _titleLabel.RectMinSize = new Vector2(0, 40);
-        _titleLabel.Align = Label.AlignEnum.Left;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Left;
         _titleLabel.AddFontOverride("font_size", 24);
         _headerContainer.AddChild(_titleLabel);
 
         _progressLabel = new Label();
         _progressLabel.Text = "0 / 0 Unlocked";
-        _progressLabel.AddColorOverride("font_color", Colors.White);
-        _progressLabel.Align = Label.AlignEnum.Right;
+        _progressLabel.AddThemeColorOverride("font_color", Colors.White);
+        _progressLabel.HorizontalAlignment = HorizontalAlignment.Right;
         _headerContainer.AddChild(_progressLabel);
 
         // Tab container
@@ -104,7 +104,7 @@ public partial class AchievementUI : Control
 
         var sep1 = new Label();
         sep1.Text = "  |  ";
-        sep1.AddColorOverride("font_color", Colors.Gray);
+        sep1.AddThemeColorOverride("font_color", Colors.Gray);
         statsPanel.AddChild(sep1);
 
         _bossKillsLabel = CreateStatLabel("Bosses: 0");
@@ -112,7 +112,7 @@ public partial class AchievementUI : Control
 
         var sep2 = new Label();
         sep2.Text = "  |  ";
-        sep2.AddColorOverride("font_color", Colors.Gray);
+        sep2.AddThemeColorOverride("font_color", Colors.Gray);
         statsPanel.AddChild(sep2);
 
         _pvpWinsLabel = CreateStatLabel("PvP Wins: 0");
@@ -120,7 +120,7 @@ public partial class AchievementUI : Control
 
         var sep3 = new Label();
         sep3.Text = "  |  ";
-        sep3.AddColorOverride("font_color", Colors.Gray);
+        sep3.AddThemeColorOverride("font_color", Colors.Gray);
         statsPanel.AddChild(sep3);
 
         _goldLabel = CreateStatLabel("Gold: 0");
@@ -128,7 +128,7 @@ public partial class AchievementUI : Control
 
         var sep4 = new Label();
         sep4.Text = "  |  ";
-        sep4.AddColorOverride("font_color", Colors.Gray);
+        sep4.AddThemeColorOverride("font_color", Colors.Gray);
         statsPanel.AddChild(sep4);
 
         _playTimeLabel = CreateStatLabel("Playtime: 0h");
@@ -137,8 +137,8 @@ public partial class AchievementUI : Control
         // Bottom hint
         var hintLabel = new Label();
         hintLabel.Text = "Press H to toggle  |  ESC to close";
-        hintLabel.AddColorOverride("font_color", Colors.Gray);
-        hintLabel.Align = Label.AlignEnum.Center;
+        hintLabel.AddThemeColorOverride("font_color", Colors.Gray);
+        hintLabel.HorizontalAlignment = HorizontalAlignment.Center;
         hintLabel.SetAnchorsPreset(Control.LayoutPreset.BottomWide);
         hintLabel.MarginBottom = 10;
         _mainContainer.AddChild(hintLabel);
@@ -191,8 +191,8 @@ public partial class AchievementUI : Control
     {
         var label = new Label();
         label.Text = text;
-        label.AddColorOverride("font_color", Colors.White);
-        label.Align = Label.AlignEnum.Center;
+        label.AddThemeColorOverride("font_color", Colors.White);
+        label.HorizontalAlignment = HorizontalAlignment.Center;
         return label;
     }
 
@@ -269,13 +269,13 @@ public partial class AchievementUI : Control
 
         var nameLabel = new Label();
         nameLabel.Text = achievement.name;
-        nameLabel.AddColorOverride("font_color", GetRarityColor(achievement.rarity));
+        nameLabel.AddThemeColorOverride("font_color", GetRarityColor(achievement.rarity));
         nameLabel.AddFontOverride("font_size", 16);
         infoVbox.AddChild(nameLabel);
 
         var descLabel = new Label();
         descLabel.Text = achievement.description;
-        descLabel.AddColorOverride("font_color", achievement.isUnlocked ? Colors.LightGreen : Colors.Gray);
+        descLabel.AddThemeColorOverride("font_color", achievement.isUnlocked ? Colors.LightGreen : Colors.Gray);
         descLabel.Autowrap = true;
         infoVbox.AddChild(descLabel);
 
@@ -286,16 +286,16 @@ public partial class AchievementUI : Control
         hbox.AddChild(progressVbox);
 
         var progressText = new Label();
-        progressText.Align = Label.AlignEnum.Right;
+        progressText.HorizontalAlignment = HorizontalAlignment.Right;
         if (achievement.isUnlocked)
         {
             progressText.Text = "✓ COMPLETED";
-            progressText.AddColorOverride("font_color", Colors.Green);
+            progressText.AddThemeColorOverride("font_color", Colors.Green);
         }
         else
         {
             progressText.Text = $"{achievement.currentProgress} / {achievement.requirement}";
-            progressText.AddColorOverride("font_color", Colors.White);
+            progressText.AddThemeColorOverride("font_color", Colors.White);
         }
         progressVbox.AddChild(progressText);
 
@@ -310,8 +310,8 @@ public partial class AchievementUI : Control
         // Reward
         var rewardLabel = new Label();
         rewardLabel.Text = $"💰 {achievement.rewardGold} | ✨ {achievement.rewardExp}";
-        rewardLabel.AddColorOverride("font_color", Colors.Yellow);
-        rewardLabel.Align = Label.AlignEnum.Right;
+        rewardLabel.AddThemeColorOverride("font_color", Colors.Yellow);
+        rewardLabel.HorizontalAlignment = HorizontalAlignment.Right;
         progressVbox.AddChild(rewardLabel);
 
         return card;

@@ -492,7 +492,7 @@ namespace ClawRPG.Scripts.Mounts {
         public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, object>();
-            var mountCombatList = new Array();
+            var mountCombatList = new Godot.Collections.Array();
             
             foreach (var kvp in _mountCombatData)
             {
@@ -505,7 +505,7 @@ namespace ClawRPG.Scripts.Mounts {
                     { "combat_damage_dealt", kvp.Value.CombatDamageDealt },
                     { "combat_damage_taken", kvp.Value.CombatDamageTaken },
                     { "combat_kills", kvp.Value.CombatKills },
-                    { "unlocked_skills", new Array(kvp.Value.UnlockedSkills) }
+                    { "unlocked_skills", new Godot.Collections.Array(kvp.Value.UnlockedSkills) }
                 };
                 
                 // 序列化冷却

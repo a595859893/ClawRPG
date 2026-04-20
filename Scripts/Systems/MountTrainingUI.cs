@@ -78,8 +78,8 @@ public partial class MountTrainingUI : Control
         title.Text = "Mount Training System";
         title.SetAnchor(0, 0, 0, 0);
         title.SetOffset(0, 10, 300, 50);
-        title.Align = Label.AlignEnum.Center;
-        title.AddColorOverride("font_color", new Color(1, 0.9, 0.5f));
+        title.HorizontalAlignment = HorizontalAlignment.Center;
+        title.AddThemeColorOverride("font_color", new Color(1, 0.9, 0.5f));
         mainContainer.AddChild(title);
         
         // Mount selector
@@ -214,7 +214,7 @@ public partial class MountTrainingUI : Control
         projectNameLabel.Text = "Select a training project";
         projectNameLabel.SetAnchor(0, 0, 0, 0);
         projectNameLabel.SetOffset(20, 20, 400, 50);
-        projectNameLabel.AddColorOverride("font_color", new Color(1, 0.9, 0.5f));
+        projectNameLabel.AddThemeColorOverride("font_color", new Color(1, 0.9, 0.5f));
         detailsTab.AddChild(projectNameLabel);
         
         projectDescLabel = new Label();
@@ -234,14 +234,14 @@ public partial class MountTrainingUI : Control
         projectRewardsLabel.Text = "";
         projectRewardsLabel.SetAnchor(0, 0, 0, 0);
         projectRewardsLabel.SetOffset(20, 170, 600, 250);
-        projectRewardsLabel.AddColorOverride("font_color", new Color(0.5f, 1, 0.5f));
+        projectRewardsLabel.AddThemeColorOverride("font_color", new Color(0.5f, 1, 0.5f));
         detailsTab.AddChild(projectRewardsLabel);
         
         dailyLimitLabel = new Label();
         dailyLimitLabel.Text = "";
         dailyLimitLabel.SetAnchor(0, 0, 0, 0);
         dailyLimitLabel.SetOffset(20, 260, 400, 290);
-        dailyLimitLabel.AddColorOverride("font_color", new Color(1, 0.5f, 0.5f));
+        dailyLimitLabel.AddThemeColorOverride("font_color", new Color(1, 0.5f, 0.5f));
         detailsTab.AddChild(dailyLimitLabel);
     }
     
@@ -438,7 +438,7 @@ public partial class MountTrainingUI : Control
         UpdateMountDisplay();
     }
     
-    private void _on_project_selected(int index)
+    private void _on_project_selected(long index)
     {
         ItemList selectedList = null;
         

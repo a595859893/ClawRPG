@@ -575,7 +575,7 @@ namespace ClawRPG.Scripts.Systems
                 shopData["total_spent"] = kvp.Value.TotalSpent;
                 
                 // 保存物品购买记录
-                var itemRecords = new Array();
+                var itemRecords = new Godot.Collections.Array();
                 foreach (var record in kvp.Value.PurchaseRecords)
                 {
                     var recordData = new Dictionary<string, object>();

@@ -447,7 +447,7 @@ public partial class SkillComboSystem : BaseSystem
         data["total_combos_triggered"] = _playerData.TotalCombosTriggered;
         
         // Discovered combos
-        var discoveredCombos = new Array();
+        var discoveredCombos = new Godot.Collections.Array();
         foreach (var combo in _playerData.DiscoveredCombos)
         {
             discoveredCombos.Add(combo);

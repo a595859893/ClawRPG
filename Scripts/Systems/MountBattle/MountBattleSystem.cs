@@ -524,7 +524,7 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
             data["best_streak"] = _data.BestStreak;
             
             // 激活的坐骑战斗技能
-            data["unlocked_mount_skills"] = new Array(_data.UnlockedMountSkills);
+            data["unlocked_mount_skills"] = new Godot.Collections.Array(_data.UnlockedMountSkills);
             
             // 技能等级
             var skillLevels = new Dictionary<string, object>();

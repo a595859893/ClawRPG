@@ -43,7 +43,7 @@ public partial class MilestoneUI : Control
         // Title
         var title = new Label();
         title.Text = "Milestones";
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         title.AddFontOverride("font_size", 24);
         mainVBox.AddChild(title);
         
@@ -214,7 +214,7 @@ public partial class MilestoneUI : Control
         
         var valueNode = new Label();
         valueNode.Text = value;
-        valueNode.Align = Label.AlignEnum.Right;
+        valueNode.HorizontalAlignment = HorizontalAlignment.Right;
         hbox.AddChild(valueNode);
     }
     
@@ -296,7 +296,7 @@ public partial class MilestoneUI : Control
         // Statistics tab is rebuilt when selected
     }
     
-    private void OnMilestoneSelected(int index)
+    private void OnMilestoneSelected(long index)
     {
         if (!_displayedMilestones.ContainsKey(index))
             return;

@@ -269,7 +269,7 @@ namespace ClawRPG.Scripts.Systems {
             {
                 var data = new Dictionary
                 {
-                    { "purchased_costumes", new Array(_playerData.PurchasedCostumes) },
+                    { "purchased_costumes", new Godot.Collections.Array(_playerData.PurchasedCostumes) },
                     { "equipped_outfit", _playerData.EquippedOutfit },
                     { "equipped_hat", _playerData.EquippedHat },
                     { "equipped_weapon_skin", _playerData.EquippedWeaponSkin },
@@ -353,7 +353,7 @@ namespace ClawRPG.Scripts.Systems {
         {
             return new Dictionary
             {
-                { "purchased_costumes", new Array(_playerData.PurchasedCostumes) },
+                { "purchased_costumes", new Godot.Collections.Array(_playerData.PurchasedCostumes) },
                 { "equipped_outfit", _playerData.EquippedOutfit },
                 { "equipped_hat", _playerData.EquippedHat },
                 { "equipped_weapon_skin", _playerData.EquippedWeaponSkin },

@@ -146,7 +146,7 @@ namespace ClawRPG.Systems {
         public override Dictionary<string, object> ExportSaveData()
         {
             var data = new Dictionary<string, object>();
-            var unlocked = new Array();
+            var unlocked = new Godot.Collections.Array();
             foreach (var badgeId in _unlockedBadges)
             {
                 unlocked.Add(badgeId);

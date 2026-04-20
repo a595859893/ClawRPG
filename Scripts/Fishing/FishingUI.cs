@@ -103,7 +103,8 @@ namespace ClawRPG.Scripts.Fishing
             
             // 标签页容器
             _tabContainer = new TabContainer();
-            _tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.Fill);
+            _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+            _tabContainer.SizeFlagsVertical = Control.SizeFlags.Fill;
             mainVBox.AddChild(_tabContainer);
             
             // 钓鱼页

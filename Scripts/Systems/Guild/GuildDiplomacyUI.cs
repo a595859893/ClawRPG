@@ -50,8 +50,8 @@ public partial class GuildDiplomacyUI : Control
         // 标题
         var titleLabel = new Label();
         titleLabel.Text = "  🏛️ Guild Diplomacy";
-        titleLabel.AddColorOverride("font_color", new Color(1, 0.9, 0.6));
-        titleLabel.Align = Label.AlignEnum.Left;
+        titleLabel.AddThemeColorOverride("font_color", new Color(1, 0.9, 0.6));
+        titleLabel.HorizontalAlignment = HorizontalAlignment.Left;
         mainContainer.AddChild(titleLabel);
         
         // 统计面板
@@ -193,7 +193,7 @@ public partial class GuildDiplomacyUI : Control
         label.Text = $"  {relation.GuildName} - {typeStr} (Trust: {trustStr})";
         
         Color labelColor = GetRelationColor(relation.Type);
-        label.AddColorOverride("font_color", labelColor);
+        label.AddThemeColorOverride("font_color", labelColor);
         
         container.AddChild(label);
         
@@ -213,7 +213,7 @@ public partial class GuildDiplomacyUI : Control
         
         var label = new Label();
         label.Text = $"  {guildName} - {GetRelationTypeString(type)}";
-        label.AddColorOverride("font_color", GetRelationColor(type));
+        label.AddThemeColorOverride("font_color", GetRelationColor(type));
         
         container.AddChild(label);
         

@@ -44,7 +44,7 @@ namespace ClawRPG.Scripts.UI.Ripple {
             // 调试标签（开发用）
             _debugLabel = new Label();
             _debugLabel.Text = "Ripple: --";
-            _debugLabel.Align = Label.AlignEnum.Right;
+            _debugLabel.HorizontalAlignment = HorizontalAlignment.Right;
             AddChild(_debugLabel);
 
             // 初始隐藏
@@ -210,9 +210,9 @@ namespace ClawRPG.Scripts.UI.Ripple {
             // 添加问号符号表示预兆
             var label = new Label();
             label.Text = "?";
-            label.Align = Label.AlignEnum.Center;
+            label.HorizontalAlignment = HorizontalAlignment.Center;
             label.Valign = Label.VAlign.Center;
-            label.AddColorOverride("font_color", Colors.White);
+            label.AddThemeColorOverride("font_color", Colors.White);
             label.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             bg.AddChild(label);
 

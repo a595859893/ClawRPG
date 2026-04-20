@@ -110,7 +110,7 @@ public partial class PartyUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "组队系统";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         _titleLabel.AddThemeColorOverride("font_color", _primaryColor);
         _mainVBox.AddChild(_titleLabel);
@@ -124,8 +124,8 @@ public partial class PartyUI : Control
 
         // Tab Container
         _tabContainer = new TabContainer();
-        _tabContainer.SetSizeFlagsHorizontal(Control.SizeFlags.ExpandFill);
-        _tabContainer.SetSizeFlagsVertical(Control.SizeFlags.ExpandFill);
+        _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _mainVBox.AddChild(_tabContainer);
 
         SetupPartyListTab();
@@ -155,7 +155,7 @@ public partial class PartyUI : Control
         header.AddChild(_createPartyButton);
 
         _partyListScroll = new ScrollContainer();
-        _partyListScroll.SetSizeFlagsVertical(Control.SizeFlags.ExpandFill);
+        _partyListScroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _partyListTab.AddChild(_partyListScroll);
 
         _partyListContainer = new VBoxContainer();
@@ -197,7 +197,7 @@ public partial class PartyUI : Control
         _myPartyTab.AddChild(memberLabel);
 
         _memberListScroll = new ScrollContainer();
-        _memberListScroll.SetSizeFlagsVertical(Control.SizeFlags.ExpandFill);
+        _memberListScroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _myPartyTab.AddChild(_memberListScroll);
 
         _memberListContainer = new VBoxContainer();
@@ -258,7 +258,7 @@ public partial class PartyUI : Control
         _statsTab.AddChild(historyLabel);
 
         _historyScroll = new ScrollContainer();
-        _historyScroll.SetSizeFlagsVertical(Control.SizeFlags.ExpandFill);
+        _historyScroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _statsTab.AddChild(_historyScroll);
 
         _historyContainer = new VBoxContainer();
@@ -401,7 +401,7 @@ public partial class PartyUI : Control
         {
             var emptyLabel = new Label();
             emptyLabel.Text = "暂无可用队伍";
-            emptyLabel.Align = Label.AlignEnum.Center;
+            emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
             emptyLabel.AddThemeColorOverride("font_color", _secondaryColor);
             _partyListContainer.AddChild(emptyLabel);
         }

@@ -351,7 +351,7 @@ public delegate void EquipmentRepairedEventHandler(string itemId, int cost);
         var data = new Dictionary<string, object>();
         
         // 保存装备耐久度
-        var durabilityList = new Array();
+        var durabilityList = new Godot.Collections.Array();
         foreach (var kvp in _playerData.EquippedDurability)
         {
             var itemData = new Dictionary<string, object>();

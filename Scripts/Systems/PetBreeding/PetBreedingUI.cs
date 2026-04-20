@@ -91,8 +91,8 @@ public partial class PetBreedingUI : Control
         // Tab container
         _tabContainer = new TabContainer
         {
-            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
-            SizeFlagsVertical = SizeFlags.ExpandAndFill
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
         };
         _mainContainer.AddChild(_tabContainer);
 
@@ -127,7 +127,7 @@ public partial class PetBreedingUI : Control
         // Parent selection
         var selectionBox = new HBoxContainer
         {
-            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
             CustomMinimumSize = new Vector2(0, 150)
         };
         tab.AddChild(selectionBox);
@@ -135,8 +135,8 @@ public partial class PetBreedingUI : Control
         // Parent 1
         var parent1Box = new VBoxContainer
         {
-            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
-            SizeFlagsVertical = SizeFlags.ExpandAndFill
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
         };
         selectionBox.AddChild(parent1Box);
 
@@ -145,7 +145,7 @@ public partial class PetBreedingUI : Control
 
         _parent1Selector = new OptionButton
         {
-            SizeFlagsHorizontal = SizeFlags.ExpandAndFill
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
         };
         parent1Box.AddChild(_parent1Selector);
 
@@ -165,8 +165,8 @@ public partial class PetBreedingUI : Control
         // Parent 2
         var parent2Box = new VBoxContainer
         {
-            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
-            SizeFlagsVertical = SizeFlags.ExpandAndFill
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
         };
         selectionBox.AddChild(parent2Box);
 
@@ -175,7 +175,7 @@ public partial class PetBreedingUI : Control
 
         _parent2Selector = new OptionButton
         {
-            SizeFlagsHorizontal = SizeFlags.ExpandAndFill
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
         };
         parent2Box.AddChild(_parent2Selector);
 
@@ -222,8 +222,8 @@ public partial class PetBreedingUI : Control
 
         _historyContainer = new VBoxContainer
         {
-            SizeFlagsHorizontal = SizeFlags.ExpandAndFill,
-            SizeFlagsVertical = SizeFlags.ExpandAndFill
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
         };
         tab.AddChild(_historyContainer);
 

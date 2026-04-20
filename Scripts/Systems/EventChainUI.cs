@@ -370,7 +370,7 @@ namespace ClawRPG.Scripts.Systems {
                 Alignment = Alignment.Center,
                 SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
-            title.AddColorOverride("font_color", new Color(0.9f, 0.7f, 0.2f));
+            title.AddThemeColorOverride("font_color", new Color(0.9f, 0.7f, 0.2f));
             vbox.AddChild(title);
             
             var chainLabel = new Label {
@@ -378,7 +378,7 @@ namespace ClawRPG.Scripts.Systems {
                 Alignment = Alignment.Center,
                 SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
-            chainLabel.AddColorOverride("font_color", Colors.White);
+            chainLabel.AddThemeColorOverride("font_color", Colors.White);
             vbox.AddChild(chainLabel);
             
             var spacer = new Control { CustomMinimumSize = new Vector2(0, 10) };
@@ -392,7 +392,7 @@ namespace ClawRPG.Scripts.Systems {
                 Alignment = Alignment.Center,
                 SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
-            goldLabel.AddColorOverride("font_color", new Color(1f, 0.85f, 0.2f));
+            goldLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.2f));
             rewardBox.AddChild(goldLabel);
             
             var expLabel = new Label {
@@ -400,7 +400,7 @@ namespace ClawRPG.Scripts.Systems {
                 Alignment = Alignment.Center,
                 SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
-            expLabel.AddColorOverride("font_color", new Color(0.4f, 0.8f, 1f));
+            expLabel.AddThemeColorOverride("font_color", new Color(0.4f, 0.8f, 1f));
             rewardBox.AddChild(expLabel);
             
             // 淡入动画
@@ -445,7 +445,7 @@ namespace ClawRPG.Scripts.Systems {
                 Alignment = Alignment.Center,
                 SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
             };
-            label.AddColorOverride("font_color", color);
+            label.AddThemeColorOverride("font_color", color);
             border.AddChild(label);
             
             var tween = CreateTween();

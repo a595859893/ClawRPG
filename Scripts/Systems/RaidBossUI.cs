@@ -57,7 +57,8 @@ public partial class RaidBossUI : Control
         
         // Tab container
         tabContainer = new TabContainer();
-        tabContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.ShrinkEnd);
+        tabContainer.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+        tabContainer.SizeFlagsVertical = Control.SizeFlags.ShrinkEnd;
         mainContainer.AddChild(tabContainer);
         
         // === Raid Tab ===
@@ -172,12 +173,14 @@ public partial class RaidBossUI : Control
         raidTab.AddChild(participantLabel);
         
         var participantScroll = new ScrollContainer();
-        participantScroll.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.ShrinkEnd);
+        participantScroll.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+        participantScroll.SizeFlagsVertical = Control.SizeFlags.ShrinkEnd;
         participantScroll.CustomMinimumSize = new Vector2(0, 200);
         raidTab.AddChild(participantScroll);
         
         participantListContainer = new VBoxContainer();
-        participantListContainer.SetSizeFlags(Control.SizeFlags.Expand | Control.SizeFlags.Fill, Control.SizeFlags.ShrinkEnd);
+        participantListContainer.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+        participantListContainer.SizeFlagsVertical = Control.SizeFlags.ShrinkEnd;
         participantScroll.AddChild(participantListContainer);
         
         // === Statistics Tab ===

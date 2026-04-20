@@ -54,7 +54,7 @@ namespace ClawRPG.Scripts.Systems
         {
             var data = new Dictionary<string, object>();
             
-            var activePets = new Array();
+            var activePets = new Godot.Collections.Array();
             foreach (var pet in _playerData.ActivePetAIs)
             {
                 activePets.Add(pet.SummonId);

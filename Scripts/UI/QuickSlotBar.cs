@@ -29,8 +29,8 @@ namespace ClawRPG.Scripts.UI {
             // Title label
             _titleLabel = new Label();
             _titleLabel.Text = "快速槽 [1-9]";
-            _titleLabel.Align = Label.AlignEnum.Center;
-            _titleLabel.AddColorOverride("font_color", new Color(1, 0.84f, 0)); // Gold color
+            _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _titleLabel.AddThemeColorOverride("font_color", new Color(1, 0.84f, 0)); // Gold color
             mainContainer.AddChild(_titleLabel);
             
             // Slot container
@@ -152,8 +152,8 @@ namespace ClawRPG.Scripts.UI {
             _keyLabel = new Label();
             _keyLabel.Text = (slotIndex + 1).ToString();
             _keyLabel.Position = new Vector2(5, 2);
-            _keyLabel.AddColorOverride("font_color", new Color(1, 1, 1, 0.7f));
-            _keyLabel.AddColorOverride("font_color_shadow", new Color(0, 0, 0, 0.8f));
+            _keyLabel.AddThemeColorOverride("font_color", new Color(1, 1, 1, 0.7f));
+            _keyLabel.AddThemeColorOverride("font_color_shadow", new Color(0, 0, 0, 0.8f));
             AddChild(_keyLabel);
             
             // Item icon (center)
@@ -169,9 +169,9 @@ namespace ClawRPG.Scripts.UI {
             _itemNameLabel.SetAnchorsPreset(Control.LayoutPreset.BottomWide);
             _itemNameLabel.Position = new Vector2(5, -18);
             _itemNameLabel.Size = new Vector2(90, 16);
-            _itemNameLabel.Align = Label.AlignEnum.Center;
-            _itemNameLabel.AddColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f));
-            _itemNameLabel.AddColorOverride("font_color_shadow", new Color(0, 0, 0, 0.8f));
+            _itemNameLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _itemNameLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f));
+            _itemNameLabel.AddThemeColorOverride("font_color_shadow", new Color(0, 0, 0, 0.8f));
             AddChild(_itemNameLabel);
             
             // Quantity label (bottom-right)
@@ -179,9 +179,9 @@ namespace ClawRPG.Scripts.UI {
             _quantityLabel.SetAnchorsPreset(Control.LayoutPreset.BottomRight);
             _quantityLabel.Position = new Vector2(-25, -16);
             _quantityLabel.Size = new Vector2(20, 14);
-            _quantityLabel.Align = Label.AlignEnum.Right;
-            _quantityLabel.AddColorOverride("font_color", new Color(1, 1, 1));
-            _quantityLabel.AddColorOverride("font_color_shadow", new Color(0, 0, 0, 0.8f));
+            _quantityLabel.HorizontalAlignment = HorizontalAlignment.Right;
+            _quantityLabel.AddThemeColorOverride("font_color", new Color(1, 1, 1));
+            _quantityLabel.AddThemeColorOverride("font_color_shadow", new Color(0, 0, 0, 0.8f));
             AddChild(_quantityLabel);
             
             // Style the panel

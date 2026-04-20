@@ -104,7 +104,7 @@ namespace ClawRPG.Scripts.UI {
             
             // 标签容器
             tabContainer = new TabContainer();
-            tabContainer.SetSizeFlagsVertical(Control.SizeFlags.Expand);
+            tabContainer.SizeFlagsVertical = Control.SizeFlags.Expand;
             contentBox.AddChild(tabContainer);
             
             // 创建标签页

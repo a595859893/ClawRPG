@@ -246,7 +246,7 @@ namespace ClawRPG.Scripts.Systems
             var data = new Dictionary<string, object>();
             
             // Export party buffs
-            var buffsArray = new Array();
+            var buffsArray = new Godot.Collections.Array();
             foreach (var kvp in _partyBuffs)
             {
                 var entry = new Dictionary
@@ -259,7 +259,7 @@ namespace ClawRPG.Scripts.Systems
             data["partyBuffs"] = buffsArray;
             
             // Export synergy effects
-            var synergyArray = new Array();
+            var synergyArray = new Godot.Collections.Array();
             foreach (var kvp in _synergyEffects)
             {
                 var entry = new Dictionary

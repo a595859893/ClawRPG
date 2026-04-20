@@ -497,7 +497,7 @@ public delegate void SkillUnlockedEventHandler(string skillId);
             var data = new Dictionary<string, object>();
             
             // Mastery data
-            var masteriesArray = new Array();
+            var masteriesArray = new Godot.Collections.Array();
             foreach (var kvp in _masteries)
             {
                 var m = new Dictionary
@@ -519,7 +519,7 @@ public delegate void SkillUnlockedEventHandler(string skillId);
             data["masteries"] = masteriesArray;
             
             // Combo usages
-            var comboUsagesArray = new Array();
+            var comboUsagesArray = new Godot.Collections.Array();
             foreach (var kvp in ComboUsages)
             {
                 comboUsagesArray.Add(new Dictionary { ["comboId"] = kvp.Key, ["usages"] = kvp.Value });

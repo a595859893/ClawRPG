@@ -72,7 +72,7 @@ namespace ClawRPG.Systems.RelicNeglect
             _titleLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.8f, 1.0f));
             titleBar.AddChild(_titleLabel);
 
-            var spacer = new Control { SizeFlagsHorizontal = Control.SizeFlagsExpand };
+            var spacer = new Control { SizeFlagsHorizontal = Control.SizeFlags.Expand };
             titleBar.AddChild(spacer);
 
             _closeButton = new Button { Text = "✕" };
@@ -246,7 +246,7 @@ namespace ClawRPG.Systems.RelicNeglect
             var nameLabel = new Label
             {
                 Text = relicName,
-                SizeFlagsHorizontal = Control.SizeFlagsExpand,
+                SizeFlagsHorizontal = Control.SizeFlags.Expand,
                 VerticalAlignment = VerticalAlignment.Center
             };
             nameLabel.AddThemeColorOverride("font_color", GetLevelColor(level));

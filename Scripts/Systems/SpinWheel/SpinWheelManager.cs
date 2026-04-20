@@ -410,7 +410,7 @@ public partial class SpinWheelManager : BaseSystem
         data["last_free_spin_time"] = LastFreeSpinTime;
         data["total_gold_spent"] = TotalGoldSpent;
         data["total_gold_won"] = TotalGoldWon;
-        data["spin_history"] = new Array(SpinHistory);
+        data["spin_history"] = new Godot.Collections.Array(SpinHistory);
 
         return data;
     }

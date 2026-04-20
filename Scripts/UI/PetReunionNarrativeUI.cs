@@ -27,10 +27,10 @@ public partial class PetReunionNarrativeUI : CanvasLayer
 
         // 创建UI结构
         _panel = new PanelContainer();
-        _panel.SetAnchor(AnchorsPreset.CenterRight, true);
-        _panel.SetAnchor(AnchorsPreset.CenterRight, true);
-        _panel.SetAnchor(AnchorsPreset.CenterRight, true);
-        _panel.SetAnchor(AnchorsPreset.CenterRight, true);
+        _panel.SetAnchorsPreset(CenterRight, true);
+        _panel.SetAnchorsPreset(CenterRight, true);
+        _panel.SetAnchorsPreset(CenterRight, true);
+        _panel.SetAnchorsPreset(CenterRight, true);
         _panel.OffsetLeft = -400;
         _panel.OffsetTop = 100;
         _panel.OffsetRight = -20;

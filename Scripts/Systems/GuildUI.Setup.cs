@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using GameSystems;
 
 public partial class GuildUI {
     public override void _Ready() {
@@ -30,7 +31,7 @@ public partial class GuildUI {
         titleLabel.AddThemeFontSizeOverride("font_size", 24);
         titleBar.AddChild(titleLabel);
 
-        titleBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlagsExpand });
+        titleBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
 
         var closeButton = new Button();
         closeButton.Text = "✕";
@@ -67,11 +68,11 @@ public partial class GuildUI {
         disbandButton.Pressed += OnDisbandButtonPressed;
         buttonBar.AddChild(disbandButton);
 
-        buttonBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlagsExpand });
+        buttonBar.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
 
         // 标签页容器
         var tabContainer = new TabContainer();
-        tabContainer.SizeFlagsVertical = Control.SizeFlagsExpand;
+        tabContainer.SizeFlagsVertical = Control.SizeFlags.Expand;
         mainVBox.AddChild(tabContainer);
 
         // 信息标签页
@@ -176,7 +177,7 @@ public partial class GuildUI {
 
         noticeInput = new LineEdit();
         noticeInput.PlaceholderText = "输入新公告...";
-        noticeInput.SizeFlagsHorizontal = Control.SizeFlagsExpand;
+        noticeInput.SizeFlagsHorizontal = Control.SizeFlags.Expand;
         noticeInput.CustomMinimumSize = new Vector2(300, 0);
         noticeInputRow.AddChild(noticeInput);
 
@@ -196,7 +197,7 @@ public partial class GuildUI {
 
         var searchInput = new LineEdit();
         searchInput.PlaceholderText = "输入公会名称...";
-        searchInput.SizeFlagsHorizontal = Control.SizeFlagsExpand;
+        searchInput.SizeFlagsHorizontal = Control.SizeFlags.Expand;
         searchInput.TextSubmitted += OnSearchSubmitted;
         searchRow.AddChild(searchInput);
 
@@ -212,7 +213,7 @@ public partial class GuildUI {
 
         guildList = new ItemList();
         guildList.CustomMinimumSize = new Vector2(0, 200);
-        guildList.SizeFlagsVertical = Control.SizeFlagsExpand;
+        guildList.SizeFlagsVertical = Control.SizeFlags.Expand;
         guildList.ItemSelected += OnGuildSelected;
         vbox.AddChild(guildList);
 
@@ -226,7 +227,7 @@ public partial class GuildUI {
         // 成员列表
         memberList = new ItemList();
         memberList.CustomMinimumSize = new Vector2(300, 0);
-        memberList.SizeFlagsVertical = Control.SizeFlagsExpand;
+        memberList.SizeFlagsVertical = Control.SizeFlags.Expand;
         memberList.ItemSelected += OnMemberSelected;
         hbox.AddChild(memberList);
 
@@ -269,7 +270,7 @@ public partial class GuildUI {
         // 建筑列表
         buildingList = new ItemList();
         buildingList.CustomMinimumSize = new Vector2(300, 0);
-        buildingList.SizeFlagsVertical = Control.SizeFlagsExpand;
+        buildingList.SizeFlagsVertical = Control.SizeFlags.Expand;
         buildingList.ItemSelected += OnBuildingSelected;
         hbox.AddChild(buildingList);
 
@@ -297,7 +298,7 @@ public partial class GuildUI {
         // 技能列表
         skillList = new ItemList();
         skillList.CustomMinimumSize = new Vector2(300, 0);
-        skillList.SizeFlagsVertical = Control.SizeFlagsExpand;
+        skillList.SizeFlagsVertical = Control.SizeFlags.Expand;
         skillList.ItemSelected += OnSkillSelected;
         hbox.AddChild(skillList);
 
@@ -325,7 +326,7 @@ public partial class GuildUI {
         // 申请列表
         applicationList = new ItemList();
         applicationList.CustomMinimumSize = new Vector2(300, 0);
-        applicationList.SizeFlagsVertical = Control.SizeFlagsExpand;
+        applicationList.SizeFlagsVertical = Control.SizeFlags.Expand;
         applicationList.ItemSelected += OnApplicationSelected;
         hbox.AddChild(applicationList);
 

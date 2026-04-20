@@ -207,7 +207,7 @@ namespace ClawRPG.Scripts.Systems {
                     ["totalQuestsCompleted"] = _totalQuestsCompleted,
                     ["regionsExplored"] = _regionsExplored,
                     ["survivalTimeSeconds"] = _survivalTimeSeconds,
-                    ["exploredRegionIds"] = new Array(_exploredRegionIds),
+                    ["exploredRegionIds"] = new Godot.Collections.Array(_exploredRegionIds),
                     ["totalFishCaught"] = _totalFishCaught,
                     ["totalAlchemyCrafted"] = _totalAlchemyCrafted,
                     ["totalMountKills"] = _totalMountKills,
@@ -236,7 +236,7 @@ namespace ClawRPG.Scripts.Systems {
         }
         
         private Array BuildChallengeArray() {
-            var challengeArray = new Array();
+            var challengeArray = new Godot.Collections.Array();
             foreach (var challenge in _dailyChallenges) {
                 challengeArray.Add(new Dictionary {
                     ["Id"] = challenge.Id,
@@ -249,7 +249,7 @@ namespace ClawRPG.Scripts.Systems {
                     ["IsCompleted"] = challenge.IsCompleted,
                     ["GoldReward"] = challenge.GoldReward,
                     ["ExpReward"] = challenge.ExpReward,
-                    ["ItemRewardIds"] = new Array(challenge.ItemRewardIds),
+                    ["ItemRewardIds"] = new Godot.Collections.Array(challenge.ItemRewardIds),
                     ["ExpireTime"] = challenge.ExpireTime.ToString("yyyy-MM-dd HH:mm:ss")
                 });
             }

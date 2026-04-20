@@ -204,7 +204,7 @@ public partial class GuildDiplomacySystem : BaseSystem
         var data = new Dictionary<string, object>();
         
         // 公会外交关系
-        var relationsArray = new Array();
+        var relationsArray = new Godot.Collections.Array();
         foreach (var kvp in diplomacyData.Relations)
         {
             relationsArray.Add(new Dictionary<string, object>

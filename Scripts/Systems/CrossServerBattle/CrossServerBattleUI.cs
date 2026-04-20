@@ -78,7 +78,7 @@ public partial class CrossServerBattleUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "⚔️ Cross-Server Battle System";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 28);
         mainContainer.AddChild(_titleLabel);
 

@@ -67,7 +67,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             // Title
             var titleLabel = new Label();
             titleLabel.Text = "⚔️ Procedural Weapon Generator ⚔️";
-            titleLabel.Align = Label.AlignEnum.Center;
+            titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             titleLabel.AddThemeFontSizeOverride("font_size", 24);
             mainContainer.AddChild(titleLabel);
             
@@ -151,7 +151,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             // Weapon name
             _weaponNameLabel = new Label();
             _weaponNameLabel.Text = "No weapon generated yet";
-            _weaponNameLabel.Align = Label.AlignEnum.Center;
+            _weaponNameLabel.HorizontalAlignment = HorizontalAlignment.Center;
             _weaponNameLabel.AddThemeFontSizeOverride("font_size", 20);
             displayVBox.AddChild(_weaponNameLabel);
             
@@ -190,7 +190,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             // Effects
             _effectsLabel = new Label();
             _effectsLabel.Text = "Effects: None";
-            _effectsLabel.Align = Label.AlignEnum.Center;
+            _effectsLabel.HorizontalAlignment = HorizontalAlignment.Center;
             displayVBox.AddChild(_effectsLabel);
             
             // Reroll button
@@ -204,7 +204,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             // Cost
             _costLabel = new Label();
             _costLabel.Text = "Cost: 100g";
-            _costLabel.Align = Label.AlignEnum.Center;
+            _costLabel.HorizontalAlignment = HorizontalAlignment.Center;
             container.AddChild(_costLabel);
         }
         

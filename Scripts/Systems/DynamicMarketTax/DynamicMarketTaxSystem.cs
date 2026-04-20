@@ -467,7 +467,7 @@ public partial class DynamicMarketTaxSystem : BaseSystem
         data["consecutive_low_activity"] = _data.ConsecutiveLowActivity;
         
         // 活动历史
-        var activityHistoryArray = new Array();
+        var activityHistoryArray = new Godot.Collections.Array();
         foreach (var activity in _activityHistory)
         {
             activityHistoryArray.Add(activity);

@@ -10,9 +10,9 @@ namespace ClawRPG.Systems
     [GlobalClass]
     public partial class DeckBuildingData : Resource
     {
-        [Export] public Dictionary<string, bool> UnlockedCards = new Dictionary<string, bool>();
-        [Export] public List<string> CurrentDeck = new List<string>();
-        [Export] public Dictionary<string, int> CardCollection = new Dictionary<string, int>();
+        [Export] public Godot.Collections.Dictionary UnlockedCards = new Godot.Collections.Dictionary();
+        [Export] public Godot.Collections.Array CurrentDeck = new Godot.Collections.Array();
+        [Export] public Godot.Collections.Dictionary CardCollection = new Godot.Collections.Dictionary();
         [Export] public int TotalCardsPlayed = 0;
         [Export] public int TotalDamageDealt = 0;
         [Export] public int TotalCardsDrawn = 0;
@@ -65,7 +65,7 @@ namespace ClawRPG.Systems
                 UnlockedCards[card] = false;
                 
             // 默认套牌
-            CurrentDeck = new List<string> { "Strike", "Strike", "Strike", "Defend", "Defend", "Defend", "Bash" };
+            CurrentDeck = new Godot.Collections.Array { "Strike", "Strike", "Strike", "Defend", "Defend", "Defend", "Bash" };
         }
     }
     

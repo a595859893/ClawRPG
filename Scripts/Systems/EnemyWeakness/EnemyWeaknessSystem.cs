@@ -235,13 +235,13 @@ public partial class EnemyWeaknessSystem : BaseSystem
         var data = new Dictionary<string, object>();
         
         // 敌人弱点追踪数据
-        var enemyWeaknessesData = new Array();
+        var enemyWeaknessesData = new Godot.Collections.Array();
         foreach (var kvp in _data.EnemyWeaknesses)
         {
             var enemyData = new Dictionary<string, object>();
             enemyData["enemy_type"] = kvp.Key;
             
-            var weaknessesArray = new Array();
+            var weaknessesArray = new Godot.Collections.Array();
             foreach (var weakness in kvp.Value.Weaknesses)
             {
                 weaknessesArray.Add(new Dictionary<string, object>
@@ -259,7 +259,7 @@ public partial class EnemyWeaknessSystem : BaseSystem
         data["enemy_weaknesses"] = enemyWeaknessesData;
         
         // 弱点激活历史
-        var historyArray = new Array();
+        var historyArray = new Godot.Collections.Array();
         foreach (var record in _data.ActivationHistory)
         {
             historyArray.Add(new Dictionary<string, object>

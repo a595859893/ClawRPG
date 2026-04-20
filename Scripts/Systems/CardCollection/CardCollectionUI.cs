@@ -74,7 +74,7 @@ public partial class CardCollectionUI : Control
         // Title
         var title = new Label();
         title.Text = "Card Collection";
-        title.Align = Label.AlignEnum.Center;
+        title.HorizontalAlignment = HorizontalAlignment.Center;
         mainVBox.AddChild(title);
         
         // Tab container
@@ -123,12 +123,12 @@ public partial class CardCollectionUI : Control
         
         // Progress label
         _collectionProgress = new Label();
-        _collectionProgress.Align = Label.AlignEnum.Center;
+        _collectionProgress.HorizontalAlignment = HorizontalAlignment.Center;
         _collectionTab.AddChild(_collectionProgress);
         
         // Total cards label
         _totalCardsLabel = new Label();
-        _totalCardsLabel.Align = Label.AlignEnum.Center;
+        _totalCardsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _collectionTab.AddChild(_totalCardsLabel);
         
         // Card grid (scrollable)
@@ -154,11 +154,11 @@ public partial class CardCollectionUI : Control
         
         _cardNameLabel = new Label();
         _cardNameLabel.Text = "Select a card";
-        _cardNameLabel.Align = Label.AlignEnum.Center;
+        _cardNameLabel.HorizontalAlignment = HorizontalAlignment.Center;
         previewVBox.AddChild(_cardNameLabel);
         
         _cardInfoLabel = new Label();
-        _cardInfoLabel.Align = Label.AlignEnum.Center;
+        _cardInfoLabel.HorizontalAlignment = HorizontalAlignment.Center;
         previewVBox.AddChild(_cardInfoLabel);
         
         _cardDescLabel = new Label();
@@ -173,7 +173,7 @@ public partial class CardCollectionUI : Control
         
         _goldLabel = new Label();
         _goldLabel.Text = "Gold: 0";
-        _goldLabel.Align = Label.AlignEnum.Center;
+        _goldLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _packsTab.AddChild(_goldLabel);
         
         var packScroll = new ScrollContainer();

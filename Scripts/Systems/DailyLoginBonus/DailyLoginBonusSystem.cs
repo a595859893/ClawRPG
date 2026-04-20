@@ -386,7 +386,7 @@ public partial class DailyLoginBonusSystem : BaseSystem
         data["last_login_day"] = (int)_data.LastLoginDate.Get("day", 0);
         
         // 本月登录天数
-        var monthlyDaysArray = new Array();
+        var monthlyDaysArray = new Godot.Collections.Array();
         foreach (var day in _data.MonthlyLoginDays)
         {
             monthlyDaysArray.Add(day);

@@ -91,7 +91,7 @@ public partial class DynamicDifficultyUI : Control
         // 标题
         _titleLabel = new Label();
         _titleLabel.Text = "⚔️ 动态难度系统";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         _titleLabel.AddThemeColorOverride("font_color", _titleColor);
         _mainVBox.AddChild(_titleLabel);
@@ -114,19 +114,19 @@ public partial class DynamicDifficultyUI : Control
         // 建议难度
         _recommendedDifficultyLabel = new Label();
         _recommendedDifficultyLabel.Text = "建议难度: 普通";
-        _recommendedDifficultyLabel.Align = Label.AlignEnum.Center;
+        _recommendedDifficultyLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _mainVBox.AddChild(_recommendedDifficultyLabel);
 
         // 技能评分
         _skillScoreLabel = new Label();
         _skillScoreLabel.Text = "技能评分: 0.50";
-        _skillScoreLabel.Align = Label.AlignEnum.Center;
+        _skillScoreLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _mainVBox.AddChild(_skillScoreLabel);
 
         // 玩家分组
         _playerGroupLabel = new Label();
         _playerGroupLabel.Text = "玩家分组: 普通";
-        _playerGroupLabel.Align = Label.AlignEnum.Center;
+        _playerGroupLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _playerGroupLabel.AddThemeFontSizeOverride("font_size", 16);
         _mainVBox.AddChild(_playerGroupLabel);
 
@@ -154,7 +154,7 @@ public partial class DynamicDifficultyUI : Control
         // 会话统计
         _sessionStatsLabel = new Label();
         _sessionStatsLabel.Text = "击杀: 0 | 死亡: 0 | 用时: 0分钟";
-        _sessionStatsLabel.Align = Label.AlignEnum.Center;
+        _sessionStatsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _mainVBox.AddChild(_sessionStatsLabel);
 
         AddSeparator();
@@ -169,7 +169,7 @@ public partial class DynamicDifficultyUI : Control
         // 技能档案
         _skillProfileLabel = new Label();
         _skillProfileLabel.Text = "总会话: 0 | 胜利: 0 | 失败: 0";
-        _skillProfileLabel.Align = Label.AlignEnum.Center;
+        _skillProfileLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _mainVBox.AddChild(_skillProfileLabel);
 
         AddSeparator();

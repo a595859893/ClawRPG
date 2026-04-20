@@ -61,7 +61,7 @@ public partial class EconomicDashboardUI : Control
     {
         // 主容器
         var mainContainer = new VBoxContainer();
-        mainContainer.SetAnchor(AnchorsPreset.FullRect);
+        mainContainer.SetAnchorsPreset(FullRect);
         mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(mainContainer);
         
@@ -74,7 +74,7 @@ public partial class EconomicDashboardUI : Control
         titleLabel.AddThemeFontSizeOverride("font_size", 24);
         header.AddChild(titleLabel);
         
-        header.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlagsExpand });
+        header.AddChild(new Control() { SizeFlagsHorizontal = Control.SizeFlags.Expand });
         
         // 关闭按钮
         var closeBtn = new Button();
@@ -95,7 +95,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(overviewTab);
         
         var overviewContainer = new VBoxContainer();
-        overviewContainer.SetAnchor(AnchorsPreset.FullRect);
+        overviewContainer.SetAnchorsPreset(FullRect);
         overviewContainer.AddThemeConstantOverride("separation", 15);
         overviewTab.AddChild(overviewContainer);
         
@@ -154,7 +154,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(earningsTab);
         
         earningsContainer = new VBoxContainer();
-        earningsContainer.SetAnchor(AnchorsPreset.FullRect);
+        earningsContainer.SetAnchorsPreset(FullRect);
         earningsContainer.AddThemeConstantOverride("separation", 10);
         earningsTab.AddChild(earningsContainer);
         
@@ -170,7 +170,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(expensesTab);
         
         expensesContainer = new VBoxContainer();
-        expensesContainer.SetAnchor(AnchorsPreset.FullRect);
+        expensesContainer.SetAnchorsPreset(FullRect);
         expensesContainer.AddThemeConstantOverride("separation", 10);
         expensesTab.AddChild(expensesContainer);
         
@@ -186,7 +186,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(transactionsTab);
         
         transactionsContainer = new VBoxContainer();
-        transactionsContainer.SetAnchor(AnchorsPreset.FullRect);
+        transactionsContainer.SetAnchorsPreset(FullRect);
         transactionsContainer.AddThemeConstantOverride("separation", 5);
         transactionsTab.AddChild(transactionsContainer);
         
@@ -196,7 +196,7 @@ public partial class EconomicDashboardUI : Control
         tabContainer.AddChild(itemsTab);
         
         var itemsContainer = new VBoxContainer();
-        itemsContainer.SetAnchor(AnchorsPreset.FullRect);
+        itemsContainer.SetAnchorsPreset(FullRect);
         itemsContainer.AddThemeConstantOverride("separation", 15);
         itemsTab.AddChild(itemsContainer);
         
@@ -247,7 +247,7 @@ public partial class EconomicDashboardUI : Control
         
         var nameLabel = new Label();
         nameLabel.Text = name;
-        nameLabel.SizeFlagsHorizontal = Control.SizeFlagsExpand;
+        nameLabel.SizeFlagsHorizontal = Control.SizeFlags.Expand;
         container.AddChild(nameLabel);
         
         var valueLabel = new Label();
@@ -398,25 +398,25 @@ public partial class EconomicDashboardUI : Control
             
             var typeLabel = new Label();
             typeLabel.Text = tx.Type == "收入" ? "💰" : "💸";
-            typeLabel.SizeFlagsHorizontal = Control.SizeFlagsShrinkEnd;
+            typeLabel.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
             container.AddChild(typeLabel);
             
             var amountLabel = new Label();
             string sign = tx.Amount >= 0 ? "+" : "";
             amountLabel.Text = $"{sign}{FormatNumber(Mathf.Abs(tx.Amount))}";
             amountLabel.Modulate = tx.Amount >= 0 ? new Color(0.3f, 0.9f, 0.3f) : new Color(0.9f, 0.3f, 0.3f);
-            amountLabel.SizeFlagsHorizontal = Control.SizeFlagsShrinkEnd;
+            amountLabel.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
             container.AddChild(amountLabel);
             
             var descLabel = new Label();
             descLabel.Text = tx.Description;
-            descLabel.SizeFlagsHorizontal = Control.SizeFlagsExpand;
+            descLabel.SizeFlagsHorizontal = Control.SizeFlags.Expand;
             container.AddChild(descLabel);
             
             var timeLabel = new Label();
             timeLabel.Text = FormatTimestamp(tx.Timestamp);
             timeLabel.Modulate = new Color(0.5f, 0.5f, 0.5f);
-            timeLabel.SizeFlagsHorizontal = Control.SizeFlagsShrinkEnd;
+            timeLabel.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
             container.AddChild(timeLabel);
             
             transactionsContainer.AddChild(container);

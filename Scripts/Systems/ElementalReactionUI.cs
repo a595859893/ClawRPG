@@ -94,7 +94,7 @@ public partial class ElementalReactionUI : Control
 
         // 标签页容器
         _tabContainer = new TabContainer();
-        _tabContainer.SetSizeFlagsVertical(Control.SizeFlags.Expand);
+        _tabContainer.SizeFlagsVertical = Control.SizeFlags.Expand;
         _content.AddChild(_tabContainer);
 
         // 创建三个标签页

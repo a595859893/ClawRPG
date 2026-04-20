@@ -346,8 +346,8 @@ public partial class RandomBoonSystem : BaseSystem
         
         if (PlayerData != null)
         {
-            data["active_boons"] = new Array(PlayerData.ActiveBoons);
-            data["boon_history"] = new Array(PlayerData.BoonHistory);
+            data["active_boons"] = new Godot.Collections.Array(PlayerData.ActiveBoons);
+            data["boon_history"] = new Godot.Collections.Array(PlayerData.BoonHistory);
             data["reroll_count"] = PlayerData.RerollCount;
             data["total_boons_activated"] = PlayerData.TotalBoonsActivated;
         }

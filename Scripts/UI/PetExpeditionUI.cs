@@ -77,7 +77,7 @@ public partial class PetExpeditionUI : Control
             CustomFonts.Font = GD.Load<DynamicFont>("res://fonts/msyh.ttc"),
             CustomFontSizes.FontSize = 24
         };
-        _titleLabel.AddColorOverride("font_color", new Color(1, 0.84f, 0));
+        _titleLabel.AddThemeColorOverride("font_color", new Color(1, 0.84f, 0));
         titleBar.AddChild(_titleLabel);
         
         titleBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.Expand });
@@ -88,7 +88,7 @@ public partial class PetExpeditionUI : Control
             Text = "总远征: 0 | 总金币: 0 | 总经验: 0",
             CustomFontSizes.FontSize = 14
         };
-        _statsLabel.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
+        _statsLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
         _mainPanel.AddChild(_statsLabel);
         
         // 分割线
@@ -228,7 +228,7 @@ public partial class PetExpeditionUI : Control
             Text = zone.Name,
             CustomFontSizes.FontSize = 18
         };
-        nameLabel.AddColorOverride("font_color", new Color(1, 0.84f, 0));
+        nameLabel.AddThemeColorOverride("font_color", new Color(1, 0.84f, 0));
         info.AddChild(nameLabel);
         
         var descLabel = new Label
@@ -236,7 +236,7 @@ public partial class PetExpeditionUI : Control
             Text = zone.Description,
             CustomFontSizes.FontSize = 14
         };
-        descLabel.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
+        descLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
         info.AddChild(descLabel);
         
         var statsLabel = new Label
@@ -244,7 +244,7 @@ public partial class PetExpeditionUI : Control
             Text = $"推荐等级: {zone.RecommendedLevel} | 时长: {zone.DurationMinutes}分钟 | 所需宠物: {zone.PetSlotsRequired}只",
             CustomFontSizes.FontSize = 12
         };
-        statsLabel.AddColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+        statsLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
         info.AddChild(statsLabel);
         
         var rewardLabel = new Label
@@ -252,7 +252,7 @@ public partial class PetExpeditionUI : Control
             Text = $"金币: {zone.MinGoldReward}-{zone.MaxGoldReward} | 经验: {zone.MinExpReward}-{zone.MaxExpReward}",
             CustomFontSizes.FontSize = 12
         };
-        rewardLabel.AddColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+        rewardLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
         info.AddChild(rewardLabel);
         
         // 远征按钮
@@ -292,7 +292,7 @@ public partial class PetExpeditionUI : Control
             CustomFontSizes.FontSize = 12,
             Alignment = Alignment.Center
         };
-        completeLabel.AddColorOverride("font_color", new Color(0.5f, 0.8f, 0.5f));
+        completeLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.8f, 0.5f));
         btnContainer.AddChild(completeLabel);
         
         return panel;
@@ -318,7 +318,7 @@ public partial class PetExpeditionUI : Control
                 CustomFontSizes.FontSize = 16,
                 Alignment = Alignment.Center
             };
-            emptyLabel.AddColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+            emptyLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
             _activeContainer.AddChild(emptyLabel);
             return;
         }
@@ -346,7 +346,7 @@ public partial class PetExpeditionUI : Control
                 Text = zone != null ? zone.Name : expedition.ZoneId,
                 CustomFontSizes.FontSize = 16
             };
-            nameLabel.AddColorOverride("font_color", new Color(1, 0.84f, 0));
+            nameLabel.AddThemeColorOverride("font_color", new Color(1, 0.84f, 0));
             info.AddChild(nameLabel);
             
             var progress = PetExpeditionSystem.Instance.GetExpeditionProgress(expedition.ExpeditionId);
@@ -355,8 +355,8 @@ public partial class PetExpeditionUI : Control
                 Value = progress * 100,
                 RectMinSize = new Vector2(200, 20)
             };
-            progressBar.AddColorOverride("font_color", new Color(1, 1, 1));
-            progressBar.AddColorOverride("font_color_disabled", new Color(1, 1, 1));
+            progressBar.AddThemeColorOverride("font_color", new Color(1, 1, 1));
+            progressBar.AddThemeColorOverride("font_color_disabled", new Color(1, 1, 1));
             info.AddChild(progressBar);
             
             var timeLabel = new Label
@@ -364,7 +364,7 @@ public partial class PetExpeditionUI : Control
                 Text = $"{progress * 100:F0}%",
                 CustomFontSizes.FontSize = 12
             };
-            timeLabel.AddColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
+            timeLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.8f));
             info.AddChild(timeLabel);
             
             // 取消按钮
@@ -398,7 +398,7 @@ public partial class PetExpeditionUI : Control
                 CustomFontSizes.FontSize = 16,
                 Alignment = Alignment.Center
             };
-            emptyLabel.AddColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+            emptyLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
             _historyContainer.AddChild(emptyLabel);
             return;
         }
@@ -426,7 +426,7 @@ public partial class PetExpeditionUI : Control
                 Text = (zone != null ? zone.Name : result.ZoneId) + (result.Success ? " ✓" : " ✗"),
                 CustomFontSizes.FontSize = 14
             };
-            nameLabel.AddColorOverride("font_color", result.Success ? new Color(0.5f, 1f, 0.5f) : new Color(1f, 0.5f, 0.5f));
+            nameLabel.AddThemeColorOverride("font_color", result.Success ? new Color(0.5f, 1f, 0.5f) : new Color(1f, 0.5f, 0.5f));
             info.AddChild(nameLabel);
             
             var rewardLabel = new Label
@@ -435,7 +435,7 @@ public partial class PetExpeditionUI : Control
                        (result.ItemsEarned.Count > 0 ? $" | 物品: {string.Join(", ", result.ItemsEarned)}" : ""),
                 CustomFontSizes.FontSize = 12
             };
-            rewardLabel.AddColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+            rewardLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
             info.AddChild(rewardLabel);
         }
     }

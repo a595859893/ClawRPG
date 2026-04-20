@@ -280,7 +280,7 @@ namespace ClawRPG.Scripts.UI
             {
                 Text = "正在观测...",
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                SizeFlagsVertical = Control.SizeFlags.ShinkBegin
+                SizeFlagsVertical = Control.SizeFlags.ShrinkBegin
             };
             _observerWorldLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.8f, 0.7f));
             observerTab.AddChild(_observerWorldLabel);
@@ -302,7 +302,7 @@ namespace ClawRPG.Scripts.UI
             {
                 Text = "还未看清你的意图...",
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                SizeFlagsVertical = Control.SizeFlags.ShinkBegin
+                SizeFlagsVertical = Control.SizeFlags.ShrinkBegin
             };
             _observerGoalLabel.AddThemeColorOverride("font_color", new Color(0.85f, 0.8f, 0.7f));
             observerTab.AddChild(_observerGoalLabel);

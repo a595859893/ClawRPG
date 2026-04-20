@@ -69,7 +69,7 @@ public partial class ProceduralStoryData : BaseSystem
         data["total_exp_earned"] = TotalExpEarned;
         
         // 当前进行的故事
-        var activeStoriesList = new Array();
+        var activeStoriesList = new Godot.Collections.Array();
         foreach (var kvp in ActiveStories)
         {
             var storyDict = new Dictionary
@@ -83,7 +83,7 @@ public partial class ProceduralStoryData : BaseSystem
                 { "tension", kvp.Value.Tension }
             };
             
-            var completedChapters = new Array();
+            var completedChapters = new Godot.Collections.Array();
             foreach (var chapter in kvp.Value.CompletedChapters)
             {
                 completedChapters.Add(chapter);
@@ -102,7 +102,7 @@ public partial class ProceduralStoryData : BaseSystem
         data["active_stories"] = activeStoriesList;
         
         // 故事历史
-        var historyList = new Array();
+        var historyList = new Godot.Collections.Array();
         foreach (var record in StoryHistory)
         {
             var recordDict = new Dictionary

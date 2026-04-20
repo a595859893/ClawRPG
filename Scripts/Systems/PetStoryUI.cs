@@ -137,7 +137,7 @@ namespace ClawRPG.Scripts.Systems {
             storyTitleLabel = new Label();
             storyTitleLabel.AddThemeFontSizeOverride("font_size", 22);
             storyTitleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.4f));
-            storyTitleLabel.Align = Label.AlignEnum.Center;
+            storyTitleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             detailVBox.AddChild(storyTitleLabel);
             
             // Backstory

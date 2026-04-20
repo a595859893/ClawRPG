@@ -422,14 +422,14 @@ public delegate void AllTracksUnlocked();
             var data = new Dictionary<string, object>();
             
             // 已解锁曲目
-            var unlocked = new Array();
+            var unlocked = new Godot.Collections.Array();
             foreach (var trackId in _unlockedTracks.Keys) {
                 unlocked.Add(trackId);
             }
             data["unlocked"] = unlocked;
             
             // 收藏
-            var favorites = new Array();
+            var favorites = new Godot.Collections.Array();
             foreach (var trackId in _favoriteTracks) {
                 favorites.Add(trackId);
             }

@@ -42,7 +42,7 @@ public partial class ComboUI : Control
     {
         // Main container
         var mainContainer = new VBoxContainer();
-        mainContainer.SetAnchor(AnchorsPreset.FullRect);
+        mainContainer.SetAnchorsPreset(FullRect);
         mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(mainContainer);
         

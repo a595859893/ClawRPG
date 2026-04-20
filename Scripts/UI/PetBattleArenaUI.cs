@@ -78,7 +78,7 @@ public partial class PetBattleArenaUI : Control
         // Title
         _titleLabel = new Label();
         _titleLabel.Text = "🐾 Pet Battle Arena";
-        _titleLabel.Align = Label.AlignEnum.Center;
+        _titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _titleLabel.Modulate = new Color(1, 0.85f, 0);
         leftPanel.AddChild(_titleLabel);
         
@@ -175,7 +175,7 @@ public partial class PetBattleArenaUI : Control
         // Battle status
         var battleTitle = new Label();
         battleTitle.Text = "⚔️ Battle Arena";
-        battleTitle.Align = Label.AlignEnum.Center;
+        battleTitle.HorizontalAlignment = HorizontalAlignment.Center;
         battleTitle.Modulate = new Color(1, 0.85f, 0);
         rightPanel.AddChild(battleTitle);
         
@@ -190,13 +190,13 @@ public partial class PetBattleArenaUI : Control
         
         var playerTitle = new Label();
         playerTitle.Text = "🐾 Your Pet";
-        playerTitle.Align = Label.AlignEnum.Center;
+        playerTitle.HorizontalAlignment = HorizontalAlignment.Center;
         playerTitle.Modulate = new Color(0.3f, 0.9f, 0.3f);
         playerSide.AddChild(playerTitle);
         
         _playerPetLabel = new Label();
         _playerPetLabel.Text = "No Pet Selected";
-        _playerPetLabel.Align = Label.AlignEnum.Center;
+        _playerPetLabel.HorizontalAlignment = HorizontalAlignment.Center;
         playerSide.AddChild(_playerPetLabel);
         
         _playerHealthBar = new ProgressBar();
@@ -208,7 +208,7 @@ public partial class PetBattleArenaUI : Control
         // VS label
         var vsLabel = new Label();
         vsLabel.Text = "VS";
-        vsLabel.Align = Label.AlignEnum.Center;
+        vsLabel.HorizontalAlignment = HorizontalAlignment.Center;
         vsLabel.Modulate = new Color(1, 0.5f, 0);
         vsLabel.CustomMinimumSize = new Vector2(50, 0);
         battleField.AddChild(vsLabel);
@@ -220,13 +220,13 @@ public partial class PetBattleArenaUI : Control
         
         var enemyTitle = new Label();
         enemyTitle.Text = "👹 Enemy";
-        enemyTitle.Align = Label.AlignEnum.Center;
+        enemyTitle.HorizontalAlignment = HorizontalAlignment.Center;
         enemyTitle.Modulate = new Color(0.9f, 0.3f, 0.3f);
         enemySide.AddChild(enemyTitle);
         
         _enemyPetLabel = new Label();
         _enemyPetLabel.Text = "Waiting...";
-        _enemyPetLabel.Align = Label.AlignEnum.Center;
+        _enemyPetLabel.HorizontalAlignment = HorizontalAlignment.Center;
         enemySide.AddChild(_enemyPetLabel);
         
         _enemyHealthBar = new ProgressBar();
@@ -242,27 +242,27 @@ public partial class PetBattleArenaUI : Control
         
         _scoreLabel = new Label();
         _scoreLabel.Text = "0 - 0";
-        _scoreLabel.Align = Label.AlignEnum.Center;
+        _scoreLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _scoreLabel.Modulate = new Color(1, 0.85f, 0);
         _scoreLabel.CustomMinimumSize = new Vector2(200, 0);
         scoreContainer.AddChild(_scoreLabel);
         
         _roundLabel = new Label();
         _roundLabel.Text = "Round: 0/5";
-        _roundLabel.Align = Label.AlignEnum.Center;
+        _roundLabel.HorizontalAlignment = HorizontalAlignment.Center;
         scoreContainer.AddChild(_roundLabel);
         
         // Result display
         _resultLabel = new Label();
         _resultLabel.Text = "";
-        _resultLabel.Align = Label.AlignEnum.Center;
+        _resultLabel.HorizontalAlignment = HorizontalAlignment.Center;
         _resultLabel.Modulate = new Color(1, 0.85f, 0);
         _resultLabel.CustomMinimumSize = new Vector2(400, 30);
         rightPanel.AddChild(_resultLabel);
         
         _rewardLabel = new Label();
         _rewardLabel.Text = "";
-        _rewardLabel.Align = Label.AlignEnum.Center;
+        _rewardLabel.HorizontalAlignment = HorizontalAlignment.Center;
         rightPanel.AddChild(_rewardLabel);
         
         // Claim reward button

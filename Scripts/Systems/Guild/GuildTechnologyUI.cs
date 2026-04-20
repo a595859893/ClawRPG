@@ -45,7 +45,7 @@ public partial class GuildTechnologyUI : Control
     {
         // 主容器
         mainContainer = new VBoxContainer();
-        mainContainer.SetAnchor(AnchorsPreset.FullRect);
+        mainContainer.SetAnchorsPreset(FullRect);
         mainContainer.AddThemeConstantOverride("separation", 10);
         AddChild(mainContainer);
 
@@ -112,7 +112,7 @@ public partial class GuildTechnologyUI : Control
 
         // 存储科技数据
         var techs = GuildTechnologyDatabase.Instance.GetTechnologiesByCategory(category);
-        Array techArray = new Array();
+        Array techArray = new Godot.Collections.Array();
         foreach (var t in techs) techArray.Add(t);
         categoryTechs[category] = techArray;
     }
@@ -120,7 +120,7 @@ public partial class GuildTechnologyUI : Control
     private void SetupDetailPanel()
     {
         VBoxContainer container = new VBoxContainer();
-        container.SetAnchor(AnchorsPreset.FullRect);
+        container.SetAnchorsPreset(FullRect);
         container.AddThemeConstantOverride("separation", 10);
         container.AddThemeConstantOverride("margin_left", 20);
         container.AddThemeConstantOverride("margin_top", 10);
@@ -183,7 +183,7 @@ public partial class GuildTechnologyUI : Control
         GuildTechnologySystem.Instance.OnResearchComplete += OnResearchCompleted;
     }
 
-    private void OnItemSelected(int index)
+    private void OnItemSelected(long index)
     {
         var techs = categoryTechs[currentCategory];
         if (index < 0 || index >= techs.Count) return;

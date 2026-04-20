@@ -176,17 +176,17 @@ public partial class ElementalTrialUI : Control
         
         _currentTrialLabel = new Label();
         _currentTrialLabel.AddThemeFontSizeOverride("font_size", 24);
-        _currentTrialLabel.Align = Label.AlignEnum.Center;
+        _currentTrialLabel.HorizontalAlignment = HorizontalAlignment.Center;
         activeContainer.AddChild(_currentTrialLabel);
         
         _waveLabel = new Label();
         _waveLabel.AddThemeFontSizeOverride("font_size", 18);
-        _waveLabel.Align = Label.AlignEnum.Center;
+        _waveLabel.HorizontalAlignment = HorizontalAlignment.Center;
         activeContainer.AddChild(_waveLabel);
         
         _timeLabel = new Label();
         _timeLabel.AddThemeFontSizeOverride("font_size", 16);
-        _timeLabel.Align = Label.AlignEnum.Center;
+        _timeLabel.HorizontalAlignment = HorizontalAlignment.Center;
         activeContainer.AddChild(_timeLabel);
         
         _timeProgressBar = new ProgressBar();
