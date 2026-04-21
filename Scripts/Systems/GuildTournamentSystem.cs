@@ -54,6 +54,106 @@ namespace ClawRPG.Scripts.Systems
         public event Action<TournamentState> OnStateChanged;
         public event Action<int, GuildTournamentScore> OnScoreUpdated;
         public event Action<TournamentData> OnTournamentComplete;
+
+        // ===== UI 桥接（REQ-075 解耦）=====
+        private GuildTournamentUI _ui;
+
+        /// <summary>
+        /// 注册 UI 以建立事件驱动的解耦通信（REQ-075）
+        /// </summary>
+        public void RegisterUI(GuildTournamentUI ui)
+        {
+            if (_ui != null)
+            {
+                UnregisterUI(_ui);
+            }
+            _ui = ui;
+
+            // 订阅 System 信号 → UI 更新
+            OnStateChanged += HandleStateChanged;
+            OnScoreUpdated += HandleScoreUpdated;
+            OnTournamentComplete += HandleTournamentComplete;
+
+            // 订阅 UI 事件 → System 操作
+            _ui.OnRefreshRequested += HandleRefreshRequested;
+            _ui.OnStartTournamentRequested += HandleStartTournamentRequested;
+            _ui.OnRegisterGuildRequested += HandleRegisterGuildRequested;
+
+            GD.Print("[GuildTournamentSystem] UI registered (event-driven mode)");
+        }
+
+        /// <summary>
+        /// 取消注册 UI（REQ-075）
+        /// </summary>
+        public void UnregisterUI(GuildTournamentUI ui)
+        {
+            if (_ui != ui || _ui == null)
+                return;
+
+            OnStateChanged -= HandleStateChanged;
+            OnScoreUpdated -= HandleScoreUpdated;
+            OnTournamentComplete -= HandleTournamentComplete;
+
+            if (_ui != null)
+            {
+                _ui.OnRefreshRequested -= HandleRefreshRequested;
+                _ui.OnStartTournamentRequested -= HandleStartTournamentRequested;
+                _ui.OnRegisterGuildRequested -= HandleRegisterGuildRequested;
+            }
+            _ui = null;
+
+            GD.Print("[GuildTournamentSystem] UI unregistered");
+        }
+
+        // ===== UI 事件处理器（System → UI 推送数据）=====
+
+        private void HandleStateChanged(TournamentState state)
+        {
+            if (_ui == null) return;
+            // System 推送数据给 UI，而不是 UI 主动拉取
+            _ui.UpdateTournamentInfo(GetCurrentTournament());
+            _ui.UpdateLeaderboard(GetLeaderboard());
+        }
+
+        private void HandleScoreUpdated(int guildId, GuildTournamentScore score)
+        {
+            if (_ui == null) return;
+            _ui.UpdateLeaderboard(GetLeaderboard());
+        }
+
+        private void HandleTournamentComplete(TournamentData tournament)
+        {
+            if (_ui == null) return;
+            _ui.UpdateTournamentInfo(tournament);
+            _ui.UpdateLeaderboard(GetLeaderboard());
+            GD.Print($"[GuildTournament] Tournament completed: {tournament.Name}");
+        }
+
+        // ===== UI 事件处理器（UI → System 请求操作）=====
+
+        private void HandleRefreshRequested()
+        {
+            if (_ui == null) return;
+            // System 推送当前完整数据给 UI
+            _ui.UpdateTournamentInfo(GetCurrentTournament());
+            _ui.UpdateLeaderboard(GetLeaderboard());
+            _ui.UpdateHistory(GetHistory());
+            _ui.UpdateTimerDisplay(GetTimeRemaining(), _currentTournament.State);
+        }
+
+        private void HandleStartTournamentRequested(TournamentType type, string name)
+        {
+            StartTournament(type, name);
+        }
+
+        private void HandleRegisterGuildRequested(int guildId, string guildName)
+        {
+            bool success = RegisterGuild(guildId, guildName);
+            if (success)
+            {
+                GD.Print($"[GuildTournament] Guild {guildName} registered via UI event");
+            }
+        }
         
         public GuildTournamentSystem()
         {

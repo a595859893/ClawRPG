@@ -6,19 +6,21 @@ namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
     /// Guild Tournament UI - Display and manage guild tournaments
+    /// 重构自 REQ-075: 移除对 GuildTournamentSystem 的直接引用，改为事件驱动解耦
     /// </summary>
     public partial class GuildTournamentUI : Control
     {
-        private static GuildTournamentUI _instance;
-        public static GuildTournamentUI Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = new GuildTournamentUI();
-                return _instance;
-            }
-        }
+        // ===== 事件接口（UI → System 通信） =====
+        // UI 层通过事件向外部/System 发送操作请求，不直接持有 System 引用
+
+        /// <summary>请求刷新所有 UI 数据（System 收到后调用 UpdateTournamentInfo + UpdateLeaderboard + UpdateHistory）</summary>
+        public Action OnRefreshRequested;
+
+        /// <summary>请求开始锦标赛（System 收到后处理）</summary>
+        public Action<GuildTournamentSystem.TournamentType, string> OnStartTournamentRequested;
+
+        /// <summary>请求注册公会（System 收到后处理）</summary>
+        public Action<int, string> OnRegisterGuildRequested;
 
         // UI Elements
         private Control _mainContainer;
@@ -26,36 +28,31 @@ namespace ClawRPG.Scripts.Systems
         private Label _statusLabel;
         private Label _timerLabel;
         private TabContainer _tabContainer;
-        
+
         // Tournament info
         private Label _tournamentNameLabel;
         private Label _tournamentTypeLabel;
         private Label _registeredCountLabel;
         private Label _prizePoolLabel;
-        
+
         // Leaderboard
         private VBoxContainer _leaderboardContainer;
-        
+
         // History
         private VBoxContainer _historyContainer;
-        
+
         // Buttons
         private Button _registerButton;
         private Button _startTournamentButton;
         private Button _closeButton;
-        
+
         // Tournament selection
         private OptionButton _tournamentTypeOption;
         private LineEdit _tournamentNameEdit;
-        
+
         // State
         private bool _isVisible = false;
-        
-        public GuildTournamentUI()
-        {
-            _instance = this;
-        }
-        
+
         /// <summary>
         /// Initialize the UI
         /// </summary>
@@ -63,20 +60,20 @@ namespace ClawRPG.Scripts.Systems
         {
             if (_mainContainer != null)
                 return;
-                
+
             // Create main container
             _mainContainer = new Control();
             _mainContainer.Name = "GuildTournamentUI";
             _mainContainer.SetAnchorsPreset(Control.LayoutPreset.Center);
             _mainContainer.CustomMinimumSize = new Vector2(800, 600);
             _mainContainer.Visible = false;
-            
+
             // Create background
             Panel background = new Panel();
             background.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             background.Modulate = new Color(0, 0, 0, 0.85f);
             _mainContainer.AddChild(background);
-            
+
             // Create title
             _titleLabel = new Label();
             _titleLabel.Text = "⚔️ 公会锦标赛";
@@ -85,7 +82,7 @@ namespace ClawRPG.Scripts.Systems
             _titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f)); // Gold
             _titleLabel.Position = new Vector2(0, 20);
             _mainContainer.AddChild(_titleLabel);
-            
+
             // Status label
             _statusLabel = new Label();
             _statusLabel.Text = "等待开始...";
@@ -94,7 +91,7 @@ namespace ClawRPG.Scripts.Systems
             _statusLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
             _statusLabel.Position = new Vector2(0, 60);
             _mainContainer.AddChild(_statusLabel);
-            
+
             // Timer label
             _timerLabel = new Label();
             _timerLabel.Text = "";
@@ -103,33 +100,28 @@ namespace ClawRPG.Scripts.Systems
             _timerLabel.AddThemeColorOverride("font_color", new Color(0.3f, 0.9f, 0.3f));
             _timerLabel.Position = new Vector2(0, 90);
             _mainContainer.AddChild(_timerLabel);
-            
+
             // Create tab container
             _tabContainer = new TabContainer();
             _tabContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             _tabContainer.Position = new Vector2(20, 140);
             _tabContainer.CustomMinimumSize = new Vector2(760, 380);
             _mainContainer.AddChild(_tabContainer);
-            
+
             // Create tabs
             CreateTournamentTab();
             CreateLeaderboardTab();
             CreateHistoryTab();
-            
+
             // Create buttons
             CreateButtons();
-            
+
             // Add to tree
             GetTree().Root.AddChild(_mainContainer);
-            
-            // Connect signals
-            GuildTournamentSystem.Instance.OnStateChanged += OnStateChanged;
-            GuildTournamentSystem.Instance.OnScoreUpdated += OnScoreUpdated;
-            GuildTournamentSystem.Instance.OnTournamentComplete += OnTournamentComplete;
-            
-            GD.Print("[GuildTournamentUI] Initialized");
+
+            GD.Print("[GuildTournamentUI] Initialized (event-driven mode)");
         }
-        
+
         /// <summary>
         /// Create tournament setup tab
         /// </summary>
@@ -137,31 +129,31 @@ namespace ClawRPG.Scripts.Systems
         {
             Control tab = new Control();
             tab.Name = "Tournament";
-            
+
             // Tournament name input
             Label nameLabel = new Label();
             nameLabel.Text = "锦标赛名称:";
             nameLabel.Position = new Vector2(50, 30);
             nameLabel.AddThemeFontSizeOverride("font_size", 16);
             tab.AddChild(nameLabel);
-            
+
             _tournamentNameEdit = new LineEdit();
             _tournamentNameEdit.Text = "公会争霸赛";
             _tournamentNameEdit.Position = new Vector2(180, 30);
             _tournamentNameEdit.CustomMinimumSize = new Vector2(300, 30);
             tab.AddChild(_tournamentNameEdit);
-            
+
             // Tournament type selection
             Label typeLabel = new Label();
             typeLabel.Text = "比赛类型:";
             typeLabel.Position = new Vector2(50, 80);
             typeLabel.AddThemeFontSizeOverride("font_size", 16);
             tab.AddChild(typeLabel);
-            
+
             _tournamentTypeOption = new OptionButton();
             _tournamentTypeOption.Position = new Vector2(180, 80);
             _tournamentTypeOption.CustomMinimumSize = new Vector2(200, 30);
-            
+
             // Add tournament types
             string[] typeNames = { "死亡竞赛", "夺旗战", "生存赛", "Bossrush", "寻宝赛", "解谜挑战" };
             for (int i = 0; i < typeNames.Length; i++)
@@ -169,7 +161,7 @@ namespace ClawRPG.Scripts.Systems
                 _tournamentTypeOption.AddItem(typeNames[i], i);
             }
             tab.AddChild(_tournamentTypeOption);
-            
+
             // Start button
             _startTournamentButton = new Button();
             _startTournamentButton.Text = "开始锦标赛";
@@ -177,33 +169,33 @@ namespace ClawRPG.Scripts.Systems
             _startTournamentButton.CustomMinimumSize = new Vector2(150, 30);
             _startTournamentButton.Pressed += OnStartTournamentPressed;
             tab.AddChild(_startTournamentButton);
-            
+
             // Tournament info
             _tournamentNameLabel = new Label();
             _tournamentNameLabel.Text = "当前锦标赛: -";
             _tournamentNameLabel.Position = new Vector2(50, 140);
             _tournamentNameLabel.AddThemeFontSizeOverride("font_size", 18);
             tab.AddChild(_tournamentNameLabel);
-            
+
             _tournamentTypeLabel = new Label();
             _tournamentTypeLabel.Text = "类型: -";
             _tournamentTypeLabel.Position = new Vector2(50, 170);
             _tournamentTypeLabel.AddThemeFontSizeOverride("font_size", 16);
             tab.AddChild(_tournamentTypeLabel);
-            
+
             _registeredCountLabel = new Label();
             _registeredCountLabel.Text = "已报名公会: 0/16";
             _registeredCountLabel.Position = new Vector2(50, 200);
             _registeredCountLabel.AddThemeFontSizeOverride("font_size", 16);
             tab.AddChild(_registeredCountLabel);
-            
+
             _prizePoolLabel = new Label();
             _prizePoolLabel.Text = "奖金池: 0 金币";
             _prizePoolLabel.Position = new Vector2(50, 230);
             _prizePoolLabel.AddThemeFontSizeOverride("font_size", 16);
             _prizePoolLabel.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
             tab.AddChild(_prizePoolLabel);
-            
+
             // Register button
             _registerButton = new Button();
             _registerButton.Text = "报名参加";
@@ -211,10 +203,10 @@ namespace ClawRPG.Scripts.Systems
             _registerButton.CustomMinimumSize = new Vector2(200, 40);
             _registerButton.Pressed += OnRegisterPressed;
             tab.AddChild(_registerButton);
-            
+
             _tabContainer.AddChild(tab);
         }
-        
+
         /// <summary>
         /// Create leaderboard tab
         /// </summary>
@@ -222,55 +214,55 @@ namespace ClawRPG.Scripts.Systems
         {
             Control tab = new Control();
             tab.Name = "Leaderboard";
-            
+
             // Header
             HBoxContainer header = new HBoxContainer();
             header.Position = new Vector2(20, 20);
             header.CustomMinimumSize = new Vector2(700, 30);
-            
+
             Label rankHeader = new Label();
             rankHeader.Text = "排名";
             rankHeader.CustomMinimumSize = new Vector2(80, 30);
             rankHeader.AddThemeFontSizeOverride("font_size", 16);
             rankHeader.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
             header.AddChild(rankHeader);
-            
+
             Label guildHeader = new Label();
             guildHeader.Text = "公会名称";
             guildHeader.CustomMinimumSize = new Vector2(300, 30);
             guildHeader.AddThemeFontSizeOverride("font_size", 16);
             guildHeader.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
             header.AddChild(guildHeader);
-            
+
             Label scoreHeader = new Label();
             scoreHeader.Text = "得分";
             scoreHeader.CustomMinimumSize = new Vector2(150, 30);
             scoreHeader.AddThemeFontSizeOverride("font_size", 16);
             scoreHeader.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
             header.AddChild(scoreHeader);
-            
+
             Label killsHeader = new Label();
             killsHeader.Text = "击杀/死亡";
             killsHeader.CustomMinimumSize = new Vector2(150, 30);
             killsHeader.AddThemeFontSizeOverride("font_size", 16);
             killsHeader.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
             header.AddChild(killsHeader);
-            
+
             tab.AddChild(header);
-            
+
             // Scroll container for leaderboard
             ScrollContainer scroll = new ScrollContainer();
             scroll.Position = new Vector2(20, 60);
             scroll.CustomMinimumSize = new Vector2(700, 280);
             tab.AddChild(scroll);
-            
+
             _leaderboardContainer = new VBoxContainer();
             _leaderboardContainer.CustomMinimumSize = new Vector2(700, 280);
             scroll.AddChild(_leaderboardContainer);
-            
+
             _tabContainer.AddChild(tab);
         }
-        
+
         /// <summary>
         /// Create history tab
         /// </summary>
@@ -278,20 +270,20 @@ namespace ClawRPG.Scripts.Systems
         {
             Control tab = new Control();
             tab.Name = "History";
-            
+
             // Scroll container
             ScrollContainer scroll = new ScrollContainer();
             scroll.Position = new Vector2(20, 20);
             scroll.CustomMinimumSize = new Vector2(700, 320);
             tab.AddChild(scroll);
-            
+
             _historyContainer = new VBoxContainer();
             _historyContainer.CustomMinimumSize = new Vector2(700, 320);
             scroll.AddChild(_historyContainer);
-            
+
             _tabContainer.AddChild(tab);
         }
-        
+
         /// <summary>
         /// Create buttons
         /// </summary>
@@ -305,7 +297,7 @@ namespace ClawRPG.Scripts.Systems
             _closeButton.Pressed += OnClosePressed;
             _mainContainer.AddChild(_closeButton);
         }
-        
+
         /// <summary>
         /// Toggle UI visibility
         /// </summary>
@@ -313,16 +305,17 @@ namespace ClawRPG.Scripts.Systems
         {
             if (_mainContainer == null)
                 Initialize();
-                
+
             _isVisible = !_isVisible;
             _mainContainer.Visible = _isVisible;
-            
+
             if (_isVisible)
             {
-                UpdateUI();
+                // 通过事件请求刷新数据，而不是直接调用 System
+                OnRefreshRequested?.Invoke();
             }
         }
-        
+
         /// <summary>
         /// Show the UI
         /// </summary>
@@ -330,12 +323,13 @@ namespace ClawRPG.Scripts.Systems
         {
             if (_mainContainer == null)
                 Initialize();
-                
+
             _isVisible = true;
             _mainContainer.Visible = true;
-            UpdateUI();
+            // 通过事件请求刷新数据
+            OnRefreshRequested?.Invoke();
         }
-        
+
         /// <summary>
         /// Hide the UI
         /// </summary>
@@ -345,69 +339,48 @@ namespace ClawRPG.Scripts.Systems
             if (_mainContainer != null)
                 _mainContainer.Visible = false;
         }
-        
+
+        // ===== 公开更新接口（System → UI 通信） =====
+        // REQ-075 解耦：UI 不再主动拉取数据，而是等待外部推送
+
         /// <summary>
-        /// Update UI elements
+        /// 更新锦标赛信息显示（由外部/System 调用）
         /// </summary>
-        public void UpdateUI()
+        public void UpdateTournamentInfo(TournamentData tournament)
         {
-            var tournament = GuildTournamentSystem.Instance.GetCurrentTournament();
             if (tournament == null)
                 return;
-                
+
             // Update status
             string[] stateNames = { "报名中", "准备中", "进行中", "已结束" };
             _statusLabel.Text = $"状态: {stateNames[(int)tournament.State]}";
-            
-            // Update timer
-            float timeRemaining = GuildTournamentSystem.Instance.GetTimeRemaining();
-            if (tournament.State == GuildTournamentSystem.TournamentState.InProgress ||
-                tournament.State == GuildTournamentSystem.TournamentState.Registration ||
-                tournament.State == GuildTournamentSystem.TournamentState.Preparation)
-            {
-                int minutes = (int)(timeRemaining / 60);
-                int seconds = (int)(timeRemaining % 60);
-                _timerLabel.Text = $"剩余时间: {minutes}:{seconds:D2}";
-            }
-            else
-            {
-                _timerLabel.Text = "";
-            }
-            
+
             // Update tournament info
             _tournamentNameLabel.Text = $"当前锦标赛: {tournament.Name}";
-            
+
             string[] typeNames = { "死亡竞赛", "夺旗战", "生存赛", "Bossrush", "寻宝赛", "解谜挑战" };
             _tournamentTypeLabel.Text = $"类型: {typeNames[(int)tournament.Type]}";
             _registeredCountLabel.Text = $"已报名公会: {tournament.RegisteredGuilds.Count}/16";
             _prizePoolLabel.Text = $"奖金池: {tournament.RegisteredGuilds.Count * 1000} 金币";
-            
+
             // Update button states
             bool canRegister = tournament.State == GuildTournamentSystem.TournamentState.Registration;
             _registerButton.Disabled = !canRegister;
             _startTournamentButton.Disabled = tournament.State != GuildTournamentSystem.TournamentState.Completed;
-            
-            // Update leaderboard
-            UpdateLeaderboard();
-            
-            // Update history
-            UpdateHistory();
         }
-        
+
         /// <summary>
-        /// Update leaderboard display
+        /// 更新排行榜显示（由外部/System 调用）
         /// </summary>
-        private void UpdateLeaderboard()
+        public void UpdateLeaderboard(List<GuildTournamentScore> leaderboard)
         {
             // Clear existing
             foreach (Node child in _leaderboardContainer.GetChildren())
             {
                 child.QueueFree();
             }
-            
-            var leaderboard = GuildTournamentSystem.Instance.GetLeaderboard();
-            
-            if (leaderboard.Count == 0)
+
+            if (leaderboard == null || leaderboard.Count == 0)
             {
                 Label empty = new Label();
                 empty.Text = "暂无排名数据";
@@ -416,18 +389,18 @@ namespace ClawRPG.Scripts.Systems
                 _leaderboardContainer.AddChild(empty);
                 return;
             }
-            
+
             foreach (var score in leaderboard)
             {
                 HBoxContainer row = new HBoxContainer();
                 row.CustomMinimumSize = new Vector2(700, 40);
-                
+
                 // Rank
                 Label rank = new Label();
                 rank.Text = $"#{score.Rank}";
                 rank.CustomMinimumSize = new Vector2(80, 40);
                 rank.AddThemeFontSizeOverride("font_size", 18);
-                
+
                 // Color by rank
                 if (score.Rank == 1)
                     rank.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f)); // Gold
@@ -437,16 +410,16 @@ namespace ClawRPG.Scripts.Systems
                     rank.AddThemeColorOverride("font_color", new Color(0.8f, 0.5f, 0.2f)); // Bronze
                 else
                     rank.AddThemeColorOverride("font_color", new Color(1f, 1f, 1f));
-                    
+
                 row.AddChild(rank);
-                
+
                 // Guild name
                 Label guildName = new Label();
                 guildName.Text = score.GuildName;
                 guildName.CustomMinimumSize = new Vector2(300, 40);
                 guildName.AddThemeFontSizeOverride("font_size", 16);
                 row.AddChild(guildName);
-                
+
                 // Score
                 Label scoreLabel = new Label();
                 scoreLabel.Text = score.Score.ToString();
@@ -454,32 +427,30 @@ namespace ClawRPG.Scripts.Systems
                 scoreLabel.AddThemeFontSizeOverride("font_size", 16);
                 scoreLabel.AddThemeColorOverride("font_color", new Color(0.3f, 0.9f, 0.3f));
                 row.AddChild(scoreLabel);
-                
+
                 // Kills/Deaths
                 Label kd = new Label();
                 kd.Text = $"{score.Kills}/{score.Deaths}";
                 kd.CustomMinimumSize = new Vector2(150, 40);
                 kd.AddThemeFontSizeOverride("font_size", 16);
                 row.AddChild(kd);
-                
+
                 _leaderboardContainer.AddChild(row);
             }
         }
-        
+
         /// <summary>
-        /// Update history display
+        /// 更新历史记录显示（由外部/System 调用）
         /// </summary>
-        private void UpdateHistory()
+        public void UpdateHistory(List<TournamentData> history)
         {
             // Clear existing
             foreach (Node child in _historyContainer.GetChildren())
             {
                 child.QueueFree();
             }
-            
-            var history = GuildTournamentSystem.Instance.GetHistory();
-            
-            if (history.Count == 0)
+
+            if (history == null || history.Count == 0)
             {
                 Label empty = new Label();
                 empty.Text = "暂无历史记录";
@@ -488,19 +459,19 @@ namespace ClawRPG.Scripts.Systems
                 _historyContainer.AddChild(empty);
                 return;
             }
-            
+
             foreach (var tournament in history)
             {
                 HBoxContainer row = new HBoxContainer();
                 row.CustomMinimumSize = new Vector2(700, 35);
-                
+
                 // Name
                 Label name = new Label();
                 name.Text = tournament.Name;
                 name.CustomMinimumSize = new Vector2(300, 35);
                 name.AddThemeFontSizeOverride("font_size", 14);
                 row.AddChild(name);
-                
+
                 // Type
                 string[] typeNames = { "死亡竞赛", "夺旗战", "生存赛", "Bossrush", "寻宝赛", "解谜挑战" };
                 Label type = new Label();
@@ -508,7 +479,7 @@ namespace ClawRPG.Scripts.Systems
                 type.CustomMinimumSize = new Vector2(150, 35);
                 type.AddThemeFontSizeOverride("font_size", 14);
                 row.AddChild(type);
-                
+
                 // Winner
                 Label winner = new Label();
                 winner.Text = tournament.WinnerGuildName;
@@ -516,35 +487,41 @@ namespace ClawRPG.Scripts.Systems
                 winner.AddThemeFontSizeOverride("font_size", 14);
                 winner.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0f));
                 row.AddChild(winner);
-                
+
                 _historyContainer.AddChild(row);
             }
         }
-        
+
         /// <summary>
-        /// Handle state change
+        /// 更新计时器显示（由外部/System 调用）
         /// </summary>
-        private void OnStateChanged(GuildTournamentSystem.TournamentState state)
+        public void UpdateTimerDisplay(float timeRemaining, GuildTournamentSystem.TournamentState state)
         {
-            UpdateUI();
+            if (state == GuildTournamentSystem.TournamentState.InProgress ||
+                state == GuildTournamentSystem.TournamentState.Registration ||
+                state == GuildTournamentSystem.TournamentState.Preparation)
+            {
+                int minutes = (int)(timeRemaining / 60);
+                int seconds = (int)(timeRemaining % 60);
+                _timerLabel.Text = $"剩余时间: {minutes}:{seconds:D2}";
+            }
+            else
+            {
+                _timerLabel.Text = "";
+            }
         }
-        
+
         /// <summary>
-        /// Handle score update
+        /// 更新按钮状态（由外部/System 调用）
         /// </summary>
-        private void OnScoreUpdated(int guildId, GuildTournamentScore score)
+        public void UpdateButtonStates(bool canRegister, bool canStart)
         {
-            UpdateUI();
+            _registerButton.Disabled = !canRegister;
+            _startTournamentButton.Disabled = !canStart;
         }
-        
-        /// <summary>
-        /// Handle tournament complete
-        /// </summary>
-        private void OnTournamentComplete(TournamentData tournament)
-        {
-            UpdateUI();
-        }
-        
+
+        // ===== 事件处理（转发到外部） =====
+
         /// <summary>
         /// Handle start tournament button pressed
         /// </summary>
@@ -552,13 +529,14 @@ namespace ClawRPG.Scripts.Systems
         {
             string name = _tournamentNameEdit.Text;
             int typeIndex = _tournamentTypeOption.GetSelectedId();
-            
+
             GuildTournamentSystem.TournamentType type = (GuildTournamentSystem.TournamentType)typeIndex;
-            GuildTournamentSystem.Instance.StartTournament(type, name);
-            
-            GD.Print($"[GuildTournamentUI] Started tournament: {name}, Type: {type}");
+            // 通过事件请求，而不是直接调用 System
+            OnStartTournamentRequested?.Invoke(type, name);
+
+            GD.Print($"[GuildTournamentUI] Requested start tournament: {name}, Type: {type}");
         }
-        
+
         /// <summary>
         /// Handle register button pressed
         /// </summary>
@@ -567,14 +545,11 @@ namespace ClawRPG.Scripts.Systems
             // Get current player guild (placeholder - would need to integrate with guild system)
             int guildId = 1; // Default guild
             string guildName = "玩家公会";
-            
-            bool success = GuildTournamentSystem.Instance.RegisterGuild(guildId, guildName);
-            if (success)
-            {
-                GD.Print($"[GuildTournamentUI] Registered guild: {guildName}");
-            }
+
+            // 通过事件请求，而不是直接调用 System
+            OnRegisterGuildRequested?.Invoke(guildId, guildName);
         }
-        
+
         /// <summary>
         /// Handle close button pressed
         /// </summary>
@@ -582,7 +557,7 @@ namespace ClawRPG.Scripts.Systems
         {
             Hide();
         }
-        
+
         /// <summary>
         /// Handle input
         /// </summary>
