@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 
 /// <summary>
 /// Combo Fatigue persistent data.

@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Godot.Collections;
+using Array = System.Array;
 
 /// <summary>
 /// 好友系统 - 玩家好友关系管理

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 
 /// <summary>
 /// Boss Rush 系统 - 连续挑战 Boss 的模式

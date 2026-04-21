@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 
 /// <summary>
 /// 坐骑竞速系统 - 坐骑竞速比赛管理

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
+using Array = System.Array;
 
 public partial class GuildTechnologyUI : Control
 {

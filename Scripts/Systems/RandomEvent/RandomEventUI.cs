@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.RandomEvent;
+using EventRarity = ClawRPG.Scripts.Systems.RandomEvent.EventRarity;
 
 /// <summary>
 /// UI for displaying and interacting with random events

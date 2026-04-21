@@ -191,7 +191,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
                     
                 if (fusionData.Contains("fusion_count_by_gem")) {
                     var countData = (Dictionary)fusionData["fusion_count_by_gem"];
-                    _playerFusionData.FusionCountByGem = new Dictionary<string, int>();
+                    _playerFusionData.FusionCountByGem = new System.Collections.Generic.Dictionary<string, int>();
                     foreach (var key in countData.Keys) {
                         _playerFusionData.FusionCountByGem[key.ToString()] = Convert.ToInt32(countData[key]);
                     }

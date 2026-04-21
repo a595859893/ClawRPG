@@ -5,6 +5,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FileAccess = Godot.FileAccess;
 
 /// <summary>
 /// HUD layout configuration for a single draggable element.

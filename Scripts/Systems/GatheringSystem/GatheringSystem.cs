@@ -2,6 +2,7 @@ using Godot;
 using Godot.Collections;
 using System;
 using System.Text.Json;
+using Array = System.Array;
 
 public partial class GatheringSystem : BaseSystem
 {

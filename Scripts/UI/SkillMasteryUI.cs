@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Skills;
 using SkillMasterySystem = ClawRPG.Scripts.Skills.SkillMasterySystem;
+using RuneSlotType = ClawRPG.Scripts.Database.RuneSlotType;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>

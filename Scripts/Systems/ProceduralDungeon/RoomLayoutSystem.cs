@@ -93,7 +93,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
             var allowedTypes = config.AllowedRoomTypes;
 
             // 基础概率分布
-            var weights = new Dictionary<RoomType, int>
+            var weights = new System.Collections.Generic.Dictionary<RoomType, int>
             {
                 [RoomType.Combat] = 40,
                 [RoomType.Treasure] = 15,

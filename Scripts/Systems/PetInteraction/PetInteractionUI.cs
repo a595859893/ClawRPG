@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Systems.PetInteraction;
+using InteractionType = ClawRPG.Scripts.Systems.PetInteraction.InteractionType;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>

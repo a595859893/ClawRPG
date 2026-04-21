@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ClawRPG.Scripts.Items;
+using InventoryManager = ClawRPG.Scripts.Items.InventoryManager;
 
 namespace ClawRPG.Scripts.UI
 {

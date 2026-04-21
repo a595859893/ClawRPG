@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Environment = Godot.Environment;
 
 namespace ClawRPG.Scripts.Systems
 {

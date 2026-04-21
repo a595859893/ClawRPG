@@ -2,6 +2,7 @@ using Godot;
 using Godot.Collections;
 using System;
 using System.Linq;
+using Array = System.Array;
 
 namespace ClawRPG.Scripts.Systems.GemSystem {
     /// <summary>

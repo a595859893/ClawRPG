@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 
 public partial class RogueLegacySystem : BaseSystem
 {

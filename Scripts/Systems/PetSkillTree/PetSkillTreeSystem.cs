@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Godot.Collections;
+using Array = System.Array;
 
 namespace ClawRPG.Scripts.Systems
 {

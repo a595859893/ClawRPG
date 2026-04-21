@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using ClawRPG.Scripts.Items;
+using InventoryManager = ClawRPG.Scripts.Items.InventoryManager;
 
 public partial class InventoryUI
 {

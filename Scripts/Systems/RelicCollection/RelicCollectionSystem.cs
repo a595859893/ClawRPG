@@ -8,6 +8,9 @@ using RelicEffectType = ClawRPG.Systems.Relics.RelicEffectType;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using PlayerRelicData = ClawRPG.Systems.Relics.PlayerRelicData;
+using RelicRarity = ClawRPG.Systems.Relics.RelicRarity;
+using RelicType = ClawRPG.Systems.Relics.RelicType;
 
 namespace ClawRPG.Scripts.Systems
 {

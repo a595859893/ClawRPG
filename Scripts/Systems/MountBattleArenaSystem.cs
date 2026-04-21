@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 using ClawRPG.Scripts.Mounts;
 
 /// <summary>

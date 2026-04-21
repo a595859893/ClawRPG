@@ -5,6 +5,7 @@ using Godot;
 using Godot.Collections;
 using ClawRPG.Scripts.Systems;
 using ClawRPG.Scripts.Managers;
+using Array = System.Array;
 
 namespace ClawRPG.Scripts.Systems.ProceduralDungeon
 {

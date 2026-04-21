@@ -1,6 +1,7 @@
 using Godot;
 using ClawRPG.Systems.PetLifeCycle;
 using System.Collections.Generic;
+using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 
 public partial class PetLifeCycleSystem : BaseSystem
 {

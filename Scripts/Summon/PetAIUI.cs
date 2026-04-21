@@ -4,6 +4,7 @@ using System.Linq;
 using ClawRPG.Scripts.Data;
 using ClawRPG.Scripts.Database;
 using ClawRPG.Scripts.Systems;
+using PetAIState = ClawRPG.Scripts.Data.PetAIState;
 
 namespace ClawRPG.Scripts.UI
 {

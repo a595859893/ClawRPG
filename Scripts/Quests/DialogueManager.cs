@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using ClawRPG.Scripts.Items;
+using InventoryManager = ClawRPG.Scripts.Items.InventoryManager;
 
 namespace ClawRPG.Scripts.Quests {
     /// <summary>

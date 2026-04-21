@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 
 public partial class EconomicWarningSystem : BaseSystem
 {

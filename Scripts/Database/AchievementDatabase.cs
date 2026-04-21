@@ -4,6 +4,7 @@ using Godot;
 using ClawRPG.Scripts.Data;
 using ClawRPG.Scripts.Database.Loaders;
 using ClawRPG.Scripts.Framework;
+using AchievementDifficulty = ClawRPG.Scripts.Data.AchievementDifficulty;
 
 namespace ClawRPG.Scripts.Database
 {

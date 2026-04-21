@@ -2,6 +2,7 @@ using Godot;
 using System;
 using ClawRPG.Scripts.Framework;
 using ClawRPG.Scripts.Items;
+using InventoryManager = ClawRPG.Scripts.Items.InventoryManager;
 
 namespace ClawRPG.Scripts.UI {
     /// <summary>

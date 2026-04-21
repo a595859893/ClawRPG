@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FileAccess = Godot.FileAccess;
 
 namespace ClawRPG.Framework
 {

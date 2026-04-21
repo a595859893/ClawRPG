@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Framework;
+using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 
 namespace 悬疑RPG
 {
