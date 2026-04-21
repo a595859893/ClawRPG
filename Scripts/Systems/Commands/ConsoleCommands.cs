@@ -88,7 +88,7 @@ namespace ClawRPG.Scripts.Systems.Commands
                     if (args.Length == 0)
                     {
                         // 无参数：使用默认敌人生成一个
-                        var esm = EnemySpawnManager.Instance;
+                        var esm = Systems.EnemySpawnManager.Instance;
                         if (esm != null)
                         {
                             esm.SpawnEnemy();
@@ -110,7 +110,7 @@ namespace ClawRPG.Scripts.Systems.Commands
                         count = Mathf.Max(1, parsedCount);
                     }
 
-                    var spawnManager = EnemySpawnManager.Instance;
+                    var spawnManager = Systems.EnemySpawnManager.Instance;
                     if (spawnManager == null)
                     {
                         PrintError("EnemySpawnManager 不可用");
@@ -258,7 +258,7 @@ namespace ClawRPG.Scripts.Systems.Commands
                 "击杀所有敌人",
                 (args) =>
                 {
-                    var spawnManager = EnemySpawnManager.Instance;
+                    var spawnManager = Systems.EnemySpawnManager.Instance;
                     if (spawnManager == null)
                     {
                         PrintError("EnemySpawnManager 不可用");

@@ -286,10 +286,10 @@ namespace ClawRPG.Scripts.UI
         {
             return type switch
             {
-                PetType.Companion => "伙伴",
-                PetType.Collector => "收藏家",
-                PetType.Guardian => "守护者",
-                PetType.Explorer => "探险家",
+                Data.PetType.Companion => "伙伴",
+                Data.PetType.Collector => "收藏家",
+                Data.PetType.Guardian => "守护者",
+                Data.PetType.Explorer => "探险家",
                 _ => "未知"
             };
         }

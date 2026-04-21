@@ -62,7 +62,7 @@ namespace ClawRPG.Scripts.Systems
         {
             if (slot < 0 || slot >= MaxSaveSlots) return false;
             string path = GetSavePath(slot);
-            return File.Exists(path);
+            return System.IO.File.Exists(path);
         }
         
         /// <summary>
@@ -117,7 +117,7 @@ namespace ClawRPG.Scripts.Systems
                 });
                 
                 string path = GetSavePath(slot);
-                File.WriteAllText(path, json);
+                System.IO.File.WriteAllText(path, json);
                 
                 // Update slot info
                 UpdateSlotInfo(slot, data);
@@ -149,13 +149,13 @@ namespace ClawRPG.Scripts.Systems
             {
                 string path = GetSavePath(slot);
                 
-                if (!File.Exists(path))
+                if (!System.IO.File.Exists(path))
                 {
                     GD.PrintErr("No save file found in slot " + slot);
                     return null;
                 }
                 
-                string json = File.ReadAllText(path);
+                string json = System.IO.File.ReadAllText(path);
                 var data = System.Text.Json.JsonSerializer.Deserialize<SaveDataManager.SaveData>(json);
                 
                 GD.Print("Game loaded from slot " + slot + " - " + data.SaveName);
@@ -212,14 +212,14 @@ namespace ClawRPG.Scripts.Systems
         {
             string infoPath = GetSlotInfoPath(slot);
             
-            if (!File.Exists(infoPath))
+            if (!System.IO.File.Exists(infoPath))
             {
                 return new SaveDataManager.SaveSlotInfo { Slot = slot };
             }
             
             try
             {
-                string json = File.ReadAllText(infoPath);
+                string json = System.IO.File.ReadAllText(infoPath);
                 return System.Text.Json.JsonSerializer.Deserialize<SaveDataManager.SaveSlotInfo>(json);
             }
             catch
@@ -246,7 +246,7 @@ namespace ClawRPG.Scripts.Systems
             };
             
             string json = System.Text.Json.JsonSerializer.Serialize(info, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(GetSlotInfoPath(slot), json);
+            System.IO.File.WriteAllText(GetSlotInfoPath(slot), json);
         }
         
         /// <summary>
@@ -260,17 +260,17 @@ namespace ClawRPG.Scripts.Systems
             string path = GetSavePath(slot);
             string infoPath = GetSlotInfoPath(slot);
             
-            if (File.Exists(path))
+            if (System.IO.File.Exists(path))
             {
                 // Create final backup before deletion
                 CreateBackup(slot);
-                File.Delete(path);
+                System.IO.File.Delete(path);
                 GD.Print("Save deleted from slot " + slot);
             }
             
-            if (File.Exists(infoPath))
+            if (System.IO.File.Exists(infoPath))
             {
-                File.Delete(infoPath);
+                System.IO.File.Delete(infoPath);
             }
         }
         
@@ -281,7 +281,7 @@ namespace ClawRPG.Scripts.Systems
         public void CreateBackup(int slot)
         {
             string sourcePath = GetSavePath(slot);
-            if (!File.Exists(sourcePath)) return;
+            if (!System.IO.File.Exists(sourcePath)) return;
             
             try
             {
@@ -289,7 +289,7 @@ namespace ClawRPG.Scripts.Systems
                 string backupName = $"save_{slot}_{timestamp}.json";
                 string backupFullPath = BackupPath + backupName;
                 
-                File.Copy(sourcePath, backupFullPath);
+                System.IO.File.Copy(sourcePath, backupFullPath);
                 GD.Print("Backup created: " + backupName);
                 
                 // Clean old backups
@@ -317,7 +317,7 @@ namespace ClawRPG.Scripts.Systems
                     Array.Sort(files);
                     for (int i = 0; i < files.Length - MaxBackups; i++)
                     {
-                        File.Delete(files[i]);
+                        System.IO.File.Delete(files[i]);
                     }
                 }
             }
@@ -348,7 +348,7 @@ namespace ClawRPG.Scripts.Systems
                 Array.Sort(files);
                 string latestBackup = files[files.Length - 1];
                 
-                string json = File.ReadAllText(latestBackup);
+                string json = System.IO.File.ReadAllText(latestBackup);
                 var data = System.Text.Json.JsonSerializer.Deserialize<SaveDataManager.SaveData>(json);
                 
                 GD.Print("Game restored from backup: " + latestBackup);
@@ -370,11 +370,11 @@ namespace ClawRPG.Scripts.Systems
         public bool ExportSave(int slot, string exportPath)
         {
             string sourcePath = GetSavePath(slot);
-            if (!File.Exists(sourcePath)) return false;
+            if (!System.IO.File.Exists(sourcePath)) return false;
             
             try
             {
-                File.Copy(sourcePath, exportPath, true);
+                System.IO.File.Copy(sourcePath, exportPath, true);
                 GD.Print("Save exported to: " + exportPath);
                 return true;
             }
@@ -393,12 +393,12 @@ namespace ClawRPG.Scripts.Systems
         /// <returns>True if import was successful.</returns>
         public bool ImportSave(string importPath, int slot)
         {
-            if (!File.Exists(importPath)) return false;
+            if (!System.IO.File.Exists(importPath)) return false;
             
             try
             {
                 // Validate the import file first
-                string json = File.ReadAllText(importPath);
+                string json = System.IO.File.ReadAllText(importPath);
                 var data = System.Text.Json.JsonSerializer.Deserialize<SaveDataManager.SaveData>(json);
                 
                 if (data == null)
@@ -408,7 +408,7 @@ namespace ClawRPG.Scripts.Systems
                 }
                 
                 string destPath = GetSavePath(slot);
-                File.Copy(importPath, destPath, true);
+                System.IO.File.Copy(importPath, destPath, true);
                 
                 // Update slot info
                 UpdateSlotInfo(slot, data);
@@ -431,7 +431,7 @@ namespace ClawRPG.Scripts.Systems
         public long GetSaveFileSize(int slot)
         {
             string path = GetSavePath(slot);
-            if (File.Exists(path))
+            if (System.IO.File.Exists(path))
             {
                 return new FileInfo(path).Length;
             }
@@ -446,11 +446,11 @@ namespace ClawRPG.Scripts.Systems
         public bool IsSaveCorrupted(int slot)
         {
             string path = GetSavePath(slot);
-            if (!File.Exists(path)) return true;
+            if (!System.IO.File.Exists(path)) return true;
             
             try
             {
-                string json = File.ReadAllText(path);
+                string json = System.IO.File.ReadAllText(path);
                 var data = System.Text.Json.JsonSerializer.Deserialize<SaveDataManager.SaveData>(json);
                 return data == null;
             }
@@ -472,7 +472,7 @@ namespace ClawRPG.Scripts.Systems
             {
                 var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
                 string json = System.Text.Json.JsonSerializer.Serialize(data, options);
-                File.WriteAllText(path, json);
+                System.IO.File.WriteAllText(path, json);
             }
             catch (Exception e)
             {
@@ -490,9 +490,9 @@ namespace ClawRPG.Scripts.Systems
         {
             try
             {
-                if (File.Exists(path))
+                if (System.IO.File.Exists(path))
                 {
-                    string json = File.ReadAllText(path);
+                    string json = System.IO.File.ReadAllText(path);
                     return System.Text.Json.JsonSerializer.Deserialize<T>(json);
                 }
             }
@@ -512,7 +512,7 @@ namespace ClawRPG.Scripts.Systems
             {
                 var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
                 string json = System.Text.Json.JsonSerializer.Serialize(data, options);
-                File.WriteAllText(path, json);
+                System.IO.File.WriteAllText(path, json);
                 GD.Print($"[{systemName}] Data saved");
                 return true;
             }
@@ -530,9 +530,9 @@ namespace ClawRPG.Scripts.Systems
         {
             try
             {
-                if (File.Exists(path))
+                if (System.IO.File.Exists(path))
                 {
-                    string json = File.ReadAllText(path);
+                    string json = System.IO.File.ReadAllText(path);
                     var data = System.Text.Json.JsonSerializer.Deserialize<T>(json);
                     GD.Print($"[{systemName}] Data loaded");
                     return data;

@@ -32,8 +32,8 @@ namespace ClawRPG.Scripts.Systems {
         /// </summary>
         public void LoadConfig() {
             try {
-                if (File.Exists(_configPath)) {
-                    string json = File.ReadAllText(_configPath);
+                if (System.IO.File.Exists(_configPath)) {
+                    string json = System.IO.File.ReadAllText(_configPath);
                     _config = JsonSerializer.Deserialize<BalanceConfig>(json);
                     GD.Print("[BalanceManager] 配置已加载");
                 } else {
@@ -60,7 +60,7 @@ namespace ClawRPG.Scripts.Systems {
                     WriteIndented = true
                 };
                 string json = JsonSerializer.Serialize(_config, options);
-                File.WriteAllText(_configPath, json);
+                System.IO.File.WriteAllText(_configPath, json);
                 GD.Print("[BalanceManager] 配置已保存");
             } catch (Exception e) {
                 GD.PrintErr($"[BalanceManager] 配置保存失败: {e.Message}");

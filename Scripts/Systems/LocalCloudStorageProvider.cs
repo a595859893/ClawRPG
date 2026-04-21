@@ -148,7 +148,7 @@ namespace ClawRPG.Framework
             }
 
             var path = "user://" + GetSlotPath(slot);
-            using (var file = FileAccess.Open(path, FileAccess.ModeFlags.Write))
+            using (var file = Godot.FileAccess.Open(path, FileAccess.ModeFlags.Write))
             {
                 if (file == null)
                 {
@@ -168,13 +168,13 @@ namespace ClawRPG.Framework
         {
             var path = "user://" + GetSlotPath(slot);
 
-            if (!FileAccess.FileExists(path))
+            if (!Godot.FileAccess.FileExists(path))
             {
                 GD.Print("[LocalCloudStorageProvider] Slot " + slot + " does not exist in cloud storage");
                 return null;
             }
 
-            using (var file = FileAccess.Open(path, FileAccess.ModeFlags.Read))
+            using (var file = Godot.FileAccess.Open(path, FileAccess.ModeFlags.Read))
             {
                 if (file == null)
                 {
@@ -192,7 +192,7 @@ namespace ClawRPG.Framework
         {
             var path = "user://" + GetSlotPath(slot);
 
-            if (!FileAccess.FileExists(path))
+            if (!Godot.FileAccess.FileExists(path))
             {
                 GD.Print("[LocalCloudStorageProvider] Slot " + slot + " does not exist, nothing to delete");
                 return true;
@@ -243,7 +243,7 @@ namespace ClawRPG.Framework
                     if (int.TryParse(slotStr, out var slot))
                     {
                         var path = "user://" + CloudSaveDirectory + "/" + fileName;
-                        using (var file = FileAccess.Open(path, FileAccess.ModeFlags.Read))
+                        using (var file = Godot.FileAccess.Open(path, FileAccess.ModeFlags.Read))
                         {
                             if (file != null)
                             {
@@ -291,9 +291,9 @@ namespace ClawRPG.Framework
                 if (!fileName.StartsWith(".") && !fileName.StartsWith(".."))
                 {
                     var path = "user://" + CloudSaveDirectory + "/" + fileName;
-                    if (FileAccess.FileExists(path))
+                    if (Godot.FileAccess.FileExists(path))
                     {
-                        using (var file = FileAccess.Open(path, FileAccess.ModeFlags.Read))
+                        using (var file = Godot.FileAccess.Open(path, FileAccess.ModeFlags.Read))
                         {
                             if (file != null)
                             {

@@ -2,16 +2,29 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using ClawRPG.Scripts.Items;
-using ClawRPG.Scripts.Database;
+using ClawRPG.Systems.Alchemy;
 
 namespace ClawRPG.Scripts.Systems
 {
     /// <summary>
     /// 炼金界面 - GDScript UI绑定
+    /// 重构自 REQ-075: 移除对 AlchemySystem/AlchemyDatabase 的直接引用，改为事件驱动解耦
     /// </summary>
     public partial class AlchemyUI : Control
     {
-        // UI组件引用 (通过GetNode获取)
+        // ===== 事件接口（UI → System 通信） =====
+        // UI 层通过事件向外部/System 发送操作请求，不直接持有 System/Database 引用
+
+        /// <summary>请求刷新配方列表（System 收到后调用 UpdatePlayerData + UpdateRecipeList）</summary>
+        public Action OnRefreshRequested;
+
+        /// <summary>请求制作配方（System 收到后处理，调用 UpdateCraftResult）</summary>
+        public Action<int> OnCraftRequested;
+
+        /// <summary>请求查看配方详情（System 收到后调用 UpdateRecipeDetails）</summary>
+        public Action<int> OnRecipeDetailsRequested;
+
+        // ===== UI组件引用 (通过GetNode获取) =====
         private Label _titleLabel;
         private Label _levelLabel;
         private Label _experienceLabel;
@@ -28,14 +41,18 @@ namespace ClawRPG.Scripts.Systems
         private Button _closeButton;
         private Label _messageLabel;
 
-        private bool _isVisible = false; 
+        private bool _isVisible = false;
         private AlchemyRecipe _selectedRecipe;
+        private List<AlchemyRecipe> _currentRecipes = new List<AlchemyRecipe>();
+        private int _selectedRecipeId = -1;
+
+        // ===== 生命周期 =====
 
         public override void _Ready()
         {
             InitializeUI();
-            ConnectSignals();
-            AlchemySystem.Instance.Initialize();
+            // 不再直接持有 System 引用
+            // 初始化数据通过 OnRefreshRequested 事件请求
         }
 
         private void InitializeUI()
@@ -91,66 +108,37 @@ namespace ClawRPG.Scripts.Systems
             _messageLabel = GetNode<Label>("Panel/VBoxContainer/MessageLabel");
 
             // 初始隐藏
-            Visible = false; 
+            Visible = false;
         }
 
-        private void ConnectSignals()
-        {
-            AlchemySystem.Instance.OnCraftAttempt += OnCraftAttempt;
-            AlchemySystem.Instance.OnLevelUp += OnLevelUp;
-            AlchemySystem.Instance.OnRecipeUnlocked += OnRecipeUnlocked;
-        }
+        // ===== 公开更新接口（System → UI 通信） =====
+        // REQ-075 解耦：UI 不再主动拉取数据，而是等待外部推送
 
-        public override void _Process(double delta)
+        /// <summary>
+        /// 更新玩家炼金数据（由外部/System 调用）
+        /// </summary>
+        public void UpdatePlayerData(int alchemyLevel, int currentExp, int expToNext, int gold)
         {
-            if (!_isVisible) return;
-            
-            UpdateUI();
-        }
-
-        public void Toggle()
-        {
-            _isVisible = !_isVisible;
-            Visible = _isVisible;
-            
-            if (_isVisible)
-            {
-                RefreshRecipeList();
-                UpdateUI();
-            }
-        }
-
-        private void UpdateUI()
-        {
-            var playerData = AlchemySystem.Instance.PlayerData;
-            var inventory = PlayerInventory.Instance;
-
-            // 更新等级和经验
             if (_levelLabel != null)
-                _levelLabel.Text = $"炼金等级: {playerData.AlchemyLevel}";
-            
+                _levelLabel.Text = $"炼金等级: {alchemyLevel}";
+
             if (_experienceLabel != null)
-                _experienceLabel.Text = $"{playerData.CurrentExperience} / {playerData.ExperienceToNextLevel} 经验";
-            
-            if (_experienceBar != null)
+                _experienceLabel.Text = $"{currentExp} / {expToNext} 经验";
+
+            if (_experienceBar != null && expToNext > 0)
             {
-                float progress = (float)playerData.CurrentExperience / playerData.ExperienceToNextLevel;
+                float progress = (float)currentExp / expToNext;
                 _experienceBar.Value = progress * 100;
             }
 
-            // 更新金币
             if (_goldLabel != null)
-                _goldLabel.Text = $"金币: {inventory.Gold}";
-
-            // 更新制作按钮状态
-            if (_craftButton != null && _selectedRecipe != null)
-            {
-                bool canCraft = AlchemySystem.Instance.CanCraft(_selectedRecipe.Id);
-                _craftButton.Disabled = !canCraft;
-            }
+                _goldLabel.Text = $"金币: {gold}";
         }
 
-        private void RefreshRecipeList()
+        /// <summary>
+        /// 更新配方列表显示（由外部/System 调用）
+        /// </summary>
+        public void UpdateRecipeList(List<AlchemyRecipe> recipes, int filterIndex)
         {
             if (_recipeList == null) return;
 
@@ -160,15 +148,11 @@ namespace ClawRPG.Scripts.Systems
                 child.QueueFree();
             }
 
-            int filterIndex = _recipeFilter?.Selected ?? 0;
-            var allRecipes = AlchemyDatabase.Instance.GetAllRecipes();
-            var unlockedRecipes = AlchemySystem.Instance.GetUnlockedRecipes();
+            _currentRecipes = recipes;
 
-            foreach (var recipe in allRecipes)
+            foreach (var recipe in recipes)
             {
-                bool shouldShow = false; 
-                bool isUnlocked = AlchemySystem.Instance.IsRecipeUnlocked(recipe.Id);
-                bool canCraft = AlchemySystem.Instance.CanCraft(recipe.Id);
+                bool shouldShow = false;
 
                 switch (filterIndex)
                 {
@@ -176,29 +160,134 @@ namespace ClawRPG.Scripts.Systems
                         shouldShow = true;
                         break;
                     case 1: // 已解锁
-                        shouldShow = isUnlocked;
+                        shouldShow = recipe.IsUnlocked;
                         break;
                     case 2: // 可制作
-                        shouldShow = canCraft;
+                        shouldShow = recipe.IsUnlocked && recipe.CanCraft;
                         break;
                 }
 
                 if (shouldShow)
                 {
-                    var item = CreateRecipeItem(recipe, isUnlocked, canCraft);
+                    var item = CreateRecipeItem(recipe);
                     _recipeList.AddChild(item);
                 }
             }
         }
 
-        private Control CreateRecipeItem(AlchemyRecipe recipe, bool isUnlocked, bool canCraft)
+        /// <summary>
+        /// 更新配方详情显示（由外部/System 调用）
+        /// </summary>
+        public void UpdateRecipeDetails(int recipeId, string name, string description,
+            int goldCost, float successRate, float craftTime,
+            List<MaterialDisplayData> materials)
+        {
+            if (_selectedRecipeLabel != null)
+                _selectedRecipeLabel.Text = name;
+
+            if (_selectedDescriptionLabel != null)
+                _selectedDescriptionLabel.Text = description;
+
+            // 材料需求
+            var materialsText = "材料需求:\n";
+            foreach (var mat in materials)
+            {
+                string color = mat.HasEnough ? "[color=green]" : "[color=red]";
+                materialsText += $"{color}{mat.Name}[/color]: {mat.PlayerCount}/{mat.Required}[/color]\n";
+            }
+
+            if (_selectedMaterialsLabel != null)
+                _selectedMaterialsLabel.Text = materialsText;
+
+            // 费用和成功率
+            var costText = $"费用: {goldCost} 金币\n";
+            costText += $"成功率: {(successRate * 100):F0}%\n";
+            costText += $"制作时间: {craftTime:F1}秒";
+
+            if (_selectedCostLabel != null)
+                _selectedCostLabel.Text = costText;
+
+            _selectedRecipeId = recipeId;
+        }
+
+        /// <summary>
+        /// 更新制作结果消息（由外部/System 调用）
+        /// </summary>
+        public void UpdateCraftResult(bool success, string message)
+        {
+            if (_messageLabel != null)
+            {
+                _messageLabel.Text = message;
+                _messageLabel.Modulate = success ? new Color(0, 1, 0) : new Color(1, 0, 0);
+            }
+        }
+
+        /// <summary>
+        /// 更新制作按钮状态（由外部/System 调用）
+        /// </summary>
+        public void UpdateCraftButton(bool canCraft)
+        {
+            if (_craftButton != null)
+                _craftButton.Disabled = !canCraft;
+        }
+
+        /// <summary>
+        /// 显示升级提示（由外部/System 调用）
+        /// </summary>
+        public void ShowLevelUp(int newLevel)
+        {
+            if (_messageLabel != null)
+            {
+                _messageLabel.Text = $"升级了! 炼金等级 {newLevel}";
+                _messageLabel.Modulate = new Color(1, 0.84, 0);
+            }
+        }
+
+        /// <summary>
+        /// 显示解锁新配方提示（由外部/System 调用）
+        /// </summary>
+        public void ShowRecipeUnlocked(string recipeName)
+        {
+            if (_messageLabel != null)
+            {
+                _messageLabel.Text = $"解锁新配方: {recipeName}";
+                _messageLabel.Modulate = new Color(0, 1, 1);
+            }
+        }
+
+        // ===== 私有辅助数据结构 =====
+
+        /// <summary>
+        /// 配方列表项数据（由 System 传入，已包含材料数据）
+        /// </summary>
+        public class RecipeDisplayData
+        {
+            public AlchemyRecipe Recipe;
+            public bool IsUnlocked;
+            public bool CanCraft;
+        }
+
+        /// <summary>
+        /// 材料显示数据（由 System 计算后传入）
+        /// </summary>
+        public class MaterialDisplayData
+        {
+            public string Name;
+            public int PlayerCount;
+            public int Required;
+            public bool HasEnough;
+        }
+
+        // ===== 私有方法 =====
+
+        private Control CreateRecipeItem(AlchemyRecipe recipe)
         {
             var container = new HBoxContainer();
             container.CustomMinimumSize = new Vector2(0, 40);
 
             // 状态图标
             var statusLabel = new Label();
-            statusLabel.Text = isUnlocked ? (canCraft ? "✓" : "🔒") : "🔒";
+            statusLabel.Text = recipe.IsUnlocked ? (recipe.CanCraft ? "✓" : "🔒") : "🔒";
             statusLabel.CustomMinimumSize = new Vector2(30, 0);
             container.AddChild(statusLabel);
 
@@ -217,7 +306,7 @@ namespace ClawRPG.Scripts.Systems
             // 制作按钮
             var craftBtn = new Button();
             craftBtn.Text = "制作";
-            craftBtn.Disabled = !canCraft;
+            craftBtn.Disabled = !recipe.CanCraft;
             craftBtn.Pressed += () => OnRecipeSelected(recipe);
             container.AddChild(craftBtn);
 
@@ -227,7 +316,7 @@ namespace ClawRPG.Scripts.Systems
             clickable.Modulate = new Color(1, 1, 1, 0); // 透明
             clickable.Pressed += () => OnRecipeSelected(recipe);
             container.AddChild(clickable);
-            
+
             // 放到最底层
             container.MoveChild(clickable, 0);
 
@@ -237,79 +326,23 @@ namespace ClawRPG.Scripts.Systems
         private void OnRecipeSelected(AlchemyRecipe recipe)
         {
             _selectedRecipe = recipe;
-            UpdateRecipeDetails();
-        }
-
-        private void UpdateRecipeDetails()
-        {
-            if (_selectedRecipe == null) return;
-
-            var recipe = _selectedRecipe;
-            var inventory = PlayerInventory.Instance;
-
-            // 名称
-            if (_selectedRecipeLabel != null)
-                _selectedRecipeLabel.Text = recipe.Name;
-
-            // 描述
-            if (_selectedDescriptionLabel != null)
-                _selectedDescriptionLabel.Text = recipe.Description;
-
-            // 材料需求
-            var materialsText = "材料需求:\n";
-            foreach (var req in recipe.Requirements)
-            {
-                var material = AlchemyDatabase.Instance.GetMaterial(req.MaterialId);
-                if (material != null)
-                {
-                    int playerCount = inventory.GetItemCount(req.MaterialId);
-                    bool hasEnough = playerCount >= req.Quantity;
-                    string color = hasEnough ? "[color=green]" : "[color=red]";
-                    materialsText += $"{color}{material.Name}[/color]: {playerCount}/{req.Quantity}\n";
-                }
-            }
-
-            if (_selectedMaterialsLabel != null)
-                _selectedMaterialsLabel.Text = materialsText;
-
-            // 费用和成功率
-            var costText = $"费用: {recipe.GoldCost} 金币\n";
-            costText += $"成功率: {(recipe.SuccessRate * 100):F0}%\n";
-            costText += $"制作时间: {recipe.CraftTime:F1}秒";
-
-            if (_selectedCostLabel != null)
-                _selectedCostLabel.Text = costText;
-
-            UpdateUI();
+            // 通过事件请求 System 提供详情数据，而不是直接查询
+            OnRecipeDetailsRequested?.Invoke(recipe.Id);
         }
 
         private void OnFilterChanged(long index)
         {
-            RefreshRecipeList();
+            // 通过事件请求 System 重新提供过滤后的列表
+            OnRefreshRequested?.Invoke();
         }
 
         private void OnCraftPressed()
         {
             if (_selectedRecipe == null) return;
 
-            var success = AlchemySystem.Instance.TryCraft(
-                _selectedRecipe.Id,
-                out int itemId,
-                out int quantity,
-                out string message
-            );
-
-            if (_messageLabel != null)
-            {
-                _messageLabel.Text = message;
-                _messageLabel.Modulate = success ? new Color(0, 1, 0) : new Color(1, 0, 0);
-            }
-
-            if (success)
-            {
-                RefreshRecipeList();
-                UpdateRecipeDetails();
-            }
+            // 通过事件请求 System 处理制作逻辑
+            // 而不是直接调用 AlchemySystem.Instance.TryCraft()
+            OnCraftRequested?.Invoke(_selectedRecipe.Id);
         }
 
         private void OnClosePressed()
@@ -317,34 +350,22 @@ namespace ClawRPG.Scripts.Systems
             Toggle();
         }
 
-        private void OnCraftAttempt(AlchemyRecipe recipe, bool success)
-        {
-            // 刷新UI
-            RefreshRecipeList();
-            UpdateRecipeDetails();
-        }
+        // ===== 公开方法 =====
 
-        private void OnLevelUp(int newLevel)
+        public void Toggle()
         {
-            if (_messageLabel != null)
+            _isVisible = !_isVisible;
+            Visible = _isVisible;
+
+            if (_isVisible)
             {
-                _messageLabel.Text = $"升级了! 炼金等级 {newLevel}";
-                _messageLabel.Modulate = new Color(1, 0.84, 0);
+                // 通过事件请求 System 提供初始数据
+                OnRefreshRequested?.Invoke();
             }
-            RefreshRecipeList();
         }
 
-        private void OnRecipeUnlocked(AlchemyRecipe recipe)
-        {
-            if (_messageLabel != null)
-            {
-                _messageLabel.Text = $"解锁新配方: {recipe.Name}";
-                _messageLabel.Modulate = new Color(0, 1, 1);
-            }
-            RefreshRecipeList();
-        }
+        // ===== 快捷键处理 =====
 
-        // 快捷键处理
         public override void _Input(InputEvent @event)
         {
             if (@event.IsActionPressed("ui_cancel") && _isVisible)

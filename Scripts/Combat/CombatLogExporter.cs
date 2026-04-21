@@ -58,7 +58,7 @@ namespace ClawRPG.Scripts.Combat
             try
             {
                 var content = ExportToString(format);
-                File.WriteAllText(filePath, content);
+                System.IO.File.WriteAllText(filePath, content);
                 GD.Print($"[CombatLogExporter] Exported to {filePath}");
                 return true;
             }

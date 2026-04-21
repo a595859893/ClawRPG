@@ -245,9 +245,9 @@ public partial class HUDLayoutManager : Node
     {
         try
         {
-            if (!FileAccess.FileExists(CONFIG_FILE)) return;
+            if (!Godot.FileAccess.FileExists(CONFIG_FILE)) return;
 
-            using var file = FileAccess.Open(CONFIG_FILE, FileAccess.ModeFlags.Read);
+            using var file = Godot.FileAccess.Open(CONFIG_FILE, FileAccess.ModeFlags.Read);
             if (file == null) return;
 
             string json = file.GetAsText();
@@ -281,7 +281,7 @@ public partial class HUDLayoutManager : Node
     {
         try
         {
-            using var file = FileAccess.Open(CONFIG_FILE, FileAccess.ModeFlags.Write);
+            using var file = Godot.FileAccess.Open(CONFIG_FILE, FileAccess.ModeFlags.Write);
             if (file == null) return;
 
             var dict = new GodotDictionary();

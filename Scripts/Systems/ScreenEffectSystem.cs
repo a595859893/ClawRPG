@@ -350,11 +350,11 @@ public partial class ScreenEffectSystem : BaseSystem
     public void LoadData()
     {
         string path = GetSavePath();
-        if (!File.Exists(path)) return;
+        if (!System.IO.File.Exists(path)) return;
         
         try
         {
-            string json = File.ReadAllText(path);
+            string json = System.IO.File.ReadAllText(path);
             var loaded = JsonSerializer.Deserialize<ScreenEffectData>(json);
             if (loaded != null) _data = loaded;
         }
@@ -375,7 +375,7 @@ public partial class ScreenEffectSystem : BaseSystem
             
             var options = new JsonSerializerOptions { WriteIndented = true };
             string json = JsonSerializer.Serialize(_data, options);
-            File.WriteAllText(path, json);
+            System.IO.File.WriteAllText(path, json);
         }
         catch (Exception e)
         {

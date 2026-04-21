@@ -16,7 +16,7 @@ namespace ClawRPG.Scripts.Systems
         private static byte[] GetMachineKey()
         {
             // 使用机器名和用户名作为盐值
-            string machineFingerprint = $"{Environment.MachineName}_{Environment.UserName}_ClawRPG";
+            string machineFingerprint = $"{System.Environment.MachineName}_{Environment.UserName}_ClawRPG";
             byte[] salt = Encoding.UTF8.GetBytes(machineFingerprint);
             
             // 使用 PBKDF2 派生密钥
@@ -28,7 +28,7 @@ namespace ClawRPG.Scripts.Systems
         
         private static byte[] GetMachineIV()
         {
-            string machineFingerprint = $"{Environment.MachineName}_{Environment.UserName}_ClawRPG";
+            string machineFingerprint = $"{System.Environment.MachineName}_{Environment.UserName}_ClawRPG";
             byte[] salt = Encoding.UTF8.GetBytes(machineFingerprint);
             
             using (var deriveBytes = new Rfc2898DeriveBytes("ClawRPG_IV_Salt", salt, 10000, HashAlgorithmName.SHA256))
@@ -165,14 +165,14 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public bool EncryptFile(string sourcePath, string destPath)
         {
-            if (!File.Exists(sourcePath))
+            if (!System.IO.File.Exists(sourcePath))
                 return false;
                 
             try
             {
-                string content = File.ReadAllText(sourcePath);
+                string content = System.IO.File.ReadAllText(sourcePath);
                 string encrypted = Encrypt(content);
-                File.WriteAllText(destPath, encrypted);
+                System.IO.File.WriteAllText(destPath, encrypted);
                 return true;
             }
             catch (Exception e)
@@ -187,14 +187,14 @@ namespace ClawRPG.Scripts.Systems
         /// </summary>
         public bool DecryptFile(string sourcePath, string destPath)
         {
-            if (!File.Exists(sourcePath))
+            if (!System.IO.File.Exists(sourcePath))
                 return false;
                 
             try
             {
-                string content = File.ReadAllText(sourcePath);
+                string content = System.IO.File.ReadAllText(sourcePath);
                 string decrypted = Decrypt(content);
-                File.WriteAllText(destPath, decrypted);
+                System.IO.File.WriteAllText(destPath, decrypted);
                 return true;
             }
             catch (Exception e)

@@ -125,14 +125,14 @@ namespace ClawRPG.Scripts.Database.Loaders
             {
                 _lastError = string.Empty;
 
-                if (!File.Exists(configPath))
+                if (!System.IO.File.Exists(configPath))
                 {
                     _lastError = $"符文配置文件不存在: {configPath}";
                     GD.PrintErr($"[RuneConfigLoader] {_lastError}");
                     return false;
                 }
 
-                string json = File.ReadAllText(configPath);
+                string json = System.IO.File.ReadAllText(configPath);
                 var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true

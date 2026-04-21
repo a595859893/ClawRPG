@@ -59,7 +59,7 @@ namespace ClawRPG.Scripts.Systems.Testing
             // JSON 导出
             string json = ExportJson(summary);
             string jsonPath = GetJsonOutputPath();
-            File.WriteAllText(jsonPath, json);
+            System.IO.File.WriteAllText(jsonPath, json);
             GD.Print($"\n📄 JSON report saved: {jsonPath}");
 
             return summary;

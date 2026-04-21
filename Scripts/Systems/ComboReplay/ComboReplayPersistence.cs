@@ -112,7 +112,7 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
 
                 // 手动序列化（避免 System.Text.Json 依赖 Godot 特有类型）
                 string json = ReplayToJson(replay);
-                File.WriteAllText(fullPath, json);
+                System.IO.File.WriteAllText(fullPath, json);
 
                 GD.Print($"[ComboReplayPersistence] Saved replay: {fileName} ({replay.Actions.Count} actions, {replay.Combos.Count} combos)");
 
@@ -257,13 +257,13 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
             try
             {
                 string fullPath = Path.Combine(GetReplayDirectory(), fileName);
-                if (!File.Exists(fullPath))
+                if (!System.IO.File.Exists(fullPath))
                 {
                     GD.PrintErr($"[ComboReplayPersistence] Replay file not found: {fileName}");
                     return null;
                 }
 
-                string json = File.ReadAllText(fullPath);
+                string json = System.IO.File.ReadAllText(fullPath);
                 var replay = JsonToReplay(json);
                 GD.Print($"[ComboReplayPersistence] Loaded replay: {fileName}");
                 return replay;
@@ -346,9 +346,9 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
             try
             {
                 string fullPath = Path.Combine(GetReplayDirectory(), fileName);
-                if (File.Exists(fullPath))
+                if (System.IO.File.Exists(fullPath))
                 {
-                    File.Delete(fullPath);
+                    System.IO.File.Delete(fullPath);
                     _cachedReplayList.RemoveAll(r => r.FileName == fileName);
                     GD.Print($"[ComboReplayPersistence] Deleted replay: {fileName}");
                     return true;
