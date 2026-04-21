@@ -31,6 +31,84 @@ public partial class DailyRitualSystem : BaseSystem
     // Current bonuses from rituals
     public Dictionary<string, float> ActiveBonuses { get; private set; }
 
+    // ===== UI 桥接（REQ-075 解耦） =====
+    private DailyRitualUI _ui;
+
+    public void RegisterUI(DailyRitualUI ui)
+    {
+        _ui = ui;
+        if (_ui == null) return;
+
+        // 订阅 UI 事件
+        _ui.OnRefreshRequested += HandleRefreshRequested;
+        _ui.OnStartRitualRequested += HandleStartRitualRequested;
+        _ui.OnClearBonusesRequested += HandleClearBonusesRequested;
+    }
+
+    public void UnregisterUI(DailyRitualUI ui)
+    {
+        if (ui == null) return;
+        ui.OnRefreshRequested -= HandleRefreshRequested;
+        ui.OnStartRitualRequested -= HandleStartRitualRequested;
+        ui.OnClearBonusesRequested -= HandleClearBonusesRequested;
+        if (_ui == ui) _ui = null;
+    }
+
+    private void HandleRefreshRequested()
+    {
+        if (_ui == null) return;
+
+        // 获取所有仪式数据
+        var allRituals = DailyRitualDatabase.Instance.GetAllRituals();
+        _ui.UpdateRitualList(allRituals, UnlockedRitualIds, CurrentRitualId);
+        _ui.UpdateStats(TotalRitualsPerformed, TotalGoldSpent, TotalReputationGained);
+        _ui.UpdateDailyCount(_dailyRitualsRemaining);
+    }
+
+    private void HandleStartRitualRequested(string ritualId)
+    {
+        if (_ui == null) return;
+
+        var ritual = DailyRitualDatabase.Instance.GetRitual(ritualId);
+        if (ritual == null) return;
+
+        // 获取玩家金币（通过场景树）
+        var player = GetTree().CurrentScene?.GetNode<Player>("Player");
+        if (player == null)
+        {
+            GD.Print("Player not found");
+            return;
+        }
+
+        // 检查金币（使用反射获取 gold 属性）
+        var goldProperty = player.GetType().GetProperty("Gold");
+        int playerGold = goldProperty != null ? (int)goldProperty.GetValue(player) : 0;
+
+        if (playerGold < ritual.GoldCost)
+        {
+            GD.Print("Not enough gold");
+            return;
+        }
+
+        // 扣除金币
+        if (goldProperty != null)
+        {
+            goldProperty.SetValue(player, playerGold - ritual.GoldCost);
+        }
+
+        // 启动仪式
+        if (StartRitual(ritualId, playerGold - ritual.GoldCost))
+        {
+            _ui.NotifyRitualStarted(ritualId);
+            _ui.UpdateDailyCount(_dailyRitualsRemaining);
+        }
+    }
+
+    private void HandleClearBonusesRequested()
+    {
+        ClearBonuses();
+    }
+
     public override void _Ready()
     {
         Instance = this;
@@ -52,7 +130,7 @@ public partial class DailyRitualSystem : BaseSystem
     {
         if (IsRitualActive)
         {
-            UpdateRitualProgress(delta);
+            UpdateRitualProgress((float)delta);
         }
     }
 
@@ -119,8 +197,14 @@ public partial class DailyRitualSystem : BaseSystem
         EmitSignal(nameof(RitualCompleted), ritual.Id);
 
         // Clear current ritual (bonuses remain active until next ritual or manual clear)
+        var oldRitualId = CurrentRitualId;
         CurrentRitualId = "";
         RitualProgress = 0f;
+
+        // REQ-075 桥接通知 UI
+        _ui?.NotifyRitualCompleted(oldRitualId);
+        _ui?.UpdateDailyCount(_dailyRitualsRemaining);
+        _ui?.UpdateStats(TotalRitualsPerformed, TotalGoldSpent, TotalReputationGained);
 
         SaveData();
     }
@@ -139,6 +223,8 @@ public partial class DailyRitualSystem : BaseSystem
                 {
                     UnlockedRitualIds.Add(ritual.Id);
                     EmitSignal(nameof(RitualUnlocked), ritual.Id);
+                    // REQ-075 桥接通知 UI
+                    _ui?.NotifyRitualUnlocked(ritual.Id);
                 }
             }
         }
@@ -199,8 +285,10 @@ public partial class DailyRitualSystem : BaseSystem
         // Deduct gold (handled by caller)
         
         EmitSignal(nameof(RitualStarted), ritualId);
+        // REQ-075 桥接通知 UI
+        _ui?.NotifyRitualStarted(ritualId);
         SaveData();
-        
+
         return true;
     }
 
@@ -217,6 +305,8 @@ public partial class DailyRitualSystem : BaseSystem
         RitualProgress = 0f;
         
         EmitSignal(nameof(RitualCancelled));
+        // REQ-075 桥接通知 UI
+        _ui?.NotifyRitualCompleted("");
         SaveData();
     }
 
@@ -224,6 +314,8 @@ public partial class DailyRitualSystem : BaseSystem
     {
         ActiveBonuses.Clear();
         EmitSignal(nameof(BonusesCleared));
+        // REQ-075 桥接通知 UI
+        _ui?.UpdateStats(TotalRitualsPerformed, TotalGoldSpent, TotalReputationGained);
     }
 
     private void CheckDailyReset()
@@ -236,6 +328,8 @@ public partial class DailyRitualSystem : BaseSystem
         {
             _lastResetTime = todayTicks;
             _dailyRitualsRemaining = 3; // 3 rituals per day
+            // REQ-075 桥接通知 UI
+            _ui?.UpdateDailyCount(_dailyRitualsRemaining);
             SaveData();
         }
     }
@@ -258,6 +352,20 @@ public partial class DailyRitualSystem : BaseSystem
     }
 
     // Signal definitions
+    [Signal]
+    public delegate void RitualCompletedEventHandler(string ritualId);
+
+    [Signal]
+    public delegate void RitualUnlockedEventHandler(string ritualId);
+
+    [Signal]
+    public delegate void RitualStartedEventHandler(string ritualId);
+
+    [Signal]
+    public delegate void RitualCancelledEventHandler();
+
+    [Signal]
+    public delegate void BonusesClearedEventHandler();
 
     // 数据持久化接口
     public override Dictionary<string, object> ExportSaveData()
