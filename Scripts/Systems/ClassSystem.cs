@@ -92,7 +92,68 @@ public class ClassData
     
     // 经验需求
     private int[] _experienceThresholds = { 0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500, 6600, 7800, 9100, 10500, 12000, 13600, 15300, 17100, 19000 };
-    
+
+    // ===== UI 桥接（REQ-075 解耦）=====
+    private ClassUI _ui;
+
+    /// <summary>
+    /// 注册 UI 以建立事件驱动的解耦通信（REQ-075）
+    /// </summary>
+    public void RegisterUI(ClassUI ui)
+    {
+        if (_ui != null)
+        {
+            UnregisterUI(_ui);
+        }
+        _ui = ui;
+
+        // 订阅 UI 事件 → System 操作
+        _ui.OnClassListRefreshRequested += HandleClassListRefreshRequested;
+        _ui.OnSwitchClassRequested += HandleSwitchClassRequested;
+
+        GD.Print("[ClassSystem] UI registered (event-driven mode)");
+    }
+
+    /// <summary>
+    /// 取消注册 UI（REQ-075）
+    /// </summary>
+    public void UnregisterUI(ClassUI ui)
+    {
+        if (_ui != null)
+        {
+            _ui.OnClassListRefreshRequested -= HandleClassListRefreshRequested;
+            _ui.OnSwitchClassRequested -= HandleSwitchClassRequested;
+        }
+        _ui = null;
+        GD.Print("[ClassSystem] UI unregistered");
+    }
+
+    // ===== UI 事件处理器（UI → System 请求操作）=====
+
+    private void HandleClassListRefreshRequested()
+    {
+        if (_ui == null) return;
+        // System 推送当前完整数据给 UI
+        _ui.UpdateClassList(GetAllClasses());
+        var current = GetCurrentClassData();
+        if (current != null)
+        {
+            ClassData advanced = null;
+            if (current.AdvancedClass.HasValue)
+                advanced = GetClassData(current.AdvancedClass.Value);
+            _ui.UpdateSelectedClassDetails(current, advanced);
+            _ui.UpdateCurrentClassDisplay(current, ClassLevel, ClassExperience, ExperienceToNextLevel,
+                HealthBonus, AttackBonus, DefenseBonus, MagicBonus, SpeedBonus, LuckBonus);
+        }
+    }
+
+    private void HandleSwitchClassRequested(ClassData.ClassType classType)
+    {
+        SetClass(classType);
+        // 推送更新后的数据
+        HandleClassListRefreshRequested();
+    }
+
     public override void _Ready()
     {
         _instance = this;
@@ -384,6 +445,12 @@ public class ClassData
         _attackBonus = (int)(_attackBonus * tierMultiplier);
         _defenseBonus = (int)(_defenseBonus * tierMultiplier);
         _magicBonus = (int)(_magicBonus * tierMultiplier);
+
+        // REQ-075: 通知 UI 刷新
+        if (_ui != null)
+        {
+            HandleClassListRefreshRequested();
+        }
     }
 
     public ClassData GetCurrentClassData()

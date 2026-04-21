@@ -4,12 +4,17 @@ using System.Collections.Generic;
 
 /// <summary>
 /// ClassUI - 职业选择界面
-/// 提供职业查看、选择和属性展示的UI界面
+/// 重构自 REQ-075: 移除对 ClassSystem 的直接引用，改为事件驱动解耦
 /// </summary>
 public partial class ClassUI : Control
 {
-    private static ClassUI _instance;
-    public static ClassUI Instance => _instance;
+    // ===== 事件接口（UI → System 通信） =====
+
+    /// <summary>请求刷新职业列表（System 收到后调用 UpdateClassList）</summary>
+    public Action OnClassListRefreshRequested;
+
+    /// <summary>请求切换职业（System 收到后处理）</summary>
+    public Action<ClassData.ClassType> OnSwitchClassRequested;
 
     // UI 组件
     private Label _titleLabel;
@@ -25,14 +30,13 @@ public partial class ClassUI : Control
     private Label _bonusStatsLabel;
     private Button _switchClassButton;
     private Button _closeButton;
-    
+
     // 状态
     private bool _isVisible = false;
     private ClassData _selectedClass;
 
     public override void _Ready()
     {
-        _instance = this;
         SetupUI();
         Hide();
     }
@@ -51,14 +55,14 @@ public partial class ClassUI : Control
             CustomMinimumSize = new Vector2(800, 600)
         };
         AddChild(mainPanel);
-        
+
         var mainVBox = new VBoxContainer();
         mainPanel.AddChild(mainVBox);
-        
+
         // 标题栏
         var titleBar = new HBoxContainer();
         mainVBox.AddChild(titleBar);
-        
+
         _titleLabel = new Label
         {
             Text = "职业系统",
@@ -67,7 +71,7 @@ public partial class ClassUI : Control
         };
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         titleBar.AddChild(_titleLabel);
-        
+
         _closeButton = new Button
         {
             Text = "X",
@@ -75,52 +79,52 @@ public partial class ClassUI : Control
         };
         _closeButton.Pressed += () => ToggleUI();
         titleBar.AddChild(_closeButton);
-        
+
         // 内容区域
         var contentHBox = new HBoxContainer();
         contentHBox.SizeFlagsVertical = SizeFlags.ExpandFill;
         mainVBox.AddChild(contentHBox);
-        
+
         // 左侧 - 职业列表
         var leftPanel = new VBoxContainer();
         leftPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         leftPanel.CustomMinimumSize = new Vector2(300, 0);
         contentHBox.AddChild(leftPanel);
-        
+
         var listLabel = new Label { Text = "选择职业:" };
         listLabel.AddThemeFontSizeOverride("font_size", 18);
         leftPanel.AddChild(listLabel);
-        
+
         _classGrid = new GridContainer();
         _classGrid.Columns = 1;
         _classGrid.SizeFlagsVertical = SizeFlags.ExpandFill;
         leftPanel.AddChild(_classGrid);
-        
+
         // 右侧 - 详情面板
         _detailPanel = new VBoxContainer();
         _detailPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         contentHBox.AddChild(_detailPanel);
-        
+
         _classNameLabel = new Label();
         _classNameLabel.AddThemeFontSizeOverride("font_size", 28);
         _detailPanel.AddChild(_classNameLabel);
-        
+
         _tierLabel = new Label();
         _tierLabel.AddThemeFontSizeOverride("font_size", 18);
         _detailPanel.AddChild(_tierLabel);
-        
+
         _descriptionLabel = new Label();
         _descriptionLabel.AutowrapMode = TextServer.AutowrapMode.Word;
         _descriptionLabel.SizeFlagsVertical = SizeFlags.ExpandFill;
         _detailPanel.AddChild(_descriptionLabel);
-        
+
         var statsTitleLabel = new Label { Text = "属性加成:" };
         statsTitleLabel.AddThemeFontSizeOverride("font_size", 16);
         _detailPanel.AddChild(statsTitleLabel);
-        
+
         _bonusStatsLabel = new Label();
         _detailPanel.AddChild(_bonusStatsLabel);
-        
+
         _switchClassButton = new Button
         {
             Text = "选择此职业",
@@ -128,145 +132,149 @@ public partial class ClassUI : Control
         };
         _switchClassButton.Pressed += OnSwitchClassPressed;
         _detailPanel.AddChild(_switchClassButton);
-        
+
         // 底部 - 当前职业信息
         var bottomPanel = new VBoxContainer();
         mainVBox.AddChild(bottomPanel);
-        
+
         var currentClassTitle = new Label { Text = "当前职业:" };
         currentClassTitle.AddThemeFontSizeOverride("font_size", 16);
         bottomPanel.AddChild(currentClassTitle);
-        
+
         var currentInfoHBox = new HBoxContainer();
         bottomPanel.AddChild(currentInfoHBox);
-        
+
         _levelLabel = new Label { Text = "等级: 1" };
         currentInfoHBox.AddChild(_levelLabel);
-        
+
         _expLabel = new Label { Text = "经验: 0/100" };
         currentInfoHBox.AddChild(_expLabel);
-        
+
         _expProgressBar = new ProgressBar { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         _expProgressBar.MinValue = 0;
         _expProgressBar.MaxValue = 100;
         _expProgressBar.Value = 0;
         bottomPanel.AddChild(_expProgressBar);
-        
+
         _statsLabel = new Label { Text = "属性加成: 生命+0 攻击+0 防御+0 魔法+0 速度+0 幸运+0" };
         bottomPanel.AddChild(_statsLabel);
-        
-        RefreshClassList();
-        UpdateCurrentClassInfo();
+
+        GD.Print("[ClassUI] Initialized (event-driven mode)");
     }
 
-    private void RefreshClassList()
+    // ===== 公开更新接口（System → UI 通信） =====
+    // REQ-075 解耦：UI 不再主动拉取数据，而是等待外部推送
+
+    /// <summary>
+    /// 更新职业列表显示（由外部/System 调用）
+    /// </summary>
+    public void UpdateClassList(Dictionary<ClassData.ClassType, ClassData> classes)
     {
         // 清除现有项
         foreach (var child in _classGrid.GetChildren())
         {
             child.QueueFree();
         }
-        
-        if (ClassSystem.Instance == null) return;
-        
-        var classes = ClassSystem.Instance.GetAllClasses();
+
+        if (classes == null) return;
+
         foreach (var kvp in classes)
         {
             var classData = kvp.Value;
             var button = new Button
             {
                 Text = $"[{GetTierName(classData.Tier)}] {classData.Name}",
-                CustomMinimumSize = new Vector2(0, 45),
-                Tag = classData.Type
+                CustomMinimumSize = new Vector2(0, 45)
             };
             button.Pressed += () => OnClassSelected(classData);
             _classGrid.AddChild(button);
         }
     }
 
-    private void OnClassSelected(ClassData classData)
+    /// <summary>
+    /// 更新选中职业详情（由外部/System 调用）
+    /// </summary>
+    public void UpdateSelectedClassDetails(ClassData classData, ClassData advancedData)
     {
         _selectedClass = classData;
-        
+
         _classNameLabel.Text = classData.Name;
         _tierLabel.Text = $"阶级: {GetTierName(classData.Tier)} (需求等级: {classData.LevelRequired})";
         _descriptionLabel.Text = classData.Description;
-        
+
         var stats = $"生命+{classData.BaseHealthBonus} 攻击+{classData.BaseAttackBonus} 防御+{classData.BaseDefenseBonus}\n" +
                      $"魔法+{classData.BaseMagicBonus} 速度+{classData.BaseSpeedBonus} 幸运+{classData.BaseLuckBonus}";
-        
-        if (classData.AdvancedClass.HasValue)
+
+        if (classData.AdvancedClass.HasValue && advancedData != null)
         {
-            var advancedData = ClassSystem.Instance.GetClassData(classData.AdvancedClass.Value);
-            if (advancedData != null)
-                stats += $"\n\n进阶职业: {advancedData.Name}";
+            stats += $"\n\n进阶职业: {advancedData.Name}";
         }
-        
+
         if (classData.PassiveSkills.Count > 0)
             stats += $"\n\n被动技能: {classData.PassiveSkills.Count}个";
         if (classData.ActiveSkills.Count > 0)
             stats += $"\n主动技能: {classData.ActiveSkills.Count}个";
-        
+
         _bonusStatsLabel.Text = stats;
     }
 
-    private void OnSwitchClassPressed()
+    /// <summary>
+    /// 更新当前职业信息（由外部/System 调用）
+    /// </summary>
+    public void UpdateCurrentClassDisplay(ClassData currentClass, int level, int exp, int expToNext,
+        int healthBonus, int attackBonus, int defenseBonus, int magicBonus, int speedBonus, int luckBonus)
     {
-        if (_selectedClass == null || ClassSystem.Instance == null) return;
-        
-        ClassSystem.Instance.SetClass(_selectedClass.Type);
-        UpdateCurrentClassInfo();
-        RefreshClassList();
-    }
-
-    private void UpdateCurrentClassInfo()
-    {
-        if (ClassSystem.Instance == null) return;
-        
-        var currentClass = ClassSystem.Instance.GetCurrentClassData();
         if (currentClass == null) return;
-        
-        _levelLabel.Text = $"等级: {ClassSystem.Instance.ClassLevel}";
-        
-        int expToNext = ClassSystem.Instance.ExperienceToNextLevel;
+
+        _levelLabel.Text = $"等级: {level}";
+
         if (expToNext > 0)
-            _expLabel.Text = $"经验: {ClassSystem.Instance.ClassExperience}/{ClassSystem.Instance.ExperienceToNextLevel}";
+            _expLabel.Text = $"经验: {exp}/{exp + expToNext}";
         else
             _expLabel.Text = "经验: 满级";
-        
-        int maxExp = ClassSystem.Instance.ExperienceToNextLevel;
-        if (maxExp > 0)
+
+        if (expToNext > 0)
         {
-            _expProgressBar.MaxValue = maxExp;
-            _expProgressBar.Value = ClassSystem.Instance.ClassExperience;
+            _expProgressBar.MaxValue = exp + expToNext;
+            _expProgressBar.Value = exp;
         }
-        
-        _statsLabel.Text = $"属性加成: 生命+{ClassSystem.Instance.HealthBonus} 攻击+{ClassSystem.Instance.AttackBonus} " +
-                          $"防御+{ClassSystem.Instance.DefenseBonus} 魔法+{ClassSystem.Instance.MagicBonus} " +
-                          $"速度+{ClassSystem.Instance.SpeedBonus} 幸运+{ClassSystem.Instance.LuckBonus}";
+
+        _statsLabel.Text = $"属性加成: 生命+{healthBonus} 攻击+{attackBonus} " +
+                          $"防御+{defenseBonus} 魔法+{magicBonus} " +
+                          $"速度+{speedBonus} 幸运+{luckBonus}";
     }
 
-    private string GetTierName(ClassData.ClassTier tier)
+    // ===== 事件处理（转发到外部） =====
+
+    /// <summary>
+    /// Handle class selected — 请求外部提供详情数据
+    /// </summary>
+    private void OnClassSelected(ClassData classData)
     {
-        switch (tier)
-        {
-            case ClassData.ClassTier.Novice: return "初级";
-            case ClassData.ClassTier.Adept: return "熟练";
-            case ClassData.ClassTier.Master: return "大师";
-            case ClassData.ClassTier.Legend: return "传奇";
-            default: return "未知";
-        }
+        // 通过事件请求，而不是直接调用 System
+        OnClassListRefreshRequested?.Invoke();
+    }
+
+    /// <summary>
+    /// Handle switch class button pressed
+    /// </summary>
+    private void OnSwitchClassPressed()
+    {
+        if (_selectedClass == null) return;
+
+        // 通过事件请求，而不是直接调用 System
+        OnSwitchClassRequested?.Invoke(_selectedClass.Type);
     }
 
     public void ToggleUI()
     {
         _isVisible = !_isVisible;
-        
+
         if (_isVisible)
         {
             Show();
-            RefreshClassList();
-            UpdateCurrentClassInfo();
+            // 通过事件请求刷新数据
+            OnClassListRefreshRequested?.Invoke();
         }
         else
         {
@@ -283,11 +291,15 @@ public partial class ClassUI : Control
         }
     }
 
-    public override void _Notification(int what)
+    private string GetTierName(ClassData.ClassTier tier)
     {
-        if (what == NotificationReady && ClassSystem.Instance != null)
+        switch (tier)
         {
-            UpdateCurrentClassInfo();
+            case ClassData.ClassTier.Novice: return "初级";
+            case ClassData.ClassTier.Adept: return "熟练";
+            case ClassData.ClassTier.Master: return "大师";
+            case ClassData.ClassTier.Legend: return "传奇";
+            default: return "未知";
         }
     }
 }
