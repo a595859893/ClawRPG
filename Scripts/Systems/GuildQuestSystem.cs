@@ -118,6 +118,64 @@ public partial class GuildQuestSystem : BaseSystem
     public List<GuildQuest> GetActiveQuests() => _activeQuests;
     public List<GuildQuest> GetCompletedQuests() => _completedQuests;
 
+    // ===== UI 桥接（REQ-075 解耦） =====
+    // GuildQuestUI 通过事件驱动，不直接持有 System 引用
+    // 此方法由外部调用以建立桥接（如场景初始化时）
+    
+    private GuildQuestUI _ui;
+    
+    public void RegisterUI(GuildQuestUI ui)
+    {
+        _ui = ui;
+        if (_ui == null) return;
+        
+        // 订阅 UI 事件
+        _ui.OnRefreshRequested += HandleRefreshRequested;
+        _ui.OnQuestAccepted += HandleQuestAccepted;
+        _ui.OnQuestCompleted += HandleQuestCompleted;
+    }
+
+    public void UnregisterUI(GuildQuestUI ui)
+    {
+        if (ui == null) return;
+        ui.OnRefreshRequested -= HandleRefreshRequested;
+        ui.OnQuestAccepted -= HandleQuestAccepted;
+        ui.OnQuestCompleted -= HandleQuestCompleted;
+        if (_ui == ui) _ui = null;
+    }
+
+    private void HandleRefreshRequested()
+    {
+        if (_ui == null) return;
+        _ui.UpdateQuestList(GetActiveQuests());
+        
+        var stats = GetQuestStatistics();
+        _ui.UpdateStatistics(
+            (int)stats["total_completed"],
+            SumQuestPoints(),
+            SumQuestGold()
+        );
+    }
+
+    private void HandleQuestAccepted(string questId)
+    {
+        // 任务接受逻辑（如有需要）
+        GD.Print($"[GuildQuest] Quest accepted: {questId}");
+    }
+
+    private void HandleQuestCompleted(string questId)
+    {
+        // 查找并完成任务
+        foreach (var quest in _activeQuests)
+        {
+            if ($"{quest.Id}" == questId || quest.Name == questId)
+            {
+                CompleteQuest(quest);
+                break;
+            }
+        }
+    }
+
     public Dictionary<string, object> GetQuestStatistics()
     {
         return new Dictionary<string, object>

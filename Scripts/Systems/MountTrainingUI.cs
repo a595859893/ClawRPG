@@ -5,11 +5,21 @@ using ClawRPG.Scripts.Data;
 
 /// <summary>
 /// 坐骑训练界面 - 显示和管理坐骑训练项目的UI
+/// 重构自 REQ-075: 移除对 System/Database 的直接引用，改为事件驱动解耦
 /// </summary>
 public partial class MountTrainingUI : Control
 {
-    private MountTrainingSystem system;
-    private MountTrainingDatabase database;
+    // ===== 事件接口（解耦核心） =====
+    // UI 层通过事件向外部（System/Bridge）发送操作请求
+    // UI 不直接持有 System 引用，而是通过事件广播操作意图
+    
+    public Action<string> OnMountSelected;
+    public Action<string, string> OnProjectSelected;  // mountId, projectId
+    public Action<string, string> OnTrainingStarted;   // mountId, projectId
+    public Action OnClosePressed;
+    public Action OnRefreshRequested;
+    
+    // ===== 纯展示数据（由外部更新） =====
     
     // UI Elements
     private Control mainContainer;
@@ -49,15 +59,135 @@ public partial class MountTrainingUI : Control
     
     // Current selection
     private string currentMountId = "";
+    private string selectedProjectId = "";
     private TrainingProject selectedProject;
+    
+    // ===== 生命周期 =====
     
     public override void _Ready()
     {
-        system = MountTrainingSystem.Instance;
-        database = MountTrainingDatabase.Instance;
-        
         SetupUI();
-        RefreshMountList();
+        RequestRefresh();  // 通过事件请求初始数据，而不是直接调用 System
+    }
+    
+    // ===== 公开更新接口（由外部/System 调用） =====
+    // REQ-075 解耦：UI 不再主动拉取数据，而是等待外部推送
+    
+    public void UpdateMountList(string[] mountIds)
+    {
+        mountSelector.Clear();
+        for (int i = 0; i < mountIds.Length; i++)
+        {
+            mountSelector.AddItem(mountIds[i], i);
+        }
+        if (mountIds.Length > 0)
+        {
+            mountSelector.Select(0);
+            OnMountSelected?.Invoke(mountIds[0]);
+        }
+    }
+    
+    public void UpdateMountDisplay(int level, int bondLevel, int expProgress, int bondProgress, string[] unlockedSkills)
+    {
+        mountLevelLabel.Text = $"Level: {level}";
+        mountBondLabel.Text = $"Bond: Lv.{bondLevel}";
+        experienceBar.Value = expProgress;
+        bondBar.Value = bondProgress;
+        
+        skillsList.Clear();
+        foreach (string skill in unlockedSkills)
+            skillsList.AddItem(skill);
+    }
+    
+    public void UpdateTrainingLists(TrainingProject[][] projectsByCategory)
+    {
+        // projectsByCategory[0]=Combat, [1]=Speed, [2]=Stamina, [3]=Intelligence, [4]=Bonding, [5]=Special
+        if (projectsByCategory == null || projectsByCategory.Length < 6) return;
+        
+        ClearAllLists();
+        
+        foreach (var p in projectsByCategory[0])
+            combatList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
+        foreach (var p in projectsByCategory[1])
+            speedList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
+        foreach (var p in projectsByCategory[2])
+            staminaList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
+        foreach (var p in projectsByCategory[3])
+            intelligenceList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
+        foreach (var p in projectsByCategory[4])
+            bondingList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
+        foreach (var p in projectsByCategory[5])
+            specialList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
+    }
+    
+    public void UpdateStatistics(int totalSessions, int totalExp, int avgLevel, int avgBond)
+    {
+        totalSessionsLabel.Text = $"Total Training Sessions: {totalSessions}";
+        totalExpLabel.Text = $"Total Experience Gained: {totalExp}";
+        avgLevelLabel.Text = $"Average Mount Level: {avgLevel}";
+        avgBondLabel.Text = $"Average Bond Level: {avgBond}";
+    }
+    
+    public void UpdateProjectDetails(TrainingProject project, int remainingDaily)
+    {
+        if (project == null)
+        {
+            projectNameLabel.Text = "Select a training project";
+            projectDescLabel.Text = "";
+            projectRequirementsLabel.Text = "";
+            projectRewardsLabel.Text = "";
+            dailyLimitLabel.Text = "";
+            trainButton.Disabled = true;
+            return;
+        }
+        
+        projectNameLabel.Text = project.ProjectName;
+        projectDescLabel.Text = project.Description;
+        
+        string reqs = $"Required Level: {project.RequiredLevel}\nDuration: {project.DurationMinutes} minutes";
+        if (project.RequiredSkills.Count > 0)
+            reqs += $"\nRequired Skills: {string.Join(", ", project.RequiredSkills)}";
+        projectRequirementsLabel.Text = reqs;
+        
+        string rewards = $"Experience: +{project.ExperienceReward}\nBond Points: +{project.BondPointsReward}";
+        if (project.AttributeRewards.Count > 0)
+        {
+            rewards += "\nAttributes:";
+            foreach (var attr in project.AttributeRewards)
+                rewards += $"\n  {attr.Key}: +{attr.Value}";
+        }
+        projectRewardsLabel.Text = rewards;
+        
+        dailyLimitLabel.Text = $"Daily Uses Remaining: {remainingDaily}/{project.DailyLimit}";
+        trainButton.Disabled = remainingDaily <= 0;
+    }
+    
+    public void ShowTrainingResult(bool success)
+    {
+        if (success)
+        {
+            GD.Print($"Training started: {selectedProject?.ProjectName ?? selectedProjectId}");
+        }
+        else
+        {
+            GD.PrintErr("Training failed!");
+        }
+    }
+    
+    public void Toggle()
+    {
+        Visible = !Visible;
+        if (Visible)
+        {
+            RequestRefresh();
+        }
+    }
+    
+    // ===== 私有方法 =====
+    
+    private void RequestRefresh()
+    {
+        OnRefreshRequested?.Invoke();
     }
     
     private void SetupUI()
@@ -292,60 +422,6 @@ public partial class MountTrainingUI : Control
         avgBondLabel.SetAnchor(0, 0, 0, 0);
         avgBondLabel.SetOffset(20, 140, 400, 170);
         statsTab.AddChild(avgBondLabel);
-        
-        UpdateStatisticsDisplay();
-    }
-    
-    private void RefreshMountList()
-    {
-        mountSelector.Clear();
-        
-        // Add some default mounts for demonstration
-        string[] demoMounts = { "ThunderSteed", "ShadowPhoenix", "FrostWyvern", "InfernoLion", "AzureDragon" };
-        
-        for (int i = 0; i < demoMounts.Length; i++)
-        {
-            mountSelector.AddItem(demoMounts[i], i);
-        }
-        
-        if (demoMounts.Length > 0)
-        {
-            mountSelector.Select(0);
-            currentMountId = demoMounts[0];
-            RefreshTrainingLists();
-            UpdateMountDisplay();
-        }
-    }
-    
-    private void RefreshTrainingLists()
-    {
-        if (string.IsNullOrEmpty(currentMountId)) return;
-        
-        ClearAllLists();
-        
-        var combatProjects = system.GetProjectsByCategory(currentMountId, TrainingCategory.Combat);
-        foreach (var p in combatProjects)
-            combatList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
-        
-        var speedProjects = system.GetProjectsByCategory(currentMountId, TrainingCategory.Speed);
-        foreach (var p in speedProjects)
-            speedList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
-        
-        var staminaProjects = system.GetProjectsByCategory(currentMountId, TrainingCategory.Stamina);
-        foreach (var p in staminaProjects)
-            staminaList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
-        
-        var intProjects = system.GetProjectsByCategory(currentMountId, TrainingCategory.Intelligence);
-        foreach (var p in intProjects)
-            intelligenceList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
-        
-        var bondingProjects = system.GetProjectsByCategory(currentMountId, TrainingCategory.Bonding);
-        foreach (var p in bondingProjects)
-            bondingList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
-        
-        var specialProjects = system.GetProjectsByCategory(currentMountId, TrainingCategory.Special);
-        foreach (var p in specialProjects)
-            specialList.AddItem($"{p.ProjectName} (Lv.{p.RequiredLevel})");
     }
     
     private void ClearAllLists()
@@ -358,91 +434,19 @@ public partial class MountTrainingUI : Control
         specialList.Clear();
     }
     
-    private void UpdateMountDisplay()
-    {
-        if (string.IsNullOrEmpty(currentMountId)) return;
-        
-        int level = system.GetMountLevel(currentMountId);
-        int bondLevel = system.GetMountBondLevel(currentMountId);
-        int expProgress = system.GetExperienceProgress(currentMountId);
-        int bondProgress = system.GetBondProgress(currentMountId);
-        
-        mountLevelLabel.Text = $"Level: {level}";
-        mountBondLabel.Text = $"Bond: Lv.{bondLevel}";
-        experienceBar.Value = expProgress;
-        bondBar.Value = bondProgress;
-        
-        // Update skills list
-        skillsList.Clear();
-        var skills = system.GetUnlockedSkills(currentMountId);
-        foreach (string skill in skills)
-            skillsList.AddItem(skill);
-        
-        UpdateStatisticsDisplay();
-    }
-    
-    private void UpdateStatisticsDisplay()
-    {
-        var stats = system.GetStatistics();
-        
-        totalSessionsLabel.Text = $"Total Training Sessions: {stats["TotalTrainingSessions"]}";
-        totalExpLabel.Text = $"Total Experience Gained: {stats["TotalExperienceGained"]}";
-        
-        if (stats.ContainsKey("AverageLevel"))
-        {
-            avgLevelLabel.Text = $"Average Mount Level: {stats["AverageLevel"]}";
-            avgBondLabel.Text = $"Average Bond Level: {stats["AverageBondLevel"]}";
-        }
-    }
-    
-    private void UpdateProjectDetails(TrainingProject project)
-    {
-        if (project == null)
-        {
-            projectNameLabel.Text = "Select a training project";
-            projectDescLabel.Text = "";
-            projectRequirementsLabel.Text = "";
-            projectRewardsLabel.Text = "";
-            dailyLimitLabel.Text = "";
-            trainButton.Disabled = true;
-            return;
-        }
-        
-        projectNameLabel.Text = project.ProjectName;
-        projectDescLabel.Text = project.Description;
-        
-        string reqs = $"Required Level: {project.RequiredLevel}\nDuration: {project.DurationMinutes} minutes";
-        if (project.RequiredSkills.Count > 0)
-            reqs += $"\nRequired Skills: {string.Join(", ", project.RequiredSkills)}";
-        projectRequirementsLabel.Text = reqs;
-        
-        string rewards = $"Experience: +{project.ExperienceReward}\nBond Points: +{project.BondPointsReward}";
-        if (project.AttributeRewards.Count > 0)
-        {
-            rewards += "\nAttributes:";
-            foreach (var attr in project.AttributeRewards)
-                rewards += $"\n  {attr.Key}: +{attr.Value}";
-        }
-        projectRewardsLabel.Text = rewards;
-        
-        int remaining = system.GetRemainingDailyTraining(currentMountId, project.ProjectId);
-        dailyLimitLabel.Text = $"Daily Uses Remaining: {remaining}/{project.DailyLimit}";
-        
-        trainButton.Disabled = remaining <= 0;
-    }
+    // ===== 事件处理（转发到外部） =====
     
     private void _on_mount_selected(int index)
     {
-        currentMountId = mountSelector.GetItemText(index);
-        RefreshTrainingLists();
-        UpdateMountDisplay();
+        string mountId = mountSelector.GetItemText(index);
+        currentMountId = mountId;
+        OnMountSelected?.Invoke(mountId);
     }
     
     private void _on_project_selected(long index)
     {
         ItemList selectedList = null;
         
-        // Determine which list was selected based on current tab
         int tabIndex = tabContainer.CurrentTab;
         string[] tabNames = { "Combat", "Speed", "Stamina", "Intelligence", "Bonding", "Special" };
         
@@ -461,50 +465,23 @@ public partial class MountTrainingUI : Control
         }
         
         if (selectedList == null) return;
+        if (!selectedList.IsItemSelected((int)index)) return;
         
-        var projects = system.GetProjectsByCategory(currentMountId, 
-            (TrainingCategory)tabIndex);
-        
-        if (index >= 0 && index < projects.Count)
-        {
-            selectedProject = projects[index];
-            UpdateProjectDetails(selectedProject);
-            tabContainer.CurrentTab = 6; // Details tab
-        }
+        // 转发选择事件，不直接访问 System
+        selectedProjectId = $"{(TrainingCategory)tabIndex}_{index}";
+        OnProjectSelected?.Invoke(currentMountId, selectedProjectId);
+        tabContainer.CurrentTab = 6; // Details tab
     }
     
     private void _on_train_pressed()
     {
-        if (selectedProject == null || string.IsNullOrEmpty(currentMountId)) return;
-        
-        bool success = system.StartTraining(currentMountId, selectedProject.ProjectId);
-        
-        if (success)
-        {
-            GD.Print($"Training started: {selectedProject.ProjectName}");
-            RefreshTrainingLists();
-            UpdateMountDisplay();
-            UpdateProjectDetails(selectedProject);
-        }
-        else
-        {
-            GD.PrintErr("Training failed!");
-        }
+        if (string.IsNullOrEmpty(currentMountId) || string.IsNullOrEmpty(selectedProjectId)) return;
+        OnTrainingStarted?.Invoke(currentMountId, selectedProjectId);
     }
     
     private void _on_close_pressed()
     {
         Visible = false;
-    }
-    
-    public void Toggle()
-    {
-        Visible = !Visible;
-        if (Visible)
-        {
-            RefreshMountList();
-            RefreshTrainingLists();
-            UpdateMountDisplay();
-        }
+        OnClosePressed?.Invoke();
     }
 }

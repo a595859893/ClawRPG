@@ -4,26 +4,83 @@ using System.Collections.Generic;
 
 /// <summary>
 /// 公会任务UI - 显示公会任务界面
+/// 重构自 REQ-075: 移除对 GuildQuestSystem 的直接引用，改为事件驱动解耦
 /// </summary>
 public partial class GuildQuestUI : Control
 {
+    // ===== 事件接口（UI → System 通信） =====
+    // UI 层通过事件向外部发送操作请求，不直接持有 System 引用
+    
+    /// <summary>请求刷新任务列表（外部/System 收到后调用 UpdateQuestList）</summary>
+    public Action OnRefreshRequested;
+    
+    /// <summary>请求接受任务（外部/System 收到后处理）</summary>
+    public Action<string> OnQuestAccepted;
+    
+    /// <summary>请求完成任务（外部/System 收到后处理）</summary>
+    public Action<string> OnQuestCompleted;
+
+    // ===== UI Elements =====
     private VBoxContainer _questList;
     private Label _titleLabel;
     private Label _statsLabel;
     private Button _refreshButton;
     private Button _closeButton;
 
-    private GuildQuestSystem _questSystem;
+    // Current state (for tracking which quest panel corresponds to which quest)
+    private string _currentQuestId = "";
 
+    // ===== 生命周期 =====
+    
     public override void _Ready()
     {
         Visible = false;
-        _questSystem = GuildQuestSystem.Instance;
-
         SetupUI();
-        SetupKeybinds();
+        // 不再直接持有 System 引用
+        // 初始化数据通过 OnRefreshRequested 事件请求
     }
 
+    // ===== 公开更新接口（System → UI 通信） =====
+    // REQ-075 解耦：UI 不再主动拉取数据，而是等待外部推送
+    
+    /// <summary>
+    /// 更新任务列表显示（由外部/System 调用）
+    /// </summary>
+    public void UpdateQuestList(List<GuildQuest> quests)
+    {
+        // 清除旧列表
+        foreach (Node child in _questList.GetChildren())
+        {
+            child.QueueFree();
+        }
+        
+        if (quests == null || quests.Count == 0)
+        {
+            var emptyLabel = new Label { Text = "No active quests." };
+            emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _questList.AddChild(emptyLabel);
+            return;
+        }
+        
+        foreach (var quest in quests)
+        {
+            var questPanel = CreateQuestPanel(quest);
+            _questList.AddChild(questPanel);
+        }
+    }
+    
+    /// <summary>
+    /// 更新统计数据显示（由外部/System 调用）
+    /// </summary>
+    public void UpdateStatistics(int totalCompleted, int totalPoints, int totalGold)
+    {
+        _statsLabel.Text = $"[b]Total Completed:[/b] {totalCompleted}  " +
+                          $"[b]Total Guild Points:[/b] {totalPoints}  " +
+                          $"[b]Total Gold Earned:[/b] {totalGold}";
+    }
+
+    // ===== UI 设置 =====
+    
     private void SetupUI()
     {
         var bg = new Panel
@@ -97,41 +154,44 @@ public partial class GuildQuestUI : Control
         mainContainer.AddChild(_statsLabel);
     }
 
-    private void SetupKeybinds()
-    {
-        if (KeybindingSystem.Instance != null)
-        {
-            KeybindingSystem.Instance.BindAction("guild_quest", ToggleUI);
-        }
-    }
-
+    // ===== 事件处理（转发到外部） =====
+    
+    /// <summary>
+    /// 切换 UI 可见性（由外部或快捷键调用）
+    /// </summary>
     public void ToggleUI()
     {
         Visible = !Visible;
         if (Visible)
         {
-            RefreshQuestList();
+            // 可见时请求刷新数据
+            OnRefreshRequested?.Invoke();
         }
     }
 
-    private void RefreshQuestList()
+    private void OnRefreshPressed()
     {
-        foreach (Node child in _questList.GetChildren())
-        {
-            child.QueueFree();
-        }
-
-        var activeQuests = _questSystem.GetActiveQuests();
-        
-        foreach (var quest in activeQuests)
-        {
-            var questPanel = CreateQuestPanel(quest);
-            _questList.AddChild(questPanel);
-        }
-
-        UpdateStats();
+        // 通过事件请求刷新，而不是直接调用 System
+        OnRefreshRequested?.Invoke();
     }
 
+    private void OnQuestAcceptedAction(string questId)
+    {
+        OnQuestAccepted?.Invoke(questId);
+    }
+
+    private void OnQuestCompletedAction(string questId)
+    {
+        OnQuestCompleted?.Invoke(questId);
+    }
+
+    private void OnClosePressed()
+    {
+        Visible = false;
+    }
+
+    // ===== 私有辅助方法 =====
+    
     private Control CreateQuestPanel(GuildQuest quest)
     {
         var panel = new PanelContainer();
@@ -141,8 +201,9 @@ public partial class GuildQuestUI : Control
         panel.AddChild(hbox);
 
         var difficultyColor = GetDifficultyColor(quest.Difficulty);
-        var statusColor = quest.IsCompleted ? "[color=#00FF00]" : "[color=#FFFFFF]";
-        var progressPercent = (float)quest.CurrentProgress / quest.TargetCount * 100;
+        var progressPercent = quest.TargetCount > 0 
+            ? (float)quest.CurrentProgress / quest.TargetCount * 100 
+            : 0f;
         
         var infoLabel = new RichTextLabel
         {
@@ -164,7 +225,7 @@ public partial class GuildQuestUI : Control
         {
             SizeFlagsVertical = SizeFlags.ShrinkCenter,
             MinValue = 0,
-            MaxValue = quest.TargetCount,
+            MaxValue = quest.TargetCount > 0 ? quest.TargetCount : 1,
             Value = quest.CurrentProgress,
             ShowPercentage = false
         };
@@ -194,26 +255,6 @@ public partial class GuildQuestUI : Control
             5 => "#FF0000",
             _ => "#FFFFFF"
         };
-    }
-
-    private void UpdateStats()
-    {
-        var stats = _questSystem.GetQuestStatistics();
-        
-        _statsLabel.Text = $"[b]Total Completed:[/b] {stats["total_completed"]}  " +
-                          $"[b]Total Guild Points:[/b] {stats["total_points"]}  " +
-                          $"[b]Total Gold Earned:[/b] {stats["total_gold"]}";
-    }
-
-    private void OnRefreshPressed()
-    {
-        _questSystem.RefreshQuests();
-        RefreshQuestList();
-    }
-
-    private void OnClosePressed()
-    {
-        Visible = false;
     }
 
     public override void _Input(InputEvent e)
