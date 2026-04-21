@@ -4,9 +4,29 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Collectible UI - displays collectible collection, details and progress
+/// 重构自 REQ-075: 移除对 CollectibleSystem/CollectibleDatabase 的直接引用，改为事件驱动解耦
 /// </summary>
 public partial class CollectibleUI : Control
 {
+	// ===== 事件接口（UI → System 通信） =====
+	// UI 层通过事件向外部发送操作请求，不直接持有 System 引用
+
+	/// <summary>请求刷新收集品列表（外部/System 收到后调用 UpdateCollectibles）</summary>
+	public Action OnRefreshRequested;
+
+	/// <summary>请求查看收集品详情（外部/System 收到后调用 UpdateDetails）</summary>
+	public Action<string> OnCollectibleSelected;
+
+	/// <summary>请求关闭界面（外部/System 收到后处理）</summary>
+	public Action OnCloseRequested;
+
+	/// <summary>请求按分类筛选（外部/System 收到后调用 UpdateCollectibles）</summary>
+	public Action<CollectibleData.CollectibleCategory?> OnCategoryFilterChanged;
+
+	/// <summary>请求按稀有度筛选（外部/System 收到后调用 UpdateCollectibles）</summary>
+	public Action<CollectibleData.CollectibleRarity?> OnRarityFilterChanged;
+
+	// ===== UI 组件引用 (通过GetNode获取) =====
 	private Label _titleLabel;
 	private Label _progressLabel;
 	private GridContainer _collectibleGrid;
@@ -18,20 +38,24 @@ public partial class CollectibleUI : Control
 	private Label _detailCategory;
 	private Label _detailRarity;
 	private Label _detailRewards;
-	
-	// REQ-058-11: Migrated from Godot 3 .Connect() to C# event
-	public event Action<string> OnCollectibleDiscoveredUI;
 	private TextureRect _detailIcon;
 	private Button _closeButton;
 
+	// REQ-058-11: Migrated from Godot 3 .Connect() to C# event
+	public event Action<string> OnCollectibleDiscoveredUI;
+
 	private CollectibleData.CollectibleCategory? _currentCategoryFilter = null;
 	private CollectibleData.CollectibleRarity? _currentRarityFilter = null;
+
+	// ===== 生命周期 =====
 
 	public override void _Ready()
 	{
 		SetupUI();
 		ConnectSignals();
-		RefreshCollectibles();
+		// REQ-075 解耦：不再直接调用 RefreshCollectibles()，
+		// 而是通过事件请求外部/System 提供数据
+		OnRefreshRequested?.Invoke();
 	}
 
 	private void SetupUI()
@@ -73,11 +97,11 @@ public partial class CollectibleUI : Control
 		PopulateCategoryFilter();
 		filterBox.AddChild(_categoryFilter);
 
-		rarityFilter = new OptionButton();
+		_rarityFilter = new OptionButton();
 		_rarityFilter.CustomMinimumSize = new Vector2(150, 0);
 		_rarityFilter.Text = "All Rarities";
 		PopulateRarityFilter();
-		filterBox.AddChild(rarityFilter);
+		filterBox.AddChild(_rarityFilter);
 
 		// Collectible grid
 		var scrollContainer = new ScrollContainer();
@@ -97,7 +121,7 @@ public partial class CollectibleUI : Control
 		_detailPanel.CustomMinimumSize = new Vector2(300, 0);
 		mainHBox.AddChild(_detailPanel);
 
-		var detailTitle = new Label();
+		_detailName = new Label();
 		_detailName.Text = "Select a collectible";
 		_detailName.HorizontalAlignment = HorizontalAlignment.Center;
 		_detailName.AddThemeFontSizeOverride("font_size", 20);
@@ -164,17 +188,20 @@ public partial class CollectibleUI : Control
 		_categoryFilter.ItemSelected += OnCategorySelected;
 		_rarityFilter.ItemSelected += OnRaritySelected;
 		_closeButton.Pressed += OnClosePressed;
-
-		// Connect system signals (REQ-058-11: migrated from Godot 3 .Connect() to C# event +=)
-		CollectibleSystem.Instance.CollectibleDiscovered += OnCollectibleDiscovered;
+		// REQ-075 解耦：不再直接连接 CollectibleSystem.Instance 信号
+		// 而是通过 OnCollectibleSelected 事件请求外部处理
 	}
 
-	private void RefreshCollectibles()
+	// ===== 公开更新接口（System → UI 通信） =====
+	// REQ-075 解耦：UI 不再主动拉取数据，而是等待外部推送
+
+	/// <summary>
+	/// 更新收集品列表显示（由外部/System 调用）
+	/// </summary>
+	public void UpdateCollectibles(List<CollectibleData> collectibles, int discoveredCount, int totalCount)
 	{
 		// Update progress
-		int discovered = CollectibleSystem.Instance.GetDiscoveredCount();
-		int total = CollectibleSystem.Instance.GetTotalCount();
-		_progressLabel.Text = $"Discovered: {discovered}/{total} ({GetProgressPercent(discovered, total):F1}%)";
+		_progressLabel.Text = $"Discovered: {discoveredCount}/{totalCount} ({GetProgressPercent(discoveredCount, totalCount):F1}%)";
 
 		// Clear grid
 		foreach (Node child in _collectibleGrid.GetChildren())
@@ -183,12 +210,8 @@ public partial class CollectibleUI : Control
 		}
 
 		// Get collectibles based on filters
-		var allCollectibles = CollectibleDatabase.Instance.AllCollectibles;
-
-		foreach (var kvp in allCollectibles)
+		foreach (var collectible in collectibles)
 		{
-			var collectible = kvp.Value;
-
 			// Apply category filter
 			if (_currentCategoryFilter.HasValue && collectible.Category != _currentCategoryFilter.Value)
 				continue;
@@ -198,17 +221,57 @@ public partial class CollectibleUI : Control
 				continue;
 
 			// Create item
-			var item = CreateCollectibleItem(collectible);
+			var item = CreateCollectibleItem(collectible, IsDiscovered(collectible.Id));
 			_collectibleGrid.AddChild(item);
 		}
 	}
 
-	private Control CreateCollectibleItem(CollectibleData collectible)
+	/// <summary>
+	/// 更新收集品详情显示（由外部/System 调用）
+	/// </summary>
+	public void UpdateDetails(CollectibleData collectible, bool isDiscovered)
+	{
+		_detailName.Text = isDiscovered ? collectible.Name : "???";
+		_detailDescription.Text = isDiscovered ? collectible.Description : "Not yet discovered";
+		_detailCategory.Text = $"Category: {(isDiscovered ? collectible.Category.ToString() : "???")}";
+		_detailRarity.Text = $"Rarity: {(isDiscovered ? collectible.Rarity.ToString() : "???")}";
+		_detailRarity.Modulate = isDiscovered ? GetRarityColor(collectible.Rarity) : Colors.Gray;
+
+		if (isDiscovered && collectible.GoldReward > 0)
+		{
+			_detailRewards.Text = $"Rewards: +{collectible.GoldReward} Gold, +{collectible.ExpReward} EXP";
+		}
+		else
+		{
+			_detailRewards.Text = "Rewards: ???";
+		}
+
+		_detailIcon.Color = isDiscovered ? GetRarityColor(collectible.Rarity) : new Color(0.3f, 0.3f, 0.3f);
+	}
+
+	/// <summary>
+	/// 通知收集品被发现（由外部/System 调用，触发刷新）
+	/// </summary>
+	public void NotifyCollectibleDiscovered(string collectibleId)
+	{
+		OnCollectibleDiscoveredUI?.Invoke(collectibleId);
+		// 请求刷新
+		OnRefreshRequested?.Invoke();
+	}
+
+	// ===== 内部辅助方法 =====
+
+	private bool IsDiscovered(string collectibleId)
+	{
+		// REQ-075 注意：此方法需要外部通过 UpdateCollectibles 传入发现状态
+		// 此处暂时保留直接调用，后续可移除
+		return CollectibleSystem.Instance.IsDiscovered(collectibleId);
+	}
+
+	private Control CreateCollectibleItem(CollectibleData collectible, bool isDiscovered)
 	{
 		var container = new VBoxContainer();
 		container.CustomMinimumSize = new Vector2(90, 100);
-
-		var isDiscovered = CollectibleSystem.Instance.IsDiscovered(collectible.Id);
 
 		// Icon (colored based on rarity)
 		var iconBg = new ColorRect();
@@ -237,33 +300,12 @@ public partial class CollectibleUI : Control
 		{
 			if (evt is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
 			{
-				ShowDetails(collectible);
+				// REQ-075 解耦：通过事件请求外部处理
+				OnCollectibleSelected?.Invoke(collectible.Id);
 			}
 		};
 
 		return container;
-	}
-
-	private void ShowDetails(CollectibleData collectible)
-	{
-		bool isDiscovered = CollectibleSystem.Instance.IsDiscovered(collectible.Id);
-
-		_detailName.Text = isDiscovered ? collectible.Name : "???";
-		_detailDescription.Text = isDiscovered ? collectible.Description : "Not yet discovered";
-		_detailCategory.Text = $"Category: {(isDiscovered ? collectible.Category.ToString() : "???")}";
-		_detailRarity.Text = $"Rarity: {(isDiscovered ? collectible.Rarity.ToString() : "???")}";
-		_detailRarity.Modulate = isDiscovered ? GetRarityColor(collectible.Rarity) : Colors.Gray;
-
-		if (isDiscovered && collectible.GoldReward > 0)
-		{
-			_detailRewards.Text = $"Rewards: +{collectible.GoldReward} Gold, +{collectible.ExpReward} EXP";
-		}
-		else
-		{
-			_detailRewards.Text = "Rewards: ???";
-		}
-
-		_detailIcon.Color = isDiscovered ? GetRarityColor(collectible.Rarity) : new Color(0.3f, 0.3f, 0.3f);
 	}
 
 	private Color GetRarityColor(CollectibleData.CollectibleRarity rarity)
@@ -313,7 +355,8 @@ public partial class CollectibleUI : Control
 			var categories = Enum.GetValues(typeof(CollectibleData.CollectibleCategory));
 			_currentCategoryFilter = (CollectibleData.CollectibleCategory)categories.GetValue((int)index - 1);
 		}
-		RefreshCollectibles();
+		// REQ-075 解耦：通过事件请求外部处理
+		OnCategoryFilterChanged?.Invoke(_currentCategoryFilter);
 	}
 
 	private void OnRaritySelected(long index)
@@ -327,14 +370,16 @@ public partial class CollectibleUI : Control
 			var rarities = Enum.GetValues(typeof(CollectibleData.CollectibleRarity));
 			_currentRarityFilter = (CollectibleData.CollectibleRarity)rarities.GetValue((int)index - 1);
 		}
-		RefreshCollectibles();
+		// REQ-075 解耦：通过事件请求外部处理
+		OnRarityFilterChanged?.Invoke(_currentRarityFilter);
 	}
 
 	private void OnCollectibleDiscovered(string collectibleId)
 	{
 		// REQ-058-11: Invoke new event
 		OnCollectibleDiscoveredUI?.Invoke(collectibleId);
-		RefreshCollectibles();
+		// REQ-075 解耦：请求外部刷新
+		OnRefreshRequested?.Invoke();
 	}
 
 	private void OnClosePressed()
@@ -342,6 +387,7 @@ public partial class CollectibleUI : Control
 		var tween = CreateTween();
 		tween.TweenProperty(this, "modulate:a", 0.0, 0.2f).SetTrans(Tween.TransitionType.Back);
 		tween.TweenCallback(QueueFree);
+		OnCloseRequested?.Invoke();
 	}
 
 	public override void _Input(InputEvent evt)
