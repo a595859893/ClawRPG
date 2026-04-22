@@ -49,6 +49,8 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         Escape = 1 << 2,
         CombatHeavy = 1 << 3,
         LootRich = 1 << 4,
+        Boss = 1 << 5,
+        Treasure = 1 << 6,
     }
 
     /// <summary>
@@ -72,9 +74,11 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         public PlayerBehaviorType BehaviorType { get; set; }
         public RoomEnvironmentType EnvironmentType { get; set; }
         public float Xp { get; set; }
-        public int Level { get; set; }
+        public int ImprintLevel { get; set; }
         public float DecayTimer { get; set; }
-        public float LastUpdatedTime { get; set; }
+        public DateTime LastRecordedAt { get; set; }
+        public int TotalTriggers { get; set; }
+        public float Fidelity { get; set; }
 
         public BehaviorImprint() { }
 
@@ -83,9 +87,11 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             BehaviorType = behavior;
             EnvironmentType = envType;
             Xp = 0f;
-            Level = 0;
+            ImprintLevel = 0;
             DecayTimer = 0f;
-            LastUpdatedTime = 0f;
+            LastRecordedAt = DateTime.Now;
+            TotalTriggers = 0;
+            Fidelity = 0.5f;
         }
     }
 
@@ -95,10 +101,12 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
     public class PersonalityAnalysisResult
     {
         public PlayerBehaviorType DominantBehavior { get; set; }
-        public float DominanceScore { get; set; }
+        public float DominantScore { get; set; }
         public PersonalityTriggerType DominantTriggerType { get; set; }
         public List<PlayerBehaviorType> SecondaryBehaviors { get; set; } = new List<PlayerBehaviorType>();
-        public string PersonalityDescription { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public List<PersonalityTrigger> ActiveTriggers { get; set; } = new List<PersonalityTrigger>();
+        public Dictionary<PlayerBehaviorType, float> AllScores { get; set; } = new Dictionary<PlayerBehaviorType, float>();
     }
 
     /// <summary>
@@ -109,12 +117,16 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         public PersonalityTriggerType TriggerType { get; private set; }
         public PlayerBehaviorType Behavior { get; private set; }
         public float Weight { get; private set; }
+        public bool IsActive { get; private set; }
+        public string Reason { get; private set; }
 
-        public PersonalityTrigger(PersonalityTriggerType triggerType, PlayerBehaviorType behavior, float weight = 1.0f)
+        public PersonalityTrigger(PersonalityTriggerType triggerType, PlayerBehaviorType behavior, float weight = 1.0f, bool isActive = true, string reason = null)
         {
             TriggerType = triggerType;
             Behavior = behavior;
             Weight = weight;
+            IsActive = isActive;
+            Reason = reason ?? string.Empty;
         }
     }
 }

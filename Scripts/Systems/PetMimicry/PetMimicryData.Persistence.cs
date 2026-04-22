@@ -37,7 +37,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
             _highestBehaviorLevel.Clear();
             _eventDrivenBonus.Clear();
 
-            if (data == null || !data.Contains("imprints")) return;
+            if (data == null || !data.ContainsKey("imprints")) return;
 
             var imprintList = (Godot.Collections.Array)data["imprints"];
             foreach (Dictionary imprintData in imprintList)
@@ -50,8 +50,8 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                     Xp = (float)(double)imprintData["xp"],
                     LastRecordedAt = DateTime.Parse((string)imprintData["lastRecorded"]),
                     TotalTriggers = (int)imprintData["totalTriggers"],
-                    Fidelity = imprintData.Contains("fidelity") ? (float)(double)imprintData["fidelity"] : 0.5f,
-                    DecayTimer = imprintData.Contains("decayTimer") ? (float)(double)imprintData["decayTimer"] : 0f
+                    Fidelity = imprintData.ContainsKey("fidelity") ? (float)(double)imprintData["fidelity"] : 0.5f,
+                    DecayTimer = imprintData.ContainsKey("decayTimer") ? (float)(double)imprintData["decayTimer"] : 0f
                 };
                 _imprints.Add(imprint);
                 UpdateHighestLevel(imprint.BehaviorType, imprint.ImprintLevel);

@@ -41,7 +41,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
                 }
             }
 
-            result.DominantBehavior = dominant;
+            result.DominantBehavior = dominant ?? PlayerBehaviorType.None;
             result.DominantScore = maxScore;
             result.AllScores = scores;
             result.Description = BuildPersonalityDescription(result);
@@ -178,10 +178,10 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
 
         private string BuildPersonalityDescription(PersonalityAnalysisResult result)
         {
-            if (result.DominantBehavior == null) return "无记录";
+            if (result.DominantBehavior == PlayerBehaviorType.None) return "无记录";
 
             var parts = new List<string>();
-            parts.Add($"核心性格: {GetBehaviorDisplayName(result.DominantBehavior.Value)}");
+            parts.Add($"核心性格: {GetBehaviorDisplayName((PlayerBehaviorType)result.DominantBehavior)}");
 
             var sortedTriggers = result.ActiveTriggers.FindAll(t => t.IsActive && t.Weight > 0.1f);
             sortedTriggers.Sort((a, b) => b.Weight.CompareTo(a.Weight));

@@ -83,7 +83,7 @@ namespace ClawRPG.Scripts.Systems.PetMimicry
         public void AddImprint(BehaviorImprint imprint)
         {
             if (imprint.Fidelity <= 0f)
-                imprint.Fidelity = 0.3f + (float)GD.RandDouble() * 0.3f;
+                imprint.Fidelity = 0.3f + (float)GD.RandRange(0.0, 0.3);
             _imprints.Add(imprint);
             UpdateHighestLevel(imprint.BehaviorType, imprint.ImprintLevel);
             if (imprint.LastRecordedAt > _mostRecentRecordTime)

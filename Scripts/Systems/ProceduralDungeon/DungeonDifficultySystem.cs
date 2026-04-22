@@ -152,5 +152,38 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
         {
             // 无需持久化数据
         }
+
+        /// <summary>
+        /// 获取指定楼层的配置
+        /// </summary>
+        public DungeonFloorConfig GetFloorConfig(int floorNumber)
+        {
+            var config = _database.FloorConfigs.FirstOrDefault(f => f.FloorNumber == floorNumber);
+            if (config != null) return config;
+
+            // Fallback: 返回与 floorNumber % 5 匹配的配置文件
+            int normalizedFloor = ((floorNumber - 1) % 5) + 1;
+            return _database.FloorConfigs.FirstOrDefault(f => f.FloorNumber == normalizedFloor)
+                ?? _database.FloorConfigs[0];
+        }
+
+        /// <summary>
+        /// 根据楼层配置获取随机房间数量
+        /// </summary>
+        public int GetRandomRoomCount(DungeonFloorConfig floorConfig)
+        {
+            if (floorConfig == null) return 5;
+            return _random.Next(floorConfig.MinRooms, floorConfig.MaxRooms + 1);
+        }
+
+        /// <summary>
+        /// 填充房间内容
+        /// </summary>
+        public void PopulateRoom(DungeonRoom room, DungeonTypeConfig config, int floorNumber)
+        {
+            if (room == null) return;
+
+            PopulateRoomContent(room, room.Type, floorNumber, config);
+        }
     }
 }
