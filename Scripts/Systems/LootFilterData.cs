@@ -65,7 +65,7 @@ namespace ClawRPG.Scripts.Systems
     /// Persisted as a Godot Resource.
     /// </summary>
     [Serializable]
-    public class LootFilterData : Resource
+    public partial class LootFilterData : Resource
     {
         /// <summary>All available presets.</summary>
         public List<FilterPreset> Presets = new List<FilterPreset>();

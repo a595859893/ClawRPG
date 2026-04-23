@@ -10,7 +10,7 @@ namespace UI
     /// </summary>
     public partial class AuctionHouseUI : Control
     {
-        [Export] public bool VisibleOnStart => false;
+        public bool VisibleOnStart => false;
 
         // UI 组件
         private VBoxContainer _mainContainer;
