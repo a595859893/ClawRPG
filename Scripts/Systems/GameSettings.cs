@@ -42,8 +42,8 @@ public partial class GameSettings : BaseSystem
     [Export] private bool _hitStop = true;
     [Export] private bool _controllerVibration = true;
 
-    // Key bindings
-    [Export] private Dictionary<string, string> _keyBindings = new Dictionary<string, string>()
+    // Key bindings (Dictionary not Godot-exportable; managed via code)
+    private Dictionary<string, string> _keyBindings = new Dictionary<string, string>()
     {
         { "move_up", "Key.W" },
         { "move_down", "Key.S" },

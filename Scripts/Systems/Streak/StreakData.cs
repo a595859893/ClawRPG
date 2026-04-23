@@ -31,7 +31,8 @@ public partial class StreakData : Resource
     [Export] public long LastDungeonTime { get; set; } = 0;
     [Export] public long LastPetInteractionTime { get; set; } = 0;
     
-    [Export] public List<long> StreakHistory { get; set; } = new List<long>();
+    // [Export] removed: List<long> not Godot-exportable
+    public List<long> StreakHistory { get; set; } = new List<long>();
     
     [Export] public int TotalRewardsClaimed { get; set; } = 0;
     [Export] public int TotalGoldFromStreaks { get; set; } = 0;

@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 public partial class PetBreedingDatabase : Resource
 {
-    [Export] public Dictionary<string, PetBreedConfig> BreedConfigs = new Dictionary<string, PetBreedConfig>();
+    // [Export] removed: Dictionary not Godot-exportable
+    public Dictionary<string, PetBreedConfig> BreedConfigs = new Dictionary<string, PetBreedConfig>();
 
     public PetBreedingDatabase()
     {

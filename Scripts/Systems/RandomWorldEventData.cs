@@ -45,7 +45,8 @@ namespace ClawRPG.Scripts.Systems {
         // 事件效果
         [Export] public int GoldReward { get; set; }
         [Export] public int ExpReward { get; set; }
-        [Export] public List<string> ItemRewards { get; set; } = new List<string>();
+        // [Export] removed: List<string> not Godot-exportable
+        public List<string> ItemRewards { get; set; } = new List<string>();
         
         // 触发条件
         [Export] public int MinPlayerLevel { get; set; } = 1;

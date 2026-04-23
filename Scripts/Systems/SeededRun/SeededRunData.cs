@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public partial class SeededRunData : Resource
 {
     [Export] public int TotalSeededRuns { get; set; } = 0;
-    [Export] public Dictionary<string, SeededRunRecord> SeedHistory { get; set; } = new Dictionary<string, SeededRunRecord>();
+    // [Export] removed: Dictionary not Godot-exportable
+    public Dictionary<string, SeededRunRecord> SeedHistory { get; set; } = new Dictionary<string, SeededRunRecord>();
     [Export] public string LastUsedSeed { get; set; } = "";
     [Export] public bool IsSeededModeActive { get; set; } = false;
     
