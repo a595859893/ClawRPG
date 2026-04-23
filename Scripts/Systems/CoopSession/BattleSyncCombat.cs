@@ -13,6 +13,17 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         // 线程安全锁
         protected readonly object _lock = new object();
 
+        // Signal delegates — enables SignalName inner class generation
+        [Signal] public delegate void BattleActionReceived(BattleSyncData.BattleAction action);
+        [Signal] public delegate void PlayerHealthChanged(string targetId, double health, double maxHealth, double change);
+        [Signal] public delegate void PlayerStateUpdated(string targetId, BattleSyncData.PlayerState state);
+        [Signal] public delegate void EnemyKilled(string enemyId, string playerId);
+        [Signal] public delegate void EnemyStateUpdated(string enemyId, BattleSyncData.EnemyState state);
+        [Signal] public delegate void BuffApplied(string targetId, BattleSyncData.BuffState buff);
+        [Signal] public delegate void BuffRemoved(string targetId, string buffId);
+        [Signal] public delegate void PlayerDied(string playerId);
+        [Signal] public delegate void PlayerRevived(string playerId);
+
         // 待广播的战斗操作
         protected Queue<BattleSyncData.BattleAction> _pendingActions;
         protected Queue<BattleSyncData.BattleAction> _broadcastBuffer;

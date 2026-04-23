@@ -12,6 +12,7 @@ public class TutorialStep
     public bool RequireAction { get; set; } = false;
     public string ActionType { get; set; } = "";
     public int Duration { get; set; } = 0;
+    public bool IsCompleted { get; set; } = false;
 }
 
 public class TutorialDefinition
@@ -304,6 +305,69 @@ public class TutorialDatabase
         }
         string[] result = new string[categories.Count];
         categories.CopyTo(result);
+        return result;
+    }
+
+    /// <summary>
+    /// Get all tutorial steps across all tutorials.
+    /// </summary>
+    public List<TutorialStep> GetAllSteps()
+    {
+        List<TutorialStep> allSteps = new List<TutorialStep>();
+        foreach (var tutorial in Tutorials.Values)
+        {
+            allSteps.AddRange(tutorial.Steps);
+        }
+        return allSteps;
+    }
+
+    /// <summary>
+    /// Get a specific tutorial step by its step ID.
+    /// </summary>
+    public TutorialStep GetStep(string stepId)
+    {
+        foreach (var tutorial in Tutorials.Values)
+        {
+            foreach (var step in tutorial.Steps)
+            {
+                if (step.StepId == stepId)
+                    return step;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Get all steps that match a given trigger (TargetElement).
+    /// </summary>
+    public List<TutorialStep> GetStepsByTrigger(string trigger)
+    {
+        List<TutorialStep> result = new List<TutorialStep>();
+        foreach (var tutorial in Tutorials.Values)
+        {
+            foreach (var step in tutorial.Steps)
+            {
+                if (step.TargetElement == trigger)
+                    result.Add(step);
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Get all steps that have not been completed.
+    /// </summary>
+    public List<TutorialStep> GetIncompleteSteps()
+    {
+        List<TutorialStep> result = new List<TutorialStep>();
+        foreach (var tutorial in Tutorials.Values)
+        {
+            foreach (var step in tutorial.Steps)
+            {
+                if (!step.IsCompleted)
+                    result.Add(step);
+            }
+        }
         return result;
     }
 }
