@@ -179,7 +179,7 @@ public partial class ArtifactFusionSystem : BaseSystem
         {
             var player = GetNode("/root/Main/Player");
             var goldProperty = player.Get("gold");
-            if (goldProperty != null)
+            if (goldProperty.VariantType != Variant.Type.Nil)
                 return (int)goldProperty;
         }
         return 10000; // 默认金币
@@ -192,7 +192,7 @@ public partial class ArtifactFusionSystem : BaseSystem
         {
             var player = GetNode("/root/Main/Player");
             var levelProperty = player.Get("level");
-            if (levelProperty != null)
+            if (levelProperty.VariantType != Variant.Type.Nil)
                 return (int)levelProperty;
         }
         return 50; // 默认等级
@@ -212,26 +212,27 @@ public partial class ArtifactFusionSystem : BaseSystem
     public void SaveData()
     {
         // 保存到文件
-        var saveSystem = GetTree().Root.GetNode("Main/SaveSystem") as SaveSystem;
-        if (saveSystem != null)
+        var file = FileAccess.Open("user://artifact_fusion_data.json", FileAccess.ModeFlags.Write);
+        if (file != null)
         {
-            var key = "artifact_fusion_data";
-            saveSystem.SaveGameData(key, Data.Save());
+            var json = Json.Stringify(Data.ExportSaveData());
+            file.StoreString(json);
+            file.Close();
         }
     }
     
     public void LoadData()
     {
-        var saveSystem = GetTree().Root.GetNode("Main/SaveSystem") as SaveSystem;
-        if (saveSystem != null)
+        var file = FileAccess.FileExists("user://artifact_fusion_data.json")
+            ? FileAccess.Open("user://artifact_fusion_data.json", FileAccess.ModeFlags.Read)
+            : null;
+        if (file != null)
         {
-            var key = "artifact_fusion_data";
-            var data = saveSystem.LoadGameData(key);
-            if (data != null)
-            {
-                Data.Load(data);
-                GD.Print($"[ArtifactFusionSystem] Loaded {Data.TotalFusions} fusion records");
-            }
+            var json = file.GetAsText();
+            file.Close();
+            var dict = Json.ParseString(json).As<Godot.Collections.Dictionary>();
+            if (dict != null)
+                Data.ImportSaveData(dict);
         }
     }
 
@@ -245,10 +246,12 @@ public partial class ArtifactFusionSystem : BaseSystem
         data["successful_fusions"] = Data.SuccessfulFusions;
         data["legendary_fusions"] = Data.LegendaryFusions;
         data["total_gold_spent"] = Data.TotalGoldSpent;
-        data["unlocked_recipes"] = new Godot.Array(Data.UnlockedRecipes);
+        var recipesArr = new Godot.Collections.Array();
+        foreach (var r in Data.UnlockedRecipes) recipesArr.Add(r);
+        data["unlocked_recipes"] = recipesArr;
         
         // Serialize fusion history
-        var historyArray = new Godot.Array();
+        var historyArray = new Godot.Collections.Array();
         foreach (var record in Data.FusionHistory)
         {
             var recordDict = new Dictionary<string, object>();
@@ -258,7 +261,10 @@ public partial class ArtifactFusionSystem : BaseSystem
             recordDict["success"] = record.Success;
             recordDict["gold_spent"] = record.GoldSpent;
             recordDict["timestamp"] = record.Timestamp;
-            historyArray.Add(recordDict);
+            var gdDict = new Godot.Collections.Dictionary();
+            foreach (var k in recordDict.Keys)
+                gdDict[k] = (Variant)recordDict[k];
+            historyArray.Add(gdDict);
         }
         data["fusion_history"] = historyArray;
         
@@ -272,15 +278,15 @@ public partial class ArtifactFusionSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("total_fusions")) Data.TotalFusions = (int)data["total_fusions"];
-        if (data.Contains("successful_fusions")) Data.SuccessfulFusions = (int)data["successful_fusions"];
-        if (data.Contains("legendary_fusions")) Data.LegendaryFusions = (int)data["legendary_fusions"];
-        if (data.Contains("total_gold_spent")) Data.TotalGoldSpent = (int)data["total_gold_spent"];
+        if (data.ContainsKey("total_fusions")) Data.TotalFusions = (int)data["total_fusions"];
+        if (data.ContainsKey("successful_fusions")) Data.SuccessfulFusions = (int)data["successful_fusions"];
+        if (data.ContainsKey("legendary_fusions")) Data.LegendaryFusions = (int)data["legendary_fusions"];
+        if (data.ContainsKey("total_gold_spent")) Data.TotalGoldSpent = (int)data["total_gold_spent"];
         
-        if (data.Contains("unlocked_recipes"))
+        if (data.ContainsKey("unlocked_recipes"))
         {
             Data.UnlockedRecipes.Clear();
-            var recipes = (Godot.Array)data["unlocked_recipes"];
+            var recipes = (Godot.Collections.Array)data["unlocked_recipes"];
             foreach (string recipe in recipes)
             {
                 Data.UnlockedRecipes.Add(recipe);

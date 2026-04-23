@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 拍卖品数据 - 定义拍卖物品的数据结构
 /// </summary>
-public class AuctionItem
+public class AuctionRecord
 {
     public int Id { get; set; }
     public string SellerName { get; set; }
@@ -19,13 +19,13 @@ public class AuctionItem
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public bool IsActive { get; set; }
-    public AuctionItemStatus Status { get; set; }
+    public AuctionListingStatus Status { get; set; }
 }
 
 /// <summary>
 /// 拍卖品状态枚举
 /// </summary>
-public enum AuctionItemStatus
+public enum AuctionListingStatus
 {
     Active,     // 活跃
     Sold,       // 已售出
@@ -52,7 +52,7 @@ public class PlayerAuctionData
 /// </summary>
 public static class AuctionDatabase
 {
-    private static readonly Dictionary<int, AuctionItem> _auctions = new Dictionary<int, AuctionItem>();
+    private static readonly Dictionary<int, AuctionRecord> _auctions = new Dictionary<int, AuctionRecord>();
     private static int _nextAuctionId = 1;
     private static readonly Dictionary<string, PlayerAuctionData> _playerData = new Dictionary<string, PlayerAuctionData>();
     
@@ -84,7 +84,7 @@ public static class AuctionDatabase
         // 示例拍卖物品
         var sampleAuctions = new[]
         {
-            new AuctionItem
+            new AuctionRecord
             {
                 Id = _nextAuctionId++,
                 SellerName = "Merchant_Alice",
@@ -98,9 +98,9 @@ public static class AuctionDatabase
                 StartTime = DateTime.UtcNow.AddHours(-12),
                 EndTime = DateTime.UtcNow.AddHours(12),
                 IsActive = true,
-                Status = AuctionItemStatus.Active
+                Status = AuctionListingStatus.Active
             },
-            new AuctionItem
+            new AuctionRecord
             {
                 Id = _nextAuctionId++,
                 SellerName = "Merchant_Bob",
@@ -114,9 +114,9 @@ public static class AuctionDatabase
                 StartTime = DateTime.UtcNow.AddHours(-6),
                 EndTime = DateTime.UtcNow.AddHours(18),
                 IsActive = true,
-                Status = AuctionItemStatus.Active
+                Status = AuctionListingStatus.Active
             },
-            new AuctionItem
+            new AuctionRecord
             {
                 Id = _nextAuctionId++,
                 SellerName = "Merchant_Clara",
@@ -130,7 +130,7 @@ public static class AuctionDatabase
                 StartTime = DateTime.UtcNow.AddHours(-2),
                 EndTime = DateTime.UtcNow.AddHours(22),
                 IsActive = true,
-                Status = AuctionItemStatus.Active
+                Status = AuctionListingStatus.Active
             }
         };
         
@@ -148,7 +148,7 @@ public static class AuctionDatabase
     /// <summary>
     /// 添加拍卖品
     /// </summary>
-    public static void AddAuction(AuctionItem auction)
+    public static void AddAuction( AuctionRecord auction)
     {
         _auctions[auction.Id] = auction;
     }
@@ -156,7 +156,7 @@ public static class AuctionDatabase
     /// <summary>
     /// 获取指定ID的拍卖品
     /// </summary>
-    public static AuctionItem GetAuction(int id)
+    public static  AuctionRecord GetAuction(int id)
     {
         return _auctions.ContainsKey(id) ? _auctions[id] : null;
     }
@@ -164,20 +164,20 @@ public static class AuctionDatabase
     /// <summary>
     /// 获取所有拍卖品
     /// </summary>
-    public static List<AuctionItem> GetAllAuctions()
+    public static List<AuctionRecord> GetAllAuctions()
     {
-        return new List<AuctionItem>(_auctions.Values);
+        return new List<AuctionRecord>(_auctions.Values);
     }
     
     /// <summary>
     /// 获取所有活跃的拍卖品
     /// </summary>
-    public static List<AuctionItem> GetActiveAuctions()
+    public static List<AuctionRecord> GetActiveAuctions()
     {
-        var active = new List<AuctionItem>();
+        var active = new List<AuctionRecord>();
         foreach (var auction in _auctions.Values)
         {
-            if (auction.IsActive && auction.Status == AuctionItemStatus.Active && auction.EndTime > DateTime.UtcNow)
+            if (auction.IsActive && auction.Status == AuctionListingStatus.Active && auction.EndTime > DateTime.UtcNow)
             {
                 active.Add(auction);
             }
@@ -188,9 +188,9 @@ public static class AuctionDatabase
     /// <summary>
     /// 按稀有度获取拍卖品
     /// </summary>
-    public static List<AuctionItem> GetAuctionsByRarity(int rarity)
+    public static List<AuctionRecord> GetAuctionsByRarity(int rarity)
     {
-        var result = new List<AuctionItem>();
+        var result = new List<AuctionRecord>();
         foreach (var auction in GetActiveAuctions())
         {
             if (auction.ItemRarity == rarity)
@@ -204,9 +204,9 @@ public static class AuctionDatabase
     /// <summary>
     /// 按搜索词获取拍卖品
     /// </summary>
-    public static List<AuctionItem> GetAuctionsBySearch(string searchTerm)
+    public static List<AuctionRecord> GetAuctionsBySearch(string searchTerm)
     {
-        var result = new List<AuctionItem>();
+        var result = new List<AuctionRecord>();
         foreach (var auction in GetActiveAuctions())
         {
             if (auction.ItemName.ToLower().Contains(searchTerm.ToLower()))
@@ -220,9 +220,9 @@ public static class AuctionDatabase
     /// <summary>
     /// 获取玩家的挂单
     /// </summary>
-    public static List<AuctionItem> GetPlayerListings(string playerName)
+    public static List<AuctionRecord> GetPlayerListings(string playerName)
     {
-        var result = new List<AuctionItem>();
+        var result = new List<AuctionRecord>();
         foreach (var auction in _auctions.Values)
         {
             if (auction.SellerName == playerName && auction.IsActive)
@@ -236,9 +236,9 @@ public static class AuctionDatabase
     /// <summary>
     /// 获取玩家的竞拍
     /// </summary>
-    public static List<AuctionItem> GetPlayerBids(string playerName)
+    public static List<AuctionRecord> GetPlayerBids(string playerName)
     {
-        var result = new List<AuctionItem>();
+        var result = new List<AuctionRecord>();
         foreach (var auction in GetActiveAuctions())
         {
             if (auction.HighestBidder == playerName)
@@ -279,7 +279,7 @@ public static class AuctionDatabase
     /// <summary>
     /// 更新拍卖品信息
     /// </summary>
-    public static void UpdateAuction(AuctionItem auction)
+    public static void UpdateAuction( AuctionRecord auction)
     {
         if (_auctions.ContainsKey(auction.Id))
         {
@@ -295,13 +295,13 @@ public static class AuctionDatabase
         var now = DateTime.UtcNow;
         foreach (var auction in _auctions.Values)
         {
-            if (auction.IsActive && auction.Status == AuctionItemStatus.Active && auction.EndTime <= now)
+            if (auction.IsActive && auction.Status == AuctionListingStatus.Active && auction.EndTime <= now)
             {
                 // 拍卖结束
                 if (!string.IsNullOrEmpty(auction.HighestBidder))
                 {
                     // 物品出售给出价最高者
-                    auction.Status = AuctionItemStatus.Sold;
+                    auction.Status = AuctionListingStatus.Sold;
                     auction.IsActive = false; 
                     
                     // 更新卖家数据
@@ -321,7 +321,7 @@ public static class AuctionDatabase
                 else
                 {
                     // 无人出价，拍卖过期
-                    auction.Status = AuctionItemStatus.Expired;
+                    auction.Status = AuctionListingStatus.Expired;
                     auction.IsActive = false; 
                 }
             }
@@ -331,12 +331,12 @@ public static class AuctionDatabase
     /// <summary>
     /// 获取已过期的拍卖品
     /// </summary>
-    public static List<AuctionItem> GetExpiredAuctions()
+    public static List<AuctionRecord> GetExpiredAuctions()
     {
-        var result = new List<AuctionItem>();
+        var result = new List<AuctionRecord>();
         foreach (var auction in _auctions.Values)
         {
-            if (!auction.IsActive && (auction.Status == AuctionItemStatus.Sold || auction.Status == AuctionItemStatus.Expired))
+            if (!auction.IsActive && (auction.Status == AuctionListingStatus.Sold || auction.Status == AuctionListingStatus.Expired))
             {
                 result.Add(auction);
             }

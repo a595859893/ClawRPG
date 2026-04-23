@@ -277,15 +277,15 @@ public partial class BossPhaseSystem : BaseSystem
         // 导入到当前关联的battle
         if (_currentBattle != null)
         {
-            _currentBattle.CurrentPhase = data.GetValueOrDefault("currentPhase", 1);
-            _currentBattle.IsEnraged = data.GetValueOrDefault("isEnraged", false);
-            _currentBattle.EnrageProgress = data.GetValueOrDefault("enrageProgress", 0f);
-            _currentBattle.TimeInCombat = data.GetValueOrDefault("timeInCombat", 0f);
+            _currentBattle.CurrentPhase = (int)data.GetValueOrDefault("currentPhase", 1);
+            _currentBattle.IsEnraged = (bool)data.GetValueOrDefault("isEnraged", false);
+            _currentBattle.EnrageProgress = (float)data.GetValueOrDefault("enrageProgress", 0f);
+            _currentBattle.TimeInCombat = (float)data.GetValueOrDefault("timeInCombat", 0f);
 
             // 恢复阶段状态
-            _currentBattle.Phase = (BossPhase)data.GetValueOrDefault("phase", (int)BossPhase.Active);
-            _currentBattle.CurrentDamageMultiplier = data.GetValueOrDefault("currentDamageMultiplier", 1.0f);
-            _currentBattle.CurrentSpeedMultiplier = data.GetValueOrDefault("currentSpeedMultiplier", 1.0f);
+            _currentBattle.Phase = (BossPhase)(int)data.GetValueOrDefault("phase", (int)BossPhase.Active);
+            _currentBattle.CurrentDamageMultiplier = (float)data.GetValueOrDefault("currentDamageMultiplier", 1.0f);
+            _currentBattle.CurrentSpeedMultiplier = (float)data.GetValueOrDefault("currentSpeedMultiplier", 1.0f);
         }
     }
 

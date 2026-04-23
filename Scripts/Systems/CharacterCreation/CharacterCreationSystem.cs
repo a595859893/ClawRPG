@@ -21,8 +21,7 @@ public partial class CharacterCreationSystem : BaseSystem
         if (_data == null)
         {
             _data = new CharacterCreationData();
-            _data.Name = "CharacterCreationData";
-            GetTree().Root.AddChild(_data);
+            _data.LoadData();
         }
         
         if (_database == null)

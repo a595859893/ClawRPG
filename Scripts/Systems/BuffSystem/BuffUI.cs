@@ -27,9 +27,9 @@ public partial class BuffUI : Control
 		// 连接到BuffSystem信号
 		if (BuffSystem.Instance != null)
 		{
-			BuffSystem.Instance.BuffListChanged += OnBuffListChanged;
-			BuffSystem.Instance.BuffApplied += OnBuffApplied;
-			BuffSystem.Instance.BuffRemoved += OnBuffRemoved;
+			BuffSystem.BuffListChanged += OnBuffListChanged;
+			BuffSystem.BuffApplied += (b, s) => OnBuffApplied(b, s);
+			BuffSystem.BuffRemoved += b => OnBuffRemoved(b);
 		}
 	}
 	
@@ -38,10 +38,10 @@ public partial class BuffUI : Control
 		// 主面板
 		_mainPanel = new PanelContainer();
 		_mainPanel.SetAnchorsPreset(Control.LayoutPreset.RightWide);
-		_mainPanel.MarginLeft = -320;
-		_mainPanel.MarginTop = 50;
-		_mainPanel.MarginRight = -20;
-		_mainPanel.MarginBottom = -50;
+		_mainPanel.OffsetLeft = -320;
+		_mainPanel.OffsetTop = 50;
+		_mainPanel.OffsetRight = -20;
+		_mainPanel.OffsetBottom = -50;
 		_mainPanel.CustomMinimumSize = new Vector2(300, 0);
 		
 		// 样式
@@ -51,42 +51,43 @@ public partial class BuffUI : Control
 		style.SetBorderWidthAll(2);
 		style.SetCornerRadiusAll(8);
 		style.SetContentMarginAll(10);
-		_mainPanel.AddStyleboxOverride("panel", style);
+		_mainPanel.AddThemeStyleboxOverride("panel", style);
 		
 		// 垂直布局
 		VBoxContainer mainVBox = new VBoxContainer();
-		mainVBox.SetStretchRatio(1, 1);
+		
+		mainVBox.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		_mainPanel.AddChild(mainVBox);
 		
 		// 标题
 		_titleLabel = new Label();
 		_titleLabel.Text = "  状态效果";
 		_titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.6f, 1f));
-		_titleLabel.AddFontOverride("font", GD.Load<Font>("res://Fonts/TitleFont.tres"));
+		_titleLabel.AddThemeFontOverride("font", GD.Load<Font>("res://Fonts/TitleFont.tres"));
 		mainVBox.AddChild(_titleLabel);
 		
 		// 分隔线
 		HSeparator separator = new HSeparator();
-		separator.MarginTop = 5;
-		separator.MarginBottom = 5;
+		separator.OffsetTop = 5;
+		separator.OffsetBottom = -5;
 		mainVBox.AddChild(separator);
 		
 		// Buff列表滚动容器
 		_scrollContainer = new ScrollContainer();
-		_scrollContainer.SetHScrollEnabled(false);
-		_scrollContainer.SetVScrollEnabled(true);
-		_scrollContainer.MarginTop = 10;
-		_scrollContainer.MarginBottom = 10;
+		_scrollContainer.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+		_scrollContainer.VerticalScrollMode = ScrollContainer.ScrollMode.ShowAlways;
+		_scrollContainer.OffsetTop = 10;
+		_scrollContainer.OffsetBottom = -10;
 		mainVBox.AddChild(_scrollContainer);
 		
 		// Buff列表容器
 		_buffListContainer = new VBoxContainer();
-		_buffListContainer.SetHExpand(true);
+		_buffListContainer.SizeFlagsHorizontal = Control.SizeFlags.Fill | Control.SizeFlags.Expand;
 		_scrollContainer.AddChild(_buffListContainer);
 		
 		// 统计信息
 		_statsLabel = new Label();
-		_statsLabel.MarginTop = 10;
+		_statsLabel.OffsetTop = 10;
 		_statsLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.8f, 1f));
 		mainVBox.AddChild(_statsLabel);
 		
@@ -143,13 +144,13 @@ public partial class BuffUI : Control
 	private void CreateBuffItem(ActiveBuff buff)
 	{
 		HBoxContainer itemContainer = new HBoxContainer();
-		itemContainer.SetHExpand(true);
-		itemContainer.MarginBottom = 5;
+		itemContainer.SizeFlagsHorizontal = Control.SizeFlags.Fill | Control.SizeFlags.Expand;
+		itemContainer.OffsetBottom = -5;
 		
 		// 图标背景
 		Panel iconPanel = new Panel();
 		iconPanel.CustomMinimumSize = new Vector2(32, 32);
-		iconPanel.MarginRight = 8;
+		iconPanel.OffsetRight = -8;
 		
 		// 颜色根据buff类型
 		StyleBoxFlat iconStyle = new StyleBoxFlat();
@@ -162,13 +163,13 @@ public partial class BuffUI : Control
 			iconStyle.BgColor = new Color(0.2f, 0.6f, 0.8f, 0.8f);  // 蓝色增益
 		}
 		iconStyle.SetCornerRadiusAll(4);
-		iconPanel.AddStyleboxOverride("panel", iconStyle);
+		iconPanel.AddThemeStyleboxOverride("panel", iconStyle);
 		
 		itemContainer.AddChild(iconPanel);
 		
 		// 信息容器
 		VBoxContainer infoContainer = new VBoxContainer();
-		infoContainer.SetHExpand(true);
+		infoContainer.SizeFlagsHorizontal = Control.SizeFlags.Fill | Control.SizeFlags.Expand;
 		
 		// 名称和层数
 		HBoxContainer nameRow = new HBoxContainer();
@@ -190,7 +191,7 @@ public partial class BuffUI : Control
 		
 		// 持续时间或进度
 		ProgressBar timeBar = new ProgressBar();
-		timeBar.SetHExpand(true);
+		timeBar.SizeFlagsHorizontal = Control.SizeFlags.Fill | Control.SizeFlags.Expand;
 		timeBar.CustomMinimumSize = new Vector2(0, 8);
 		
 		float maxTime = buff.Info.Duration > 0 ? buff.Info.Duration : 1f;
@@ -201,12 +202,12 @@ public partial class BuffUI : Control
 		StyleBoxFlat barStyle = new StyleBoxFlat();
 		barStyle.BgColor = new Color(0.2f, 0.2f, 0.3f, 0.8f);
 		barStyle.SetCornerRadiusAll(2);
-		timeBar.AddStyleboxOverride("background", barStyle);
+				timeBar.AddThemeStyleboxOverride("background", barStyle);
 		
 		StyleBoxFlat fillStyle = new StyleBoxFlat();
 		fillStyle.BgColor = buff.Info.IsDebuff ? new Color(0.9f, 0.3f, 0.3f) : new Color(0.3f, 0.8f, 0.5f);
 		fillStyle.SetCornerRadiusAll(2);
-		timeBar.AddStyleboxOverride("fill", fillStyle);
+				timeBar.AddThemeStyleboxOverride("fill", fillStyle);
 		
 		infoContainer.AddChild(timeBar);
 		
@@ -275,10 +276,9 @@ public partial class BuffUI : Control
 		if (eventObject is InputEventKey keyEvent && keyEvent.Pressed)
 		{
 			// V键切换buff界面
-			if (keyEvent.Scancode == Godot.KeyList.V && !keyEvent.Echo)
+			if (keyEvent.Keycode == Key.V && !keyEvent.Echo)
 			{
 				ToggleBuffUI();
-				GetTree().SetInputAsHandled();
 			}
 		}
 	}

@@ -323,7 +323,7 @@ public partial class EnemyLifecycleManager : ManagerBase
     /// </summary>
     public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary
+        return new Dictionary<string, object>
         {
             { "killCount", KillCount },
             { "maxEnemies", MaxEnemies },
@@ -338,11 +338,11 @@ public partial class EnemyLifecycleManager : ManagerBase
     {
         if (data == null) return;
         
-        if (data.Contains("killCount"))
+        if (data.ContainsKey("killCount"))
             KillCount = Convert.ToInt32(data["killCount"]);
-        if (data.Contains("maxEnemies"))
+        if (data.ContainsKey("maxEnemies"))
             MaxEnemies = Convert.ToInt32(data["maxEnemies"]);
-        if (data.Contains("spawnInterval"))
+        if (data.ContainsKey("spawnInterval"))
             SpawnInterval = Convert.ToSingle(data["spawnInterval"]);
     }
 }

@@ -39,13 +39,13 @@ public partial class BuffSystem : BaseSystem
 	private PlayerBuffData _playerBuffData = new PlayerBuffData();
 	
 	// 信号
-public delegate void BuffApplied(string buffId, int stackCount);
-public delegate void BuffRemoved(string buffId);
-public delegate void BuffTick(string buffId, float value);
-public delegate void BuffStackChanged(string buffId, int newStack);
-public delegate void ShieldChanged(float newShield);
-public delegate void StateChanged(string state, bool isActive);
-public delegate void BuffListChanged();
+public static event Action<string, int> BuffApplied;
+public static event Action<string> BuffRemoved;
+public static event Action<string, float> BuffTick;
+public static event Action<string, int> BuffStackChanged;
+public static event Action<float> ShieldChanged;
+public static event Action<string, bool> StateChanged;
+public static event Action BuffListChanged;
 	
 	public override void _Ready()
 	{
@@ -86,8 +86,8 @@ public delegate void BuffListChanged();
 				Invariant.AssertRange(existingBuff.StackCount, 1, buffInfo.MaxStacks, "StackCount after stacking");
 				Invariant.Assert(newDuration < 0 || newDuration >= 0, "Buff duration must be -1 (permanent) or non-negative");
 
-				EmitSignal(nameof(BuffStackChanged), buffId, existingBuff.StackCount);
-				EmitSignal(nameof(BuffApplied), buffId, existingBuff.StackCount);
+				BuffStackChanged?.Invoke(buffId, existingBuff.StackCount);
+				BuffApplied?.Invoke(buffId, existingBuff.StackCount);
 			}
 			else
 			{
@@ -121,12 +121,12 @@ public delegate void BuffListChanged();
 				_playerBuffData.BuffSourceCount[sourceKey] = 0;
 			_playerBuffData.BuffSourceCount[sourceKey]++;
 			
-			EmitSignal(nameof(BuffApplied), buffId, 1);
+			BuffApplied?.Invoke(buffId, 1);
 		}
 		
 		// 更新属性加成
 		UpdateBuffBonuses();
-		EmitSignal(nameof(BuffListChanged));
+		BuffListChanged?.Invoke();
 	}
 	
 	// 移除Buff
@@ -139,7 +139,7 @@ public delegate void BuffListChanged();
 			Invariant.Assert(_activeBuffs.Contains(buff), "RemoveBuff: buff not in _activeBuffs list — possible duplicate removal");
 
 			_activeBuffs.Remove(buff);
-			EmitSignal(nameof(BuffRemoved), buffId);
+			BuffRemoved?.Invoke(buffId);
 			
 			// 更新统计
 			if (_playerBuffData.BuffStacks.ContainsKey(buffId))
@@ -151,7 +151,7 @@ public delegate void BuffListChanged();
 			
 			// 更新属性加成
 			UpdateBuffBonuses();
-			EmitSignal(nameof(BuffListChanged));
+			BuffListChanged?.Invoke();
 		}
 	}
 	
@@ -208,7 +208,7 @@ public delegate void BuffListChanged();
 	{
 		_activeBuffs.Clear();
 		UpdateBuffBonuses();
-		EmitSignal(nameof(BuffListChanged));
+		BuffListChanged?.Invoke();
 	}
 	
 	// 查找buff
@@ -286,15 +286,15 @@ public delegate void BuffListChanged();
 			if (!buff.IsActive) continue;
 			
 			// 更新持续时间
-			buff.TimeElapsed += delta;
-			buff.TimeRemaining -= delta;
+			buff.TimeElapsed += (float)delta;
+			buff.TimeRemaining -= (float)delta;
 			
 			// 周期伤害/治疗
 			if (buff.Info.TickDamage != 0 && buff.Info.TickInterval > 0)
 			{
-				buff.TickTimer += delta;
+				buff.TickTimer += (float)delta;
 				// 不变量：TickTimer 不应过度累积（超过 2 倍 interval 说明逻辑卡顿）
-				Invariant.Assert(buff.TickTimer < buff.Info.TickInterval * 2,
+				Invariant.Assert(buff.TickTimer < (float)buff.Info.TickInterval * 2,
 					"TickTimer overflow: {0} >= {1} * 2 — possible logic stall", buff.TickTimer, buff.Info.TickInterval);
 
 				if (buff.TickTimer >= buff.Info.TickInterval)
@@ -329,7 +329,7 @@ public delegate void BuffListChanged();
 			Player player = GetTree().GetFirstNodeInGroup("Player") as Player;
 			if (player != null)
 			{
-				player.Heal(Mathf.Abs(effectValue));
+				player.Heal((int)Mathf.Abs(effectValue));
 			}
 		}
 		else
@@ -338,11 +338,11 @@ public delegate void BuffListChanged();
 			Player player = GetTree().GetFirstNodeInGroup("Player") as Player;
 			if (player != null)
 			{
-				player.TakeDamage(effectValue, null, false);
+				player.TakeDamage((int)effectValue);
 			}
 		}
 		
-		EmitSignal(nameof(BuffTick), buff.Info.Id, effectValue);
+		BuffTick?.Invoke(buff.Info.Id, effectValue);
 	}
 	
 	// 更新属性加成
@@ -434,14 +434,14 @@ public delegate void BuffListChanged();
 		}
 		
 		// 发送状态变化信号
-		EmitSignal(nameof(StateChanged), "Invincible", _isInvincible);
-		EmitSignal(nameof(StateChanged), "Frozen", _isFrozen);
-		EmitSignal(nameof(StateChanged), "Stunned", _isStunned);
-		EmitSignal(nameof(StateChanged), "Silenced", _isSilenced);
-		EmitSignal(nameof(StateChanged), "Rooted", _isRooted);
+		StateChanged?.Invoke("Invincible", _isInvincible);
+		StateChanged?.Invoke("Frozen", _isFrozen);
+		StateChanged?.Invoke("Stunned", _isStunned);
+		StateChanged?.Invoke("Silenced", _isSilenced);
+		StateChanged?.Invoke("Rooted", _isRooted);
 		
 		if (_shieldValue > 0)
-			EmitSignal(nameof(ShieldChanged), _shieldValue);
+			ShieldChanged?.Invoke(_shieldValue);
 	}
 	
 	// ===== 属性获取方法 =====
@@ -480,7 +480,7 @@ public delegate void BuffListChanged();
 		// 不变量：护盾值不能为负
 		Invariant.Assert(_shieldValue >= 0, "AbsorbShieldDamage: _shieldValue went negative: {0}", _shieldValue);
 
-		EmitSignal(nameof(ShieldChanged), _shieldValue);
+		ShieldChanged?.Invoke(_shieldValue);
 
 		return remaining;
 	}
@@ -529,7 +529,9 @@ public delegate void BuffListChanged();
 			buffData["time_remaining"] = buff.TimeRemaining;
 			buffData["stack_count"] = buff.StackCount;
 			buffData["current_value"] = buff.CurrentValue;
-			activeBuffsData.Add(buffData);
+			var gdBuffData = new Godot.Collections.Dictionary();
+			foreach (var k in buffData.Keys) gdBuffData[k] = (Variant)buffData[k];
+			activeBuffsData.Add(gdBuffData);
 		}
 		data["active_buffs"] = activeBuffsData;
 		

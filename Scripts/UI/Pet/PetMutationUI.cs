@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
 
 namespace ClawRPG.UI;
 
@@ -42,22 +43,22 @@ public partial class PetMutationUI : Control
         };
         AddChild(mainPanel);
         
-        var mainVBox = new VBoxContainer { RectMinSize = new Vector2(0, 40) };
+        var mainVBox = new VBoxContainer { CustomMinimumSize = new Vector2(0, 40) };
         mainPanel.AddChild(mainVBox);
         
         // 标题栏
-        var titleBar = new HBoxContainer { RectMinSize = new Vector2(0, 50) };
+        var titleBar = new HBoxContainer { CustomMinimumSize = new Vector2(0, 50) };
         mainVBox.AddChild(titleBar);
         
         _titleLabel = new Label
         {
             Text = "  宠物变异系统",
-            RectMinSize = new Vector2(200, 0),
-            Align = Label.AlignEnum.Left
+            CustomMinimumSize = new Vector2(200, 0),
+            HorizontalAlignment = HorizontalAlignment.Left
         };
         titleBar.AddChild(_titleLabel);
         
-        titleBar.AddChild(new Control { HBoxExpand = true });
+        titleBar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
         
         _closeButton = new Button { Text = "✕ 关闭" };
         _closeButton.Pressed += OnClosePressed;
@@ -72,10 +73,10 @@ public partial class PetMutationUI : Control
         contentHBox.AddChild(leftPanel);
         
         // 宠物选择器
-        var selectorContainer = new HBoxContainer { RectMinSize = new Vector2(0, 40) };
+        var selectorContainer = new HBoxContainer { CustomMinimumSize = new Vector2(0, 40) };
         leftPanel.AddChild(selectorContainer);
         
-        var selectorLabel = new Label { Text = "选择宠物:", RectMinSize = new Vector2(80, 0) };
+        var selectorLabel = new Label { Text = "选择宠物:", CustomMinimumSize = new Vector2(80, 0) };
         selectorContainer.AddChild(selectorLabel);
         
         _petSelector = new OptionButton();
@@ -87,7 +88,7 @@ public partial class PetMutationUI : Control
         leftPanel.AddChild(_mutationTree);
         
         // 操作按钮
-        var buttonContainer = new HBoxContainer { RectMinSize = new Vector2(0, 40) };
+        var buttonContainer = new HBoxContainer { CustomMinimumSize = new Vector2(0, 40) };
         leftPanel.AddChild(buttonContainer);
         
         var mutateButton = new Button { Text = "🔄 尝试变异 (100金币)" };
@@ -99,7 +100,7 @@ public partial class PetMutationUI : Control
         buttonContainer.AddChild(_rerollButton);
         
         // 右侧 - 详情面板和统计
-        var rightPanel = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.Expand, SizeFlagsVertical = SizeFlags.Expand, RectMinSize = new Vector2(300, 0) };
+        var rightPanel = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.Expand, SizeFlagsVertical = SizeFlags.Expand, CustomMinimumSize = new Vector2(300, 0) };
         contentHBox.AddChild(rightPanel);
         
         // 详情面板
@@ -107,7 +108,7 @@ public partial class PetMutationUI : Control
         rightPanel.AddChild(_detailsPanel);
         
         // 统计面板
-        var statsPanel = new PanelContainer { RectMinSize = new Vector2(0, 120) };
+        var statsPanel = new PanelContainer { CustomMinimumSize = new Vector2(0, 120) };
         rightPanel.AddChild(statsPanel);
         
         var statsVBox = new VBoxContainer();
@@ -123,8 +124,8 @@ public partial class PetMutationUI : Control
         var tipLabel = new Label
         {
             Text = "提示: 变异概率随宠物等级提升，传说变异极为稀有",
-            RectMinSize = new Vector2(0, 30),
-            Align = Label.AlignEnum.Center
+            CustomMinimumSize = new Vector2(0, 30),
+            HorizontalAlignment = HorizontalAlignment.Center
         };
         mainVBox.AddChild(tipLabel);
     }
@@ -138,7 +139,7 @@ public partial class PetMutationUI : Control
     {
         if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
         {
-            if (keyEvent.Scancode == KeyList.Escape)
+            if (keyEvent.Keycode == Key.Escape)
             {
                 HidePanel();
             }
@@ -184,20 +185,21 @@ public partial class PetMutationUI : Control
             }
         }
         
-        if (_petSelector.GetItemCount() > 0)
+        if (_petSelector.ItemCount > 0)
         {
             _petSelector.Selected = 0;
             OnPetSelected(0);
         }
     }
     
-    private void OnPetSelected(int index)
+    private void OnPetSelected(long index)
     {
         var petSystem = PetSystem.Instance;
         if (petSystem == null) return;
         
         var pets = petSystem.GetAllPets();
-        if (index < 0 || index >= pets.Count) return;
+        int petCount = pets.Count;
+        if (index < 0 || index >= petCount) return;
         
         _selectedPetId = pets[index].Id;
         RefreshMutationList();
@@ -281,6 +283,7 @@ public partial class PetMutationUI : Control
         
         var petSystem = PetSystem.Instance;
         var pets = petSystem.GetAllPets();
+        int petCount = pets.Count;
         var pet = pets.Find(p => p.Id == _selectedPetId);
         
         if (pet != null)
@@ -329,8 +332,8 @@ public partial class PetMutationUI : Control
         var notification = new Label
         {
             Text = text,
-            RectMinSize = new Vector2(200, 40),
-            Align = Label.AlignEnum.Center,
+            CustomMinimumSize = new Vector2(200, 40),
+            HorizontalAlignment = HorizontalAlignment.Center,
             Modulate = new Color(1, 1, 0)
         };
         AddChild(notification);

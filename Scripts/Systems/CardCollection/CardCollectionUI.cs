@@ -68,7 +68,7 @@ public partial class CardCollectionUI : Control
     {
         // Main container
         var mainVBox = new VBoxContainer();
-        mainVBox.SetAnchorAndMargin(Control.LayoutPreset.FullRect, 0f);
+        mainVBox.SetAnchorsPreset(Control.LayoutPreset.FullRect); mainVBox.SetOffsetsPreset(Control.LayoutPreset.FullRect);;
         AddChild(mainVBox);
         
         // Title
@@ -79,7 +79,7 @@ public partial class CardCollectionUI : Control
         
         // Tab container
         _tabContainer = new TabContainer();
-        _tabContainer.SetAnchorAndMargin(Control.LayoutPreset.FullRect, 0f);
+        _tabContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect); _tabContainer.SetOffsetsPreset(Control.LayoutPreset.FullRect);;
         _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         mainVBox.AddChild(_tabContainer);
         
@@ -108,7 +108,7 @@ public partial class CardCollectionUI : Control
         
         var rarityLabel = new Label();
         rarityLabel.Text = "Rarity:";
-        rarityLabel.MarginLeft = 20;
+        rarityLabel.OffsetLeft = 20;
         filterHBox.AddChild(rarityLabel);
         
         _rarityFilter = new OptionButton();
@@ -133,7 +133,7 @@ public partial class CardCollectionUI : Control
         
         // Card grid (scrollable)
         var scrollContainer = new ScrollContainer();
-        scrollContainer.SetAnchorAndMargin(Control.LayoutPreset.FullRect, 0f);
+        scrollContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect); scrollContainer.SetOffsetsPreset(Control.LayoutPreset.FullRect);;
         scrollContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _collectionTab.AddChild(scrollContainer);
         
@@ -145,7 +145,7 @@ public partial class CardCollectionUI : Control
         
         // Card preview panel
         _cardPreview = new Panel();
-        _cardPreview.SetAnchorAndMargin(Control.LayoutPreset.BottomLeft, 0f);
+        _cardPreview.SetAnchorsPreset(Control.LayoutPreset.BottomLeft); _cardPreview.SetOffsetsPreset(Control.LayoutPreset.BottomLeft);;
         _cardPreview.CustomMinimumSize = new Vector2(300, 150);
         _collectionTab.AddChild(_cardPreview);
         
@@ -163,7 +163,7 @@ public partial class CardCollectionUI : Control
         
         _cardDescLabel = new Label();
         _cardDescLabel.Text = "";
-        _cardDescLabel.Autowrap = true;
+        _cardDescLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         previewVBox.AddChild(_cardDescLabel);
         
         // Packs tab
@@ -177,7 +177,7 @@ public partial class CardCollectionUI : Control
         _packsTab.AddChild(_goldLabel);
         
         var packScroll = new ScrollContainer();
-        packScroll.SetAnchorAndMargin(Control.LayoutPreset.FullRect, 0f);
+        packScroll.SetAnchorsPreset(Control.LayoutPreset.FullRect); packScroll.SetOffsetsPreset(Control.LayoutPreset.FullRect);;
         packScroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _packsTab.AddChild(packScroll);
         
@@ -192,17 +192,17 @@ public partial class CardCollectionUI : Control
         _tabContainer.AddChild(_statisticsTab);
         
         _statsLabel = new Label();
-        _statsLabel.Autowrap = true;
+        _statsLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _statisticsTab.AddChild(_statsLabel);
         
         _rarityDistLabel = new Label();
-        _rarityDistLabel.MarginTop = 20;
-        _rarityDistLabel.Autowrap = true;
+        _rarityDistLabel.OffsetTop = 20;
+        _rarityDistLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _statisticsTab.AddChild(_rarityDistLabel);
         
         _categoryDistLabel = new Label();
-        _categoryDistLabel.MarginTop = 20;
-        _categoryDistLabel.Autowrap = true;
+        _categoryDistLabel.OffsetTop = 20;
+        _categoryDistLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _statisticsTab.AddChild(_categoryDistLabel);
     }
     
@@ -210,10 +210,10 @@ public partial class CardCollectionUI : Control
     /// 分类筛选选项改变时的回调
     /// </summary>
     /// <param name="index">选中的分类索引</param>
-    private void OnCategorySelected(int index)
+    private void OnCategorySelected(long index)
     {
         string[] categories = { "All", "Attack", "Skill", "Power", "Defense", "Special" };
-        _selectedCategory = categories[index];
+        _selectedCategory = categories[(int)index];
         RefreshCollection();
     }
     
@@ -221,10 +221,10 @@ public partial class CardCollectionUI : Control
     /// 稀有度筛选选项改变时的回调
     /// </summary>
     /// <param name="index">选中的稀有度索引</param>
-    private void OnRaritySelected(int index)
+    private void OnRaritySelected(long index)
     {
         string[] rarities = { "All", "Common", "Uncommon", "Rare", "Epic", "Legendary" };
-        _selectedRarity = rarities[index];
+        _selectedRarity = rarities[(int)index];
         RefreshCollection();
     }
     
@@ -313,7 +313,7 @@ public partial class CardCollectionUI : Control
         // Favorite button
         var favBtn = new Button();
         favBtn.Text = _system.IsFavorite(cardId) ? "★ Unfavorite" : "☆ Favorite";
-        favBtn.MarginTop = 120;
+        favBtn.OffsetTop = 120;
         _cardPreview.AddChild(favBtn);
         
         favBtn.Pressed -= () => _system.ToggleFavorite(cardId);

@@ -4,8 +4,15 @@
 namespace ClawRPG.Scripts.Systems
 {
     // ── Pet Systems ──────────────────────────────────────────────────
-    public class PetSystem { }
-    public class PetData { }
+    public class PetSystem {
+        public static PetSystem Instance { get; private set; } = new PetSystem();
+        public List<PetData> GetAllPets() { return new List<PetData>(); }
+    }
+    public class PetData {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public int Level { get; set; }
+    }
     public class PetBreedingResult { }
     public class PetLifeCycleEntry { }
     public class LifeStage { }

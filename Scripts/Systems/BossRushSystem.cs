@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
+using SaveSystem = ClawRPG.Scripts.Systems.SaveSystem;
 
 /// <summary>
 /// Boss Rush 系统 - 连续挑战 Boss 的模式
@@ -27,31 +27,31 @@ public partial class BossRushSystem : BaseSystem
     private void LoadData()
     {
         var saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
-        var savedData = saveSystem.LoadGame();
+        var saveData = saveSystem.LoadGame(0);
         
-        if (savedData.Contains("BossRushData"))
+        if (saveData != null && saveData.BossRushData != null && saveData.BossRushData.Count > 0)
         {
-            var dict = (Godot.Collections.Dictionary)savedData["BossRushData"];
+            var dict = saveData.BossRushData;
             data = new BossRushData();
             
-            if (dict.Contains("CurrentStage")) data.CurrentStage = Convert.ToInt32(dict["CurrentStage"]);
-            if (dict.Contains("CurrentBossIndex")) data.CurrentBossIndex = Convert.ToInt32(dict["CurrentBossIndex"]);
-            if (dict.Contains("IsInRush")) data.IsInRush = Convert.ToBoolean(dict["IsInRush"]);
-            if (dict.Contains("CurrentStreak")) data.CurrentStreak = Convert.ToInt32(dict["CurrentStreak"]);
-            if (dict.Contains("BestStreak")) data.BestStreak = Convert.ToInt32(dict["BestStreak"]);
-            if (dict.Contains("StartingHealth")) data.StartingHealth = Convert.ToSingle(dict["StartingHealth"]);
-            if (dict.Contains("StartingAttack")) data.StartingAttack = Convert.ToSingle(dict["StartingAttack"]);
-            if (dict.Contains("StartingDefense")) data.StartingDefense = Convert.ToSingle(dict["StartingDefense"]);
-            if (dict.Contains("CurrentHealth")) data.CurrentHealth = Convert.ToSingle(dict["CurrentHealth"]);
-            if (dict.Contains("GoldEarned")) data.GoldEarned = Convert.ToInt32(dict["GoldEarned"]);
-            if (dict.Contains("ExpEarned")) data.ExpEarned = Convert.ToInt32(dict["ExpEarned"]);
-            if (dict.Contains("BossesDefeated")) data.BossesDefeated = Convert.ToInt32(dict["BossesDefeated"]);
-            if (dict.Contains("TotalRushAttempts")) data.TotalRushAttempts = Convert.ToInt32(dict["TotalRushAttempts"]);
-            if (dict.Contains("TotalVictories")) data.TotalVictories = Convert.ToInt32(dict["TotalVictories"]);
-            if (dict.Contains("TotalBossesDefeated")) data.TotalBossesDefeated = Convert.ToInt32(dict["TotalBossesDefeated"]);
-            if (dict.Contains("HighestStageReached")) data.HighestStageReached = Convert.ToInt32(dict["HighestStageReached"]);
-            if (dict.Contains("TotalGoldEarned")) data.TotalGoldEarned = Convert.ToInt32(dict["TotalGoldEarned"]);
-            if (dict.Contains("TotalExpEarned")) data.TotalExpEarned = Convert.ToInt32(dict["TotalExpEarned"]);
+            if (dict.ContainsKey("CurrentStage")) data.CurrentStage = Convert.ToInt32(dict["CurrentStage"]);
+            if (dict.ContainsKey("CurrentBossIndex")) data.CurrentBossIndex = Convert.ToInt32(dict["CurrentBossIndex"]);
+            if (dict.ContainsKey("IsInRush")) data.IsInRush = Convert.ToBoolean(dict["IsInRush"]);
+            if (dict.ContainsKey("CurrentStreak")) data.CurrentStreak = Convert.ToInt32(dict["CurrentStreak"]);
+            if (dict.ContainsKey("BestStreak")) data.BestStreak = Convert.ToInt32(dict["BestStreak"]);
+            if (dict.ContainsKey("StartingHealth")) data.StartingHealth = Convert.ToSingle(dict["StartingHealth"]);
+            if (dict.ContainsKey("StartingAttack")) data.StartingAttack = Convert.ToSingle(dict["StartingAttack"]);
+            if (dict.ContainsKey("StartingDefense")) data.StartingDefense = Convert.ToSingle(dict["StartingDefense"]);
+            if (dict.ContainsKey("CurrentHealth")) data.CurrentHealth = Convert.ToSingle(dict["CurrentHealth"]);
+            if (dict.ContainsKey("GoldEarned")) data.GoldEarned = Convert.ToInt32(dict["GoldEarned"]);
+            if (dict.ContainsKey("ExpEarned")) data.ExpEarned = Convert.ToInt32(dict["ExpEarned"]);
+            if (dict.ContainsKey("BossesDefeated")) data.BossesDefeated = Convert.ToInt32(dict["BossesDefeated"]);
+            if (dict.ContainsKey("TotalRushAttempts")) data.TotalRushAttempts = Convert.ToInt32(dict["TotalRushAttempts"]);
+            if (dict.ContainsKey("TotalVictories")) data.TotalVictories = Convert.ToInt32(dict["TotalVictories"]);
+            if (dict.ContainsKey("TotalBossesDefeated")) data.TotalBossesDefeated = Convert.ToInt32(dict["TotalBossesDefeated"]);
+            if (dict.ContainsKey("HighestStageReached")) data.HighestStageReached = Convert.ToInt32(dict["HighestStageReached"]);
+            if (dict.ContainsKey("TotalGoldEarned")) data.TotalGoldEarned = Convert.ToInt32(dict["TotalGoldEarned"]);
+            if (dict.ContainsKey("TotalExpEarned")) data.TotalExpEarned = Convert.ToInt32(dict["TotalExpEarned"]);
         }
         else
         {
@@ -63,7 +63,7 @@ public partial class BossRushSystem : BaseSystem
     
     public override Dictionary<string, object> ExportSaveData()
     {
-        var dict = new Godot.Collections.Dictionary();
+        var dict = new Dictionary<string, object>();
         dict["CurrentStage"] = data.CurrentStage;
         dict["CurrentBossIndex"] = data.CurrentBossIndex;
         dict["IsInRush"] = data.IsInRush;
@@ -90,24 +90,24 @@ public partial class BossRushSystem : BaseSystem
     {
         if (saveData == null) return;
         
-        if (saveData.Contains("CurrentStage")) data.CurrentStage = (int)saveData["CurrentStage"];
-        if (saveData.Contains("CurrentBossIndex")) data.CurrentBossIndex = (int)saveData["CurrentBossIndex"];
-        if (saveData.Contains("IsInRush")) data.IsInRush = (bool)saveData["IsInRush"];
-        if (saveData.Contains("CurrentStreak")) data.CurrentStreak = (int)saveData["CurrentStreak"];
-        if (saveData.Contains("BestStreak")) data.BestStreak = (int)saveData["BestStreak"];
-        if (saveData.Contains("StartingHealth")) data.StartingHealth = (int)saveData["StartingHealth"];
-        if (saveData.Contains("StartingAttack")) data.StartingAttack = (int)saveData["StartingAttack"];
-        if (saveData.Contains("StartingDefense")) data.StartingDefense = (int)saveData["StartingDefense"];
-        if (saveData.Contains("CurrentHealth")) data.CurrentHealth = (int)saveData["CurrentHealth"];
-        if (saveData.Contains("GoldEarned")) data.GoldEarned = (int)saveData["GoldEarned"];
-        if (saveData.Contains("ExpEarned")) data.ExpEarned = (int)saveData["ExpEarned"];
-        if (saveData.Contains("BossesDefeated")) data.BossesDefeated = (int)saveData["BossesDefeated"];
-        if (saveData.Contains("TotalRushAttempts")) data.TotalRushAttempts = (int)saveData["TotalRushAttempts"];
-        if (saveData.Contains("TotalVictories")) data.TotalVictories = (int)saveData["TotalVictories"];
-        if (saveData.Contains("TotalBossesDefeated")) data.TotalBossesDefeated = (int)saveData["TotalBossesDefeated"];
-        if (saveData.Contains("HighestStageReached")) data.HighestStageReached = (int)saveData["HighestStageReached"];
-        if (saveData.Contains("TotalGoldEarned")) data.TotalGoldEarned = (int)saveData["TotalGoldEarned"];
-        if (saveData.Contains("TotalExpEarned")) data.TotalExpEarned = (int)saveData["TotalExpEarned"];
+        if (saveData.ContainsKey("CurrentStage")) data.CurrentStage = (int)saveData["CurrentStage"];
+        if (saveData.ContainsKey("CurrentBossIndex")) data.CurrentBossIndex = (int)saveData["CurrentBossIndex"];
+        if (saveData.ContainsKey("IsInRush")) data.IsInRush = (bool)saveData["IsInRush"];
+        if (saveData.ContainsKey("CurrentStreak")) data.CurrentStreak = (int)saveData["CurrentStreak"];
+        if (saveData.ContainsKey("BestStreak")) data.BestStreak = (int)saveData["BestStreak"];
+        if (saveData.ContainsKey("StartingHealth")) data.StartingHealth = (int)saveData["StartingHealth"];
+        if (saveData.ContainsKey("StartingAttack")) data.StartingAttack = (int)saveData["StartingAttack"];
+        if (saveData.ContainsKey("StartingDefense")) data.StartingDefense = (int)saveData["StartingDefense"];
+        if (saveData.ContainsKey("CurrentHealth")) data.CurrentHealth = (int)saveData["CurrentHealth"];
+        if (saveData.ContainsKey("GoldEarned")) data.GoldEarned = (int)saveData["GoldEarned"];
+        if (saveData.ContainsKey("ExpEarned")) data.ExpEarned = (int)saveData["ExpEarned"];
+        if (saveData.ContainsKey("BossesDefeated")) data.BossesDefeated = (int)saveData["BossesDefeated"];
+        if (saveData.ContainsKey("TotalRushAttempts")) data.TotalRushAttempts = (int)saveData["TotalRushAttempts"];
+        if (saveData.ContainsKey("TotalVictories")) data.TotalVictories = (int)saveData["TotalVictories"];
+        if (saveData.ContainsKey("TotalBossesDefeated")) data.TotalBossesDefeated = (int)saveData["TotalBossesDefeated"];
+        if (saveData.ContainsKey("HighestStageReached")) data.HighestStageReached = (int)saveData["HighestStageReached"];
+        if (saveData.ContainsKey("TotalGoldEarned")) data.TotalGoldEarned = (int)saveData["TotalGoldEarned"];
+        if (saveData.ContainsKey("TotalExpEarned")) data.TotalExpEarned = (int)saveData["TotalExpEarned"];
     }
     
     // Start a new boss rush
@@ -132,9 +132,9 @@ public partial class BossRushSystem : BaseSystem
         data.CurrentBossIndex = 0;
         data.IsInRush = true;
         data.CurrentStreak = 0;
-        data.StartingHealth = player.Get("max_health") != null ? Convert.ToSingle(player.Get("max_health")) : 1000f;
-        data.StartingAttack = player.Get("attack") != null ? Convert.ToSingle(player.Get("attack")) : 100f;
-        data.StartingDefense = player.Get("defense") != null ? Convert.ToSingle(player.Get("defense")) : 50f;
+        data.StartingHealth = player.Get("max_health").AsSingle();
+        data.StartingAttack = player.Get("attack").AsSingle();
+        data.StartingDefense = player.Get("defense").AsSingle();
         data.CurrentHealth = data.StartingHealth;
         data.GoldEarned = 0;
         data.ExpEarned = 0;

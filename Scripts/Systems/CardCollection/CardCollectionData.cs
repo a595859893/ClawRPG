@@ -47,13 +47,17 @@ public class CardCollectionData
     /// </summary>
     public Dictionary ExportSaveData()
     {
-        var data = new Dictionary<string, object>();
+        var data = new Dictionary();
         
         // 卡牌收藏
-        data["owned_cards"] = new Dictionary(OwnedCards);
+        var ownedCardsGd = new Godot.Collections.Dictionary();
+        foreach (var kvp in OwnedCards) ownedCardsGd[kvp.Key] = kvp.Value;
+        data["owned_cards"] = ownedCardsGd;
         
         // 喜欢的卡牌
-        data["favorite_cards"] = new Godot.Collections.Array(FavoriteCards);
+        var favArray = new Godot.Collections.Array();
+        foreach (var f in FavoriteCards) favArray.Add(f);
+        data["favorite_cards"] = favArray;
         
         // 统计数据
         data["total_unique_cards"] = TotalUniqueCards;
@@ -79,10 +83,14 @@ public class CardCollectionData
         data["obtain_history"] = historyList;
         
         // 分类解锁
-        data["unlocked_categories"] = new Dictionary(UnlockedCategories);
+        var unlockedGd = new Godot.Collections.Dictionary();
+        foreach (var kvp in OwnedCards) unlockedGd[kvp.Key] = kvp.Value;
+        data["unlocked_categories"] = unlockedGd;
         
         // 可用于组卡的卡牌
-        data["deck_buildable_cards"] = new Godot.Collections.Array(DeckBuildableCards);
+        var dbArray = new Godot.Collections.Array();
+        foreach (var c in DeckBuildableCards) dbArray.Add(c);
+        data["deck_buildable_cards"] = dbArray;
         
         return data;
     }
@@ -90,25 +98,25 @@ public class CardCollectionData
     /// <summary>
     /// 导入保存数据
     /// </summary>
-    public void ImportSaveData(Dictionary data)
+    public void ImportSaveData(Godot.Collections.Dictionary data)
     {
         if (data == null) return;
         
         // 卡牌收藏
-        if (data.Contains("owned_cards"))
+        if (data.ContainsKey("owned_cards"))
         {
-            var cardsDict = (Dictionary)data["owned_cards"];
+            var cardsDict = (Godot.Collections.Dictionary)data["owned_cards"];
             OwnedCards = new Dictionary<string, int>();
             foreach (var kvp in cardsDict)
             {
-                OwnedCards[kvp.Key] = (int)kvp.Value;
+                OwnedCards[(string)kvp.Key] = (int)(float)kvp.Value;
             }
         }
         
         // 喜欢的卡牌
-        if (data.Contains("favorite_cards"))
+        if (data.ContainsKey("favorite_cards"))
         {
-            var favArray = (Array)data["favorite_cards"];
+            var favArray = (Godot.Collections.Array)data["favorite_cards"];
             FavoriteCards = new List<string>();
             foreach (string card in favArray)
             {
@@ -125,37 +133,37 @@ public class CardCollectionData
         PacksOpened = (int)data.GetValueOrDefault("packs_opened", 0);
         
         // 获取历史
-        if (data.Contains("obtain_history"))
+        if (data.ContainsKey("obtain_history"))
         {
-            var historyArray = (Array)data["obtain_history"];
+            var historyArray = (Godot.Collections.Array)data["obtain_history"];
             ObtainHistory = new List<CardObtainRecord>();
-            foreach (Dictionary recordDict in historyArray)
+            foreach (Godot.Collections.Dictionary recordDict in historyArray)
             {
                 var record = new CardObtainRecord(
                     (string)recordDict["card_id"],
-                    (int)recordDict["count"],
+                    (int)(float)recordDict["count"],
                     (string)recordDict["source"]
                 );
-                record.Timestamp = (int)recordDict["timestamp"];
+                record.Timestamp = (int)(float)recordDict["timestamp"];
                 ObtainHistory.Add(record);
             }
         }
         
         // 分类解锁
-        if (data.Contains("unlocked_categories"))
+        if (data.ContainsKey("unlocked_categories"))
         {
-            var categoriesDict = (Dictionary)data["unlocked_categories"];
+            var categoriesDict = (Godot.Collections.Dictionary)data["unlocked_categories"];
             UnlockedCategories = new Dictionary<string, bool>();
             foreach (var kvp in categoriesDict)
             {
-                UnlockedCategories[kvp.Key] = (bool)kvp.Value;
+                UnlockedCategories[(string)kvp.Key] = (bool)kvp.Value;
             }
         }
         
         // 可用于组卡的卡牌
-        if (data.Contains("deck_buildable_cards"))
+        if (data.ContainsKey("deck_buildable_cards"))
         {
-            var deckArray = (Array)data["deck_buildable_cards"];
+            var deckArray = (Godot.Collections.Array)data["deck_buildable_cards"];
             DeckBuildableCards = new List<string>();
             foreach (string card in deckArray)
             {
@@ -177,6 +185,6 @@ public class CardObtainRecord
         CardId = cardId;
         Count = count;
         Source = source;
-        Timestamp = OS.GetUnixTime();
+        Timestamp = (int)Time.GetUnixTimeFromSystem();
     }
 }

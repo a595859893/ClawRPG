@@ -131,7 +131,7 @@ public partial class MainSaveLoad : Node
             foreach (var key in data.ComboForgetData.Keys)
             {
                 object val = data.ComboForgetData[key];
-                cfDict[key] = val;
+                cfDict[key] = (Variant)val;
             }
             Framework.ComboForgetData.Instance.ImportSaveData(cfDict);
             GD.Print("Combo forget data loaded successfully!");
@@ -299,7 +299,7 @@ public partial class MainSaveLoad : Node
     /// <summary>
     /// 导出所有游戏数据（供存档使用）
     /// </summary>
-    public Dictionary ExportSaveData()
+    public Dictionary<string, object> ExportSaveData()
     {
         var allData = new Dictionary<string, object>();
         
@@ -318,7 +318,7 @@ public partial class MainSaveLoad : Node
         }
         
         // UI 数据
-        var uiManager = GetNodeOrNull<UI.UIManager>("../UIManager");
+        var uiManager = GetNodeOrNull<ClawRPG.Scripts.UI.UIManager>("../UIManager");
         if (uiManager != null)
         {
             allData["ui"] = uiManager.ExportSaveData();
@@ -342,31 +342,59 @@ public partial class MainSaveLoad : Node
         if (data == null) return;
 
         // 游戏状态数据
-        if (data.Contains("gameState"))
+        if (data.ContainsKey("gameState"))
         {
             var gameStateManager = GetNodeOrNull<GameStateManager>("../GameStateManager");
-            gameStateManager?.ImportSaveData(data["gameState"] as Dictionary);
+            if (gameStateManager != null)
+            {
+                var subData = new System.Collections.Generic.Dictionary<string, object>();
+                var gd = (Godot.Collections.Dictionary)data["gameState"];
+                foreach (var k in gd.Keys)
+                    subData[(string)k] = gd[k];
+                gameStateManager.ImportSaveData(subData);
+            }
         }
         
         // 系统初始化数据
-        if (data.Contains("systemInit"))
+        if (data.ContainsKey("systemInit"))
         {
             var systemInitManager = GetNodeOrNull<SystemInitializationManager>("../SystemInitializationManager");
-            systemInitManager?.ImportSaveData(data["systemInit"] as Dictionary);
+            if (systemInitManager != null)
+            {
+                var subData = new System.Collections.Generic.Dictionary<string, object>();
+                var gd = (Godot.Collections.Dictionary)data["systemInit"];
+                foreach (var k in gd.Keys)
+                    subData[(string)k] = gd[k];
+                systemInitManager.ImportSaveData(subData);
+            }
         }
         
         // UI 数据
-        if (data.Contains("ui"))
+        if (data.ContainsKey("ui"))
         {
-            var uiManager = GetNodeOrNull<UI.UIManager>("../UIManager");
-            uiManager?.ImportSaveData(data["ui"] as Dictionary);
+            var uiManager = GetNodeOrNull<ClawRPG.Scripts.UI.UIManager>("../UIManager");
+            if (uiManager != null)
+            {
+                var subData = new System.Collections.Generic.Dictionary<string, object>();
+                var gd = (Godot.Collections.Dictionary)data["ui"];
+                foreach (var k in gd.Keys)
+                    subData[(string)k] = gd[k];
+                uiManager.ImportSaveData(subData);
+            }
         }
         
         // 存档管理数据
-        if (data.Contains("saveLoad"))
+        if (data.ContainsKey("saveLoad"))
         {
             var saveLoadManager = GetNodeOrNull<SaveLoadManager>("../SaveLoadManager");
-            saveLoadManager?.ImportSaveData(data["saveLoad"] as Dictionary);
+            if (saveLoadManager != null)
+            {
+                var subData = new System.Collections.Generic.Dictionary<string, object>();
+                var gd = (Godot.Collections.Dictionary)data["saveLoad"];
+                foreach (var k in gd.Keys)
+                    subData[(string)k] = gd[k];
+                saveLoadManager.ImportSaveData(subData);
+            }
         }
     }
 }

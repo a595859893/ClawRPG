@@ -100,7 +100,7 @@ public partial class ChaosComboNotification : Control
             var notification = _container.GetChild(0);
             var tween = CreateTween();
             tween.TweenProperty(notification, "modulate:a", 0f, _slideOutDuration);
-            tween.Callback(Callable.From(() =>
+            tween.TweenCallback(Callable.From(() =>
             {
                 foreach (var child in _container.GetChildren())
                 {

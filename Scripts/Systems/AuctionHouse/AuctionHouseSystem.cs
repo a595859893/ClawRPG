@@ -1,8 +1,9 @@
 using Godot;
-using ClawRPG.Systems.AuctionHouse;
 using System;
 using System.Collections.Generic;
 
+namespace ClawRPG.Systems.AuctionHouse
+{
 public partial class AuctionHouseSystem : BaseSystem
 {
     private AuctionHouseData _data;
@@ -610,4 +611,5 @@ public partial class AuctionHouseSystem : BaseSystem
             GD.PrintErr($"[AuctionHouseSystem] LoadAuctionData failed: {ex.Message}");
         }
     }
+}
 }

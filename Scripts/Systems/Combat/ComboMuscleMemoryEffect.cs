@@ -118,17 +118,17 @@ public partial class ComboMuscleMemoryEffect : Node
         // Create fullscreen overlay panel
         _overlay = new Panel();
         _overlay.Name = "ComboMuscleMemoryOverlay";
-        _overlay.AnchorsPreset = Control.LayoutPreset.FullRect;
+        _overlay.AnchorsPreset = (int)Control.LayoutPreset.FullRect;
         _overlay.Modulate = new Color(1f, 1f, 1f, 0f); // starts transparent
 
         // Dark vignette background
         var bgStyle = new StyleBoxFlat();
-        bgStyle.BgColor = new Color(_comboColor.r, _comboColor.g, _comboColor.b, 1f);
+        bgStyle.BgColor = new Color(_comboColor.R, _comboColor.G, _comboColor.B, 1f);
         bgStyle.ContentMarginLeft = 0;
         bgStyle.ContentMarginTop = 0;
         bgStyle.ContentMarginRight = 0;
         bgStyle.ContentMarginBottom = 0;
-        _overlay.AddThemeStyleBoxOverride("panel", bgStyle);
+        _overlay.AddThemeStyleboxOverride("panel", bgStyle);
 
         // We'll use a texture with a hole (vignette shape).
         // Since Godot doesn't have native hole-punch textures, we cover the screen
@@ -151,19 +151,19 @@ public partial class ComboMuscleMemoryEffect : Node
         if (tree != null && tree.Root != null)
             viewportSize = tree.Root.GetViewport().GetVisibleRect().Size;
 
-        float w = viewportSize.x;
-        float h = viewportSize.y;
+        float w = viewportSize.X;
+        float h = viewportSize.Y;
         float t = _vignetteThickness;
 
         // Parent control (invisible, just for organization)
         _overlay = new Control();
         _overlay.Name = "ComboMuscleMemoryOverlay";
-        _overlay.AnchorsPreset = Control.LayoutPreset.FullRect;
+        _overlay.AnchorsPreset = (int)Control.LayoutPreset.FullRect;
         _overlay.Modulate = new Color(1f, 1f, 1f, _maxOpacity);
         _overlay.MouseFilter = Control.MouseFilterEnum.Ignore; // don't block input
         parent.AddChild(_overlay);
 
-        var col = new Color(_comboColor.r, _comboColor.g, _comboColor.b, 1f);
+        var col = new Color(_comboColor.R, _comboColor.G, _comboColor.B, 1f);
 
         // Helper to make a stylebox
         StyleBoxFlat makeStyle() { var s = new StyleBoxFlat(); s.BgColor = col; return s; }
@@ -182,14 +182,14 @@ public partial class ComboMuscleMemoryEffect : Node
     {
         var p = new Panel();
         p.Name = name;
-        p.AnchorsPreset = Control.LayoutPreset.Custom;
-        p.CustomMinimumSize = new Vector2(rect.Size.x, rect.Size.y);
-        p.OffsetLeft = rect.Position.x;
-        p.OffsetTop = rect.Position.y;
-        p.OffsetRight = rect.Position.x + rect.Size.x;
-        p.OffsetBottom = rect.Position.y + rect.Size.y;
+        p.AnchorsPreset = (int)Control.LayoutPreset.FullRect;
+        p.CustomMinimumSize = new Vector2(rect.Size.X, rect.Size.Y);
+        p.OffsetLeft = rect.Position.X;
+        p.OffsetTop = rect.Position.Y;
+        p.OffsetRight = rect.Position.X + rect.Size.X;
+        p.OffsetBottom = rect.Position.Y + rect.Size.Y;
         p.MouseFilter = Control.MouseFilterEnum.Ignore;
-        p.AddThemeStyleBoxOverride("panel", style);
+        p.AddThemeStyleboxOverride("panel", style);
         parent.AddChild(p);
     }
 
@@ -209,12 +209,12 @@ public partial class ComboMuscleMemoryEffect : Node
         // Skill strip: centered at bottom above vignette
         var stripWidth = 400f;
         var stripHeight = 60f;
-        float centerX = (viewportSize.x - stripWidth) / 2f;
-        float stripY = viewportSize.y - _vignetteThickness - stripHeight - 24f;
+        float centerX = (viewportSize.X - stripWidth) / 2f;
+        float stripY = viewportSize.Y - _vignetteThickness - stripHeight - 24f;
 
         var strip = new Panel();
         strip.Name = "SkillStrip";
-        strip.AnchorsPreset = Control.LayoutPreset.Custom;
+        strip.AnchorsPreset = (int)Control.LayoutPreset.FullRect;
         strip.CustomMinimumSize = new Vector2(stripWidth, stripHeight);
         strip.OffsetLeft = centerX;
         strip.OffsetTop = stripY;
@@ -232,7 +232,7 @@ public partial class ComboMuscleMemoryEffect : Node
         stripStyle.ContentMarginTop = 10;
         stripStyle.ContentMarginRight = 16;
         stripStyle.ContentMarginBottom = 10;
-        strip.AddThemeStyleBoxOverride("panel", stripStyle);
+        strip.AddThemeStyleboxOverride("panel", stripStyle);
         _overlay.AddChild(strip);
 
         var hbox = new HBoxContainer();
@@ -273,7 +273,7 @@ public partial class ComboMuscleMemoryEffect : Node
 
         var namePanel = new Panel();
         namePanel.Name = "ComboNamePanel";
-        namePanel.AnchorsPreset = Control.LayoutPreset.Custom;
+        namePanel.AnchorsPreset = Control.LayoutPreset.FullRect;
         namePanel.CustomMinimumSize = new Vector2(stripWidth, 24f);
         namePanel.OffsetLeft = centerX;
         namePanel.OffsetTop = stripY - 26f;
@@ -282,7 +282,7 @@ public partial class ComboMuscleMemoryEffect : Node
         namePanel.MouseFilter = Control.MouseFilterEnum.Ignore;
         var namePanelStyle = new StyleBoxFlat();
         namePanelStyle.BgColor = new Color(0f, 0f, 0f, 0f);
-        namePanel.AddThemeStyleBoxOverride("panel", namePanelStyle);
+        namePanel.AddThemeStyleboxOverride("panel", namePanelStyle);
         namePanel.AddChild(nameLabel);
         _overlay.AddChild(namePanel);
     }
@@ -294,13 +294,13 @@ public partial class ComboMuscleMemoryEffect : Node
 
         var style = new StyleBoxFlat();
         style.BgColor = isLast
-            ? new Color(_comboColor.r, _comboColor.g, _comboColor.b, 0.9f)
+            ? new Color(_comboColor.R, _comboColor.G, _comboColor.B, 0.9f)
             : new Color(_comboColor.r * 0.4f, _comboColor.g * 0.4f, _comboColor.b * 0.4f, 0.35f);
         style.CornerRadiusTopLeft = 6;
         style.CornerRadiusTopRight = 6;
         style.CornerRadiusBottomLeft = 6;
         style.CornerRadiusBottomRight = 6;
-        container.AddThemeStyleBoxOverride("panel", style);
+        container.AddThemeStyleboxOverride("panel", style);
 
         var label = new Label();
         // Truncate skill ID to 4 chars for display

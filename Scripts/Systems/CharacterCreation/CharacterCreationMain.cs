@@ -25,7 +25,7 @@ public partial class CharacterCreationMain : BaseSystem
     public override void _Process(double delta)
     {
         // Handle toggle input
-        if (Input.IsKeyPressed(Key.C) && Input.IsKeyPressed(Key.Control) && Input.IsKeyPressed(Key.Shift))
+        if (Input.IsKeyPressed(Key.C) && Input.IsKeyPressed(Key.Ctrl) && Input.IsKeyPressed(Key.Shift))
         {
             ToggleUI();
         }

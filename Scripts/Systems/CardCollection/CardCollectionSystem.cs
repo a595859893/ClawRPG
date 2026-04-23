@@ -115,7 +115,7 @@ public partial class CardCollectionSystem : BaseSystem
         }
         else
         {
-            _data.FavoriteCards.Add(cardId);
+            _data.FavoriteCards.Add((string)cardId);
             FavoriteChanged?.Invoke(cardId, true);
         }
     }
@@ -193,7 +193,7 @@ public partial class CardCollectionSystem : BaseSystem
     // Unlock category
     public void UnlockCategory(string category)
     {
-        _data.UnlockedCategories[category] = true;
+        _data.UnlockedCategories[(string)category] = true;
         CategoryUnlocked?.Invoke(category);
     }
     
@@ -276,21 +276,25 @@ public partial class CardCollectionSystem : BaseSystem
         var data = new Dictionary<string, object>();
         
         // Owned cards
-        var ownedCardsArray = new Godot.Array();
+        var ownedCardsArray = new Godot.Collections.Array();
         foreach (var kvp in _data.OwnedCards)
         {
             var cardData = new Dictionary<string, object>();
             cardData["card_id"] = kvp.Key;
             cardData["count"] = kvp.Value;
-            ownedCardsArray.Add(cardData);
+            var gdCardData = new Godot.Collections.Dictionary();
+            foreach (var k in cardData.Keys) gdCardData[k] = (Variant)cardData[k];
+            ownedCardsArray.Add(gdCardData);
         }
         data["owned_cards"] = ownedCardsArray;
         
         // Favorite cards
-        data["favorite_cards"] = new Godot.Array(_data.FavoriteCards);
+        var favArray = new Godot.Collections.Array();
+        foreach (var f in _data.FavoriteCards) favArray.Add(f);
+        data["favorite_cards"] = favArray;
         
         // Unlocked categories
-        var categoriesArray = new Godot.Array();
+        var categoriesArray = new Godot.Collections.Array();
         foreach (var kvp in _data.UnlockedCategories)
         {
             if (kvp.Value)
@@ -317,42 +321,43 @@ public partial class CardCollectionSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("owned_cards"))
+        if (data.ContainsKey("owned_cards"))
         {
             _data.OwnedCards.Clear();
-            var cardsArray = (Godot.Array)data["owned_cards"];
-            foreach (Dictionary cardData in cardsArray)
+            var cardsArray =  (Godot.Collections.Array)data["owned_cards"];
+            foreach (var cardData in cardsArray)
             {
-                string cardId = (string)cardData["card_id"];
-                int count = (int)cardData["count"];
+                var cd = (Godot.Collections.Dictionary)cardData;
+                string cardId = (string)cd["card_id"];
+                int count = (int)(float)cd["count"];
                 _data.OwnedCards[cardId] = count;
             }
         }
         
-        if (data.Contains("favorite_cards"))
+        if (data.ContainsKey("favorite_cards"))
         {
             _data.FavoriteCards.Clear();
-            var favArray = (Godot.Array)data["favorite_cards"];
-            foreach (string cardId in favArray)
+            var favArray =  (Godot.Collections.Array)data["favorite_cards"];
+            foreach (var cardId in favArray)
             {
-                _data.FavoriteCards.Add(cardId);
+                _data.FavoriteCards.Add((string)cardId);
             }
         }
         
-        if (data.Contains("unlocked_categories"))
+        if (data.ContainsKey("unlocked_categories"))
         {
             _data.UnlockedCategories.Clear();
-            var catArray = (Godot.Array)data["unlocked_categories"];
-            foreach (string category in catArray)
+            var catArray =  (Godot.Collections.Array)data["unlocked_categories"];
+            foreach (var category in catArray)
             {
-                _data.UnlockedCategories[category] = true;
+                _data.UnlockedCategories[(string)category] = true;
             }
         }
         
-        if (data.Contains("total_unique_cards")) _data.TotalUniqueCards = (int)data["total_unique_cards"];
-        if (data.Contains("total_cards_obtained")) _data.TotalCardsObtained = (int)data["total_cards_obtained"];
-        if (data.Contains("total_duplicates")) _data.TotalDuplicates = (int)data["total_duplicates"];
-        if (data.Contains("packs_opened")) _data.PacksOpened = (int)data["packs_opened"];
-        if (data.Contains("total_gold_spent")) _data.TotalGoldSpent = (int)data["total_gold_spent"];
+        if (data.ContainsKey("total_unique_cards")) _data.TotalUniqueCards = (int)data["total_unique_cards"];
+        if (data.ContainsKey("total_cards_obtained")) _data.TotalCardsObtained = (int)data["total_cards_obtained"];
+        if (data.ContainsKey("total_duplicates")) _data.TotalDuplicates = (int)data["total_duplicates"];
+        if (data.ContainsKey("packs_opened")) _data.PacksOpened = (int)data["packs_opened"];
+        if (data.ContainsKey("total_gold_spent")) _data.TotalGoldSpent = (int)data["total_gold_spent"];
     }
 }

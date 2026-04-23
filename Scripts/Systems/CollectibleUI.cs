@@ -71,7 +71,7 @@ public partial class CollectibleUI : Control
 
 		// Left panel - filters and grid
 		var leftPanel = new VBoxContainer();
-		leftPanel.SetHExpandFlags(Control.ExpandFlags.ExpandHorizontal);
+		leftPanel.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
 		leftPanel.CustomMinimumSize = new Vector2(550, 0);
 		mainHBox.AddChild(leftPanel);
 
@@ -105,13 +105,13 @@ public partial class CollectibleUI : Control
 
 		// Collectible grid
 		var scrollContainer = new ScrollContainer();
-		scrollContainer.SetVExpandFlags(Control.ExpandFlags.ExpandFill);
+		scrollContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		leftPanel.AddChild(scrollContainer);
 
 		_collectibleGrid = new GridContainer();
 		_collectibleGrid.Columns = 5;
-		_collectibleGrid.SetHExpandFlags(Control.ExpandFlags.ExpandHorizontal);
-		_collectibleGrid.SetVExpandFlags(Control.ExpandFlags.ExpandFill);
+		_collectibleGrid.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+		_collectibleGrid.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		_collectibleGrid.AddThemeConstantOverride("h_separation", 10);
 		_collectibleGrid.AddThemeConstantOverride("v_separation", 10);
 		scrollContainer.AddChild(_collectibleGrid);
@@ -153,7 +153,7 @@ public partial class CollectibleUI : Control
 		_detailPanel.AddChild(_closeButton);
 
 		// Animate in
-		modulate = new Color(1, 1, 1, 0);
+		Modulate = new Color(1, 1, 1, 0);
 		var tween = CreateTween();
 		tween.SetParallel(true);
 		tween.TweenProperty(this, "modulate:a", 1.0, 0.3f).SetTrans(Tween.TransitionType.Back);

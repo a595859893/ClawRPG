@@ -37,7 +37,7 @@ namespace Game
         private VBoxContainer _bonusListContainer;
         
         private SetType? _currentFilter = null;
-        private EquipmentSet _selectedSet = null;
+        private ClawRPG.Scripts.Items.EquipmentSet _selectedSet = null;
 
         public override void _Ready()
         {
@@ -289,19 +289,20 @@ namespace Game
                 child.QueueFree();
             }
 
-            foreach (var item in set.Items)
+            foreach (var itemId in set.EquipmentIds)
             {
                 var itemLabel = new Label();
-                bool hasItem = EquipmentSetSystem.Instance.HasSetItem(set.SetId, item.ItemId);
+                var itemData = ItemDatabase.Instance.GetItem(itemId);
+                bool hasItem = ClawRPG.Scripts.Items.InventoryManager.Instance.GetItemCount(itemId) > 0;
                 
                 if (hasItem)
                 {
-                    itemLabel.Text = $"✓ {item.Name}";
+                    itemLabel.Text = $"✓ {itemData?.Name ?? "Unknown"}";
                     itemLabel.Modulate = new Color(0.2f, 0.8f, 0.2f);
                 }
                 else
                 {
-                    itemLabel.Text = $"✗ {item.Name}";
+                    itemLabel.Text = $"✗ {itemData?.Name ?? "Unknown"}";
                     itemLabel.Modulate = new Color(0.5f, 0.5f, 0.5f);
                 }
                 

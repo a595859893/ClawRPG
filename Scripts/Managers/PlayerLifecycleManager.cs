@@ -283,10 +283,10 @@ public partial class PlayerLifecycleManager : ManagerBase
     {
         if (data == null) return;
         
-        if (data.Contains("deathCount"))
+        if (data.ContainsKey("deathCount"))
             DeathCount = Convert.ToInt32(data["deathCount"]);
         
-        if (data.Contains("respawnPointX") && data.Contains("respawnPointY") && data.Contains("respawnPointZ"))
+        if (data.ContainsKey("respawnPointX") && data.ContainsKey("respawnPointY") && data.ContainsKey("respawnPointZ"))
         {
             RespawnPoint = new Vector3(
                 Convert.ToSingle(data["respawnPointX"]),
@@ -295,7 +295,7 @@ public partial class PlayerLifecycleManager : ManagerBase
             );
         }
         
-        if (data.Contains("respawnDelay"))
+        if (data.ContainsKey("respawnDelay"))
             RespawnDelay = Convert.ToSingle(data["respawnDelay"]);
     }
 }

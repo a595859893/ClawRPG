@@ -39,9 +39,9 @@ public partial class BattlefieldVariantUI : CanvasLayer
         // 主面板（屏幕顶部中央）
         _variantPanel = new PanelContainer();
         _variantPanel.SetAnchorsPreset(Control.LayoutPreset.TopWide);
-        _variantPanel.MarginTop = 20;
-        _variantPanel.MarginLeft = 100;
-        _variantPanel.MarginRight = -100;
+        _variantPanel.OffsetTop = 20;
+        _variantPanel.OffsetLeft = 100;
+        _variantPanel.OffsetRight = -100;
         _variantPanel.CustomMinimumSize = new Vector2(0, 60);
         AddChild(_variantPanel);
 
@@ -52,10 +52,10 @@ public partial class BattlefieldVariantUI : CanvasLayer
         style.CornerRadiusTopRight = 8;
         style.CornerRadiusBottomLeft = 8;
         style.CornerRadiusBottomRight = 8;
-        style.ContentMarginLeft = 20;
-        style.ContentMarginTop = 12;
-        style.ContentMarginRight = 20;
-        style.ContentMarginBottom = 12;
+        style.ContentMarginLeft = 20f;
+        style.ContentMarginTop = 12f;
+        style.ContentMarginRight = 20f;
+        style.ContentMarginBottom = 12f;
         _variantPanel.AddThemeStyleboxOverride("panel", style);
 
         // HBox 容器
@@ -94,9 +94,9 @@ public partial class BattlefieldVariantUI : CanvasLayer
         // 效果触发提示标签（屏幕底部中央）
         _effectLabel = new PanelContainer();
         _effectLabel.SetAnchorsPreset(Control.LayoutPreset.BottomWide);
-        _effectLabel.MarginBottom = 120;
-        _effectLabel.MarginLeft = 200;
-        _effectLabel.MarginRight = -200;
+        _effectLabel.OffsetBottom = 120;
+        _effectLabel.OffsetLeft = 200;
+        _effectLabel.OffsetRight = -200;
         _effectLabel.Hide();
         AddChild(_effectLabel);
 
@@ -106,10 +106,10 @@ public partial class BattlefieldVariantUI : CanvasLayer
         effectStyle.CornerRadiusTopRight = 6;
         effectStyle.CornerRadiusBottomLeft = 6;
         effectStyle.CornerRadiusBottomRight = 6;
-        effectStyle.ContentMarginLeft = 16;
-        effectStyle.ContentMarginTop = 8;
-        effectStyle.ContentMarginRight = 16;
-        effectStyle.ContentMarginBottom = 8;
+        effectStyle.ContentMarginLeft = 16f;
+        effectStyle.ContentMarginTop = 8f;
+        effectStyle.ContentMarginRight = 16f;
+        effectStyle.ContentMarginBottom = 8f;
         _effectLabel.AddThemeStyleboxOverride("panel", effectStyle);
 
         var effectText = new Label();
@@ -124,9 +124,9 @@ public partial class BattlefieldVariantUI : CanvasLayer
         if (BattlefieldVariantSystem.Instance != null)
         {
             // REQ-151-03: Godot 3→4 Signal migration
-            BattlefieldVariantSystem.Instance.VariantSelected += OnVariantSelected;
-            BattlefieldVariantSystem.Instance.VariantEffectTriggered += OnVariantEffectTriggered;
-            BattlefieldVariantSystem.Instance.VariantExited += OnVariantExited;
+            BattlefieldVariantSystem.VariantSelected += OnVariantSelected;
+            BattlefieldVariantSystem.VariantEffectTriggered += OnVariantEffectTriggered;
+            BattlefieldVariantSystem.VariantExited += OnVariantExited;
         }
     }
 
@@ -163,7 +163,7 @@ public partial class BattlefieldVariantUI : CanvasLayer
     private void ShowVariantPanel()
     {
         _variantPanel.Show();
-        Modulate = new Color(1, 1, 1, 0);
+        _variantPanel.Modulate = new Color(1, 1, 1, 0);
     }
 
     private void PlayIntroAnimation()

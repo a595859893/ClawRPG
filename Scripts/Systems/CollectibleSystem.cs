@@ -35,7 +35,7 @@ public partial class CollectibleSystem : BaseSystem
 		var collectible = CollectibleDatabase.Instance.GetCollectible(collectibleId);
 		if (collectible == null)
 		{
-			GD.Warning($"[CollectibleSystem] Collectible not found: {collectibleId}");
+			GD.PushWarning($"[CollectibleSystem] Collectible not found: {collectibleId}");
 			return false;
 		}
 
@@ -63,11 +63,11 @@ public partial class CollectibleSystem : BaseSystem
 		// Add gold and exp to player
 		if (collectible.GoldReward > 0)
 		{
-			Player.Instance.AddGold(collectible.GoldReward);
+			Player.Instance.Gold += collectible.GoldReward;
 		}
 		if (collectible.ExpReward > 0)
 		{
-			Player.Instance.AddExp(collectible.ExpReward);
+			Player.Instance.Gold += collectible.ExpReward;
 		}
 
 		// Check if category completed
@@ -75,17 +75,17 @@ public partial class CollectibleSystem : BaseSystem
 		int categoryDiscovered = Data.CategoryDiscovered[categoryName];
 		if (categoryDiscovered >= categoryTotal)
 		{
-			CategoryCompleted.Emit(categoryName);
+			CategoryCompleted?.Invoke(categoryName);
 		}
 
 		// Check if all completed
 		if (Data.TotalDiscovered >= CollectibleDatabase.Instance.GetTotalCount())
 		{
-			AllCollectiblesCompleted.Emit("All");
+			AllCollectiblesCompleted?.Invoke("All");
 		}
 
 		GD.Print($"[CollectibleSystem] Discovered: {collectible.Name} (+{collectible.GoldReward} gold, +{collectible.ExpReward} exp)");
-		CollectibleDiscovered.Emit(collectibleId);
+		CollectibleDiscovered?.Invoke(collectibleId);
 
 		// Auto-save
 		SaveSystem.Instance.SaveGame();

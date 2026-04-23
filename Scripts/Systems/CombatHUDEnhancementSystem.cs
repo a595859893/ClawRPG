@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Combat;
 
 /// <summary>
 /// 战斗HUD增强系统 - 增强战斗界面显示效果
@@ -86,12 +87,9 @@ public partial class CombatHUDEnhancementSystem : BaseSystem
 	private const float COMBO_TIMEOUT = 3.0f;
 	
 	// Signals (Godot 4 compatible)
-	[Signal]
-	public delegate void CombatEndedDelegateEventHandlerEventHandler(string ratingGrade);
-	[Signal]
-	public delegate void ComboChangedDelegateEventHandlerEventHandler(int combo);
-	[Signal]
-	public delegate void MilestoneReachedDelegateEventHandlerEventHandler(string milestone);
+	public static event Action<string> CombatEnded;
+	public static event Action<int> ComboChanged;
+	public static event Action<string> MilestoneReached;
 	
 	public override void _Ready()
 	{
@@ -109,7 +107,7 @@ public partial class CombatHUDEnhancementSystem : BaseSystem
 			IsActive = true,
 			CombatZone = zone
 		};
-		_sessionStartTime = Time.GetUnixTimeFromSystem();
+		_sessionStartTime = (float)Time.GetUnixTimeFromSystem();
 		_enemyInfoMap.Clear();
 		_currentCombo = 0;
 		_comboTimer = 0;
@@ -121,12 +119,10 @@ public partial class CombatHUDEnhancementSystem : BaseSystem
 		
 		_currentSession.EndTime = DateTime.Now;
 		_currentSession.IsActive = false; 
-		_currentSession.PlayerStats.CombatDuration = Time.GetUnixTimeFromSystem() - _sessionStartTime;
+		_currentSession.PlayerStats.CombatDuration = (float)(Time.GetUnixTimeFromSystem() - _sessionStartTime);
 		_currentSession.PlayerStats.MaxCombo = Math.Max(_currentSession.PlayerStats.MaxCombo, _currentCombo);
 		
-		var rating = CalculateCombatRating();
-		CombatEnded.Emit(rating.Grade);
-	}
+			}
 	
 	public void RecordDamageDealt(int damage, bool isCritical, string enemyId, string enemyName)
 	{
@@ -212,21 +208,21 @@ public partial class CombatHUDEnhancementSystem : BaseSystem
 			_currentSession.PlayerStats.MaxCombo = _currentCombo;
 		}
 		
-		ComboChanged.Emit(_currentCombo);
+		ComboChanged?.Invoke(_currentCombo);
 		
 		// Milestone combos
-		if (_currentCombo == 10) MilestoneReached.Emit("Combo10");
-		else if (_currentCombo == 25) MilestoneReached.Emit("Combo25");
-		else if (_currentCombo == 50) MilestoneReached.Emit("Combo50");
-		else if (_currentCombo == 100) MilestoneReached.Emit("Combo100");
+		if (_currentCombo == 10) MilestoneReached?.Invoke("Combo10");
+		else if (_currentCombo == 25) MilestoneReached?.Invoke("Combo25");
+		else if (_currentCombo == 50) MilestoneReached?.Invoke("Combo50");
+		else if (_currentCombo == 100) MilestoneReached?.Invoke("Combo100");
 	}
 	
 	private void CheckMilestones()
 	{
 		int kills = _currentSession.PlayerStats.EnemiesKilled;
-		if (kills == 5) MilestoneReached.Emit("Kill5");
-		else if (kills == 10) MilestoneReached.Emit("Kill10");
-		else if (kills == 25) MilestoneReached.Emit("Kill25");
+		if (kills == 5) MilestoneReached?.Invoke("Kill5");
+		else if (kills == 10) MilestoneReached?.Invoke("Kill10");
+		else if (kills == 25) MilestoneReached?.Invoke("Kill25");
 		else if (kills == 50) MilestoneReached.Emit("Kill50");
 	}
 	
@@ -246,7 +242,7 @@ public partial class CombatHUDEnhancementSystem : BaseSystem
 		}
 		
 		// Update combat duration
-		_currentSession.PlayerStats.CombatDuration = Time.GetUnixTimeFromSystem() - _sessionStartTime;
+		_currentSession.PlayerStats.CombatDuration = (float)(Time.GetUnixTimeFromSystem() - _sessionStartTime);
 	}
 	
 	private CombatHUDEnhancementData.CombatRating CalculateCombatRating()

@@ -35,41 +35,40 @@ public class CharacterCreationData
 
     public void LoadData()
     {
-        if (File.Exists(GetSavePath()))
+        if (FileAccess.FileExists(GetSavePath()))
         {
-            var data = new Godot.File();
-            data.Open(GetSavePath(), Godot.File.ModeFlags.Read);
-            var json = data.GetAsText();
-            data.Close();
+            var file = FileAccess.Open(GetSavePath(), FileAccess.ModeFlags.Read);
+            var json = file.GetAsText();
+            file.Close();
             
-            var dict = JSON.Parse(json).Result as Dictionary<string, object>;
-            if (dict != null)
+            var result = Json.ParseString(json);
+            if (result.VariantType != Variant.Type.Nil)
             {
-                CharacterName = dict.Get("CharacterName", "Hero");
-                SelectedClass = dict.Get("SelectedClass", "Warrior");
-                Strength = (int)dict.Get("Strength", 10);
-                Agility = (int)dict.Get("Agility", 10);
-                Intelligence = (int)dict.Get("Intelligence", 10);
-                Vitality = (int)dict.Get("Vitality", 10);
-                Luck = (int)dict.Get("Luck", 10);
-                AvailablePoints = (int)dict.Get("AvailablePoints", 20);
-                UsedPoints = (int)dict.Get("UsedPoints", 0);
-                SelectedBackground = dict.Get("SelectedBackground", "Commoner");
-                HairStyle = (int)dict.Get("HairStyle", 0);
-                SkinColor = (int)dict.Get("SkinColor", 0);
-                EyeColor = (int)dict.Get("EyeColor", 0);
-                CharactersCreated = (int)dict.Get("CharactersCreated", 0);
-                MostCommonClass = (int)dict.Get("MostCommonClass", 0);
+                var dict = result.As<Godot.Collections.Dictionary>();
+                CharacterName = dict.ContainsKey("CharacterName") ? (string)dict["CharacterName"] : "Hero";
+                SelectedClass = dict.ContainsKey("SelectedClass") ? (string)dict["SelectedClass"] : "Warrior";
+                Strength = dict.ContainsKey("Strength") ? (int)(float)dict["Strength"] : 10;
+                Agility = dict.ContainsKey("Agility") ? (int)(float)dict["Agility"] : 10;
+                Intelligence = dict.ContainsKey("Intelligence") ? (int)(float)dict["Intelligence"] : 10;
+                Vitality = dict.ContainsKey("Vitality") ? (int)(float)dict["Vitality"] : 10;
+                Luck = dict.ContainsKey("Luck") ? (int)(float)dict["Luck"] : 10;
+                AvailablePoints = dict.ContainsKey("AvailablePoints") ? (int)(float)dict["AvailablePoints"] : 20;
+                UsedPoints = dict.ContainsKey("UsedPoints") ? (int)(float)dict["UsedPoints"] : 0;
+                SelectedBackground = dict.ContainsKey("SelectedBackground") ? (string)dict["SelectedBackground"] : "Commoner";
+                HairStyle = dict.ContainsKey("HairStyle") ? (int)(float)dict["HairStyle"] : 0;
+                SkinColor = dict.ContainsKey("SkinColor") ? (int)(float)dict["SkinColor"] : 0;
+                EyeColor = dict.ContainsKey("EyeColor") ? (int)(float)dict["EyeColor"] : 0;
+                CharactersCreated = dict.ContainsKey("CharactersCreated") ? (int)(float)dict["CharactersCreated"] : 0;
+                MostCommonClass = dict.ContainsKey("MostCommonClass") ? (int)(float)dict["MostCommonClass"] : 0;
             }
         }
     }
     
     public void SaveData()
     {
-        var data = new Godot.File();
-        data.Open(GetSavePath(), Godot.File.ModeFlags.Write);
+        var file = FileAccess.Open(GetSavePath(), FileAccess.ModeFlags.Write);
         
-        var dict = new Dictionary<string, object>
+        var dict = new Godot.Collections.Dictionary
         {
             { "CharacterName", CharacterName },
             { "SelectedClass", SelectedClass },
@@ -88,8 +87,8 @@ public class CharacterCreationData
             { "MostCommonClass", MostCommonClass }
         };
         
-        data.StoreLine(JSON.Print(dict));
-        data.Close();
+        file.StoreLine(Json.Stringify(dict));
+        file.Close();
     }
     
     public string GetSavePath()
@@ -116,7 +115,7 @@ public class CharacterCreationData
 
     public Dictionary ExportSaveData()
     {
-        var data = new Dictionary<string, object>();
+        var data = new Godot.Collections.Dictionary();
         
         // Character Info
         data["character_name"] = CharacterName;

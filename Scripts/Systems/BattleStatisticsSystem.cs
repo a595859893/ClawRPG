@@ -447,32 +447,32 @@ public partial class BattleStatisticsSystem : BaseSystem
     {
         if (data == null) return;
 
-        if (data.Contains("TotalBattles")) _stats.TotalBattles = Convert.ToInt32(data["TotalBattles"]);
-        if (data.Contains("TotalVictories")) _stats.TotalVictories = Convert.ToInt32(data["TotalVictories"]);
-        if (data.Contains("TotalDefeats")) _stats.TotalDefeats = Convert.ToInt32(data["TotalDefeats"]);
-        if (data.Contains("TotalBattleTime")) _stats.TotalBattleTime = (float)Convert.ToDouble(data["TotalBattleTime"]);
-        if (data.Contains("TotalDamageDealt")) _stats.TotalDamageDealt = Convert.ToInt32(data["TotalDamageDealt"]);
-        if (data.Contains("TotalDamageTaken")) _stats.TotalDamageTaken = Convert.ToInt32(data["TotalDamageTaken"]);
-        if (data.Contains("TotalCriticalDamage")) _stats.TotalCriticalDamage = Convert.ToInt32(data["TotalCriticalDamage"]);
-        if (data.Contains("TotalHealing")) _stats.TotalHealing = Convert.ToInt32(data["TotalHealing"]);
-        if (data.Contains("TotalEnemiesKilled")) _stats.TotalEnemiesKilled = Convert.ToInt32(data["TotalEnemiesKilled"]);
-        if (data.Contains("TotalBossesKilled")) _stats.TotalBossesKilled = Convert.ToInt32(data["TotalBossesKilled"]);
-        if (data.Contains("TotalEliteKilled")) _stats.TotalEliteKilled = Convert.ToInt32(data["TotalEliteKilled"]);
-        if (data.Contains("TotalSkillsUsed")) _stats.TotalSkillsUsed = Convert.ToInt32(data["TotalSkillsUsed"]);
-        if (data.Contains("TotalSkillsHit")) _stats.TotalSkillsHit = Convert.ToInt32(data["TotalSkillsHit"]);
-        if (data.Contains("TotalSkillsMissed")) _stats.TotalSkillsMissed = Convert.ToInt32(data["TotalSkillsMissed"]);
-        if (data.Contains("FireDamage")) _stats.FireDamage = Convert.ToInt32(data["FireDamage"]);
-        if (data.Contains("IceDamage")) _stats.IceDamage = Convert.ToInt32(data["IceDamage"]);
-        if (data.Contains("LightningDamage")) _stats.LightningDamage = Convert.ToInt32(data["LightningDamage"]);
-        if (data.Contains("DarkDamage")) _stats.DarkDamage = Convert.ToInt32(data["DarkDamage"]);
-        if (data.Contains("HolyDamage")) _stats.HolyDamage = Convert.ToInt32(data["HolyDamage"]);
-        if (data.Contains("PhysicalDamage")) _stats.PhysicalDamage = Convert.ToInt32(data["PhysicalDamage"]);
-        if (data.Contains("SessionBattles")) _stats.SessionBattles = Convert.ToInt32(data["SessionBattles"]);
-        if (data.Contains("SessionVictories")) _stats.SessionVictories = Convert.ToInt32(data["SessionVictories"]);
-        if (data.Contains("SessionStart")) _stats.SessionStart = DateTime.FromOADate(Convert.ToDouble(data["SessionStart"]));
+        if (data.ContainsKey("TotalBattles")) _stats.TotalBattles = Convert.ToInt32(data["TotalBattles"]);
+        if (data.ContainsKey("TotalVictories")) _stats.TotalVictories = Convert.ToInt32(data["TotalVictories"]);
+        if (data.ContainsKey("TotalDefeats")) _stats.TotalDefeats = Convert.ToInt32(data["TotalDefeats"]);
+        if (data.ContainsKey("TotalBattleTime")) _stats.TotalBattleTime = (float)Convert.ToDouble(data["TotalBattleTime"]);
+        if (data.ContainsKey("TotalDamageDealt")) _stats.TotalDamageDealt = Convert.ToInt32(data["TotalDamageDealt"]);
+        if (data.ContainsKey("TotalDamageTaken")) _stats.TotalDamageTaken = Convert.ToInt32(data["TotalDamageTaken"]);
+        if (data.ContainsKey("TotalCriticalDamage")) _stats.TotalCriticalDamage = Convert.ToInt32(data["TotalCriticalDamage"]);
+        if (data.ContainsKey("TotalHealing")) _stats.TotalHealing = Convert.ToInt32(data["TotalHealing"]);
+        if (data.ContainsKey("TotalEnemiesKilled")) _stats.TotalEnemiesKilled = Convert.ToInt32(data["TotalEnemiesKilled"]);
+        if (data.ContainsKey("TotalBossesKilled")) _stats.TotalBossesKilled = Convert.ToInt32(data["TotalBossesKilled"]);
+        if (data.ContainsKey("TotalEliteKilled")) _stats.TotalEliteKilled = Convert.ToInt32(data["TotalEliteKilled"]);
+        if (data.ContainsKey("TotalSkillsUsed")) _stats.TotalSkillsUsed = Convert.ToInt32(data["TotalSkillsUsed"]);
+        if (data.ContainsKey("TotalSkillsHit")) _stats.TotalSkillsHit = Convert.ToInt32(data["TotalSkillsHit"]);
+        if (data.ContainsKey("TotalSkillsMissed")) _stats.TotalSkillsMissed = Convert.ToInt32(data["TotalSkillsMissed"]);
+        if (data.ContainsKey("FireDamage")) _stats.FireDamage = Convert.ToInt32(data["FireDamage"]);
+        if (data.ContainsKey("IceDamage")) _stats.IceDamage = Convert.ToInt32(data["IceDamage"]);
+        if (data.ContainsKey("LightningDamage")) _stats.LightningDamage = Convert.ToInt32(data["LightningDamage"]);
+        if (data.ContainsKey("DarkDamage")) _stats.DarkDamage = Convert.ToInt32(data["DarkDamage"]);
+        if (data.ContainsKey("HolyDamage")) _stats.HolyDamage = Convert.ToInt32(data["HolyDamage"]);
+        if (data.ContainsKey("PhysicalDamage")) _stats.PhysicalDamage = Convert.ToInt32(data["PhysicalDamage"]);
+        if (data.ContainsKey("SessionBattles")) _stats.SessionBattles = Convert.ToInt32(data["SessionBattles"]);
+        if (data.ContainsKey("SessionVictories")) _stats.SessionVictories = Convert.ToInt32(data["SessionVictories"]);
+        if (data.ContainsKey("SessionStart")) _stats.SessionStart = DateTime.FromOADate(Convert.ToDouble(data["SessionStart"]));
 
         // EnemyKillsByType: Dictionary<string, int>
-        if (data.Contains("EnemyKillsByType") && data["EnemyKillsByType"] is Dictionary<string, object> killsData)
+        if (data.ContainsKey("EnemyKillsByType") && data["EnemyKillsByType"] is Dictionary<string, object> killsData)
         {
             _stats.EnemyKillsByType.Clear();
             foreach (var kvp in killsData)
@@ -480,7 +480,7 @@ public partial class BattleStatisticsSystem : BaseSystem
         }
 
         // RecentBattles: List<BattleRecord>
-        if (data.Contains("RecentBattles") && data["RecentBattles"] is List<object> battlesData)
+        if (data.ContainsKey("RecentBattles") && data["RecentBattles"] is List<object> battlesData)
         {
             _stats.RecentBattles.Clear();
             foreach (var item in battlesData)
@@ -488,19 +488,19 @@ public partial class BattleStatisticsSystem : BaseSystem
                 if (item is Dictionary<string, object> recordDict)
                 {
                     var record = new BattleRecord();
-                    if (recordDict.Contains("Timestamp"))
+                    if (recordDict.ContainsKey("Timestamp"))
                         record.Timestamp = DateTime.FromOADate(Convert.ToDouble(recordDict["Timestamp"]));
-                    if (recordDict.Contains("Victory"))
+                    if (recordDict.ContainsKey("Victory"))
                         record.Victory = Convert.ToBoolean(recordDict["Victory"]);
-                    if (recordDict.Contains("DamageDealt"))
+                    if (recordDict.ContainsKey("DamageDealt"))
                         record.DamageDealt = Convert.ToInt32(recordDict["DamageDealt"]);
-                    if (recordDict.Contains("DamageTaken"))
+                    if (recordDict.ContainsKey("DamageTaken"))
                         record.DamageTaken = Convert.ToInt32(recordDict["DamageTaken"]);
-                    if (recordDict.Contains("EnemiesKilled"))
+                    if (recordDict.ContainsKey("EnemiesKilled"))
                         record.EnemiesKilled = Convert.ToInt32(recordDict["EnemiesKilled"]);
-                    if (recordDict.Contains("Duration"))
+                    if (recordDict.ContainsKey("Duration"))
                         record.Duration = (float)Convert.ToDouble(recordDict["Duration"]);
-                    if (recordDict.Contains("BattleType"))
+                    if (recordDict.ContainsKey("BattleType"))
                         record.BattleType = recordDict["BattleType"]?.ToString() ?? "";
                     _stats.RecentBattles.Add(record);
                 }

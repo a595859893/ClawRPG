@@ -220,13 +220,13 @@ public partial class AlchemyLaboratorySystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("is_unlocked")) IsUnlocked = Convert.ToBoolean(data["is_unlocked"]);
-        if (data.Contains("laboratory_level")) LaboratoryLevel = Convert.ToInt32(data["laboratory_level"]);
-        if (data.Contains("total_researches_completed")) TotalResearchesCompleted = Convert.ToInt32(data["total_researches_completed"]);
-        if (data.Contains("total_formulas_discovered")) TotalFormulasDiscovered = Convert.ToInt32(data["total_formulas_discovered"]);
-        if (data.Contains("total_gold_invested")) TotalGoldInvested = Convert.ToInt32(data["total_gold_invested"]);
+        if (data.ContainsKey("is_unlocked")) IsUnlocked = Convert.ToBoolean(data["is_unlocked"]);
+        if (data.ContainsKey("laboratory_level")) LaboratoryLevel = Convert.ToInt32(data["laboratory_level"]);
+        if (data.ContainsKey("total_researches_completed")) TotalResearchesCompleted = Convert.ToInt32(data["total_researches_completed"]);
+        if (data.ContainsKey("total_formulas_discovered")) TotalFormulasDiscovered = Convert.ToInt32(data["total_formulas_discovered"]);
+        if (data.ContainsKey("total_gold_invested")) TotalGoldInvested = Convert.ToInt32(data["total_gold_invested"]);
         
-        if (data.Contains("discovered_formulas"))
+        if (data.ContainsKey("discovered_formulas"))
         {
             DiscoveredFormulas = new List<string>((System.Collections.Generic.IEnumerable<string>)data["discovered_formulas"]);
         }
@@ -235,7 +235,7 @@ public partial class AlchemyLaboratorySystem : BaseSystem
         GenerateNewResearches();
         
         // Load completed researches
-        if (data.Contains("researches"))
+        if (data.ContainsKey("researches"))
         {
             foreach (Dictionary r in (System.Collections.ArrayList)data["researches"])
             {
@@ -278,6 +278,6 @@ public partial class AlchemyLaboratorySystem : BaseSystem
     // 兼容性方法 - 调用 ImportSaveData
     public void LoadFromData(Dictionary<string, object> data)
     {
-        ImportSaveData(new Dictionary(data));
+        ImportSaveData(data);
     }
 }

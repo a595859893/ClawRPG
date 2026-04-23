@@ -254,6 +254,7 @@ namespace ClawRPG.Scripts.Systems
 
             /// <summary>Guild Quest system data dictionary.</summary>
             public Dictionary<string, object> GuildQuestData { get; set; } = new();
+            public Dictionary<string, object> BossRushData { get; set; } = new();
             
             /// <summary>Legacy player data (for backwards compatibility).</summary>
             public object PlayerData { get; set; }

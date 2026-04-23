@@ -12,11 +12,11 @@ public partial class BattlefieldVariantSystem : BaseSystem
     private static BattlefieldVariantSystem _instance;
     public static BattlefieldVariantSystem Instance => _instance;
 
-    // Signals
-    public delegate void VariantSelectedEventHandler(BattlefieldVariantType variant);
-    public delegate void VariantEffectTriggeredEventHandler(BattlefieldVariantType variant, string effectDesc);
-    public delegate void VariantExitedEventHandler(BattlefieldVariantType variant);
-    public delegate void VariantDamageAppliedEventHandler(float damage);
+    // Signals (C# events for internal use)
+    public static event Action<BattlefieldVariantType> VariantSelected;
+    public static event Action<BattlefieldVariantType, string> VariantEffectTriggered;
+    public static event Action<BattlefieldVariantType> VariantExited;
+    public static event Action<float> VariantDamageApplied;
 
     // 运行时数据
     private BattlefieldVariantRuntimeData _runtimeData = new BattlefieldVariantRuntimeData();
@@ -115,7 +115,7 @@ public partial class BattlefieldVariantSystem : BaseSystem
         {
             EventBusManager.Instance.Subscribe(EventBusManager.Events.CombatStarted, OnCombatStarted);
             EventBusManager.Instance.Subscribe(EventBusManager.Events.CombatEnded, OnCombatEnded);
-            EventBusManager.Instance.Subscribe(EventBusManager.Events.DamageDealt, OnDamageDealt);
+            EventBusManager.Instance.Subscribe<object>(EventBusManager.Events.DamageDealt, data => OnDamageDealt(data));
         }
     }
 
@@ -135,7 +135,7 @@ public partial class BattlefieldVariantSystem : BaseSystem
         _isInCombat = false;
         if (_runtimeData.ActiveVariant != BattlefieldVariantType.None)
         {
-            EmitSignal(SignalName.VariantExited, _runtimeData.ActiveVariant);
+            VariantExited?.Invoke(_runtimeData.ActiveVariant);
 
             if (EventBusManager.Instance != null)
             {
@@ -178,7 +178,7 @@ public partial class BattlefieldVariantSystem : BaseSystem
         _stationaryTime = 0f;
 
         // 通知 UI
-        EmitSignal(SignalName.VariantSelected, selected);
+        VariantSelected?.Invoke(selected);
 
         // 打印变体信息
         if (_variantConfigs.TryGetValue(selected, out var config))
@@ -227,7 +227,7 @@ public partial class BattlefieldVariantSystem : BaseSystem
             string effectDesc = stackingBonus > 0
                 ? $"灼烧伤害 {totalDamage:F1}（静止+{stackingBonus:F1}）"
                 : $"灼烧伤害 {totalDamage:F1}";
-            EmitSignal(SignalName.VariantEffectTriggered, BattlefieldVariantType.ScorchedEarth, effectDesc);
+            VariantEffectTriggered?.Invoke(BattlefieldVariantType.ScorchedEarth, effectDesc);
         }
     }
 
@@ -238,7 +238,7 @@ public partial class BattlefieldVariantSystem : BaseSystem
         if (playerNodes.Count > 0 && playerNodes[0] is Node2D player)
         {
             // 通过 EmitSignal 通知伤害系统处理
-            EmitSignal(SignalName.VariantDamageApplied, damage);
+            VariantDamageApplied?.Invoke(damage);
         }
 
         // 对敌人也生效（公平）
@@ -267,7 +267,7 @@ public partial class BattlefieldVariantSystem : BaseSystem
                 }
             }
         }
-        EmitSignal(SignalName.VariantEffectTriggered, BattlefieldVariantType.StaticAir,
+        VariantEffectTriggered?.Invoke(BattlefieldVariantType.StaticAir,
             $"链式反应！已影响 {_runtimeData.ChainReactionCount} 个单位");
     }
 

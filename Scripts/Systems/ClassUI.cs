@@ -287,7 +287,7 @@ public partial class ClassUI : Control
         if (@event.IsActionPressed("ui_cancel") && _isVisible)
         {
             ToggleUI();
-            GetTree().SetInputAsHandled();
+            // Input already handled by this callback
         }
     }
 

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Systems.AuctionHouse;
 
 public partial class AuctionHouseUI : Control
 {
@@ -69,7 +70,7 @@ public partial class AuctionHouseUI : Control
         titleBar.AddChild(_titleLabel);
         
         titleBar.AddChild(new Control());
-        titleBar.HBoxContainerFlags |= (int)HBoxContainer.ContainerFlags.SizeExpandFill;
+        ((Control)titleBar.GetChild(titleBar.GetChildCount() - 1)).SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         
         var closeBtn = new Button();
         closeBtn.Text = "✕";
@@ -85,7 +86,7 @@ public partial class AuctionHouseUI : Control
         filterBar.AddChild(searchLabel);
         
         _searchInput = new LineEdit();
-        _searchInput.Placeholder = "搜索物品...";
+        _searchInput.PlaceholderText = "搜索物品...";
         _searchInput.CustomMinimumSize = new Vector2(200, 0);
         filterBar.AddChild(_searchInput);
         
@@ -206,7 +207,7 @@ public partial class AuctionHouseUI : Control
         detailsVBox.AddChild(_detailsPrice);
         
         detailsVBox.AddChild(new Control());
-        detailsVBox.VBoxContainerFlags |= (int)VBoxContainer.ContainerFlags.SizeExpandFill;
+        ((Control)detailsVBox.GetChild(detailsVBox.GetChildCount() - 1)).SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         
         _buyButton = new Button();
         _buyButton.Text = "购买";
@@ -233,8 +234,8 @@ public partial class AuctionHouseUI : Control
     {
         var vbox = new VBoxContainer();
         vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        vbox.MarginLeft = 20;
-        vbox.MarginTop = 20;
+        vbox.OffsetLeft = 20;
+        vbox.OffsetTop = 20;
         parent.AddChild(vbox);
         
         var title = new Label();
@@ -243,7 +244,7 @@ public partial class AuctionHouseUI : Control
         vbox.AddChild(title);
         
         vbox.AddChild(new Control());
-        vbox.ControlVBoxFlags |= (int)Control.ContainerFlags.SizeExpandFill;
+        ((Control)vbox.GetChild(vbox.GetChildCount() - 1)).SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         
         var hint = new Label();
         hint.Text = "挂售功能开发中...\n请在浏览市场时选择物品进行购买";

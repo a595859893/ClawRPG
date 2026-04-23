@@ -6,6 +6,11 @@ public partial class CombatStanceSystem : BaseSystem
 {
     public static CombatStanceSystem Instance { get; private set; }
     
+    // Signals as C# events
+    public static event Action StanceExpired;
+    public static event Action<StanceType, StanceType> StanceChanged;  // newStance, oldStance
+    public static event Action<int> StanceLevelUp;  // stanceLevel
+    
     // 战斗姿态类型
     public enum StanceType
     {
@@ -49,7 +54,7 @@ public partial class CombatStanceSystem : BaseSystem
             {
                 currentStanceDuration = 0;
                 isStanceActive = false;
-                EmitSignal(SignalName.StanceExpired);
+                StanceExpired?.Invoke();
             }
         }
     }
@@ -185,7 +190,7 @@ public partial class CombatStanceSystem : BaseSystem
             maxStanceDuration = 0;
         }
         
-        EmitSignal(SignalName.StanceChanged, newStance, oldStance);
+        StanceChanged?.Invoke(newStance, oldStance);
         
         GD.Print($"[CombatStance] Switched from {oldStance} to {newStance}");
         return true;
@@ -216,7 +221,7 @@ public partial class CombatStanceSystem : BaseSystem
     public void LevelUpStance()
     {
         stanceLevel++;
-        EmitSignal(SignalName.StanceLevelUp, stanceLevel);
+        StanceLevelUp?.Invoke(stanceLevel);
         GD.Print($"[CombatStance] Stance level up to {stanceLevel}");
     }
     

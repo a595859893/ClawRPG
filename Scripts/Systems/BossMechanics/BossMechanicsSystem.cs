@@ -33,7 +33,7 @@ public partial class BossMechanicsSystem : BaseSystem
     public override void _Ready()
     {
         Instance = this;
-        BossMechanicsDatabase.Initialize();
+        BossMechanicsDatabase.StaticInitialize();
         
         // 初始化子系统
         _phaseSystem = new BossPhaseSystem();
@@ -49,7 +49,7 @@ public partial class BossMechanicsSystem : BaseSystem
         ConnectSubsystemSignals();
 
         // 连接Rage触发信号 (REQ-127)
-        BossPhaseSystem.Instance.BossRageTriggered += _OnBossRageTriggered;
+        BossPhaseSystem.BossRageTriggered += _OnBossRageTriggered;
         
         LoadPlayerStats();
     }
@@ -57,14 +57,14 @@ public partial class BossMechanicsSystem : BaseSystem
     private void ConnectSubsystemSignals()
     {
         // 连接PhaseSystem信号
-        BossPhaseSystem.Instance.BossPhaseChanged += _OnPhaseChanged;
-        BossPhaseSystem.Instance.BossEnraged += _OnBossEnraged;
+        BossPhaseSystem.BossPhaseChanged += _OnPhaseChanged;
+        BossPhaseSystem.BossEnraged += _OnBossEnraged;
         
         // 连接AbilitySystem信号
-        BossAbilitySystem.Instance.BossSkillExecuted += _OnSkillExecuted;
+        BossAbilitySystem.BossSkillExecuted += _OnSkillExecuted;
         
         // 连接PatternSystem信号
-        BossPatternSystem.Instance.BossPatternChanged += _OnPatternChanged;
+        BossPatternSystem.BossPatternChanged += _OnPatternChanged;
     }
 
     private void _OnPhaseChanged(string instanceId, int oldPhase, int newPhase)
@@ -110,7 +110,7 @@ public partial class BossMechanicsSystem : BaseSystem
 
     public override void _Process(double delta)
     {
-        UpdateBossBattles(delta);
+        UpdateBossBattles((float)delta);
     }
 
     private void UpdateBossBattles(float delta)
@@ -145,7 +145,7 @@ public partial class BossMechanicsSystem : BaseSystem
     // 公开API - 战斗管理
     public void StartBossBattle(string bossId, string playerId)
     {
-        var config = BossMechanicsDatabase.GetBossConfig(bossId);
+        var config = BossMechanicsDatabase.GetBossConfigStatic(bossId);
         if (config == null) return;
 
         string instanceId = Guid.NewGuid().ToString();
@@ -382,17 +382,17 @@ public partial class BossMechanicsSystem : BaseSystem
 
     public Dictionary<string, BossConfig> GetAllBossConfigs()
     {
-        return BossMechanicsDatabase.GetAllBossConfigs();
+        return BossMechanicsDatabase.GetAllBossConfigsStatic();
     }
 
     public List<BossConfig> GetBossConfigsByType(BossType type)
     {
-        return BossMechanicsDatabase.GetBossConfigsByType(type);
+        return BossMechanicsDatabase.GetBossConfigsByTypeStatic(type);
     }
 
     public List<BossConfig> GetBossConfigsByDifficulty(DifficultyLevel difficulty)
     {
-        return BossMechanicsDatabase.GetBossConfigsByDifficulty(difficulty);
+        return BossMechanicsDatabase.GetBossConfigsByDifficultyStatic(difficulty);
     }
 
     // 公开API - 子系统访问（保持向后兼容）
@@ -452,7 +452,7 @@ public partial class BossMechanicsSystem : BaseSystem
             battleData["abilityData"] = _abilitySystem.ExportSaveData(battle.Value);
             battleData["patternData"] = _patternSystem.ExportSaveData(battle.Value);
             
-            battlesData.Add(battleData);
+            battlesData.Add((Godot.Collections.Dictionary)(object)battleData);
         }
         data["activeBattles"] = battlesData;
         

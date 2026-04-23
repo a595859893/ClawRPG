@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.BossMechanics;
 
 /// <summary>
 /// Boss技能系统 - 负责Boss技能/机制（伤害、治疗、护盾、召唤等）
@@ -475,7 +476,7 @@ public partial class BossAbilitySystem : BaseSystem
         if (data == null) return;
 
         // 导入激活的技能列表
-        if (data.Contains("activatedSkills"))
+        if (data.ContainsKey("activatedSkills"))
         {
             _activatedSkills.Clear();
             var activatedArray = (Godot.Collections.Array)data["activatedSkills"];
@@ -486,7 +487,7 @@ public partial class BossAbilitySystem : BaseSystem
         }
 
         // 导入召唤的小怪
-        if (data.Contains("summonedMonsters"))
+        if (data.ContainsKey("summonedMonsters"))
         {
             _summonedMonsters.Clear();
             var summonArray = (Godot.Collections.Array)data["summonedMonsters"];
@@ -497,7 +498,7 @@ public partial class BossAbilitySystem : BaseSystem
         }
 
         // 导入技能冷却 (到当前关联的battle)
-        if (_currentBattle != null && data.Contains("skillCooldowns"))
+        if (_currentBattle != null && data.ContainsKey("skillCooldowns"))
         {
             _currentBattle.SkillCooldowns.Clear();
             var cooldownArray = (Godot.Collections.Array)data["skillCooldowns"];
@@ -546,7 +547,7 @@ public partial class BossAbilitySystem : BaseSystem
         if (battle == null || data == null) return;
 
         // 导入技能冷却
-        if (data.Contains("skillCooldowns"))
+        if (data.ContainsKey("skillCooldowns"))
         {
             battle.SkillCooldowns.Clear();
             var cooldownArray = (Godot.Collections.Array)data["skillCooldowns"];
@@ -557,7 +558,7 @@ public partial class BossAbilitySystem : BaseSystem
         }
 
         // 导入召唤的小怪
-        if (data.Contains("summonedMonsters"))
+        if (data.ContainsKey("summonedMonsters"))
         {
             battle.SummonedMonsters.Clear();
             var summonArray = (Godot.Collections.Array)data["summonedMonsters"];

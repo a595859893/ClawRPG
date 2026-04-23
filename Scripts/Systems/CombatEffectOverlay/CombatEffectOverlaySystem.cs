@@ -12,7 +12,7 @@ public partial class CombatEffectOverlaySystem : BaseSystem
         {
             if (_instance == null)
             {
-                _instance = GetNode<CombatEffectOverlaySystem>("/root/CombatEffectOverlaySystem");
+                // Instance set in _Ready()
             }
             return _instance;
         }
@@ -46,6 +46,7 @@ public partial class CombatEffectOverlaySystem : BaseSystem
     
     public override void _Ready()
     {
+        _instance = this;
         _database = CombatEffectOverlayDatabase.Instance;
         _data = new CombatEffectOverlayData();
         
@@ -60,10 +61,10 @@ public partial class CombatEffectOverlaySystem : BaseSystem
     
     public override void _Process(double delta)
     {
-        UpdateScreenEffects(delta);
-        UpdateCameraShake(delta);
-        UpdateSlowMotion(delta);
-        UpdateFloatingTexts(delta);
+        UpdateScreenEffects((float)delta);
+        UpdateCameraShake((float)delta);
+        UpdateSlowMotion((float)delta);
+        UpdateFloatingTexts((float)delta);
     }
     
     #region Screen Effects

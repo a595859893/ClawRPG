@@ -288,8 +288,8 @@ public partial class AnimationEffectManager : BaseSystem
     public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
-        if (data.Contains("enable_attack_trail")) _enableAttackTrail = (bool)data["enable_attack_trail"];
-        if (data.Contains("attack_trail_color")) _attackTrailColor = Color.FromHtml((string)data["attack_trail_color"]);
-        if (data.Contains("trail_width")) _trailWidth = (float)data["trail_width"];
+        if (data.ContainsKey("enable_attack_trail")) _enableAttackTrail = (bool)data["enable_attack_trail"];
+        if (data.ContainsKey("attack_trail_color")) _attackTrailColor = Color.FromHtml((string)data["attack_trail_color"]);
+        if (data.ContainsKey("trail_width")) _trailWidth = (float)data["trail_width"];
     }
 }

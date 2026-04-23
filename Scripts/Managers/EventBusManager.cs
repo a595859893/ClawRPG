@@ -1,6 +1,8 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems;
+using ClawRPG.Scripts.Quests;
 
 /// <summary>
 /// 事件总线管理器 - 统一的游戏事件分发系统
@@ -365,7 +367,7 @@ public partial class EventBusManager : ManagerBase
         // 成就解锁声音
         if (AchievementManager.Instance != null)
         {
-            AchievementManager.Instance.OnAchievementUnlocked += achievement =>
+            ((AchievementManager)AchievementManager.Instance).OnAchievementUnlocked += achievement =>
             {
                 SoundEffectSystem.Instance?.PlayAchievementUnlock();
             };
@@ -374,14 +376,14 @@ public partial class EventBusManager : ManagerBase
         // 称号解锁声音
         if (TitleSystem.Instance != null)
         {
-            TitleSystem.Instance.OnTitleUnlocked += title =>
+            TitleSystem.Instance.Connect(TitleSystem.SignalName.TitleUnlocked, Callable.From((string pid, TitleData data) =>
             {
                 SoundEffectSystem.Instance?.PlayTitleUnlock();
-            };
+            }));
         }
 
         // 任务完成声音
-        QuestSystem.OnQuestCompleted += quest =>
+        QuestManager.OnQuestCompleted += quest =>
         {
             SoundEffectSystem.Instance?.PlayQuestComplete();
         };

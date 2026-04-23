@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using ClawRPG.Scripts.Systems.BossMechanics;
 
 /// <summary>
 /// Boss模式系统 - 负责Boss攻击模式、决策逻辑、AI行为
@@ -517,8 +518,8 @@ public partial class BossPatternSystem : BaseSystem
         if (_currentBattle != null)
         {
             _currentBattle.CurrentPattern = (AttackPattern)data.GetValueOrDefault("currentPattern", (int)AttackPattern.Balanced);
-            _currentBattle.TimeSinceLastAttack = data.GetValueOrDefault("timeSinceLastAttack", 0f);
-            _currentBattle.TimeSinceLastSkill = data.GetValueOrDefault("timeSinceLastSkill", 0f);
+            _currentBattle.TimeSinceLastAttack = (float)data.GetValueOrDefault("timeSinceLastAttack", 0f);
+            _currentBattle.TimeSinceLastSkill = (float)data.GetValueOrDefault("timeSinceLastSkill", 0f);
         }
     }
 

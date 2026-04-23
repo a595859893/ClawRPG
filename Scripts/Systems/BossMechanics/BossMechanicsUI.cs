@@ -445,15 +445,15 @@ public partial class BossMechanicsUI : Control
     {
         if (!_isModeEnraged || _modeLabel == null) return;
 
-        _pulseTimer += delta;
+        _pulseTimer += (float)delta;
 
         // 脉冲动画：0.5秒周期，在 0.3~1.0 之间波动
         float pulse = 0.3f + 0.7f * (Mathf.Sin(_pulseTimer * Mathf.Pi * 2f) * 0.5f + 0.5f);
-        _modeLabel.modulate = new Color(1f, pulse * 0.3f, pulse * 0.3f, 1f);
+        _modeLabel.Modulate = new Color(1f, pulse * 0.3f, pulse * 0.3f, 1f);
 
         // 轻微震动偏移（每帧微小抖动）
         float shakeX = (Mathf.Sin(_pulseTimer * 30f) * 2f);
-        _modeLabel.RectPosition = new Vector2(shakeX, _modeLabel.RectPosition.y);
+        _modeLabel.Position = new Vector2(shakeX, _modeLabel.Position.Y);
     }
 
     private void OnBossSkillUsed(string bossId, string skillId, string skillName)
@@ -506,29 +506,29 @@ public partial class BossMechanicsUI : Control
     {
         if (evt is InputEventKey keyEvent && keyEvent.Pressed)
         {
-            switch (keyEvent.Scancode)
+            switch (keyEvent.Keycode)
             {
-                case KeyList.Up:
+                case Key.Up:
                     MoveSelection(-1);
                     break;
-                case KeyList.Down:
+                case Key.Down:
                     MoveSelection(1);
                     break;
-                case KeyList._1:
+                case KeyList.D1:
                     _tabContainer.CurrentTab = 0;
                     break;
-                case KeyList._2:
+                case KeyList.D2:
                     _tabContainer.CurrentTab = 1;
                     break;
-                case KeyList._3:
+                case KeyList.D3:
                     _tabContainer.CurrentTab = 2;
                     RefreshStats();
                     break;
-                case KeyList.Enter:
+                case Key.Enter:
                     if (_tabContainer.CurrentTab == 0)
                         OnStartBattlePressed();
                     break;
-                case KeyList.Escape:
+                case Key.Escape:
                     Visible = false;
                     break;
             }
@@ -538,7 +538,7 @@ public partial class BossMechanicsUI : Control
     private void MoveSelection(int direction)
     {
         int current = _bossList.GetSelectedItems().Length > 0 ? _bossList.GetSelectedItems()[0] : 0;
-        int newIndex = Mathf.Clamp(current + direction, 0, _bossList.GetItemCount() - 1);
+        int newIndex = Mathf.Clamp(current + direction, 0, _bossList.ItemCount - 1);
         _bossList.Select(newIndex);
         OnBossListItemSelected(newIndex);
     }

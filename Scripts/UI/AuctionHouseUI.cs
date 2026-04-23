@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using AuctionItem = ClawRPG.Systems.AuctionHouse.AuctionItem;
 
 namespace UI
 {

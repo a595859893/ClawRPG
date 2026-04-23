@@ -262,13 +262,13 @@ public partial class SaveLoadManager : ManagerBase
     {
         if (!_saveSystem.HasSave()) return null;
         
-        var saveData = _saveSystem.LoadGame();
+        var saveData = _saveSystem.ExportAllData();
         if (saveData == null) return null;
         
         return new Dictionary
         {
-            { "saveTime", saveData.Contains("saveTime") ? saveData["saveTime"] : "Unknown" },
-            { "gameVersion", saveData.Contains("gameVersion") ? saveData["gameVersion"] : "Unknown" }
+            { "saveTime", saveData.ContainsKey("saveTime") ? saveData["saveTime"] : "Unknown" },
+            { "gameVersion", saveData.ContainsKey("gameVersion") ? saveData["gameVersion"] : "Unknown" }
         };
     }
     
@@ -279,7 +279,8 @@ public partial class SaveLoadManager : ManagerBase
     {
         if (slot < 0 || slot >= MaxSaveSlots) return false;
         
-        return _saveSystem.DeleteSave(slot);
+        _saveSystem.DeleteSave();
+        return true;
     }
     
     /// <summary>
@@ -303,7 +304,7 @@ public partial class SaveLoadManager : ManagerBase
     /// </summary>
     public override Dictionary<string, object> ExportSaveData()
     {
-        return new Dictionary
+        return new Dictionary<string, object>
         {
             { "currentSaveSlot", CurrentSaveSlot },
             { "autoSaveInterval", AutoSaveInterval },
@@ -319,11 +320,11 @@ public partial class SaveLoadManager : ManagerBase
     {
         if (data == null) return;
         
-        if (data.Contains("currentSaveSlot"))
+        if (data.ContainsKey("currentSaveSlot"))
             CurrentSaveSlot = Convert.ToInt32(data["currentSaveSlot"]);
-        if (data.Contains("autoSaveInterval"))
+        if (data.ContainsKey("autoSaveInterval"))
             AutoSaveInterval = Convert.ToSingle(data["autoSaveInterval"]);
-        if (data.Contains("autoSaveEnabled"))
+        if (data.ContainsKey("autoSaveEnabled"))
             AutoSaveEnabled = Convert.ToBoolean(data["autoSaveEnabled"]);
     }
 }

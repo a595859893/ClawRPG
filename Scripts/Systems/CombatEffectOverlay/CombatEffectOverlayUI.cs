@@ -12,7 +12,7 @@ public partial class CombatEffectOverlayUI : Control
         {
             if (_instance == null)
             {
-                _instance = GetNode<CombatEffectOverlayUI>("/root/CombatEffectOverlayUI");
+                // Instance set in _Ready()
             }
             return _instance;
         }
@@ -54,6 +54,7 @@ public partial class CombatEffectOverlayUI : Control
     
     public override void _Ready()
     {
+        _instance = this;
         _system = CombatEffectOverlaySystem.Instance;
         
         SetupUI();
@@ -78,7 +79,7 @@ public partial class CombatEffectOverlayUI : Control
         
         // Create main box
         _mainBox = new VBoxContainer();
-        _mainBox.Setanchorspreset(Control.LayoutPreset.FullRect);
+        _mainBox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         _mainBox.AddThemeConstantOverride("separation", 10);
         _mainPanel.AddChild(_mainBox);
         
@@ -91,8 +92,8 @@ public partial class CombatEffectOverlayUI : Control
         
         // Create tab container
         _tabContainer = new TabContainer();
-        _tabContainer.SetHExpand(true);
-        _tabContainer.SetVExpand(true);
+        _tabContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        _tabContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _mainBox.AddChild(_tabContainer);
         
         // Create tabs
@@ -111,13 +112,13 @@ public partial class CombatEffectOverlayUI : Control
     private void CreateOverviewTab()
     {
         _overviewTab = new Control();
-        _overviewTab.SetHExpand(true);
-        _overviewTab.SetVExpand(true);
+        _overviewTab.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        _overviewTab.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _tabContainer.AddChild(_overviewTab);
-        _tabContainer.SetTabTitle(_overviewTab, "Overview");
+        _tabContainer.SetTabTitle(0, "Overview");
         
         var vbox = new VBoxContainer();
-        vbox.Setanchorspreset(Control.LayoutPreset.FullRect);
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         vbox.AddThemeConstantOverride("separation", 15);
         _overviewTab.AddChild(vbox);
         
@@ -131,7 +132,7 @@ public partial class CombatEffectOverlayUI : Control
         // Status grid
         var grid = new GridContainer();
         grid.Columns = 2;
-        grid.SetHExpand(true);
+        grid.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         vbox.AddChild(grid);
         
         // Red Overlay
@@ -188,13 +189,13 @@ public partial class CombatEffectOverlayUI : Control
     private void CreateEffectsTab()
     {
         _effectsTab = new Control();
-        _effectsTab.SetHExpand(true);
-        _effectsTab.SetVExpand(true);
+        _effectsTab.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        _effectsTab.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         _tabContainer.AddChild(_effectsTab);
-        _tabContainer.SetTabTitle(_effectsTab, "Effects Config");
+        _tabContainer.SetTabTitle(1, "Effects Config");
         
         var vbox = new VBoxContainer();
-        vbox.Setanchorspreset(Control.LayoutPreset.FullRect);
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         vbox.AddThemeConstantOverride("separation", 15);
         _effectsTab.AddChild(vbox);
         
@@ -249,7 +250,7 @@ public partial class CombatEffectOverlayUI : Control
         _tabContainer.SetTabTitle(_statisticsTab, "Statistics");
         
         var vbox = new VBoxContainer();
-        vbox.Setanchorspreset(Control.LayoutPreset.FullRect);
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         vbox.AddThemeConstantOverride("separation", 15);
         _statisticsTab.AddChild(vbox);
         
@@ -262,7 +263,7 @@ public partial class CombatEffectOverlayUI : Control
         // Statistics grid
         var grid = new GridContainer();
         grid.Columns = 2;
-        grid.SetHExpand(true);
+        grid.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         vbox.AddChild(grid);
         
         grid.AddChild(CreateStatRow("Total Screen Flashes:", out _totalFlashesLabel));
@@ -308,7 +309,7 @@ public partial class CombatEffectOverlayUI : Control
         _tabContainer.SetTabTitle(_testTab, "Test Effects");
         
         var vbox = new VBoxContainer();
-        vbox.Setanchorspreset(Control.LayoutPreset.FullRect);
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         vbox.AddThemeConstantOverride("separation", 15);
         _testTab.AddChild(vbox);
         

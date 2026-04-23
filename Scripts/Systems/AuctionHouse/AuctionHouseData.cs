@@ -1,8 +1,9 @@
 using Godot;
-using ClawRPG.Systems.AuctionHouse;
 using System;
 using System.Collections.Generic;
 
+namespace ClawRPG.Systems.AuctionHouse
+{
 public class AuctionHouseData
 {
     public Dictionary<int, AuctionItem> ActiveListings = new Dictionary<int, AuctionItem>();
@@ -157,8 +158,8 @@ public class AuctionHouseData
                         ExpireTime = Convert.ToInt64(itemData["expireTime"]),
                         Rarity = itemData["rarity"].ToString(),
                         Category = itemData["category"].ToString(),
-                        CurrentBid = Convert.ToInt32(itemData["purchasePrice"]),
-                        EndTime = Convert.ToInt64(itemData["purchaseTime"])
+                        PurchasePrice = Convert.ToInt32(itemData["purchasePrice"]),
+                        PurchaseTime = Convert.ToInt64(itemData["purchaseTime"])
                     };
                     items.Add(item);
                 }
@@ -178,4 +179,5 @@ public class AuctionHouseData
         return true;
     }
     // ==================== 持久化接口结束 ====================
+}
 }

@@ -48,14 +48,16 @@ public class ArtifactFusionData
             foreach (var h in history)
             {
                 var record = new FusionRecord();
-                record.Load((Dictionary<string, object>)h);
+                record.Load((Godot.Collections.Dictionary)h);
                 FusionHistory.Add(record);
             }
         }
         
         if (data.ContainsKey("unlocked_recipes"))
         {
-            UnlockedRecipes = ((List<object>)data["unlocked_recipes"]).Cast<string>().ToList();
+            var recipesArr = (Godot.Collections.Array)data["unlocked_recipes"];
+            UnlockedRecipes = new List<string>();
+            foreach (var r in recipesArr) UnlockedRecipes.Add((string)r);
         }
         
         TotalFusions = Convert.ToInt32(data.GetValueOrDefault("total_fusions", 0) ?? 0);
@@ -71,17 +73,22 @@ public class ArtifactFusionData
     /// </summary>
     public Dictionary ExportSaveData()
     {
-        return new Dictionary
-        {
-            { "fusion_history", FusionHistory.ConvertAll(r => r.Save()) },
-            { "unlocked_recipes", UnlockedRecipes },
-            { "total_fusions", TotalFusions },
-            { "successful_fusions", SuccessfulFusions },
-            { "legendary_fusions", LegendaryFusions },
-            { "total_gold_spent", TotalGoldSpent },
-            { "selected_artifact1", SelectedArtifact1 },
-            { "selected_artifact2", SelectedArtifact2 }
-        };
+        var result = new Dictionary();
+        var historyArray = new Godot.Collections.Array();
+        foreach (var r in FusionHistory)
+            historyArray.Add(r.Save());
+        result.Add("fusion_history", historyArray);
+        var recipesArray = new Godot.Collections.Array();
+        foreach (var r in UnlockedRecipes)
+            recipesArray.Add(r);
+        result.Add("unlocked_recipes", recipesArray);
+        result.Add("total_fusions", TotalFusions);
+        result.Add("successful_fusions", SuccessfulFusions);
+        result.Add("legendary_fusions", LegendaryFusions);
+        result.Add("total_gold_spent", TotalGoldSpent);
+        result.Add("selected_artifact1", SelectedArtifact1);
+        result.Add("selected_artifact2", SelectedArtifact2);
+        return result;
     }
     
     /// <summary>
@@ -91,34 +98,32 @@ public class ArtifactFusionData
     {
         if (data == null) return;
         
-        if (data.Contains("fusion_history"))
+        if (data.ContainsKey("fusion_history"))
         {
-            var history = data["fusion_history"] as Godot.Array;
+            var history = (Godot.Collections.Array)data["fusion_history"];
             FusionHistory = new List<FusionRecord>();
-            foreach (Dictionary h in history)
+            foreach (var h in history)
             {
                 var record = new FusionRecord();
-                record.Load(new Dictionary<string, object>(h));
+                record.Load((Godot.Collections.Dictionary)h);
                 FusionHistory.Add(record);
             }
         }
         
-        if (data.Contains("unlocked_recipes"))
+        if (data.ContainsKey("unlocked_recipes"))
         {
-            var recipes = data["unlocked_recipes"] as Godot.Array;
+            var recipes = (Godot.Collections.Array)data["unlocked_recipes"];
             UnlockedRecipes = new List<string>();
-            foreach (string r in recipes)
-            {
-                UnlockedRecipes.Add(r);
-            }
+            foreach (var r in recipes)
+                UnlockedRecipes.Add((string)r);
         }
         
-        TotalFusions = Convert.ToInt32(data.GetValueOrDefault("total_fusions", 0) ?? 0);
-        SuccessfulFusions = Convert.ToInt32(data.GetValueOrDefault("successful_fusions", 0) ?? 0);
-        LegendaryFusions = Convert.ToInt32(data.GetValueOrDefault("legendary_fusions", 0) ?? 0);
-        TotalGoldSpent = Convert.ToInt32(data.GetValueOrDefault("total_gold_spent", 0) ?? 0);
-        SelectedArtifact1 = (string)(data.GetValueOrDefault("selected_artifact1", "") ?? "");
-        SelectedArtifact2 = (string)(data.GetValueOrDefault("selected_artifact2", "") ?? "");
+        TotalFusions = data.ContainsKey("total_fusions") ? Convert.ToInt32(data["total_fusions"]) : 0;
+        SuccessfulFusions = data.ContainsKey("successful_fusions") ? Convert.ToInt32(data["successful_fusions"]) : 0;
+        LegendaryFusions = data.ContainsKey("legendary_fusions") ? Convert.ToInt32(data["legendary_fusions"]) : 0;
+        TotalGoldSpent = data.ContainsKey("total_gold_spent") ? Convert.ToInt32(data["total_gold_spent"]) : 0;
+        SelectedArtifact1 = data.ContainsKey("selected_artifact1") ? (string)data["selected_artifact1"] : "";
+        SelectedArtifact2 = data.ContainsKey("selected_artifact2") ? (string)data["selected_artifact2"] : "";
     }
 }
 
@@ -131,9 +136,9 @@ public class FusionRecord
     public int GoldSpent { get; set; } = 0;
     public float Timestamp { get; set; } = 0;
     
-    public Dictionary<string, object> Save()
+    public Godot.Collections.Dictionary Save()
     {
-        return new Dictionary<string, object>
+        return new Godot.Collections.Dictionary
         {
             { "artifact1", Artifact1 },
             { "artifact2", Artifact2 },
@@ -144,14 +149,15 @@ public class FusionRecord
         };
     }
     
-    public void Load(Dictionary<string, object> data)
+    public void Load(Godot.Collections.Dictionary data)
     {
-        Artifact1 = (string)(data.GetValueOrDefault("artifact1", "") ?? "");
-        Artifact2 = (string)(data.GetValueOrDefault("artifact2", "") ?? "");
-        ResultArtifact = (string)(data.GetValueOrDefault("result_artifact", "") ?? "");
-        Success = (bool)(data.GetValueOrDefault("success", false) ?? false);
-        GoldSpent = Convert.ToInt32(data.GetValueOrDefault("gold_spent", 0) ?? 0);
-        Timestamp = Convert.ToSingle(data.GetValueOrDefault("timestamp", 0f) ?? 0f);
+        if (data == null) return;
+        Artifact1 = data.ContainsKey("artifact1") ? (string)data["artifact1"] : "";
+        Artifact2 = data.ContainsKey("artifact2") ? (string)data["artifact2"] : "";
+        ResultArtifact = data.ContainsKey("result_artifact") ? (string)data["result_artifact"] : "";
+        Success = data.ContainsKey("success") && (bool)data["success"];
+        GoldSpent = data.ContainsKey("gold_spent") ? Convert.ToInt32(data["gold_spent"]) : 0;
+        Timestamp = data.ContainsKey("timestamp") ? Convert.ToSingle(data["timestamp"]) : 0f;
     }
 }
 

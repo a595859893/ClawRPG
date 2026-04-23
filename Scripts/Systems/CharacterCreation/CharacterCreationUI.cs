@@ -98,7 +98,7 @@ public partial class CharacterCreationUI : Control
         _titleLabel = new Label
         {
             Text = "⚔️ Character Creation ⚔️",
-            Align = Label.AlignCenter,
+            HorizontalAlignment = HorizontalAlignment.Center,
             SizeFlagsHorizontal = Control.SizeFlags.Expand
         };
         _titleLabel.Set("custom_fonts/font", CreateTitleFont());
@@ -258,7 +258,7 @@ public partial class CharacterCreationUI : Control
         
         // Buttons
         var buttonContainer = new HBoxContainer();
-        buttonContainer.Alignment = BoxContainer.AlignMode.Center;
+        buttonContainer.Alignment = BoxContainer.AlignmentMode.Center;
         mainContainer.AddChild(buttonContainer);
         
         _createButton = new Button
@@ -300,17 +300,17 @@ public partial class CharacterCreationUI : Control
     
     private SystemFont CreateTitleFont()
     {
-        var font = new DynamicFont();
-        font.FontData = GD.Load<DynamicFontData>("res://fonts/NormalFont.ttf");
-        font.Size = 24;
+        var font = new SystemFont();
+        // SystemFont uses OS fonts
+        // SystemFont uses OS font size, no FontSize property
         return font;
     }
     
     private SystemFont CreateHeaderFont()
     {
-        var font = new DynamicFont();
-        font.FontData = GD.Load<DynamicFontData>("res://fonts/NormalFont.ttf");
-        font.Size = 18;
+        var font = new SystemFont();
+        // SystemFont uses OS fonts
+        // SystemFont uses OS font size, no FontSize property
         return font;
     }
     
@@ -422,7 +422,7 @@ public partial class CharacterCreationUI : Control
         _system.SetCharacterName(text);
     }
     
-    private void OnClassSelected(int index)
+    private void OnClassSelected(long index)
     {
         var classes = _system.GetAvailableClasses();
         if (index >= 0 && index < classes.Length)
@@ -432,7 +432,7 @@ public partial class CharacterCreationUI : Control
         }
     }
     
-    private void OnBackgroundSelected(int index)
+    private void OnBackgroundSelected(long index)
     {
         var backgrounds = _system.GetAvailableBackgrounds();
         if (index >= 0 && index < backgrounds.Length)
@@ -442,17 +442,17 @@ public partial class CharacterCreationUI : Control
         }
     }
     
-    private void OnHairStyleSelected(int index)
+    private void OnHairStyleSelected(long index)
     {
         _system.SetHairStyle(index);
     }
     
-    private void OnSkinColorSelected(int index)
+    private void OnSkinColorSelected(long index)
     {
         _system.SetSkinColor(index);
     }
     
-    private void OnEyeColorSelected(int index)
+    private void OnEyeColorSelected(long index)
     {
         _system.SetEyeColor(index);
     }

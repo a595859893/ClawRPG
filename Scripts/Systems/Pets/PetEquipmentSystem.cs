@@ -249,13 +249,15 @@ namespace Game.Systems.Pets
         /// </summary>
         public Dictionary Save()
         {
-            Dictionary data = new Dictionary<string, object>();
+            var data = new Godot.Collections.Dictionary();
             
             // 保存已拥有装备
-            Dictionary ownedData = new Dictionary<string, object>();
+            var ownedData = new Godot.Collections.Dictionary();
             foreach (var kvp in _playerData.OwnedEquipment)
             {
-                ownedData[kvp.Key] = new Godot.Collections.Array(kvp.Value);
+                var arr = new Godot.Collections.Array();
+                foreach (var item in kvp.Value) arr.Add(item);
+                ownedData[kvp.Key] = arr;
             }
             data["owned"] = ownedData;
             
@@ -263,7 +265,7 @@ namespace Game.Systems.Pets
             Godot.Collections.Array equippedList = new Godot.Collections.Array();
             foreach (var kvp in _playerData.EquippedEquipment)
             {
-                Dictionary equipEntry = new Dictionary<string, object>();
+                var equipEntry = new Godot.Collections.Dictionary();
                 equipEntry["pet_id"] = kvp.Key;
                 equipEntry["equipment_id"] = kvp.Value;
                 equippedList.Add(equipEntry);
@@ -283,7 +285,7 @@ namespace Game.Systems.Pets
             _playerData = new PlayerPetEquipmentData();
             
             // 加载已拥有装备
-            if (data.Contains("owned"))
+            if (data.ContainsKey("owned"))
             {
                 Dictionary ownedData = (Dictionary)data["owned"];
                 foreach (string key in ownedData.Keys)
@@ -299,7 +301,7 @@ namespace Game.Systems.Pets
             }
             
             // 加载已装备
-            if (data.Contains("equipped"))
+            if (data.ContainsKey("equipped"))
             {
                 Godot.Collections.Array equippedList = (Godot.Collections.Array)data["equipped"];
                 foreach (Dictionary entry in equippedList)

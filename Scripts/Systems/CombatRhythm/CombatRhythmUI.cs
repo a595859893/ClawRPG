@@ -49,8 +49,8 @@ public partial class CombatRhythmUI : CanvasLayer
         // 面板 — 屏幕右上角
         _panel = new PanelContainer();
         _panel.SetAnchorsPreset(Control.LayoutPreset.TopRight);
-        _panel.MarginTop   = 80;
-        _panel.MarginRight = 20;
+        _panel.OffsetTop   = 80;
+        _panel.OffsetRight = 20;
         _panel.CustomMinimumSize = new Vector2(140, 44);
         AddChild(_panel);
 
@@ -78,7 +78,6 @@ public partial class CombatRhythmUI : CanvasLayer
         _iconLabel = new Label();
         _iconLabel.Text        = "💤";
         _iconLabel.AddThemeFontSizeOverride("font_size", 22);
-        _iconLabel.ExpandIcon  = false;
         _hbox.AddChild(_iconLabel);
 
         // 分隔
@@ -92,7 +91,7 @@ public partial class CombatRhythmUI : CanvasLayer
         _nameLabel.Text        = "Calm";
         _nameLabel.AddThemeFontSizeOverride("font_size", 15);
         _nameLabel.AddThemeColorOverride("font_color", LevelColors[0]);
-        _nameLabel.Valign     = Label.Valign.Center;
+        _nameLabel.VerticalAlignment     = Label.VerticalAlignment.Center;
         _hbox.AddChild(_nameLabel);
 
         // 脉冲覆盖层（用于 Frenzied 时的红色脉冲效果）
