@@ -61,7 +61,7 @@ public partial class ComboData : Resource
     /// <summary>
     /// 技能序列 - 按顺序需要使用的技能ID列表
     /// </summary>
-    [Export] public List<string> skillSequence = new List<string>();
+    public List<string> skillSequence = new List<string>();
     /// <summary>
     /// 伤害倍率
     /// </summary>
@@ -95,7 +95,7 @@ public partial class ComboData : Resource
     /// <summary>
     /// 技能池（Chaos Combo 从中随机抽取），非 Chaos combo 为空
     /// </summary>
-    [Export] public List<string> skillPool = new List<string>();
+    public List<string> skillPool = new List<string>();
     /// <summary>
     /// Chaos Combo 每次触发随机抽取的技能数量下限
     /// </summary>
@@ -107,7 +107,7 @@ public partial class ComboData : Resource
     /// <summary>
     /// 技能稀有度权重（技能ID -> 权重），未定义默认为 1.0
     /// </summary>
-    [Export] public Dictionary<string, float> rarityWeights = new Dictionary<string, float>();
+    public Dictionary<string, float> rarityWeights = new Dictionary<string, float>();
 
     /// <summary>
     /// 连击类型枚举

@@ -9,13 +9,13 @@ namespace ClawRPG.Systems.GuildHall {
         [Export] public int HallLevel { get; set; }
         [Export] public int Experience { get; set; }
         [Export] public int RequiredExperience { get; set; }
-        [Export] public List<string> UnlockedRooms { get; set; } = new List<string>();
-        [Export] public List<string> Furniture { get; set; } = new List<string>();
-        [Export] public int GoldDeposited { get; set; }
-        [Export] public List<string> Visitors { get; set; } = new List<string>();
-        [Export] public Dictionary<string, int> RoomLevels { get; set; } = new Dictionary<string, int>();
-        [Export] public Dictionary<string, int> Statistics { get; set; } = new Dictionary<string, int>();
-        [Export] public List<string> DecorationInventory { get; set; } = new List<string>();
+        public List<string> UnlockedRooms { get; set; } = new List<string>();
+        public List<string> Furniture { get; set; } = new List<string>();
+        public int GoldDeposited { get; set; }
+        public List<string> Visitors { get; set; } = new List<string>();
+        public Dictionary<string, int> RoomLevels { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> Statistics { get; set; } = new Dictionary<string, int>();
+        public List<string> DecorationInventory { get; set; } = new List<string>();
         
         public GuildHallData() {
             HallLevel = 1;

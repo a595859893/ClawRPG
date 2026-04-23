@@ -5,11 +5,11 @@ using System.Collections.Generic;
 namespace ClawRPG.Systems {
     [GlobalClass]
     public partial class MountRacingData : Resource {
-        [Export] public Dictionary<string, MountRacingRecord> RacingHistory = new Dictionary<string, MountRacingRecord>();
-        [Export] public List<string> UnlockedTracks = new List<string> {"Meadow Sprint", "Forest Trail"};
-        [Export] public Dictionary<string, int> BestTimes = new Dictionary<string, int>();
-        [Export] public Dictionary<string, int> TotalRaces = new Dictionary<string, int>();
-        [Export] public Dictionary<string, int> TotalWins = new Dictionary<string, int>();
+        public Dictionary<string, MountRacingRecord> RacingHistory = new Dictionary<string, MountRacingRecord>();
+        public List<string> UnlockedTracks = new List<string> {"Meadow Sprint", "Forest Trail"};
+        public Dictionary<string, int> BestTimes = new Dictionary<string, int>();
+        public Dictionary<string, int> TotalRaces = new Dictionary<string, int>();
+        public Dictionary<string, int> TotalWins = new Dictionary<string, int>();
         [Export] public int TotalGoldEarned = 0;
         [Export] public int TotalExpEarned = 0;
         

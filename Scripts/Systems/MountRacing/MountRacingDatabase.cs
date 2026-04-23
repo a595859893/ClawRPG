@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace ClawRPG.Systems {
     [GlobalClass]
     public partial class MountRacingDatabase : Resource {
-        [Export] public Dictionary<string, TrackConfig> Tracks = new Dictionary<string, TrackConfig> {
+        public Dictionary<string, TrackConfig> Tracks = new Dictionary<string, TrackConfig> {
             ["Meadow Sprint"] = new TrackConfig {
                 Name = "Meadow Sprint",
                 Description = "A gentle race through blooming meadows",
@@ -104,7 +104,7 @@ namespace ClawRPG.Systems {
             }
         };
         
-        [Export] public Dictionary<TrackDifficulty, DifficultyConfig> DifficultySettings = new Dictionary<TrackDifficulty, DifficultyConfig> {
+        public Dictionary<TrackDifficulty, DifficultyConfig> DifficultySettings = new Dictionary<TrackDifficulty, DifficultyConfig> {
             [TrackDifficulty.Easy] = new DifficultyConfig { SpeedMod = 1.2f, ObstacleChance = 0.3f, TimeLimit = 180 },
             [TrackDifficulty.Normal] = new DifficultyConfig { SpeedMod = 1.0f, ObstacleChance = 0.5f, TimeLimit = 150 },
             [TrackDifficulty.Hard] = new DifficultyConfig { SpeedMod = 0.85f, ObstacleChance = 0.7f, TimeLimit = 120 },
@@ -112,7 +112,7 @@ namespace ClawRPG.Systems {
             [TrackDifficulty.Legendary] = new DifficultyConfig { SpeedMod = 0.5f, ObstacleChance = 1.0f, TimeLimit = 80 }
         };
         
-        [Export] public Dictionary<int, RankReward> RankRewards = new Dictionary<int, RankReward> {
+        public Dictionary<int, RankReward> RankRewards = new Dictionary<int, RankReward> {
             [1] = new RankReward { GoldMultiplier = 2.0f, ExpMultiplier = 2.0f, Title = "Champion" },
             [2] = new RankReward { GoldMultiplier = 1.5f, ExpMultiplier = 1.5f, Title = "Silver" },
             [3] = new RankReward { GoldMultiplier = 1.2f, ExpMultiplier = 1.2f, Title = "Bronze" },

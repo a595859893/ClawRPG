@@ -14,9 +14,9 @@ namespace ClawRPG.Scripts.Systems {
         [Export] public int minChainLength = 2;
         [Export] public int maxChainLength = 5;
         [Export] public float triggerProbability = 0.3f;
-        [Export] public List<String> requiredEvents = new List<String>();
-        [Export] public List<String> followUpEvents = new List<String>();
-        [Export] public EventChainReward reward = new EventChainReward();
+        public List<String> requiredEvents = new List<String>();
+        public List<String> followUpEvents = new List<String>();
+        public EventChainReward reward = new EventChainReward();
         [Export] public EventChainCategory category = EventChainCategory.Adventure;
     }
 
@@ -24,7 +24,7 @@ namespace ClawRPG.Scripts.Systems {
         [Export] public int goldBonus = 0;
         [Export] public int expBonus = 0;
         [Export] public float dropRateBonus = 1.0f;
-        [Export] public List<String> bonusItems = new List<String>();
+        public List<String> bonusItems = new List<String>();
     }
 
     public enum EventChainCategory {

@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 public partial class PetBreedingData : Resource
 {
-    [Export] public Dictionary<string, bool> UnlockedBreeds = new Dictionary<string, bool>();
-    [Export] public List<PetBreedingRecord> BreedingHistory = new List<PetBreedingRecord>();
+    public Dictionary<string, bool> UnlockedBreeds = new Dictionary<string, bool>();
+    public List<PetBreedingRecord> BreedingHistory = new List<PetBreedingRecord>();
     [Export] public int TotalBreeds = 0;
     [Export] public int SuccessfulBreeds = 0;
     [Export] public int LegendaryBreeds = 0;
-    [Export] public Dictionary<string, int> OffspringStats = new Dictionary<string, int>();
+    public Dictionary<string, int> OffspringStats = new Dictionary<string, int>();
 }
 
 public class PetBreedingRecord

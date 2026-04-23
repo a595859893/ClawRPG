@@ -6,10 +6,10 @@ public partial class GuildWarLeagueData : Resource {
     [Export] public int CurrentSeason { get; set; } = 1;
     [Export] public int SeasonStartTimestamp { get; set; }
     [Export] public int SeasonDurationDays { get; set; } = 30;
-    [Export] public Dictionary<string, GuildWarLeagueRecord> GuildRecords { get; set; } = new Dictionary<string, GuildWarLeagueRecord>();
-    [Export] public List<GuildWarMatch> SeasonMatches { get; set; } = new List<GuildWarMatch>();
-    [Export] public Dictionary<string, int> DivisionStandings { get; set; } = new Dictionary<string, int>();
-    [Export] public GuildWarLeagueStatistics Statistics { get; set; } = new GuildWarLeagueStatistics();
+    public Dictionary<string, GuildWarLeagueRecord> GuildRecords { get; set; } = new Dictionary<string, GuildWarLeagueRecord>();
+    public List<GuildWarMatch> SeasonMatches { get; set; } = new List<GuildWarMatch>();
+    public Dictionary<string, int> DivisionStandings { get; set; } = new Dictionary<string, int>();
+    public GuildWarLeagueStatistics Statistics { get; set; } = new GuildWarLeagueStatistics();
 }
 
 public class GuildWarLeagueRecord {
@@ -56,9 +56,9 @@ public class GuildWarLeagueStatistics {
 }
 
 public partial class GuildWarLeagueDatabase : Resource {
-    [Export] public Dictionary<string, DivisionConfig> Divisions { get; set; } = new Dictionary<string, DivisionConfig>();
-    [Export] public Dictionary<string, SeasonReward> SeasonRewards { get; set; } = new Dictionary<string, SeasonReward>();
-    [Export] public Dictionary<string, MatchConfig> MatchTypes { get; set; } = new Dictionary<string, MatchConfig>();
+    public Dictionary<string, DivisionConfig> Divisions { get; set; } = new Dictionary<string, DivisionConfig>();
+    public Dictionary<string, SeasonReward> SeasonRewards { get; set; } = new Dictionary<string, SeasonReward>();
+    public Dictionary<string, MatchConfig> MatchTypes { get; set; } = new Dictionary<string, MatchConfig>();
     
     public GuildWarLeagueDatabase() {
         InitializeDivisions();

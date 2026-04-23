@@ -9,12 +9,12 @@ public partial class CookingRecipe : Resource
     [Export] public string description;
     [Export] public FoodType foodType;
     [Export] public Rarity rarity;
-    [Export] public Dictionary<string, int> ingredients = new Dictionary<string, int>();
+    public Dictionary<string, int> ingredients = new Dictionary<string, int>();
     [Export] public int cookingTime; // seconds
     [Export] public int hungerRestored;
     [Export] public int energyRestored;
-    [Export] public List<StatBonus> statBonuses = new List<StatBonus>();
-    [Export] public List<string> requiredTools = new List<string>();
+    public List<StatBonus> statBonuses = new List<StatBonus>();
+    public List<string> requiredTools = new List<string>();
     [Export] public int requiredCookingLevel;
 }
 

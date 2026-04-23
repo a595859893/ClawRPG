@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 public partial class RandomQuestData : Resource
 {
-    [Export] public List<ActiveQuest> ActiveQuests { get; set; } = new List<ActiveQuest>();
-    [Export] public List<string> CompletedQuestIds { get; set; } = new List<string>();
-    [Export] public List<string> FailedQuestIds { get; set; } = new List<string>();
-    [Export] public Dictionary<string, int> QuestCompletionCount { get; set; } = new Dictionary<string, int>();
+    public List<ActiveQuest> ActiveQuests { get; set; } = new List<ActiveQuest>();
+    public List<string> CompletedQuestIds { get; set; } = new List<string>();
+    public List<string> FailedQuestIds { get; set; } = new List<string>();
+    public Dictionary<string, int> QuestCompletionCount { get; set; } = new Dictionary<string, int>();
     [Export] public int TotalQuestsGenerated { get; set; }
     [Export] public int TotalQuestsCompleted { get; set; }
     [Export] public int TotalQuestsFailed { get; set; }

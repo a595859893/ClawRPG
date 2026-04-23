@@ -3,16 +3,12 @@ using System.Collections.Generic;
 
 public partial class RuneData : Godot.Resource
 {
-    [Export]
     public Dictionary<string, int> UnlockedRunes = new Dictionary<string, int>();
     
-    [Export]
     public Dictionary<string, string> EquippedRunes = new Dictionary<string, string>();
     
-    [Export]
     public List<RuneHistoryEntry> RuneHistory = new List<RuneHistoryEntry>();
     
-    [Export]
     public RuneStatistics Statistics = new RuneStatistics();
 }
 
