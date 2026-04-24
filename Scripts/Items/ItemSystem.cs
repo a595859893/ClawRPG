@@ -64,6 +64,7 @@ namespace ClawRPG.Scripts.Items {
     {
         public float Defense { get; set; }
         public float HealthBonus { get; set; }
+        public float ManaBonus { get; set; }
         public ArmorCategory ArmorType { get; set; }
         
         public enum ArmorCategory { Helmet, Chest, Legs, Shield }
