@@ -116,12 +116,12 @@ public partial class PetFusionSystem : BaseSystem
         // 元素组合映射
         var elements = new List<string> { pet1Type, pet2Type };
         
-        if (elements.ContainsKey("Fire") && elements.ContainsKey("Water")) return "Steam";
-        if (elements.ContainsKey("Fire") && elements.ContainsKey("Ice")) return "Steam";
-        if (elements.ContainsKey("Fire") && elements.ContainsKey("Lightning")) return "Plasma";
-        if (elements.ContainsKey("Water") && elements.ContainsKey("Ice")) return "Frost";
-        if (elements.ContainsKey("Shadow") && elements.ContainsKey("Holy")) return "Balance";
-        if (elements.ContainsKey("Fire") && elements.ContainsKey("Shadow")) return "Infernal";
+        if (elements.Contains("Fire") && elements.Contains("Water")) return "Steam";
+        if (elements.Contains("Fire") && elements.Contains("Ice")) return "Steam";
+        if (elements.Contains("Fire") && elements.Contains("Lightning")) return "Plasma";
+        if (elements.Contains("Water") && elements.Contains("Ice")) return "Frost";
+        if (elements.Contains("Shadow") && elements.Contains("Holy")) return "Balance";
+        if (elements.Contains("Fire") && elements.Contains("Shadow")) return "Infernal";
         
         // 默认返回第一个元素
         return pet1Type;

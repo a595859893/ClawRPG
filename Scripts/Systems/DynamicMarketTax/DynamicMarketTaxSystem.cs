@@ -404,18 +404,18 @@ public partial class DynamicMarketTaxSystem : BaseSystem
                         var saveData = result.Result as Dictionary<string, object>;
                         if (saveData != null)
                         {
-                            _data.BaseTaxRate = (float)saveData.Get("baseTaxRate", 5.0);
-                            _data.CurrentDynamicTaxRate = (float)saveData.Get("currentDynamicTaxRate", 5.0);
-                            _data.MarketActivity = (float)saveData.Get("marketActivity", 50.0);
-                            _data.TotalTransactions = (int)saveData.Get("totalTransactions", 0);
-                            _data.TotalTaxCollected = (long)saveData.Get("totalTaxCollected", 0L);
-                            _data.TotalVolume = (long)saveData.Get("totalVolume", 0L);
-                            _data.AverageTransactionValue = (float)saveData.Get("averageTransactionValue", 0.0);
-                            _data.PeakVolume = (float)saveData.Get("peakVolume", 0.0);
-                            _data.LastTaxUpdate = (long)saveData.Get("lastTaxUpdate", OS.GetSystemTimeMsecs());
-                            _data.MarketTrend = (string)saveData.Get("marketTrend", "Stable");
-                            _data.ConsecutiveHighActivity = (int)saveData.Get("consecutiveHighActivity", 0);
-                            _data.ConsecutiveLowActivity = (int)saveData.Get("consecutiveLowActivity", 0);
+                            _data.BaseTaxRate = (float)(saveData.ContainsKey("baseTaxRate") ? saveData["baseTaxRate"] : 5.0);
+                            _data.CurrentDynamicTaxRate = (float)(saveData.ContainsKey("currentDynamicTaxRate") ? saveData["currentDynamicTaxRate"] : 5.0);
+                            _data.MarketActivity = (float)(saveData.ContainsKey("marketActivity") ? saveData["marketActivity"] : 50.0);
+                            _data.TotalTransactions = (int)(saveData.ContainsKey("totalTransactions") ? saveData["totalTransactions"] : 0);
+                            _data.TotalTaxCollected = (long)(saveData.ContainsKey("totalTaxCollected") ? saveData["totalTaxCollected"] : 0L);
+                            _data.TotalVolume = (long)(saveData.ContainsKey("totalVolume") ? saveData["totalVolume"] : 0L);
+                            _data.AverageTransactionValue = (float)(saveData.ContainsKey("averageTransactionValue") ? saveData["averageTransactionValue"] : 0.0);
+                            _data.PeakVolume = (float)(saveData.ContainsKey("peakVolume") ? saveData["peakVolume"] : 0.0);
+                            _data.LastTaxUpdate = (long)(saveData.ContainsKey("lastTaxUpdate") ? saveData["lastTaxUpdate"] : OS.GetSystemTimeMsecs());
+                            _data.MarketTrend = (string)(saveData.ContainsKey("marketTrend") ? saveData["marketTrend"] : "Stable");
+                            _data.ConsecutiveHighActivity = (int)(saveData.ContainsKey("consecutiveHighActivity") ? saveData["consecutiveHighActivity"] : 0);
+                            _data.ConsecutiveLowActivity = (int)(saveData.ContainsKey("consecutiveLowActivity") ? saveData["consecutiveLowActivity"] : 0);
                             
                             GD.Print("DynamicMarketTaxSystem: 税收数据已加载");
                         }
