@@ -1,3 +1,3 @@
 namespace ClawRPG.Scripts.UI {
-    public class EnhancementEffect : Godot.Node { }
+    public partial class EnhancementEffect : Godot.Node { }
 }
