@@ -208,11 +208,11 @@ public delegate void SlotEmpty(int slotIndex);
         if (item == null) return QuickSlotType.Item;
         
         // Determine slot type based on item properties
-        if (item is Potion || item.Name.ContainsKey("药水") || item.Name.ContainsKey("药水"))
+        if (item is Potion || item.Name.Contains("药水") || item.Name.Contains("药水"))
             return QuickSlotType.Potion;
-        if (item is Food || item.Name.ContainsKey("食物") || item.Name.ContainsKey("肉"))
+        if (item is Food || item.Name.Contains("食物") || item.Name.Contains("肉"))
             return QuickSlotType.Food;
-        if (item.Name.ContainsKey("卷轴") || item.Name.ContainsKey("传送"))
+        if (item.Name.Contains("卷轴") || item.Name.Contains("传送"))
             return QuickSlotType.Scroll;
         
         return QuickSlotType.Item;
@@ -310,7 +310,7 @@ public delegate void SlotEmpty(int slotIndex);
         if (player == null) return false;
         
         // Handle different scroll types
-        if (item.Name.ContainsKey("传送") || item.Name.ContainsKey("home"))
+        if (item.Name.Contains("传送") || item.Name.Contains("home"))
         {
             // Teleport to home/waypoint
             if (player.HasMethod("TeleportToHome"))

@@ -342,13 +342,13 @@ public partial class QuickCastSystem : BaseSystem
     private BuffType GetBuffTypeFromItem(string itemId)
     {
         // Map item to buff type
-        if (itemId.ContainsKey("attack") || itemId.ContainsKey("strength"))
+        if (itemId.Contains("attack") || itemId.Contains("strength"))
             return BuffType.Attack;
-        if (itemId.ContainsKey("defense") || itemId.ContainsKey("armor"))
+        if (itemId.Contains("defense") || itemId.Contains("armor"))
             return BuffType.Defense;
-        if (itemId.ContainsKey("speed") || itemId.ContainsKey("haste"))
+        if (itemId.Contains("speed") || itemId.Contains("haste"))
             return BuffType.Speed;
-        if (itemId.ContainsKey("health") || itemId.ContainsKey("vitality"))
+        if (itemId.Contains("health") || itemId.Contains("vitality"))
             return BuffType.Health;
         return BuffType.None;
     }

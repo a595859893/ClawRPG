@@ -78,7 +78,7 @@ namespace ClawRPG.Scripts.Characters {
             }
             
             // Check if ability is available
-            if (!_data.AvailableAbilities.Contains(abilityId))
+            if (!_data.ContainsKey(abilityId))
             {
                 return;
             }
