@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using SaveSystem = ClawRPG.Scripts.Framework.SaveSystem;
 using ClawRPG.Scripts.UI;
+using ItemType = ClawRPG.Scripts.Items.Item.ItemType;
 
 /// <summary>
 /// 快速施法槽项目数据。
