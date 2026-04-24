@@ -344,19 +344,19 @@ namespace ClawRPG.Scripts.Combat
         {
             if (data == null) return;
 
-            if (data.Contains("formatType"))
+            if (data.ContainsKey("formatType"))
                 _currentFormat = (FormatType)Convert.ToInt32(data["formatType"]);
 
-            if (data.Contains("showTimestamp"))
+            if (data.ContainsKey("showTimestamp"))
                 _showTimestamp = Convert.ToBoolean(data["showTimestamp"]);
 
-            if (data.Contains("showType"))
+            if (data.ContainsKey("showType"))
                 _showType = Convert.ToBoolean(data["showType"]);
 
-            if (data.Contains("useColor"))
+            if (data.ContainsKey("useColor"))
                 _useColor = Convert.ToBoolean(data["useColor"]);
 
-            if (data.Contains("useIcon"))
+            if (data.ContainsKey("useIcon"))
                 _useIcon = Convert.ToBoolean(data["useIcon"]);
 
             GD.Print("[CombatLogFormatter] Save data imported successfully");

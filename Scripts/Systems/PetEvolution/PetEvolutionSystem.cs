@@ -379,7 +379,7 @@ public partial class PetEvolutionSystem : BaseSystem
         if (data == null) return;
 
         // Load evolved pets
-        if (data.Contains("pet_evolution_pets"))
+        if (data.ContainsKey("pet_evolution_pets"))
         {
             var petsArray = (Godot.Array)data["pet_evolution_pets"];
             foreach (Dictionary petData in petsArray)
@@ -393,14 +393,14 @@ public partial class PetEvolutionSystem : BaseSystem
                     RequiredPoints = (int)petData["required_points"],
                     IsEvolved = (bool)petData["is_evolved"]
                 };
-                if (petData.Contains("last_evolution"))
+                if (petData.ContainsKey("last_evolution"))
                     record.LastEvolutionTime = DateTime.Parse((string)petData["last_evolution"]);
                 _data.EvolvedPets[record.PetId] = record;
             }
         }
 
         // Load evolution history
-        if (data.Contains("pet_evolution_history"))
+        if (data.ContainsKey("pet_evolution_history"))
         {
             var historyArray = (Godot.Array)data["pet_evolution_history"];
             foreach (Dictionary historyData in historyArray)
@@ -419,7 +419,7 @@ public partial class PetEvolutionSystem : BaseSystem
         }
 
         // Load stats
-        if (data.Contains("pet_evolution_stats"))
+        if (data.ContainsKey("pet_evolution_stats"))
         {
             var stats = (Godot.Collections.Dictionary)data["pet_evolution_stats"];
             _data.TotalEvolutions = (int)stats.Get("total_evolutions", 0);
@@ -480,31 +480,31 @@ public partial class PetEvolutionSystem : BaseSystem
     {
         if (data == null) return;
 
-        if (data.Contains("evolvedPets"))
+        if (data.ContainsKey("evolvedPets"))
         {
             _data.EvolvedPets = (Dictionary<int, PetEvolutionRecord>)data["evolvedPets"];
         }
-        if (data.Contains("totalEvolutions"))
+        if (data.ContainsKey("totalEvolutions"))
         {
             _data.TotalEvolutions = (int)data["totalEvolutions"];
         }
-        if (data.Contains("legendaryEvolutions"))
+        if (data.ContainsKey("legendaryEvolutions"))
         {
             _data.LegendaryEvolutions = (int)data["legendaryEvolutions"];
         }
-        if (data.Contains("epicEvolutions"))
+        if (data.ContainsKey("epicEvolutions"))
         {
             _data.EpicEvolutions = (int)data["epicEvolutions"];
         }
-        if (data.Contains("rareEvolutions"))
+        if (data.ContainsKey("rareEvolutions"))
         {
             _data.RareEvolutions = (int)data["rareEvolutions"];
         }
-        if (data.Contains("totalEvolutionPoints"))
+        if (data.ContainsKey("totalEvolutionPoints"))
         {
             _data.TotalEvolutionPoints = (int)data["totalEvolutionPoints"];
         }
-        if (data.Contains("evolutionHistory"))
+        if (data.ContainsKey("evolutionHistory"))
         {
             _data.EvolutionHistory = (List<EvolutionHistoryEntry>)data["evolutionHistory"];
         }

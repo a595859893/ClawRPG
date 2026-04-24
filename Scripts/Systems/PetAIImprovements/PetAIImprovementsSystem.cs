@@ -581,39 +581,39 @@ public partial class PetAIImprovementsSystem : BaseSystem
     {
         base.ImportSaveData(data);
 
-        if (data.Contains("personality_type"))
+        if (data.ContainsKey("personality_type"))
         {
             personality = new PetAIPersonality((int)data["personality_type"]);
-            personality.curiosityLevel = data.Contains("curiosity_level") ? (float)data["curiosity_level"] : 0.5f;
-            personality.energyLevel = data.Contains("energy_level") ? (float)data["energy_level"] : 1.0f;
-            personality.loyaltyLevel = data.Contains("loyalty_level") ? (float)data["loyalty_level"] : 0.5f;
+            personality.curiosityLevel = data.ContainsKey("curiosity_level") ? (float)data["curiosity_level"] : 0.5f;
+            personality.energyLevel = data.ContainsKey("energy_level") ? (float)data["energy_level"] : 1.0f;
+            personality.loyaltyLevel = data.ContainsKey("loyalty_level") ? (float)data["loyalty_level"] : 0.5f;
         }
 
-        if (data.Contains("adaptation_level"))
+        if (data.ContainsKey("adaptation_level"))
         {
             learning.adaptationLevel = (int)data["adaptation_level"];
-            learning.learningData["total_battles"] = data.Contains("total_battles") ? data["total_battles"] : 0;
-            learning.learningData["wins"] = data.Contains("wins") ? data["wins"] : 0;
-            learning.learningData["losses"] = data.Contains("losses") ? data["losses"] : 0;
-            learning.learningData["best_combo"] = data.Contains("best_combo") ? data["best_combo"] : 0;
+            learning.learningData["total_battles"] = data.ContainsKey("total_battles") ? data["total_battles"] : 0;
+            learning.learningData["wins"] = data.ContainsKey("wins") ? data["wins"] : 0;
+            learning.learningData["losses"] = data.ContainsKey("losses") ? data["losses"] : 0;
+            learning.learningData["best_combo"] = data.ContainsKey("best_combo") ? data["best_combo"] : 0;
         }
 
-        if (data.Contains("enemy_type_kills"))
+        if (data.ContainsKey("enemy_type_kills"))
         {
             learning.enemyTypeKills = (Dictionary)data["enemy_type_kills"];
         }
 
-        if (data.Contains("current_emotion"))
+        if (data.ContainsKey("current_emotion"))
         {
             emotion.currentEmotion = (PetAIEmotionalState.Emotion)(int)data["current_emotion"];
-            emotion.emotionIntensity = data.Contains("emotion_intensity") ? (float)data["emotion_intensity"] : 0.5f;
+            emotion.emotionIntensity = data.ContainsKey("emotion_intensity") ? (float)data["emotion_intensity"] : 0.5f;
         }
 
-        totalDamageDealt = data.Contains("total_damage_dealt") ? (float)data["total_damage_dealt"] : 0f;
-        totalDamagePrevented = data.Contains("total_damage_prevented") ? (float)data["total_damage_prevented"] : 0f;
-        totalHealingDone = data.Contains("total_healing_done") ? (float)data["total_healing_done"] : 0f;
-        criticalHits = data.Contains("critical_hits") ? (int)data["critical_hits"] : 0;
-        perfectDodges = data.Contains("perfect_dodges") ? (int)data["perfect_dodges"] : 0;
+        totalDamageDealt = data.ContainsKey("total_damage_dealt") ? (float)data["total_damage_dealt"] : 0f;
+        totalDamagePrevented = data.ContainsKey("total_damage_prevented") ? (float)data["total_damage_prevented"] : 0f;
+        totalHealingDone = data.ContainsKey("total_healing_done") ? (float)data["total_healing_done"] : 0f;
+        criticalHits = data.ContainsKey("critical_hits") ? (int)data["critical_hits"] : 0;
+        perfectDodges = data.ContainsKey("perfect_dodges") ? (int)data["perfect_dodges"] : 0;
 
         lastAiLevel = GetAiLevel();
     }

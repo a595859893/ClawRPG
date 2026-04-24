@@ -358,12 +358,12 @@ namespace ClawRPG.Scripts.Systems.Pets
             if (data == null) return;
             
             // 加载全局技能点
-            if (data.Contains("global_skill_points"))
+            if (data.ContainsKey("global_skill_points"))
                 _globalSkillPoints = (int)data["global_skill_points"];
             
             // 加载宠物技能数据
             _playerPetSkills.Clear();
-            if (data.Contains("pets"))
+            if (data.ContainsKey("pets"))
             {
                 var petsData = (Godot.Collections.Dictionary)data["pets"];
                 foreach (string petId in petsData.Keys)
@@ -371,10 +371,10 @@ namespace ClawRPG.Scripts.Systems.Pets
                     var petData = (Godot.Collections.Dictionary)petsData[petId];
                     var petSkillData = new PetSkillData();
                     
-                    if (petData.Contains("available_skill_points"))
+                    if (petData.ContainsKey("available_skill_points"))
                         petSkillData.AvailableSkillPoints = (int)petData["available_skill_points"];
                     
-                    if (petData.Contains("skills"))
+                    if (petData.ContainsKey("skills"))
                     {
                         var skillsData = (Godot.Collections.Dictionary)petData["skills"];
                         foreach (string skillId in skillsData.Keys)
@@ -388,7 +388,7 @@ namespace ClawRPG.Scripts.Systems.Pets
                                 SkillId = skillId,
                                 CurrentLevel = level
                             };
-                            if (skillInstance.Contains("times_used"))
+                            if (skillInstance.ContainsKey("times_used"))
                                 learnedSkill.TimesUsed = (int)skillInstance["times_used"];
                             
                             petSkillData.SkillInstances[skillId] = learnedSkill;

@@ -420,7 +420,7 @@ public partial class SummonSystem : BaseSystem
 		if (saveSystem != null)
 		{
 			var data = saveSystem.GetSection("summon_system");
-			if (data.Contains("player_summons"))
+			if (data.ContainsKey("player_summons"))
 			{
 				// Load player summon data
 			}

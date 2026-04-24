@@ -189,7 +189,7 @@ public delegate void BossModeChangedEventHandler(BossMode oldMode, BossMode newM
                 foreach (var skillId in availableSkills)
                 {
                     var skill = _abilityDb.GetSkillData(bossData, skillId);
-                    if (skill != null && skill.SkillName.ToLower().Contains("heal"))
+                    if (skill != null && skill.SkillName.ToLower().ContainsKey("heal"))
                     {
                         return skillId;
                     }
@@ -303,7 +303,7 @@ public delegate void BossModeChangedEventHandler(BossMode oldMode, BossMode newM
         
         public override void ImportSaveData(Dictionary<string, object> data)
         {
-            if (data.Contains("decisionInterval")) {
+            if (data.ContainsKey("decisionInterval")) {
                 _decisionInterval = Convert.ToSingle(data["decisionInterval"]);
             }
         }

@@ -256,15 +256,15 @@ public partial class GuildTechnologySystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("availablePoints"))
+        if (data.ContainsKey("availablePoints"))
         {
             Data.AvailablePoints = (int)data["availablePoints"];
         }
-        if (data.Contains("totalResearched"))
+        if (data.ContainsKey("totalResearched"))
         {
             Data.TotalResearched = (int)data["totalResearched"];
         }
-        if (data.Contains("guildTechs"))
+        if (data.ContainsKey("guildTechs"))
         {
             Data.GuildTechs = (Dictionary<string, GuildTechnologyData.GuildTechnologyProgress>)data["guildTechs"];
         }

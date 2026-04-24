@@ -199,7 +199,7 @@ public delegate void MailSent(bool success, string message);
             
             _mailBox.Clear();
             
-            if (data.Contains("mailBox")) {
+            if (data.ContainsKey("mailBox")) {
                 var mailBoxList = (Godot.Array)data["mailBox"];
                 foreach (Dictionary playerEntry in mailBoxList)
                 {

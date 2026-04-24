@@ -237,11 +237,11 @@ namespace ClawRPG.Scripts.Systems
         {
             if (data == null) return;
 
-            if (data.Contains("auto_save_enabled"))
+            if (data.ContainsKey("auto_save_enabled"))
             {
                 _autoSaveEnabled = (bool)data["auto_save_enabled"];
             }
-            if (data.Contains("auto_save_timer"))
+            if (data.ContainsKey("auto_save_timer"))
             {
                 _autoSaveTimer = (float)data["auto_save_timer"];
             }

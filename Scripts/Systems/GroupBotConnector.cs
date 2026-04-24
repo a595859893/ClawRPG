@@ -395,13 +395,13 @@ public partial class GroupBotConnector : BaseSystem
     /// </summary>
     public override void ImportSaveData(Dictionary<string, object> data)
     {
-        if (data.Contains("bot_api_url"))
+        if (data.ContainsKey("bot_api_url"))
             BotApiUrl = data["bot_api_url"].ToString();
-        if (data.Contains("bot_ws_url"))
+        if (data.ContainsKey("bot_ws_url"))
             BotWsUrl = data["bot_ws_url"].ToString();
-        if (data.Contains("enable_integration"))
+        if (data.ContainsKey("enable_integration"))
             EnableGroupBotIntegration = (bool)data["enable_integration"];
-        if (data.Contains("use_websocket"))
+        if (data.ContainsKey("use_websocket"))
             UseWebSocket = (bool)data["use_websocket"];
     }
 }

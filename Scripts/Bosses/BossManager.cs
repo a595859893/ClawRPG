@@ -365,17 +365,17 @@ namespace ClawRPG.Scripts.Bosses {
         {
             if (data == null) return;
             
-            if (data.Contains("is_boss_active"))
+            if (data.ContainsKey("is_boss_active"))
             {
                 _isBossActive = (bool)data["is_boss_active"];
             }
             
-            if (data.Contains("boss_defeated"))
+            if (data.ContainsKey("boss_defeated"))
             {
                 _bossDefeated = (bool)data["boss_defeated"];
             }
             
-            if (data.Contains("current_boss_id"))
+            if (data.ContainsKey("current_boss_id"))
             {
                 var bossId = (string)data["current_boss_id"];
                 if (_isBossActive && !_bossDefeated)

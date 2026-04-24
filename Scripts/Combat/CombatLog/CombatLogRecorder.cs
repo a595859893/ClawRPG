@@ -560,15 +560,15 @@ namespace ClawRPG.Scripts.Combat
             if (data == null) return;
 
             // 恢复会话时间
-            if (data.Contains("sessionTime"))
+            if (data.ContainsKey("sessionTime"))
                 _currentSessionTime = Convert.ToSingle(data["sessionTime"]);
 
             // 恢复最大条目数
-            if (data.Contains("maxEntries"))
+            if (data.ContainsKey("maxEntries"))
                 _maxEntries = Convert.ToInt32(data["maxEntries"]);
 
             // 恢复日志条目
-            if (data.Contains("logEntries"))
+            if (data.ContainsKey("logEntries"))
             {
                 _logEntries.Clear();
                 var entries = data["logEntries"] as ArrayList;
@@ -578,13 +578,13 @@ namespace ClawRPG.Scripts.Combat
                     {
                         var entry = new CombatLogEntry
                         {
-                            Timestamp = entryData.Contains("timestamp") ? Convert.ToSingle(entryData["timestamp"]) : 0f,
-                            Type = entryData.Contains("type") ? (CombatLogType)Convert.ToInt32(entryData["type"]) : CombatLogType.Info,
-                            Message = entryData.Contains("message") ? entryData["message"].ToString() : "",
-                            Value = entryData.Contains("value") ? Convert.ToSingle(entryData["value"]) : 0f,
-                            Source = entryData.Contains("source") ? entryData["source"].ToString() : "",
-                            Target = entryData.Contains("target") ? entryData["target"].ToString() : "",
-                            IsPlayerAction = entryData.Contains("isPlayerAction") && Convert.ToBoolean(entryData["isPlayerAction"])
+                            Timestamp = entryData.ContainsKey("timestamp") ? Convert.ToSingle(entryData["timestamp"]) : 0f,
+                            Type = entryData.ContainsKey("type") ? (CombatLogType)Convert.ToInt32(entryData["type"]) : CombatLogType.Info,
+                            Message = entryData.ContainsKey("message") ? entryData["message"].ToString() : "",
+                            Value = entryData.ContainsKey("value") ? Convert.ToSingle(entryData["value"]) : 0f,
+                            Source = entryData.ContainsKey("source") ? entryData["source"].ToString() : "",
+                            Target = entryData.ContainsKey("target") ? entryData["target"].ToString() : "",
+                            IsPlayerAction = entryData.ContainsKey("isPlayerAction") && Convert.ToBoolean(entryData["isPlayerAction"])
                         };
                         _logEntries.Add(entry);
                     }

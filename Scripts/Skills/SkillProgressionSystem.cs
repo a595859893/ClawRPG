@@ -193,7 +193,7 @@ namespace ClawRPG.Scripts.Skills
             
             _skillProgress.Clear();
             
-            if (data.Contains("skillProgress"))
+            if (data.ContainsKey("skillProgress"))
             {
                 var progressArray = (Array)data["skillProgress"];
                 foreach (Dictionary entry in progressArray)

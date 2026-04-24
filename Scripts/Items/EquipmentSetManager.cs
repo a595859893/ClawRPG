@@ -249,7 +249,7 @@ namespace ClawRPG.Scripts.Items {
             if (data == null) return;
 
             _equippedSets.Clear();
-            if (data.Contains("equippedSets"))
+            if (data.ContainsKey("equippedSets"))
             {
                 var equippedSetsData = data["equippedSets"] as Dictionary;
                 foreach (string setIdStr in equippedSetsData.Keys)
@@ -268,7 +268,7 @@ namespace ClawRPG.Scripts.Items {
             }
 
             _activeSetBonuses.Clear();
-            if (data.Contains("activeSetBonuses"))
+            if (data.ContainsKey("activeSetBonuses"))
             {
                 var activeBonusesData = data["activeSetBonuses"] as Godot.Collections.Array;
                 foreach (Dictionary bonusDict in activeBonusesData)

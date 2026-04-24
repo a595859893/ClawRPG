@@ -140,7 +140,7 @@ public partial class ProceduralStoryData : BaseSystem
         
         // 当前进行的故事
         ActiveStories = new Dictionary<string, ActiveStory>();
-        if (data.Contains("active_stories"))
+        if (data.ContainsKey("active_stories"))
         {
             var storiesArray = (Array)data["active_stories"];
             foreach (Dictionary storyDict in storiesArray)
@@ -156,7 +156,7 @@ public partial class ProceduralStoryData : BaseSystem
                     Tension = (int)storyDict["tension"]
                 };
                 
-                if (storyDict.Contains("completed_chapters"))
+                if (storyDict.ContainsKey("completed_chapters"))
                 {
                     var chaptersArray = (Array)storyDict["completed_chapters"];
                     story.CompletedChapters = new List<string>();
@@ -166,7 +166,7 @@ public partial class ProceduralStoryData : BaseSystem
                     }
                 }
                 
-                if (storyDict.Contains("choices"))
+                if (storyDict.ContainsKey("choices"))
                 {
                     var choicesDict = (Dictionary)storyDict["choices"];
                     story.Choices = new Dictionary<string, bool>();
@@ -182,7 +182,7 @@ public partial class ProceduralStoryData : BaseSystem
         
         // 故事历史
         StoryHistory = new List<StoryRecord>();
-        if (data.Contains("story_history"))
+        if (data.ContainsKey("story_history"))
         {
             var historyArray = (Array)data["story_history"];
             foreach (Dictionary recordDict in historyArray)

@@ -474,7 +474,7 @@ public partial class BossMechanicsSystem : BaseSystem
         _playerStats.TotalComboScore = data.GetValueOrDefault("totalComboScore", 0);
         
         // 导入击杀计数
-        if (data.Contains("bossKillCount"))
+        if (data.ContainsKey("bossKillCount"))
         {
             _playerStats.BossKillCount.Clear();
             var killCountArray = (Godot.Collections.Array)data["bossKillCount"];
@@ -485,7 +485,7 @@ public partial class BossMechanicsSystem : BaseSystem
         }
         
         // 导入最佳生存时间
-        if (data.Contains("bestSurvivalTimes"))
+        if (data.ContainsKey("bestSurvivalTimes"))
         {
             _playerStats.BestSurvivalTimes.Clear();
             var survivalArray = (Godot.Collections.Array)data["bestSurvivalTimes"];
@@ -496,7 +496,7 @@ public partial class BossMechanicsSystem : BaseSystem
         }
         
         // 导入最佳DPS
-        if (data.Contains("bestDPS"))
+        if (data.ContainsKey("bestDPS"))
         {
             _playerStats.BestDPS.Clear();
             var dpsArray = (Godot.Collections.Array)data["bestDPS"];
@@ -507,7 +507,7 @@ public partial class BossMechanicsSystem : BaseSystem
         }
         
         // 导入活跃战斗数据
-        if (data.Contains("activeBattles") && _phaseSystem != null && _abilitySystem != null && _patternSystem != null)
+        if (data.ContainsKey("activeBattles") && _phaseSystem != null && _abilitySystem != null && _patternSystem != null)
         {
             var battlesData = (Godot.Collections.Array)data["activeBattles"];
             foreach (Dictionary battleData in battlesData)
@@ -518,13 +518,13 @@ public partial class BossMechanicsSystem : BaseSystem
                 {
                     var battle = _activeBossBattles[instanceId];
                     
-                    if (battleData.Contains("phaseData"))
+                    if (battleData.ContainsKey("phaseData"))
                         _phaseSystem.ImportSaveData(battle, (Dictionary)battleData["phaseData"]);
                     
-                    if (battleData.Contains("abilityData"))
+                    if (battleData.ContainsKey("abilityData"))
                         _abilitySystem.ImportSaveData(battle, (Dictionary)battleData["abilityData"]);
                     
-                    if (battleData.Contains("patternData"))
+                    if (battleData.ContainsKey("patternData"))
                         _patternSystem.ImportSaveData(battle, (Dictionary)battleData["patternData"]);
                 }
             }

@@ -225,15 +225,15 @@ namespace ClawRPG.Scripts.Characters {
         {
             if (data == null) return;
             
-            if (data.Contains("currentPhase"))
+            if (data.ContainsKey("currentPhase"))
                 CurrentPhase = (int)data["currentPhase"];
-            if (data.Contains("isEnraged"))
+            if (data.ContainsKey("isEnraged"))
                 IsEnraged = (bool)data["isEnraged"];
-            if (data.Contains("isRageTriggered"))
+            if (data.ContainsKey("isRageTriggered"))
                 IsRageTriggered = (bool)data["isRageTriggered"];
-            if (data.Contains("enrageTimer"))
+            if (data.ContainsKey("enrageTimer"))
                 EnrageTimer = (float)data["enrageTimer"];
-            if (data.Contains("abilityTimer"))
+            if (data.ContainsKey("abilityTimer"))
                 AbilityTimer = (float)data["abilityTimer"];
         }
     }

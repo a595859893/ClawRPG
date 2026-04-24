@@ -371,13 +371,13 @@ namespace ClawRPG.Scripts.UI
         {
             if (data == null) return;
 
-            if (data.Contains("MainMenuUI") && _mainMenuUI != null)
+            if (data.ContainsKey("MainMenuUI") && _mainMenuUI != null)
                 _mainMenuUI.ImportSaveData((Godot.Collections.Dictionary)data["MainMenuUI"]);
-            if (data.Contains("HUDUI") && _hudUI != null)
+            if (data.ContainsKey("HUDUI") && _hudUI != null)
                 _hudUI.ImportSaveData((Godot.Collections.Dictionary)data["HUDUI"]);
-            if (data.Contains("InventoryUI") && _inventoryUI != null)
+            if (data.ContainsKey("InventoryUI") && _inventoryUI != null)
                 _inventoryUI.ImportSaveData((Godot.Collections.Dictionary)data["InventoryUI"]);
-            if (data.Contains("MiniMapUI") && _miniMapUI != null)
+            if (data.ContainsKey("MiniMapUI") && _miniMapUI != null)
                 _miniMapUI.ImportSaveData((Godot.Collections.Dictionary)data["MiniMapUI"]);
         }
 

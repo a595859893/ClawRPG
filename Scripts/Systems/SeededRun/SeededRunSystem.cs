@@ -89,15 +89,15 @@ public partial class SeededRunSystem : BaseSystem
         {
             _data = new SeededRunData();
             
-            if (data.Contains("total_seeded_runs"))
+            if (data.ContainsKey("total_seeded_runs"))
                 _data.TotalSeededRuns = Convert.ToInt32(data["total_seeded_runs"]);
-            if (data.Contains("last_used_seed"))
+            if (data.ContainsKey("last_used_seed"))
                 _data.LastUsedSeed = data["last_used_seed"]?.ToString() ?? "";
-            if (data.Contains("is_seeded_mode_active"))
+            if (data.ContainsKey("is_seeded_mode_active"))
                 _data.IsSeededModeActive = Convert.ToBoolean(data["is_seeded_mode_active"]);
             
             // 反序列化种子历史
-            if (data.Contains("seed_history"))
+            if (data.ContainsKey("seed_history"))
             {
                 var seedHistory = data["seed_history"] as Array;
                 if (seedHistory != null)
@@ -109,25 +109,25 @@ public partial class SeededRunSystem : BaseSystem
                         if (!string.IsNullOrEmpty(seed))
                         {
                             var runRecord = new SeededRunRecord(seed);
-                            if (record.Contains("run_count"))
+                            if (record.ContainsKey("run_count"))
                                 runRecord.RunCount = Convert.ToInt32(record["run_count"]);
-                            if (record.Contains("best_floor"))
+                            if (record.ContainsKey("best_floor"))
                                 runRecord.BestFloor = Convert.ToInt32(record["best_floor"]);
-                            if (record.Contains("best_score"))
+                            if (record.ContainsKey("best_score"))
                                 runRecord.BestScore = Convert.ToInt32(record["best_score"]);
-                            if (record.Contains("best_time"))
+                            if (record.ContainsKey("best_time"))
                                 runRecord.BestTime = Convert.ToSingle(record["best_time"]);
-                            if (record.Contains("total_gold"))
+                            if (record.ContainsKey("total_gold"))
                                 runRecord.TotalGold = Convert.ToInt32(record["total_gold"]);
-                            if (record.Contains("total_exp"))
+                            if (record.ContainsKey("total_exp"))
                                 runRecord.TotalExp = Convert.ToInt32(record["total_exp"]);
-                            if (record.Contains("enemies_defeated"))
+                            if (record.ContainsKey("enemies_defeated"))
                                 runRecord.EnemiesDefeated = Convert.ToInt32(record["enemies_defeated"]);
-                            if (record.Contains("bosses_defeated"))
+                            if (record.ContainsKey("bosses_defeated"))
                                 runRecord.BossesDefeated = Convert.ToInt32(record["bosses_defeated"]);
-                            if (record.Contains("completed"))
+                            if (record.ContainsKey("completed"))
                                 runRecord.Completed = Convert.ToBoolean(record["completed"]);
-                            if (record.Contains("last_played"))
+                            if (record.ContainsKey("last_played"))
                                 runRecord.LastPlayed = record["last_played"]?.ToString() ?? "";
                             
                             _data.SeedHistory[seed] = runRecord;

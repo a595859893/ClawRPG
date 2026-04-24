@@ -67,7 +67,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
                     _ => attr.Key
                 };
                 float val = attr.Value;
-                if (attr.Key.Contains("rate") || attr.Key.Contains("damage")) {
+                if (attr.Key.ContainsKey("rate") || attr.Key.ContainsKey("damage")) {
                     desc += $"{attrName} +{val:F1}% ";
                 } else {
                     desc += $"{attrName} +{val} ";

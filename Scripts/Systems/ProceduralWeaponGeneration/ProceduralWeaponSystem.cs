@@ -416,21 +416,21 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             if (data == null) return;
 
             // Load generation history
-            if (data.Contains("procedural_weapon_history")) {
+            if (data.ContainsKey("procedural_weapon_history")) {
                 var historyArray = (Godot.Array)data["procedural_weapon_history"];
                 _data.GenerationHistory.Clear();
                 foreach (Godot.Collections.Dictionary recordData in historyArray)
                 {
                     var record = new WeaponGenerationRecord();
-                    record.WeaponName = recordData.Contains("weapon_name") ? (string)recordData["weapon_name"] : "";
-                    record.WeaponType = recordData.Contains("weapon_type") ? (string)recordData["weapon_type"] : "";
-                    record.Rarity = recordData.Contains("rarity") ? (string)recordData["rarity"] : "";
-                    record.Level = recordData.Contains("level") ? (int)recordData["level"] : 1;
-                    record.Attack = recordData.Contains("attack") ? (int)recordData["attack"] : 0;
-                    record.Defense = recordData.Contains("defense") ? (int)recordData["defense"] : 0;
-                    record.Speed = recordData.Contains("speed") ? (int)recordData["speed"] : 0;
+                    record.WeaponName = recordData.ContainsKey("weapon_name") ? (string)recordData["weapon_name"] : "";
+                    record.WeaponType = recordData.ContainsKey("weapon_type") ? (string)recordData["weapon_type"] : "";
+                    record.Rarity = recordData.ContainsKey("rarity") ? (string)recordData["rarity"] : "";
+                    record.Level = recordData.ContainsKey("level") ? (int)recordData["level"] : 1;
+                    record.Attack = recordData.ContainsKey("attack") ? (int)recordData["attack"] : 0;
+                    record.Defense = recordData.ContainsKey("defense") ? (int)recordData["defense"] : 0;
+                    record.Speed = recordData.ContainsKey("speed") ? (int)recordData["speed"] : 0;
                     
-                    if (recordData.Contains("special_effects")) {
+                    if (recordData.ContainsKey("special_effects")) {
                         var effectsArray = (Godot.Array)recordData["special_effects"];
                         foreach (string effect in effectsArray)
                         {
@@ -438,33 +438,33 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
                         }
                     }
                     
-                    if (recordData.Contains("generation_time") && recordData["generation_time"] != null) {
+                    if (recordData.ContainsKey("generation_time") && recordData["generation_time"] != null) {
                         if (DateTime.TryParse((string)recordData["generation_time"], out var genTime)) {
                             record.GenerationTime = genTime;
                         }
                     }
-                    record.GoldCost = recordData.Contains("gold_cost") ? (int)recordData["gold_cost"] : 0;
-                    record.IsReroll = recordData.Contains("is_reroll") && (bool)recordData["is_reroll"];
+                    record.GoldCost = recordData.ContainsKey("gold_cost") ? (int)recordData["gold_cost"] : 0;
+                    record.IsReroll = recordData.ContainsKey("is_reroll") && (bool)recordData["is_reroll"];
                     _data.GenerationHistory.Add(record);
                 }
             }
 
             // Load statistics
-            if (data.Contains("procedural_weapon_total"))
+            if (data.ContainsKey("procedural_weapon_total"))
                 _data.TotalWeaponsGenerated = (int)data["procedural_weapon_total"];
-            if (data.Contains("procedural_weapon_legendary"))
+            if (data.ContainsKey("procedural_weapon_legendary"))
                 _data.LegendaryWeapons = (int)data["procedural_weapon_legendary"];
-            if (data.Contains("procedural_weapon_epic"))
+            if (data.ContainsKey("procedural_weapon_epic"))
                 _data.EpicWeapons = (int)data["procedural_weapon_epic"];
-            if (data.Contains("procedural_weapon_rare"))
+            if (data.ContainsKey("procedural_weapon_rare"))
                 _data.RareWeapons = (int)data["procedural_weapon_rare"];
-            if (data.Contains("procedural_weapon_gold_spent"))
+            if (data.ContainsKey("procedural_weapon_gold_spent"))
                 _data.TotalGoldSpent = (int)data["procedural_weapon_gold_spent"];
-            if (data.Contains("procedural_weapon_materials_used"))
+            if (data.ContainsKey("procedural_weapon_materials_used"))
                 _data.TotalMaterialsUsed = (int)data["procedural_weapon_materials_used"];
 
             // Load unlocked types
-            if (data.Contains("procedural_weapon_unlocked_types")) {
+            if (data.ContainsKey("procedural_weapon_unlocked_types")) {
                 var typesArray = (Godot.Array)data["procedural_weapon_unlocked_types"];
                 _data.UnlockedWeaponTypes.Clear();
                 foreach (string type in typesArray)
@@ -474,7 +474,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             }
 
             // Load unlocked prefixes
-            if (data.Contains("procedural_weapon_unlocked_prefixes")) {
+            if (data.ContainsKey("procedural_weapon_unlocked_prefixes")) {
                 var prefixesArray = (Godot.Array)data["procedural_weapon_unlocked_prefixes"];
                 _data.UnlockedPrefixes.Clear();
                 foreach (string prefix in prefixesArray)
@@ -484,7 +484,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             }
 
             // Load unlocked suffixes
-            if (data.Contains("procedural_weapon_unlocked_suffixes")) {
+            if (data.ContainsKey("procedural_weapon_unlocked_suffixes")) {
                 var suffixesArray = (Godot.Array)data["procedural_weapon_unlocked_suffixes"];
                 _data.UnlockedSuffixes.Clear();
                 foreach (string suffix in suffixesArray)
@@ -494,7 +494,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralWeaponGeneration {
             }
 
             // Load rarity distribution
-            if (data.Contains("procedural_weapon_rarity_dist")) {
+            if (data.ContainsKey("procedural_weapon_rarity_dist")) {
                 var rarityDistDict = (Godot.Collections.Dictionary)data["procedural_weapon_rarity_dist"];
                 foreach (var key in rarityDistDict.Keys)
                 {

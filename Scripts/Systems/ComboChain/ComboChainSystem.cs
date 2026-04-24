@@ -366,13 +366,13 @@ public delegate void ComboLevelUp(int newLevel, string levelName);
     {
         if (data == null || _data == null) return;
         
-        if (data.Contains("total_chains")) _data.TotalChains = (int)data["total_chains"];
-        if (data.Contains("total_chain_hits")) _data.TotalChainHits = (int)data["total_chain_hits"];
-        if (data.Contains("max_chain_ever")) _data.MaxChainEver = (int)data["max_chain_ever"];
-        if (data.Contains("chain_10_count")) _data.Chain10Count = (int)data["chain_10_count"];
-        if (data.Contains("chain_25_count")) _data.Chain25Count = (int)data["chain_25_count"];
-        if (data.Contains("chain_50_count")) _data.Chain50Count = (int)data["chain_50_count"];
-        if (data.Contains("chain_100_count")) _data.Chain100Count = (int)data["chain_100_count"];
-        if (data.Contains("total_chain_damage")) _data.TotalChainDamage = (float)data["total_chain_damage"];
+        if (data.ContainsKey("total_chains")) _data.TotalChains = (int)data["total_chains"];
+        if (data.ContainsKey("total_chain_hits")) _data.TotalChainHits = (int)data["total_chain_hits"];
+        if (data.ContainsKey("max_chain_ever")) _data.MaxChainEver = (int)data["max_chain_ever"];
+        if (data.ContainsKey("chain_10_count")) _data.Chain10Count = (int)data["chain_10_count"];
+        if (data.ContainsKey("chain_25_count")) _data.Chain25Count = (int)data["chain_25_count"];
+        if (data.ContainsKey("chain_50_count")) _data.Chain50Count = (int)data["chain_50_count"];
+        if (data.ContainsKey("chain_100_count")) _data.Chain100Count = (int)data["chain_100_count"];
+        if (data.ContainsKey("total_chain_damage")) _data.TotalChainDamage = (float)data["total_chain_damage"];
     }
 }

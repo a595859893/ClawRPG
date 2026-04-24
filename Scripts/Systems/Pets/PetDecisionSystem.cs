@@ -312,13 +312,13 @@ namespace ClawRPG.Scripts.Systems.Pets
         public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
-            if (data.Contains("lastAttackTime"))
+            if (data.ContainsKey("lastAttackTime"))
                 _lastAttackTime = Convert.ToSingle(data["lastAttackTime"]);
-            if (data.Contains("supportCooldown"))
+            if (data.ContainsKey("supportCooldown"))
                 _supportCooldown = Convert.ToSingle(data["supportCooldown"]);
-            if (data.Contains("currentState"))
+            if (data.ContainsKey("currentState"))
                 CurrentState = (PetAIState)(int)data["currentState"];
-            if (data.Contains("personality"))
+            if (data.ContainsKey("personality"))
                 _personality = (PetPersonality)(int)data["personality"];
         }
     }

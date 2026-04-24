@@ -185,44 +185,44 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
 
             var replay = new ComboReplayData
             {
-                Version = result.Contains("Version") ? System.Convert.ToInt32(result["Version"]) : 1,
-                Seed = result.Contains("Seed") ? System.Convert.ToInt32(result["Seed"]) : 0,
-                StartTimestamp = result.Contains("StartTimestamp") ? System.Convert.ToDouble(result["StartTimestamp"]) : 0,
-                DurationSeconds = result.Contains("DurationSeconds") ? (float)System.Convert.ToDouble(result["DurationSeconds"]) : 0f
+                Version = result.ContainsKey("Version") ? System.Convert.ToInt32(result["Version"]) : 1,
+                Seed = result.ContainsKey("Seed") ? System.Convert.ToInt32(result["Seed"]) : 0,
+                StartTimestamp = result.ContainsKey("StartTimestamp") ? System.Convert.ToDouble(result["StartTimestamp"]) : 0,
+                DurationSeconds = result.ContainsKey("DurationSeconds") ? (float)System.Convert.ToDouble(result["DurationSeconds"]) : 0f
             };
 
-            if (result.Contains("Actions"))
+            if (result.ContainsKey("Actions"))
             {
                 var actions = (Godot.Collections.Array)result["Actions"];
                 foreach (Godot.Collections.Dictionary ad in actions)
                 {
                     replay.Actions.Add(new PlayerActionRecord
                     {
-                        Time = ad.Contains("Time") ? (float)System.Convert.ToDouble(ad["Time"]) : 0f,
-                        Type = ad.Contains("Type") ? (PlayerActionType)System.Convert.ToInt32(ad["Type"]) : PlayerActionType.SkillUse,
-                        SkillId = ad.Contains("SkillId") ? ad["SkillId"]?.ToString() ?? "" : "",
-                        TargetId = ad.Contains("TargetId") ? ad["TargetId"]?.ToString() ?? "" : "",
-                        PlayerPosX = ad.Contains("PlayerPosX") ? (float)System.Convert.ToDouble(ad["PlayerPosX"]) : 0f,
-                        PlayerPosY = ad.Contains("PlayerPosY") ? (float)System.Convert.ToDouble(ad["PlayerPosY"]) : 0f,
-                        ExtraData = ad.Contains("ExtraData") ? ad["ExtraData"]?.ToString() ?? "" : ""
+                        Time = ad.ContainsKey("Time") ? (float)System.Convert.ToDouble(ad["Time"]) : 0f,
+                        Type = ad.ContainsKey("Type") ? (PlayerActionType)System.Convert.ToInt32(ad["Type"]) : PlayerActionType.SkillUse,
+                        SkillId = ad.ContainsKey("SkillId") ? ad["SkillId"]?.ToString() ?? "" : "",
+                        TargetId = ad.ContainsKey("TargetId") ? ad["TargetId"]?.ToString() ?? "" : "",
+                        PlayerPosX = ad.ContainsKey("PlayerPosX") ? (float)System.Convert.ToDouble(ad["PlayerPosX"]) : 0f,
+                        PlayerPosY = ad.ContainsKey("PlayerPosY") ? (float)System.Convert.ToDouble(ad["PlayerPosY"]) : 0f,
+                        ExtraData = ad.ContainsKey("ExtraData") ? ad["ExtraData"]?.ToString() ?? "" : ""
                     });
                 }
             }
 
-            if (result.Contains("Combos"))
+            if (result.ContainsKey("Combos"))
             {
                 var combos = (Godot.Collections.Array)result["Combos"];
                 foreach (Godot.Collections.Dictionary cd in combos)
                 {
                     var combo = new ComboRecord
                     {
-                        Time = cd.Contains("Time") ? (float)System.Convert.ToDouble(cd["Time"]) : 0f,
-                        ComboId = cd.Contains("ComboId") ? cd["ComboId"]?.ToString() ?? "" : "",
-                        ComboName = cd.Contains("ComboName") ? cd["ComboName"]?.ToString() ?? "" : "",
-                        Damage = cd.Contains("Damage") ? System.Convert.ToInt32(cd["Damage"]) : 0,
-                        Killed = cd.Contains("Killed") ? System.Convert.ToBoolean(cd["Killed"]) : false
+                        Time = cd.ContainsKey("Time") ? (float)System.Convert.ToDouble(cd["Time"]) : 0f,
+                        ComboId = cd.ContainsKey("ComboId") ? cd["ComboId"]?.ToString() ?? "" : "",
+                        ComboName = cd.ContainsKey("ComboName") ? cd["ComboName"]?.ToString() ?? "" : "",
+                        Damage = cd.ContainsKey("Damage") ? System.Convert.ToInt32(cd["Damage"]) : 0,
+                        Killed = cd.ContainsKey("Killed") ? System.Convert.ToBoolean(cd["Killed"]) : false
                     };
-                    if (cd.Contains("SkillSequence"))
+                    if (cd.ContainsKey("SkillSequence"))
                     {
                         var seq = (Godot.Collections.Array)cd["SkillSequence"];
                         foreach (var s in seq)
@@ -232,17 +232,17 @@ namespace ClawRPG.Scripts.Systems.ComboReplay
                 }
             }
 
-            if (result.Contains("Metadata"))
+            if (result.ContainsKey("Metadata"))
             {
                 var meta = (Godot.Collections.Dictionary)result["Metadata"];
                 replay.Metadata = new ReplayMetadata
                 {
-                    CreatedAt = meta.Contains("CreatedAt") ? System.Convert.ToDouble(meta["CreatedAt"]) : 0,
-                    GameVersion = meta.Contains("GameVersion") ? meta["GameVersion"]?.ToString() ?? "1.0.0" : "1.0.0",
-                    PlayerLevel = meta.Contains("PlayerLevel") ? System.Convert.ToInt32(meta["PlayerLevel"]) : 0,
-                    Result = meta.Contains("Result") ? meta["Result"]?.ToString() ?? "victory" : "victory",
-                    SceneName = meta.Contains("SceneName") ? meta["SceneName"]?.ToString() ?? "" : "",
-                    EnemyCount = meta.Contains("EnemyCount") ? System.Convert.ToInt32(meta["EnemyCount"]) : 0
+                    CreatedAt = meta.ContainsKey("CreatedAt") ? System.Convert.ToDouble(meta["CreatedAt"]) : 0,
+                    GameVersion = meta.ContainsKey("GameVersion") ? meta["GameVersion"]?.ToString() ?? "1.0.0" : "1.0.0",
+                    PlayerLevel = meta.ContainsKey("PlayerLevel") ? System.Convert.ToInt32(meta["PlayerLevel"]) : 0,
+                    Result = meta.ContainsKey("Result") ? meta["Result"]?.ToString() ?? "victory" : "victory",
+                    SceneName = meta.ContainsKey("SceneName") ? meta["SceneName"]?.ToString() ?? "" : "",
+                    EnemyCount = meta.ContainsKey("EnemyCount") ? System.Convert.ToInt32(meta["EnemyCount"]) : 0
                 };
             }
 

@@ -198,7 +198,7 @@ public partial class GatheringSystem : BaseSystem
     
     public void SaveGatheringData(Dictionary data)
     {
-        if (data.Contains("gathering_stats"))
+        if (data.ContainsKey("gathering_stats"))
         {
             gatheringStats = new System.Collections.Generic.Dictionary<string, int>((Dictionary)data["gathering_stats"]);
         }
@@ -214,7 +214,7 @@ public partial class GatheringSystem : BaseSystem
     
     public void LoadSaveData(Dictionary data)
     {
-        if (data.Contains("gathering_stats"))
+        if (data.ContainsKey("gathering_stats"))
         {
             gatheringStats = new System.Collections.Generic.Dictionary<string, int>((Dictionary)data["gathering_stats"]);
         }
@@ -269,7 +269,7 @@ public partial class GatheringSystem : BaseSystem
         }
         
         // 工具数据
-        if (data.Contains("tools"))
+        if (data.ContainsKey("tools"))
         {
             var toolsData = (Array)data["tools"];
             foreach (Dictionary toolData in toolsData)

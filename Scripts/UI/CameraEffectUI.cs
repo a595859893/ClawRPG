@@ -41,29 +41,29 @@ namespace ClawRPG.Scripts.UI {
             foreach (var child in GetChildren()) {
                 if (child is CheckBox checkBox) {
                     string name = child.Name.ToString().ToLower();
-                    if (name.Contains("dynamicfov") || name.Contains("fov")) {
+                    if (name.ContainsKey("dynamicfov") || name.ContainsKey("fov")) {
                         enableDynamicFOVCheck = checkBox;
-                    } else if (name.Contains("shake")) {
+                    } else if (name.ContainsKey("shake")) {
                         enableShakeCheck = checkBox;
-                    } else if (name.Contains("vignette")) {
+                    } else if (name.ContainsKey("vignette")) {
                         enableVignetteCheck = checkBox;
                     }
                 } else if (child is HSlider slider) {
                     string name = child.Name.ToString().ToLower();
-                    if (name.Contains("fov")) {
+                    if (name.ContainsKey("fov")) {
                         fovSlider = slider;
-                    } else if (name.Contains("shake")) {
+                    } else if (name.ContainsKey("shake")) {
                         shakeSlider = slider;
-                    } else if (name.Contains("vignette")) {
+                    } else if (name.ContainsKey("vignette")) {
                         vignetteSlider = slider;
                     }
                 } else if (child is Label label) {
                     string name = child.Name.ToString().ToLower();
-                    if (name.Contains("fov")) {
+                    if (name.ContainsKey("fov")) {
                         fovValueLabel = label;
-                    } else if (name.Contains("shake")) {
+                    } else if (name.ContainsKey("shake")) {
                         shakeValueLabel = label;
-                    } else if (name.Contains("vignette")) {
+                    } else if (name.ContainsKey("vignette")) {
                         vignetteValueLabel = label;
                     }
                 }
@@ -206,27 +206,27 @@ namespace ClawRPG.Scripts.UI {
         /// 加载设置数据（用于读档）
         /// </summary>
         public void LoadSettingsData(Dictionary data) {
-            if (data.Contains("enableDynamicFOV")) {
+            if (data.ContainsKey("enableDynamicFOV")) {
                 enableDynamicFOV = (bool)data["enableDynamicFOV"];
                 if (enableDynamicFOVCheck != null) enableDynamicFOVCheck.ButtonPressed = enableDynamicFOV;
             }
-            if (data.Contains("enableShake")) {
+            if (data.ContainsKey("enableShake")) {
                 enableShake = (bool)data["enableShake"];
                 if (enableShakeCheck != null) enableShakeCheck.ButtonPressed = enableShake;
             }
-            if (data.Contains("enableVignette")) {
+            if (data.ContainsKey("enableVignette")) {
                 enableVignette = (bool)data["enableVignette"];
                 if (enableVignetteCheck != null) enableVignetteCheck.ButtonPressed = enableVignette;
             }
-            if (data.Contains("fovIntensity")) {
+            if (data.ContainsKey("fovIntensity")) {
                 fovIntensity = (float)data["fovIntensity"];
                 if (fovSlider != null) fovSlider.Value = fovIntensity;
             }
-            if (data.Contains("shakeIntensity")) {
+            if (data.ContainsKey("shakeIntensity")) {
                 shakeIntensity = (float)data["shakeIntensity"];
                 if (shakeSlider != null) shakeSlider.Value = shakeIntensity;
             }
-            if (data.Contains("vignetteIntensity")) {
+            if (data.ContainsKey("vignetteIntensity")) {
                 vignetteIntensity = (float)data["vignetteIntensity"];
                 if (vignetteSlider != null) vignetteSlider.Value = vignetteIntensity;
             }

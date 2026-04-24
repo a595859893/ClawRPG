@@ -86,7 +86,7 @@ public partial class DungeonEventGenerator
             var eventData = _database.GetEvent(eventId);
             if (eventData != null)
             {
-                string rarity = eventData.Contains("rarity") ? eventData["rarity"].ToString() : "Common";
+                string rarity = eventData.ContainsKey("rarity") ? eventData["rarity"].ToString() : "Common";
                 
                 // Scale availability by floor
                 if (_data.PlayerFloor < 5 && (rarity == "Epic" || rarity == "Legendary"))
@@ -125,7 +125,7 @@ public partial class DungeonEventGenerator
             if (eventData == null)
                 continue;
                 
-            string rarity = eventData.Contains("rarity") ? eventData["rarity"].ToString() : "Common";
+            string rarity = eventData.ContainsKey("rarity") ? eventData["rarity"].ToString() : "Common";
             float eventWeight = rarity switch
             {
                 "Common" => commonWeight,
@@ -168,8 +168,8 @@ public partial class DungeonEventGenerator
         _data.TotalEventsTriggered++;
         
         string category = eventData["category"].ToString();
-        bool isPositive = eventData.Contains("positive") && eventData["positive"].ToString() == "true";
-        bool isNegative = eventData.Contains("positive") && eventData["positive"].ToString() == "false";
+        bool isPositive = eventData.ContainsKey("positive") && eventData["positive"].ToString() == "true";
+        bool isNegative = eventData.ContainsKey("positive") && eventData["positive"].ToString() == "false";
         
         if (isPositive) _data.PositiveEvents++;
         else if (isNegative) _data.NegativeEvents++;
@@ -215,7 +215,7 @@ public partial class DungeonEventGenerator
         
         foreach (var kvp in database)
         {
-            string eventRarity = kvp.Value.Contains("rarity") ? kvp.Value["rarity"].ToString() : "Common";
+            string eventRarity = kvp.Value.ContainsKey("rarity") ? kvp.Value["rarity"].ToString() : "Common";
             if (eventRarity == rarity)
             {
                 matchingEvents.Add(kvp.Key);

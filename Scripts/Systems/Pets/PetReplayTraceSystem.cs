@@ -370,11 +370,11 @@ namespace ClawRPG.Scripts.Systems.Pets
         public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
-            if (data.Contains("totalDecisions"))
+            if (data.ContainsKey("totalDecisions"))
                 _totalDecisions = Convert.ToInt32(data["totalDecisions"]);
-            if (data.Contains("successCount"))
+            if (data.ContainsKey("successCount"))
                 _successCount = Convert.ToInt32(data["successCount"]);
-            if (data.Contains("failureCount"))
+            if (data.ContainsKey("failureCount"))
                 _failureCount = Convert.ToInt32(data["failureCount"]);
         }
     }

@@ -270,13 +270,13 @@ namespace ClawRPG.Scripts.Systems.AI.Flocking
         /// </summary>
         public override void ImportSaveData(Dictionary<string, object> data)
         {
-            if (data.Contains("separation_weight")) _separationWeight = Convert.ToSingle(data["separation_weight"]);
-            if (data.Contains("alignment_weight")) _alignmentWeight = Convert.ToSingle(data["alignment_weight"]);
-            if (data.Contains("cohesion_weight")) _cohesionWeight = Convert.ToSingle(data["cohesion_weight"]);
-            if (data.Contains("perception_radius")) _perceptionRadius = Convert.ToSingle(data["perception_radius"]);
-            if (data.Contains("max_speed")) _maxSpeed = Convert.ToSingle(data["max_speed"]);
-            if (data.Contains("max_force")) _maxForce = Convert.ToSingle(data["max_force"]);
-            if (data.Contains("next_flock_id")) _nextFlockId = Convert.ToInt32(data["next_flock_id"]);
+            if (data.ContainsKey("separation_weight")) _separationWeight = Convert.ToSingle(data["separation_weight"]);
+            if (data.ContainsKey("alignment_weight")) _alignmentWeight = Convert.ToSingle(data["alignment_weight"]);
+            if (data.ContainsKey("cohesion_weight")) _cohesionWeight = Convert.ToSingle(data["cohesion_weight"]);
+            if (data.ContainsKey("perception_radius")) _perceptionRadius = Convert.ToSingle(data["perception_radius"]);
+            if (data.ContainsKey("max_speed")) _maxSpeed = Convert.ToSingle(data["max_speed"]);
+            if (data.ContainsKey("max_force")) _maxForce = Convert.ToSingle(data["max_force"]);
+            if (data.ContainsKey("next_flock_id")) _nextFlockId = Convert.ToInt32(data["next_flock_id"]);
         }
     }
 }

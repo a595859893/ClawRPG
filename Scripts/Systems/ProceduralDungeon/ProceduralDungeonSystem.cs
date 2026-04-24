@@ -375,13 +375,13 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
             Statistics.TotalTreasuresFound = (int)data.GetValueOrDefault("total_treasures_found", 0);
             Statistics.TotalSecretsDiscovered = (int)data.GetValueOrDefault("total_secrets_discovered", 0);
             
-            if (data.Contains("total_time_in_dungeons"))
+            if (data.ContainsKey("total_time_in_dungeons"))
             {
                 Statistics.TotalTimeInDungeons = TimeSpan.FromTicks((long)data["total_time_in_dungeons"]);
             }
             
             // 当前进度
-            if (data.Contains("current_dungeon_id"))
+            if (data.ContainsKey("current_dungeon_id"))
             {
                 if (CurrentProgress == null)
                 {
@@ -392,13 +392,13 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
                 CurrentProgress.CurrentFloor = (int)data.GetValueOrDefault("current_floor", 1);
                 CurrentProgress.CurrentRoomId = (string)data.GetValueOrDefault("current_room_id", "");
                 
-                if (data.Contains("start_time") && DateTime.TryParse((string)data["start_time"], out var startTime))
+                if (data.ContainsKey("start_time") && DateTime.TryParse((string)data["start_time"], out var startTime))
                 {
                     CurrentProgress.StartTime = startTime;
                 }
                 
                 // 已清理房间
-                if (data.Contains("cleared_rooms"))
+                if (data.ContainsKey("cleared_rooms"))
                 {
                     var clearedArray = (Array)data["cleared_rooms"];
                     CurrentProgress.ClearedRooms = new List<string>();
@@ -409,7 +409,7 @@ namespace ClawRPG.Scripts.Systems.ProceduralDungeon
                 }
                 
                 // 发现的秘密
-                if (data.Contains("discovered_secrets"))
+                if (data.ContainsKey("discovered_secrets"))
                 {
                     var secretsArray = (Array)data["discovered_secrets"];
                     CurrentProgress.DiscoveredSecrets = new List<string>();

@@ -60,7 +60,7 @@ namespace ClawRPG.Scripts.Mounts {
             if (data == null) return;
             
             // 导入已拥有的坐骑
-            if (data.Contains("owned_mounts"))
+            if (data.ContainsKey("owned_mounts"))
             {
                 var mounts = data["owned_mounts"] as Array;
                 if (mounts != null)
@@ -83,7 +83,7 @@ namespace ClawRPG.Scripts.Mounts {
             }
             
             // 导入当前激活的坐骑
-            if (data.Contains("active_mount_id"))
+            if (data.ContainsKey("active_mount_id"))
             {
                 string activeMountId = data["active_mount_id"] as string;
                 if (!string.IsNullOrEmpty(activeMountId) && _ownedMounts.ContainsKey(activeMountId))

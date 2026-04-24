@@ -324,7 +324,7 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
             
             // 加载已装备的遗物
-            if (data.Contains("equipped_relics"))
+            if (data.ContainsKey("equipped_relics"))
             {
                 _data.EquippedRelicIds.Clear();
                 var equippedRelics = (Godot.Array)data["equipped_relics"];
@@ -335,7 +335,7 @@ namespace ClawRPG.Scripts.Systems
             }
             
             // 加载已解锁的套装
-            if (data.Contains("unlocked_sets"))
+            if (data.ContainsKey("unlocked_sets"))
             {
                 _data.UnlockedSetIds.Clear();
                 var unlockedSets = (Godot.Array)data["unlocked_sets"];
@@ -346,7 +346,7 @@ namespace ClawRPG.Scripts.Systems
             }
             
             // 加载套装完成次数
-            if (data.Contains("set_completion_counts"))
+            if (data.ContainsKey("set_completion_counts"))
             {
                 _data.SetCompletionCounts.Clear();
                 var setCompletionCounts = (Godot.Collections.Dictionary)data["set_completion_counts"];
@@ -357,9 +357,9 @@ namespace ClawRPG.Scripts.Systems
             }
             
             // 加载统计信息
-            if (data.Contains("total_sets_completed"))
+            if (data.ContainsKey("total_sets_completed"))
                 _totalSetsCompleted = (int)data["total_sets_completed"];
-            if (data.Contains("total_pieces_equipped"))
+            if (data.ContainsKey("total_pieces_equipped"))
                 _totalPiecesEquipped = (int)data["total_pieces_equipped"];
             
             RecalculateBonuses();

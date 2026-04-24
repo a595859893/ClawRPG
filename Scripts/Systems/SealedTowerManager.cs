@@ -250,7 +250,7 @@ public delegate void CurseAcquired(string curseId);
     {
         // Apply curse effects
         int actualDamage = damage;
-        if (_activeCurses.Contains("vulnerable"))
+        if (_activeCurses.ContainsKey("vulnerable"))
         {
             actualDamage = (int)(actualDamage * 1.25);
         }
@@ -341,11 +341,11 @@ public delegate void CurseAcquired(string curseId);
     {
         if (data == null) return;
         
-        if (data.Contains("current_floor")) _currentFloor = (int)data["current_floor"];
-        if (data.Contains("max_floor_reached")) _maxFloorReached = (int)data["max_floor_reached"];
-        if (data.Contains("total_runs")) _totalRuns = (int)data["total_runs"];
-        if (data.Contains("wins")) _wins = (int)data["wins"];
-        if (data.Contains("is_in_tower")) _isInTower = (bool)data["is_in_tower"];
+        if (data.ContainsKey("current_floor")) _currentFloor = (int)data["current_floor"];
+        if (data.ContainsKey("max_floor_reached")) _maxFloorReached = (int)data["max_floor_reached"];
+        if (data.ContainsKey("total_runs")) _totalRuns = (int)data["total_runs"];
+        if (data.ContainsKey("wins")) _wins = (int)data["wins"];
+        if (data.ContainsKey("is_in_tower")) _isInTower = (bool)data["is_in_tower"];
     }
 }
 

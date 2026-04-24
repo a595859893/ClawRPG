@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using PartySystemReal = ClawRPG.Scripts.Systems.PartySystem;
 
 /// <summary>
 /// 队伍系统UI
@@ -154,15 +155,15 @@ public partial class PartyUI : Control
         AddChild(helpLabel);
         
         // 监听PartySystem事件
-        if (PartySystem.Instance != null)
+        if (PartySystemReal.Instance != null)
         {
-            PartySystem.Instance.OnPartyCreated += OnPartyCreated;
-            PartySystem.Instance.OnPartyJoined += OnPartyJoined;
-            PartySystem.Instance.OnPartyLeft += OnPartyLeft;
-            PartySystem.Instance.OnMemberJoined += OnMemberJoined;
-            PartySystem.Instance.OnMemberLeft += OnMemberLeft;
-            PartySystem.Instance.OnBuffAdded += OnBuffAdded;
-            PartySystem.Instance.OnBuffRemoved += OnBuffRemoved;
+            PartySystemReal.Instance.OnPartyCreated += OnPartyCreated;
+            PartySystemReal.Instance.OnPartyJoined += OnPartyJoined;
+            PartySystemReal.Instance.OnPartyLeft += OnPartyLeft;
+            PartySystemReal.Instance.OnMemberJoined += OnMemberJoined;
+            PartySystemReal.Instance.OnMemberLeft += OnMemberLeft;
+            PartySystemReal.Instance.OnBuffAdded += OnBuffAdded;
+            PartySystemReal.Instance.OnBuffRemoved += OnBuffRemoved;
         }
     }
 
@@ -219,7 +220,7 @@ public partial class PartyUI : Control
             child.QueueFree();
         }
         
-        if (PartySystem.Instance == null || !PartySystem.Instance.IsInParty)
+        if (PartySystemReal.Instance == null || !PartySystemReal.Instance.IsInParty)
         {
             _titleLabel.Text = "队伍系统 (未加入)";
             _createButton.Text = "创建队伍";
@@ -238,17 +239,17 @@ public partial class PartyUI : Control
         }
         else
         {
-            _titleLabel.Text = $"队伍系统 (ID: {PartySystem.Instance.PartyId})";
-            _createButton.Text = PartySystem.Instance.IsLeader ? "解散队伍" : "";
+            _titleLabel.Text = $"队伍系统 (ID: {PartySystemReal.Instance.PartyId})";
+            _createButton.Text = PartySystemReal.Instance.IsLeader ? "解散队伍" : "";
             _leaveButton.Text = "离开队伍";
-            _inviteButton.Disabled = !PartySystem.Instance.IsLeader;
+            _inviteButton.Disabled = !PartySystemReal.Instance.IsLeader;
             _shareExpCheck.Disabled = false;
-            _shareLootCheck.Disabled = !PartySystem.Instance.IsLeader;
-            _shareExpCheck.Pressed = PartySystem.Instance.ShareExp;
-            _shareLootCheck.Pressed = PartySystem.Instance.ShareLoot;
+            _shareLootCheck.Disabled = !PartySystemReal.Instance.IsLeader;
+            _shareExpCheck.Pressed = PartySystemReal.Instance.ShareExp;
+            _shareLootCheck.Pressed = PartySystemReal.Instance.ShareLoot;
             
             // 显示成员列表
-            var members = PartySystem.Instance.GetMembers();
+            var members = PartySystemReal.Instance.GetMembers();
             foreach (var member in members)
             {
                 var memberPanel = CreateMemberPanel(member);
@@ -262,15 +263,15 @@ public partial class PartyUI : Control
 
     public override void _ExitTree()
     {
-        if (PartySystem.Instance != null)
+        if (PartySystemReal.Instance != null)
         {
-            PartySystem.Instance.OnPartyCreated -= OnPartyCreated;
-            PartySystem.Instance.OnPartyJoined -= OnPartyJoined;
-            PartySystem.Instance.OnPartyLeft -= OnPartyLeft;
-            PartySystem.Instance.OnMemberJoined -= OnMemberJoined;
-            PartySystem.Instance.OnMemberLeft -= OnMemberLeft;
-            PartySystem.Instance.OnBuffAdded -= OnBuffAdded;
-            PartySystem.Instance.OnBuffRemoved -= OnBuffRemoved;
+            PartySystemReal.Instance.OnPartyCreated -= OnPartyCreated;
+            PartySystemReal.Instance.OnPartyJoined -= OnPartyJoined;
+            PartySystemReal.Instance.OnPartyLeft -= OnPartyLeft;
+            PartySystemReal.Instance.OnMemberJoined -= OnMemberJoined;
+            PartySystemReal.Instance.OnMemberLeft -= OnMemberLeft;
+            PartySystemReal.Instance.OnBuffAdded -= OnBuffAdded;
+            PartySystemReal.Instance.OnBuffRemoved -= OnBuffRemoved;
         }
     }
 }

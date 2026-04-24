@@ -84,13 +84,13 @@ public partial class ComboChainData : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("currentChain")) CurrentChain = (int)data["currentChain"];
-        if (data.Contains("maxChain")) MaxChain = (int)data["maxChain"];
-        if (data.Contains("isChainActive")) IsChainActive = (bool)data["isChainActive"];
+        if (data.ContainsKey("currentChain")) CurrentChain = (int)data["currentChain"];
+        if (data.ContainsKey("maxChain")) MaxChain = (int)data["maxChain"];
+        if (data.ContainsKey("isChainActive")) IsChainActive = (bool)data["isChainActive"];
         
         // 加载历史记录
         ChainHistory.Clear();
-        if (data.Contains("chainHistory"))
+        if (data.ContainsKey("chainHistory"))
         {
             var historyList = (Godot.Array)data["chainHistory"];
             foreach (Dictionary recordDict in historyList)
@@ -106,14 +106,14 @@ public partial class ComboChainData : BaseSystem
         }
         
         // 加载统计
-        if (data.Contains("totalChains")) TotalChains = (int)data["totalChains"];
-        if (data.Contains("totalChainHits")) TotalChainHits = (int)data["totalChainHits"];
-        if (data.Contains("maxChainEver")) MaxChainEver = (int)data["maxChainEver"];
-        if (data.Contains("chain10Count")) Chain10Count = (int)data["chain10Count"];
-        if (data.Contains("chain25Count")) Chain25Count = (int)data["chain25Count"];
-        if (data.Contains("chain50Count")) Chain50Count = (int)data["chain50Count"];
-        if (data.Contains("chain100Count")) Chain100Count = (int)data["chain100Count"];
-        if (data.Contains("totalChainDamage")) TotalChainDamage = (float)data["totalChainDamage"];
-        if (data.Contains("chainDamageBonus")) ChainDamageBonus = (float)data["chainDamageBonus"];
+        if (data.ContainsKey("totalChains")) TotalChains = (int)data["totalChains"];
+        if (data.ContainsKey("totalChainHits")) TotalChainHits = (int)data["totalChainHits"];
+        if (data.ContainsKey("maxChainEver")) MaxChainEver = (int)data["maxChainEver"];
+        if (data.ContainsKey("chain10Count")) Chain10Count = (int)data["chain10Count"];
+        if (data.ContainsKey("chain25Count")) Chain25Count = (int)data["chain25Count"];
+        if (data.ContainsKey("chain50Count")) Chain50Count = (int)data["chain50Count"];
+        if (data.ContainsKey("chain100Count")) Chain100Count = (int)data["chain100Count"];
+        if (data.ContainsKey("totalChainDamage")) TotalChainDamage = (float)data["totalChainDamage"];
+        if (data.ContainsKey("chainDamageBonus")) ChainDamageBonus = (float)data["chainDamageBonus"];
     }
 }

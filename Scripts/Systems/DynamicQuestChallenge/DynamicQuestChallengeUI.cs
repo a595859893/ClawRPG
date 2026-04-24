@@ -292,20 +292,20 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
             hbox.AddChild(infoVbox);
 
             var nameLabel = new Label();
-            nameLabel.Text = challenge.Contains("name") ? (string)challenge["name"] : "Unknown";
+            nameLabel.Text = challenge.ContainsKey("name") ? (string)challenge["name"] : "Unknown";
             nameLabel.AddThemeFontSizeOverride("font_size", 16);
             infoVbox.AddChild(nameLabel);
 
             var descLabel = new Label();
-            descLabel.Text = challenge.Contains("description") ? (string)challenge["description"] : "";
+            descLabel.Text = challenge.ContainsKey("description") ? (string)challenge["description"] : "";
             infoVbox.AddChild(descLabel);
 
             // Progress
             var progressLabel = new Label();
             if (isActive)
             {
-                var progress = challenge.Contains("progress") ? (int)challenge["progress"] : 0;
-                var target = challenge.Contains("target_amount") ? (int)challenge["target_amount"] : 0;
+                var progress = challenge.ContainsKey("progress") ? (int)challenge["progress"] : 0;
+                var target = challenge.ContainsKey("target_amount") ? (int)challenge["target_amount"] : 0;
                 progressLabel.Text = $"Progress: {progress}/{target}";
             }
             else
@@ -315,7 +315,7 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
             infoVbox.AddChild(progressLabel);
 
             // Difficulty badge
-            var difficulty = challenge.Contains("difficulty") ? (string)challenge["difficulty"] : "Easy";
+            var difficulty = challenge.ContainsKey("difficulty") ? (string)challenge["difficulty"] : "Easy";
             var difficultyLabel = new Label();
             difficultyLabel.Text = $"[{difficulty}]";
             difficultyLabel.Modulate = GetDifficultyColor(difficulty);
@@ -326,7 +326,7 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
             {
                 var abandonBtn = new Button();
                 abandonBtn.Text = "Abandon";
-                var challengeId = challenge.Contains("id") ? (string)challenge["id"] : "";
+                var challengeId = challenge.ContainsKey("id") ? (string)challenge["id"] : "";
                 abandonBtn.Pressed += () => OnAbandonPressed(challengeId);
                 hbox.AddChild(abandonBtn);
             }
@@ -393,7 +393,7 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
             if (_system != null)
             {
                 var challenge = _system.GenerateChallenge(10, "Warrior", new List<object>());
-                GD.Print($"[DynamicQuestChallengeUI] Generated challenge: {(challenge.Contains("name") ? challenge["name"] : "")}");
+                GD.Print($"[DynamicQuestChallengeUI] Generated challenge: {(challenge.ContainsKey("name") ? challenge["name"] : "")}");
                 ShowActiveChallenges();
             }
         }

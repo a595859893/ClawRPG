@@ -182,14 +182,14 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         public void Load(Dictionary data) {
             if (data == null) return;
             
-            if (data.Contains("player_fusion_data")) {
+            if (data.ContainsKey("player_fusion_data")) {
                 var fusionData = (Dictionary)data["player_fusion_data"];
-                _playerFusionData.TotalFusions = fusionData.Contains("total_fusions") ? 
+                _playerFusionData.TotalFusions = fusionData.ContainsKey("total_fusions") ? 
                     Convert.ToInt32(fusionData["total_fusions"]) : 0;
-                _playerFusionData.SuccessfulFusions = fusionData.Contains("successful_fusions") ? 
+                _playerFusionData.SuccessfulFusions = fusionData.ContainsKey("successful_fusions") ? 
                     Convert.ToInt32(fusionData["successful_fusions"]) : 0;
                     
-                if (fusionData.Contains("fusion_count_by_gem")) {
+                if (fusionData.ContainsKey("fusion_count_by_gem")) {
                     var countData = (Dictionary)fusionData["fusion_count_by_gem"];
                     _playerFusionData.FusionCountByGem = new System.Collections.Generic.Dictionary<string, int>();
                     foreach (var key in countData.Keys) {
@@ -228,11 +228,11 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
     {
         if (data == null) return;
         
-        if (data.Contains("total_fusions")) _playerFusionData.TotalFusions = (int)data["total_fusions"];
-        if (data.Contains("successful_fusions")) _playerFusionData.SuccessfulFusions = (int)data["successful_fusions"];
+        if (data.ContainsKey("total_fusions")) _playerFusionData.TotalFusions = (int)data["total_fusions"];
+        if (data.ContainsKey("successful_fusions")) _playerFusionData.SuccessfulFusions = (int)data["successful_fusions"];
         
         _playerFusionData.FusionCountByGem.Clear();
-        if (data.Contains("fusion_count_by_gem"))
+        if (data.ContainsKey("fusion_count_by_gem"))
         {
             var fusionCountData = (Dictionary)data["fusion_count_by_gem"];
             foreach (var kvp in fusionCountData)

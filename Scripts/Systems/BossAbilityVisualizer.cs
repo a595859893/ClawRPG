@@ -587,7 +587,7 @@ namespace ClawRPG.Scripts.UI {
         public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
-            if (data.Contains("maxConcurrentVisuals")) {
+            if (data.ContainsKey("maxConcurrentVisuals")) {
                 _maxConcurrentVisuals = (int)data["maxConcurrentVisuals"];
             }
         }

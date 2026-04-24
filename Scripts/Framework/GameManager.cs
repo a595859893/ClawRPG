@@ -145,7 +145,7 @@ public partial class GameManager : BaseSystem
         foreach (BaseSystem system in _systems)
         {
             var systemName = system.SystemName;
-            if (data.Contains(systemName))
+            if (data.ContainsKey(systemName))
             {
                 try
                 {

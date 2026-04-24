@@ -495,9 +495,9 @@ public delegate void TrackChanged(string trackName);
         public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
-            if (data.Contains("music_volume")) _musicVolume = (float)data["music_volume"];
-            if (data.Contains("battle_music_volume")) _battleMusicVolume = (float)data["battle_music_volume"];
-            if (data.Contains("crossfade_duration")) _crossfadeDuration = (float)data["crossfade_duration"];
+            if (data.ContainsKey("music_volume")) _musicVolume = (float)data["music_volume"];
+            if (data.ContainsKey("battle_music_volume")) _battleMusicVolume = (float)data["battle_music_volume"];
+            if (data.ContainsKey("crossfade_duration")) _crossfadeDuration = (float)data["crossfade_duration"];
         }
     }
 

@@ -269,17 +269,17 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
             
             // 导入统计信息
-            if (data.Contains("total_skill_points_earned"))
+            if (data.ContainsKey("total_skill_points_earned"))
                 TotalSkillPointsEarned = (int)data["total_skill_points_earned"];
-            if (data.Contains("total_skill_points_spent"))
+            if (data.ContainsKey("total_skill_points_spent"))
                 TotalSkillPointsSpent = (int)data["total_skill_points_spent"];
-            if (data.Contains("total_nodes_unlocked"))
+            if (data.ContainsKey("total_nodes_unlocked"))
                 TotalNodesUnlocked = (int)data["total_nodes_unlocked"];
-            if (data.Contains("total_ultimates_unlocked"))
+            if (data.ContainsKey("total_ultimates_unlocked"))
                 TotalUltimatesUnlocked = (int)data["total_ultimates_unlocked"];
             
             // 导入宠物技能树数据
-            if (data.Contains("pet_skill_trees"))
+            if (data.ContainsKey("pet_skill_trees"))
             {
                 var petTreesData = (Dictionary)data["pet_skill_trees"];
                 foreach (string petId in petTreesData.Keys)
@@ -296,7 +296,7 @@ namespace ClawRPG.Scripts.Systems
                     };
                     
                     // 恢复节点状态
-                    if (treeData.Contains("node_statuses"))
+                    if (treeData.ContainsKey("node_statuses"))
                     {
                         var nodeStatuses = (Dictionary)treeData["node_statuses"];
                         foreach (string nodeId in nodeStatuses.Keys)
@@ -306,7 +306,7 @@ namespace ClawRPG.Scripts.Systems
                     }
                     
                     // 恢复已解锁节点
-                    if (treeData.Contains("unlocked_nodes"))
+                    if (treeData.ContainsKey("unlocked_nodes"))
                     {
                         var db = PetSkillTreeDatabase.Instance;
                         var unlockedNodeIds = (Array)treeData["unlocked_nodes"];

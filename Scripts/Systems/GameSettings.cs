@@ -613,32 +613,32 @@ public partial class GameSettings : BaseSystem
         if (data == null) return;
         
         // Audio settings
-        if (data.Contains("master_volume")) _masterVolume = Convert.ToSingle(data["master_volume"]);
-        if (data.Contains("music_volume")) _musicVolume = Convert.ToSingle(data["music_volume"]);
-        if (data.Contains("sfx_volume")) _sfxVolume = Convert.ToSingle(data["sfx_volume"]);
-        if (data.Contains("voice_volume")) _voiceVolume = Convert.ToSingle(data["voice_volume"]);
+        if (data.ContainsKey("master_volume")) _masterVolume = Convert.ToSingle(data["master_volume"]);
+        if (data.ContainsKey("music_volume")) _musicVolume = Convert.ToSingle(data["music_volume"]);
+        if (data.ContainsKey("sfx_volume")) _sfxVolume = Convert.ToSingle(data["sfx_volume"]);
+        if (data.ContainsKey("voice_volume")) _voiceVolume = Convert.ToSingle(data["voice_volume"]);
         
         // Graphics settings
-        if (data.Contains("fullscreen")) _fullscreen = Convert.ToBoolean(data["fullscreen"]);
-        if (data.Contains("vsync")) _vsync = Convert.ToBoolean(data["vsync"]);
-        if (data.Contains("quality_level")) _qualityLevel = Convert.ToInt32(data["quality_level"]);
-        if (data.Contains("show_fps")) _showFps = Convert.ToBoolean(data["show_fps"]);
-        if (data.Contains("show_damage_numbers")) _showDamageNumbers = Convert.ToBoolean(data["show_damage_numbers"]);
+        if (data.ContainsKey("fullscreen")) _fullscreen = Convert.ToBoolean(data["fullscreen"]);
+        if (data.ContainsKey("vsync")) _vsync = Convert.ToBoolean(data["vsync"]);
+        if (data.ContainsKey("quality_level")) _qualityLevel = Convert.ToInt32(data["quality_level"]);
+        if (data.ContainsKey("show_fps")) _showFps = Convert.ToBoolean(data["show_fps"]);
+        if (data.ContainsKey("show_damage_numbers")) _showDamageNumbers = Convert.ToBoolean(data["show_damage_numbers"]);
         
         // Game settings
-        if (data.Contains("difficulty")) _difficulty = Convert.ToInt32(data["difficulty"]);
-        if (data.Contains("auto_save")) _autoSave = Convert.ToBoolean(data["auto_save"]);
-        if (data.Contains("auto_save_interval")) _autoSaveInterval = Convert.ToInt32(data["auto_save_interval"]);
-        if (data.Contains("show_tutorials")) _showTutorials = Convert.ToBoolean(data["show_tutorials"]);
-        if (data.Contains("ui_scale")) _uiScale = Convert.ToSingle(data["ui_scale"]);
+        if (data.ContainsKey("difficulty")) _difficulty = Convert.ToInt32(data["difficulty"]);
+        if (data.ContainsKey("auto_save")) _autoSave = Convert.ToBoolean(data["auto_save"]);
+        if (data.ContainsKey("auto_save_interval")) _autoSaveInterval = Convert.ToInt32(data["auto_save_interval"]);
+        if (data.ContainsKey("show_tutorials")) _showTutorials = Convert.ToBoolean(data["show_tutorials"]);
+        if (data.ContainsKey("ui_scale")) _uiScale = Convert.ToSingle(data["ui_scale"]);
         
         // Accessibility settings
-        if (data.Contains("screen_shake")) _screenShake = Convert.ToBoolean(data["screen_shake"]);
-        if (data.Contains("hit_stop")) _hitStop = Convert.ToBoolean(data["hit_stop"]);
-        if (data.Contains("controller_vibration")) _controllerVibration = Convert.ToBoolean(data["controller_vibration"]);
+        if (data.ContainsKey("screen_shake")) _screenShake = Convert.ToBoolean(data["screen_shake"]);
+        if (data.ContainsKey("hit_stop")) _hitStop = Convert.ToBoolean(data["hit_stop"]);
+        if (data.ContainsKey("controller_vibration")) _controllerVibration = Convert.ToBoolean(data["controller_vibration"]);
         
         // Key bindings
-        if (data.Contains("key_bindings"))
+        if (data.ContainsKey("key_bindings"))
         {
             var bindings = (Godot.Array)data["key_bindings"];
             foreach (Dictionary binding in bindings)

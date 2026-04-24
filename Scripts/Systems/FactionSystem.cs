@@ -58,7 +58,7 @@ public partial class FactionSystem : BaseSystem
     /// </summary>
     public override void ImportSaveData(Dictionary<string, object> data)
     {
-        if (data == null || !data.Contains("reputations")) return;
+        if (data == null || !data.ContainsKey("reputations")) return;
         
         var reputations = (Dictionary)data["reputations"];
         foreach (var kvp in reputations)
@@ -327,11 +327,11 @@ public partial class FactionSystem : BaseSystem
         int baseReward = 100;
         
         // Bonus based on quest difficulty
-        if (questId.Contains("legendary") || questId.Contains("leader"))
+        if (questId.ContainsKey("legendary") || questId.ContainsKey("leader"))
             baseReward = 300;
-        else if (questId.Contains("elite") || questId.Contains("escort"))
+        else if (questId.ContainsKey("elite") || questId.ContainsKey("escort"))
             baseReward = 200;
-        else if (questId.Contains("hunt") || questId.Contains("deliver"))
+        else if (questId.ContainsKey("hunt") || questId.ContainsKey("deliver"))
             baseReward = 150;
         
         ModifyReputation(factionId, baseReward);

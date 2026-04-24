@@ -417,7 +417,7 @@ namespace ClawRPG.Systems.MultiplayerVote
             if (data == null) return;
             
             // 导入队伍
-            if (data.Contains("parties"))
+            if (data.ContainsKey("parties"))
             {
                 var partiesData = (Godot.Collections.Array)data["parties"];
                 foreach (Dictionary partyData in partiesData)
@@ -428,15 +428,15 @@ namespace ClawRPG.Systems.MultiplayerVote
                         PartyName = partyData["party_name"].ToString(),
                         LeaderId = partyData["leader_id"].ToString(),
                         IsPublic = (bool)partyData["is_public"],
-                        Password = partyData.Contains("password") ? partyData["password"].ToString() : "",
-                        GameMode = partyData.Contains("game_mode") ? partyData["game_mode"].ToString() : "",
+                        Password = partyData.ContainsKey("password") ? partyData["password"].ToString() : "",
+                        GameMode = partyData.ContainsKey("game_mode") ? partyData["game_mode"].ToString() : "",
                         MaxMembers = Convert.ToInt32(partyData["max_members"]),
-                        MinLevel = partyData.Contains("min_level") ? Convert.ToInt32(partyData["min_level"]) : 1,
-                        MaxLevel = partyData.Contains("max_level") ? Convert.ToInt32(partyData["max_level"]) : 100,
+                        MinLevel = partyData.ContainsKey("min_level") ? Convert.ToInt32(partyData["min_level"]) : 1,
+                        MaxLevel = partyData.ContainsKey("max_level") ? Convert.ToInt32(partyData["max_level"]) : 100,
                         CreateTime = Convert.ToInt32(partyData["create_time"])
                     };
                     
-                    if (partyData.Contains("members"))
+                    if (partyData.ContainsKey("members"))
                     {
                         var membersData = (Godot.Collections.Array)partyData["members"];
                         foreach (Dictionary memberData in membersData)
@@ -461,7 +461,7 @@ namespace ClawRPG.Systems.MultiplayerVote
             }
             
             // 导入玩家数据
-            if (data.Contains("player_data"))
+            if (data.ContainsKey("player_data"))
             {
                 var playerDataList = (Godot.Collections.Array)data["player_data"];
                 foreach (Dictionary playerData in playerDataList)
@@ -474,7 +474,7 @@ namespace ClawRPG.Systems.MultiplayerVote
                         TotalPartiesCreated = Convert.ToInt32(playerData["total_parties_created"])
                     };
                     
-                    if (playerData.Contains("pending_invites"))
+                    if (playerData.ContainsKey("pending_invites"))
                     {
                         var invites = (Godot.Collections.Array)playerData["pending_invites"];
                         foreach (string invite in invites)
@@ -483,7 +483,7 @@ namespace ClawRPG.Systems.MultiplayerVote
                         }
                     }
                     
-                    if (playerData.Contains("past_party_ids"))
+                    if (playerData.ContainsKey("past_party_ids"))
                     {
                         var pastIds = (Godot.Collections.Array)playerData["past_party_ids"];
                         foreach (string pastId in pastIds)

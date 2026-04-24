@@ -379,12 +379,12 @@ namespace ClawRPG.Systems.Alchemy
         {
             if (data == null) return;
             
-            if (data.Contains("nextMaterialId"))
+            if (data.ContainsKey("nextMaterialId"))
             {
                 _nextMaterialId = (int)data["nextMaterialId"];
             }
             
-            if (data.Contains("materials"))
+            if (data.ContainsKey("materials"))
             {
                 var materialsData = (Dictionary)data["materials"];
                 _materials.Clear();

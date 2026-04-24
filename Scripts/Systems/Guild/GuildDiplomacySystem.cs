@@ -235,7 +235,7 @@ public partial class GuildDiplomacySystem : BaseSystem
         
         // 外交关系
         diplomacyData.Relations.Clear();
-        if (data.Contains("relations"))
+        if (data.ContainsKey("relations"))
         {
             var relationsArray = (Array)data["relations"];
             foreach (Dictionary relationData in relationsArray)
@@ -253,7 +253,7 @@ public partial class GuildDiplomacySystem : BaseSystem
         }
         
         // 外交统计
-        if (data.Contains("total_alliances")) diplomacyData.TotalAlliances = (int)data["total_alliances"];
-        if (data.Contains("total_enemies")) diplomacyData.TotalEnemies = (int)data["total_enemies"];
+        if (data.ContainsKey("total_alliances")) diplomacyData.TotalAlliances = (int)data["total_alliances"];
+        if (data.ContainsKey("total_enemies")) diplomacyData.TotalEnemies = (int)data["total_enemies"];
     }
 }

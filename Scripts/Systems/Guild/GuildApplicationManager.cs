@@ -138,15 +138,15 @@ public partial class GuildApplicationManager
         foreach (var dict in data)
         {
             var app = new GuildApplication {
-                ApplicationId = dict.Contains("application_id") ? dict["application_id"].ToString() : "",
-                GuildId = dict.Contains("guild_id") ? dict["guild_id"].ToString() : "",
-                PlayerId = dict.Contains("player_id") ? dict["player_id"].ToString() : "",
-                PlayerName = dict.Contains("player_name") ? dict["player_name"].ToString() : "",
-                Message = dict.Contains("message") ? dict["message"].ToString() : "",
-                PlayerLevel = dict.Contains("player_level") ? (int)dict["player_level"] : 1,
-                IsAccepted = dict.Contains("is_accepted") && dict["is_accepted"] is bool b && b
+                ApplicationId = dict.ContainsKey("application_id") ? dict["application_id"].ToString() : "",
+                GuildId = dict.ContainsKey("guild_id") ? dict["guild_id"].ToString() : "",
+                PlayerId = dict.ContainsKey("player_id") ? dict["player_id"].ToString() : "",
+                PlayerName = dict.ContainsKey("player_name") ? dict["player_name"].ToString() : "",
+                Message = dict.ContainsKey("message") ? dict["message"].ToString() : "",
+                PlayerLevel = dict.ContainsKey("player_level") ? (int)dict["player_level"] : 1,
+                IsAccepted = dict.ContainsKey("is_accepted") && dict["is_accepted"] is bool b && b
             };
-            if (dict.Contains("apply_time") && !string.IsNullOrEmpty(dict["apply_time"].ToString()))
+            if (dict.ContainsKey("apply_time") && !string.IsNullOrEmpty(dict["apply_time"].ToString()))
             {
                 try { app.ApplyTime = DateTime.Parse(dict["apply_time"].ToString()); }
                 catch { app.ApplyTime = DateTime.Now; }

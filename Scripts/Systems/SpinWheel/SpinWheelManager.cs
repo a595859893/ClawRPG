@@ -427,7 +427,7 @@ public partial class SpinWheelManager : BaseSystem
         TotalGoldSpent = (int)data.GetValueOrDefault("total_gold_spent", 0);
         TotalGoldWon = (int)data.GetValueOrDefault("total_gold_won", 0);
 
-        if (data.Contains("last_free_spin_time"))
+        if (data.ContainsKey("last_free_spin_time"))
         {
             if (DateTime.TryParse(data["last_free_spin_time"].ToString(), out var time))
             {
@@ -435,7 +435,7 @@ public partial class SpinWheelManager : BaseSystem
             }
         }
 
-        if (data.Contains("spin_history"))
+        if (data.ContainsKey("spin_history"))
         {
             var historyArray = (Array)data["spin_history"];
             SpinHistory = new List<string>();

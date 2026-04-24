@@ -228,9 +228,9 @@ public partial class PartyLootSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("share_exp")) _shareExp = (bool)data["share_exp"];
-        if (data.Contains("share_loot")) _shareLoot = (bool)data["share_loot"];
-        if (data.Contains("auto_accept")) _autoAccept = (bool)data["auto_accept"];
-        if (data.Contains("exp_mode")) _expMode = (PartyData.ExpDistributionMode)(int)data["exp_mode"];
+        if (data.ContainsKey("share_exp")) _shareExp = (bool)data["share_exp"];
+        if (data.ContainsKey("share_loot")) _shareLoot = (bool)data["share_loot"];
+        if (data.ContainsKey("auto_accept")) _autoAccept = (bool)data["auto_accept"];
+        if (data.ContainsKey("exp_mode")) _expMode = (PartyData.ExpDistributionMode)(int)data["exp_mode"];
     }
 }

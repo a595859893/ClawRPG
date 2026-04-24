@@ -370,7 +370,7 @@ namespace ClawRPG.Scripts.Systems.GuildTournamentBracket {
         {
             if (data == null) return;
             
-            if (data.Contains("currentTournament"))
+            if (data.ContainsKey("currentTournament"))
             {
                 _currentTournament = (GuildTournamentBracketData)data["currentTournament"];
             }

@@ -228,37 +228,37 @@ public partial class GameGuideSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("unlocked_categories"))
+        if (data.ContainsKey("unlocked_categories"))
         {
             Data.UnlockedCategories = (Dictionary<string, bool>)data["unlocked_categories"];
         }
         
-        if (data.Contains("read_guides"))
+        if (data.ContainsKey("read_guides"))
         {
             Data.ReadGuides = new HashSet<string>((List<string>)data["read_guides"]);
         }
         
-        if (data.Contains("completed_tutorials"))
+        if (data.ContainsKey("completed_tutorials"))
         {
             Data.CompletedTutorials = new HashSet<string>((List<string>)data["completed_tutorials"]);
         }
         
-        if (data.Contains("read_history"))
+        if (data.ContainsKey("read_history"))
         {
             Data.ReadHistory = (List<GuideReadHistory>)data["read_history"];
         }
         
-        if (data.Contains("total_guides_read"))
+        if (data.ContainsKey("total_guides_read"))
         {
             Data.TotalGuidesRead = (int)data["total_guides_read"];
         }
         
-        if (data.Contains("total_tutorials_completed"))
+        if (data.ContainsKey("total_tutorials_completed"))
         {
             Data.TotalTutorialsCompleted = (int)data["total_tutorials_completed"];
         }
         
-        if (data.Contains("categories_unlocked"))
+        if (data.ContainsKey("categories_unlocked"))
         {
             Data.CategoriesUnlocked = (int)data["categories_unlocked"];
         }

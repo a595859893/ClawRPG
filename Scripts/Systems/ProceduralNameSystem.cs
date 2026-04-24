@@ -242,11 +242,11 @@ namespace ClawRPG.Systems {
         {
             if (data == null) return;
             
-            _data.TotalGenerated = data.Contains("total_generated") ? (int)data["total_generated"] : 0;
-            _data.FantasyStyleCount = data.Contains("fantasy_style_count") ? (int)data["fantasy_style_count"] : 0;
-            _data.ModernStyleCount = data.Contains("modern_style_count") ? (int)data["modern_style_count"] : 0;
-            _data.MythicalStyleCount = data.Contains("mythical_style_count") ? (int)data["mythical_style_count"] : 0;
-            _data.AncientStyleCount = data.Contains("ancient_style_count") ? (int)data["ancient_style_count"] : 0;
+            _data.TotalGenerated = data.ContainsKey("total_generated") ? (int)data["total_generated"] : 0;
+            _data.FantasyStyleCount = data.ContainsKey("fantasy_style_count") ? (int)data["fantasy_style_count"] : 0;
+            _data.ModernStyleCount = data.ContainsKey("modern_style_count") ? (int)data["modern_style_count"] : 0;
+            _data.MythicalStyleCount = data.ContainsKey("mythical_style_count") ? (int)data["mythical_style_count"] : 0;
+            _data.AncientStyleCount = data.ContainsKey("ancient_style_count") ? (int)data["ancient_style_count"] : 0;
         }
         
         /// <summary>

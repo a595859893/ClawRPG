@@ -231,10 +231,10 @@ namespace ClawRPG.Scripts.Systems.Combat
         public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
-            if (data.Contains("totalDamageNumbers")) TotalDamageNumbers = (int)data["totalDamageNumbers"];
-            if (data.Contains("criticalHits")) CriticalHits = (int)data["criticalHits"];
-            if (data.Contains("totalDamage")) TotalDamage = (int)data["totalDamage"];
-            if (data.Contains("totalHealing")) TotalHealing = (int)data["totalHealing"];
+            if (data.ContainsKey("totalDamageNumbers")) TotalDamageNumbers = (int)data["totalDamageNumbers"];
+            if (data.ContainsKey("criticalHits")) CriticalHits = (int)data["criticalHits"];
+            if (data.ContainsKey("totalDamage")) TotalDamage = (int)data["totalDamage"];
+            if (data.ContainsKey("totalHealing")) TotalHealing = (int)data["totalHealing"];
         }
     }
 }

@@ -481,7 +481,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
             _data.availableQuests.Clear();
             _data.acceptedQuestIds.Clear();
             
-            if (data.Contains("available_quests"))
+            if (data.ContainsKey("available_quests"))
             {
                 var questsArray = data["available_quests"] as Godot.Array;
                 foreach (Dictionary questDict in questsArray)
@@ -506,7 +506,7 @@ namespace ClawRPG.Scripts.Systems.GuildQuestBoard {
                 }
             }
             
-            if (data.Contains("accepted_quest_ids"))
+            if (data.ContainsKey("accepted_quest_ids"))
             {
                 var acceptedArray = data["accepted_quest_ids"] as Godot.Array;
                 foreach (int questId in acceptedArray)

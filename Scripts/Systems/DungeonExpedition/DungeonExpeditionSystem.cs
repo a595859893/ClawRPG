@@ -513,7 +513,7 @@ public delegate void ExpeditionAbandonedEventHandler(int dungeonType);
         if (data == null) return;
         
         // 恢复当前远征
-        if (data.Contains("current_expedition_type"))
+        if (data.ContainsKey("current_expedition_type"))
         {
             _currentExpedition = new ExpeditionRecord();
             _currentExpedition.DungeonType = (DungeonType)(int)data["current_expedition_type"];
@@ -521,7 +521,7 @@ public delegate void ExpeditionAbandonedEventHandler(int dungeonType);
             _currentExpedition.Status = (ExpeditionStatus)(int)data["current_expedition_status"];
             _currentExpedition.CurrentFloor = (int)(data.GetValueOrDefault("current_expedition_floor", 0));
             _currentExpedition.EnemiesDefeated = (int)(data.GetValueOrDefault("current_expedition_enemies", 0));
-            if (data.Contains("current_expedition_start_time"))
+            if (data.ContainsKey("current_expedition_start_time"))
                 _currentExpedition.StartTime = DateTime.Parse(data["current_expedition_start_time"].ToString());
         }
         
@@ -533,7 +533,7 @@ public delegate void ExpeditionAbandonedEventHandler(int dungeonType);
         _playerProgress.TotalExpEarned = (int)(data.GetValueOrDefault("total_exp_earned", 0));
         _playerProgress.BestFloor = (int)(data.GetValueOrDefault("best_floor", 0));
         
-        if (data.Contains("unlocked_dungeons"))
+        if (data.ContainsKey("unlocked_dungeons"))
             _playerProgress.UnlockedDungeons = (List<int>)data["unlocked_dungeons"];
     }
 }

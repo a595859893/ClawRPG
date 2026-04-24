@@ -116,12 +116,12 @@ public partial class PetFusionSystem : BaseSystem
         // 元素组合映射
         var elements = new List<string> { pet1Type, pet2Type };
         
-        if (elements.Contains("Fire") && elements.Contains("Water")) return "Steam";
-        if (elements.Contains("Fire") && elements.Contains("Ice")) return "Steam";
-        if (elements.Contains("Fire") && elements.Contains("Lightning")) return "Plasma";
-        if (elements.Contains("Water") && elements.Contains("Ice")) return "Frost";
-        if (elements.Contains("Shadow") && elements.Contains("Holy")) return "Balance";
-        if (elements.Contains("Fire") && elements.Contains("Shadow")) return "Infernal";
+        if (elements.ContainsKey("Fire") && elements.ContainsKey("Water")) return "Steam";
+        if (elements.ContainsKey("Fire") && elements.ContainsKey("Ice")) return "Steam";
+        if (elements.ContainsKey("Fire") && elements.ContainsKey("Lightning")) return "Plasma";
+        if (elements.ContainsKey("Water") && elements.ContainsKey("Ice")) return "Frost";
+        if (elements.ContainsKey("Shadow") && elements.ContainsKey("Holy")) return "Balance";
+        if (elements.ContainsKey("Fire") && elements.ContainsKey("Shadow")) return "Infernal";
         
         // 默认返回第一个元素
         return pet1Type;
@@ -207,7 +207,7 @@ public partial class PetFusionSystem : BaseSystem
             var saveJson = (Godot.Collections.Dictionary)json.Result;
             
             // 加载融合历史
-            if (saveJson.Contains("fusion_history")) {
+            if (saveJson.ContainsKey("fusion_history")) {
                 var fusionHistory = (Godot.Collections.Array)saveJson["fusion_history"];
                 foreach (Godot.Collections.Dictionary recordDict in fusionHistory) {
                     var record = new PetFusionRecord {
@@ -225,19 +225,19 @@ public partial class PetFusionSystem : BaseSystem
             }
             
             // 加载统计数据
-            if (saveJson.Contains("total_fusions")) {
+            if (saveJson.ContainsKey("total_fusions")) {
                 _data.TotalFusions = (int)saveJson["total_fusions"];
             }
-            if (saveJson.Contains("successful_fusions")) {
+            if (saveJson.ContainsKey("successful_fusions")) {
                 _data.SuccessfulFusions = (int)saveJson["successful_fusions"];
             }
-            if (saveJson.Contains("legendary_fusions")) {
+            if (saveJson.ContainsKey("legendary_fusions")) {
                 _data.LegendaryFusions = (int)saveJson["legendary_fusions"];
             }
-            if (saveJson.Contains("total_gold_spent")) {
+            if (saveJson.ContainsKey("total_gold_spent")) {
                 _data.TotalGoldSpent = (int)saveJson["total_gold_spent"];
             }
-            if (saveJson.Contains("unlocked_fusion_types")) {
+            if (saveJson.ContainsKey("unlocked_fusion_types")) {
                 var unlockedTypes = (Godot.Collections.Array)saveJson["unlocked_fusion_types"];
                 foreach (string type in unlockedTypes) {
                     _data.UnlockedFusionTypes.Add(type);
@@ -268,23 +268,23 @@ public partial class PetFusionSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("totalFusions"))
+        if (data.ContainsKey("totalFusions"))
         {
             _data.TotalFusions = (int)data["totalFusions"];
         }
-        if (data.Contains("successfulFusions"))
+        if (data.ContainsKey("successfulFusions"))
         {
             _data.SuccessfulFusions = (int)data["successfulFusions"];
         }
-        if (data.Contains("legendaryFusions"))
+        if (data.ContainsKey("legendaryFusions"))
         {
             _data.LegendaryFusions = (int)data["legendaryFusions"];
         }
-        if (data.Contains("totalGoldSpent"))
+        if (data.ContainsKey("totalGoldSpent"))
         {
             _data.TotalGoldSpent = (int)data["totalGoldSpent"];
         }
-        if (data.Contains("unlockedFusionTypes"))
+        if (data.ContainsKey("unlockedFusionTypes"))
         {
             _data.UnlockedFusionTypes = new HashSet<string>((List<string>)data["unlockedFusionTypes"]);
         }

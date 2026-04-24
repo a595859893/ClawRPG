@@ -400,71 +400,71 @@ public partial class PlayerProfileSystem : BaseSystem
         if (data == null) return;
         
         // 玩家基本信息
-        if (data.Contains("player_name"))
+        if (data.ContainsKey("player_name"))
             Profile.PlayerName = data["player_name"].ToString();
-        if (data.Contains("total_play_time"))
+        if (data.ContainsKey("total_play_time"))
             Profile.TotalPlayTime = (int)data["total_play_time"];
-        if (data.Contains("first_play_date"))
+        if (data.ContainsKey("first_play_date"))
             DateTime.TryParse(data["first_play_date"].ToString(), out Profile.FirstPlayDate);
-        if (data.Contains("last_play_date"))
+        if (data.ContainsKey("last_play_date"))
             DateTime.TryParse(data["last_play_date"].ToString(), out Profile.LastPlayDate);
-        if (data.Contains("current_level"))
+        if (data.ContainsKey("current_level"))
             Profile.CurrentLevel = (int)data["current_level"];
-        if (data.Contains("total_experience"))
+        if (data.ContainsKey("total_experience"))
             Profile.TotalExperience = Convert.ToInt64(data["total_experience"]);
         
         // 战斗统计
-        if (data.Contains("total_kills"))
+        if (data.ContainsKey("total_kills"))
             Profile.TotalKills = (int)data["total_kills"];
-        if (data.Contains("boss_kills"))
+        if (data.ContainsKey("boss_kills"))
             Profile.BossKills = (int)data["boss_kills"];
-        if (data.Contains("total_damage_dealt"))
+        if (data.ContainsKey("total_damage_dealt"))
             Profile.TotalDamageDealt = (int)data["total_damage_dealt"];
-        if (data.Contains("total_damage_taken"))
+        if (data.ContainsKey("total_damage_taken"))
             Profile.TotalDamageTaken = (int)data["total_damage_taken"];
-        if (data.Contains("total_healing_done"))
+        if (data.ContainsKey("total_healing_done"))
             Profile.TotalHealingDone = (int)data["total_healing_done"];
-        if (data.Contains("critical_hits"))
+        if (data.ContainsKey("critical_hits"))
             Profile.CriticalHits = (int)data["critical_hits"];
-        if (data.Contains("max_combo"))
+        if (data.ContainsKey("max_combo"))
             Profile.MaxCombo = (int)data["max_combo"];
         
         // 生存统计
-        if (data.Contains("deaths"))
+        if (data.ContainsKey("deaths"))
             Profile.Deaths = (int)data["deaths"];
-        if (data.Contains("total_gold_earned"))
+        if (data.ContainsKey("total_gold_earned"))
             Profile.TotalGoldEarned = (int)data["total_gold_earned"];
-        if (data.Contains("total_gold_spent"))
+        if (data.ContainsKey("total_gold_spent"))
             Profile.TotalGoldSpent = (int)data["total_gold_spent"];
-        if (data.Contains("items_collected"))
+        if (data.ContainsKey("items_collected"))
             Profile.ItemsCollected = (int)data["items_collected"];
-        if (data.Contains("items_crafted"))
+        if (data.ContainsKey("items_crafted"))
             Profile.ItemsCrafted = (int)data["items_crafted"];
         
         // 探索统计
-        if (data.Contains("regions_discovered"))
+        if (data.ContainsKey("regions_discovered"))
             Profile.RegionsDiscovered = (int)data["regions_discovered"];
-        if (data.Contains("dungeons_completed"))
+        if (data.ContainsKey("dungeons_completed"))
             Profile.DungeonsCompleted = (int)data["dungeons_completed"];
-        if (data.Contains("quests_completed"))
+        if (data.ContainsKey("quests_completed"))
             Profile.QuestsCompleted = (int)data["quests_completed"];
-        if (data.Contains("secrets_found"))
+        if (data.ContainsKey("secrets_found"))
             Profile.SecretsFound = (int)data["secrets_found"];
         
         // 社交统计
-        if (data.Contains("trades_completed"))
+        if (data.ContainsKey("trades_completed"))
             Profile.TradesCompleted = (int)data["trades_completed"];
-        if (data.Contains("pvp_wins"))
+        if (data.ContainsKey("pvp_wins"))
             Profile.PvPWins = (int)data["pvp_wins"];
-        if (data.Contains("pvp_losses"))
+        if (data.ContainsKey("pvp_losses"))
             Profile.PvPLosses = (int)data["pvp_losses"];
-        if (data.Contains("parties_joined"))
+        if (data.ContainsKey("parties_joined"))
             Profile.PartiesJoined = (int)data["parties_joined"];
         
         // 成就统计
-        if (data.Contains("achievements_unlocked"))
+        if (data.ContainsKey("achievements_unlocked"))
             Profile.AchievementsUnlocked = (int)data["achievements_unlocked"];
-        if (data.Contains("total_achievement_points"))
+        if (data.ContainsKey("total_achievement_points"))
             Profile.TotalAchievementPoints = (int)data["total_achievement_points"];
     }
     

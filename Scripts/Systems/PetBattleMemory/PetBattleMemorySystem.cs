@@ -362,26 +362,26 @@ namespace ClawRPG.Systems.PetBattleMemory
 
             var saveData = new PetBattleMemorySaveData();
 
-            if (data.Contains("entries"))
+            if (data.ContainsKey("entries"))
             {
                 foreach (Godot.Collections.Dictionary entryDict in (Godot.Collections.Array)data["entries"])
                 {
                     var entry = new PetBattleMemoryEntry();
-                    entry.PetId = entryDict.Contains("pet_id") ? entryDict["pet_id"].AsString() : "";
-                    entry.FirstSkillUsed = entryDict.Contains("first_skill") ? entryDict["first_skill"].AsString() : "";
-                    entry.AssociatedComboId = entryDict.Contains("combo_id") ? entryDict["combo_id"].AsString() : "";
-                    entry.TimesObserved = entryDict.Contains("times_observed") ? entryDict["times_observed"].AsInt32() : 1;
-                    entry.LastObservedTicks = entryDict.Contains("last_observed") ? entryDict["last_observed"].AsInt64() : DateTime.Now.Ticks;
+                    entry.PetId = entryDict.ContainsKey("pet_id") ? entryDict["pet_id"].AsString() : "";
+                    entry.FirstSkillUsed = entryDict.ContainsKey("first_skill") ? entryDict["first_skill"].AsString() : "";
+                    entry.AssociatedComboId = entryDict.ContainsKey("combo_id") ? entryDict["combo_id"].AsString() : "";
+                    entry.TimesObserved = entryDict.ContainsKey("times_observed") ? entryDict["times_observed"].AsInt32() : 1;
+                    entry.LastObservedTicks = entryDict.ContainsKey("last_observed") ? entryDict["last_observed"].AsInt64() : DateTime.Now.Ticks;
                     saveData.Entries.Add(entry);
                 }
             }
 
-            if (data.Contains("reincarnated_map"))
+            if (data.ContainsKey("reincarnated_map"))
             {
                 foreach (Godot.Collections.Dictionary kvpDict in (Godot.Collections.Array)data["reincarnated_map"])
                 {
-                    string newId = kvpDict.Contains("new_pet_id") ? kvpDict["new_pet_id"].AsString() : "";
-                    string fromId = kvpDict.Contains("inherited_from") ? kvpDict["inherited_from"].AsString() : "";
+                    string newId = kvpDict.ContainsKey("new_pet_id") ? kvpDict["new_pet_id"].AsString() : "";
+                    string fromId = kvpDict.ContainsKey("inherited_from") ? kvpDict["inherited_from"].AsString() : "";
                     if (!string.IsNullOrEmpty(newId) && !string.IsNullOrEmpty(fromId))
                         saveData.ReincarnatedMemoryMap[newId] = fromId;
                 }

@@ -363,7 +363,7 @@ public partial class RandomBoonSystem : BaseSystem
     {
         if (data == null || PlayerData == null) return;
         
-        if (data.Contains("active_boons"))
+        if (data.ContainsKey("active_boons"))
         {
             var boonsArray = (Array)data["active_boons"];
             PlayerData.ActiveBoons = new List<string>();
@@ -373,7 +373,7 @@ public partial class RandomBoonSystem : BaseSystem
             }
         }
         
-        if (data.Contains("boon_history"))
+        if (data.ContainsKey("boon_history"))
         {
             var historyArray = (Array)data["boon_history"];
             PlayerData.BoonHistory = new List<string>();

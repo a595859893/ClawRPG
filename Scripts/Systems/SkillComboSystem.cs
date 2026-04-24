@@ -464,7 +464,7 @@ public partial class SkillComboSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("combo_usage_count"))
+        if (data.ContainsKey("combo_usage_count"))
         {
             var usageCount = (Dictionary)data["combo_usage_count"];
             _playerData.ComboUsageCount = new Dictionary<string, int>();
@@ -474,7 +474,7 @@ public partial class SkillComboSystem : BaseSystem
             }
         }
         
-        if (data.Contains("combo_streak_best"))
+        if (data.ContainsKey("combo_streak_best"))
         {
             var streakBest = (Dictionary)data["combo_streak_best"];
             _playerData.ComboStreakBest = new Dictionary<string, int>();
@@ -484,10 +484,10 @@ public partial class SkillComboSystem : BaseSystem
             }
         }
         
-        if (data.Contains("total_combo_damage")) _playerData.TotalComboDamage = (float)data["total_combo_damage"];
-        if (data.Contains("total_combos_triggered")) _playerData.TotalCombosTriggered = (int)data["total_combos_triggered"];
+        if (data.ContainsKey("total_combo_damage")) _playerData.TotalComboDamage = (float)data["total_combo_damage"];
+        if (data.ContainsKey("total_combos_triggered")) _playerData.TotalCombosTriggered = (int)data["total_combos_triggered"];
         
-        if (data.Contains("discovered_combos"))
+        if (data.ContainsKey("discovered_combos"))
         {
             var discoveredCombos = (Array)data["discovered_combos"];
             _playerData.DiscoveredCombos = new List<string>();

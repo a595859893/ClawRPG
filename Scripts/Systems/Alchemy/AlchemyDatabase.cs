@@ -287,7 +287,7 @@ namespace ClawRPG.Systems.Alchemy
         {
             if (data == null) return;
             
-            if (data.Contains("inventory") && _inventory != null)
+            if (data.ContainsKey("inventory") && _inventory != null)
             {
                 _inventory.ImportSaveData((Dictionary)data["inventory"]);
             }

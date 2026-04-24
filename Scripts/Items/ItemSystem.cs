@@ -109,25 +109,25 @@ namespace ClawRPG.Scripts.Items {
         private void Initialize()
         {
             // Weapons
-            AddItem(new Weapon { Id = 1, Name = "木剑", Description = "基础的木质剑", Value = 10, Damage = 5, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Weapon { Id = 2, Name = "铁剑", Description = "精炼铁制剑", Value = 50, Damage = 12, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Weapon { Id = 3, Name = "钢剑", Description = "优质钢材剑", Value = 150, Damage = 20, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Weapon { Id = 4, Name = "银剑", Description = "附魔银剑", Value = 500, Damage = 30, CriticalChance = 0.1f, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Weapon { Id = 5, Name = "火焰之剑", Description = "火焰附魔剑", Value = 1000, Damage = 40, CriticalChance = 0.15f, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Weapon { Id = 6, Name = "冰霜之剑", Description = "冰霜附魔剑", Value = 1000, Damage = 40, CriticalChance = 0.15f, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Weapon { Id = 7, Name = "雷神之锤", Description = "雷电之力", Value = 1500, Damage = 50, AttackSpeed = 0.8f, WeaponType = Weapon.WeaponType.Axe });
-            AddItem(new Weapon { Id = 8, Name = "传奇之刃", Description = "传说中的武器", Value = 5000, Damage = 80, CriticalChance = 0.25f, WeaponType = Weapon.WeaponType.Sword });
+            AddItem(new Weapon { Id = 1, Name = "木剑", Description = "基础的木质剑", Value = 10, Damage = 5, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Weapon { Id = 2, Name = "铁剑", Description = "精炼铁制剑", Value = 50, Damage = 12, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Weapon { Id = 3, Name = "钢剑", Description = "优质钢材剑", Value = 150, Damage = 20, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Weapon { Id = 4, Name = "银剑", Description = "附魔银剑", Value = 500, Damage = 30, CriticalChance = 0.1f, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Weapon { Id = 5, Name = "火焰之剑", Description = "火焰附魔剑", Value = 1000, Damage = 40, CriticalChance = 0.15f, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Weapon { Id = 6, Name = "冰霜之剑", Description = "冰霜附魔剑", Value = 1000, Damage = 40, CriticalChance = 0.15f, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Weapon { Id = 7, Name = "雷神之锤", Description = "雷电之力", Value = 1500, Damage = 50, AttackSpeed = 0.8f, WeaponType = Weapon.WeaponCategory.Axe });
+            AddItem(new Weapon { Id = 8, Name = "传奇之刃", Description = "传说中的武器", Value = 5000, Damage = 80, CriticalChance = 0.25f, WeaponType = Weapon.WeaponCategory.Sword });
             
             // Extended weapons
-            AddItem(new Weapon { Id = 9, Name = "暗影之刃", Description = "暗影附魔剑", Value = 2000, Damage = 55, CriticalChance = 0.2f, WeaponType = Weapon.WeaponType.Dagger });
-            AddItem(new Weapon { Id = 10, Name = "神圣之剑", Description = "神圣附魔剑", Value = 2500, Damage = 60, CriticalChance = 0.18f, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Weapon { Id = 11, Name = "龙息之剑", Description = "龙火淬炼的剑", Value = 3500, Damage = 70, CriticalChance = 0.22f, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Weapon { Id = 12, Name = "精灵长弓", Description = "精灵族的长弓", Value = 1800, Damage = 45, AttackSpeed = 1.2f, WeaponType = Weapon.WeaponType.Bow });
-            AddItem(new Weapon { Id = 13, Name = "猎龙弓", Description = "专门猎龙的强弓", Value = 4000, Damage = 65, AttackSpeed = 1.0f, WeaponType = Weapon.WeaponType.Bow });
-            AddItem(new Weapon { Id = 14, Name = "奥术法杖", Description = "蕴含奥术能量", Value = 2200, Damage = 50, WeaponType = Weapon.WeaponType.Staff });
-            AddItem(new Weapon { Id = 15, Name = "元素法杖", Description = "元素魔法杖", Value = 3500, Damage = 70, WeaponType = Weapon.WeaponType.Staff });
-            AddItem(new Weapon { Id = 16, Name = "月影之刃", Description = "月光淬炼的刺客武器", Value = 4500, Damage = 75, CriticalChance = 0.3f, WeaponType = Weapon.WeaponType.Dagger });
-            AddItem(new Weapon { Id = 17, Name = "泰坦战斧", Description = "泰坦之力", Value = 6000, Damage = 90, AttackSpeed = 0.7f, WeaponType = Weapon.WeaponType.Axe });
+            AddItem(new Weapon { Id = 9, Name = "暗影之刃", Description = "暗影附魔剑", Value = 2000, Damage = 55, CriticalChance = 0.2f, WeaponType = Weapon.WeaponCategory.Dagger });
+            AddItem(new Weapon { Id = 10, Name = "神圣之剑", Description = "神圣附魔剑", Value = 2500, Damage = 60, CriticalChance = 0.18f, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Weapon { Id = 11, Name = "龙息之剑", Description = "龙火淬炼的剑", Value = 3500, Damage = 70, CriticalChance = 0.22f, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Weapon { Id = 12, Name = "精灵长弓", Description = "精灵族的长弓", Value = 1800, Damage = 45, AttackSpeed = 1.2f, WeaponType = Weapon.WeaponCategory.Bow });
+            AddItem(new Weapon { Id = 13, Name = "猎龙弓", Description = "专门猎龙的强弓", Value = 4000, Damage = 65, AttackSpeed = 1.0f, WeaponType = Weapon.WeaponCategory.Bow });
+            AddItem(new Weapon { Id = 14, Name = "奥术法杖", Description = "蕴含奥术能量", Value = 2200, Damage = 50, WeaponType = Weapon.WeaponCategory.Staff });
+            AddItem(new Weapon { Id = 15, Name = "元素法杖", Description = "元素魔法杖", Value = 3500, Damage = 70, WeaponType = Weapon.WeaponCategory.Staff });
+            AddItem(new Weapon { Id = 16, Name = "月影之刃", Description = "月光淬炼的刺客武器", Value = 4500, Damage = 75, CriticalChance = 0.3f, WeaponType = Weapon.WeaponCategory.Dagger });
+            AddItem(new Weapon { Id = 17, Name = "泰坦战斧", Description = "泰坦之力", Value = 6000, Damage = 90, AttackSpeed = 0.7f, WeaponType = Weapon.WeaponCategory.Axe });
             
             // Armor
             AddItem(new Armor { Id = 101, Name = "布袍", Description = "基础法师袍", Value = 20, Defense = 2, HealthBonus = 10 });
@@ -140,7 +140,7 @@ namespace ClawRPG.Scripts.Items {
             
             // Extended armor
             AddItem(new Armor { Id = 108, Name = "暗影皮甲", Description = "暗影刺客皮甲", Value = 1500, Defense = 25, HealthBonus = 80 });
-            AddItem(new Armor { Id = 109, Name = "火焰锁甲", Description = "火焰附魔锁甲", Value = 1800, Defense = 28, HealthBonus = 90, ArmorType = Armor.ArmorType.Chest });
+            AddItem(new Armor { Id = 109, Name = "火焰锁甲", Description = "火焰附魔锁甲", Value = 1800, Defense = 28, HealthBonus = 90, ArmorType = Armor.ArmorCategory.Chest });
             AddItem(new Armor { Id = 110, Name = "冰霜铁甲", Description = "冰霜附魔铁甲", Value = 2000, Defense = 30, HealthBonus = 100 });
             AddItem(new Armor { Id = 111, Name = "神圣长袍", Description = "神圣法师长袍", Value = 2500, Defense = 15, HealthBonus = 120 });
             AddItem(new Armor { Id = 112, Name = "龙鳞战甲", Description = "强化龙鳞甲", Value = 3500, Defense = 50, HealthBonus = 180 });
@@ -152,88 +152,88 @@ namespace ClawRPG.Scripts.Items {
             
             // === Equipment Sets ===
             // Set 1: Warrior's Might (战士之力) - ID 1001-1005
-            AddItem(new Weapon { Id = 1001, Name = "战士之剑", Description = "战士之力套装 - 武器", Value = 3000, Damage = 45, CriticalChance = 0.15f, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Armor { Id = 1002, Name = "战士头盔", Description = "战士之力套装 - 头盔", Value = 2000, Defense = 25, HealthBonus = 100, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1003, Name = "战士胸甲", Description = "战士之力套装 - 胸甲", Value = 2500, Defense = 35, HealthBonus = 150, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1004, Name = "战士护腿", Description = "战士之力套装 - 护腿", Value = 1800, Defense = 20, HealthBonus = 80, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1005, Name = "战士盾牌", Description = "战士之力套装 - 盾牌", Value = 2200, Defense = 30, HealthBonus = 100, ArmorType = Armor.ArmorType.Shield });
+            AddItem(new Weapon { Id = 1001, Name = "战士之剑", Description = "战士之力套装 - 武器", Value = 3000, Damage = 45, CriticalChance = 0.15f, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Armor { Id = 1002, Name = "战士头盔", Description = "战士之力套装 - 头盔", Value = 2000, Defense = 25, HealthBonus = 100, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1003, Name = "战士胸甲", Description = "战士之力套装 - 胸甲", Value = 2500, Defense = 35, HealthBonus = 150, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1004, Name = "战士护腿", Description = "战士之力套装 - 护腿", Value = 1800, Defense = 20, HealthBonus = 80, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1005, Name = "战士盾牌", Description = "战士之力套装 - 盾牌", Value = 2200, Defense = 30, HealthBonus = 100, ArmorType = Armor.ArmorCategory.Shield });
             
             // Set 2: Mage's Robes (法师长袍) - ID 1011-1015
-            AddItem(new Weapon { Id = 1011, Name = "奥术法杖", Description = "法师长袍套装 - 法杖", Value = 3200, Damage = 55, WeaponType = Weapon.WeaponType.Staff });
-            AddItem(new Armor { Id = 1012, Name = "法师帽子", Description = "法师长袍套装 - 帽子", Value = 2100, Defense = 15, ManaBonus = 100, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1013, Name = "法师长袍", Description = "法师长袍套装 - 长袍", Value = 2600, Defense = 18, ManaBonus = 150, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1014, Name = "法师护腿", Description = "法师长袍套装 - 护腿", Value = 1900, Defense = 12, ManaBonus = 80, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1015, Name = "法师手套", Description = "法师长袍套装 - 手套", Value = 1600, Defense = 10, ManaBonus = 60, ArmorType = Armor.ArmorType.Helmet });
+            AddItem(new Weapon { Id = 1011, Name = "奥术法杖", Description = "法师长袍套装 - 法杖", Value = 3200, Damage = 55, WeaponType = Weapon.WeaponCategory.Staff });
+            AddItem(new Armor { Id = 1012, Name = "法师帽子", Description = "法师长袍套装 - 帽子", Value = 2100, Defense = 15, ManaBonus = 100, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1013, Name = "法师长袍", Description = "法师长袍套装 - 长袍", Value = 2600, Defense = 18, ManaBonus = 150, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1014, Name = "法师护腿", Description = "法师长袍套装 - 护腿", Value = 1900, Defense = 12, ManaBonus = 80, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1015, Name = "法师手套", Description = "法师长袍套装 - 手套", Value = 1600, Defense = 10, ManaBonus = 60, ArmorType = Armor.ArmorCategory.Helmet });
             
             // Set 3: Assassin's Shadow (刺客阴影) - ID 1021-1025
-            AddItem(new Weapon { Id = 1021, Name = "暗影匕首", Description = "刺客阴影套装 - 匕首", Value = 3500, Damage = 50, CriticalChance = 0.25f, WeaponType = Weapon.WeaponType.Dagger });
-            AddItem(new Armor { Id = 1022, Name = "刺客头巾", Description = "刺客阴影套装 - 头巾", Value = 2000, Defense = 12, HealthBonus = 50, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1023, Name = "刺客皮甲", Description = "刺客阴影套装 - 皮甲", Value = 2400, Defense = 18, HealthBonus = 80, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1024, Name = "刺客护腿", Description = "刺客阴影套装 - 护腿", Value = 1700, Defense = 10, HealthBonus = 50, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1025, Name = "刺客靴子", Description = "刺客阴影套装 - 靴子", Value = 1500, Defense = 8, HealthBonus = 40, ArmorType = Armor.ArmorType.Legs });
+            AddItem(new Weapon { Id = 1021, Name = "暗影匕首", Description = "刺客阴影套装 - 匕首", Value = 3500, Damage = 50, CriticalChance = 0.25f, WeaponType = Weapon.WeaponCategory.Dagger });
+            AddItem(new Armor { Id = 1022, Name = "刺客头巾", Description = "刺客阴影套装 - 头巾", Value = 2000, Defense = 12, HealthBonus = 50, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1023, Name = "刺客皮甲", Description = "刺客阴影套装 - 皮甲", Value = 2400, Defense = 18, HealthBonus = 80, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1024, Name = "刺客护腿", Description = "刺客阴影套装 - 护腿", Value = 1700, Defense = 10, HealthBonus = 50, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1025, Name = "刺客靴子", Description = "刺客阴影套装 - 靴子", Value = 1500, Defense = 8, HealthBonus = 40, ArmorType = Armor.ArmorCategory.Legs });
             
             // Set 4: Dragon Scale Armor (龙鳞护甲) - ID 1031-1035
-            AddItem(new Weapon { Id = 1031, Name = "龙鳞剑", Description = "龙鳞护甲套装 - 剑", Value = 5000, Damage = 65, CriticalChance = 0.2f, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Armor { Id = 1032, Name = "龙鳞头盔", Description = "龙鳞护甲套装 - 头盔", Value = 3500, Defense = 40, HealthBonus = 200, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1033, Name = "龙鳞胸甲", Description = "龙鳞护甲套装 - 胸甲", Value = 4500, Defense = 55, HealthBonus = 300, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1034, Name = "龙鳞护腿", Description = "龙鳞护甲套装 - 护腿", Value = 3000, Defense = 35, HealthBonus = 180, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1035, Name = "龙鳞盾牌", Description = "龙鳞护甲套装 - 盾牌", Value = 3800, Defense = 45, HealthBonus = 220, ArmorType = Armor.ArmorType.Shield });
+            AddItem(new Weapon { Id = 1031, Name = "龙鳞剑", Description = "龙鳞护甲套装 - 剑", Value = 5000, Damage = 65, CriticalChance = 0.2f, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Armor { Id = 1032, Name = "龙鳞头盔", Description = "龙鳞护甲套装 - 头盔", Value = 3500, Defense = 40, HealthBonus = 200, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1033, Name = "龙鳞胸甲", Description = "龙鳞护甲套装 - 胸甲", Value = 4500, Defense = 55, HealthBonus = 300, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1034, Name = "龙鳞护腿", Description = "龙鳞护甲套装 - 护腿", Value = 3000, Defense = 35, HealthBonus = 180, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1035, Name = "龙鳞盾牌", Description = "龙鳞护甲套装 - 盾牌", Value = 3800, Defense = 45, HealthBonus = 220, ArmorType = Armor.ArmorCategory.Shield });
             
             // Set 5: Holy Light (神圣之光) - ID 1041-1045
-            AddItem(new Weapon { Id = 1041, Name = "圣光法杖", Description = "神圣之光套装 - 法杖", Value = 4500, Damage = 60, WeaponType = Weapon.WeaponType.Staff });
-            AddItem(new Armor { Id = 1042, Name = "圣光头盔", Description = "神圣之光套装 - 头盔", Value = 3200, Defense = 25, HealthBonus = 180, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1043, Name = "圣光胸甲", Description = "神圣之光套装 - 胸甲", Value = 4000, Defense = 35, HealthBonus = 250, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1044, Name = "圣光护腿", Description = "神圣之光套装 - 护腿", Value = 2800, Defense = 22, HealthBonus = 150, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1045, Name = "圣光护符", Description = "神圣之光套装 - 饰品", Value = 3500, Defense = 15, HealthBonus = 120, ArmorType = Armor.ArmorType.Helmet });
+            AddItem(new Weapon { Id = 1041, Name = "圣光法杖", Description = "神圣之光套装 - 法杖", Value = 4500, Damage = 60, WeaponType = Weapon.WeaponCategory.Staff });
+            AddItem(new Armor { Id = 1042, Name = "圣光头盔", Description = "神圣之光套装 - 头盔", Value = 3200, Defense = 25, HealthBonus = 180, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1043, Name = "圣光胸甲", Description = "神圣之光套装 - 胸甲", Value = 4000, Defense = 35, HealthBonus = 250, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1044, Name = "圣光护腿", Description = "神圣之光套装 - 护腿", Value = 2800, Defense = 22, HealthBonus = 150, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1045, Name = "圣光护符", Description = "神圣之光套装 - 饰品", Value = 3500, Defense = 15, HealthBonus = 120, ArmorType = Armor.ArmorCategory.Helmet });
             
             // Set 6: Elemental Master (元素大师) - ID 1051-1055
-            AddItem(new Weapon { Id = 1051, Name = "元素法杖", Description = "元素大师套装 - 法杖", Value = 4800, Damage = 70, WeaponType = Weapon.WeaponType.Staff });
-            AddItem(new Armor { Id = 1052, Name = "元素头盔", Description = "元素大师套装 - 头盔", Value = 3400, Defense = 22, ManaBonus = 120, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1053, Name = "元素长袍", Description = "元素大师套装 - 长袍", Value = 4200, Defense = 28, ManaBonus = 180, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1054, Name = "元素护腿", Description = "元素大师套装 - 护腿", Value = 3000, Defense = 18, ManaBonus = 100, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1055, Name = "元素戒指", Description = "元素大师套装 - 饰品", Value = 3600, Defense = 12, ManaBonus = 150, ArmorType = Armor.ArmorType.Helmet });
+            AddItem(new Weapon { Id = 1051, Name = "元素法杖", Description = "元素大师套装 - 法杖", Value = 4800, Damage = 70, WeaponType = Weapon.WeaponCategory.Staff });
+            AddItem(new Armor { Id = 1052, Name = "元素头盔", Description = "元素大师套装 - 头盔", Value = 3400, Defense = 22, ManaBonus = 120, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1053, Name = "元素长袍", Description = "元素大师套装 - 长袍", Value = 4200, Defense = 28, ManaBonus = 180, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1054, Name = "元素护腿", Description = "元素大师套装 - 护腿", Value = 3000, Defense = 18, ManaBonus = 100, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1055, Name = "元素戒指", Description = "元素大师套装 - 饰品", Value = 3600, Defense = 12, ManaBonus = 150, ArmorType = Armor.ArmorCategory.Helmet });
             
             // Set 7: Shadow Lord (暗影王者) - ID 1061-1065
-            AddItem(new Weapon { Id = 1061, Name = "暗影之刃", Description = "暗影王者套装 - 武器", Value = 5200, Damage = 75, CriticalChance = 0.25f, WeaponType = Weapon.WeaponType.Dagger });
-            AddItem(new Armor { Id = 1062, Name = "暗影头盔", Description = "暗影王者套装 - 头盔", Value = 3600, Defense = 28, HealthBonus = 150, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1063, Name = "暗影胸甲", Description = "暗影王者套装 - 胸甲", Value = 4400, Defense = 38, HealthBonus = 200, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1064, Name = "暗影护腿", Description = "暗影王者套装 - 护腿", Value = 3200, Defense = 25, HealthBonus = 120, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1065, Name = "暗影披风", Description = "暗影王者套装 - 披风", Value = 3800, Defense = 20, HealthBonus = 180, ArmorType = Armor.ArmorType.Chest });
+            AddItem(new Weapon { Id = 1061, Name = "暗影之刃", Description = "暗影王者套装 - 武器", Value = 5200, Damage = 75, CriticalChance = 0.25f, WeaponType = Weapon.WeaponCategory.Dagger });
+            AddItem(new Armor { Id = 1062, Name = "暗影头盔", Description = "暗影王者套装 - 头盔", Value = 3600, Defense = 28, HealthBonus = 150, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1063, Name = "暗影胸甲", Description = "暗影王者套装 - 胸甲", Value = 4400, Defense = 38, HealthBonus = 200, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1064, Name = "暗影护腿", Description = "暗影王者套装 - 护腿", Value = 3200, Defense = 25, HealthBonus = 120, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1065, Name = "暗影披风", Description = "暗影王者套装 - 披风", Value = 3800, Defense = 20, HealthBonus = 180, ArmorType = Armor.ArmorCategory.Chest });
             
             // Set 8: Fire Lord (火焰领主) - ID 1071-1075
-            AddItem(new Weapon { Id = 1071, Name = "火焰剑", Description = "火焰领主套装 - 剑", Value = 5500, Damage = 80, CriticalChance = 0.22f, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Armor { Id = 1072, Name = "火焰头盔", Description = "火焰领主套装 - 头盔", Value = 3800, Defense = 30, HealthBonus = 160, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1073, Name = "火焰胸甲", Description = "火焰领主套装 - 胸甲", Value = 4600, Defense = 42, HealthBonus = 220, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1074, Name = "火焰护腿", Description = "火焰领主套装 - 护腿", Value = 3400, Defense = 28, HealthBonus = 140, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1075, Name = "火焰盾牌", Description = "火焰领主套装 - 盾牌", Value = 4000, Defense = 48, HealthBonus = 180, ArmorType = Armor.ArmorType.Shield });
+            AddItem(new Weapon { Id = 1071, Name = "火焰剑", Description = "火焰领主套装 - 剑", Value = 5500, Damage = 80, CriticalChance = 0.22f, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Armor { Id = 1072, Name = "火焰头盔", Description = "火焰领主套装 - 头盔", Value = 3800, Defense = 30, HealthBonus = 160, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1073, Name = "火焰胸甲", Description = "火焰领主套装 - 胸甲", Value = 4600, Defense = 42, HealthBonus = 220, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1074, Name = "火焰护腿", Description = "火焰领主套装 - 护腿", Value = 3400, Defense = 28, HealthBonus = 140, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1075, Name = "火焰盾牌", Description = "火焰领主套装 - 盾牌", Value = 4000, Defense = 48, HealthBonus = 180, ArmorType = Armor.ArmorCategory.Shield });
             
             // Set 9: Frost Heart (冰霜之心) - ID 1081-1085
-            AddItem(new Weapon { Id = 1081, Name = "冰霜剑", Description = "冰霜之心套装 - 剑", Value = 5500, Damage = 75, CriticalChance = 0.2f, WeaponType = Weapon.WeaponType.Sword });
-            AddItem(new Armor { Id = 1082, Name = "冰霜头盔", Description = "冰霜之心套装 - 头盔", Value = 3700, Defense = 28, HealthBonus = 150, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1083, Name = "冰霜胸甲", Description = "冰霜之心套装 - 胸甲", Value = 4500, Defense = 40, HealthBonus = 200, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1084, Name = "冰霜护腿", Description = "冰霜之心套装 - 护腿", Value = 3300, Defense = 26, HealthBonus = 130, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1085, Name = "冰霜戒指", Description = "冰霜之心套装 - 饰品", Value = 3900, Defense = 15, HealthBonus = 160, ArmorType = Armor.ArmorType.Helmet });
+            AddItem(new Weapon { Id = 1081, Name = "冰霜剑", Description = "冰霜之心套装 - 剑", Value = 5500, Damage = 75, CriticalChance = 0.2f, WeaponType = Weapon.WeaponCategory.Sword });
+            AddItem(new Armor { Id = 1082, Name = "冰霜头盔", Description = "冰霜之心套装 - 头盔", Value = 3700, Defense = 28, HealthBonus = 150, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1083, Name = "冰霜胸甲", Description = "冰霜之心套装 - 胸甲", Value = 4500, Defense = 40, HealthBonus = 200, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1084, Name = "冰霜护腿", Description = "冰霜之心套装 - 护腿", Value = 3300, Defense = 26, HealthBonus = 130, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1085, Name = "冰霜戒指", Description = "冰霜之心套装 - 饰品", Value = 3900, Defense = 15, HealthBonus = 160, ArmorType = Armor.ArmorCategory.Helmet });
             
             // Set 10: Lightning Messenger (闪电使者) - ID 1091-1095
-            AddItem(new Weapon { Id = 1091, Name = "雷神之杖", Description = "闪电使者套装 - 法杖", Value = 5800, Damage = 85, AttackSpeed = 1.3f, WeaponType = Weapon.WeaponType.Staff });
-            AddItem(new Armor { Id = 1092, Name = "闪电头盔", Description = "闪电使者套装 - 头盔", Value = 3900, Defense = 26, HealthBonus = 140, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1093, Name = "闪电胸甲", Description = "闪电使者套装 - 胸甲", Value = 4700, Defense = 36, HealthBonus = 180, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1094, Name = "闪电护腿", Description = "闪电使者套装 - 护腿", Value = 3500, Defense = 24, HealthBonus = 120, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1095, Name = "闪电靴子", Description = "闪电使者套装 - 靴子", Value = 3200, Defense = 18, HealthBonus = 100, ArmorType = Armor.ArmorType.Legs });
+            AddItem(new Weapon { Id = 1091, Name = "雷神之杖", Description = "闪电使者套装 - 法杖", Value = 5800, Damage = 85, AttackSpeed = 1.3f, WeaponType = Weapon.WeaponCategory.Staff });
+            AddItem(new Armor { Id = 1092, Name = "闪电头盔", Description = "闪电使者套装 - 头盔", Value = 3900, Defense = 26, HealthBonus = 140, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1093, Name = "闪电胸甲", Description = "闪电使者套装 - 胸甲", Value = 4700, Defense = 36, HealthBonus = 180, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1094, Name = "闪电护腿", Description = "闪电使者套装 - 护腿", Value = 3500, Defense = 24, HealthBonus = 120, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1095, Name = "闪电靴子", Description = "闪电使者套装 - 靴子", Value = 3200, Defense = 18, HealthBonus = 100, ArmorType = Armor.ArmorCategory.Legs });
             
             // Set 11: Elven Grace (精灵套装) - ID 1101-1105
-            AddItem(new Weapon { Id = 1101, Name = "精灵弓", Description = "精灵套装 - 弓", Value = 5400, Damage = 70, AttackSpeed = 1.4f, WeaponType = Weapon.WeaponType.Bow });
-            AddItem(new Armor { Id = 1102, Name = "精灵头盔", Description = "精灵套装 - 头盔", Value = 3600, Defense = 24, HealthBonus = 180, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1103, Name = "精灵皮甲", Description = "精灵套装 - 皮甲", Value = 4400, Defense = 32, HealthBonus = 220, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1104, Name = "精灵护腿", Description = "精灵套装 - 护腿", Value = 3200, Defense = 22, HealthBonus = 140, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1105, Name = "精灵斗篷", Description = "精灵套装 - 斗篷", Value = 3800, Defense = 18, HealthBonus = 160, ArmorType = Armor.ArmorType.Chest });
+            AddItem(new Weapon { Id = 1101, Name = "精灵弓", Description = "精灵套装 - 弓", Value = 5400, Damage = 70, AttackSpeed = 1.4f, WeaponType = Weapon.WeaponCategory.Bow });
+            AddItem(new Armor { Id = 1102, Name = "精灵头盔", Description = "精灵套装 - 头盔", Value = 3600, Defense = 24, HealthBonus = 180, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1103, Name = "精灵皮甲", Description = "精灵套装 - 皮甲", Value = 4400, Defense = 32, HealthBonus = 220, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1104, Name = "精灵护腿", Description = "精灵套装 - 护腿", Value = 3200, Defense = 22, HealthBonus = 140, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1105, Name = "精灵斗篷", Description = "精灵套装 - 斗篷", Value = 3800, Defense = 18, HealthBonus = 160, ArmorType = Armor.ArmorCategory.Chest });
             
             // Set 12: Titan's Power (泰坦之力) - ID 1111-1115
-            AddItem(new Weapon { Id = 1111, Name = "泰坦战斧", Description = "泰坦之力套装 - 战斧", Value = 6500, Damage = 100, AttackSpeed = 0.75f, WeaponType = Weapon.WeaponType.Axe });
-            AddItem(new Armor { Id = 1112, Name = "泰坦头盔", Description = "泰坦之力套装 - 头盔", Value = 4500, Defense = 45, HealthBonus = 300, ArmorType = Armor.ArmorType.Helmet });
-            AddItem(new Armor { Id = 1113, Name = "泰坦胸甲", Description = "泰坦之力套装 - 胸甲", Value = 5500, Defense = 60, HealthBonus = 400, ArmorType = Armor.ArmorType.Chest });
-            AddItem(new Armor { Id = 1114, Name = "泰坦护腿", Description = "泰坦之力套装 - 护腿", Value = 4000, Defense = 40, HealthBonus = 250, ArmorType = Armor.ArmorType.Legs });
-            AddItem(new Armor { Id = 1115, Name = "泰坦盾牌", Description = "泰坦之力套装 - 盾牌", Value = 4800, Defense = 55, HealthBonus = 300, ArmorType = Armor.ArmorType.Shield });
+            AddItem(new Weapon { Id = 1111, Name = "泰坦战斧", Description = "泰坦之力套装 - 战斧", Value = 6500, Damage = 100, AttackSpeed = 0.75f, WeaponType = Weapon.WeaponCategory.Axe });
+            AddItem(new Armor { Id = 1112, Name = "泰坦头盔", Description = "泰坦之力套装 - 头盔", Value = 4500, Defense = 45, HealthBonus = 300, ArmorType = Armor.ArmorCategory.Helmet });
+            AddItem(new Armor { Id = 1113, Name = "泰坦胸甲", Description = "泰坦之力套装 - 胸甲", Value = 5500, Defense = 60, HealthBonus = 400, ArmorType = Armor.ArmorCategory.Chest });
+            AddItem(new Armor { Id = 1114, Name = "泰坦护腿", Description = "泰坦之力套装 - 护腿", Value = 4000, Defense = 40, HealthBonus = 250, ArmorType = Armor.ArmorCategory.Legs });
+            AddItem(new Armor { Id = 1115, Name = "泰坦盾牌", Description = "泰坦之力套装 - 盾牌", Value = 4800, Defense = 55, HealthBonus = 300, ArmorType = Armor.ArmorCategory.Shield });
             
             // Consumables
             AddItem(new Consumable { Id = 201, Name = "小生命药水", Description = "恢复50生命", Value = 10, HealthRestore = 50 });

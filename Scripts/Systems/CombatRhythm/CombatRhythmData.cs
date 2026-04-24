@@ -237,7 +237,7 @@ public delegate void RhythmIntensityUpdatedEventHandler(RhythmLevel level, int r
     public override void ImportSaveData(Dictionary<string, object> data)
     {
         if (data == null) return;
-        if (data.Contains("last_battle_level"))
+        if (data.ContainsKey("last_battle_level"))
             _lastBattleLevel = (RhythmLevel)(int)(float)data["last_battle_level"];
     }
 

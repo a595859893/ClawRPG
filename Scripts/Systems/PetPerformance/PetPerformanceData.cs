@@ -273,19 +273,19 @@ public partial class PetPerformanceData : BaseSystem
     public override void ImportSaveData(Dictionary<string, object> data)
     {
         _records.Clear();
-        if (!data.Contains("records")) return;
+        if (!data.ContainsKey("records")) return;
         var recordsList = (Godot.Collections.Array)data["records"];
         foreach (Godot.Collections.Dictionary rd in recordsList)
         {
             _records.Add(new RoomPerformanceRecord
             {
-                RoomId = rd.Contains("room_id") ? rd["room_id"].ToString() : "",
-                RunType = rd.Contains("run_type") ? (RunType)(int)rd["run_type"] : RunType.Solo,
-                ClearTimeSeconds = rd.Contains("clear_time") ? (float)rd["clear_time"] : 0,
-                HpLoss = rd.Contains("hp_loss") ? (int)rd["hp_loss"] : 0,
-                DamageDealt = rd.Contains("damage_dealt") ? (float)rd["damage_dealt"] : 0,
-                PetSkillActivations = rd.Contains("pet_skill_activations") ? (int)rd["pet_skill_activations"] : 0,
-                Timestamp = rd.Contains("timestamp") ? (double)rd["timestamp"] : 0
+                RoomId = rd.ContainsKey("room_id") ? rd["room_id"].ToString() : "",
+                RunType = rd.ContainsKey("run_type") ? (RunType)(int)rd["run_type"] : RunType.Solo,
+                ClearTimeSeconds = rd.ContainsKey("clear_time") ? (float)rd["clear_time"] : 0,
+                HpLoss = rd.ContainsKey("hp_loss") ? (int)rd["hp_loss"] : 0,
+                DamageDealt = rd.ContainsKey("damage_dealt") ? (float)rd["damage_dealt"] : 0,
+                PetSkillActivations = rd.ContainsKey("pet_skill_activations") ? (int)rd["pet_skill_activations"] : 0,
+                Timestamp = rd.ContainsKey("timestamp") ? (double)rd["timestamp"] : 0
             });
         }
     }

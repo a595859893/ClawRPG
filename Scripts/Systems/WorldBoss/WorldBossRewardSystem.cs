@@ -267,7 +267,7 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
             
             // 加载击杀历史
-            if (data.Contains("kill_history"))
+            if (data.ContainsKey("kill_history"))
             {
                 var history = data["kill_history"] as Array;
                 if (history != null)
@@ -296,7 +296,7 @@ namespace ClawRPG.Scripts.Systems
             }
             
             // 加载玩家统计
-            if (data.Contains("player_stats"))
+            if (data.ContainsKey("player_stats"))
             {
                 var stats = data["player_stats"] as Dictionary;
                 if (stats != null)

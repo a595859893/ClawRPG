@@ -29,7 +29,7 @@ namespace ClawRPG.Systems.Pets.AI
 
         private void OnPlayerDied()
         {
-            if (_currentTrajectory.PredictedTrajectory.Contains("死亡"))
+            if (_currentTrajectory.PredictedTrajectory.ContainsKey("死亡"))
             {
                 _observerState.PersistentState.PredictionSuccessCount++;
             }

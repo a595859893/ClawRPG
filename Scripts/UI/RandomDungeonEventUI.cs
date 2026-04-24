@@ -147,13 +147,13 @@ public partial class RandomDungeonEventUI : Control
         
         var result = _eventSystem.TriggerRandomEvent();
         
-        if (result.Contains("description"))
+        if (result.ContainsKey("description"))
         {
             string desc = result["description"].ToString();
             _eventDescription.Text = $"[color=yellow]{desc}[/color]";
         }
         
-        if (result.Contains("category"))
+        if (result.ContainsKey("category"))
         {
             string category = result["category"].ToString();
             _eventCategory.Text = category;
@@ -176,7 +176,7 @@ public partial class RandomDungeonEventUI : Control
             _eventCategory.AddThemeColorOverride("font_color", categoryColor);
         }
         
-        if (result.Contains("message"))
+        if (result.ContainsKey("message"))
         {
             string message = result["message"].ToString();
             _eventResult.Text = message;

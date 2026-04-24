@@ -475,7 +475,7 @@ public partial class PetMutationSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("petMutations"))
+        if (data.ContainsKey("petMutations"))
         {
             var petMutationsData = data["petMutations"] as Dictionary<string, object>;
             if (petMutationsData != null)
@@ -493,15 +493,15 @@ public partial class PetMutationSystem : BaseSystem
                 }
             }
         }
-        if (data.Contains("totalMutationAttempts"))
+        if (data.ContainsKey("totalMutationAttempts"))
         {
             _totalMutationAttempts = (int)data["totalMutationAttempts"];
         }
-        if (data.Contains("successfulMutations"))
+        if (data.ContainsKey("successfulMutations"))
         {
             _successfulMutations = (int)data["successfulMutations"];
         }
-        if (data.Contains("rerollUsed"))
+        if (data.ContainsKey("rerollUsed"))
         {
             _rerollUsed = (int)data["rerollUsed"];
         }

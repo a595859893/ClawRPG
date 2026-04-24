@@ -483,7 +483,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             _data = new MultiplayerVoteData();
 
             // Import active votes
-            if (data.Contains("ActiveVotes") && data["ActiveVotes"] is List<object> votes)
+            if (data.ContainsKey("ActiveVotes") && data["ActiveVotes"] is List<object> votes)
             {
                 foreach (Dictionary voteDict in votes)
                 {
@@ -501,7 +501,7 @@ namespace ClawRPG.Modules.MultiplayerVote
                         EndTime = Convert.ToInt32(voteDict.GetValueOrDefault("EndTime", 0))
                     };
 
-                    if (voteDict.Contains("Votes") && voteDict["Votes"] is List<object> voteRecords)
+                    if (voteDict.ContainsKey("Votes") && voteDict["Votes"] is List<object> voteRecords)
                     {
                         foreach (Dictionary recordDict in voteRecords)
                         {

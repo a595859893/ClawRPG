@@ -477,7 +477,7 @@ public partial class PetAchievementSystem : BaseSystem
         if (data == null) return;
         
         // Import pet achievements
-        if (data.Contains("pet_achievements") && data["pet_achievements"] is Dictionary petAchievementsData)
+        if (data.ContainsKey("pet_achievements") && data["pet_achievements"] is Dictionary petAchievementsData)
         {
             Data.PetAchievements = new Dictionary<string, List<PetAchievementData.Achievement>>();
             foreach (var kvp in petAchievementsData)
@@ -495,7 +495,7 @@ public partial class PetAchievementSystem : BaseSystem
         }
         
         // Import global achievements
-        if (data.Contains("global_achievements") && data["global_achievements"] is Dictionary[] globalArray)
+        if (data.ContainsKey("global_achievements") && data["global_achievements"] is Dictionary[] globalArray)
         {
             Data.GlobalAchievements = new List<PetAchievementData.Achievement>();
             foreach (var achievementDict in globalArray)
@@ -505,17 +505,17 @@ public partial class PetAchievementSystem : BaseSystem
         }
         
         // Import statistics
-        if (data.Contains("total_unlocked"))
+        if (data.ContainsKey("total_unlocked"))
             Data.TotalAchievementsUnlocked = Convert.ToInt32(data["total_unlocked"]);
-        if (data.Contains("total_achievements"))
+        if (data.ContainsKey("total_achievements"))
             Data.TotalAchievements = Convert.ToInt32(data["total_achievements"]);
-        if (data.Contains("total_rewards_claimed"))
+        if (data.ContainsKey("total_rewards_claimed"))
             Data.TotalRewardsClaimed = Convert.ToInt32(data["total_rewards_claimed"]);
-        if (data.Contains("total_gold_earned"))
+        if (data.ContainsKey("total_gold_earned"))
             Data.TotalGoldEarned = Convert.ToInt32(data["total_gold_earned"]);
         
         // Import rarity breakdown
-        if (data.Contains("rarity_breakdown") && data["rarity_breakdown"] is Dictionary rarityDict)
+        if (data.ContainsKey("rarity_breakdown") && data["rarity_breakdown"] is Dictionary rarityDict)
         {
             Data.RarityBreakdown = new Dictionary<PetAchievementData.AchievementRarity, int>();
             foreach (PetAchievementData.AchievementRarity rarity in Enum.GetValues(typeof(PetAchievementData.AchievementRarity)))
@@ -590,20 +590,20 @@ public partial class PetAchievementSystem : BaseSystem
     private PetAchievementData.Achievement DictToAchievement(Dictionary dict)
     {
         var achievement = new PetAchievementData.Achievement();
-        achievement.Id = dict.Contains("id") ? dict["id"].ToString() : "";
-        achievement.Name = dict.Contains("name") ? dict["name"].ToString() : "";
-        achievement.Description = dict.Contains("description") ? dict["description"].ToString() : "";
+        achievement.Id = dict.ContainsKey("id") ? dict["id"].ToString() : "";
+        achievement.Name = dict.ContainsKey("name") ? dict["name"].ToString() : "";
+        achievement.Description = dict.ContainsKey("description") ? dict["description"].ToString() : "";
         
-        if (dict.Contains("type") && Enum.TryParse<PetAchievementData.AchievementType>(dict["type"].ToString(), out var type))
+        if (dict.ContainsKey("type") && Enum.TryParse<PetAchievementData.AchievementType>(dict["type"].ToString(), out var type))
             achievement.Type = type;
-        if (dict.Contains("rarity") && Enum.TryParse<PetAchievementData.AchievementRarity>(dict["rarity"].ToString(), out var rarity))
+        if (dict.ContainsKey("rarity") && Enum.TryParse<PetAchievementData.AchievementRarity>(dict["rarity"].ToString(), out var rarity))
             achievement.Rarity = rarity;
         
-        achievement.RequiredValue = dict.Contains("required_value") ? Convert.ToInt32(dict["required_value"]) : 0;
-        achievement.CurrentValue = dict.Contains("current_value") ? Convert.ToInt32(dict["current_value"]) : 0;
-        achievement.IsUnlocked = dict.Contains("is_unlocked") && Convert.ToBoolean(dict["is_unlocked"]);
+        achievement.RequiredValue = dict.ContainsKey("required_value") ? Convert.ToInt32(dict["required_value"]) : 0;
+        achievement.CurrentValue = dict.ContainsKey("current_value") ? Convert.ToInt32(dict["current_value"]) : 0;
+        achievement.IsUnlocked = dict.ContainsKey("is_unlocked") && Convert.ToBoolean(dict["is_unlocked"]);
         
-        if (dict.Contains("unlocked_at") && !string.IsNullOrEmpty(dict["unlocked_at"].ToString()))
+        if (dict.ContainsKey("unlocked_at") && !string.IsNullOrEmpty(dict["unlocked_at"].ToString()))
             achievement.UnlockedAt = DateTime.Parse(dict["unlocked_at"].ToString());
         
         return achievement;
@@ -631,7 +631,7 @@ public partial class PetAchievementSystem : BaseSystem
         {
             foreach (var item in array)
             {
-                if (item is Dictionary dict && dict.Contains("key") && dict.Contains("value"))
+                if (item is Dictionary dict && dict.ContainsKey("key") && dict.ContainsKey("value"))
                 {
                     result[dict["key"].ToString()] = Convert.ToInt32(dict["value"]);
                 }

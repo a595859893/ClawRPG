@@ -307,7 +307,7 @@ public partial class PetLifeCycleSystem : BaseSystem
         if (data == null) return;
 
         // 加载宠物生命周期数据
-        if (data.Contains("pet_life_cycle_pets"))
+        if (data.ContainsKey("pet_life_cycle_pets"))
         {
             var petCyclesArray = (Godot.Array)data["pet_life_cycle_pets"];
             foreach (Godot.Collections.Dictionary petData in petCyclesArray)
@@ -328,7 +328,7 @@ public partial class PetLifeCycleSystem : BaseSystem
         }
 
         // 加载统计数据
-        if (data.Contains("pet_life_cycle_stats"))
+        if (data.ContainsKey("pet_life_cycle_stats"))
         {
             var stats = (Godot.Collections.Dictionary)data["pet_life_cycle_stats"];
             _data.TotalLifeCycles = (int)stats["total_life_cycles"];
@@ -338,7 +338,7 @@ public partial class PetLifeCycleSystem : BaseSystem
         }
 
         // 加载历史记录
-        if (data.Contains("pet_life_cycle_history"))
+        if (data.ContainsKey("pet_life_cycle_history"))
         {
             var historyArray = (Godot.Array)data["pet_life_cycle_history"];
             foreach (Godot.Collections.Dictionary historyData in historyArray)

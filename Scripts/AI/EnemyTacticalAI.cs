@@ -192,15 +192,15 @@ namespace ClawRPG.Scripts.AI {
             // Adjust based on enemy difficulty
             string enemyName = _enemy.EnemyName.ToLower();
             
-            if (enemyName.Contains("boss") || enemyName.Contains("elite")) {
+            if (enemyName.ContainsKey("boss") || enemyName.ContainsKey("elite")) {
                 _aggression = 0.7f;
                 _caution = 0.6f;
                 _optimalAttackRange = 80f;
-            } else if (enemyName.Contains("tank") || enemyName.Contains("guardian")) {
+            } else if (enemyName.ContainsKey("tank") || enemyName.ContainsKey("guardian")) {
                 _aggression = 0.3f;
                 _caution = 0.8f;
                 _optimalAttackRange = 50f;
-            } else if (enemyName.Contains("assassin") || enemyName.Contains("ranger")) {
+            } else if (enemyName.ContainsKey("assassin") || enemyName.ContainsKey("ranger")) {
                 _aggression = 0.8f;
                 _caution = 0.3f;
                 _optimalAttackRange = 150f;

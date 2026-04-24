@@ -238,11 +238,11 @@ public partial class PetEquipmentEnhancementUI : Control
 
     private string GetEquipmentType(string equipmentId)
     {
-        if (equipmentId.Contains("collar")) return "collar";
-        if (equipmentId.Contains("harness")) return "harness";
-        if (equipmentId.Contains("armor")) return "armor";
-        if (equipmentId.Contains("accessory")) return "accessory";
-        if (equipmentId.Contains("toy")) return "toy";
+        if (equipmentId.ContainsKey("collar")) return "collar";
+        if (equipmentId.ContainsKey("harness")) return "harness";
+        if (equipmentId.ContainsKey("armor")) return "armor";
+        if (equipmentId.ContainsKey("accessory")) return "accessory";
+        if (equipmentId.ContainsKey("toy")) return "toy";
         return "accessory";
     }
 

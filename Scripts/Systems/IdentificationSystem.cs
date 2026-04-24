@@ -282,11 +282,11 @@ public partial class IdentificationSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("total_identifications")) _totalIdentifications = (int)data["total_identifications"];
-        if (data.Contains("basic_identifications")) _basicIdentifications = (int)data["basic_identifications"];
-        if (data.Contains("standard_identifications")) _standardIdentifications = (int)data["standard_identifications"];
-        if (data.Contains("advanced_identifications")) _advancedIdentifications = (int)data["advanced_identifications"];
-        if (data.Contains("premium_identifications")) _premiumIdentifications = (int)data["premium_identifications"];
-        if (data.Contains("highest_rarity_identified")) _highestRarityIdentified = (int)data["highest_rarity_identified"];
+        if (data.ContainsKey("total_identifications")) _totalIdentifications = (int)data["total_identifications"];
+        if (data.ContainsKey("basic_identifications")) _basicIdentifications = (int)data["basic_identifications"];
+        if (data.ContainsKey("standard_identifications")) _standardIdentifications = (int)data["standard_identifications"];
+        if (data.ContainsKey("advanced_identifications")) _advancedIdentifications = (int)data["advanced_identifications"];
+        if (data.ContainsKey("premium_identifications")) _premiumIdentifications = (int)data["premium_identifications"];
+        if (data.ContainsKey("highest_rarity_identified")) _highestRarityIdentified = (int)data["highest_rarity_identified"];
     }
 }

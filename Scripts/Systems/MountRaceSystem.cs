@@ -404,7 +404,7 @@ public partial class MountRaceSystem : BaseSystem
 
 		_playerProgress = new MountRaceData.PlayerRaceProgress();
 
-		if (data.Contains("best_times"))
+		if (data.ContainsKey("best_times"))
 		{
 			var bestTimesArray = (Godot.Collections.Array)data["best_times"];
 			foreach (Dictionary entry in bestTimesArray)
@@ -415,15 +415,15 @@ public partial class MountRaceSystem : BaseSystem
 			}
 		}
 
-		if (data.Contains("total_races"))
+		if (data.ContainsKey("total_races"))
 			_playerProgress.TotalRaces = (int)data["total_races"];
-		if (data.Contains("first_places"))
+		if (data.ContainsKey("first_places"))
 			_playerProgress.FirstPlaces = (int)data["first_places"];
-		if (data.Contains("second_places"))
+		if (data.ContainsKey("second_places"))
 			_playerProgress.SecondPlaces = (int)data["second_places"];
-		if (data.Contains("third_places"))
+		if (data.ContainsKey("third_places"))
 			_playerProgress.ThirdPlaces = (int)data["third_places"];
-		if (data.Contains("total_earnings"))
+		if (data.ContainsKey("total_earnings"))
 			_playerProgress.TotalEarnings = (int)data["total_earnings"];
 	}
 
@@ -461,7 +461,7 @@ public partial class MountRaceSystem : BaseSystem
 		if (data == null) return;
 		
 		// 加载最佳时间
-		if (data.Contains("best_times"))
+		if (data.ContainsKey("best_times"))
 		{
 			var bestTimesArray = (Array)data["best_times"];
 			_playerProgress.BestTimes.Clear();
@@ -473,19 +473,19 @@ public partial class MountRaceSystem : BaseSystem
 			}
 		}
 		
-		if (data.Contains("total_races"))
+		if (data.ContainsKey("total_races"))
 			_playerProgress.TotalRaces = (int)data["total_races"];
-		if (data.Contains("first_places"))
+		if (data.ContainsKey("first_places"))
 			_playerProgress.FirstPlaces = (int)data["first_places"];
-		if (data.Contains("second_places"))
+		if (data.ContainsKey("second_places"))
 			_playerProgress.SecondPlaces = (int)data["second_places"];
-		if (data.Contains("third_places"))
+		if (data.ContainsKey("third_places"))
 			_playerProgress.ThirdPlaces = (int)data["third_places"];
-		if (data.Contains("total_earnings"))
+		if (data.ContainsKey("total_earnings"))
 			_playerProgress.TotalEarnings = (int)data["total_earnings"];
 		
 		// 加载当前状态
-		if (data.Contains("currentState"))
+		if (data.ContainsKey("currentState"))
 			_currentState = (MountRaceData.RaceState)(int)data["currentState"];
 	}
 }

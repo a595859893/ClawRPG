@@ -345,7 +345,7 @@ public partial class PlayerTalentSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("unlocked_talents"))
+        if (data.ContainsKey("unlocked_talents"))
         {
             var talents = (Godot.Collections.Array)data["unlocked_talents"];
             PlayerData.UnlockedTalents = new HashSet<string>();
@@ -355,17 +355,17 @@ public partial class PlayerTalentSystem : BaseSystem
             }
         }
         
-        if (data.Contains("total_points_spent"))
+        if (data.ContainsKey("total_points_spent"))
         {
             PlayerData.TotalPointsSpent = Convert.ToInt32(data["total_points_spent"]);
         }
 
-        if (data.Contains("available_points"))
+        if (data.ContainsKey("available_points"))
         {
             _availablePoints = Convert.ToInt32(data["available_points"]);
         }
         
-        if (data.Contains("tree_points"))
+        if (data.ContainsKey("tree_points"))
         {
             var treePoints = (Dictionary)data["tree_points"];
             foreach (var kvp in treePoints)
@@ -375,7 +375,7 @@ public partial class PlayerTalentSystem : BaseSystem
             }
         }
         
-        if (data.Contains("unlocked_trees"))
+        if (data.ContainsKey("unlocked_trees"))
         {
             var unlockedTrees = (Dictionary)data["unlocked_trees"];
             foreach (var kvp in unlockedTrees)

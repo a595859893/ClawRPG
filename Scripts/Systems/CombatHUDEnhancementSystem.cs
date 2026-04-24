@@ -336,7 +336,7 @@ public partial class CombatHUDEnhancementSystem : BaseSystem
 	{
 		if (data == null) return;
 		
-		if (data.Contains("session_start_time"))
+		if (data.ContainsKey("session_start_time"))
 		{
 			_sessionStartTime = Convert.ToSingle(data["session_start_time"]);
 		}

@@ -192,7 +192,7 @@ public partial class MultiplayerChatData : BaseSystem
         TotalEmotesUsed = (int)data.GetValueOrDefault("total_emotes_used", 0);
         
         // 每个频道的消息数
-        if (data.Contains("messages_per_channel"))
+        if (data.ContainsKey("messages_per_channel"))
         {
             var messagesPerChannelDict = (Dictionary)data["messages_per_channel"];
             MessagesPerChannel = new Dictionary<ChatChannel, int>();
@@ -206,7 +206,7 @@ public partial class MultiplayerChatData : BaseSystem
         }
         
         // 忽略列表
-        if (data.Contains("ignored_players"))
+        if (data.ContainsKey("ignored_players"))
         {
             var ignoredArray = (Array)data["ignored_players"];
             IgnoredPlayers = new List<string>();
@@ -217,7 +217,7 @@ public partial class MultiplayerChatData : BaseSystem
         }
         
         // 频道设置
-        if (data.Contains("channel_settings"))
+        if (data.ContainsKey("channel_settings"))
         {
             var channelSettingsDict = (Dictionary)data["channel_settings"];
             foreach (var kvp in channelSettingsDict)

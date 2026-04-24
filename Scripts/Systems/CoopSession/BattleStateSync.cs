@@ -86,7 +86,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession {
         }
         
         public override void ImportSaveData(Dictionary<string, object> data) {
-            if (data.Contains("syncInterval")) {
+            if (data.ContainsKey("syncInterval")) {
                 _syncInterval = (float)data["syncInterval"];
             }
         }

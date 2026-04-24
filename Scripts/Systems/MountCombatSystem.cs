@@ -532,7 +532,7 @@ namespace ClawRPG.Scripts.Mounts {
             
             _mountCombatData.Clear();
             
-            if (data.Contains("mount_combat_data"))
+            if (data.ContainsKey("mount_combat_data"))
             {
                 var mountCombatList = (Array)data["mount_combat_data"];
                 foreach (Dictionary mountData in mountCombatList)
@@ -549,7 +549,7 @@ namespace ClawRPG.Scripts.Mounts {
                     };
                     
                     // 解锁技能
-                    if (mountData.Contains("unlocked_skills"))
+                    if (mountData.ContainsKey("unlocked_skills"))
                     {
                         var skills = (Array)mountData["unlocked_skills"];
                         instance.UnlockedSkills = new List<string>();
@@ -560,7 +560,7 @@ namespace ClawRPG.Scripts.Mounts {
                     }
                     
                     // 冷却
-                    if (mountData.Contains("cooldowns"))
+                    if (mountData.ContainsKey("cooldowns"))
                     {
                         var cdData = (Dictionary)mountData["cooldowns"];
                         instance.SkillCooldowns = new Dictionary<string, int>();

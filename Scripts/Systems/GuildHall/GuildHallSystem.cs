@@ -246,16 +246,16 @@ namespace ClawRPG.Systems.GuildHall {
         {
             if (data == null) return;
             
-            _data.GuildId = data.Contains("guild_id") ? Convert.ToInt32(data["guild_id"]) : 1;
-            _data.GuildName = data.Contains("guild_name") ? data["guild_name"].ToString() : "My Guild";
-            _data.HallLevel = data.Contains("hall_level") ? Convert.ToInt32(data["hall_level"]) : 1;
-            _data.Experience = data.Contains("experience") ? Convert.ToInt32(data["experience"]) : 0;
-            _data.RequiredExperience = data.Contains("required_experience") ? Convert.ToInt32(data["required_experience"]) : 1000;
-            _data.GoldDeposited = data.Contains("gold_deposited") ? Convert.ToInt32(data["gold_deposited"]) : 0;
+            _data.GuildId = data.ContainsKey("guild_id") ? Convert.ToInt32(data["guild_id"]) : 1;
+            _data.GuildName = data.ContainsKey("guild_name") ? data["guild_name"].ToString() : "My Guild";
+            _data.HallLevel = data.ContainsKey("hall_level") ? Convert.ToInt32(data["hall_level"]) : 1;
+            _data.Experience = data.ContainsKey("experience") ? Convert.ToInt32(data["experience"]) : 0;
+            _data.RequiredExperience = data.ContainsKey("required_experience") ? Convert.ToInt32(data["required_experience"]) : 1000;
+            _data.GoldDeposited = data.ContainsKey("gold_deposited") ? Convert.ToInt32(data["gold_deposited"]) : 0;
             
             // 解锁的房间
             _data.UnlockedRooms.Clear();
-            if (data.Contains("unlocked_rooms")) {
+            if (data.ContainsKey("unlocked_rooms")) {
                 var rooms = data["unlocked_rooms"] as Godot.Collections.Array;
                 if (rooms != null) {
                     foreach (var room in rooms) _data.UnlockedRooms.Add(room.ToString());
@@ -264,7 +264,7 @@ namespace ClawRPG.Systems.GuildHall {
             
             // 家具
             _data.Furniture.Clear();
-            if (data.Contains("furniture")) {
+            if (data.ContainsKey("furniture")) {
                 var furniture = data["furniture"] as Godot.Collections.Array;
                 if (furniture != null) {
                     foreach (var item in furniture) _data.Furniture.Add(item.ToString());
@@ -273,7 +273,7 @@ namespace ClawRPG.Systems.GuildHall {
             
             // 访客
             _data.Visitors.Clear();
-            if (data.Contains("visitors")) {
+            if (data.ContainsKey("visitors")) {
                 var visitors = data["visitors"] as Godot.Collections.Array;
                 if (visitors != null) {
                     foreach (var v in visitors) _data.Visitors.Add(v.ToString());
@@ -282,7 +282,7 @@ namespace ClawRPG.Systems.GuildHall {
             
             // 装饰品库存
             _data.DecorationInventory.Clear();
-            if (data.Contains("decoration_inventory")) {
+            if (data.ContainsKey("decoration_inventory")) {
                 var inventory = data["decoration_inventory"] as Godot.Collections.Array;
                 if (inventory != null) {
                     foreach (var d in inventory) _data.DecorationInventory.Add(d.ToString());
@@ -291,7 +291,7 @@ namespace ClawRPG.Systems.GuildHall {
             
             // 房间等级
             _data.RoomLevels.Clear();
-            if (data.Contains("room_levels")) {
+            if (data.ContainsKey("room_levels")) {
                 var levels = data["room_levels"] as Godot.Collections.Dictionary;
                 if (levels != null) {
                     foreach (var kvp in levels) _data.RoomLevels[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);
@@ -300,7 +300,7 @@ namespace ClawRPG.Systems.GuildHall {
             
             // 统计
             _data.Statistics.Clear();
-            if (data.Contains("statistics")) {
+            if (data.ContainsKey("statistics")) {
                 var stats = data["statistics"] as Godot.Collections.Dictionary;
                 if (stats != null) {
                     foreach (var kvp in stats) _data.Statistics[kvp.Key.ToString()] = Convert.ToInt32(kvp.Value);

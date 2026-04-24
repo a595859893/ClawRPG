@@ -352,11 +352,11 @@ namespace ClawRPG.Scripts.Systems
         public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
-            if (data.Contains("auto_use_health_potion")) AutoUseHealthPotion = (bool)data["auto_use_health_potion"];
-            if (data.Contains("auto_use_mana_potion")) AutoUseManaPotion = (bool)data["auto_use_mana_potion"];
-            if (data.Contains("auto_use_buff_potions")) AutoUseBuffPotions = (bool)data["auto_use_buff_potions"];
-            if (data.Contains("health_potion_threshold")) HealthPotionThreshold = (int)data["health_potion_threshold"];
-            if (data.Contains("mana_potion_threshold")) ManaPotionThreshold = (int)data["mana_potion_threshold"];
+            if (data.ContainsKey("auto_use_health_potion")) AutoUseHealthPotion = (bool)data["auto_use_health_potion"];
+            if (data.ContainsKey("auto_use_mana_potion")) AutoUseManaPotion = (bool)data["auto_use_mana_potion"];
+            if (data.ContainsKey("auto_use_buff_potions")) AutoUseBuffPotions = (bool)data["auto_use_buff_potions"];
+            if (data.ContainsKey("health_potion_threshold")) HealthPotionThreshold = (int)data["health_potion_threshold"];
+            if (data.ContainsKey("mana_potion_threshold")) ManaPotionThreshold = (int)data["mana_potion_threshold"];
         }
     }
 }

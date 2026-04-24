@@ -49,7 +49,7 @@ public partial class RogueLegacySystem : BaseSystem
         var data = saveSystem.LoadGame();
         if (data == null) return;
         
-        if (data.Contains("RogueLegacy"))
+        if (data.ContainsKey("RogueLegacy"))
         {
             var legacyData = (Godot.Collections.Dictionary)data["RogueLegacy"];
             _data.LegacyPoints = (int)legacyData.Get("legacyPoints", 0);
@@ -65,7 +65,7 @@ public partial class RogueLegacySystem : BaseSystem
             _experienceInheritancePercent = _data.ExperienceInheritancePercent;
             _itemInheritancePercent = _data.ItemInheritancePercent;
             
-            if (legacyData.Contains("unlockedUpgrades"))
+            if (legacyData.ContainsKey("unlockedUpgrades"))
             {
                 var upgrades = (Godot.Collections.Array)legacyData["unlockedUpgrades"];
                 _data.UnlockedUpgrades = new List<string>();

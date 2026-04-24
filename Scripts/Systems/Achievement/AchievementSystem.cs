@@ -245,16 +245,16 @@ namespace ClawRPG.Systems.Achievement
         {
             if (data == null) return;
             
-            _totalKills = data.Contains("totalKills") ? (int)data["totalKills"] : 0;
-            _bossKills = data.Contains("bossKills") ? (int)data["bossKills"] : 0;
-            _pvpWins = data.Contains("pvpWins") ? (int)data["pvpWins"] : 0;
-            _zonesDiscovered = data.Contains("zonesDiscovered") ? (int)data["zonesDiscovered"] : 0;
-            _sealedTowerFloor = data.Contains("sealedTowerFloor") ? (int)data["sealedTowerFloor"] : 0;
-            _petsCollected = data.Contains("petsCollected") ? (int)data["petsCollected"] : 0;
-            _mountsCollected = data.Contains("mountsCollected") ? (int)data["mountsCollected"] : 0;
-            _equipmentCollected = data.Contains("equipmentCollected") ? (int)data["equipmentCollected"] : 0;
-            _friendsMade = data.Contains("friendsMade") ? (int)data["friendsMade"] : 0;
-            _goldSpent = data.Contains("goldSpent") ? (int)data["goldSpent"] : 0;
+            _totalKills = data.ContainsKey("totalKills") ? (int)data["totalKills"] : 0;
+            _bossKills = data.ContainsKey("bossKills") ? (int)data["bossKills"] : 0;
+            _pvpWins = data.ContainsKey("pvpWins") ? (int)data["pvpWins"] : 0;
+            _zonesDiscovered = data.ContainsKey("zonesDiscovered") ? (int)data["zonesDiscovered"] : 0;
+            _sealedTowerFloor = data.ContainsKey("sealedTowerFloor") ? (int)data["sealedTowerFloor"] : 0;
+            _petsCollected = data.ContainsKey("petsCollected") ? (int)data["petsCollected"] : 0;
+            _mountsCollected = data.ContainsKey("mountsCollected") ? (int)data["mountsCollected"] : 0;
+            _equipmentCollected = data.ContainsKey("equipmentCollected") ? (int)data["equipmentCollected"] : 0;
+            _friendsMade = data.ContainsKey("friendsMade") ? (int)data["friendsMade"] : 0;
+            _goldSpent = data.ContainsKey("goldSpent") ? (int)data["goldSpent"] : 0;
         }
         
         #endregion

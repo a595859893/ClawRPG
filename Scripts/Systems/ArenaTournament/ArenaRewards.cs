@@ -161,10 +161,10 @@ namespace ClawRPG.Scripts.Systems.ArenaTournament {
         }
         
         public override void ImportSaveData(Dictionary<string, object> data) {
-            if (data.Contains("baseGold")) {
+            if (data.ContainsKey("baseGold")) {
                 _baseGold = (int)data["baseGold"];
             }
-            if (data.Contains("baseExp")) {
+            if (data.ContainsKey("baseExp")) {
                 _baseExp = (int)data["baseExp"];
             }
         }

@@ -573,15 +573,15 @@ namespace ClawRPG.Core.Systems
         {
             if (data == null) return;
             
-            if (data.Contains("totalEventsParticipated"))
+            if (data.ContainsKey("totalEventsParticipated"))
                 _playerData.TotalEventsParticipated = (int)data["totalEventsParticipated"];
-            if (data.Contains("eventsCompleted"))
+            if (data.ContainsKey("eventsCompleted"))
                 _playerData.EventsCompleted = (int)data["eventsCompleted"];
-            if (data.Contains("eventsFailed"))
+            if (data.ContainsKey("eventsFailed"))
                 _playerData.EventsFailed = (int)data["eventsFailed"];
-            if (data.Contains("goldEarned"))
+            if (data.ContainsKey("goldEarned"))
                 _playerData.GoldEarned = (int)data["goldEarned"];
-            if (data.Contains("experienceEarned"))
+            if (data.ContainsKey("experienceEarned"))
                 _playerData.ExperienceEarned = (int)data["experienceEarned"];
         }
     }

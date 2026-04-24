@@ -392,9 +392,9 @@ public partial class DailyDungeonSystem : BaseSystem
         _timeRemaining = (float)(data.GetValueOrDefault("time_remaining", 0f));
         _isInDungeon = (bool)(data.GetValueOrDefault("is_in_dungeon", false));
         
-        if (data.Contains("dungeon_start_time"))
+        if (data.ContainsKey("dungeon_start_time"))
             _dungeonStartTime = DateTime.Parse(data["dungeon_start_time"].ToString());
-        if (data.Contains("last_daily_reset"))
+        if (data.ContainsKey("last_daily_reset"))
             _lastDailyReset = DateTime.Parse(data["last_daily_reset"].ToString());
         
         _dailyChallengeCount = (int)(data.GetValueOrDefault("daily_challenge_count", 0));
@@ -402,7 +402,7 @@ public partial class DailyDungeonSystem : BaseSystem
         
         // 恢复玩家地下城数据
         PlayerDungeonData.Clear();
-        if (data.Contains("player_dungeon_data"))
+        if (data.ContainsKey("player_dungeon_data"))
         {
             var playerDataList = data["player_dungeon_data"] as List<Dictionary>;
             if (playerDataList != null)
@@ -414,7 +414,7 @@ public partial class DailyDungeonSystem : BaseSystem
                     pdata.TimesCompleted = (int)(pd.GetValueOrDefault("times_completed", 0));
                     pdata.TotalGoldEarned = (int)(pd.GetValueOrDefault("total_gold_earned", 0));
                     pdata.TotalExpEarned = (int)(pd.GetValueOrDefault("total_exp_earned", 0));
-                    if (pd.Contains("last_played_date"))
+                    if (pd.ContainsKey("last_played_date"))
                         pdata.LastPlayedDate = DateTime.Parse(pd["last_played_date"].ToString());
                     
                     var dungeonId = pd["dungeon_id"].ToString();

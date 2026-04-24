@@ -225,13 +225,13 @@ namespace ClawRPG.Scripts.Systems
         {
             if (data == null) return;
             
-            if (data.Contains("current_mode"))
+            if (data.ContainsKey("current_mode"))
             {
                 var mode = (GameModeType)(int)data["current_mode"];
                 Config.SetGameMode(mode);
             }
             
-            if (data.Contains("is_quick_mode"))
+            if (data.ContainsKey("is_quick_mode"))
             {
                 bool isQuick = (bool)data["is_quick_mode"];
                 if (isQuick && !Config.IsQuickMode)

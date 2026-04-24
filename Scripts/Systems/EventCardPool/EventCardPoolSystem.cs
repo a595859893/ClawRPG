@@ -357,11 +357,11 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
         {
             if (data == null) return;
 
-            if (data.Contains("tempAllyActive"))
+            if (data.ContainsKey("tempAllyActive"))
                 _tempAllyActive = (bool)data["tempAllyActive"];
-            if (data.Contains("tempAllyEndTime"))
+            if (data.ContainsKey("tempAllyEndTime"))
                 _tempAllyEndTime = (float)data["tempAllyEndTime"];
-            if (data.Contains("tempAllyCardId"))
+            if (data.ContainsKey("tempAllyCardId"))
                 _tempAllyCardId = (string)data["tempAllyCardId"];
         }
 

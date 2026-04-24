@@ -98,19 +98,19 @@ public partial class MarketTrendSystem : BaseSystem
     {
         if (data == null) return;
 
-        if (data.Contains("market_sentiment"))
+        if (data.ContainsKey("market_sentiment"))
             MarketSentiment = (int)data["market_sentiment"];
-        if (data.Contains("total_trend_updates"))
+        if (data.ContainsKey("total_trend_updates"))
             TotalTrendUpdates = (int)data["total_trend_updates"];
-        if (data.Contains("total_predictions_made"))
+        if (data.ContainsKey("total_predictions_made"))
             TotalPredictionsMade = (int)data["total_predictions_made"];
-        if (data.Contains("correct_predictions"))
+        if (data.ContainsKey("correct_predictions"))
             CorrectPredictions = (int)data["correct_predictions"];
-        if (data.Contains("last_update_time"))
+        if (data.ContainsKey("last_update_time"))
             LastUpdateTime = (double)data["last_update_time"];
 
         // Restore current trends
-        if (data.Contains("current_trends"))
+        if (data.ContainsKey("current_trends"))
         {
             CurrentTrends.Clear();
             var trendsData = (Godot.Collections.Array)data["current_trends"];

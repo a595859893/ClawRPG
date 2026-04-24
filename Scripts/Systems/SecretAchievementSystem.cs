@@ -359,15 +359,15 @@ public delegate void OnSecretCategoryComplete(SecretAchievementCategory category
             if (data == null) return;
             
             // 加载统计数据
-            if (data.Contains("totalDiscovered"))
+            if (data.ContainsKey("totalDiscovered"))
                 _totalDiscovered = (int)data["totalDiscovered"];
-            if (data.Contains("totalGoldEarned"))
+            if (data.ContainsKey("totalGoldEarned"))
                 _totalGoldEarned = (int)data["totalGoldEarned"];
-            if (data.Contains("totalExpEarned"))
+            if (data.ContainsKey("totalExpEarned"))
                 _totalExpEarned = (int)data["totalExpEarned"];
             
             // 加载玩家成就数据
-            if (data.Contains("playerAchievements"))
+            if (data.ContainsKey("playerAchievements"))
             {
                 var achievementsData = (Dictionary<string, Variant>)data["playerAchievements"];
                 foreach (var kvp in achievementsData)
@@ -378,11 +378,11 @@ public delegate void OnSecretCategoryComplete(SecretAchievementCategory category
                     }
                     
                     var achievementDict = (Dictionary<string, Variant>)kvp.Value;
-                    if (achievementDict.Contains("isDiscovered"))
+                    if (achievementDict.ContainsKey("isDiscovered"))
                         _playerAchievements[kvp.Key].IsDiscovered = (bool)achievementDict["isDiscovered"];
-                    if (achievementDict.Contains("progress"))
+                    if (achievementDict.ContainsKey("progress"))
                         _playerAchievements[kvp.Key].Progress = (int)achievementDict["progress"];
-                    if (achievementDict.Contains("discoveredAt"))
+                    if (achievementDict.ContainsKey("discoveredAt"))
                         DateTime.TryParse(achievementDict["discoveredAt"].ToString(), out _playerAchievements[kvp.Key].DiscoveredAt);
                 }
             }

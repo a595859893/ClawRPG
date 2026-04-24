@@ -471,9 +471,9 @@ namespace ClawRPG.Scripts.Systems.Pets
         public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
-            if (data.Contains("fireBreathCooldown"))
+            if (data.ContainsKey("fireBreathCooldown"))
                 _fireBreathCooldown = Convert.ToSingle(data["fireBreathCooldown"]);
-            if (data.Contains("holyProtectionTimer"))
+            if (data.ContainsKey("holyProtectionTimer"))
                 _holyProtectionTimer = Convert.ToSingle(data["holyProtectionTimer"]);
         }
 

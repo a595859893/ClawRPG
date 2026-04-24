@@ -106,7 +106,7 @@ namespace ClawRPG.Systems
             TotalLosses = (int)data.GetValueOrDefault("total_losses", 0);
             
             // 房间历史记录
-            if (data.Contains("room_history"))
+            if (data.ContainsKey("room_history"))
             {
                 var historyArray = (Array)data["room_history"];
                 RoomHistory = new List<string>();

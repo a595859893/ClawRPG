@@ -574,7 +574,7 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
             _data.BestStreak = (int)data.GetValueOrDefault("best_streak", 0);
             
             // 激活的坐骑战斗技能
-            if (data.Contains("unlocked_mount_skills"))
+            if (data.ContainsKey("unlocked_mount_skills"))
             {
                 var skills = (Array)data["unlocked_mount_skills"];
                 _data.UnlockedMountSkills = new List<string>();
@@ -585,7 +585,7 @@ namespace ClawRPG.Scripts.Systems.MountBattle {
             }
             
             // 技能等级
-            if (data.Contains("skill_levels"))
+            if (data.ContainsKey("skill_levels"))
             {
                 var skillLevels = (Dictionary)data["skill_levels"];
                 _data.SkillLevels = new Dictionary<string, int>();

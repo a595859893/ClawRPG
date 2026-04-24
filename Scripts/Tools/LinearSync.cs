@@ -235,7 +235,7 @@ public partial class LinearSync : BaseSystem
         var reqs = LoadRegistry();
         if (reqs == null || !reqs.ContainsKey(reqId)) return;
 
-        string newStatus = commitMessage.ToLowerInvariant().Contains("fix")
+        string newStatus = commitMessage.ToLowerInvariant().ContainsKey("fix")
             ? "in_progress" : "completed";
 
         var reqData = reqs[reqId] as Godot.Collections.Dictionary;

@@ -49,12 +49,12 @@ public partial class EconomicWarningSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("enabled"))
+        if (data.ContainsKey("enabled"))
         {
             _isEnabled = (bool)data["enabled"];
         }
         
-        if (data.Contains("check_interval"))
+        if (data.ContainsKey("check_interval"))
         {
             _checkInterval = (float)data["check_interval"];
         }

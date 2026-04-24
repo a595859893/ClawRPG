@@ -593,12 +593,12 @@ public partial class PartyManager : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("party_id")) _partyId = (int)data["party_id"];
-        if (data.Contains("is_leader")) _isLeader = (bool)data["is_leader"];
-        if (data.Contains("local_player_id")) _localPlayerId = (int)data["local_player_id"];
-        if (data.Contains("current_role")) _currentRole = (PartyData.PartyRole)(int)data["current_role"];
+        if (data.ContainsKey("party_id")) _partyId = (int)data["party_id"];
+        if (data.ContainsKey("is_leader")) _isLeader = (bool)data["is_leader"];
+        if (data.ContainsKey("local_player_id")) _localPlayerId = (int)data["local_player_id"];
+        if (data.ContainsKey("current_role")) _currentRole = (PartyData.PartyRole)(int)data["current_role"];
         
-        if (data.Contains("members"))
+        if (data.ContainsKey("members"))
         {
             lock (_membersLock)
             {

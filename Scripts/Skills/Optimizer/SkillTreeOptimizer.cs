@@ -286,10 +286,10 @@ namespace ClawRPG.Scripts.Skills.Optimizer {
         /// Check and unlock new presets
         /// </summary>
         private void CheckAndUnlockPresets() {
-            if (_progress.TotalOptimizations >= 5 && !_progress.UnlockedPresets.Contains("hybrid_focus")) {
+            if (_progress.TotalOptimizations >= 5 && !_progress.UnlockedPresets.ContainsKey("hybrid_focus")) {
                 _progress.UnlockedPresets.Add("hybrid_focus");
             }
-            if (_progress.PointsSaved >= 50 && !_progress.UnlockedPresets.Contains("speed_focus")) {
+            if (_progress.PointsSaved >= 50 && !_progress.UnlockedPresets.ContainsKey("speed_focus")) {
                 _progress.UnlockedPresets.Add("speed_focus");
             }
         }

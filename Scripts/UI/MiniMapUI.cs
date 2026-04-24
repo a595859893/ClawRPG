@@ -353,13 +353,13 @@ namespace ClawRPG.Scripts.UI
         {
             base.ImportSaveData(data);
 
-            if (data.Contains("ShowNPCMarkers"))
+            if (data.ContainsKey("ShowNPCMarkers"))
                 _showNPCMarkers = Convert.ToBoolean(data["ShowNPCMarkers"]);
-            if (data.Contains("ShowEnemyMarkers"))
+            if (data.ContainsKey("ShowEnemyMarkers"))
                 _showEnemyMarkers = Convert.ToBoolean(data["ShowEnemyMarkers"]);
-            if (data.Contains("ShowPOIMarkers"))
+            if (data.ContainsKey("ShowPOIMarkers"))
                 _showPOIMarkers = Convert.ToBoolean(data["ShowPOIMarkers"]);
-            if (data.Contains("MapScale"))
+            if (data.ContainsKey("MapScale"))
                 _mapScale = Convert.ToSingle(data["MapScale"]);
         }
 

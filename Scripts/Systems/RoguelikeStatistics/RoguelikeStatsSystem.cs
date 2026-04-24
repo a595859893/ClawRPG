@@ -341,32 +341,32 @@ public partial class RoguelikeStatsSystem : BaseSystem
         if (data == null) return;
         
         // 加载总统计数据
-        if (data.Contains("total_runs")) _data.TotalRuns = (int)data["total_runs"];
-        if (data.Contains("total_wins")) _data.TotalWins = (int)data["total_wins"];
-        if (data.Contains("total_deaths")) _data.TotalDeaths = (int)data["total_deaths"];
-        if (data.Contains("highest_floor_reached")) _data.HighestFloorReached = (int)data["highest_floor_reached"];
-        if (data.Contains("total_enemies_killed")) _data.TotalEnemiesKilled = (int)data["total_enemies_killed"];
-        if (data.Contains("total_damage_dealt")) _data.TotalDamageDealt = (int)data["total_damage_dealt"];
-        if (data.Contains("total_damage_taken")) _data.TotalDamageTaken = (int)data["total_damage_taken"];
-        if (data.Contains("total_gold_earned")) _data.TotalGoldEarned = (int)data["total_gold_earned"];
-        if (data.Contains("total_gold_spent")) _data.TotalGoldSpent = (int)data["total_gold_spent"];
-        if (data.Contains("total_items_collected")) _data.TotalItemsCollected = (int)data["total_items_collected"];
-        if (data.Contains("total_pets_obtained")) _data.TotalPetsObtained = (int)data["total_pets_obtained"];
+        if (data.ContainsKey("total_runs")) _data.TotalRuns = (int)data["total_runs"];
+        if (data.ContainsKey("total_wins")) _data.TotalWins = (int)data["total_wins"];
+        if (data.ContainsKey("total_deaths")) _data.TotalDeaths = (int)data["total_deaths"];
+        if (data.ContainsKey("highest_floor_reached")) _data.HighestFloorReached = (int)data["highest_floor_reached"];
+        if (data.ContainsKey("total_enemies_killed")) _data.TotalEnemiesKilled = (int)data["total_enemies_killed"];
+        if (data.ContainsKey("total_damage_dealt")) _data.TotalDamageDealt = (int)data["total_damage_dealt"];
+        if (data.ContainsKey("total_damage_taken")) _data.TotalDamageTaken = (int)data["total_damage_taken"];
+        if (data.ContainsKey("total_gold_earned")) _data.TotalGoldEarned = (int)data["total_gold_earned"];
+        if (data.ContainsKey("total_gold_spent")) _data.TotalGoldSpent = (int)data["total_gold_spent"];
+        if (data.ContainsKey("total_items_collected")) _data.TotalItemsCollected = (int)data["total_items_collected"];
+        if (data.ContainsKey("total_pets_obtained")) _data.TotalPetsObtained = (int)data["total_pets_obtained"];
         
         // 加载连胜/连败记录
-        if (data.Contains("current_win_streak")) _data.CurrentWinStreak = (int)data["current_win_streak"];
-        if (data.Contains("best_win_streak")) _data.BestWinStreak = (int)data["best_win_streak"];
-        if (data.Contains("current_loss_streak")) _data.CurrentLossStreak = (int)data["current_loss_streak"];
-        if (data.Contains("best_loss_streak")) _data.BestLossStreak = (int)data["best_loss_streak"];
+        if (data.ContainsKey("current_win_streak")) _data.CurrentWinStreak = (int)data["current_win_streak"];
+        if (data.ContainsKey("best_win_streak")) _data.BestWinStreak = (int)data["best_win_streak"];
+        if (data.ContainsKey("current_loss_streak")) _data.CurrentLossStreak = (int)data["current_loss_streak"];
+        if (data.ContainsKey("best_loss_streak")) _data.BestLossStreak = (int)data["best_loss_streak"];
         
         // 加载最喜欢的职业和构建
-        if (data.Contains("most_used_class")) _data.MostUsedClass = (string)data["most_used_class"];
-        if (data.Contains("most_used_class_count")) _data.MostUsedClassCount = (int)data["most_used_class_count"];
-        if (data.Contains("most_used_build")) _data.MostUsedBuild = (string)data["most_used_build"];
-        if (data.Contains("most_used_build_count")) _data.MostUsedBuildCount = (int)data["most_used_build_count"];
+        if (data.ContainsKey("most_used_class")) _data.MostUsedClass = (string)data["most_used_class"];
+        if (data.ContainsKey("most_used_class_count")) _data.MostUsedClassCount = (int)data["most_used_class_count"];
+        if (data.ContainsKey("most_used_build")) _data.MostUsedBuild = (string)data["most_used_build"];
+        if (data.ContainsKey("most_used_build_count")) _data.MostUsedBuildCount = (int)data["most_used_build_count"];
         
         // 加载死亡原因统计
-        if (data.Contains("death_causes"))
+        if (data.ContainsKey("death_causes"))
         {
             _data.DeathCauses.Clear();
             var deathCauses = (Godot.Collections.Dictionary)data["death_causes"];
@@ -377,7 +377,7 @@ public partial class RoguelikeStatsSystem : BaseSystem
         }
         
         // 加载历史记录
-        if (data.Contains("run_history"))
+        if (data.ContainsKey("run_history"))
         {
             _data.RunHistory.Clear();
             var runHistory = (Godot.Array)data["run_history"];

@@ -324,31 +324,31 @@ namespace ClawRPG.Systems {
         {
             if (data == null) return;
             
-            if (data.Contains("ownedRelics"))
+            if (data.ContainsKey("ownedRelics"))
             {
                 _playerData.OwnedRelicIds = new HashSet<string>((List<string>)data["ownedRelics"]);
             }
-            if (data.Contains("equippedRelics"))
+            if (data.ContainsKey("equippedRelics"))
             {
                 _playerData.EquippedRelics = (Dictionary<string, bool>)data["equippedRelics"];
             }
-            if (data.Contains("relicStacks"))
+            if (data.ContainsKey("relicStacks"))
             {
                 _playerData.RelicStacks = (Dictionary<string, int>)data["relicStacks"];
             }
-            if (data.Contains("maxSlots"))
+            if (data.ContainsKey("maxSlots"))
             {
                 _playerData.MaxRelicSlots = (int)data["maxSlots"];
             }
-            if (data.Contains("goldSpent"))
+            if (data.ContainsKey("goldSpent"))
             {
                 _playerData.GoldSpentOnRelics = (int)data["goldSpent"];
             }
-            if (data.Contains("discovered"))
+            if (data.ContainsKey("discovered"))
             {
                 _playerData.RelicsDiscovered = (int)data["discovered"];
             }
-            if (data.Contains("completed"))
+            if (data.ContainsKey("completed"))
             {
                 _playerData.RelicsCompleted = (int)data["completed"];
             }

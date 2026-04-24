@@ -232,7 +232,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
             if (data == null) return;
             _excludedChoices.Clear();
 
-            if (data.Contains("excluded_choices")) {
+            if (data.ContainsKey("excluded_choices")) {
                 var excludedList = data["excluded_choices"] as Godot.Array;
                 foreach (var item in excludedList) {
                     _excludedChoices.Add(item.ToString());

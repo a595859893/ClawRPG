@@ -351,11 +351,11 @@ public partial class TutorialSystem : BaseSystem
         var data = saveSystem.LoadGame();
         if (data == null) return;
 
-        if (data.Contains("tutorial_data"))
+        if (data.ContainsKey("tutorial_data"))
         {
             var tutorialData = (Godot.Collections.Dictionary)data["tutorial_data"];
             
-            if (tutorialData.Contains("completed"))
+            if (tutorialData.ContainsKey("completed"))
             {
                 var completed = (Godot.Collections.Dictionary)tutorialData["completed"];
                 foreach (var key in completed.Keys)
@@ -364,7 +364,7 @@ public partial class TutorialSystem : BaseSystem
                 }
             }
 
-            if (tutorialData.Contains("progress"))
+            if (tutorialData.ContainsKey("progress"))
             {
                 var progress = (Godot.Collections.Dictionary)tutorialData["progress"];
                 foreach (var key in progress.Keys)
@@ -373,7 +373,7 @@ public partial class TutorialSystem : BaseSystem
                 }
             }
 
-            if (tutorialData.Contains("in_progress"))
+            if (tutorialData.ContainsKey("in_progress"))
             {
                 var inProgress = (Godot.Collections.Array)tutorialData["in_progress"];
                 foreach (var item in inProgress)
@@ -382,10 +382,10 @@ public partial class TutorialSystem : BaseSystem
                 }
             }
 
-            if (tutorialData.Contains("hints_used"))
+            if (tutorialData.ContainsKey("hints_used"))
                 _data.HintsUsed = (int)(long)tutorialData["hints_used"];
 
-            if (tutorialData.Contains("total_completed"))
+            if (tutorialData.ContainsKey("total_completed"))
                 _data.TotalTutorialsCompleted = (int)(long)tutorialData["total_completed"];
 
             GD.Print("[TutorialSystem] 教程数据已加载");
@@ -471,7 +471,7 @@ public partial class TutorialSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("completed"))
+        if (data.ContainsKey("completed"))
         {
             var completed = data["completed"] as Dictionary;
             if (completed != null)
@@ -483,7 +483,7 @@ public partial class TutorialSystem : BaseSystem
             }
         }
         
-        if (data.Contains("progress"))
+        if (data.ContainsKey("progress"))
         {
             var progress = data["progress"] as Dictionary;
             if (progress != null)
@@ -495,7 +495,7 @@ public partial class TutorialSystem : BaseSystem
             }
         }
         
-        if (data.Contains("in_progress"))
+        if (data.ContainsKey("in_progress"))
         {
             var inProgress = data["in_progress"] as List<object>;
             if (inProgress != null)
@@ -508,10 +508,10 @@ public partial class TutorialSystem : BaseSystem
             }
         }
         
-        if (data.Contains("hints_used"))
+        if (data.ContainsKey("hints_used"))
             _data.HintsUsed = Convert.ToInt32(data["hints_used"]);
         
-        if (data.Contains("total_completed"))
+        if (data.ContainsKey("total_completed"))
             _data.TotalTutorialsCompleted = Convert.ToInt32(data["total_completed"]);
         
         GD.Print("[TutorialSystem] Data loaded via ImportSaveData");

@@ -366,7 +366,7 @@ public partial class RelicSystem : BaseSystem
         if (data == null) return;
         
         // 加载拥有的遗物
-        if (data.Contains("owned_relics"))
+        if (data.ContainsKey("owned_relics"))
         {
             var ownedArray = (Array)data["owned_relics"];
             _playerData.OwnedRelicIds.Clear();
@@ -377,7 +377,7 @@ public partial class RelicSystem : BaseSystem
         }
         
         // 加载已装备的遗物
-        if (data.Contains("equipped_relics"))
+        if (data.ContainsKey("equipped_relics"))
         {
             var equippedArray = (Array)data["equipped_relics"];
             _playerData.EquippedRelicIds.Clear();
@@ -388,7 +388,7 @@ public partial class RelicSystem : BaseSystem
         }
         
         // 加载最大槽位
-        if (data.Contains("max_slots"))
+        if (data.ContainsKey("max_slots"))
             _playerData.MaxRelicSlots = (int)data["max_slots"];
         
         ApplyRelicEffects();

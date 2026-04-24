@@ -341,13 +341,13 @@ public partial class QuickCastSystem : BaseSystem
     private BuffType GetBuffTypeFromItem(string itemId)
     {
         // Map item to buff type
-        if (itemId.Contains("attack") || itemId.Contains("strength"))
+        if (itemId.ContainsKey("attack") || itemId.ContainsKey("strength"))
             return BuffType.Attack;
-        if (itemId.Contains("defense") || itemId.Contains("armor"))
+        if (itemId.ContainsKey("defense") || itemId.ContainsKey("armor"))
             return BuffType.Defense;
-        if (itemId.Contains("speed") || itemId.Contains("haste"))
+        if (itemId.ContainsKey("speed") || itemId.ContainsKey("haste"))
             return BuffType.Speed;
-        if (itemId.Contains("health") || itemId.Contains("vitality"))
+        if (itemId.ContainsKey("health") || itemId.ContainsKey("vitality"))
             return BuffType.Health;
         return BuffType.None;
     }
@@ -547,7 +547,7 @@ public partial class QuickCastSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("slots"))
+        if (data.ContainsKey("slots"))
         {
             var slots = (Array)data["slots"];
             for (int i = 0; i < Mathf.Min(slots.Count, MaxSlots); i++)
@@ -555,22 +555,22 @@ public partial class QuickCastSystem : BaseSystem
                 var slotData = (Dictionary)slots[i];
                 var slot = _quickSlots[i];
                 
-                if (slotData.Contains("item_id"))
+                if (slotData.ContainsKey("item_id"))
                     slot.ItemId = slotData["item_id"].ToString();
-                if (slotData.Contains("item_name"))
+                if (slotData.ContainsKey("item_name"))
                     slot.ItemName = slotData["item_name"].ToString();
-                if (slotData.Contains("is_assigned"))
+                if (slotData.ContainsKey("is_assigned"))
                     slot.IsAssigned = (bool)slotData["is_assigned"];
-                if (slotData.Contains("cooldown_time"))
+                if (slotData.ContainsKey("cooldown_time"))
                     slot.CooldownTime = (float)slotData["cooldown_time"];
             }
         }
         
-        if (data.Contains("total_casts"))
+        if (data.ContainsKey("total_casts"))
             _totalCasts = (int)data["total_casts"];
-        if (data.Contains("successful_casts"))
+        if (data.ContainsKey("successful_casts"))
             _successfulCasts = (int)data["successful_casts"];
-        if (data.Contains("item_usage_count"))
+        if (data.ContainsKey("item_usage_count"))
         {
             var usageCount = (Dictionary)data["item_usage_count"];
             _itemUsageCount = new Dictionary<string, int>();

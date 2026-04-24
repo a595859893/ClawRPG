@@ -30,7 +30,6 @@ namespace ClawRPG.Systems {
     public class PartySystem {}
     public class InventoryManager {}
     public class WorldEventSystem {}
-    public enum DungeonType { Normal, Hard, Nightmare }
     public enum DungeonPhase { Exploration, Combat, Event, Boss, Victory }
 }
 

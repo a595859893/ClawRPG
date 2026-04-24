@@ -63,9 +63,9 @@ namespace ClawRPG.Scripts.Characters {
             _boss.AttackCooldown *= 0.9f;
             
             // Unlock more abilities in later phases
-            if (newPhase >= 2 && !_data.AvailableAbilities.Contains("lightning_chain"))
+            if (newPhase >= 2 && !_data.AvailableAbilities.ContainsKey("lightning_chain"))
                 _data.AvailableAbilities.Add("lightning_chain");
-            if (newPhase >= 3 && !_data.AvailableAbilities.Contains("fear_shout"))
+            if (newPhase >= 3 && !_data.AvailableAbilities.ContainsKey("fear_shout"))
                 _data.AvailableAbilities.Add("fear_shout");
             
             OnPhaseChange?.Invoke(_data.CurrentPhase);

@@ -423,7 +423,7 @@ namespace ClawRPG.Scripts.UI
         public void ImportSaveData(Dictionary<string, object> data)
         {
             base.ImportSaveData(data);
-            if (data.Contains("CurrentPage"))
+            if (data.ContainsKey("CurrentPage"))
                 _currentPage = Convert.ToInt32(data["CurrentPage"]);
             Refresh();
         }

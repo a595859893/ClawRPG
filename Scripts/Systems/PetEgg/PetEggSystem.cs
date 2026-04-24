@@ -370,7 +370,7 @@ public partial class PetEggSystem : BaseSystem
         if (data == null) return;
 
         // 拥有的蛋
-        if (data.Contains("owned_eggs"))
+        if (data.ContainsKey("owned_eggs"))
         {
             ownedEggs = new Dictionary<string, PetEgg>();
             var eggsArray = (Array)data["owned_eggs"];

@@ -641,10 +641,10 @@ namespace ClawRPG.Scripts.UI {
             // Build the icon emoji (Godot Label supports basic emoji as text on most fonts)
             string icon = intent.IntentType switch {
                 BossIntentType.Damage => intent.IsAoE ? "💥" : "⚔️",
-                BossIntentType.Buff => intent.AbilityName?.ToLowerInvariant().Contains("heal") == true ? "💚" : "🛡️",
+                BossIntentType.Buff => intent.AbilityName?.ToLowerInvariant().ContainsKey("heal") == true ? "💚" : "🛡️",
                 BossIntentType.Debuff => "☠️",
                 BossIntentType.Defend => "🏃",
-                BossIntentType.Special => intent.AbilityName?.ToLowerInvariant().Contains("summon") == true ? "👹" : "⚡",
+                BossIntentType.Special => intent.AbilityName?.ToLowerInvariant().ContainsKey("summon") == true ? "👹" : "⚡",
                 _ => "❓"
             };
 

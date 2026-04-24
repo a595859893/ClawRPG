@@ -499,11 +499,11 @@ namespace ClawRPG.Scripts.Systems
         private int GetMaxStock(string itemId)
         {
             // 根据物品ID返回最大库存
-            if (itemId.Contains("potion"))
+            if (itemId.ContainsKey("potion"))
                 return 20;
-            if (itemId.Contains("scroll"))
+            if (itemId.ContainsKey("scroll"))
                 return 15;
-            if (itemId.Contains("legendary") || itemId.Contains("artifact"))
+            if (itemId.ContainsKey("legendary") || itemId.ContainsKey("artifact"))
                 return 1;
             return 10;
         }

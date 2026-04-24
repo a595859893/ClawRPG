@@ -435,7 +435,7 @@ namespace ClawRPG.Systems.MultiplayerVote
             if (data == null) return;
             
             // 导入投票
-            if (data.Contains("votes"))
+            if (data.ContainsKey("votes"))
             {
                 var votesData = (Godot.Collections.Array)data["votes"];
                 foreach (Dictionary voteData in votesData)
@@ -454,7 +454,7 @@ namespace ClawRPG.Systems.MultiplayerVote
                         Status = (VoteResults.VoteStatus)Convert.ToInt32(voteData["status"])
                     };
                     
-                    if (voteData.Contains("vote_records"))
+                    if (voteData.ContainsKey("vote_records"))
                     {
                         var recordsData = (Godot.Collections.Array)voteData["vote_records"];
                         foreach (Dictionary recordData in recordsData)

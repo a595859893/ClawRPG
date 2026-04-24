@@ -259,7 +259,7 @@ namespace ClawRPG.Scripts.Combat {
         
         public override void ImportSaveData(Dictionary<string, object> data)
         {
-            if (data.Contains("maxDamageNumbers")) {
+            if (data.ContainsKey("maxDamageNumbers")) {
                 _maxDamageNumbers = Convert.ToInt32(data["maxDamageNumbers"]);
             }
         }

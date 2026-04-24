@@ -486,12 +486,12 @@ namespace ClawRPG.Systems.Pets.AI
         {
             if (data == null) return;
             
-            if (data.Contains("tacticalMode"))
+            if (data.ContainsKey("tacticalMode"))
             {
                 var mode = (PetTacticalMode)(int)data["tacticalMode"];
                 _tacticalState.CurrentMode = mode;
             }
-            if (data.Contains("modeSwitchCooldown"))
+            if (data.ContainsKey("modeSwitchCooldown"))
                 _tacticalState.ModeSwitchCooldown = Convert.ToSingle(data["modeSwitchCooldown"]);
         }
     }

@@ -365,21 +365,21 @@ public partial class CookingSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("known_recipes"))
+        if (data.ContainsKey("known_recipes"))
             _cookingData.knownRecipes = (Dictionary<string, int>)data["known_recipes"];
-        if (data.Contains("cooking_level"))
+        if (data.ContainsKey("cooking_level"))
             _cookingData.cookingLevel = (int)data["cooking_level"];
-        if (data.Contains("cooking_exp"))
+        if (data.ContainsKey("cooking_exp"))
             _cookingData.cookingExp = (int)data["cooking_exp"];
-        if (data.Contains("total_dishes_cooked"))
+        if (data.ContainsKey("total_dishes_cooked"))
             _cookingData.totalDishesCooked = (int)data["total_dishes_cooked"];
-        if (data.Contains("successful_cooks"))
+        if (data.ContainsKey("successful_cooks"))
             _cookingData.successfulCooks = (int)data["successful_cooks"];
-        if (data.Contains("failed_cooks"))
+        if (data.ContainsKey("failed_cooks"))
             _cookingData.failedCooks = (int)data["failed_cooks"];
-        if (data.Contains("cooked_dishes"))
+        if (data.ContainsKey("cooked_dishes"))
             _cookingData.cookedDishes = (Dictionary<string, int>)data["cooked_dishes"];
-        if (data.Contains("favorite_recipes"))
+        if (data.ContainsKey("favorite_recipes"))
             _cookingData.favoriteRecipes = (List<string>)data["favorite_recipes"];
     }
 }

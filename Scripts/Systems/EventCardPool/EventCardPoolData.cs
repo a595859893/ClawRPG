@@ -261,13 +261,13 @@ namespace ClawRPG.Scripts.Systems.EventCardPool
         {
             if (data == null) return;
 
-            if (data.Contains("currentDrawnCardId"))
+            if (data.ContainsKey("currentDrawnCardId"))
                 _currentDrawnCardId = (string)data["currentDrawnCardId"];
-            if (data.Contains("usedCardIds"))
+            if (data.ContainsKey("usedCardIds"))
                 _usedCardIds = new List<string>((Godot.Collections.Array)data["usedCardIds"]);
-            if (data.Contains("rerollCount"))
+            if (data.ContainsKey("rerollCount"))
                 _rerollCount = (int)(long)data["rerollCount"];
-            if (data.Contains("cardAccepted"))
+            if (data.ContainsKey("cardAccepted"))
                 _cardAccepted = (bool)data["cardAccepted"];
 
             GD.Print($"[EventCardPoolData] Import: card={_currentDrawnCardId}, used={_usedCardIds.Count}, rerolls={_rerollCount}");

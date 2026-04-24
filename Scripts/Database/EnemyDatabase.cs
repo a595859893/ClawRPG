@@ -294,7 +294,7 @@ namespace ClawRPG.Scripts.Database
         {
             if (data == null) return;
             
-            if (data.Contains("spawnLogic") && _spawnLogic != null)
+            if (data.ContainsKey("spawnLogic") && _spawnLogic != null)
             {
                 _spawnLogic.ImportSaveData((Dictionary)data["spawnLogic"]);
             }

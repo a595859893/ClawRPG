@@ -174,7 +174,7 @@ public delegate void DepositLevelChanged(DepositType type, int newLevel);
 
     public void ImportSaveData(Dictionary<string, object> data)
     {
-        if (data == null || !data.Contains("depositSlots")) return;
+        if (data == null || !data.ContainsKey("depositSlots")) return;
 
         foreach (Dictionary slotData in (Godot.Collections.Array)data["depositSlots"])
         {

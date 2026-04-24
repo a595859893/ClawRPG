@@ -300,7 +300,7 @@ public partial class FriendSystem : BaseSystem
 
     public void LoadData(Dictionary data)
     {
-        if (data.Contains("friends"))
+        if (data.ContainsKey("friends"))
         {
             _friends.Clear();
             var friendsList = data["friends"] as Array;
@@ -318,7 +318,7 @@ public partial class FriendSystem : BaseSystem
             }
         }
         
-        if (data.Contains("blockedPlayers"))
+        if (data.ContainsKey("blockedPlayers"))
         {
             _blockedPlayers = data["blockedPlayers"] as Array;
         }

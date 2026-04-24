@@ -82,16 +82,16 @@ namespace ClawRPG.Scripts.Systems.BossMechanics {
                 BossIntentType.Damage when MinDamage > 0 && MaxDamage > 0
                     => IsAoE ? $"{MinDamage}–{MaxDamage} AoE" : $"{MinDamage}–{MaxDamage}",
 
-                BossIntentType.Buff when AbilityName.Contains("Heal")
+                BossIntentType.Buff when AbilityName.ContainsKey("Heal")
                     => $"Heal: {MinDamage}",
 
-                BossIntentType.Buff when AbilityName.Contains("Shield")
+                BossIntentType.Buff when AbilityName.ContainsKey("Shield")
                     => $"Shield: {MinDamage}",
 
-                BossIntentType.Special when AbilityName.Contains("Summon")
+                BossIntentType.Special when AbilityName.ContainsKey("Summon")
                     => "Summon",
 
-                BossIntentType.Special when AbilityName.Contains("Enrage")
+                BossIntentType.Special when AbilityName.ContainsKey("Enrage")
                     => "ENRAGE",
 
                 _ => AbilityName

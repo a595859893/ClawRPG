@@ -472,7 +472,7 @@ namespace ClawRPG.Scripts.Skills {
             
             _unlockStates.Clear();
             
-            if (data.Contains("unlockStates"))
+            if (data.ContainsKey("unlockStates"))
             {
                 var statesArray = (Array)data["unlockStates"];
                 foreach (Dictionary entry in statesArray)

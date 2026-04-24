@@ -161,7 +161,7 @@ namespace ClawRPG.Systems {
         public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
-            if (data.Contains("unlocked_badges"))
+            if (data.ContainsKey("unlocked_badges"))
             {
                 _unlockedBadges.Clear();
                 var unlocked = (Array)data["unlocked_badges"];

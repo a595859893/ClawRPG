@@ -116,7 +116,7 @@ public class PartyPersistenceManager
         _playerData.Clear();
         _pendingInvites.Clear();
 
-        if (data.Contains("parties"))
+        if (data.ContainsKey("parties"))
         {
             var partiesList = (Godot.Collections.Array)data["parties"];
             foreach (var partyObj in partiesList)
@@ -137,7 +137,7 @@ public class PartyPersistenceManager
                     CreatedAt = DateTime.Parse(partyData["created_at"].ToString())
                 };
 
-                if (partyData.Contains("members"))
+                if (partyData.ContainsKey("members"))
                 {
                     var membersList = (Godot.Collections.Array)partyData["members"];
                     foreach (var memberObj in membersList)
@@ -163,7 +163,7 @@ public class PartyPersistenceManager
         }
 
         // 加载待处理的邀请
-        if (data.Contains("pending_invites"))
+        if (data.ContainsKey("pending_invites"))
         {
             var invitesList = (Godot.Collections.Array)data["pending_invites"];
             foreach (var inviteObj in invitesList)
@@ -181,7 +181,7 @@ public class PartyPersistenceManager
             }
         }
 
-        if (data.Contains("player_data"))
+        if (data.ContainsKey("player_data"))
         {
             var playerDataDict = (Dictionary)data["player_data"];
             foreach (var kvp in playerDataDict)

@@ -56,7 +56,7 @@ public partial class GodotRunner : BaseSystem
         foreach (var candidate in candidates)
         {
             // 简单检查命令是否存在 (非阻塞)
-            if (candidate.Contains("/"))
+            if (candidate.ContainsKey("/"))
             {
                 if (System.IO.File.Exists(candidate))
                 {

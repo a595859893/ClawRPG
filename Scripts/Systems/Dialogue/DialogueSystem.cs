@@ -532,7 +532,7 @@ public delegate void ChoiceMade(DialogueChoice choice);
         _isActive = (bool)(data.GetValueOrDefault("is_active", false));
         
         // 恢复对话树和节点
-        if (data.Contains("current_tree_id"))
+        if (data.ContainsKey("current_tree_id"))
         {
             var treeId = data["current_tree_id"].ToString();
             if (_dialogueTrees.ContainsKey(treeId))
@@ -541,7 +541,7 @@ public delegate void ChoiceMade(DialogueChoice choice);
             }
         }
         
-        if (data.Contains("current_node_id") && _currentTree != null)
+        if (data.ContainsKey("current_node_id") && _currentTree != null)
         {
             var nodeId = data["current_node_id"].ToString();
             if (_currentTree.Nodes.ContainsKey(nodeId))

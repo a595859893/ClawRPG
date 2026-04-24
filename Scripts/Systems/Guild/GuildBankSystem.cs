@@ -333,14 +333,14 @@ public partial class GuildBankSystem : BaseSystem {
     {
         if (data == null) return;
         
-        if (data.Contains("guild_id")) BankData.GuildId = (string)data["guild_id"];
-        if (data.Contains("gold_deposit")) BankData.GoldDeposit = Convert.ToInt64(data["gold_deposit"]);
-        if (data.Contains("total_deposits")) BankData.TotalDeposits = Convert.ToInt64(data["total_deposits"]);
-        if (data.Contains("total_withdrawals")) BankData.TotalWithdrawals = Convert.ToInt64(data["total_withdrawals"]);
+        if (data.ContainsKey("guild_id")) BankData.GuildId = (string)data["guild_id"];
+        if (data.ContainsKey("gold_deposit")) BankData.GoldDeposit = Convert.ToInt64(data["gold_deposit"]);
+        if (data.ContainsKey("total_deposits")) BankData.TotalDeposits = Convert.ToInt64(data["total_deposits"]);
+        if (data.ContainsKey("total_withdrawals")) BankData.TotalWithdrawals = Convert.ToInt64(data["total_withdrawals"]);
         
         // 物品
         BankData.Items.Clear();
-        if (data.Contains("items"))
+        if (data.ContainsKey("items"))
         {
             var itemsArray = (Array)data["items"];
             foreach (Dictionary itemData in itemsArray)
@@ -360,7 +360,7 @@ public partial class GuildBankSystem : BaseSystem {
         
         // 交易记录
         BankData.Transactions.Clear();
-        if (data.Contains("transactions"))
+        if (data.ContainsKey("transactions"))
         {
             var transactionsArray = (Array)data["transactions"];
             foreach (Dictionary transactionData in transactionsArray)

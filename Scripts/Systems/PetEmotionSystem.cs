@@ -382,7 +382,7 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
 
             // Load pet emotions
-            if (data.Contains("pet_emotions"))
+            if (data.ContainsKey("pet_emotions"))
             {
                 var emotionsArray = (Godot.Array)data["pet_emotions"];
                 foreach (Dictionary emotionData in emotionsArray)
@@ -396,11 +396,11 @@ namespace ClawRPG.Scripts.Systems
                         TotalEmotionChanges = (int)emotionData["total_changes"]
                     };
                     
-                    if (emotionData.Contains("last_change"))
+                    if (emotionData.ContainsKey("last_change"))
                         petData.LastEmotionChange = DateTime.Parse((string)emotionData["last_change"]);
                     
                     // Load emotion values
-                    if (emotionData.Contains("emotion_values"))
+                    if (emotionData.ContainsKey("emotion_values"))
                     {
                         var emotionValues = (Godot.Collections.Dictionary)emotionData["emotion_values"];
                         foreach (var key in emotionValues.Keys)
@@ -414,7 +414,7 @@ namespace ClawRPG.Scripts.Systems
             }
 
             // Load stats
-            if (data.Contains("pet_emotion_stats"))
+            if (data.ContainsKey("pet_emotion_stats"))
             {
                 var stats = (Godot.Collections.Dictionary)data["pet_emotion_stats"];
                 TotalEmotionChanges = (int)stats.Get("total_changes", 0);

@@ -253,7 +253,7 @@ public partial class PetBreedingSystem : BaseSystem
         if (data == null) return;
 
         // Load unlocked breeds
-        if (data.Contains("pet_breeding_unlocked"))
+        if (data.ContainsKey("pet_breeding_unlocked"))
         {
             var unlockedArray = (Godot.Array)data["pet_breeding_unlocked"];
             foreach (string key in unlockedArray)
@@ -263,7 +263,7 @@ public partial class PetBreedingSystem : BaseSystem
         }
 
         // Load breeding history
-        if (data.Contains("pet_breeding_history"))
+        if (data.ContainsKey("pet_breeding_history"))
         {
             var historyArray = (Godot.Array)data["pet_breeding_history"];
             foreach (Dictionary historyData in historyArray)
@@ -283,7 +283,7 @@ public partial class PetBreedingSystem : BaseSystem
         }
 
         // Load stats
-        if (data.Contains("pet_breeding_stats"))
+        if (data.ContainsKey("pet_breeding_stats"))
         {
             var stats = (Godot.Collections.Dictionary)data["pet_breeding_stats"];
             _data.TotalBreeds = (int)stats.Get("total_breeds", 0);
@@ -292,7 +292,7 @@ public partial class PetBreedingSystem : BaseSystem
         }
 
         // Load offspring stats
-        if (data.Contains("pet_breeding_offspring"))
+        if (data.ContainsKey("pet_breeding_offspring"))
         {
             var offspringData = (Godot.Collections.Dictionary)data["pet_breeding_offspring"];
             foreach (string key in offspringData.Keys)

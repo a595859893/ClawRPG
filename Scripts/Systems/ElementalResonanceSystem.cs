@@ -290,7 +290,7 @@ public partial class ElementalResonanceSystem : BaseSystem
         targetElements.Clear();
         elementTimers.Clear();
         
-        if (data.Contains("targets"))
+        if (data.ContainsKey("targets"))
         {
             var targetsArray = (Godot.Array)data["targets"];
             foreach (Dictionary targetData in targetsArray)

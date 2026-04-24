@@ -388,7 +388,7 @@ namespace ClawRPG.Scripts.UI
         /// </summary>
         public void ImportSaveData(Dictionary<string, object> data)
         {
-            if (data == null || !data.Contains("visibleUIs")) return;
+            if (data == null || !data.ContainsKey("visibleUIs")) return;
             
             var visibleUIs = data["visibleUIs"] as List<string>;
             if (visibleUIs == null) return;

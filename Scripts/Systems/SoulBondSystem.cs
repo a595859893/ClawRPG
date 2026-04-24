@@ -331,7 +331,7 @@ public partial class SoulBondSystem : BaseSystem
         if (data == null) return;
         
         // 加载活跃的灵魂连接
-        if (data.Contains("active_bonds"))
+        if (data.ContainsKey("active_bonds"))
         {
             ActiveBonds.Clear();
             var bondsArray = (Array)data["active_bonds"];
@@ -346,9 +346,9 @@ public partial class SoulBondSystem : BaseSystem
                     TotalInteractions = (int)bondDict["total_interactions"]
                 };
                 
-                if (bondDict.Contains("bond_time"))
+                if (bondDict.ContainsKey("bond_time"))
                     DateTime.TryParse(bondDict["bond_time"].ToString(), out bond.BondTime);
-                if (bondDict.Contains("last_interaction"))
+                if (bondDict.ContainsKey("last_interaction"))
                     DateTime.TryParse(bondDict["last_interaction"].ToString(), out bond.LastInteraction);
                 
                 ActiveBonds.Add(bond);
@@ -356,7 +356,7 @@ public partial class SoulBondSystem : BaseSystem
         }
         
         // 加载连接历史
-        if (data.Contains("bond_history"))
+        if (data.ContainsKey("bond_history"))
         {
             BondHistory.Clear();
             var historyArray = (Array)data["bond_history"];
@@ -370,9 +370,9 @@ public partial class SoulBondSystem : BaseSystem
                     EndedReason = recordDict["ended_reason"].ToString()
                 };
                 
-                if (recordDict.Contains("start_time"))
+                if (recordDict.ContainsKey("start_time"))
                     DateTime.TryParse(recordDict["start_time"].ToString(), out record.StartTime);
-                if (recordDict.Contains("end_time"))
+                if (recordDict.ContainsKey("end_time"))
                     DateTime.TryParse(recordDict["end_time"].ToString(), out record.EndTime);
                 
                 BondHistory.Add(record);
@@ -380,11 +380,11 @@ public partial class SoulBondSystem : BaseSystem
         }
         
         // 加载统计
-        if (data.Contains("total_bonds_formed"))
+        if (data.ContainsKey("total_bonds_formed"))
             TotalBondsFormed = (int)data["total_bonds_formed"];
-        if (data.Contains("highest_bond_level"))
+        if (data.ContainsKey("highest_bond_level"))
             HighestBondLevel = (int)data["highest_bond_level"];
-        if (data.Contains("total_bond_points_earned"))
+        if (data.ContainsKey("total_bond_points_earned"))
             TotalBondPointsEarned = (int)data["total_bond_points_earned"];
     }
 }

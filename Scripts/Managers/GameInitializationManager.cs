@@ -282,7 +282,7 @@ namespace ClawRPG.Scripts.Managers
         {
             if (data == null) return;
             
-            if (data.Contains("initializationOrder"))
+            if (data.ContainsKey("initializationOrder"))
             {
                 _initializationOrder = data["initializationOrder"] as List<string>;
             }

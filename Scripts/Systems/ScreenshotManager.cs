@@ -152,9 +152,9 @@ public partial class ScreenshotManager : BaseSystem
     /// </summary>
     public override void ImportSaveData(Dictionary<string, object> data)
     {
-        if (data.Contains("screenshot_folder"))
+        if (data.ContainsKey("screenshot_folder"))
             ScreenshotFolder = data["screenshot_folder"].ToString();
-        if (data.Contains("auto_save"))
+        if (data.ContainsKey("auto_save"))
             AutoSaveScreenshots = (bool)data["auto_save"];
     }
 }

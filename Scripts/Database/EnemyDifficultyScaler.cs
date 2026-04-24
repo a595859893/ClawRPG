@@ -134,11 +134,11 @@ namespace ClawRPG.Scripts.Database {
         public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
-            if (data.Contains("difficulty")) {
+            if (data.ContainsKey("difficulty")) {
                 SetDifficulty((DifficultyLevel)(int)data["difficulty"]);
             }
             
-            if (data.Contains("playerLevel")) {
+            if (data.ContainsKey("playerLevel")) {
                 SetPlayerLevel((int)data["playerLevel"]);
             }
         }

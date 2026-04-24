@@ -177,7 +177,7 @@ namespace ClawRPG.Scripts.Systems
             _memberConfigs.Clear();
             
             // Import position configs
-            if (data.Contains("positionConfigs"))
+            if (data.ContainsKey("positionConfigs"))
             {
                 var positionsArray = (Array)data["positionConfigs"];
                 foreach (Dictionary entry in positionsArray)
@@ -192,7 +192,7 @@ namespace ClawRPG.Scripts.Systems
             }
             
             // Import member configs
-            if (data.Contains("memberConfigs"))
+            if (data.ContainsKey("memberConfigs"))
             {
                 var membersArray = (Array)data["memberConfigs"];
                 foreach (Dictionary entry in membersArray)

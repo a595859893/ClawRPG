@@ -119,7 +119,7 @@ namespace ClawRPG.Scripts.Systems {
                 
                 var challenges = new List<DailyChallenge>();
                 
-                if (data.Contains("challenges")) {
+                if (data.ContainsKey("challenges")) {
                     var challengeList = (Array)data["challenges"];
                     foreach (var item in challengeList) {
                         var challengeDict = item as Dictionary;
@@ -139,7 +139,7 @@ namespace ClawRPG.Scripts.Systems {
                             };
                             
                             // Load item rewards
-                            if (challengeDict.Contains("ItemRewardIds")) {
+                            if (challengeDict.ContainsKey("ItemRewardIds")) {
                                 var itemRewards = (Array)challengeDict["ItemRewardIds"];
                                 challenge.ItemRewardIds = new List<int>();
                                 foreach (var itemId in itemRewards) {
@@ -153,16 +153,16 @@ namespace ClawRPG.Scripts.Systems {
                 }
                 
                 // Restore statistics
-                if (data.Contains("totalKills")) _totalKills = (int)data["totalKills"];
-                if (data.Contains("totalDamageDealt")) _totalDamageDealt = (int)data["totalDamageDealt"];
-                if (data.Contains("totalGoldEarned")) _totalGoldEarned = (int)data["totalGoldEarned"];
-                if (data.Contains("totalSkillsUsed")) _totalSkillsUsed = (int)data["totalSkillsUsed"];
-                if (data.Contains("totalQuestsCompleted")) _totalQuestsCompleted = (int)data["totalQuestsCompleted"];
-                if (data.Contains("regionsExplored")) _regionsExplored = (int)data["regionsExplored"];
-                if (data.Contains("survivalTimeSeconds")) _survivalTimeSeconds = (int)data["survivalTimeSeconds"];
+                if (data.ContainsKey("totalKills")) _totalKills = (int)data["totalKills"];
+                if (data.ContainsKey("totalDamageDealt")) _totalDamageDealt = (int)data["totalDamageDealt"];
+                if (data.ContainsKey("totalGoldEarned")) _totalGoldEarned = (int)data["totalGoldEarned"];
+                if (data.ContainsKey("totalSkillsUsed")) _totalSkillsUsed = (int)data["totalSkillsUsed"];
+                if (data.ContainsKey("totalQuestsCompleted")) _totalQuestsCompleted = (int)data["totalQuestsCompleted"];
+                if (data.ContainsKey("regionsExplored")) _regionsExplored = (int)data["regionsExplored"];
+                if (data.ContainsKey("survivalTimeSeconds")) _survivalTimeSeconds = (int)data["survivalTimeSeconds"];
                 
                 // Restore explored region IDs
-                if (data.Contains("exploredRegionIds")) {
+                if (data.ContainsKey("exploredRegionIds")) {
                     var regionIds = (Array)data["exploredRegionIds"];
                     _exploredRegionIds = new HashSet<string>();
                     foreach (var regionId in regionIds) {
@@ -171,18 +171,18 @@ namespace ClawRPG.Scripts.Systems {
                 }
                 
                 // Restore new challenge tracking stats
-                if (data.Contains("totalFishCaught")) _totalFishCaught = (int)data["totalFishCaught"];
-                if (data.Contains("totalAlchemyCrafted")) _totalAlchemyCrafted = (int)data["totalAlchemyCrafted"];
-                if (data.Contains("totalMountKills")) _totalMountKills = (int)data["totalMountKills"];
-                if (data.Contains("totalMountSkillsUsed")) _totalMountSkillsUsed = (int)data["totalMountSkillsUsed"];
-                if (data.Contains("totalPetKills")) _totalPetKills = (int)data["totalPetKills"];
-                if (data.Contains("totalItemsSold")) _totalItemsSold = (int)data["totalItemsSold"];
-                if (data.Contains("totalItemsCrafted")) _totalItemsCrafted = (int)data["totalItemsCrafted"];
-                if (data.Contains("totalReputationGained")) _totalReputationGained = (int)data["totalReputationGained"];
-                if (data.Contains("totalBossesKilled")) _totalBossesKilled = (int)data["totalBossesKilled"];
-                if (data.Contains("totalCriticalHits")) _totalCriticalHits = (int)data["totalCriticalHits"];
-                if (data.Contains("totalDodges")) _totalDodges = (int)data["totalDodges"];
-                if (data.Contains("totalHealed")) _totalHealed = (int)data["totalHealed"];
+                if (data.ContainsKey("totalFishCaught")) _totalFishCaught = (int)data["totalFishCaught"];
+                if (data.ContainsKey("totalAlchemyCrafted")) _totalAlchemyCrafted = (int)data["totalAlchemyCrafted"];
+                if (data.ContainsKey("totalMountKills")) _totalMountKills = (int)data["totalMountKills"];
+                if (data.ContainsKey("totalMountSkillsUsed")) _totalMountSkillsUsed = (int)data["totalMountSkillsUsed"];
+                if (data.ContainsKey("totalPetKills")) _totalPetKills = (int)data["totalPetKills"];
+                if (data.ContainsKey("totalItemsSold")) _totalItemsSold = (int)data["totalItemsSold"];
+                if (data.ContainsKey("totalItemsCrafted")) _totalItemsCrafted = (int)data["totalItemsCrafted"];
+                if (data.ContainsKey("totalReputationGained")) _totalReputationGained = (int)data["totalReputationGained"];
+                if (data.ContainsKey("totalBossesKilled")) _totalBossesKilled = (int)data["totalBossesKilled"];
+                if (data.ContainsKey("totalCriticalHits")) _totalCriticalHits = (int)data["totalCriticalHits"];
+                if (data.ContainsKey("totalDodges")) _totalDodges = (int)data["totalDodges"];
+                if (data.ContainsKey("totalHealed")) _totalHealed = (int)data["totalHealed"];
                 
                 GD.Print($"[DailyChallengeManager] Loaded {challenges.Count} challenges from storage");
                 return challenges;

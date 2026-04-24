@@ -232,10 +232,10 @@ namespace ClawRPG.Scripts
         {
             if (data == null) return;
 
-            if (data.Contains("UIController") && _uiController != null)
+            if (data.ContainsKey("UIController") && _uiController != null)
                 _uiController.ImportSaveData((Godot.Collections.Dictionary)data["UIController"]);
 
-            if (data.Contains("UIPanelManager") && _panelManager != null)
+            if (data.ContainsKey("UIPanelManager") && _panelManager != null)
                 _panelManager.ImportSaveData((Godot.Collections.Dictionary)data["UIPanelManager"]);
         }
 

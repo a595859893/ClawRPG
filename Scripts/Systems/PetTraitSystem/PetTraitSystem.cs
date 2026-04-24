@@ -37,7 +37,7 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
 
             // Load unlocked traits
-            if (data.Contains("pet_trait_unlocked"))
+            if (data.ContainsKey("pet_trait_unlocked"))
             {
                 var unlockedArray = (Godot.Array)data["pet_trait_unlocked"];
                 foreach (string traitId in unlockedArray)
@@ -47,7 +47,7 @@ namespace ClawRPG.Scripts.Systems
             }
 
             // Load trait levels
-            if (data.Contains("pet_trait_levels"))
+            if (data.ContainsKey("pet_trait_levels"))
             {
                 var levelsData = (Godot.Collections.Dictionary)data["pet_trait_levels"];
                 foreach (string key in levelsData.Keys)
@@ -57,7 +57,7 @@ namespace ClawRPG.Scripts.Systems
             }
 
             // Load active traits
-            if (data.Contains("pet_trait_active"))
+            if (data.ContainsKey("pet_trait_active"))
             {
                 var activeArray = (Godot.Array)data["pet_trait_active"];
                 foreach (string traitId in activeArray)
@@ -68,7 +68,7 @@ namespace ClawRPG.Scripts.Systems
             }
 
             // Load stats
-            if (data.Contains("pet_trait_stats"))
+            if (data.ContainsKey("pet_trait_stats"))
             {
                 var stats = (Godot.Collections.Dictionary)data["pet_trait_stats"];
                 _totalTraitsUnlocked = (int)stats.Get("unlocked", 0);

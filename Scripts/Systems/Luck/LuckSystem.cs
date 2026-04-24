@@ -329,27 +329,27 @@ public partial class LuckSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("baseLuck"))
+        if (data.ContainsKey("baseLuck"))
         {
             _data.BaseLuck = (int)data["baseLuck"];
         }
-        if (data.Contains("activeModifiers"))
+        if (data.ContainsKey("activeModifiers"))
         {
             _data.ActiveModifiers = (List<LuckModifier>)data["activeModifiers"];
         }
-        if (data.Contains("totalLuckyRolls"))
+        if (data.ContainsKey("totalLuckyRolls"))
         {
             _data.TotalLuckyRolls = (int)data["totalLuckyRolls"];
         }
-        if (data.Contains("criticalLuckRolls"))
+        if (data.ContainsKey("criticalLuckRolls"))
         {
             _data.CriticalLuckRolls = (int)data["criticalLuckRolls"];
         }
-        if (data.Contains("failedLuckRolls"))
+        if (data.ContainsKey("failedLuckRolls"))
         {
             _data.FailedLuckRolls = (int)data["failedLuckRolls"];
         }
-        if (data.Contains("history"))
+        if (data.ContainsKey("history"))
         {
             _data.History = (List<LuckEvent>)data["history"];
         }

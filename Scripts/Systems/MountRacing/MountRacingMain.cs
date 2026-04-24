@@ -69,31 +69,31 @@ namespace ClawRPG.Systems {
         public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null || _mountRacingData == null) return;
             
-            if (data.Contains("racing_history")) {
+            if (data.ContainsKey("racing_history")) {
                 _mountRacingData.RacingHistory = DeserializeRacingHistory(data["racing_history"] as Dictionary);
             }
             
-            if (data.Contains("unlocked_tracks")) {
+            if (data.ContainsKey("unlocked_tracks")) {
                 _mountRacingData.UnlockedTracks = data["unlocked_tracks"] as List<string> ?? new List<string>();
             }
             
-            if (data.Contains("best_times")) {
+            if (data.ContainsKey("best_times")) {
                 _mountRacingData.BestTimes = data["best_times"] as Dictionary ?? new Dictionary<string, int>();
             }
             
-            if (data.Contains("total_races")) {
+            if (data.ContainsKey("total_races")) {
                 _mountRacingData.TotalRaces = data["total_races"] as Dictionary ?? new Dictionary<string, int>();
             }
             
-            if (data.Contains("total_wins")) {
+            if (data.ContainsKey("total_wins")) {
                 _mountRacingData.TotalWins = data["total_wins"] as Dictionary ?? new Dictionary<string, int>();
             }
             
-            if (data.Contains("total_gold_earned")) {
+            if (data.ContainsKey("total_gold_earned")) {
                 _mountRacingData.TotalGoldEarned = data["total_gold_earned"] as int? ?? 0;
             }
             
-            if (data.Contains("total_exp_earned")) {
+            if (data.ContainsKey("total_exp_earned")) {
                 _mountRacingData.TotalExpEarned = data["total_exp_earned"] as int? ?? 0;
             }
         }

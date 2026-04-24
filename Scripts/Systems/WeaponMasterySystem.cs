@@ -371,13 +371,13 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
             
             // 加载当前武器类型
-            if (data.Contains("currentWeapon"))
+            if (data.ContainsKey("currentWeapon"))
             {
                 CurrentWeaponType = (WeaponType)(int)data["currentWeapon"];
             }
             
             // 加载专精数据
-            if (data.Contains("masteries"))
+            if (data.ContainsKey("masteries"))
             {
                 var masteryList = (Array)data["masteries"];
                 foreach (Dictionary masteryData in masteryList)

@@ -476,7 +476,7 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
 
             ActiveBounties.Clear();
-            if (data.Contains("activeBounties"))
+            if (data.ContainsKey("activeBounties"))
             {
                 var bountiesObj = data["activeBounties"];
                 if (bountiesObj is IEnumerable bounties)
@@ -508,7 +508,7 @@ namespace ClawRPG.Scripts.Systems
                 }
             }
 
-            if (data.Contains("lastRefreshTime"))
+            if (data.ContainsKey("lastRefreshTime"))
             {
                 _lastRefreshTime = DateTime.Parse(data["lastRefreshTime"].ToString());
             }

@@ -40,7 +40,7 @@ public partial class RandomNameData : BaseSystem
         if (data == null) return;
         
         // 生成的名字历史
-        if (data.Contains("generated_names"))
+        if (data.ContainsKey("generated_names"))
         {
             var namesArray = (Array)data["generated_names"];
             GeneratedNames = new List<string>();
@@ -53,7 +53,7 @@ public partial class RandomNameData : BaseSystem
         // 统计数据
         TotalGenerated = (int)data.GetValueOrDefault("total_generated", 0);
         
-        if (data.Contains("first_name_count"))
+        if (data.ContainsKey("first_name_count"))
         {
             FirstNameCount = new Dictionary<string, int>();
             var dict = (Dictionary)data["first_name_count"];
@@ -63,7 +63,7 @@ public partial class RandomNameData : BaseSystem
             }
         }
         
-        if (data.Contains("last_name_count"))
+        if (data.ContainsKey("last_name_count"))
         {
             LastNameCount = new Dictionary<string, int>();
             var dict = (Dictionary)data["last_name_count"];
@@ -73,7 +73,7 @@ public partial class RandomNameData : BaseSystem
             }
         }
         
-        if (data.Contains("culture_count"))
+        if (data.ContainsKey("culture_count"))
         {
             CultureCount = new Dictionary<string, int>();
             var dict = (Dictionary)data["culture_count"];

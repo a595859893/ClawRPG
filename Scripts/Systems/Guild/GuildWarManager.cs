@@ -386,7 +386,7 @@ public delegate void PointsUpdatedSignal(int warId, int guildId, int points);
         guildWars.Clear();
         warHistory.Clear();
         
-        if (data.Contains("wars"))
+        if (data.ContainsKey("wars"))
         {
             Godot.Array warsArray = (Godot.Array)data["wars"];
             foreach (Dictionary warDict in warsArray)
@@ -405,7 +405,7 @@ public delegate void PointsUpdatedSignal(int warId, int guildId, int points);
             }
         }
         
-        if (data.Contains("history"))
+        if (data.ContainsKey("history"))
         {
             Godot.Array historyArray = (Godot.Array)data["history"];
             foreach (Dictionary entryDict in historyArray)
@@ -423,7 +423,7 @@ public delegate void PointsUpdatedSignal(int warId, int guildId, int points);
             }
         }
         
-        if (data.Contains("nextWarId"))
+        if (data.ContainsKey("nextWarId"))
         {
             nextWarId = (int)data["nextWarId"];
         }

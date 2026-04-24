@@ -533,7 +533,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             
             // 导入待处理操作
             _pendingActions.Clear();
-            if (data.Contains("PendingActions") && data["PendingActions"] is ArrayList pendingActionsData)
+            if (data.ContainsKey("PendingActions") && data["PendingActions"] is ArrayList pendingActionsData)
             {
                 foreach (Dictionary aDict in pendingActionsData)
                 {
@@ -556,7 +556,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             
             // 导入广播缓冲区
             _broadcastBuffer.Clear();
-            if (data.Contains("BroadcastBuffer") && data["BroadcastBuffer"] is ArrayList broadcastBufferData)
+            if (data.ContainsKey("BroadcastBuffer") && data["BroadcastBuffer"] is ArrayList broadcastBufferData)
             {
                 foreach (Dictionary aDict in broadcastBufferData)
                 {

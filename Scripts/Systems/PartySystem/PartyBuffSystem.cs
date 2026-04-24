@@ -293,7 +293,7 @@ namespace ClawRPG.Scripts.Systems
             _resourceBuffs.Clear();
             
             // Import party buffs
-            if (data.Contains("partyBuffs"))
+            if (data.ContainsKey("partyBuffs"))
             {
                 var buffsArray = (Array)data["partyBuffs"];
                 foreach (Dictionary entry in buffsArray)
@@ -308,7 +308,7 @@ namespace ClawRPG.Scripts.Systems
             }
             
             // Import synergy effects
-            if (data.Contains("synergyEffects"))
+            if (data.ContainsKey("synergyEffects"))
             {
                 var synergyArray = (Array)data["synergyEffects"];
                 foreach (Dictionary entry in synergyArray)
@@ -322,13 +322,13 @@ namespace ClawRPG.Scripts.Systems
                 }
             }
             
-            if (data.Contains("nextBuffId"))
+            if (data.ContainsKey("nextBuffId"))
             {
                 _nextBuffId = Convert.ToInt32(data["nextBuffId"]);
             }
             
             // Import resource buffs
-            if (data.Contains("resourceBuffs"))
+            if (data.ContainsKey("resourceBuffs"))
             {
                 var resourceData = JsonSerializer.Deserialize<Dictionary<int, float>>(data["resourceBuffs"].ToString());
                 if (resourceData != null)

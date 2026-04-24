@@ -317,7 +317,7 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
             
             // 加载生成计时器
-            if (data.Contains("spawn_timers"))
+            if (data.ContainsKey("spawn_timers"))
             {
                 var timers = data["spawn_timers"] as Dictionary;
                 if (timers != null)

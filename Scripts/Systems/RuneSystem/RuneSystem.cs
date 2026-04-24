@@ -268,12 +268,12 @@ public partial class RuneSystem : BaseSystem
             var stats = (Godot.Collections.Dictionary)data["statistics"];
             _data.Statistics = new RuneStatistics
             {
-                TotalRunesUnlocked = stats.Contains("total_runes_unlocked") ? (int)stats["total_runes_unlocked"] : 0,
-                TotalRunesEquipped = stats.Contains("total_runes_equipped") ? (int)stats["total_runes_equipped"] : 0,
-                TotalGoldSpent = stats.Contains("total_gold_spent") ? (int)stats["total_gold_spent"] : 0,
-                TotalExpGained = stats.Contains("total_exp_gained") ? (int)stats["total_exp_gained"] : 0,
-                TimesEnhanced = stats.Contains("times_enhanced") ? (int)stats["times_enhanced"] : 0,
-                TimesRemoved = stats.Contains("times_removed") ? (int)stats["times_removed"] : 0
+                TotalRunesUnlocked = stats.ContainsKey("total_runes_unlocked") ? (int)stats["total_runes_unlocked"] : 0,
+                TotalRunesEquipped = stats.ContainsKey("total_runes_equipped") ? (int)stats["total_runes_equipped"] : 0,
+                TotalGoldSpent = stats.ContainsKey("total_gold_spent") ? (int)stats["total_gold_spent"] : 0,
+                TotalExpGained = stats.ContainsKey("total_exp_gained") ? (int)stats["total_exp_gained"] : 0,
+                TimesEnhanced = stats.ContainsKey("times_enhanced") ? (int)stats["times_enhanced"] : 0,
+                TimesRemoved = stats.ContainsKey("times_removed") ? (int)stats["times_removed"] : 0
             };
         }
     }
@@ -322,7 +322,7 @@ public partial class RuneSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("unlocked_runes"))
+        if (data.ContainsKey("unlocked_runes"))
         {
             var unlocked = (Godot.Collections.Dictionary)data["unlocked_runes"];
             _data.UnlockedRunes = new Dictionary<string, int>();
@@ -332,7 +332,7 @@ public partial class RuneSystem : BaseSystem
             }
         }
         
-        if (data.Contains("equipped_runes"))
+        if (data.ContainsKey("equipped_runes"))
         {
             var equipped = (Godot.Collections.Dictionary)data["equipped_runes"];
             _data.EquippedRunes = new Dictionary<string, string>();
@@ -342,17 +342,17 @@ public partial class RuneSystem : BaseSystem
             }
         }
         
-        if (data.Contains("statistics"))
+        if (data.ContainsKey("statistics"))
         {
             var stats = (Godot.Collections.Dictionary)data["statistics"];
             _data.Statistics = new RuneStatistics
             {
-                TotalRunesUnlocked = stats.Contains("total_runes_unlocked") ? (int)stats["total_runes_unlocked"] : 0,
-                TotalRunesEquipped = stats.Contains("total_runes_equipped") ? (int)stats["total_runes_equipped"] : 0,
-                TotalGoldSpent = stats.Contains("total_gold_spent") ? (int)stats["total_gold_spent"] : 0,
-                TotalExpGained = stats.Contains("total_exp_gained") ? (int)stats["total_exp_gained"] : 0,
-                TimesEnhanced = stats.Contains("times_enhanced") ? (int)stats["times_enhanced"] : 0,
-                TimesRemoved = stats.Contains("times_removed") ? (int)stats["times_removed"] : 0
+                TotalRunesUnlocked = stats.ContainsKey("total_runes_unlocked") ? (int)stats["total_runes_unlocked"] : 0,
+                TotalRunesEquipped = stats.ContainsKey("total_runes_equipped") ? (int)stats["total_runes_equipped"] : 0,
+                TotalGoldSpent = stats.ContainsKey("total_gold_spent") ? (int)stats["total_gold_spent"] : 0,
+                TotalExpGained = stats.ContainsKey("total_exp_gained") ? (int)stats["total_exp_gained"] : 0,
+                TimesEnhanced = stats.ContainsKey("times_enhanced") ? (int)stats["times_enhanced"] : 0,
+                TimesRemoved = stats.ContainsKey("times_removed") ? (int)stats["times_removed"] : 0
             };
         }
     }

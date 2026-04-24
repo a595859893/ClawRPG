@@ -208,11 +208,11 @@ public delegate void SlotEmpty(int slotIndex);
         if (item == null) return QuickSlotType.Item;
         
         // Determine slot type based on item properties
-        if (item is Potion || item.Name.Contains("药水") || item.Name.Contains("药水"))
+        if (item is Potion || item.Name.ContainsKey("药水") || item.Name.ContainsKey("药水"))
             return QuickSlotType.Potion;
-        if (item is Food || item.Name.Contains("食物") || item.Name.Contains("肉"))
+        if (item is Food || item.Name.ContainsKey("食物") || item.Name.ContainsKey("肉"))
             return QuickSlotType.Food;
-        if (item.Name.Contains("卷轴") || item.Name.Contains("传送"))
+        if (item.Name.ContainsKey("卷轴") || item.Name.ContainsKey("传送"))
             return QuickSlotType.Scroll;
         
         return QuickSlotType.Item;
@@ -310,7 +310,7 @@ public delegate void SlotEmpty(int slotIndex);
         if (player == null) return false;
         
         // Handle different scroll types
-        if (item.Name.Contains("传送") || item.Name.Contains("home"))
+        if (item.Name.ContainsKey("传送") || item.Name.ContainsKey("home"))
         {
             // Teleport to home/waypoint
             if (player.HasMethod("TeleportToHome"))
@@ -368,9 +368,9 @@ public delegate void SlotEmpty(int slotIndex);
                 var slotData = saveData[key] as Godot.Collections.Dictionary;
                 if (slotData != null)
                 {
-                    _slots[i].ItemId = slotData.Contains("item_id") ? (string)slotData["item_id"] : "";
-                    _slots[i].ItemCount = slotData.Contains("item_count") ? (int)slotData["item_count"] : 0;
-                    _slots[i].SlotType = slotData.Contains("slot_type") ? (QuickSlotType)(int)slotData["slot_type"] : QuickSlotType.Item;
+                    _slots[i].ItemId = slotData.ContainsKey("item_id") ? (string)slotData["item_id"] : "";
+                    _slots[i].ItemCount = slotData.ContainsKey("item_count") ? (int)slotData["item_count"] : 0;
+                    _slots[i].SlotType = slotData.ContainsKey("slot_type") ? (QuickSlotType)(int)slotData["slot_type"] : QuickSlotType.Item;
                 }
             }
         }
@@ -405,20 +405,20 @@ public delegate void SlotEmpty(int slotIndex);
         if (data == null) return;
         
         // 加载快捷栏数据
-        if (data.Contains("slots"))
+        if (data.ContainsKey("slots"))
         {
             var slotsData = (Array)data["slots"];
             for (int i = 0; i < Math.Min(8, slotsData.Count); i++)
             {
                 var slotDict = (Dictionary)slotsData[i];
-                _slots[i].ItemId = slotDict.Contains("item_id") ? slotDict["item_id"].ToString() : "";
-                _slots[i].ItemCount = slotDict.Contains("item_count") ? (int)slotDict["item_count"] : 0;
-                _slots[i].SlotType = slotDict.Contains("slot_type") ? (QuickSlotType)(int)slotDict["slot_type"] : QuickSlotType.Item;
+                _slots[i].ItemId = slotDict.ContainsKey("item_id") ? slotDict["item_id"].ToString() : "";
+                _slots[i].ItemCount = slotDict.ContainsKey("item_count") ? (int)slotDict["item_count"] : 0;
+                _slots[i].SlotType = slotDict.ContainsKey("slot_type") ? (QuickSlotType)(int)slotDict["slot_type"] : QuickSlotType.Item;
             }
         }
         
         // 加载选中槽位
-        if (data.Contains("selected_slot"))
+        if (data.ContainsKey("selected_slot"))
             _selectedSlot = (int)data["selected_slot"];
     }
     

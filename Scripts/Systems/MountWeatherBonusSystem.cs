@@ -352,7 +352,7 @@ public partial class MountWeatherBonusSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("current_weather"))
+        if (data.ContainsKey("current_weather"))
         {
             currentWeather = (WeatherType)(int)data["current_weather"];
         }

@@ -247,13 +247,13 @@ namespace ClawRPG.Scripts.UI {
         public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
-            if (data.Contains("default_fov")) defaultFOV = (float)data["default_fov"];
-            if (data.Contains("max_fov")) maxFOV = (float)data["max_fov"];
-            if (data.Contains("fov_transition_speed")) fovTransitionSpeed = (float)data["fov_transition_speed"];
-            if (data.Contains("shake_intensity")) shakeIntensity = (float)data["shake_intensity"];
-            if (data.Contains("shake_duration")) shakeDuration = (float)data["shake_duration"];
-            if (data.Contains("vignette_color")) vignetteColor = Color.FromHtml((string)data["vignette_color"]);
-            if (data.Contains("vignette_intensity")) vignetteIntensity = (float)data["vignette_intensity"];
+            if (data.ContainsKey("default_fov")) defaultFOV = (float)data["default_fov"];
+            if (data.ContainsKey("max_fov")) maxFOV = (float)data["max_fov"];
+            if (data.ContainsKey("fov_transition_speed")) fovTransitionSpeed = (float)data["fov_transition_speed"];
+            if (data.ContainsKey("shake_intensity")) shakeIntensity = (float)data["shake_intensity"];
+            if (data.ContainsKey("shake_duration")) shakeDuration = (float)data["shake_duration"];
+            if (data.ContainsKey("vignette_color")) vignetteColor = Color.FromHtml((string)data["vignette_color"]);
+            if (data.ContainsKey("vignette_intensity")) vignetteIntensity = (float)data["vignette_intensity"];
         }
     }
 }

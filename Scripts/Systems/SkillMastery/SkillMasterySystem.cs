@@ -72,7 +72,7 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
             
             // 加载技能熟练度数据
-            if (data.Contains("skills"))
+            if (data.ContainsKey("skills"))
             {
                 _playerData.Skills.Clear();
                 var skillsData = (Godot.Collections.Dictionary)data["skills"];
@@ -95,11 +95,11 @@ namespace ClawRPG.Scripts.Systems
             }
             
             // 加载全局数据
-            if (data.Contains("total_mastery_points"))
+            if (data.ContainsKey("total_mastery_points"))
                 _playerData.TotalMasteryPoints = (int)data["total_mastery_points"];
-            if (data.Contains("total_uses"))
+            if (data.ContainsKey("total_uses"))
                 _playerData.TotalUses = (int)data["total_uses"];
-            if (data.Contains("critical_uses"))
+            if (data.ContainsKey("critical_uses"))
                 _playerData.CriticalUses = (int)data["critical_uses"];
             
             GD.Print($"[SkillMasterySystem] Loaded {_playerData.Skills.Count} skills, {_playerData.TotalMasteryPoints} total points");

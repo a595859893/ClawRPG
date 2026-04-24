@@ -400,7 +400,7 @@ public partial class TradeSystem : BaseSystem {
         if (data == null) return;
         
         // 加载交易历史
-        if (data.Contains("trade_history"))
+        if (data.ContainsKey("trade_history"))
         {
             TradeHistory.Clear();
             var records = (Array)data["trade_history"];
@@ -411,7 +411,7 @@ public partial class TradeSystem : BaseSystem {
                     RecordId = recordDict["record_id"].ToString()
                 };
                 
-                if (recordDict.Contains("completed_at"))
+                if (recordDict.ContainsKey("completed_at"))
                 {
                     DateTime.TryParse(recordDict["completed_at"].ToString(), out record.CompletedAt);
                 }
@@ -421,7 +421,7 @@ public partial class TradeSystem : BaseSystem {
         }
         
         // 加载当前状态
-        if (data.Contains("current_state"))
+        if (data.ContainsKey("current_state"))
         {
             CurrentState = (TradeState)(int)data["current_state"];
         }

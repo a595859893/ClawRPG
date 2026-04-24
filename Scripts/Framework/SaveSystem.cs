@@ -107,7 +107,7 @@ public partial class SaveSystem : BaseSystem
         
         foreach (var kvp in _saveables)
         {
-            if (data.Contains(kvp.Key))
+            if (data.ContainsKey(kvp.Key))
             {
                 try
                 {

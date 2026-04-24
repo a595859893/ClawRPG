@@ -393,13 +393,13 @@ public partial class RaidBossSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("totalRaidsJoined")) this.data.TotalRaidsJoined = Convert.ToInt32(data["totalRaidsJoined"]);
-        if (data.Contains("totalRaidsCompleted")) this.data.TotalRaidsCompleted = Convert.ToInt32(data["totalRaidsCompleted"]);
-        if (data.Contains("totalRaidsFailed")) this.data.TotalRaidsFailed = Convert.ToInt32(data["totalRaidsFailed"]);
-        if (data.Contains("totalBossKills")) this.data.TotalBossKills = Convert.ToInt32(data["totalBossKills"]);
-        if (data.Contains("totalDamageDealt")) this.data.TotalDamageDealt = Convert.ToInt32(data["totalDamageDealt"]);
-        if (data.Contains("totalHealingDone")) this.data.TotalHealingDone = Convert.ToInt32(data["totalHealingDone"]);
-        if (data.Contains("bestClearTime")) this.data.BestClearTime = Convert.ToInt32(data["bestClearTime"]);
+        if (data.ContainsKey("totalRaidsJoined")) this.data.TotalRaidsJoined = Convert.ToInt32(data["totalRaidsJoined"]);
+        if (data.ContainsKey("totalRaidsCompleted")) this.data.TotalRaidsCompleted = Convert.ToInt32(data["totalRaidsCompleted"]);
+        if (data.ContainsKey("totalRaidsFailed")) this.data.TotalRaidsFailed = Convert.ToInt32(data["totalRaidsFailed"]);
+        if (data.ContainsKey("totalBossKills")) this.data.TotalBossKills = Convert.ToInt32(data["totalBossKills"]);
+        if (data.ContainsKey("totalDamageDealt")) this.data.TotalDamageDealt = Convert.ToInt32(data["totalDamageDealt"]);
+        if (data.ContainsKey("totalHealingDone")) this.data.TotalHealingDone = Convert.ToInt32(data["totalHealingDone"]);
+        if (data.ContainsKey("bestClearTime")) this.data.BestClearTime = Convert.ToInt32(data["bestClearTime"]);
         
         GD.Print("[RaidBossSystem] Data loaded");
     }

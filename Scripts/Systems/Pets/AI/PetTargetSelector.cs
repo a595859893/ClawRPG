@@ -269,7 +269,7 @@ namespace ClawRPG.Systems.Pets.AI {
         
         public override void ImportSaveData(Dictionary<string, object> data)
         {
-            if (data.Contains("strategy")) {
+            if (data.ContainsKey("strategy")) {
                 _currentStrategy = (TargetStrategy)(int)data["strategy"];
             }
         }

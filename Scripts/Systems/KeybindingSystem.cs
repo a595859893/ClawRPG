@@ -45,7 +45,7 @@ public delegate void KeybindingsReset();
         /// </summary>
         public override void ImportSaveData(Dictionary<string, object> data)
         {
-            if (data == null || !data.Contains("keybindings")) return;
+            if (data == null || !data.ContainsKey("keybindings")) return;
             
             var keybindings = (Dictionary)data["keybindings"];
             foreach (var kvp in keybindings)

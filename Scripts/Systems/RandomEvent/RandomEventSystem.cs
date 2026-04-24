@@ -494,7 +494,7 @@ public partial class RandomEventSystem : BaseSystem
         _stats.totalExpFromEvents = (int)data.GetValueOrDefault("total_exp_from_events", 0);
         
         // 活跃效果
-        if (data.Contains("active_effects"))
+        if (data.ContainsKey("active_effects"))
         {
             var effectsArray = (Array)data["active_effects"];
             _stats.activeEffects = new List<string>();
@@ -505,10 +505,10 @@ public partial class RandomEventSystem : BaseSystem
         }
         
         // 当前事件
-        if (data.Contains("current_event_id") && _eventDatabase.ContainsKey((string)data["current_event_id"]))
+        if (data.ContainsKey("current_event_id") && _eventDatabase.ContainsKey((string)data["current_event_id"]))
         {
             _currentEvent = _eventDatabase[(string)data["current_event_id"]];
-            if (data.Contains("current_event_time"))
+            if (data.ContainsKey("current_event_time"))
             {
                 DateTime.TryParse(data["current_event_time"].ToString(), out _currentEventTime);
             }

@@ -341,11 +341,11 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
                 foreach (var equipmentId in equippedIds) {
                     // 从装备ID中提取类型
                     string equipmentType = "weapon";
-                    if (equipmentId.Contains("armor")) equipmentType = "armor";
-                    else if (equipmentId.Contains("helmet")) equipmentType = "helmet";
-                    else if (equipmentId.Contains("boots")) equipmentType = "boots";
-                    else if (equipmentId.Contains("gloves")) equipmentType = "gloves";
-                    else if (equipmentId.Contains("accessory")) equipmentType = "accessory";
+                    if (equipmentId.ContainsKey("armor")) equipmentType = "armor";
+                    else if (equipmentId.ContainsKey("helmet")) equipmentType = "helmet";
+                    else if (equipmentId.ContainsKey("boots")) equipmentType = "boots";
+                    else if (equipmentId.ContainsKey("gloves")) equipmentType = "gloves";
+                    else if (equipmentId.ContainsKey("accessory")) equipmentType = "accessory";
                     
                     string displayName = equipmentId.Replace("_", " ");
                     displayName = char.ToUpper(displayName[0]) + displayName.Substring(1);

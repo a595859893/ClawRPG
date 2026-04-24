@@ -113,7 +113,7 @@ public partial class ComboFatigueData : BaseSystem
         if (data == null) return;
         
         ComboHistory.Clear();
-        if (data.Contains("comboHistory"))
+        if (data.ContainsKey("comboHistory"))
         {
             foreach (string id in (Godot.Collections.Array)data["comboHistory"])
             {
@@ -122,7 +122,7 @@ public partial class ComboFatigueData : BaseSystem
         }
         
         ComboAdaptation.Clear();
-        if (data.Contains("comboAdaptation"))
+        if (data.ContainsKey("comboAdaptation"))
         {
             foreach (Dictionary entry in (Godot.Collections.Array)data["comboAdaptation"])
             {

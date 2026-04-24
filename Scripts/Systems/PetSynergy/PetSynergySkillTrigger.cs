@@ -219,13 +219,13 @@ public partial class PetSynergySkillTrigger : BaseSystem
     /// </summary>
     private string GetAnimTierKey(string animName)
     {
-        if (animName.Contains("small") || animName.Contains("nod") || animName.Contains("tail"))
+        if (animName.ContainsKey("small") || animName.ContainsKey("nod") || animName.ContainsKey("tail"))
             return "small_gesture";
-        if (animName.Contains("medium") || animName.Contains("jump") || animName.Contains("spin"))
+        if (animName.ContainsKey("medium") || animName.ContainsKey("jump") || animName.ContainsKey("spin"))
             return "medium_gesture";
-        if (animName.Contains("sync_attack"))
+        if (animName.ContainsKey("sync_attack"))
             return "sync_attack";
-        if (animName.Contains("guard_follow"))
+        if (animName.ContainsKey("guard_follow"))
             return "guard_follow";
         return animName;
     }

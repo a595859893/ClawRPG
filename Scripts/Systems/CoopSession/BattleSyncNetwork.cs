@@ -370,7 +370,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
             }
             
             // 导入网络状态
-            if (data.Contains("IsNetworkEnabled"))
+            if (data.ContainsKey("IsNetworkEnabled"))
             {
                 _isNetworkEnabled = data["IsNetworkEnabled"] is bool ine && ine;
             }

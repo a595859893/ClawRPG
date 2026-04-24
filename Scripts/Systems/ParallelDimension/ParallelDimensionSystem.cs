@@ -233,7 +233,7 @@ namespace ClawRPG.Scripts.Systems.ParallelDimension {
         }
 
         public override void ImportSaveData(Dictionary<string, object> data) {
-            if (!data.Contains("dimension_states")) return;
+            if (!data.ContainsKey("dimension_states")) return;
 
             var dimensionStates = (Godot.Collections.Array)data["dimension_states"];
             foreach (Dictionary dimData in dimensionStates) {

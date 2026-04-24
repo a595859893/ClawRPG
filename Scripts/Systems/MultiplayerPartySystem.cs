@@ -497,7 +497,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             _data = new MultiplayerVoteData();
 
             // Import active parties
-            if (data.Contains("ActiveParties") && data["ActiveParties"] is List<object> parties)
+            if (data.ContainsKey("ActiveParties") && data["ActiveParties"] is List<object> parties)
             {
                 foreach (Dictionary partyDict in parties)
                 {
@@ -515,7 +515,7 @@ namespace ClawRPG.Modules.MultiplayerVote
                         CreateTime = Convert.ToInt32(partyDict.GetValueOrDefault("CreateTime", 0))
                     };
 
-                    if (partyDict.Contains("Members") && partyDict["Members"] is List<object> members)
+                    if (partyDict.ContainsKey("Members") && partyDict["Members"] is List<object> members)
                     {
                         foreach (Dictionary memberDict in members)
                         {
@@ -538,7 +538,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             }
 
             // Import player party data
-            if (data.Contains("PlayerPartyData") && data["PlayerPartyData"] is List<object> playerDataList)
+            if (data.ContainsKey("PlayerPartyData") && data["PlayerPartyData"] is List<object> playerDataList)
             {
                 foreach (Dictionary pdDict in playerDataList)
                 {
@@ -550,7 +550,7 @@ namespace ClawRPG.Modules.MultiplayerVote
                         TotalPartiesJoined = Convert.ToInt32(pdDict.GetValueOrDefault("TotalPartiesJoined", 0))
                     };
 
-                    if (pdDict.Contains("PastPartyIds") && pdDict["PastPartyIds"] is List<object> pastIds)
+                    if (pdDict.ContainsKey("PastPartyIds") && pdDict["PastPartyIds"] is List<object> pastIds)
                     {
                         foreach (var id in pastIds)
                         {
@@ -563,7 +563,7 @@ namespace ClawRPG.Modules.MultiplayerVote
             }
 
             // Import player statistics
-            if (data.Contains("PlayerStatistics") && data["PlayerStatistics"] is List<object> statList)
+            if (data.ContainsKey("PlayerStatistics") && data["PlayerStatistics"] is List<object> statList)
             {
                 foreach (Dictionary statDict in statList)
                 {

@@ -511,7 +511,7 @@ public partial class SeasonalEventSystem : BaseSystem
     {
         if (data == null) return;
 
-        if (data.Contains("event_entries"))
+        if (data.ContainsKey("event_entries"))
         {
             var entries = data["event_entries"] as Dictionary;
             if (entries != null)

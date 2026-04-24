@@ -313,16 +313,16 @@ namespace ClawRPG.Scripts.Items
         {
             if (data == null) return;
 
-            if (data.Contains("maxSlots"))
+            if (data.ContainsKey("maxSlots"))
                 MaxSlots = Convert.ToInt32(data["maxSlots"]);
 
-            if (data.Contains("currentFilter"))
+            if (data.ContainsKey("currentFilter"))
                 _currentFilter = (InventoryFilter)Convert.ToInt32(data["currentFilter"]);
 
-            if (data.Contains("currentSort"))
+            if (data.ContainsKey("currentSort"))
                 _currentSort = (InventorySort)Convert.ToInt32(data["currentSort"]);
 
-            if (data.Contains("slots"))
+            if (data.ContainsKey("slots"))
             {
                 var slotsData = data["slots"] as Godot.Collections.Array;
                 foreach (Dictionary slotDict in slotsData)

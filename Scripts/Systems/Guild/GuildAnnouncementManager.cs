@@ -75,11 +75,11 @@ namespace ClawRPG.Scripts.Systems.Guild
             {
                 var a = new GuildAnnouncementData
                 {
-                    AnnouncementId = dict.Contains("announcement_id") ? dict["announcement_id"].ToString() : "",
-                    Content = dict.Contains("content") ? dict["content"].ToString() : "",
-                    AuthorName = dict.Contains("author_name") ? dict["author_name"].ToString() : ""
+                    AnnouncementId = dict.ContainsKey("announcement_id") ? dict["announcement_id"].ToString() : "",
+                    Content = dict.ContainsKey("content") ? dict["content"].ToString() : "",
+                    AuthorName = dict.ContainsKey("author_name") ? dict["author_name"].ToString() : ""
                 };
-                if (dict.Contains("post_time") && !string.IsNullOrEmpty(dict["post_time"].ToString()))
+                if (dict.ContainsKey("post_time") && !string.IsNullOrEmpty(dict["post_time"].ToString()))
                 {
                     try { a.PostTime = DateTime.Parse(dict["post_time"].ToString()); }
                     catch { a.PostTime = DateTime.Now; }

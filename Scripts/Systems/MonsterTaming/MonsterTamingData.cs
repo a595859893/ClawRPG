@@ -89,7 +89,7 @@ public partial class MonsterTamingData : BaseSystem
 
         // 已捕获的怪物
         TamedMonsters = new List<TamedMonster>();
-        if (data.Contains("tamed_monsters"))
+        if (data.ContainsKey("tamed_monsters"))
         {
             var monstersArray = (Array)data["tamed_monsters"];
             foreach (Dictionary monsterDict in monstersArray)
@@ -105,7 +105,7 @@ public partial class MonsterTamingData : BaseSystem
                     BondLevel = (int)monsterDict["bond_level"],
                     BattlesWon = (int)monsterDict["battles_won"]
                 };
-                if (monsterDict.Contains("tamed_at") && DateTime.TryParse(monsterDict["tamed_at"].ToString(), out var tamedAt))
+                if (monsterDict.ContainsKey("tamed_at") && DateTime.TryParse(monsterDict["tamed_at"].ToString(), out var tamedAt))
                 {
                     monster.TamedAt = tamedAt;
                 }

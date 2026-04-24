@@ -192,17 +192,17 @@ namespace ClawRPG.Systems.Pets.AI
         {
             if (data == null) return;
 
-            if (data.Contains("player_goal_model"))
+            if (data.ContainsKey("player_goal_model"))
                 _observerState.PersistentState.PlayerGoalModel = data["player_goal_model"].ToString();
-            if (data.Contains("confidence"))
+            if (data.ContainsKey("confidence"))
                 _observerState.PersistentState.Confidence = (float)Convert.ToDouble(data["confidence"]);
-            if (data.Contains("declared_goal"))
+            if (data.ContainsKey("declared_goal"))
                 _observerState.PersistentState.DeclaredGoal = data["declared_goal"].ToString();
-            if (data.Contains("prediction_success"))
+            if (data.ContainsKey("prediction_success"))
                 _observerState.PersistentState.PredictionSuccessCount = Convert.ToInt32(data["prediction_success"]);
-            if (data.Contains("prediction_failure"))
+            if (data.ContainsKey("prediction_failure"))
                 _observerState.PersistentState.PredictionFailureCount = Convert.ToInt32(data["prediction_failure"]);
-            if (data.Contains("issued_signatures"))
+            if (data.ContainsKey("issued_signatures"))
             {
                 var list = data["issued_signatures"] as System.Collections.IList;
                 if (list != null)

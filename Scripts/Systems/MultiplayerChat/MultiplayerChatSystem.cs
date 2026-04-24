@@ -320,7 +320,7 @@ public delegate void ClearRequested();
         if (data == null) return;
         
         // 当前频道
-        if (data.Contains("current_channel"))
+        if (data.ContainsKey("current_channel"))
         {
             _currentChannel = (MultiplayerChatData.ChatChannel)(int)data["current_channel"];
         }

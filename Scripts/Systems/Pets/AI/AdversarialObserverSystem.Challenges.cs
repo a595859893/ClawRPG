@@ -85,8 +85,8 @@ namespace ClawRPG.Systems.Pets.AI
         /// </summary>
         private void ValidateLastPrediction()
         {
-            if (_currentTrajectory.PredictedTrajectory.Contains("可能倒下") ||
-                _currentTrajectory.PredictedTrajectory.Contains("危险"))
+            if (_currentTrajectory.PredictedTrajectory.ContainsKey("可能倒下") ||
+                _currentTrajectory.PredictedTrajectory.ContainsKey("危险"))
             {
                 _observerState.PersistentState.PredictionSuccessCount++;
             }
@@ -100,7 +100,7 @@ namespace ClawRPG.Systems.Pets.AI
             {
                 float accuracy = _observerState.PersistentState.PredictionSuccessCount / total;
                 _observerState.PersistentState.Confidence = Mathf.Lerp(_observerState.PersistentState.Confidence, accuracy, 0.2f);
-                OnPredictionVerified?.Invoke(_currentTrajectory.PredictedTrajectory.Contains("危险"));
+                OnPredictionVerified?.Invoke(_currentTrajectory.PredictedTrajectory.ContainsKey("危险"));
             }
         }
 

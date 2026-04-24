@@ -371,19 +371,19 @@ public partial class CharacterCreationSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("character_name")) _data.CharacterName = (string)data["character_name"];
-        if (data.Contains("selected_class")) _data.SelectedClass = (string)data["selected_class"];
-        if (data.Contains("selected_background")) _data.SelectedBackground = (string)data["selected_background"];
-        if (data.Contains("strength")) _data.Strength = (int)data["strength"];
-        if (data.Contains("agility")) _data.Agility = (int)data["agility"];
-        if (data.Contains("intelligence")) _data.Intelligence = (int)data["intelligence"];
-        if (data.Contains("vitality")) _data.Vitality = (int)data["vitality"];
-        if (data.Contains("luck")) _data.Luck = (int)data["luck"];
-        if (data.Contains("used_points")) _data.UsedPoints = (int)data["used_points"];
-        if (data.Contains("hair_style")) _data.HairStyle = (int)data["hair_style"];
-        if (data.Contains("skin_color")) _data.SkinColor = (int)data["skin_color"];
-        if (data.Contains("eye_color")) _data.EyeColor = (int)data["eye_color"];
-        if (data.Contains("characters_created")) _data.CharactersCreated = (int)data["characters_created"];
-        if (data.Contains("most_common_class")) _data.MostCommonClass = (int)data["most_common_class"];
+        if (data.ContainsKey("character_name")) _data.CharacterName = (string)data["character_name"];
+        if (data.ContainsKey("selected_class")) _data.SelectedClass = (string)data["selected_class"];
+        if (data.ContainsKey("selected_background")) _data.SelectedBackground = (string)data["selected_background"];
+        if (data.ContainsKey("strength")) _data.Strength = (int)data["strength"];
+        if (data.ContainsKey("agility")) _data.Agility = (int)data["agility"];
+        if (data.ContainsKey("intelligence")) _data.Intelligence = (int)data["intelligence"];
+        if (data.ContainsKey("vitality")) _data.Vitality = (int)data["vitality"];
+        if (data.ContainsKey("luck")) _data.Luck = (int)data["luck"];
+        if (data.ContainsKey("used_points")) _data.UsedPoints = (int)data["used_points"];
+        if (data.ContainsKey("hair_style")) _data.HairStyle = (int)data["hair_style"];
+        if (data.ContainsKey("skin_color")) _data.SkinColor = (int)data["skin_color"];
+        if (data.ContainsKey("eye_color")) _data.EyeColor = (int)data["eye_color"];
+        if (data.ContainsKey("characters_created")) _data.CharactersCreated = (int)data["characters_created"];
+        if (data.ContainsKey("most_common_class")) _data.MostCommonClass = (int)data["most_common_class"];
     }
 }

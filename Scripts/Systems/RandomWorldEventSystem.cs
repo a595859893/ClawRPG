@@ -578,7 +578,7 @@ namespace ClawRPG.Scripts.Systems {
             if (data == null) return;
             
             // 加载玩家事件数据
-            if (data.Contains("event_trigger_count"))
+            if (data.ContainsKey("event_trigger_count"))
             {
                 _playerData.EventTriggerCount = new Dictionary<string, int>();
                 var tcDict = (Dictionary<string, Variant>)data["event_trigger_count"];
@@ -588,14 +588,14 @@ namespace ClawRPG.Scripts.Systems {
                 }
             }
             
-            if (data.Contains("total_events_triggered"))
+            if (data.ContainsKey("total_events_triggered"))
                 _playerData.TotalEventsTriggered = (int)data["total_events_triggered"];
             
-            if (data.Contains("legendary_events_witnessed"))
+            if (data.ContainsKey("legendary_events_witnessed"))
                 _playerData.LegendaryEventsWitnessed = (int)data["legendary_events_witnessed"];
             
             // 加载最后事件时间
-            if (data.Contains("last_event_time"))
+            if (data.ContainsKey("last_event_time"))
             {
                 _playerData.LastEventTime = new Dictionary<string, DateTime>();
                 var ltDict = (Dictionary<string, Variant>)data["last_event_time"];
@@ -609,7 +609,7 @@ namespace ClawRPG.Scripts.Systems {
             }
             
             // 加载活跃事件
-            if (data.Contains("active_events"))
+            if (data.ContainsKey("active_events"))
             {
                 _activeEvents.Clear();
                 var eventsArray = (Array)data["active_events"];
@@ -622,7 +622,7 @@ namespace ClawRPG.Scripts.Systems {
             }
             
             // 加载计时器
-            if (data.Contains("check_timer"))
+            if (data.ContainsKey("check_timer"))
                 _checkTimer = (float)data["check_timer"];
         }
     }

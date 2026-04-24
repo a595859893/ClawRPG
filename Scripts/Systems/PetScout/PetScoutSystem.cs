@@ -210,7 +210,7 @@ namespace ClawRPG.Scripts.Systems.PetScout
         private bool IsEnemy(Node2D node)
         {
             // 检查节点是否有 "Enemy" 标签或名称包含 "Enemy"
-            if (node.Name.Contains("Enemy") || node.Name.Contains("Monster"))
+            if (node.Name.ContainsKey("Enemy") || node.Name.ContainsKey("Monster"))
                 return true;
 
             // 检查是否在指定的敌人组

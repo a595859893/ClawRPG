@@ -112,10 +112,10 @@ namespace ClawRPG.Scripts.Systems {
         }
         
         private TrackRarity GetTrackRarity(string id) {
-            if (id.Contains("secret") || id.Contains("final")) return TrackRarity.Legendary;
-            if (id.Contains("boss") || id.Contains("siege")) return TrackRarity.Epic;
-            if (id.Contains("mini") || id.Contains("pvp")) return TrackRarity.Rare;
-            if (id.Contains("festival") || id.Contains("wedding")) return TrackRarity.Uncommon;
+            if (id.ContainsKey("secret") || id.ContainsKey("final")) return TrackRarity.Legendary;
+            if (id.ContainsKey("boss") || id.ContainsKey("siege")) return TrackRarity.Epic;
+            if (id.ContainsKey("mini") || id.ContainsKey("pvp")) return TrackRarity.Rare;
+            if (id.ContainsKey("festival") || id.ContainsKey("wedding")) return TrackRarity.Uncommon;
             return TrackRarity.Common;
         }
         
@@ -314,7 +314,7 @@ namespace ClawRPG.Scripts.Systems {
                 var collection = (Godot.Collections.Dictionary)data["music_collection"];
                 
                 // Load unlocked tracks
-                if (collection.Contains("unlocked")) {
+                if (collection.ContainsKey("unlocked")) {
                     var unlocked = (Godot.Collections.Array)collection["unlocked"];
                     foreach (string trackId in unlocked) {
                         if (_trackDatabase.TryGetValue(trackId, out var track)) {
@@ -325,7 +325,7 @@ namespace ClawRPG.Scripts.Systems {
                 }
                 
                 // Load favorites
-                if (collection.Contains("favorites")) {
+                if (collection.ContainsKey("favorites")) {
                     var favorites = (Godot.Collections.Array)collection["favorites"];
                     foreach (string trackId in favorites) {
                         _favoriteTracks.Add(trackId);
@@ -333,23 +333,23 @@ namespace ClawRPG.Scripts.Systems {
                 }
                 
                 // Load stats
-                if (collection.Contains("total_play_time")) {
+                if (collection.ContainsKey("total_play_time")) {
                     _totalPlayTime = (int)collection["total_play_time"];
                 }
-                if (collection.Contains("times_played")) {
+                if (collection.ContainsKey("times_played")) {
                     _timesPlayed = (int)collection["times_played"];
                 }
                 
                 // Load track-specific data
-                if (collection.Contains("track_data")) {
+                if (collection.ContainsKey("track_data")) {
                     var trackData = (Godot.Collections.Dictionary)collection["track_data"];
                     foreach (string trackId in trackData.Keys) {
                         if (_unlockedTracks.TryGetValue(trackId, out var track)) {
                             var trackInfo = (Godot.Collections.Dictionary)trackData[trackId];
-                            if (trackInfo.Contains("play_count")) {
+                            if (trackInfo.ContainsKey("play_count")) {
                                 track.PlayCount = (int)trackInfo["play_count"];
                             }
-                            if (trackInfo.Contains("total_play_time")) {
+                            if (trackInfo.ContainsKey("total_play_time")) {
                                 track.TotalPlayTime = (int)trackInfo["total_play_time"];
                             }
                         }
@@ -462,7 +462,7 @@ public delegate void AllTracksUnlocked();
             if (data == null) return;
             
             // Load unlocked tracks
-            if (data.Contains("unlocked")) {
+            if (data.ContainsKey("unlocked")) {
                 var unlocked = (Array)data["unlocked"];
                 foreach (string trackId in unlocked) {
                     if (_trackDatabase.TryGetValue(trackId, out var track)) {
@@ -473,7 +473,7 @@ public delegate void AllTracksUnlocked();
             }
             
             // Load favorites
-            if (data.Contains("favorites")) {
+            if (data.ContainsKey("favorites")) {
                 var favorites = (Array)data["favorites"];
                 foreach (string trackId in favorites) {
                     _favoriteTracks.Add(trackId);
@@ -481,23 +481,23 @@ public delegate void AllTracksUnlocked();
             }
             
             // Load stats
-            if (data.Contains("total_play_time")) {
+            if (data.ContainsKey("total_play_time")) {
                 _totalPlayTime = (int)data["total_play_time"];
             }
-            if (data.Contains("times_played")) {
+            if (data.ContainsKey("times_played")) {
                 _timesPlayed = (int)data["times_played"];
             }
             
             // Load track-specific data
-            if (data.Contains("track_data")) {
+            if (data.ContainsKey("track_data")) {
                 var trackData = (Dictionary)data["track_data"];
                 foreach (string trackId in trackData.Keys) {
                     if (_unlockedTracks.TryGetValue(trackId, out var track)) {
                         var trackInfo = (Dictionary)trackData[trackId];
-                        if (trackInfo.Contains("play_count")) {
+                        if (trackInfo.ContainsKey("play_count")) {
                             track.PlayCount = (int)trackInfo["play_count"];
                         }
-                        if (trackInfo.Contains("total_play_time")) {
+                        if (trackInfo.ContainsKey("total_play_time")) {
                             track.TotalPlayTime = (int)trackInfo["total_play_time"];
                         }
                     }

@@ -220,7 +220,7 @@ public partial class PetPhotoSystem : BaseSystem
         if (data == null) return;
         
         // 加载已解锁的位置
-        if (data.Contains("unlocked_locations"))
+        if (data.ContainsKey("unlocked_locations"))
         {
             _data.UnlockedLocations.Clear();
             var unlockedLocations = (Godot.Array)data["unlocked_locations"];
@@ -231,7 +231,7 @@ public partial class PetPhotoSystem : BaseSystem
         }
         
         // 加载所有照片
-        if (data.Contains("all_photos"))
+        if (data.ContainsKey("all_photos"))
         {
             _data.AllPhotos.Clear();
             var photosArray = (Godot.Array)data["all_photos"];
@@ -254,7 +254,7 @@ public partial class PetPhotoSystem : BaseSystem
         }
         
         // 加载相册
-        if (data.Contains("albums"))
+        if (data.ContainsKey("albums"))
         {
             _data.Albums.Clear();
             var albumsArray = (Godot.Array)data["albums"];
@@ -275,7 +275,7 @@ public partial class PetPhotoSystem : BaseSystem
         }
         
         // 加载统计数据
-        if (data.Contains("stats"))
+        if (data.ContainsKey("stats"))
         {
             var stats = (Godot.Collections.Dictionary)data["stats"];
             _data.TotalPhotos = (int)stats["total_photos"];
@@ -492,7 +492,7 @@ public partial class PetPhotoSystem : BaseSystem
         if (data == null) return;
 
         // 加载已解锁地点
-        if (data.Contains("pet_photo_unlocked_locations"))
+        if (data.ContainsKey("pet_photo_unlocked_locations"))
         {
             var locationsArray = (Godot.Array)data["pet_photo_unlocked_locations"];
             _data.UnlockedLocations.Clear();
@@ -503,7 +503,7 @@ public partial class PetPhotoSystem : BaseSystem
         }
 
         // 加载照片数据
-        if (data.Contains("pet_photo_photos"))
+        if (data.ContainsKey("pet_photo_photos"))
         {
             var photosArray = (Godot.Array)data["pet_photo_photos"];
             _data.AllPhotos.Clear();
@@ -531,7 +531,7 @@ public partial class PetPhotoSystem : BaseSystem
         }
 
         // 加载相册数据
-        if (data.Contains("pet_photo_albums"))
+        if (data.ContainsKey("pet_photo_albums"))
         {
             var albumsArray = (Godot.Array)data["pet_photo_albums"];
             _data.Albums.Clear();
@@ -552,7 +552,7 @@ public partial class PetPhotoSystem : BaseSystem
         }
 
         // 加载统计数据
-        if (data.Contains("pet_photo_stats"))
+        if (data.ContainsKey("pet_photo_stats"))
         {
             var stats = (Godot.Collections.Dictionary)data["pet_photo_stats"];
             _data.TotalPhotos = (int)stats["total_photos"];

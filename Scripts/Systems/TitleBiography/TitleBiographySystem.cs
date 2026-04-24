@@ -225,14 +225,14 @@ namespace ClawRPG.Scripts.Systems.TitleBiography
                     {
                         var bio = new TitleBiographyData
                         {
-                            TitleId = raw.Contains("TitleId") ? raw["TitleId"].ToString() : "",
-                            TitleName = raw.Contains("TitleName") ? raw["TitleName"].ToString() : "",
-                            BiographyText = raw.Contains("BiographyText") ? raw["BiographyText"].ToString() : "",
-                            Rarity = raw.Contains("Rarity") ? raw["Rarity"].ToString() : "Common",
-                            Category = raw.Contains("Category") ? raw["Category"].ToString() : "Combat"
+                            TitleId = raw.ContainsKey("TitleId") ? raw["TitleId"].ToString() : "",
+                            TitleName = raw.ContainsKey("TitleName") ? raw["TitleName"].ToString() : "",
+                            BiographyText = raw.ContainsKey("BiographyText") ? raw["BiographyText"].ToString() : "",
+                            Rarity = raw.ContainsKey("Rarity") ? raw["Rarity"].ToString() : "Common",
+                            Category = raw.ContainsKey("Category") ? raw["Category"].ToString() : "Combat"
                         };
 
-                        if (raw.Contains("UnlockTime") && raw["UnlockTime"] != null)
+                        if (raw.ContainsKey("UnlockTime") && raw["UnlockTime"] != null)
                         {
                             if (raw["UnlockTime"] is double ticks)
                                 bio.UnlockTime = DateTime.FromOADate(ticks);

@@ -423,7 +423,7 @@ namespace ClawRPG.Scripts.Systems {
         {
             if (data == null) return;
             
-            if (data.Contains("player_factions"))
+            if (data.ContainsKey("player_factions"))
             {
                 var factionsData = data["player_factions"] as Dictionary;
                 if (factionsData != null)
@@ -436,9 +436,9 @@ namespace ClawRPG.Scripts.Systems {
                             var playerData = new PlayerFactionData
                             {
                                 FactionId = kvp.Key.ToString(),
-                                Reputation = factionDict.Contains("reputation") ? (int)factionDict["reputation"] : 0,
-                                Tier = factionDict.Contains("tier") ? (ReputationTier)(int)factionDict["tier"] : ReputationTier.Neutral,
-                                RewardClaimed = factionDict.Contains("reward_claimed") && (bool)factionDict["reward_claimed"]
+                                Reputation = factionDict.ContainsKey("reputation") ? (int)factionDict["reputation"] : 0,
+                                Tier = factionDict.ContainsKey("tier") ? (ReputationTier)(int)factionDict["tier"] : ReputationTier.Neutral,
+                                RewardClaimed = factionDict.ContainsKey("reward_claimed") && (bool)factionDict["reward_claimed"]
                             };
                             _playerFactions[kvp.Key.ToString()] = playerData;
                         }

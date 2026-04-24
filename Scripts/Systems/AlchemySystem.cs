@@ -396,15 +396,15 @@ namespace ClawRPG.Scripts.Systems
         {
             if (data == null) return;
 
-            if (data.Contains("alchemy_level"))
+            if (data.ContainsKey("alchemy_level"))
                 _playerData.AlchemyLevel = (int)data["alchemy_level"];
-            if (data.Contains("current_experience"))
+            if (data.ContainsKey("current_experience"))
                 _playerData.CurrentExperience = (int)data["current_experience"];
-            if (data.Contains("unlocked_recipe_ids"))
+            if (data.ContainsKey("unlocked_recipe_ids"))
                 _playerData.UnlockedRecipeIds = new List<int>((Godot.Collections.Array)data["unlocked_recipe_ids"]).ConvertAll(x => (int)x);
-            if (data.Contains("total_crafted"))
+            if (data.ContainsKey("total_crafted"))
                 _playerData.TotalCrafted = (int)data["total_crafted"];
-            if (data.Contains("recipe_usage_count"))
+            if (data.ContainsKey("recipe_usage_count"))
             {
                 var dict = (Dictionary)data["recipe_usage_count"];
                 _playerData.RecipeUsageCount = new System.Collections.Generic.Dictionary<int, int>();

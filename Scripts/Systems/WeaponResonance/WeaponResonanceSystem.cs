@@ -282,9 +282,9 @@ namespace ClawRPG.Scripts.Systems.WeaponResonance
         {
             if (data == null) return;
 
-            if (data.Contains("isActive") && (bool)data["isActive"])
+            if (data.ContainsKey("isActive") && (bool)data["isActive"])
             {
-                string weaponType = data.Contains("activeWeaponType") ? (string)data["activeWeaponType"] : "";
+                string weaponType = data.ContainsKey("activeWeaponType") ? (string)data["activeWeaponType"] : "";
                 if (!string.IsNullOrEmpty(weaponType))
                 {
                     ResonanceData.Activate(weaponType);

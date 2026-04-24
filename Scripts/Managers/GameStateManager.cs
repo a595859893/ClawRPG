@@ -368,15 +368,15 @@ namespace ClawRPG.Scripts.Managers
         {
             if (data == null) return;
             
-            if (data.Contains("currentState")) 
+            if (data.ContainsKey("currentState")) 
                 _currentState = (GameState)Convert.ToInt32(data["currentState"]);
-            if (data.Contains("currentDay")) 
+            if (data.ContainsKey("currentDay")) 
                 _currentDay = Convert.ToInt32(data["currentDay"]);
-            if (data.Contains("dayTimer")) 
+            if (data.ContainsKey("dayTimer")) 
                 _dayTimer = Convert.ToSingle(data["dayTimer"]);
-            if (data.Contains("dayLength")) 
+            if (data.ContainsKey("dayLength")) 
                 _dayLength = Convert.ToSingle(data["dayLength"]);
-            if (data.Contains("totalPlayTime")) 
+            if (data.ContainsKey("totalPlayTime")) 
                 _totalPlayTime = Convert.ToSingle(data["totalPlayTime"]);
         }
     }

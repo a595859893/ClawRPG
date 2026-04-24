@@ -459,7 +459,7 @@ public partial class MythicPlusDungeonSystem : BaseSystem
         _playerProgress.TotalDeaths = (int)data.GetValueOrDefault("total_deaths", 0);
         
         // 等级完成次数
-        if (data.Contains("level_completion_count"))
+        if (data.ContainsKey("level_completion_count"))
         {
             var completionDict = (Dictionary)data["level_completion_count"];
             _playerProgress.LevelCompletionCount = new Dictionary<int, int>();
@@ -470,7 +470,7 @@ public partial class MythicPlusDungeonSystem : BaseSystem
         }
         
         // 等级最佳时间
-        if (data.Contains("level_best_time"))
+        if (data.ContainsKey("level_best_time"))
         {
             var bestTimeDict = (Dictionary)data["level_best_time"];
             _playerProgress.LevelBestTime = new Dictionary<int, int>();
@@ -482,7 +482,7 @@ public partial class MythicPlusDungeonSystem : BaseSystem
         
         // 跑图历史
         _runHistory = new List<MythicPlusRun>();
-        if (data.Contains("run_history"))
+        if (data.ContainsKey("run_history"))
         {
             var historyArray = (Array)data["run_history"];
             foreach (Dictionary runData in historyArray)
@@ -499,7 +499,7 @@ public partial class MythicPlusDungeonSystem : BaseSystem
                     BossesDefeated = (int)runData["bosses_defeated"],
                     Deaths = (int)runData["deaths"]
                 };
-                if (runData.Contains("start_time") && DateTime.TryParse(runData["start_time"].ToString(), out var startTime))
+                if (runData.ContainsKey("start_time") && DateTime.TryParse(runData["start_time"].ToString(), out var startTime))
                 {
                     run.StartTime = startTime;
                 }
@@ -509,7 +509,7 @@ public partial class MythicPlusDungeonSystem : BaseSystem
         
         // 排行榜
         _leaderboard = new List<MythicPlusLeaderboard>();
-        if (data.Contains("leaderboard"))
+        if (data.ContainsKey("leaderboard"))
         {
             var leaderboardArray = (Array)data["leaderboard"];
             foreach (Dictionary entryData in leaderboardArray)

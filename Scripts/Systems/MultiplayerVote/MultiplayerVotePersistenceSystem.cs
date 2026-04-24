@@ -79,21 +79,21 @@ namespace ClawRPG.Systems.MultiplayerVote
             if (data == null) return;
             
             // 导入 PartyManagementSystem 数据
-            if (data.Contains("party_system"))
+            if (data.ContainsKey("party_system"))
             {
                 var partyData = (Dictionary)data["party_system"];
                 _partySystem?.ImportSaveData(partyData);
             }
             
             // 导入 VoteProcessingSystem 数据
-            if (data.Contains("vote_system"))
+            if (data.ContainsKey("vote_system"))
             {
                 var voteData = (Dictionary)data["vote_system"];
                 _voteSystem?.ImportSaveData(voteData);
             }
             
             // 导入 VoteTimer 数据
-            if (data.Contains("vote_timer"))
+            if (data.ContainsKey("vote_timer"))
             {
                 var timerData = (Dictionary)data["vote_timer"];
                 _voteTimer?.ImportSaveData(timerData);

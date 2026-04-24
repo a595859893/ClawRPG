@@ -151,13 +151,13 @@ namespace ClawRPG.Scripts.Systems.CoopSession {
         }
         
         public override void ImportSaveData(Dictionary<string, object> data) {
-            if (data.Contains("mode")) {
+            if (data.ContainsKey("mode")) {
                 _currentMode = (CompensationMode)(int)data["mode"];
             }
-            if (data.Contains("interpolationDelay")) {
+            if (data.ContainsKey("interpolationDelay")) {
                 _interpolationDelay = (float)data["interpolationDelay"];
             }
-            if (data.Contains("predictionThreshold")) {
+            if (data.ContainsKey("predictionThreshold")) {
                 _predictionThreshold = (float)data["predictionThreshold"];
             }
         }

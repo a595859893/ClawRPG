@@ -376,7 +376,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
         {
             if (data == null) return;
             
-            if (data.Contains("owned_gems")) {
+            if (data.ContainsKey("owned_gems")) {
                 var gems = data["owned_gems"] as Dictionary;
                 _playerGemData.OwnedGems = new System.Collections.Generic.Dictionary<string, int>();
                 foreach (var key in gems.Keys) {
@@ -384,7 +384,7 @@ namespace ClawRPG.Scripts.Systems.GemSystem {
                 }
             }
             
-            if (data.Contains("equipment_slots")) {
+            if (data.ContainsKey("equipment_slots")) {
                 LoadEquipmentSlots(data["equipment_slots"] as Dictionary);
             }
         }

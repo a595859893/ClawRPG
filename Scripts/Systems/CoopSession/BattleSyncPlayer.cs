@@ -563,7 +563,7 @@ public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int 
             
             // 导入玩家状态
             _playerStates?.Clear();
-            if (data.Contains("PlayerStates") && data["PlayerStates"] is ArrayList playerStatesData)
+            if (data.ContainsKey("PlayerStates") && data["PlayerStates"] is ArrayList playerStatesData)
             {
                 if (_playerStates != null)
                 {
@@ -607,7 +607,7 @@ public delegate void AggroChangedEventHandler(int enemyId, int oldTargetId, int 
             
             // 导入敌人状态
             _enemyStates?.Clear();
-            if (data.Contains("EnemyStates") && data["EnemyStates"] is ArrayList enemyStatesData)
+            if (data.ContainsKey("EnemyStates") && data["EnemyStates"] is ArrayList enemyStatesData)
             {
                 if (_enemyStates != null)
                 {

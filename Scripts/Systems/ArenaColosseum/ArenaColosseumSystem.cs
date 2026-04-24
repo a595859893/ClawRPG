@@ -387,7 +387,7 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
 
             // 从子系统导入数据
-            if (data.Contains("seasonSystem"))
+            if (data.ContainsKey("seasonSystem"))
             {
                 _seasonSystem.ImportSaveData(data["seasonSystem"] as Dictionary);
             }

@@ -29,12 +29,12 @@ public partial class MilestoneSystem : BaseSystem
         if (data == null || data.Count == 0) return;
 
         // Load milestone data
-        if (data.Contains("milestones"))
+        if (data.ContainsKey("milestones"))
         {
             var milestoneData = (Godot.Collections.Dictionary)data["milestones"];
             
             // Load milestone entries
-            if (milestoneData.Contains("entries"))
+            if (milestoneData.ContainsKey("entries"))
             {
                 var entriesArray = (Godot.Array)milestoneData["entries"];
                 foreach (Godot.Collections.Dictionary entryDict in entriesArray)
@@ -51,10 +51,10 @@ public partial class MilestoneSystem : BaseSystem
                         Unlocked = (bool)entryDict["unlocked"]
                     };
                     
-                    if (entryDict.Contains("unlock_time") && entryDict["unlock_time"] != null)
+                    if (entryDict.ContainsKey("unlock_time") && entryDict["unlock_time"] != null)
                         entry.UnlockTime = DateTime.Parse((string)entryDict["unlock_time"]);
                     
-                    if (entryDict.Contains("rewards"))
+                    if (entryDict.ContainsKey("rewards"))
                     {
                         var rewardsArray = (Godot.Array)entryDict["rewards"];
                         entry.Rewards = new List<string>();
@@ -67,7 +67,7 @@ public partial class MilestoneSystem : BaseSystem
             }
             
             // Load category progress
-            if (milestoneData.Contains("category_progress"))
+            if (milestoneData.ContainsKey("category_progress"))
             {
                 var catProgressDict = (Godot.Collections.Dictionary)milestoneData["category_progress"];
                 foreach (var key in catProgressDict.Keys)
@@ -77,20 +77,20 @@ public partial class MilestoneSystem : BaseSystem
             }
             
             // Load statistics
-            if (milestoneData.Contains("statistics"))
+            if (milestoneData.ContainsKey("statistics"))
             {
                 var statsDict = (Godot.Collections.Dictionary)milestoneData["statistics"];
-                _data.Statistics.TotalMilestones = statsDict.Contains("total_milestones") ? (int)statsDict["total_milestones"] : 0;
-                _data.Statistics.UnlockedMilestones = statsDict.Contains("unlocked_milestones") ? (int)statsDict["unlocked_milestones"] : 0;
-                _data.Statistics.BronzeMilestones = statsDict.Contains("bronze_milestones") ? (int)statsDict["bronze_milestones"] : 0;
-                _data.Statistics.SilverMilestones = statsDict.Contains("silver_milestones") ? (int)statsDict["silver_milestones"] : 0;
-                _data.Statistics.GoldMilestones = statsDict.Contains("gold_milestones") ? (int)statsDict["gold_milestones"] : 0;
-                _data.Statistics.PlatinumMilestones = statsDict.Contains("platinum_milestones") ? (int)statsDict["platinum_milestones"] : 0;
-                _data.Statistics.DiamondMilestones = statsDict.Contains("diamond_milestones") ? (int)statsDict["diamond_milestones"] : 0;
-                _data.Statistics.LegendaryMilestones = statsDict.Contains("legendary_milestones") ? (int)statsDict["legendary_milestones"] : 0;
-                _data.Statistics.TotalRewardsClaimed = statsDict.Contains("total_rewards_claimed") ? (int)statsDict["total_rewards_claimed"] : 0;
-                _data.Statistics.TotalGoldEarned = statsDict.Contains("total_gold_earned") ? (int)statsDict["total_gold_earned"] : 0;
-                _data.Statistics.TotalExpEarned = statsDict.Contains("total_exp_earned") ? (int)statsDict["total_exp_earned"] : 0;
+                _data.Statistics.TotalMilestones = statsDict.ContainsKey("total_milestones") ? (int)statsDict["total_milestones"] : 0;
+                _data.Statistics.UnlockedMilestones = statsDict.ContainsKey("unlocked_milestones") ? (int)statsDict["unlocked_milestones"] : 0;
+                _data.Statistics.BronzeMilestones = statsDict.ContainsKey("bronze_milestones") ? (int)statsDict["bronze_milestones"] : 0;
+                _data.Statistics.SilverMilestones = statsDict.ContainsKey("silver_milestones") ? (int)statsDict["silver_milestones"] : 0;
+                _data.Statistics.GoldMilestones = statsDict.ContainsKey("gold_milestones") ? (int)statsDict["gold_milestones"] : 0;
+                _data.Statistics.PlatinumMilestones = statsDict.ContainsKey("platinum_milestones") ? (int)statsDict["platinum_milestones"] : 0;
+                _data.Statistics.DiamondMilestones = statsDict.ContainsKey("diamond_milestones") ? (int)statsDict["diamond_milestones"] : 0;
+                _data.Statistics.LegendaryMilestones = statsDict.ContainsKey("legendary_milestones") ? (int)statsDict["legendary_milestones"] : 0;
+                _data.Statistics.TotalRewardsClaimed = statsDict.ContainsKey("total_rewards_claimed") ? (int)statsDict["total_rewards_claimed"] : 0;
+                _data.Statistics.TotalGoldEarned = statsDict.ContainsKey("total_gold_earned") ? (int)statsDict["total_gold_earned"] : 0;
+                _data.Statistics.TotalExpEarned = statsDict.ContainsKey("total_exp_earned") ? (int)statsDict["total_exp_earned"] : 0;
             }
         }
     }
@@ -400,15 +400,15 @@ public partial class MilestoneSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("milestones"))
+        if (data.ContainsKey("milestones"))
         {
             _data.Milestones = (Dictionary<string, MilestoneData.MilestoneEntry>)data["milestones"];
         }
-        if (data.Contains("categoryProgress"))
+        if (data.ContainsKey("categoryProgress"))
         {
             _data.CategoryProgress = (Dictionary<string, int>)data["categoryProgress"];
         }
-        if (data.Contains("statistics"))
+        if (data.ContainsKey("statistics"))
         {
             _data.Statistics = (MilestoneData.MilestoneStatistics)data["statistics"];
         }

@@ -163,22 +163,22 @@ namespace ClawRPG.Systems.Emote {
         public override void ImportSaveData(Dictionary<string, object> data) {
             if (data == null) return;
             
-            if (data.Contains("emote_unlocked")) {
+            if (data.ContainsKey("emote_unlocked")) {
                 playerData.UnlockedEmotes = ((Godot.Array)data["emote_unlocked"])
                     .Select(v => (string)v).ToList();
             }
-            if (data.Contains("emote_favorites")) {
+            if (data.ContainsKey("emote_favorites")) {
                 playerData.FavoriteEmotes = ((Godot.Array)data["emote_favorites"])
                     .Select(v => (string)v).ToList();
             }
-            if (data.Contains("emote_usage")) {
+            if (data.ContainsKey("emote_usage")) {
                 var usageDict = (Dictionary)data["emote_usage"];
                 playerData.EmoteUsageCount = new Dictionary<string, int>();
                 foreach (var kvp in usageDict) {
                     playerData.EmoteUsageCount[kvp.Key] = (int)(long)kvp.Value;
                 }
             }
-            if (data.Contains("emote_last_used")) {
+            if (data.ContainsKey("emote_last_used")) {
                 playerData.LastUsedEmote = (string)data["emote_last_used"];
             }
         }

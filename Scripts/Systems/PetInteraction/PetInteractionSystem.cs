@@ -305,7 +305,7 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
             if (data == null || data.Count == 0) return;
 
             // Load pet interactions
-            if (data.Contains("pet_interactions"))
+            if (data.ContainsKey("pet_interactions"))
             {
                 var interactionsArray = (Godot.Array)data["pet_interactions"];
                 foreach (Godot.Collections.Dictionary petData in interactionsArray)
@@ -322,11 +322,11 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
                         affectionGained = (int)petData["affection_gained"]
                     };
 
-                    if (petData.Contains("last_interaction"))
+                    if (petData.ContainsKey("last_interaction"))
                         record.lastInteractionTime = DateTime.Parse((string)petData["last_interaction"]);
 
                     // Load history
-                    if (petData.Contains("history"))
+                    if (petData.ContainsKey("history"))
                     {
                         var historyArray = (Godot.Array)petData["history"];
                         foreach (Godot.Collections.Dictionary historyData in historyArray)
@@ -339,7 +339,7 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
                                 affectionGained = (int)historyData["affection"],
                                 soundPlayed = (string)historyData["sound"]
                             };
-                            if (historyData.Contains("timestamp"))
+                            if (historyData.ContainsKey("timestamp"))
                                 entry.timestamp = DateTime.Parse((string)historyData["timestamp"]);
                             record.history.Add(entry);
                         }
@@ -350,13 +350,13 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
             }
 
             // Load statistics
-            if (data.Contains("pet_interaction_total"))
+            if (data.ContainsKey("pet_interaction_total"))
                 _data.totalInteractions = (int)data["pet_interaction_total"];
-            if (data.Contains("pet_interaction_special"))
+            if (data.ContainsKey("pet_interaction_special"))
                 _data.specialInteractions = (int)data["pet_interaction_special"];
 
             // Load interaction type counts
-            if (data.Contains("pet_interaction_type_counts"))
+            if (data.ContainsKey("pet_interaction_type_counts"))
             {
                 var typeCountArray = (Godot.Array)data["pet_interaction_type_counts"];
                 foreach (Godot.Collections.Dictionary typeData in typeCountArray)
@@ -367,7 +367,7 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
                 }
             }
 
-            if (data.Contains("pet_interaction_last_time"))
+            if (data.ContainsKey("pet_interaction_last_time"))
                 _data.lastInteractionTime = DateTime.Parse((string)data["pet_interaction_last_time"]);
         }
         
@@ -392,23 +392,23 @@ namespace ClawRPG.Scripts.Systems.PetInteraction {
         {
             if (data == null) return;
             
-            if (data.Contains("totalInteractions"))
+            if (data.ContainsKey("totalInteractions"))
             {
                 _data.totalInteractions = (int)data["totalInteractions"];
             }
-            if (data.Contains("specialInteractions"))
+            if (data.ContainsKey("specialInteractions"))
             {
                 _data.specialInteractions = (int)data["specialInteractions"];
             }
-            if (data.Contains("petInteractions"))
+            if (data.ContainsKey("petInteractions"))
             {
                 _data.petInteractions = (Dictionary<string, PetInteractionRecord>)data["petInteractions"];
             }
-            if (data.Contains("interactionTypeCount"))
+            if (data.ContainsKey("interactionTypeCount"))
             {
                 _data.interactionTypeCount = (Dictionary<InteractionType, int>)data["interactionTypeCount"];
             }
-            if (data.Contains("lastInteractionTime"))
+            if (data.ContainsKey("lastInteractionTime"))
             {
                 _data.lastInteractionTime = (DateTime)data["lastInteractionTime"];
             }

@@ -191,7 +191,7 @@ public partial class PetBehaviorLogger : Node
 
         // Check if it's an elite/boss death → FocusElite
         string enemyType = data.EnemyType?.ToLowerInvariant() ?? "";
-        if (enemyType.Contains("elite") || enemyType.Contains("boss"))
+        if (enemyType.ContainsKey("elite") || enemyType.ContainsKey("boss"))
         {
             RecordImprint(PlayerBehaviorType.FocusElite);
 

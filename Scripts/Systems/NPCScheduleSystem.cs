@@ -272,9 +272,9 @@ namespace ClawRPG.Systems {
         {
             if (data == null) return;
             
-            if (data.Contains("game_time")) _gameTime = (float)data["game_time"];
-            if (data.Contains("time_scale")) _timeScale = (float)data["time_scale"];
-            if (data.Contains("is_paused")) _isPaused = (bool)data["is_paused"];
+            if (data.ContainsKey("game_time")) _gameTime = (float)data["game_time"];
+            if (data.ContainsKey("time_scale")) _timeScale = (float)data["time_scale"];
+            if (data.ContainsKey("is_paused")) _isPaused = (bool)data["is_paused"];
         }
     }
 

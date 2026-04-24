@@ -84,7 +84,7 @@ public partial class GuildDiplomacyData : BaseSystem
         
         Relations.Clear();
         
-        if (data.Contains("relations"))
+        if (data.ContainsKey("relations"))
         {
             var relationsArray = data["relations"] as Godot.Array;
             foreach (Dictionary relData in relationsArray)

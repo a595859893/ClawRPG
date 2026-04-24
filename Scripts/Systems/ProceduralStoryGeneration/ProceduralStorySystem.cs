@@ -314,7 +314,7 @@ public partial class ProceduralStorySystem : BaseSystem
     {
         if (data == null || _data == null) return;
         
-        if (data.Contains("story_data"))
+        if (data.ContainsKey("story_data"))
         {
             _data.ImportSaveData((Dictionary)data["story_data"]);
         }

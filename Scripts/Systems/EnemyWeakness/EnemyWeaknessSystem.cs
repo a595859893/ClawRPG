@@ -303,7 +303,7 @@ public partial class EnemyWeaknessSystem : BaseSystem
         
         // 敌人弱点追踪数据
         _data.EnemyWeaknesses.Clear();
-        if (data.Contains("enemy_weaknesses"))
+        if (data.ContainsKey("enemy_weaknesses"))
         {
             var enemyWeaknessesData = (Array)data["enemy_weaknesses"];
             foreach (Dictionary enemyData in enemyWeaknessesData)
@@ -311,7 +311,7 @@ public partial class EnemyWeaknessSystem : BaseSystem
                 string enemyType = (string)enemyData["enemy_type"];
                 var record = new EnemyWeaknessData.EnemyWeaknessRecord { EnemyType = enemyType };
                 
-                if (enemyData.Contains("weaknesses"))
+                if (enemyData.ContainsKey("weaknesses"))
                 {
                     var weaknessesArray = (Array)enemyData["weaknesses"];
                     foreach (Dictionary weaknessData in weaknessesArray)
@@ -332,7 +332,7 @@ public partial class EnemyWeaknessSystem : BaseSystem
         
         // 弱点激活历史
         _data.ActivationHistory.Clear();
-        if (data.Contains("activation_history"))
+        if (data.ContainsKey("activation_history"))
         {
             var historyArray = (Array)data["activation_history"];
             foreach (Dictionary recordData in historyArray)
@@ -349,11 +349,11 @@ public partial class EnemyWeaknessSystem : BaseSystem
         }
         
         // 统计
-        if (data.Contains("total_weakness_activations")) _data.TotalWeaknessActivations = (int)data["total_weakness_activations"];
-        if (data.Contains("total_bonus_damage")) _data.TotalBonusDamage = (int)data["total_bonus_damage"];
+        if (data.ContainsKey("total_weakness_activations")) _data.TotalWeaknessActivations = (int)data["total_weakness_activations"];
+        if (data.ContainsKey("total_bonus_damage")) _data.TotalBonusDamage = (int)data["total_bonus_damage"];
         
         _data.WeaknessTypeUsage.Clear();
-        if (data.Contains("weakness_type_usage"))
+        if (data.ContainsKey("weakness_type_usage"))
         {
             var weaknessTypeUsageData = (Dictionary)data["weakness_type_usage"];
             foreach (var kvp in weaknessTypeUsageData)
@@ -363,7 +363,7 @@ public partial class EnemyWeaknessSystem : BaseSystem
         }
         
         _data.ElementUsage.Clear();
-        if (data.Contains("element_usage"))
+        if (data.ContainsKey("element_usage"))
         {
             var elementUsageData = (Dictionary)data["element_usage"];
             foreach (var kvp in elementUsageData)

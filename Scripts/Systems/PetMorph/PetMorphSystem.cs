@@ -445,7 +445,7 @@ public partial class PetMorphSystem : BaseSystem
         
         Initialize();
         
-        if (data.Contains("unlocked_morphs"))
+        if (data.ContainsKey("unlocked_morphs"))
         {
             var unlockedMorphs = (Dictionary)data["unlocked_morphs"];
             _data.PlayerMorphData.UnlockedMorphs = new Dictionary<string, List<string>>();
@@ -460,7 +460,7 @@ public partial class PetMorphSystem : BaseSystem
             }
         }
         
-        if (data.Contains("active_morphs"))
+        if (data.ContainsKey("active_morphs"))
         {
             var activeMorphs = (Dictionary)data["active_morphs"];
             _data.PlayerMorphData.ActiveMorphs = new Dictionary<string, string>();
@@ -470,12 +470,12 @@ public partial class PetMorphSystem : BaseSystem
             }
         }
         
-        if (data.Contains("total_transformations"))
+        if (data.ContainsKey("total_transformations"))
         {
             _data.PlayerMorphData.TotalTransformations = Convert.ToInt32(data["total_transformations"]);
         }
         
-        if (data.Contains("morph_usage_count"))
+        if (data.ContainsKey("morph_usage_count"))
         {
             var morphUsageCount = (Dictionary)data["morph_usage_count"];
             _data.PlayerMorphData.MorphUsageCount = new Dictionary<string, int>();

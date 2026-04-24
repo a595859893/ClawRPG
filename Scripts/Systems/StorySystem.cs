@@ -509,11 +509,11 @@ public delegate void RewardClaimed(StoryReward reward);
         {
             if (data == null) return;
             
-            if (data.Contains("currentChapterId")) {
+            if (data.ContainsKey("currentChapterId")) {
                 LoadProgress((int)data["currentChapterId"]);
             }
             
-            if (data.Contains("objectives")) {
+            if (data.ContainsKey("objectives")) {
                 var objectivesData = (Array)data["objectives"];
                 var chapters = database.GetAllChapters();
                 

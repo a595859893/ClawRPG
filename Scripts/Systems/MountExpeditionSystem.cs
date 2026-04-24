@@ -370,15 +370,15 @@ namespace ClawRPG.Systems
         {
             _playerData = new MountExpeditionData.PlayerExpeditionData();
             
-            if (data.Contains("total_expeditions"))
+            if (data.ContainsKey("total_expeditions"))
                 _playerData.TotalExpeditions = (int)data["total_expeditions"];
-            if (data.Contains("total_gold_earned"))
+            if (data.ContainsKey("total_gold_earned"))
                 _playerData.TotalGoldEarned = (int)data["total_gold_earned"];
-            if (data.Contains("total_exp_earned"))
+            if (data.ContainsKey("total_exp_earned"))
                 _playerData.TotalExpEarned = (int)data["total_exp_earned"];
             
             // 加载活跃远征
-            if (data.Contains("active_expeditions"))
+            if (data.ContainsKey("active_expeditions"))
             {
                 var activeList = (Godot.Collections.Array)data["active_expeditions"];
                 foreach (Godot.Collections.Dictionary expData in activeList)
@@ -398,7 +398,7 @@ namespace ClawRPG.Systems
             }
             
             // 加载历史记录
-            if (data.Contains("history"))
+            if (data.ContainsKey("history"))
             {
                 var historyList = (Godot.Collections.Array)data["history"];
                 foreach (Godot.Collections.Dictionary resultData in historyList)
@@ -413,7 +413,7 @@ namespace ClawRPG.Systems
                         CompletedAt = DateTime.Parse((string)resultData["completed_at"])
                     };
                     
-                    if (resultData.Contains("item_rewards"))
+                    if (resultData.ContainsKey("item_rewards"))
                     {
                         var items = (Godot.Collections.Array)resultData["item_rewards"];
                         foreach (string item in items)
@@ -425,7 +425,7 @@ namespace ClawRPG.Systems
             }
             
             // 加载区域完成次数
-            if (data.Contains("zone_completions"))
+            if (data.ContainsKey("zone_completions"))
             {
                 var zoneCompletions = (Godot.Collections.Dictionary)data["zone_completions"];
                 foreach (var key in zoneCompletions.Keys)

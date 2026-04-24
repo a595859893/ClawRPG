@@ -410,7 +410,7 @@ namespace ClawRPG.Scripts.Systems
             {
                 _lobbyPlayers.Clear();
                 
-                if (data.Contains("players"))
+                if (data.ContainsKey("players"))
                 {
                     var playersData = (Dictionary)data["players"];
                     foreach (string key in playersData.Keys)

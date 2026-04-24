@@ -561,7 +561,7 @@ public delegate void SkillUnlockedEventHandler(string skillId);
                             CostReduction = Convert.ToSingle(entry["costReduction"])
                         };
                         
-                        if (entry.Contains("equippedRunes"))
+                        if (entry.ContainsKey("equippedRunes"))
                         {
                             var runesDict = entry["equippedRunes"] as Dictionary<object, object>;
                             if (runesDict != null)

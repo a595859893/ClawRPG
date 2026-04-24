@@ -266,7 +266,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
         public void LoadFromData(Dictionary<string, object> saveData) {
             if (saveData == null) return;
             
-            if (saveData.Contains("path_affinity")) {
+            if (saveData.ContainsKey("path_affinity")) {
                 var pathAffinity = saveData["path_affinity"] as Godot.Collections.Dictionary;
                 foreach (var key in pathAffinity.Keys) {
                     if (Enum.TryParse<FatePathType>(key.ToString(), out var pathType)) {
@@ -275,14 +275,14 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
                 }
             }
             
-            if (saveData.Contains("player_stats")) {
+            if (saveData.ContainsKey("player_stats")) {
                 var playerStats = saveData["player_stats"] as Godot.Collections.Dictionary;
                 foreach (var key in playerStats.Keys) {
                     Data.PlayerStats[key.ToString()] = Convert.ToSingle(playerStats[key]);
                 }
             }
             
-            if (saveData.Contains("made_choices")) {
+            if (saveData.ContainsKey("made_choices")) {
                 var madeChoices = saveData["made_choices"] as Godot.Array;
                 Data.MadeChoices.Clear();
                 foreach (var choice in madeChoices) {
@@ -290,21 +290,21 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
                 }
             }
             
-            if (saveData.Contains("dominant_path")) {
+            if (saveData.ContainsKey("dominant_path")) {
                 if (Enum.TryParse<FatePathType>(saveData["dominant_path"].ToString(), out var path)) {
                     Data.DominantPath = path;
                 }
             }
             
-            if (saveData.Contains("weave_level")) {
+            if (saveData.ContainsKey("weave_level")) {
                 Data.WeaveLevel = Convert.ToInt32(saveData["weave_level"]);
             }
             
-            if (saveData.Contains("total_weaves")) {
+            if (saveData.ContainsKey("total_weaves")) {
                 Data.TotalWeaves = Convert.ToInt32(saveData["total_weaves"]);
             }
             
-            if (saveData.Contains("choice_type_count")) {
+            if (saveData.ContainsKey("choice_type_count")) {
                 var choiceTypeCount = saveData["choice_type_count"] as Godot.Collections.Dictionary;
                 Data.ChoiceTypeCount.Clear();
                 foreach (var key in choiceTypeCount.Keys) {
@@ -358,7 +358,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
         {
             if (data == null) return;
             
-            if (data.Contains("player_stats")) {
+            if (data.ContainsKey("player_stats")) {
                 var playerStats = data["player_stats"] as Godot.Collections.Dictionary;
                 Data.PlayerStats.Clear();
                 foreach (var key in playerStats.Keys) {
@@ -366,7 +366,7 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
                 }
             }
             
-            if (data.Contains("made_choices")) {
+            if (data.ContainsKey("made_choices")) {
                 var madeChoices = data["made_choices"] as Godot.Array;
                 Data.MadeChoices.Clear();
                 foreach (var choice in madeChoices) {
@@ -374,21 +374,21 @@ namespace ClawRPG.Scripts.Systems.FateWeaving {
                 }
             }
             
-            if (data.Contains("dominant_path")) {
+            if (data.ContainsKey("dominant_path")) {
                 if (Enum.TryParse<FatePathType>(data["dominant_path"].ToString(), out var path)) {
                     Data.DominantPath = path;
                 }
             }
             
-            if (data.Contains("weave_level")) {
+            if (data.ContainsKey("weave_level")) {
                 Data.WeaveLevel = Convert.ToInt32(data["weave_level"]);
             }
             
-            if (data.Contains("total_weaves")) {
+            if (data.ContainsKey("total_weaves")) {
                 Data.TotalWeaves = Convert.ToInt32(data["total_weaves"]);
             }
             
-            if (data.Contains("choice_type_count")) {
+            if (data.ContainsKey("choice_type_count")) {
                 var choiceTypeCount = data["choice_type_count"] as Godot.Collections.Dictionary;
                 Data.ChoiceTypeCount.Clear();
                 foreach (var key in choiceTypeCount.Keys) {

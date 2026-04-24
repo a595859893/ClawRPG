@@ -331,7 +331,7 @@ public partial class CraftingMasterySystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("mastery_data"))
+        if (data.ContainsKey("mastery_data"))
         {
             var masteryDict = (Dictionary)data["mastery_data"];
             foreach (var kvp in masteryDict)

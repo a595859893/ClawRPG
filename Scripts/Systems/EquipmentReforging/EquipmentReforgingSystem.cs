@@ -385,12 +385,12 @@ namespace Game.Scripts.Systems.EquipmentReforging
     {
         if (data == null) return;
         
-        if (data.Contains("total_reforges")) _playerData.TotalReforges = (int)data["total_reforges"];
-        if (data.Contains("successful_reforges")) _playerData.SuccessfulReforges = (int)data["successful_reforges"];
-        if (data.Contains("failed_reforges")) _playerData.FailedReforges = (int)data["failed_reforges"];
+        if (data.ContainsKey("total_reforges")) _playerData.TotalReforges = (int)data["total_reforges"];
+        if (data.ContainsKey("successful_reforges")) _playerData.SuccessfulReforges = (int)data["successful_reforges"];
+        if (data.ContainsKey("failed_reforges")) _playerData.FailedReforges = (int)data["failed_reforges"];
         
         _playerData.ReforgeHistoryByType.Clear();
-        if (data.Contains("reforge_type_history"))
+        if (data.ContainsKey("reforge_type_history"))
         {
             var reforgeTypeHistoryData = (Dictionary)data["reforge_type_history"];
             foreach (var kvp in reforgeTypeHistoryData)

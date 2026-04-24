@@ -215,7 +215,7 @@ namespace ClawRPG.Scripts.Systems
             if (core == null) return;
 
             // 导入锦标赛
-            if (data.Contains("tournaments"))
+            if (data.ContainsKey("tournaments"))
             {
                 var tournamentsData = (ArrayList)data["tournaments"];
                 foreach (Dictionary td in tournamentsData)
@@ -248,7 +248,7 @@ namespace ClawRPG.Scripts.Systems
                         tournament.endTime = DateTime.Parse(td["endTime"]?.ToString());
 
                     // 导入玩家
-                    if (td.Contains("registeredPlayers"))
+                    if (td.ContainsKey("registeredPlayers"))
                     {
                         foreach (Dictionary pd in (ArrayList)td["registeredPlayers"])
                         {
@@ -270,7 +270,7 @@ namespace ClawRPG.Scripts.Systems
                     }
 
                     // 导入比赛
-                    if (td.Contains("matches"))
+                    if (td.ContainsKey("matches"))
                     {
                         foreach (Dictionary md in (ArrayList)td["matches"])
                         {
@@ -295,7 +295,7 @@ namespace ClawRPG.Scripts.Systems
                     }
 
                     // 导入奖励
-                    if (td.Contains("rewards"))
+                    if (td.ContainsKey("rewards"))
                     {
                         foreach (Dictionary rd in (ArrayList)td["rewards"])
                         {
@@ -311,7 +311,7 @@ namespace ClawRPG.Scripts.Systems
                     }
 
                     // 导入分组
-                    if (td.Contains("groups"))
+                    if (td.ContainsKey("groups"))
                     {
                         foreach (Dictionary gd in (ArrayList)td["groups"])
                         {
@@ -320,7 +320,7 @@ namespace ClawRPG.Scripts.Systems
                                 groupId = gd["groupId"]?.ToString() ?? "",
                                 groupName = gd["groupName"]?.ToString() ?? ""
                             };
-                            if (gd.Contains("playerIds"))
+                            if (gd.ContainsKey("playerIds"))
                             {
                                 foreach (string pid in (ArrayList)gd["playerIds"])
                                 {
@@ -336,7 +336,7 @@ namespace ClawRPG.Scripts.Systems
             }
 
             // 恢复活动锦标赛
-            if (data.Contains("activeTournamentIds"))
+            if (data.ContainsKey("activeTournamentIds"))
             {
                 core.ActiveTournaments.Clear();
                 foreach (string tid in (ArrayList)data["activeTournamentIds"])
@@ -349,7 +349,7 @@ namespace ClawRPG.Scripts.Systems
             }
 
             // 导入玩家进度
-            if (data.Contains("playerProgress"))
+            if (data.ContainsKey("playerProgress"))
             {
                 foreach (Dictionary pd in (ArrayList)data["playerProgress"])
                 {
@@ -363,7 +363,7 @@ namespace ClawRPG.Scripts.Systems
                     };
 
                     // 导入最近记录
-                    if (pd.Contains("recentRecords"))
+                    if (pd.ContainsKey("recentRecords"))
                     {
                         foreach (Dictionary rd in (ArrayList)pd["recentRecords"])
                         {
@@ -382,7 +382,7 @@ namespace ClawRPG.Scripts.Systems
                     }
 
                     // 导入统计
-                    if (pd.Contains("statistics"))
+                    if (pd.ContainsKey("statistics"))
                     {
                         var sd = (Dictionary)pd["statistics"];
                         progress.statistics = new TournamentStatistics

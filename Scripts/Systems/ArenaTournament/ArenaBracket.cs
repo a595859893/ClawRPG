@@ -173,10 +173,10 @@ namespace ClawRPG.Scripts.Systems.ArenaTournament {
         }
         
         public override void ImportSaveData(Dictionary<string, object> data) {
-            if (data.Contains("currentPhase")) {
+            if (data.ContainsKey("currentPhase")) {
                 _currentPhase = (TournamentPhase)(int)data["currentPhase"];
             }
-            if (data.Contains("currentRound")) {
+            if (data.ContainsKey("currentRound")) {
                 _currentRound = (int)data["currentRound"];
             }
         }

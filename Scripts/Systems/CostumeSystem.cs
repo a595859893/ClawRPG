@@ -292,7 +292,7 @@ namespace ClawRPG.Scripts.Systems {
                 var data = saveSystem.LoadData("costume_system") as Dictionary;
                 if (data != null)
                 {
-                    if (data.Contains("purchased_costumes"))
+                    if (data.ContainsKey("purchased_costumes"))
                     {
                         var purchased = data["purchased_costumes"] as Array;
                         _playerData.PurchasedCostumes = new List<string>();
@@ -305,15 +305,15 @@ namespace ClawRPG.Scripts.Systems {
                         }
                     }
                     
-                    if (data.Contains("equipped_outfit"))
+                    if (data.ContainsKey("equipped_outfit"))
                         _playerData.EquippedOutfit = (string)data["equipped_outfit"];
-                    if (data.Contains("equipped_hat"))
+                    if (data.ContainsKey("equipped_hat"))
                         _playerData.EquippedHat = (string)data["equipped_hat"];
-                    if (data.Contains("equipped_weapon_skin"))
+                    if (data.ContainsKey("equipped_weapon_skin"))
                         _playerData.EquippedWeaponSkin = (string)data["equipped_weapon_skin"];
-                    if (data.Contains("equipped_effect"))
+                    if (data.ContainsKey("equipped_effect"))
                         _playerData.EquippedEffect = (string)data["equipped_effect"];
-                    if (data.Contains("equipped_trail"))
+                    if (data.ContainsKey("equipped_trail"))
                         _playerData.EquippedTrail = (string)data["equipped_trail"];
                     
                     // Apply equipped status
@@ -370,7 +370,7 @@ namespace ClawRPG.Scripts.Systems {
         {
             if (data == null) return;
             
-            if (data.Contains("purchased_costumes"))
+            if (data.ContainsKey("purchased_costumes"))
             {
                 var purchased = data["purchased_costumes"] as Array;
                 _playerData.PurchasedCostumes = new List<string>();
@@ -383,15 +383,15 @@ namespace ClawRPG.Scripts.Systems {
                 }
             }
             
-            if (data.Contains("equipped_outfit"))
+            if (data.ContainsKey("equipped_outfit"))
                 _playerData.EquippedOutfit = (string)data["equipped_outfit"];
-            if (data.Contains("equipped_hat"))
+            if (data.ContainsKey("equipped_hat"))
                 _playerData.EquippedHat = (string)data["equipped_hat"];
-            if (data.Contains("equipped_weapon_skin"))
+            if (data.ContainsKey("equipped_weapon_skin"))
                 _playerData.EquippedWeaponSkin = (string)data["equipped_weapon_skin"];
-            if (data.Contains("equipped_effect"))
+            if (data.ContainsKey("equipped_effect"))
                 _playerData.EquippedEffect = (string)data["equipped_effect"];
-            if (data.Contains("equipped_trail"))
+            if (data.ContainsKey("equipped_trail"))
                 _playerData.EquippedTrail = (string)data["equipped_trail"];
             
             UpdateEquippedStatus();

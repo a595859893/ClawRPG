@@ -115,7 +115,7 @@ public partial class ConstellationSystem : BaseSystem
         
         // 反序列化已解锁的星座
         UnlockedConstellations.Clear();
-        if (data.Contains("unlockedConstellations"))
+        if (data.ContainsKey("unlockedConstellations"))
         {
             var unlockedList = (Godot.Array)data["unlockedConstellations"];
             foreach (Dictionary constData in unlockedList)
@@ -130,12 +130,12 @@ public partial class ConstellationSystem : BaseSystem
             }
         }
         
-        if (data.Contains("totalActivationPoints")) TotalActivationPoints = (int)data["totalActivationPoints"];
-        if (data.Contains("usedActivationPoints")) UsedActivationPoints = (int)data["usedActivationPoints"];
-        if (data.Contains("constellationFragments")) ConstellationFragments = (int)data["constellationFragments"];
-        if (data.Contains("totalConstellationsUnlocked")) TotalConstellationsUnlocked = (int)data["totalConstellationsUnlocked"];
-        if (data.Contains("totalStarsActivated")) TotalStarsActivated = (int)data["totalStarsActivated"];
-        if (data.Contains("goldSpentOnConstellations")) GoldSpentOnConstellations = (int)data["goldSpentOnConstellations"];
-        if (data.Contains("fragmentsCollected")) FragmentsCollected = (int)data["fragmentsCollected"];
+        if (data.ContainsKey("totalActivationPoints")) TotalActivationPoints = (int)data["totalActivationPoints"];
+        if (data.ContainsKey("usedActivationPoints")) UsedActivationPoints = (int)data["usedActivationPoints"];
+        if (data.ContainsKey("constellationFragments")) ConstellationFragments = (int)data["constellationFragments"];
+        if (data.ContainsKey("totalConstellationsUnlocked")) TotalConstellationsUnlocked = (int)data["totalConstellationsUnlocked"];
+        if (data.ContainsKey("totalStarsActivated")) TotalStarsActivated = (int)data["totalStarsActivated"];
+        if (data.ContainsKey("goldSpentOnConstellations")) GoldSpentOnConstellations = (int)data["goldSpentOnConstellations"];
+        if (data.ContainsKey("fragmentsCollected")) FragmentsCollected = (int)data["fragmentsCollected"];
     }
 }

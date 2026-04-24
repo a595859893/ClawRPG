@@ -72,7 +72,7 @@ namespace ClawRPG.Framework
                 var info = new SaveSlotInfo();
                 info.Slot = slot;
 
-                if (data.Contains("save_name") && data["save_name"] != null)
+                if (data.ContainsKey("save_name") && data["save_name"] != null)
                 {
                     info.SaveName = data["save_name"].ToString();
                 }
@@ -81,7 +81,7 @@ namespace ClawRPG.Framework
                     info.SaveName = "Slot " + slot;
                 }
 
-                if (data.Contains("save_time") && data["save_time"] != null)
+                if (data.ContainsKey("save_time") && data["save_time"] != null)
                 {
                     if (long.TryParse(data["save_time"].ToString(), out var timestamp))
                     {
@@ -93,7 +93,7 @@ namespace ClawRPG.Framework
                     info.SaveTime = DateTime.Now;
                 }
 
-                if (data.Contains("play_time") && data["play_time"] != null)
+                if (data.ContainsKey("play_time") && data["play_time"] != null)
                 {
                     if (int.TryParse(data["play_time"].ToString(), out var playTime))
                     {
@@ -105,7 +105,7 @@ namespace ClawRPG.Framework
                     info.PlayTime = 0;
                 }
 
-                if (data.Contains("location_name") && data["location_name"] != null)
+                if (data.ContainsKey("location_name") && data["location_name"] != null)
                 {
                     info.LocationName = data["location_name"].ToString();
                 }
@@ -114,7 +114,7 @@ namespace ClawRPG.Framework
                     info.LocationName = "Unknown";
                 }
 
-                if (data.Contains("level") && data["level"] != null)
+                if (data.ContainsKey("level") && data["level"] != null)
                 {
                     if (int.TryParse(data["level"].ToString(), out var level))
                     {

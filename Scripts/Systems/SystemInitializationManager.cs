@@ -458,7 +458,7 @@ namespace ClawRPG.Scripts.Systems
         {
             if (data == null) return;
             
-            if (data.Contains("isInitializationComplete"))
+            if (data.ContainsKey("isInitializationComplete"))
                 IsInitializationComplete = Convert.ToBoolean(data["isInitializationComplete"]);
         }
     }

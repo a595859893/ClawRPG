@@ -173,16 +173,16 @@ namespace ClawRPG.Scripts.Systems.Pets
 
             return new PetDecisionRecord
             {
-                TickId = data.Contains("tickId") ? Convert.ToInt32(data["tickId"]) : 0,
-                Timestamp = data.Contains("timestamp") ? Convert.ToSingle(data["timestamp"]) : 0f,
-                Type = data.Contains("type") ? (DecisionType)(int)data["type"] : DecisionType.StateTransition,
-                StateBefore = data.Contains("stateBefore") ? (PetDecisionSystem.PetAIState)(int)data["stateBefore"] : PetDecisionSystem.PetAIState.Idle,
-                StateAfter = data.Contains("stateAfter") ? (PetDecisionSystem.PetAIState)(int)data["stateAfter"] : PetDecisionSystem.PetAIState.Idle,
-                TargetName = data.Contains("targetName") ? data["targetName"]?.ToString() : "",
-                TargetDistance = data.Contains("targetDistance") ? Convert.ToSingle(data["targetDistance"]) : 0f,
-                Reason = data.Contains("reason") ? data["reason"]?.ToString() : "",
-                Outcome = data.Contains("outcome") ? (DecisionOutcome)(int)data["outcome"] : DecisionOutcome.Unknown,
-                Confidence = data.Contains("confidence") ? Convert.ToSingle(data["confidence"]) : 0f
+                TickId = data.ContainsKey("tickId") ? Convert.ToInt32(data["tickId"]) : 0,
+                Timestamp = data.ContainsKey("timestamp") ? Convert.ToSingle(data["timestamp"]) : 0f,
+                Type = data.ContainsKey("type") ? (DecisionType)(int)data["type"] : DecisionType.StateTransition,
+                StateBefore = data.ContainsKey("stateBefore") ? (PetDecisionSystem.PetAIState)(int)data["stateBefore"] : PetDecisionSystem.PetAIState.Idle,
+                StateAfter = data.ContainsKey("stateAfter") ? (PetDecisionSystem.PetAIState)(int)data["stateAfter"] : PetDecisionSystem.PetAIState.Idle,
+                TargetName = data.ContainsKey("targetName") ? data["targetName"]?.ToString() : "",
+                TargetDistance = data.ContainsKey("targetDistance") ? Convert.ToSingle(data["targetDistance"]) : 0f,
+                Reason = data.ContainsKey("reason") ? data["reason"]?.ToString() : "",
+                Outcome = data.ContainsKey("outcome") ? (DecisionOutcome)(int)data["outcome"] : DecisionOutcome.Unknown,
+                Confidence = data.ContainsKey("confidence") ? Convert.ToSingle(data["confidence"]) : 0f
             };
         }
     }

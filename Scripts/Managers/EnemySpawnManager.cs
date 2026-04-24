@@ -369,16 +369,16 @@ namespace ClawRPG.Scripts.Managers
         {
             if (data == null) return;
             
-            if (data.Contains("maxEnemies")) _maxEnemies = Convert.ToInt32(data["maxEnemies"]);
-            if (data.Contains("spawnRadius")) _spawnRadius = Convert.ToSingle(data["spawnRadius"]);
-            if (data.Contains("spawnCenterX")) _spawnCenter.x = Convert.ToSingle(data["spawnCenterX"]);
-            if (data.Contains("spawnCenterY")) _spawnCenter.y = Convert.ToSingle(data["spawnCenterY"]);
-            if (data.Contains("autoSpawn")) _autoSpawn = (bool)data["autoSpawn"];
-            if (data.Contains("currentWave")) _currentWave = Convert.ToInt32(data["currentWave"]);
-            if (data.Contains("enemiesInWave")) _enemiesInWave = Convert.ToInt32(data["enemiesInWave"]);
-            if (data.Contains("enemiesKilledInWave")) _enemiesKilledInWave = Convert.ToInt32(data["enemiesKilledInWave"]);
-            if (data.Contains("waveInProgress")) _waveInProgress = (bool)data["waveInProgress"];
-            if (data.Contains("timeBetweenWaves")) _timeBetweenWaves = Convert.ToSingle(data["timeBetweenWaves"]);
+            if (data.ContainsKey("maxEnemies")) _maxEnemies = Convert.ToInt32(data["maxEnemies"]);
+            if (data.ContainsKey("spawnRadius")) _spawnRadius = Convert.ToSingle(data["spawnRadius"]);
+            if (data.ContainsKey("spawnCenterX")) _spawnCenter.x = Convert.ToSingle(data["spawnCenterX"]);
+            if (data.ContainsKey("spawnCenterY")) _spawnCenter.y = Convert.ToSingle(data["spawnCenterY"]);
+            if (data.ContainsKey("autoSpawn")) _autoSpawn = (bool)data["autoSpawn"];
+            if (data.ContainsKey("currentWave")) _currentWave = Convert.ToInt32(data["currentWave"]);
+            if (data.ContainsKey("enemiesInWave")) _enemiesInWave = Convert.ToInt32(data["enemiesInWave"]);
+            if (data.ContainsKey("enemiesKilledInWave")) _enemiesKilledInWave = Convert.ToInt32(data["enemiesKilledInWave"]);
+            if (data.ContainsKey("waveInProgress")) _waveInProgress = (bool)data["waveInProgress"];
+            if (data.ContainsKey("timeBetweenWaves")) _timeBetweenWaves = Convert.ToSingle(data["timeBetweenWaves"]);
         }
     }
 }

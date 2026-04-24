@@ -412,13 +412,13 @@ public partial class LootDropSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("totalDrops")) _playerData.TotalDrops = Convert.ToInt32(data["totalDrops"]);
-        if (data.Contains("luckyDrops")) _playerData.LuckyDrops = Convert.ToInt32(data["luckyDrops"]);
-        if (data.Contains("criticalDrops")) _playerData.CriticalDrops = Convert.ToInt32(data["criticalDrops"]);
-        if (data.Contains("totalLuckValue")) _playerData.TotalLuckValue = Convert.ToSingle(data["totalLuckValue"]);
+        if (data.ContainsKey("totalDrops")) _playerData.TotalDrops = Convert.ToInt32(data["totalDrops"]);
+        if (data.ContainsKey("luckyDrops")) _playerData.LuckyDrops = Convert.ToInt32(data["luckyDrops"]);
+        if (data.ContainsKey("criticalDrops")) _playerData.CriticalDrops = Convert.ToInt32(data["criticalDrops"]);
+        if (data.ContainsKey("totalLuckValue")) _playerData.TotalLuckValue = Convert.ToSingle(data["totalLuckValue"]);
         
         // Import rarity drops
-        if (data.Contains("rarityDrops") && data["rarityDrops"] is Dictionary rarityData)
+        if (data.ContainsKey("rarityDrops") && data["rarityDrops"] is Dictionary rarityData)
         {
             _playerData.RarityDrops.Clear();
             foreach (var key in rarityData.Keys)
@@ -428,7 +428,7 @@ public partial class LootDropSystem : BaseSystem
         }
         
         // Import pity counters
-        if (data.Contains("pityCounters") && data["pityCounters"] is Dictionary pityData)
+        if (data.ContainsKey("pityCounters") && data["pityCounters"] is Dictionary pityData)
         {
             _pityCounters.Clear();
             foreach (var key in pityData.Keys)

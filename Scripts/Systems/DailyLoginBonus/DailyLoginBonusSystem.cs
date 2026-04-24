@@ -23,44 +23,44 @@ public partial class DailyLoginBonusSystem : BaseSystem
         if (saveSystem != null)
         {
             var gameData = saveSystem.LoadGame();
-            if (gameData.Contains("dailyLoginBonus"))
+            if (gameData.ContainsKey("dailyLoginBonus"))
             {
                 var bonusData = (Godot.Collections.Dictionary)gameData["dailyLoginBonus"];
                 _data = new DailyLoginBonusData();
                 
-                if (bonusData.Contains("currentStreak"))
+                if (bonusData.ContainsKey("currentStreak"))
                     _data.CurrentStreak = Convert.ToInt32(bonusData["currentStreak"]);
-                if (bonusData.Contains("bestStreak"))
+                if (bonusData.ContainsKey("bestStreak"))
                     _data.BestStreak = Convert.ToInt32(bonusData["bestStreak"]);
-                if (bonusData.Contains("totalLogins"))
+                if (bonusData.ContainsKey("totalLogins"))
                     _data.TotalLogins = Convert.ToInt32(bonusData["totalLogins"]);
-                if (bonusData.Contains("totalDaysClaimed"))
+                if (bonusData.ContainsKey("totalDaysClaimed"))
                     _data.TotalDaysClaimed = Convert.ToInt32(bonusData["totalDaysClaimed"]);
-                if (bonusData.Contains("cumulativeLoginDays"))
+                if (bonusData.ContainsKey("cumulativeLoginDays"))
                     _data.CumulativeLoginDays = Convert.ToInt32(bonusData["cumulativeLoginDays"]);
-                if (bonusData.Contains("totalGoldReceived"))
+                if (bonusData.ContainsKey("totalGoldReceived"))
                     _data.TotalGoldReceived = Convert.ToInt32(bonusData["totalGoldReceived"]);
-                if (bonusData.Contains("totalExpReceived"))
+                if (bonusData.ContainsKey("totalExpReceived"))
                     _data.TotalExpReceived = Convert.ToInt32(bonusData["totalExpReceived"]);
-                if (bonusData.Contains("totalDiamondsReceived"))
+                if (bonusData.ContainsKey("totalDiamondsReceived"))
                     _data.TotalDiamondsReceived = Convert.ToInt32(bonusData["totalDiamondsReceived"]);
-                if (bonusData.Contains("claimedBonusCount"))
+                if (bonusData.ContainsKey("claimedBonusCount"))
                     _data.ClaimedBonusCount = Convert.ToInt32(bonusData["claimedBonusCount"]);
                 
                 // 解析最后登录日期
-                if (bonusData.Contains("lastLoginDate"))
+                if (bonusData.ContainsKey("lastLoginDate"))
                 {
                     var lastLogin = (Godot.Collections.Dictionary)bonusData["lastLoginDate"];
                     _data.LastLoginDate = new Dictionary<string, object>
                     {
-                        { "year", lastLogin.Contains("year") ? Convert.ToInt32(lastLogin["year"]) : 0 },
-                        { "month", lastLogin.Contains("month") ? Convert.ToInt32(lastLogin["month"]) : 0 },
-                        { "day", lastLogin.Contains("day") ? Convert.ToInt32(lastLogin["day"]) : 0 }
+                        { "year", lastLogin.ContainsKey("year") ? Convert.ToInt32(lastLogin["year"]) : 0 },
+                        { "month", lastLogin.ContainsKey("month") ? Convert.ToInt32(lastLogin["month"]) : 0 },
+                        { "day", lastLogin.ContainsKey("day") ? Convert.ToInt32(lastLogin["day"]) : 0 }
                     };
                 }
                 
                 // 解析本月登录天数
-                if (bonusData.Contains("monthlyLoginDays"))
+                if (bonusData.ContainsKey("monthlyLoginDays"))
                 {
                     var monthlyDays = (Godot.Array)bonusData["monthlyLoginDays"];
                     _data.MonthlyLoginDays = new List<int>();
@@ -404,24 +404,24 @@ public partial class DailyLoginBonusSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("current_streak")) _data.CurrentStreak = (int)data["current_streak"];
-        if (data.Contains("best_streak")) _data.BestStreak = (int)data["best_streak"];
-        if (data.Contains("total_logins")) _data.TotalLogins = (int)data["total_logins"];
-        if (data.Contains("total_days_claimed")) _data.TotalDaysClaimed = (int)data["total_days_claimed"];
-        if (data.Contains("cumulative_login_days")) _data.CumulativeLoginDays = (int)data["cumulative_login_days"];
-        if (data.Contains("total_gold_received")) _data.TotalGoldReceived = (int)data["total_gold_received"];
-        if (data.Contains("total_exp_received")) _data.TotalExpReceived = (int)data["total_exp_received"];
-        if (data.Contains("total_diamonds_received")) _data.TotalDiamondsReceived = (int)data["total_diamonds_received"];
-        if (data.Contains("claimed_bonus_count")) _data.ClaimedBonusCount = (int)data["claimed_bonus_count"];
+        if (data.ContainsKey("current_streak")) _data.CurrentStreak = (int)data["current_streak"];
+        if (data.ContainsKey("best_streak")) _data.BestStreak = (int)data["best_streak"];
+        if (data.ContainsKey("total_logins")) _data.TotalLogins = (int)data["total_logins"];
+        if (data.ContainsKey("total_days_claimed")) _data.TotalDaysClaimed = (int)data["total_days_claimed"];
+        if (data.ContainsKey("cumulative_login_days")) _data.CumulativeLoginDays = (int)data["cumulative_login_days"];
+        if (data.ContainsKey("total_gold_received")) _data.TotalGoldReceived = (int)data["total_gold_received"];
+        if (data.ContainsKey("total_exp_received")) _data.TotalExpReceived = (int)data["total_exp_received"];
+        if (data.ContainsKey("total_diamonds_received")) _data.TotalDiamondsReceived = (int)data["total_diamonds_received"];
+        if (data.ContainsKey("claimed_bonus_count")) _data.ClaimedBonusCount = (int)data["claimed_bonus_count"];
         
         // 最后登录日期
-        _data.LastLoginDate["year"] = data.Contains("last_login_year") ? (int)data["last_login_year"] : 0;
-        _data.LastLoginDate["month"] = data.Contains("last_login_month") ? (int)data["last_login_month"] : 0;
-        _data.LastLoginDate["day"] = data.Contains("last_login_day") ? (int)data["last_login_day"] : 0;
+        _data.LastLoginDate["year"] = data.ContainsKey("last_login_year") ? (int)data["last_login_year"] : 0;
+        _data.LastLoginDate["month"] = data.ContainsKey("last_login_month") ? (int)data["last_login_month"] : 0;
+        _data.LastLoginDate["day"] = data.ContainsKey("last_login_day") ? (int)data["last_login_day"] : 0;
         
         // 本月登录天数
         _data.MonthlyLoginDays.Clear();
-        if (data.Contains("monthly_login_days"))
+        if (data.ContainsKey("monthly_login_days"))
         {
             var monthlyDaysArray = (Array)data["monthly_login_days"];
             foreach (var day in monthlyDaysArray)

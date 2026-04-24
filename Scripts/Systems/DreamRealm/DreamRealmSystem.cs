@@ -454,13 +454,13 @@ public partial class DreamRealmSystem : BaseSystem
 
     public void LoadData(Dictionary data)
     {
-        if (data.Contains("dreamLevel"))
+        if (data.ContainsKey("dreamLevel"))
             _dreamLevel = (int)data["dreamLevel"];
-        if (data.Contains("enemiesDefeated"))
+        if (data.ContainsKey("enemiesDefeated"))
             _enemiesDefeated = (int)data["enemiesDefeated"];
-        if (data.Contains("treasuresFound"))
+        if (data.ContainsKey("treasuresFound"))
             _treasuresFound = (int)data["treasuresFound"];
-        if (data.Contains("timeInDream"))
+        if (data.ContainsKey("timeInDream"))
             _timeInDream = (float)data["timeInDream"];
     }
 
@@ -529,7 +529,7 @@ public partial class DreamRealmSystem : BaseSystem
         
         // 恢复解锁的领域
         _unlockedRealms.Clear();
-        if (data.Contains("unlocked_realms"))
+        if (data.ContainsKey("unlocked_realms"))
         {
             var unlockedList = data["unlocked_realms"] as List<int>;
             if (unlockedList != null)
@@ -543,7 +543,7 @@ public partial class DreamRealmSystem : BaseSystem
         
         // 恢复领域统计数据
         _realmStats.Clear();
-        if (data.Contains("realm_stats"))
+        if (data.ContainsKey("realm_stats"))
         {
             var statsData = data["realm_stats"] as List<Dictionary>;
             if (statsData != null)

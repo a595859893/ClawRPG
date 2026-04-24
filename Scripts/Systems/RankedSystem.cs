@@ -111,7 +111,7 @@ public partial class RankedSystem : BaseSystem
     {
         // Load player rank data
         var gameState = GetNode<Main>("/root/Main")?.GameState;
-        if (gameState != null && gameState.Contains("ranked_data"))
+        if (gameState != null && gameState.ContainsKey("ranked_data"))
         {
             // Parse saved data
         }
@@ -445,7 +445,7 @@ public partial class RankedSystem : BaseSystem
         if (data == null) return;
         
         // 加载玩家排名数据
-        if (data.Contains("playerRanks"))
+        if (data.ContainsKey("playerRanks"))
         {
             var ranksData = (Array)data["playerRanks"];
             playerRanks.Clear();
@@ -470,7 +470,7 @@ public partial class RankedSystem : BaseSystem
         }
         
         // 加载比赛历史
-        if (data.Contains("matchHistory"))
+        if (data.ContainsKey("matchHistory"))
         {
             var historyData = (Array)data["matchHistory"];
             matchHistory.Clear();
@@ -491,15 +491,15 @@ public partial class RankedSystem : BaseSystem
         }
         
         // 加载赛季信息
-        if (data.Contains("currentSeasonId"))
+        if (data.ContainsKey("currentSeasonId"))
         {
             currentSeasonId = data["currentSeasonId"].ToString();
         }
-        if (data.Contains("seasonStartTime"))
+        if (data.ContainsKey("seasonStartTime"))
         {
             DateTime.TryParse(data["seasonStartTime"].ToString(), out seasonStartTime);
         }
-        if (data.Contains("seasonEndTime"))
+        if (data.ContainsKey("seasonEndTime"))
         {
             DateTime.TryParse(data["seasonEndTime"].ToString(), out seasonEndTime);
         }

@@ -185,7 +185,7 @@ public partial class TitleCollectionSystem : BaseSystem
         if (saveSystem != null)
         {
             var data = saveSystem.LoadGame();
-            if (data.Contains("title_collection"))
+            if (data.ContainsKey("title_collection"))
             {
                 _data.FromDict((Godot.Collections.Dictionary)data["title_collection"]);
             }
@@ -219,29 +219,29 @@ public partial class TitleCollectionSystem : BaseSystem
     public override void ImportSaveData(Dictionary<string, object> data) {
         if (data == null) return;
         
-        if (data.Contains("collectedTitles")) {
+        if (data.ContainsKey("collectedTitles")) {
             var titlesDict = (Dictionary)data["collectedTitles"];
             _data.CollectedTitles = new Dictionary<string, string>();
             foreach (var kvp in titlesDict) {
                 _data.CollectedTitles[kvp.Key] = (string)kvp.Value;
             }
         }
-        if (data.Contains("currentDisplayTitle")) {
+        if (data.ContainsKey("currentDisplayTitle")) {
             _data.CurrentDisplayTitle = (string)data["currentDisplayTitle"];
         }
-        if (data.Contains("titleHistory")) {
+        if (data.ContainsKey("titleHistory")) {
             _data.TitleHistory = (Godot.Array)data["titleHistory"];
         }
-        if (data.Contains("totalTitlesCollected")) {
+        if (data.ContainsKey("totalTitlesCollected")) {
             _data.TotalTitlesCollected = (int)data["totalTitlesCollected"];
         }
-        if (data.Contains("legendaryTitles")) {
+        if (data.ContainsKey("legendaryTitles")) {
             _data.LegendaryTitles = (int)data["legendaryTitles"];
         }
-        if (data.Contains("epicTitles")) {
+        if (data.ContainsKey("epicTitles")) {
             _data.EpicTitles = (int)data["epicTitles"];
         }
-        if (data.Contains("rareTitles")) {
+        if (data.ContainsKey("rareTitles")) {
             _data.RareTitles = (int)data["rareTitles"];
         }
     }

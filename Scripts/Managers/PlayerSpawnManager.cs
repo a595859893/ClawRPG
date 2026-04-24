@@ -283,17 +283,17 @@ namespace ClawRPG.Scripts.Managers
         {
             if (data == null) return;
             
-            if (data.Contains("hasSpawned")) _hasSpawned = (bool)data["hasSpawned"];
-            if (data.Contains("defaultSpawnPositionX")) 
+            if (data.ContainsKey("hasSpawned")) _hasSpawned = (bool)data["hasSpawned"];
+            if (data.ContainsKey("defaultSpawnPositionX")) 
                 _defaultSpawnPosition.x = Convert.ToSingle(data["defaultSpawnPositionX"]);
-            if (data.Contains("defaultSpawnPositionY")) 
+            if (data.ContainsKey("defaultSpawnPositionY")) 
                 _defaultSpawnPosition.y = Convert.ToSingle(data["defaultSpawnPositionY"]);
-            if (data.Contains("lastSafePositionX")) 
+            if (data.ContainsKey("lastSafePositionX")) 
                 _lastSafePosition.x = Convert.ToSingle(data["lastSafePositionX"]);
-            if (data.Contains("lastSafePositionY")) 
+            if (data.ContainsKey("lastSafePositionY")) 
                 _lastSafePosition.y = Convert.ToSingle(data["lastSafePositionY"]);
-            if (data.Contains("respawnDelay")) _respawnDelay = Convert.ToSingle(data["respawnDelay"]);
-            if (data.Contains("namedSpawnPoints")) 
+            if (data.ContainsKey("respawnDelay")) _respawnDelay = Convert.ToSingle(data["respawnDelay"]);
+            if (data.ContainsKey("namedSpawnPoints")) 
                 _namedSpawnPoints = data["namedSpawnPoints"] as Dictionary<string, Vector2>;
         }
     }

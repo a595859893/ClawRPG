@@ -177,27 +177,27 @@ namespace ClawRPG.Scripts.Systems.Testing
         {
             var logger = new CombatLogger
             {
-                Version = data.Contains("version") ? (string)data["version"] : "unknown",
-                Timestamp = data.Contains("timestamp") ? (string)data["timestamp"] : "",
-                Scene = data.Contains("scene") ? (string)data["scene"] : ""
+                Version = data.ContainsKey("version") ? (string)data["version"] : "unknown",
+                Timestamp = data.ContainsKey("timestamp") ? (string)data["timestamp"] : "",
+                Scene = data.ContainsKey("scene") ? (string)data["scene"] : ""
             };
 
-            if (data.Contains("player") && data["player"] is Dictionary<string, object> playerData)
+            if (data.ContainsKey("player") && data["player"] is Dictionary<string, object> playerData)
                 logger.Player = CombatActorSnapshot.Import(playerData);
 
-            if (data.Contains("enemies") && data["enemies"] is Godot.Collections.Array enemiesArr)
+            if (data.ContainsKey("enemies") && data["enemies"] is Godot.Collections.Array enemiesArr)
             {
                 foreach (Dictionary<string, object> enemyData in enemiesArr)
                     logger.Enemies.Add(CombatActorSnapshot.Import(enemyData));
             }
 
-            if (data.Contains("events") && data["events"] is Godot.Collections.Array eventsArr)
+            if (data.ContainsKey("events") && data["events"] is Godot.Collections.Array eventsArr)
             {
                 foreach (Dictionary<string, object> eventData in eventsArr)
                     logger.Events.Add(CombatEvent.Import(eventData));
             }
 
-            if (data.Contains("outcome") && data["outcome"] is Dictionary<string, object> outcomeData)
+            if (data.ContainsKey("outcome") && data["outcome"] is Dictionary<string, object> outcomeData)
                 logger.Outcome = CombatOutcome.Import(outcomeData);
 
             return logger;
@@ -229,10 +229,10 @@ namespace ClawRPG.Scripts.Systems.Testing
         {
             return new CombatActorSnapshot
             {
-                Id = data.Contains("id") ? (string)data["id"] : "",
-                Hp = data.Contains("hp") ? Convert.ToInt32(data["hp"]) : 0,
-                Attack = data.Contains("attack") ? Convert.ToInt32(data["attack"]) : 0,
-                Skills = data.Contains("skills") ? new List<string>((Godot.Collections.Array)data["skills"]) : new List<string>()
+                Id = data.ContainsKey("id") ? (string)data["id"] : "",
+                Hp = data.ContainsKey("hp") ? Convert.ToInt32(data["hp"]) : 0,
+                Attack = data.ContainsKey("attack") ? Convert.ToInt32(data["attack"]) : 0,
+                Skills = data.ContainsKey("skills") ? new List<string>((Godot.Collections.Array)data["skills"]) : new List<string>()
             };
         }
     }
@@ -271,14 +271,14 @@ namespace ClawRPG.Scripts.Systems.Testing
         {
             return new CombatEvent
             {
-                Frame = data.Contains("frame") ? Convert.ToInt32(data["frame"]) : 0,
-                Type = data.Contains("type") ? (string)data["type"] : "",
-                Actor = data.Contains("actor") ? (string)data["actor"] : "",
-                Target = data.Contains("target") ? (string)data["target"] : "",
-                Skill = data.Contains("skill") ? (string)data["skill"] : "",
-                Damage = data.Contains("damage") ? Convert.ToInt32(data["damage"]) : 0,
-                DamageType = data.Contains("damage_type") ? (string)data["damage_type"] : "",
-                Duration = data.Contains("duration") ? Convert.ToInt32(data["duration"]) : 0
+                Frame = data.ContainsKey("frame") ? Convert.ToInt32(data["frame"]) : 0,
+                Type = data.ContainsKey("type") ? (string)data["type"] : "",
+                Actor = data.ContainsKey("actor") ? (string)data["actor"] : "",
+                Target = data.ContainsKey("target") ? (string)data["target"] : "",
+                Skill = data.ContainsKey("skill") ? (string)data["skill"] : "",
+                Damage = data.ContainsKey("damage") ? Convert.ToInt32(data["damage"]) : 0,
+                DamageType = data.ContainsKey("damage_type") ? (string)data["damage_type"] : "",
+                Duration = data.ContainsKey("duration") ? Convert.ToInt32(data["duration"]) : 0
             };
         }
     }
@@ -306,9 +306,9 @@ namespace ClawRPG.Scripts.Systems.Testing
         {
             return new CombatOutcome
             {
-                Won = data.Contains("won") ? (bool)data["won"] : false,
-                DamageTaken = data.Contains("damage_taken") ? Convert.ToInt32(data["damage_taken"]) : 0,
-                Rounds = data.Contains("rounds") ? Convert.ToInt32(data["rounds"]) : 0
+                Won = data.ContainsKey("won") ? (bool)data["won"] : false,
+                DamageTaken = data.ContainsKey("damage_taken") ? Convert.ToInt32(data["damage_taken"]) : 0,
+                Rounds = data.ContainsKey("rounds") ? Convert.ToInt32(data["rounds"]) : 0
             };
         }
     }

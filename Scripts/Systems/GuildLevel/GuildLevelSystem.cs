@@ -462,7 +462,7 @@ public partial class GuildLevelSystem : BaseSystem
         
         _guildLevels.Clear();
         
-        if (data.Contains("guildLevels")) {
+        if (data.ContainsKey("guildLevels")) {
             var guildLevelsList = (Godot.Array)data["guildLevels"];
             foreach (Dictionary guildData in guildLevelsList) {
                 var levelData = new GuildLevelData();

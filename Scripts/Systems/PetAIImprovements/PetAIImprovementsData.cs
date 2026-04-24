@@ -274,7 +274,7 @@ public class PetAIDecision
         }
 
         // Situation influence
-        if (situation.Contains("player_health"))
+        if (situation.ContainsKey("player_health"))
         {
             float playerHealth = (float)situation["player_health"];
             if (playerHealth < 0.3f)
@@ -284,7 +284,7 @@ public class PetAIDecision
             }
         }
 
-        if (situation.Contains("enemy_count"))
+        if (situation.ContainsKey("enemy_count"))
         {
             int enemyCount = (int)situation["enemy_count"];
             if (enemyCount > 3)

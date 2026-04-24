@@ -312,7 +312,7 @@ public partial class TattooSystem : BaseSystem
             _data = new TattooData();
             
             // 反序列化已解锁纹身
-            if (data.Contains("unlocked_tattoos"))
+            if (data.ContainsKey("unlocked_tattoos"))
             {
                 var unlockedArray = data["unlocked_tattoos"] as Array;
                 if (unlockedArray != null)
@@ -325,7 +325,7 @@ public partial class TattooSystem : BaseSystem
             }
             
             // 反序列化已装备纹身 (兼容旧版本 applied_tattoos 和新版本 equipped_tattoos)
-            if (data.Contains("equipped_tattoos"))
+            if (data.ContainsKey("equipped_tattoos"))
             {
                 var equippedDict = data["equipped_tattoos"] as Dictionary;
                 if (equippedDict != null)
@@ -336,7 +336,7 @@ public partial class TattooSystem : BaseSystem
                     }
                 }
             }
-            else if (data.Contains("applied_tattoos"))
+            else if (data.ContainsKey("applied_tattoos"))
             {
                 // 兼容旧存档格式
                 var appliedDict = data["applied_tattoos"] as Dictionary;
@@ -350,7 +350,7 @@ public partial class TattooSystem : BaseSystem
             }
             
             // 反序列化使用次数
-            if (data.Contains("tattoo_usage_count"))
+            if (data.ContainsKey("tattoo_usage_count"))
             {
                 var usageDict = data["tattoo_usage_count"] as Dictionary;
                 if (usageDict != null)
@@ -363,9 +363,9 @@ public partial class TattooSystem : BaseSystem
             }
             
             // 统计信息
-            if (data.Contains("total_tattoos_applied"))
+            if (data.ContainsKey("total_tattoos_applied"))
                 _data.TotalTattoosApplied = Convert.ToInt32(data["total_tattoos_applied"]);
-            if (data.Contains("total_gold_spent"))
+            if (data.ContainsKey("total_gold_spent"))
                 _data.TotalGoldSpent = Convert.ToInt32(data["total_gold_spent"]);
             
             GD.Print($"[TattooSystem] Data imported: {_data.UnlockedTattoos.Count} unlocked, {_data.AppliedTattoos.Count} equipped");

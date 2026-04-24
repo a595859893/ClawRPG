@@ -390,15 +390,15 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
             
             // 导入子系统数据
-            if (data.Contains("spawner") && _spawner != null)
+            if (data.ContainsKey("spawner") && _spawner != null)
             {
                 _spawner.ImportSaveData((Dictionary)data["spawner"]);
             }
-            if (data.Contains("damage_tracker") && _damageTracker != null)
+            if (data.ContainsKey("damage_tracker") && _damageTracker != null)
             {
                 _damageTracker.ImportSaveData((Dictionary)data["damage_tracker"]);
             }
-            if (data.Contains("reward_system") && _rewardSystem != null)
+            if (data.ContainsKey("reward_system") && _rewardSystem != null)
             {
                 _rewardSystem.ImportSaveData((Dictionary)data["reward_system"]);
             }

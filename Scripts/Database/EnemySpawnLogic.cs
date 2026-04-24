@@ -336,7 +336,7 @@ namespace ClawRPG.Scripts.Database
             
             _enemyInstances.Clear();
             
-            if (data.Contains("enemyInstances"))
+            if (data.ContainsKey("enemyInstances"))
             {
                 var instancesArray = (Array)data["enemyInstances"];
                 foreach (string instanceJson in instancesArray)
@@ -349,7 +349,7 @@ namespace ClawRPG.Scripts.Database
                 }
             }
             
-            if (data.Contains("nextInstanceId"))
+            if (data.ContainsKey("nextInstanceId"))
             {
                 _nextInstanceId = Convert.ToInt32(data["nextInstanceId"]);
             }

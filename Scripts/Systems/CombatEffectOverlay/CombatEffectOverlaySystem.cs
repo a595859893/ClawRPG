@@ -589,10 +589,10 @@ public partial class CombatEffectOverlaySystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("total_screen_flashes")) _data.TotalScreenFlashes = (int)data["total_screen_flashes"];
-        if (data.Contains("total_camera_shakes")) _data.TotalCameraShakes = (int)data["total_camera_shakes"];
-        if (data.Contains("total_slow_motions")) _data.TotalSlowMotions = (int)data["total_slow_motions"];
-        if (data.Contains("total_floating_texts")) _data.TotalFloatingTexts = (int)data["total_floating_texts"];
-        if (data.Contains("total_shake_intensity")) _data.TotalShakeIntensity = (float)data["total_shake_intensity"];
+        if (data.ContainsKey("total_screen_flashes")) _data.TotalScreenFlashes = (int)data["total_screen_flashes"];
+        if (data.ContainsKey("total_camera_shakes")) _data.TotalCameraShakes = (int)data["total_camera_shakes"];
+        if (data.ContainsKey("total_slow_motions")) _data.TotalSlowMotions = (int)data["total_slow_motions"];
+        if (data.ContainsKey("total_floating_texts")) _data.TotalFloatingTexts = (int)data["total_floating_texts"];
+        if (data.ContainsKey("total_shake_intensity")) _data.TotalShakeIntensity = (float)data["total_shake_intensity"];
     }
 }

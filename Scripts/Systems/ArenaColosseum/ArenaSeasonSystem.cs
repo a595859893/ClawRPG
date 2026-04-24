@@ -307,16 +307,16 @@ namespace ClawRPG.Scripts.Systems
         {
             if (data == null) return;
 
-            if (data.Contains("currentSeasonId"))
+            if (data.ContainsKey("currentSeasonId"))
                 _currentSeasonId = Convert.ToInt32(data["currentSeasonId"]);
 
-            if (data.Contains("seasonStartDate"))
+            if (data.ContainsKey("seasonStartDate"))
                 _seasonStartDate = DateTime.Parse(data["seasonStartDate"].ToString());
 
-            if (data.Contains("seasonEndDate"))
+            if (data.ContainsKey("seasonEndDate"))
                 _seasonEndDate = DateTime.Parse(data["seasonEndDate"].ToString());
 
-            if (!data.Contains("playerData")) return;
+            if (!data.ContainsKey("playerData")) return;
 
             var playerDataList = data["playerData"] as List<object>;
             if (playerDataList == null) return;
@@ -329,7 +329,7 @@ namespace ClawRPG.Scripts.Systems
                 int playerId = Convert.ToInt32(pd["playerId"]);
                 var historyList = new List<ArenaColosseumData.ColosseumRecord>();
 
-                if (pd.Contains("history"))
+                if (pd.ContainsKey("history"))
                 {
                     var historyData = pd["history"] as List<object>;
                     if (historyData != null)

@@ -140,7 +140,7 @@ namespace ClawRPG.Scripts.Skills
             // For now, just add some placeholder logic
             
             // Example: root node is always available if not unlocked
-            if (!tree.UnlockedNodes.Contains("root") && !tree.AvailableNodes.Contains("root"))
+            if (!tree.UnlockedNodes.ContainsKey("root") && !tree.AvailableNodes.ContainsKey("root"))
             {
                 tree.AvailableNodes.Add("root");
             }
@@ -190,7 +190,7 @@ namespace ClawRPG.Scripts.Skills
             
             _skillTrees.Clear();
             
-            if (data.Contains("skillTrees"))
+            if (data.ContainsKey("skillTrees"))
             {
                 var treesArray = (Array)data["skillTrees"];
                 foreach (Dictionary entry in treesArray)

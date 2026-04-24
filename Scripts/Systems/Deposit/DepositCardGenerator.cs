@@ -97,7 +97,7 @@ public partial class DepositCardGenerator : Node
     public static string GetCardDescription(string cardId)
     {
         if (!cardId.StartsWith(DEPOSIT_CARD_PREFIX)) return "";
-        if (!cardId.Contains("_lv")) return "";
+        if (!cardId.ContainsKey("_lv")) return "";
 
         var parts = cardId.Replace(DEPOSIT_CARD_PREFIX, "").Split('_');
         if (parts.Length < 2) return "";

@@ -31,36 +31,36 @@ public partial class StreakSystem : BaseSystem
         if (data == null || data.Count == 0) return;
 
         // Load streak data
-        if (data.Contains("streak_login")) _data.LoginStreak = (int)data["streak_login"];
-        if (data.Contains("streak_battle")) _data.BattleStreak = (int)data["streak_battle"];
-        if (data.Contains("streak_quest")) _data.QuestStreak = (int)data["streak_quest"];
-        if (data.Contains("streak_dungeon")) _data.DungeonStreak = (int)data["streak_dungeon"];
-        if (data.Contains("streak_pet")) _data.PetInteractionStreak = (int)data["streak_pet"];
+        if (data.ContainsKey("streak_login")) _data.LoginStreak = (int)data["streak_login"];
+        if (data.ContainsKey("streak_battle")) _data.BattleStreak = (int)data["streak_battle"];
+        if (data.ContainsKey("streak_quest")) _data.QuestStreak = (int)data["streak_quest"];
+        if (data.ContainsKey("streak_dungeon")) _data.DungeonStreak = (int)data["streak_dungeon"];
+        if (data.ContainsKey("streak_pet")) _data.PetInteractionStreak = (int)data["streak_pet"];
 
-        if (data.Contains("best_streak_login")) _data.BestLoginStreak = (int)data["best_streak_login"];
-        if (data.Contains("best_streak_battle")) _data.BestBattleStreak = (int)data["best_streak_battle"];
-        if (data.Contains("best_streak_quest")) _data.BestQuestStreak = (int)data["best_streak_quest"];
-        if (data.Contains("best_streak_dungeon")) _data.BestDungeonStreak = (int)data["best_streak_dungeon"];
-        if (data.Contains("best_streak_pet")) _data.BestPetInteractionStreak = (int)data["best_streak_pet"];
+        if (data.ContainsKey("best_streak_login")) _data.BestLoginStreak = (int)data["best_streak_login"];
+        if (data.ContainsKey("best_streak_battle")) _data.BestBattleStreak = (int)data["best_streak_battle"];
+        if (data.ContainsKey("best_streak_quest")) _data.BestQuestStreak = (int)data["best_streak_quest"];
+        if (data.ContainsKey("best_streak_dungeon")) _data.BestDungeonStreak = (int)data["best_streak_dungeon"];
+        if (data.ContainsKey("best_streak_pet")) _data.BestPetInteractionStreak = (int)data["best_streak_pet"];
 
-        if (data.Contains("total_login_days")) _data.TotalLoginDays = (int)data["total_login_days"];
-        if (data.Contains("total_battle_days")) _data.TotalBattleDays = (int)data["total_battle_days"];
-        if (data.Contains("total_quest_days")) _data.TotalQuestDays = (int)data["total_quest_days"];
-        if (data.Contains("total_dungeon_days")) _data.TotalDungeonDays = (int)data["total_dungeon_days"];
-        if (data.Contains("total_pet_days")) _data.TotalPetInteractionDays = (int)data["total_pet_days"];
+        if (data.ContainsKey("total_login_days")) _data.TotalLoginDays = (int)data["total_login_days"];
+        if (data.ContainsKey("total_battle_days")) _data.TotalBattleDays = (int)data["total_battle_days"];
+        if (data.ContainsKey("total_quest_days")) _data.TotalQuestDays = (int)data["total_quest_days"];
+        if (data.ContainsKey("total_dungeon_days")) _data.TotalDungeonDays = (int)data["total_dungeon_days"];
+        if (data.ContainsKey("total_pet_days")) _data.TotalPetInteractionDays = (int)data["total_pet_days"];
 
-        if (data.Contains("streak_freeze_tokens")) _data.StreakFreezeTokens = (int)data["streak_freeze_tokens"];
-        if (data.Contains("total_freeze_used")) _data.TotalStreakFreezeUsed = (int)data["total_freeze_used"];
+        if (data.ContainsKey("streak_freeze_tokens")) _data.StreakFreezeTokens = (int)data["streak_freeze_tokens"];
+        if (data.ContainsKey("total_freeze_used")) _data.TotalStreakFreezeUsed = (int)data["total_freeze_used"];
 
-        if (data.Contains("last_login_time")) _data.LastLoginTime = (long)data["last_login_time"];
-        if (data.Contains("last_battle_time")) _data.LastBattleTime = (long)data["last_battle_time"];
-        if (data.Contains("last_quest_time")) _data.LastQuestTime = (long)data["last_quest_time"];
-        if (data.Contains("last_dungeon_time")) _data.LastDungeonTime = (long)data["last_dungeon_time"];
-        if (data.Contains("last_pet_time")) _data.LastPetInteractionTime = (long)data["last_pet_time"];
+        if (data.ContainsKey("last_login_time")) _data.LastLoginTime = (long)data["last_login_time"];
+        if (data.ContainsKey("last_battle_time")) _data.LastBattleTime = (long)data["last_battle_time"];
+        if (data.ContainsKey("last_quest_time")) _data.LastQuestTime = (long)data["last_quest_time"];
+        if (data.ContainsKey("last_dungeon_time")) _data.LastDungeonTime = (long)data["last_dungeon_time"];
+        if (data.ContainsKey("last_pet_time")) _data.LastPetInteractionTime = (long)data["last_pet_time"];
 
-        if (data.Contains("total_rewards_claimed")) _data.TotalRewardsClaimed = (int)data["total_rewards_claimed"];
-        if (data.Contains("total_gold_streaks")) _data.TotalGoldFromStreaks = (int)data["total_gold_streaks"];
-        if (data.Contains("total_exp_streaks")) _data.TotalExpFromStreaks = (int)data["total_exp_streaks"];
+        if (data.ContainsKey("total_rewards_claimed")) _data.TotalRewardsClaimed = (int)data["total_rewards_claimed"];
+        if (data.ContainsKey("total_gold_streaks")) _data.TotalGoldFromStreaks = (int)data["total_gold_streaks"];
+        if (data.ContainsKey("total_exp_streaks")) _data.TotalExpFromStreaks = (int)data["total_exp_streaks"];
     }
     
     public void SaveData()

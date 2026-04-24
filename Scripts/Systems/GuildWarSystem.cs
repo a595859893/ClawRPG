@@ -79,7 +79,7 @@ namespace ClawRPG.Core.Systems.GuildWar
             if (data == null) return;
             
             // 导入进行中的战争
-            if (data.Contains("active_wars"))
+            if (data.ContainsKey("active_wars"))
             {
                 var wars = data["active_wars"] as Array;
                 if (wars != null)
@@ -100,14 +100,14 @@ namespace ClawRPG.Core.Systems.GuildWar
             }
             
             // 导入玩家进度
-            if (data.Contains("player_progress"))
+            if (data.ContainsKey("player_progress"))
             {
                 var progressList = data["player_progress"] as Array;
                 if (progressList != null)
                 {
                     foreach (Dictionary progressData in progressList)
                     {
-                        if (progressData.Contains("guild_id"))
+                        if (progressData.ContainsKey("guild_id"))
                         {
                             string guildId = progressData["guild_id"] as string;
                             if (!string.IsNullOrEmpty(guildId) && !_playerProgress.ContainsKey(guildId))

@@ -202,14 +202,14 @@ namespace ClawRPG.Scripts.Combat
         public override void ImportSaveData(Dictionary<string, object> data)
         {
             if (data == null) return;
-            if (data.Contains("sessionTime")) _currentSessionTime = Convert.ToSingle(data["sessionTime"]);
-            if (data.Contains("maxEntries")) _maxEntries = Convert.ToInt32(data["maxEntries"]);
+            if (data.ContainsKey("sessionTime")) _currentSessionTime = Convert.ToSingle(data["sessionTime"]);
+            if (data.ContainsKey("maxEntries")) _maxEntries = Convert.ToInt32(data["maxEntries"]);
 
-            if (data.Contains("persistence") && _persistence != null)
+            if (data.ContainsKey("persistence") && _persistence != null)
                 _persistence.ImportSaveData(data["persistence"] as Dictionary);
-            if (data.Contains("recorder") && _recorder != null)
+            if (data.ContainsKey("recorder") && _recorder != null)
                 _recorder.ImportSaveData(data["recorder"] as Dictionary);
-            if (data.Contains("formatter") && _formatter != null)
+            if (data.ContainsKey("formatter") && _formatter != null)
                 _formatter.ImportSaveData(data["formatter"] as Dictionary);
 
             if (_recorder != null) _logEntries = _recorder.GetAllEntries();

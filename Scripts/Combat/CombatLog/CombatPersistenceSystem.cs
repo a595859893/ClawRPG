@@ -539,67 +539,67 @@ namespace ClawRPG.Scripts.Combat
             if (data == null) return;
 
             // 恢复统计信息
-            if (data.Contains("statistics"))
+            if (data.ContainsKey("statistics"))
             {
                 var stats = data["statistics"] as Dictionary;
                 if (stats != null)
                 {
-                    if (stats.Contains("totalEntries")) _statistics.TotalEntries = Convert.ToInt32(stats["totalEntries"]);
-                    if (stats.Contains("damageEntries")) _statistics.DamageEntries = Convert.ToInt32(stats["damageEntries"]);
-                    if (stats.Contains("healingEntries")) _statistics.HealingEntries = Convert.ToInt32(stats["healingEntries"]);
-                    if (stats.Contains("killEntries")) _statistics.KillEntries = Convert.ToInt32(stats["killEntries"]);
-                    if (stats.Contains("criticalHits")) _statistics.CriticalHits = Convert.ToInt32(stats["criticalHits"]);
-                    if (stats.Contains("misses")) _statistics.Misses = Convert.ToInt32(stats["misses"]);
-                    if (stats.Contains("blocks")) _statistics.Blocks = Convert.ToInt32(stats["blocks"]);
-                    if (stats.Contains("dodges")) _statistics.Dodges = Convert.ToInt32(stats["dodges"]);
-                    if (stats.Contains("totalDamageDealt")) _statistics.TotalDamageDealt = Convert.ToSingle(stats["totalDamageDealt"]);
-                    if (stats.Contains("totalDamageTaken")) _statistics.TotalDamageTaken = Convert.ToSingle(stats["totalDamageTaken"]);
-                    if (stats.Contains("totalHealing")) _statistics.TotalHealing = Convert.ToSingle(stats["totalHealing"]);
+                    if (stats.ContainsKey("totalEntries")) _statistics.TotalEntries = Convert.ToInt32(stats["totalEntries"]);
+                    if (stats.ContainsKey("damageEntries")) _statistics.DamageEntries = Convert.ToInt32(stats["damageEntries"]);
+                    if (stats.ContainsKey("healingEntries")) _statistics.HealingEntries = Convert.ToInt32(stats["healingEntries"]);
+                    if (stats.ContainsKey("killEntries")) _statistics.KillEntries = Convert.ToInt32(stats["killEntries"]);
+                    if (stats.ContainsKey("criticalHits")) _statistics.CriticalHits = Convert.ToInt32(stats["criticalHits"]);
+                    if (stats.ContainsKey("misses")) _statistics.Misses = Convert.ToInt32(stats["misses"]);
+                    if (stats.ContainsKey("blocks")) _statistics.Blocks = Convert.ToInt32(stats["blocks"]);
+                    if (stats.ContainsKey("dodges")) _statistics.Dodges = Convert.ToInt32(stats["dodges"]);
+                    if (stats.ContainsKey("totalDamageDealt")) _statistics.TotalDamageDealt = Convert.ToSingle(stats["totalDamageDealt"]);
+                    if (stats.ContainsKey("totalDamageTaken")) _statistics.TotalDamageTaken = Convert.ToSingle(stats["totalDamageTaken"]);
+                    if (stats.ContainsKey("totalHealing")) _statistics.TotalHealing = Convert.ToSingle(stats["totalHealing"]);
                 }
             }
 
             // 恢复筛选器设置
-            if (data.Contains("filters"))
+            if (data.ContainsKey("filters"))
             {
                 var filters = data["filters"] as Dictionary;
                 if (filters != null)
                 {
-                    if (filters.Contains("showDamage")) _showDamage = Convert.ToBoolean(filters["showDamage"]);
-                    if (filters.Contains("showHealing")) _showHealing = Convert.ToBoolean(filters["showHealing"]);
-                    if (filters.Contains("showBuffs")) _showBuffs = Convert.ToBoolean(filters["showBuffs"]);
-                    if (filters.Contains("showSkills")) _showSkills = Convert.ToBoolean(filters["showSkills"]);
-                    if (filters.Contains("showCombat")) _showCombat = Convert.ToBoolean(filters["showCombat"]);
-                    if (filters.Contains("showInfo")) _showInfo = Convert.ToBoolean(filters["showInfo"]);
-                    if (filters.Contains("playerOnly")) _playerOnly = Convert.ToBoolean(filters["playerOnly"]);
-                    if (filters.Contains("enemyOnly")) _enemyOnly = Convert.ToBoolean(filters["enemyOnly"]);
+                    if (filters.ContainsKey("showDamage")) _showDamage = Convert.ToBoolean(filters["showDamage"]);
+                    if (filters.ContainsKey("showHealing")) _showHealing = Convert.ToBoolean(filters["showHealing"]);
+                    if (filters.ContainsKey("showBuffs")) _showBuffs = Convert.ToBoolean(filters["showBuffs"]);
+                    if (filters.ContainsKey("showSkills")) _showSkills = Convert.ToBoolean(filters["showSkills"]);
+                    if (filters.ContainsKey("showCombat")) _showCombat = Convert.ToBoolean(filters["showCombat"]);
+                    if (filters.ContainsKey("showInfo")) _showInfo = Convert.ToBoolean(filters["showInfo"]);
+                    if (filters.ContainsKey("playerOnly")) _playerOnly = Convert.ToBoolean(filters["playerOnly"]);
+                    if (filters.ContainsKey("enemyOnly")) _enemyOnly = Convert.ToBoolean(filters["enemyOnly"]);
                 }
             }
 
             // 恢复连击状态
-            if (data.Contains("combo"))
+            if (data.ContainsKey("combo"))
             {
                 var combo = data["combo"] as Dictionary;
                 if (combo != null)
                 {
-                    if (combo.Contains("currentCombo")) _currentCombo = Convert.ToInt32(combo["currentCombo"]);
-                    if (combo.Contains("comboTimer")) _comboTimer = Convert.ToSingle(combo["comboTimer"]);
-                    if (combo.Contains("comboTimeWindow")) _comboTimeWindow = Convert.ToSingle(combo["comboTimeWindow"]);
+                    if (combo.ContainsKey("currentCombo")) _currentCombo = Convert.ToInt32(combo["currentCombo"]);
+                    if (combo.ContainsKey("comboTimer")) _comboTimer = Convert.ToSingle(combo["comboTimer"]);
+                    if (combo.ContainsKey("comboTimeWindow")) _comboTimeWindow = Convert.ToSingle(combo["comboTimeWindow"]);
                 }
             }
 
             // 恢复击杀streak
-            if (data.Contains("killStreak"))
+            if (data.ContainsKey("killStreak"))
             {
                 var killStreak = data["killStreak"] as Dictionary;
                 if (killStreak != null)
                 {
-                    if (killStreak.Contains("killStreak")) _killStreak = Convert.ToInt32(killStreak["killStreak"]);
-                    if (killStreak.Contains("killStreakTimer")) _killStreakTimer = Convert.ToSingle(killStreak["killStreakTimer"]);
+                    if (killStreak.ContainsKey("killStreak")) _killStreak = Convert.ToInt32(killStreak["killStreak"]);
+                    if (killStreak.ContainsKey("killStreakTimer")) _killStreakTimer = Convert.ToSingle(killStreak["killStreakTimer"]);
                 }
             }
 
             // 恢复最近击杀
-            if (data.Contains("recentKills"))
+            if (data.ContainsKey("recentKills"))
             {
                 _recentKills.Clear();
                 var kills = data["recentKills"] as ArrayList;
@@ -613,13 +613,13 @@ namespace ClawRPG.Scripts.Combat
             }
 
             // 恢复配置
-            if (data.Contains("config"))
+            if (data.ContainsKey("config"))
             {
                 var config = data["config"] as Dictionary;
                 if (config != null)
                 {
-                    if (config.Contains("maxEntries")) _maxEntries = Convert.ToInt32(config["maxEntries"]);
-                    if (config.Contains("autoClearTime")) _autoClearTime = Convert.ToSingle(config["autoClearTime"]);
+                    if (config.ContainsKey("maxEntries")) _maxEntries = Convert.ToInt32(config["maxEntries"]);
+                    if (config.ContainsKey("autoClearTime")) _autoClearTime = Convert.ToSingle(config["autoClearTime"]);
                 }
             }
 

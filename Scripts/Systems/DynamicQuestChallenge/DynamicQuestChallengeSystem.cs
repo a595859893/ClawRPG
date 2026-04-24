@@ -76,7 +76,7 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
         public override void ImportSaveData(Dictionary<string, object> data)
         {
             base.ImportSaveData(data);
-            if (data.Contains("data") && data["data"] is Dictionary dictData)
+            if (data.ContainsKey("data") && data["data"] is Dictionary dictData)
             {
                 _data.FromDict(dictData);
             }

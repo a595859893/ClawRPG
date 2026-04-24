@@ -34,14 +34,14 @@ public partial class ItemSmeltingData : BaseSystem
             file.Close();
             
             // Parse JSON (simplified)
-            if (json.Contains("\"TotalSmelts\""))
+            if (json.ContainsKey("\"TotalSmelts\""))
             {
                 // Load stats
                 var data = Json.ParseString(json).AsGodotDictionary();
-                if (data.Contains("TotalSmelts")) TotalSmelts = (int)data["TotalSmelts"];
-                if (data.Contains("TotalItemsSmelted")) TotalItemsSmelted = (int)data["TotalItemsSmelted"];
-                if (data.Contains("TotalMaterialsGenerated")) TotalMaterialsGenerated = (int)data["TotalMaterialsGenerated"];
-                if (data.Contains("GoldSpent")) GoldSpent = (int)data["GoldSpent"];
+                if (data.ContainsKey("TotalSmelts")) TotalSmelts = (int)data["TotalSmelts"];
+                if (data.ContainsKey("TotalItemsSmelted")) TotalItemsSmelted = (int)data["TotalItemsSmelted"];
+                if (data.ContainsKey("TotalMaterialsGenerated")) TotalMaterialsGenerated = (int)data["TotalMaterialsGenerated"];
+                if (data.ContainsKey("GoldSpent")) GoldSpent = (int)data["GoldSpent"];
             }
         }
     }
@@ -88,7 +88,7 @@ public partial class ItemSmeltingData : BaseSystem
         TotalMaterialsGenerated = data.GetValueOrDefault("total_materials_generated", 0);
         GoldSpent = data.GetValueOrDefault("gold_spent", 0);
         
-        if (data.Contains("unlocked_recipes"))
+        if (data.ContainsKey("unlocked_recipes"))
         {
             var recipesArray = data["unlocked_recipes"] as Godot.Array;
             UnlockedRecipes = new HashSet<string>();
@@ -98,7 +98,7 @@ public partial class ItemSmeltingData : BaseSystem
             }
         }
         
-        if (data.Contains("recipe_usage_count"))
+        if (data.ContainsKey("recipe_usage_count"))
         {
             var usageDict = data["recipe_usage_count"] as Dictionary;
             RecipeUsageCount = new Dictionary<string, int>();

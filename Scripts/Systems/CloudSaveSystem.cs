@@ -463,15 +463,15 @@ namespace ClawRPG.Scripts.Systems
         {
             if (data == null) return;
 
-            if (data.Contains("cloud_sync_enabled"))
+            if (data.ContainsKey("cloud_sync_enabled"))
             {
                 _isCloudSyncEnabled = (bool)data["cloud_sync_enabled"];
             }
-            if (data.Contains("cloud_provider"))
+            if (data.ContainsKey("cloud_provider"))
             {
                 _cloudProvider = (string)data["cloud_provider"];
             }
-            if (data.Contains("last_sync_time"))
+            if (data.ContainsKey("last_sync_time"))
             {
                 _lastSyncTime = DateTime.Parse((string)data["last_sync_time"]);
             }

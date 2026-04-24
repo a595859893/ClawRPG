@@ -52,15 +52,15 @@ namespace ClawRPG.Systems.DynamicQuestChallenge
         /// </summary>
         public void FromDict(Dictionary dict)
         {
-            if (dict.Contains("active_challenges"))
+            if (dict.ContainsKey("active_challenges"))
             {
                 ActiveChallenges = new List<object>((Godot.Collections.Array)dict["active_challenges"]);
             }
-            if (dict.Contains("completed_challenges"))
+            if (dict.ContainsKey("completed_challenges"))
             {
                 CompletedChallenges = new List<object>((Godot.Collections.Array)dict["completed_challenges"]);
             }
-            if (dict.Contains("statistics"))
+            if (dict.ContainsKey("statistics"))
             {
                 Statistics = new Dictionary<string, object>((Godot.Collections.Dictionary)dict["statistics"]);
             }

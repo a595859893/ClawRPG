@@ -401,7 +401,7 @@ public partial class ProceduralChallengeSystem : BaseSystem
         if (data == null) return;
 
         // Import active challenges
-        if (data.Contains("active_challenges"))
+        if (data.ContainsKey("active_challenges"))
         {
             var challengeList = (Godot.Collections.Array)data["active_challenges"];
             _activeChallenges.Clear();
@@ -429,7 +429,7 @@ public partial class ProceduralChallengeSystem : BaseSystem
         }
 
         // Import player stats
-        if (data.Contains("player_data"))
+        if (data.ContainsKey("player_data"))
         {
             var pdata = (Dictionary)data["player_data"];
             _playerData.TotalChallengesCompleted = (int)pdata["total_completed"];
@@ -437,12 +437,12 @@ public partial class ProceduralChallengeSystem : BaseSystem
             _playerData.TotalExpEarned = (int)pdata["total_exp"];
         }
 
-        if (data.Contains("max_active_challenges"))
+        if (data.ContainsKey("max_active_challenges"))
         {
             _maxActiveChallenges = (int)data["max_active_challenges"];
         }
 
-        if (data.Contains("last_refresh"))
+        if (data.ContainsKey("last_refresh"))
         {
             _lastRefreshTime = (float)data["last_refresh"];
         }

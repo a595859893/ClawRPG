@@ -174,74 +174,74 @@ namespace ClawRPG.Scripts.Systems
         {
             if (data == null) return;
 
-            if (data.Contains("gameState"))
+            if (data.ContainsKey("gameState"))
             {
                 _gameStateManager?.ImportSaveData(data["gameState"] as Dictionary);
             }
 
-            if (data.Contains("systemInit"))
+            if (data.ContainsKey("systemInit"))
             {
                 _systemInitializationManager?.ImportSaveData(data["systemInit"] as Dictionary);
             }
 
-            if (data.Contains("ui"))
+            if (data.ContainsKey("ui"))
             {
                 _uiManager?.ImportSaveData(data["ui"] as Dictionary);
             }
 
-            if (data.Contains("saveLoad"))
+            if (data.ContainsKey("saveLoad"))
             {
                 var saveLoadManager = _main.GetNodeOrNull<SaveLoadManager>("SaveLoadManager");
                 saveLoadManager?.ImportSaveData(data["saveLoad"] as Dictionary);
             }
 
             // 战斗系统持久化
-            if (data.Contains("combatSkillCooldown"))
+            if (data.ContainsKey("combatSkillCooldown"))
             {
                 _combatSkillCooldownSystem?.ImportSaveData(data["combatSkillCooldown"] as Dictionary);
             }
 
-            if (data.Contains("combatStatus"))
+            if (data.ContainsKey("combatStatus"))
             {
                 _combatStatusSystem?.ImportSaveData(data["combatStatus"] as Dictionary);
             }
 
-            if (data.Contains("crafting"))
+            if (data.ContainsKey("crafting"))
             {
                 _craftingSystem?.ImportSaveData(data["crafting"] as Dictionary);
             }
 
-            if (data.Contains("summon"))
+            if (data.ContainsKey("summon"))
             {
                 _summonSystem?.ImportSaveData(data["summon"] as Dictionary);
             }
 
             // Pet Mimicry persistence - REQ-142-07
-            if (data.Contains("petMimicry"))
+            if (data.ContainsKey("petMimicry"))
             {
                 _petMimicryData?.ImportSaveData(data["petMimicry"] as Dictionary);
             }
 
             // Event Card Pool persistence - REQ-118
-            if (data.Contains("eventCardPool"))
+            if (data.ContainsKey("eventCardPool"))
             {
                 _eventCardPoolData?.ImportSaveData(data["eventCardPool"] as Dictionary);
             }
 
             // Pet Performance persistence - REQ-148
-            if (data.Contains("petPerformance"))
+            if (data.ContainsKey("petPerformance"))
             {
                 _petPerformanceData?.ImportSaveData(data["petPerformance"] as Dictionary);
             }
 
             // Combo Forget persistence - REQ-154
-            if (data.Contains("comboForget"))
+            if (data.ContainsKey("comboForget"))
             {
                 _comboForgetData?.ImportSaveData(data["comboForget"] as Dictionary);
             }
 
             // Combat Log persistence - REQ-001
-            if (data.Contains("combatLog"))
+            if (data.ContainsKey("combatLog"))
             {
                 _combatLogSystem?.ImportSaveData(data["combatLog"] as Dictionary);
             }

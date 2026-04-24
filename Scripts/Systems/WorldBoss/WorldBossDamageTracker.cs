@@ -175,7 +175,7 @@ namespace ClawRPG.Scripts.Systems
             if (data == null) return;
             
             // Import boss damage records
-            if (data.Contains("boss_damage_records"))
+            if (data.ContainsKey("boss_damage_records"))
             {
                 var bossRecordsData = (Dictionary)data["boss_damage_records"];
                 foreach (string bossInstanceId in bossRecordsData.Keys)
@@ -200,7 +200,7 @@ namespace ClawRPG.Scripts.Systems
             }
             
             // Import player stats
-            if (data.Contains("player_stats"))
+            if (data.ContainsKey("player_stats"))
             {
                 var playerStatsData = (Dictionary)data["player_stats"];
                 foreach (string playerId in playerStatsData.Keys)

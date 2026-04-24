@@ -24,7 +24,7 @@ public partial class DailyPuzzleSystem : BaseSystem
         if (saveSystem != null)
         {
             var savedData = saveSystem.LoadGame();
-            if (savedData != null && savedData.Contains("daily_puzzle"))
+            if (savedData != null && savedData.ContainsKey("daily_puzzle"))
             {
                 ImportSaveData((Dictionary)savedData["daily_puzzle"]);
             }
@@ -250,35 +250,35 @@ public partial class DailyPuzzleSystem : BaseSystem
     {
         if (data == null) return;
         
-        if (data.Contains("current_daily_puzzle_id"))
+        if (data.ContainsKey("current_daily_puzzle_id"))
             _data.CurrentDailyPuzzleId = (int)data["current_daily_puzzle_id"];
         
-        if (data.Contains("last_puzzle_date"))
+        if (data.ContainsKey("last_puzzle_date"))
             _data.LastPuzzleDate = DateTime.Parse((string)data["last_puzzle_date"]);
         
-        if (data.Contains("current_streak"))
+        if (data.ContainsKey("current_streak"))
             _data.CurrentStreak = (int)data["current_streak"];
         
-        if (data.Contains("best_streak"))
+        if (data.ContainsKey("best_streak"))
             _data.BestStreak = (int)data["best_streak"];
         
-        if (data.Contains("total_solved"))
+        if (data.ContainsKey("total_solved"))
             _data.TotalSolved = (int)data["total_solved"];
         
-        if (data.Contains("total_failed"))
+        if (data.ContainsKey("total_failed"))
             _data.TotalFailed = (int)data["total_failed"];
         
-        if (data.Contains("hints_used"))
+        if (data.ContainsKey("hints_used"))
             _data.HintsUsed = (int)data["hints_used"];
         
-        if (data.Contains("total_gold_earned"))
+        if (data.ContainsKey("total_gold_earned"))
             _data.TotalGoldEarned = (int)data["total_gold_earned"];
         
-        if (data.Contains("total_exp_earned"))
+        if (data.ContainsKey("total_exp_earned"))
             _data.TotalExpEarned = (int)data["total_exp_earned"];
         
         // Load solved puzzles
-        if (data.Contains("solved_puzzles"))
+        if (data.ContainsKey("solved_puzzles"))
         {
             var solvedArray = (Godot.Array)data["solved_puzzles"];
             foreach (Godot.Collections.Dictionary puzzleRecord in solvedArray)

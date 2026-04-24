@@ -155,7 +155,7 @@ namespace ClawRPG.Scripts.Systems
         {
             base.ImportSaveData(data);
             
-            if (data.Contains("PlayerScene"))
+            if (data.ContainsKey("PlayerScene"))
             {
                 var path = data["PlayerScene"] as string;
                 if (!string.IsNullOrEmpty(path))
@@ -164,7 +164,7 @@ namespace ClawRPG.Scripts.Systems
                 }
             }
             
-            if (data.Contains("EnemyScene"))
+            if (data.ContainsKey("EnemyScene"))
             {
                 var path = data["EnemyScene"] as string;
                 if (!string.IsNullOrEmpty(path))

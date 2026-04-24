@@ -489,7 +489,7 @@ public delegate void DropCollected(string itemId, int quantity);
             if (data == null) return;
             
             // 玩家击杀统计
-            if (data.Contains("kill_count"))
+            if (data.ContainsKey("kill_count"))
             {
                 var killCountDict = (Dictionary)data["kill_count"];
                 _killCount = new Dictionary<string, int>();
@@ -503,7 +503,7 @@ public delegate void DropCollected(string itemId, int quantity);
             _currentCombo = (int)data.GetValueOrDefault("current_combo", 0);
             
             // Boss出现冷却
-            if (data.Contains("boss_cooldowns"))
+            if (data.ContainsKey("boss_cooldowns"))
             {
                 var bossCooldowns = (Dictionary)data["boss_cooldowns"];
                 _bossCooldowns = new Dictionary<string, float>();
@@ -514,7 +514,7 @@ public delegate void DropCollected(string itemId, int quantity);
             }
             
             // 世界状态标志
-            if (data.Contains("world_flags"))
+            if (data.ContainsKey("world_flags"))
             {
                 var worldFlags = (Dictionary)data["world_flags"];
                 _worldFlags = new Dictionary<string, bool>();

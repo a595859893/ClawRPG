@@ -211,22 +211,22 @@ public partial class GatheringNode : BaseSystem2D
     {
         if (data == null) return;
         
-        if (data.Contains("node_id"))
+        if (data.ContainsKey("node_id"))
             nodeId = (string)data["node_id"];
         
-        if (data.Contains("resource_type"))
+        if (data.ContainsKey("resource_type"))
             resourceType = (ResourceType)(int)data["resource_type"];
         
-        if (data.Contains("required_level"))
+        if (data.ContainsKey("required_level"))
             requiredLevel = (int)data["required_level"];
         
-        if (data.Contains("respawn_time"))
+        if (data.ContainsKey("respawn_time"))
             respawnTime = (float)data["respawn_time"];
         
-        if (data.Contains("is_depleted"))
+        if (data.ContainsKey("is_depleted"))
             isDepleted = (bool)data["is_depleted"];
         
-        if (data.Contains("timer"))
+        if (data.ContainsKey("timer"))
             timer = (float)data["timer"];
         
         UpdateVisuals();

@@ -317,7 +317,7 @@ namespace ClawRPG.Scripts.UI
         /// </summary>
         public void ImportSaveData(Godot.Collections.Dictionary data)
         {
-            if (data == null || !data.Contains("OpenPanels")) return;
+            if (data == null || !data.ContainsKey("OpenPanels")) return;
 
             // 先隐藏所有面板
             HideAllPanels();

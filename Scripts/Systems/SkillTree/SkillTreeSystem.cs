@@ -64,7 +64,7 @@ public partial class SkillTreeSystem : BaseSystem
         if (data == null) return;
         
         // 加载已解锁的节点
-        if (data.Contains("unlocked_nodes"))
+        if (data.ContainsKey("unlocked_nodes"))
         {
             PlayerData.UnlockedNodes.Clear();
             var unlockedNodes = (Godot.Collections.Dictionary)data["unlocked_nodes"];
@@ -75,7 +75,7 @@ public partial class SkillTreeSystem : BaseSystem
         }
         
         // 加载每个分类的技能点花费
-        if (data.Contains("skill_points_spent"))
+        if (data.ContainsKey("skill_points_spent"))
         {
             PlayerData.SkillPointsSpent.Clear();
             var skillPointsSpent = (Godot.Collections.Dictionary)data["skill_points_spent"];
@@ -86,10 +86,10 @@ public partial class SkillTreeSystem : BaseSystem
         }
         
         // 加载技能点数据
-        if (data.Contains("total_skill_points"))
+        if (data.ContainsKey("total_skill_points"))
             PlayerData.TotalSkillPoints = (int)data["total_skill_points"];
             
-        if (data.Contains("used_skill_points"))
+        if (data.ContainsKey("used_skill_points"))
             PlayerData.UsedSkillPoints = (int)data["used_skill_points"];
         
         GD.Print($"[SkillTree] Loaded: {GetUnlockedNodeCount()} nodes unlocked, {GetAvailableSkillPoints()} points available");
