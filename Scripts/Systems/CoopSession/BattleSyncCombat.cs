@@ -14,6 +14,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         protected readonly object _lock = new object();
 
         // Signal delegates — enables SignalName inner class generation
+#pragma warning disable GD0201
         [Signal] public delegate void BattleActionReceived(BattleSyncData.BattleAction action);
         [Signal] public delegate void PlayerHealthChanged(string targetId, double health, double maxHealth, double change);
         [Signal] public delegate void PlayerStateUpdated(string targetId, BattleSyncData.PlayerState state);
@@ -23,6 +24,7 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         [Signal] public delegate void BuffRemoved(string targetId, string buffId);
         [Signal] public delegate void PlayerDied(string playerId);
         [Signal] public delegate void PlayerRevived(string playerId);
+#pragma warning restore GD0201
 
         // 待广播的战斗操作
         protected Queue<BattleSyncData.BattleAction> _pendingActions;
