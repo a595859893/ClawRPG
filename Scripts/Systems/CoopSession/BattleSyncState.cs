@@ -16,6 +16,9 @@ namespace ClawRPG.Scripts.Systems.CoopSession
         // 敌人战斗状态
         protected Dictionary<int, BattleSyncData.EnemyBattleState> _enemyStates;
 
+        // Thread lock for synchronization
+        private readonly object _lock = new object();
+
         // 波次管理
         protected int _currentWave = 0;
         protected int _totalWaves = 1;

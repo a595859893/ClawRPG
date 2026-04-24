@@ -148,5 +148,7 @@ namespace ClawRPG.Modules.MultiplayerVote
     {
         public Dictionary<string, ActiveVote> ActiveVotes { get; set; } = new Dictionary<string, ActiveVote>();
         public Dictionary<string, VoteStatistics> VoteStatistics { get; set; } = new Dictionary<string, VoteStatistics>();
+        public Dictionary<string, PlayerPartyData> PlayerPartyData { get; set; } = new Dictionary<string, PlayerPartyData>();
+        public Dictionary<string, Party> ActiveParties { get; set; } = new Dictionary<string, Party>();
     }
 }

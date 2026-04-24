@@ -23,87 +23,15 @@ public partial class StreakSystem : BaseSystem
     private void LoadData()
     {
         _data = new StreakData();
-        
-        var saveSystem = SaveSystem.Instance;
-        if (saveSystem == null) return;
-
-        var data = saveSystem.LoadGame();
-        if (data == null || data.Count == 0) return;
-
-        // Load streak data
-        if (data.ContainsKey("streak_login")) _data.LoginStreak = (int)data["streak_login"];
-        if (data.ContainsKey("streak_battle")) _data.BattleStreak = (int)data["streak_battle"];
-        if (data.ContainsKey("streak_quest")) _data.QuestStreak = (int)data["streak_quest"];
-        if (data.ContainsKey("streak_dungeon")) _data.DungeonStreak = (int)data["streak_dungeon"];
-        if (data.ContainsKey("streak_pet")) _data.PetInteractionStreak = (int)data["streak_pet"];
-
-        if (data.ContainsKey("best_streak_login")) _data.BestLoginStreak = (int)data["best_streak_login"];
-        if (data.ContainsKey("best_streak_battle")) _data.BestBattleStreak = (int)data["best_streak_battle"];
-        if (data.ContainsKey("best_streak_quest")) _data.BestQuestStreak = (int)data["best_streak_quest"];
-        if (data.ContainsKey("best_streak_dungeon")) _data.BestDungeonStreak = (int)data["best_streak_dungeon"];
-        if (data.ContainsKey("best_streak_pet")) _data.BestPetInteractionStreak = (int)data["best_streak_pet"];
-
-        if (data.ContainsKey("total_login_days")) _data.TotalLoginDays = (int)data["total_login_days"];
-        if (data.ContainsKey("total_battle_days")) _data.TotalBattleDays = (int)data["total_battle_days"];
-        if (data.ContainsKey("total_quest_days")) _data.TotalQuestDays = (int)data["total_quest_days"];
-        if (data.ContainsKey("total_dungeon_days")) _data.TotalDungeonDays = (int)data["total_dungeon_days"];
-        if (data.ContainsKey("total_pet_days")) _data.TotalPetInteractionDays = (int)data["total_pet_days"];
-
-        if (data.ContainsKey("streak_freeze_tokens")) _data.StreakFreezeTokens = (int)data["streak_freeze_tokens"];
-        if (data.ContainsKey("total_freeze_used")) _data.TotalStreakFreezeUsed = (int)data["total_freeze_used"];
-
-        if (data.ContainsKey("last_login_time")) _data.LastLoginTime = (long)data["last_login_time"];
-        if (data.ContainsKey("last_battle_time")) _data.LastBattleTime = (long)data["last_battle_time"];
-        if (data.ContainsKey("last_quest_time")) _data.LastQuestTime = (long)data["last_quest_time"];
-        if (data.ContainsKey("last_dungeon_time")) _data.LastDungeonTime = (long)data["last_dungeon_time"];
-        if (data.ContainsKey("last_pet_time")) _data.LastPetInteractionTime = (long)data["last_pet_time"];
-
-        if (data.ContainsKey("total_rewards_claimed")) _data.TotalRewardsClaimed = (int)data["total_rewards_claimed"];
-        if (data.ContainsKey("total_gold_streaks")) _data.TotalGoldFromStreaks = (int)data["total_gold_streaks"];
-        if (data.ContainsKey("total_exp_streaks")) _data.TotalExpFromStreaks = (int)data["total_exp_streaks"];
+        // Data is loaded via ImportSaveData called by SaveSystem.ImportAllData
     }
     
     public void SaveData()
     {
+        // Saving is handled via ExportSaveData -> SaveSystem.SaveGame()
+        // This method is kept for API compatibility
         var saveSystem = SaveSystem.Instance;
-        if (saveSystem == null) return;
-
-        var data = saveSystem.LoadGame();
-        if (data == null) data = new Godot.Collections.Dictionary();
-
-        // Save streak data
-        data["streak_login"] = _data.LoginStreak;
-        data["streak_battle"] = _data.BattleStreak;
-        data["streak_quest"] = _data.QuestStreak;
-        data["streak_dungeon"] = _data.DungeonStreak;
-        data["streak_pet"] = _data.PetInteractionStreak;
-
-        data["best_streak_login"] = _data.BestLoginStreak;
-        data["best_streak_battle"] = _data.BestBattleStreak;
-        data["best_streak_quest"] = _data.BestQuestStreak;
-        data["best_streak_dungeon"] = _data.BestDungeonStreak;
-        data["best_streak_pet"] = _data.BestPetInteractionStreak;
-
-        data["total_login_days"] = _data.TotalLoginDays;
-        data["total_battle_days"] = _data.TotalBattleDays;
-        data["total_quest_days"] = _data.TotalQuestDays;
-        data["total_dungeon_days"] = _data.TotalDungeonDays;
-        data["total_pet_days"] = _data.TotalPetInteractionDays;
-
-        data["streak_freeze_tokens"] = _data.StreakFreezeTokens;
-        data["total_freeze_used"] = _data.TotalStreakFreezeUsed;
-
-        data["last_login_time"] = _data.LastLoginTime;
-        data["last_battle_time"] = _data.LastBattleTime;
-        data["last_quest_time"] = _data.LastQuestTime;
-        data["last_dungeon_time"] = _data.LastDungeonTime;
-        data["last_pet_time"] = _data.LastPetInteractionTime;
-
-        data["total_rewards_claimed"] = _data.TotalRewardsClaimed;
-        data["total_gold_streaks"] = _data.TotalGoldFromStreaks;
-        data["total_exp_streaks"] = _data.TotalExpFromStreaks;
-
-        saveSystem.SaveGame(data);
+        saveSystem?.SaveGame();
     }
     
     public StreakData GetData() => _data;

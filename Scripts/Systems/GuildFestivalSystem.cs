@@ -58,16 +58,16 @@ public partial class GuildFestivalSystem : BaseSystem
         // 初始化预设节日
         var presetFestivals = new[]
         {
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.SpringFestival, Name = "春节庆典", Description = "欢度新春，开启一年好运", MinGuildLevel = 1, Duration = 300, PreparationTime = 120, BonusGold = 1.5, BonusExp = 1.3, RewardPoints = 100 },
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.HarvestFestival, Name = "丰收祭", Description = "庆祝丰收，感谢大地馈赠", MinGuildLevel = 2, Duration = 360, PreparationTime = 180, BonusGold = 1.8, BonusExp = 1.2, RewardPoints = 120 },
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.MidSummerFestival, Name = "仲夏节", Description = "夏日狂欢，热情似火", MinGuildLevel = 2, Duration = 300, PreparationTime = 120, BonusGold = 1.4, BonusExp = 1.5, RewardPoints = 110 },
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.MoonFestival, Name = "中秋节", Description = "月圆之夜，团圆之时", MinGuildLevel = 3, Duration = 420, PreparationTime = 180, BonusGold = 1.6, BonusExp = 1.4, RewardPoints = 130 },
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.WinterSolstice, Name = "冬至节", Description = "寒冬暖意，温馨相聚", MinGuildLevel = 3, Duration = 360, PreparationTime = 150, BonusGold = 1.5, BonusExp = 1.6, RewardPoints = 125 },
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.Anniversary, Name = "周年庆", Description = "庆祝公会成立周年", MinGuildLevel = 5, Duration = 480, PreparationTime = 240, BonusGold = 2.0, BonusExp = 2.0, RewardPoints = 200 },
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.HeroCommemoration, Name = "英雄纪念日", Description = "纪念公会英雄的牺牲与荣耀", MinGuildLevel = 4, Duration = 360, PreparationTime = 180, BonusGold = 1.7, BonusExp = 1.8, RewardPoints = 150 },
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.TradeFair, Name = "贸易博览会", Description = "商人云集，交易盛会", MinGuildLevel = 3, Duration = 420, PreparationTime = 180, BonusGold = 2.5, BonusExp = 1.1, RewardPoints = 100 },
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.DragonRacing, Name = "龙舟赛", Description = "划船竞速，团队协作", MinGuildLevel = 2, Duration = 300, PreparationTime = 120, BonusGold = 1.3, BonusExp = 1.4, RewardPoints = 115 },
-            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.KnightTournament, Name = "骑士锦标赛", Description = "骑士荣耀之战", MinGuildLevel = 4, Duration = 360, PreparationTime = 180, BonusGold = 1.4, BonusExp = 1.9, RewardPoints = 140 }
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.SpringFestival, Name = "春节庆典", Description = "欢度新春，开启一年好运", MinGuildLevel = 1, Duration = 300, PreparationTime = 120, BonusGold = 1.5f, BonusExp = 1.3f, RewardPoints = 100 },
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.HarvestFestival, Name = "丰收祭", Description = "庆祝丰收，感谢大地馈赠", MinGuildLevel = 2, Duration = 360, PreparationTime = 180, BonusGold = 1.8f, BonusExp = 1.2f, RewardPoints = 120 },
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.MidSummerFestival, Name = "仲夏节", Description = "夏日狂欢，热情似火", MinGuildLevel = 2, Duration = 300, PreparationTime = 120, BonusGold = 1.4f, BonusExp = 1.5f, RewardPoints = 110 },
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.MoonFestival, Name = "中秋节", Description = "月圆之夜，团圆之时", MinGuildLevel = 3, Duration = 420, PreparationTime = 180, BonusGold = 1.6f, BonusExp = 1.4f, RewardPoints = 130 },
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.WinterSolstice, Name = "冬至节", Description = "寒冬暖意，温馨相聚", MinGuildLevel = 3, Duration = 360, PreparationTime = 150, BonusGold = 1.5f, BonusExp = 1.6f, RewardPoints = 125 },
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.Anniversary, Name = "周年庆", Description = "庆祝公会成立周年", MinGuildLevel = 5, Duration = 480, PreparationTime = 240, BonusGold = 2.0f, BonusExp = 2.0f, RewardPoints = 200 },
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.HeroCommemoration, Name = "英雄纪念日", Description = "纪念公会英雄的牺牲与荣耀", MinGuildLevel = 4, Duration = 360, PreparationTime = 180, BonusGold = 1.7f, BonusExp = 1.8f, RewardPoints = 150 },
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.TradeFair, Name = "贸易博览会", Description = "商人云集，交易盛会", MinGuildLevel = 3, Duration = 420, PreparationTime = 180, BonusGold = 2.5f, BonusExp = 1.1f, RewardPoints = 100 },
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.DragonRacing, Name = "龙舟赛", Description = "划船竞速，团队协作", MinGuildLevel = 2, Duration = 300, PreparationTime = 120, BonusGold = 1.3f, BonusExp = 1.4f, RewardPoints = 115 },
+            new FestivalData { Id = _nextFestivalId++, Type = FestivalType.KnightTournament, Name = "骑士锦标赛", Description = "骑士荣耀之战", MinGuildLevel = 4, Duration = 360, PreparationTime = 180, BonusGold = 1.4f, BonusExp = 1.9f, RewardPoints = 140 }
         };
 
         foreach (var festival in presetFestivals)

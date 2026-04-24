@@ -52,14 +52,14 @@ public partial class RogueLegacySystem : BaseSystem
         if (data.ContainsKey("RogueLegacy"))
         {
             var legacyData = (Godot.Collections.Dictionary)data["RogueLegacy"];
-            _data.LegacyPoints = (int)legacyData.Get("legacyPoints", 0);
-            _data.TotalLegacyPointsEarned = (int)legacyData.Get("totalLegacyPointsEarned", 0);
-            _data.TotalLegacyPointsSpent = (int)legacyData.Get("totalLegacyPointsSpent", 0);
-            _data.TotalDeaths = (int)legacyData.Get("totalDeaths", 0);
-            _data.RunsCompleted = (int)legacyData.Get("runsCompleted", 0);
-            _data.GoldInheritancePercent = (int)legacyData.Get("goldInheritancePercent", 25);
-            _data.ExperienceInheritancePercent = (int)legacyData.Get("experienceInheritancePercent", 50);
-            _data.ItemInheritancePercent = (int)legacyData.Get("itemInheritancePercent", 30);
+            _data.LegacyPoints = (legacyData.ContainsKey("legacyPoints") ? (int)legacyData["legacyPoints"] : 0);
+            _data.TotalLegacyPointsEarned = (legacyData.ContainsKey("totalLegacyPointsEarned") ? (int)legacyData["totalLegacyPointsEarned"] : 0);
+            _data.TotalLegacyPointsSpent = (legacyData.ContainsKey("totalLegacyPointsSpent") ? (int)legacyData["totalLegacyPointsSpent"] : 0);
+            _data.TotalDeaths = (legacyData.ContainsKey("totalDeaths") ? (int)legacyData["totalDeaths"] : 0);
+            _data.RunsCompleted = (legacyData.ContainsKey("runsCompleted") ? (int)legacyData["runsCompleted"] : 0);
+            _data.GoldInheritancePercent = (legacyData.ContainsKey("goldInheritancePercent") ? (int)legacyData["goldInheritancePercent"] : 25);
+            _data.ExperienceInheritancePercent = (legacyData.ContainsKey("experienceInheritancePercent") ? (int)legacyData["experienceInheritancePercent"] : 50);
+            _data.ItemInheritancePercent = (legacyData.ContainsKey("itemInheritancePercent") ? (int)legacyData["itemInheritancePercent"] : 30);
             
             _goldInheritancePercent = _data.GoldInheritancePercent;
             _experienceInheritancePercent = _data.ExperienceInheritancePercent;
@@ -76,17 +76,17 @@ public partial class RogueLegacySystem : BaseSystem
             }
             
             // 加载统计
-            _data.HighestGoldInherited = (int)legacyData.Get("highestGoldInherited", 0);
-            _data.HighestExpInherited = (int)legacyData.Get("highestExpInherited", 0);
-            _data.LongestRun = (int)legacyData.Get("longestRun", 0);
-            _data.BestFloor = (int)legacyData.Get("bestFloor", 0);
+            _data.HighestGoldInherited = (legacyData.ContainsKey("highestGoldInherited") ? (int)legacyData["highestGoldInherited"] : 0);
+            _data.HighestExpInherited = (legacyData.ContainsKey("highestExpInherited") ? (int)legacyData["highestExpInherited"] : 0);
+            _data.LongestRun = (legacyData.ContainsKey("longestRun") ? (int)legacyData["longestRun"] : 0);
+            _data.BestFloor = (legacyData.ContainsKey("bestFloor") ? (int)legacyData["bestFloor"] : 0);
             
             // 加载属性加成
-            _data.BonusAttack = (int)legacyData.Get("bonusAttack", 0);
-            _data.BonusDefense = (int)legacyData.Get("bonusDefense", 0);
-            _data.BonusHealth = (int)legacyData.Get("bonusHealth", 0);
-            _data.BonusSpeed = (int)legacyData.Get("bonusSpeed", 0);
-            _data.BonusCritical = (int)legacyData.Get("bonusCritical", 0);
+            _data.BonusAttack = (legacyData.ContainsKey("bonusAttack") ? (int)legacyData["bonusAttack"] : 0);
+            _data.BonusDefense = (legacyData.ContainsKey("bonusDefense") ? (int)legacyData["bonusDefense"] : 0);
+            _data.BonusHealth = (legacyData.ContainsKey("bonusHealth") ? (int)legacyData["bonusHealth"] : 0);
+            _data.BonusSpeed = (legacyData.ContainsKey("bonusSpeed") ? (int)legacyData["bonusSpeed"] : 0);
+            _data.BonusCritical = (legacyData.ContainsKey("bonusCritical") ? (int)legacyData["bonusCritical"] : 0);
         }
     }
     

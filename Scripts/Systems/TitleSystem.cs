@@ -839,15 +839,15 @@ public partial class TitleSystem : BaseSystem
         {
             if (string.IsNullOrEmpty(description)) return _CategoryDefaultUnit(category);
             string desc = description.ToLower();
-            if (desc.ContainsKey("enemy") || desc.ContainsKey("怪物") || desc.ContainsKey("敌人")) return "敌人";
-            if (desc.ContainsKey("boss")) return "Boss";
-            if (desc.ContainsKey("gold") || desc.ContainsKey("金币")) return "金币";
-            if (desc.ContainsKey("level") || desc.ContainsKey("等级")) return "级";
-            if (desc.ContainsKey("damage")) return "伤害";
-            if (desc.ContainsKey("combo")) return "连击";
-            if (desc.ContainsKey("pet") || desc.ContainsKey("宠物")) return "宠物";
-            if (desc.ContainsKey("run") || desc.ContainsKey("局")) return "局";
-            if (desc.ContainsKey("kill")) return "击杀";
+            if (desc.Contains("enemy") || desc.Contains("怪物") || desc.Contains("敌人")) return "敌人";
+            if (desc.Contains("boss")) return "Boss";
+            if (desc.Contains("gold") || desc.Contains("金币")) return "金币";
+            if (desc.Contains("level") || desc.Contains("等级")) return "级";
+            if (desc.Contains("damage")) return "伤害";
+            if (desc.Contains("combo")) return "连击";
+            if (desc.Contains("pet") || desc.Contains("宠物")) return "宠物";
+            if (desc.Contains("run") || desc.Contains("局")) return "局";
+            if (desc.Contains("kill")) return "击杀";
             return _CategoryDefaultUnit(category);
         }
 
